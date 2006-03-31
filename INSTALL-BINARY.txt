@@ -1,0 +1,10 @@
+Installing Penrose Studio
+-------------------------
+
+Make sure you have J2SDK 1.4.x installed on your machine. Download the binary
+distribution from http://penrose.safehaus.org/Download.
+
+On Windows platforms, simply double-click the jar file. On other platforms,
+execute the following command:
+
+  java -jar penrose-studio-<version>-<platform>.jar

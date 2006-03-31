@@ -1,0 +1,31 @@
+<shortcuts>
+	<skipIfNotSupported/>
+	<programGroup defaultName="Penrose Studio"
+		location="startMenu"/>
+	<shortcut name="Penrose Studio"
+		description="Penrose Studio"
+		programGroup="yes" 
+		target="$INSTALL_PATH/penrose-studio.exe"
+        iconFile="$INSTALL_PATH/penrose.ico"
+        iconIndex="0"
+		workingDirectory="$INSTALL_PATH"
+		type="Application"
+		encoding="UTF-8"
+		terminal="false"
+		initialState="normal">
+		<createForPack name="Penrose Studio Executables"/>
+	</shortcut>
+	<shortcut name="Uninstall Penrose Studio"
+		description="Uninstall Penrose Studio"
+		programGroup="yes"
+		target="$JAVA_HOME/bin/java.exe"
+		commandLine="-jar &quot;$INSTALL_PATH/Uninstaller/uninstaller.jar&quot;"
+		iconFile="$INSTALL_PATH/uninstall.ico"
+		iconIndex="0"
+		initialState="noShow"
+		workingDirectory=""
+		type="Application"
+		encoding="UTF-8">
+		<createForPack name="Penrose Studio Executables"/>
+	</shortcut>
+</shortcuts>

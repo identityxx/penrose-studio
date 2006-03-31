@@ -1,0 +1,396 @@
+<?xml version="1.0"?>
+<!-- ====================================================================== 
+	 Copyright (c) 2000-2005, Identyx Corporation.
+	 All rights reserved.
+     ====================================================================== -->
+<project name="penrose-studio" default="default" basedir=".">
+
+    <description>Penrose Studio</description>
+	
+    <property name="project.name" value="penrose-studio"/>
+	<property name="project.version" value="1.0"/>
+    <property name="project.dist" value="dist"/>
+    <property name="rcp.prefix" value="eclipse-RCP-3.1"/>
+    <property name="iscc.path" value="ISCC.exe"/>
+
+    <path id="lib.path">
+        <fileset dir="lib">
+            <include name="*.jar"/>
+            <include name="plugins/*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="project.classpath">
+        <fileset dir="svnant">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <taskdef name="izpack" classpath="installer/izpack/lib/compiler.jar"
+        classname="com.izforge.izpack.ant.IzPackTask"/>
+
+    <taskdef resource="svntask.properties" classpathref="project.classpath"/>
+
+    <target name="default" depends="compile,dist-all"/>
+
+    <target name="clean">
+        <delete dir="${project.dist}" failonerror="false"/>
+    	<delete dir="target" failonerror="false"/>
+    </target>
+
+    <target name="build-ant">
+        <mkdir dir="target/ant"/>
+        <javac srcdir="src/ant" destdir="target/ant"/>
+        <jar destfile="target/penrose-studio-ant.jar" basedir="target/ant"/>
+    </target>
+
+    <target name="manifest" depends="build-ant">
+        <mkdir dir="META-INF"/>
+        <copy todir="META-INF" file="MANIFEST.MF" overwrite="true">
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+        <taskdef name="manifest-generator" classname="org.safehaus.penrose.ant.ManifestTask" classpath="target/penrose-studio-ant.jar"/>
+        <manifest-generator file="META-INF/MANIFEST.MF" dir="lib"/>
+    </target>
+
+    <target name="compile" depends="manifest">
+    	<mkdir dir="target/classes"/>
+    	<javac
+            srcdir="src/java"
+            destdir="target/classes"
+            classpathref="lib.path"
+        />
+<!--
+            source="1.4"
+            target="1.4"
+-->
+    	<copy todir="target/classes">
+    		<fileset dir="src/java">
+    			<include name="**/*.xml"/>
+    			<include name="**/*.dtd"/>
+    			<include name="**/*.properties"/>
+				<include name="**/*.gif"/>
+				<include name="**/*.jpg"/>
+				<include name="**/*.png"/>
+				<include name="**/*.ico"/>
+    		</fileset>
+    		<fileset dir=".">
+    			<include name="plugin.xml"/>
+    		</fileset>
+    	</copy>
+    	<jar basedir="target/classes" destfile="target/${project.name}-${project.version}.jar">
+    		<patternset>
+    			<exclude name="**/.svn"/>
+    		</patternset>
+    	</jar>
+    </target>
+
+	<target name="build-all">
+
+        <antcall target="build-unix">
+            <param name="platform" value="aix-motif"/>
+        </antcall>
+
+        <antcall target="build-unix">
+            <param name="platform" value="hpux-motif"/>
+        </antcall>
+
+        <antcall target="build-linux">
+            <param name="platform" value="linux-gtk"/>
+        </antcall>
+
+        <antcall target="build-linux">
+            <param name="platform" value="linux-gtk-ia64"/>
+        </antcall>
+
+        <antcall target="build-linux">
+            <param name="platform" value="linux-gtk-x86_64"/>
+        </antcall>
+
+        <antcall target="build-linux">
+            <param name="platform" value="linux-motif"/>
+        </antcall>
+
+        <antcall target="build-macosx-carbon"/>
+        <antcall target="build-solaris-gtk"/>
+        <antcall target="build-solaris-motif"/>
+        <antcall target="build-win32"/>
+
+	</target>
+
+    <target name="build-unix">
+        <property name="project.path" value="target/penrose-studio-${project.version}-${platform}"/>
+        <unzip src="rcp/${rcp.prefix}-${platform}.zip" dest="target/${rcp.prefix}-${platform}"/>
+        <move todir="${project.path}">
+            <fileset dir="target/${rcp.prefix}-${platform}/eclipse"/>
+        </move>
+        <delete dir="target/${rcp.prefix}-${platform}"/>
+        <move file="${project.path}/eclipse" tofile="${project.path}/penrose-studio"/>
+        <chmod file="${project.path}/penrose-studio" perm="ugo+rx"/>
+        <antcall target="build">
+            <param name="platform" value="${platform}"/>
+        </antcall>
+    </target>
+
+    <target name="build-linux">
+        <property name="project.path" value="target/penrose-studio-${project.version}-${platform}"/>
+        <untar src="rcp/${rcp.prefix}-${platform}.tar.gz" dest="target/${rcp.prefix}-${platform}" compression="gzip"/>
+        <move todir="${project.path}">
+            <fileset dir="target/${rcp.prefix}-${platform}/eclipse"/>
+        </move>
+        <delete dir="target/${rcp.prefix}-${platform}"/>
+        <move file="${project.path}/eclipse" tofile="${project.path}/penrose-studio"/>
+        <chmod file="${project.path}/penrose-studio" perm="ugo+rx"/>
+        <antcall target="build">
+            <param name="platform" value="${platform}"/>
+        </antcall>
+    </target>
+
+    <target name="build-macosx-carbon">
+        <property name="platform" value="macosx-carbon"/>
+        <property name="project.path" value="target/penrose-studio-${project.version}-${platform}"/>
+        <untar src="rcp/${rcp.prefix}-${platform}.tar.gz" dest="target/${rcp.prefix}-${platform}" compression="gzip"/>
+        <move todir="${project.path}">
+            <fileset dir="target/${rcp.prefix}-${platform}/eclipse"/>
+        </move>
+        <delete dir="target/${rcp.prefix}-${platform}"/>
+        <move todir="${project.path}/Penrose Studio.app">
+            <fileset dir="${project.path}/Eclipse.app"/>
+        </move>
+        <copy file="media/images/Eclipse.icns" todir="${project.path}/Penrose Studio.app/Contents/Resources"/>
+        <chmod dir="${project.path}/Penrose Studio.app/Contents/MacOS" includes="*" perm="ugo+rx"/>
+        <antcall target="build">
+            <param name="platform" value="${platform}"/>
+        </antcall>
+    </target>
+
+    <target name="build-solaris-gtk">
+        <property name="platform" value="solaris-gtk"/>
+        <property name="project.path" value="target/penrose-studio-${project.version}-${platform}"/>
+        <unzip src="rcp/${rcp.prefix}-${platform}.zip" dest="target/${rcp.prefix}-${platform}"/>
+        <move todir="${project.path}">
+            <fileset dir="target/${rcp.prefix}-${platform}/eclipse"/>
+        </move>
+        <delete dir="target/${rcp.prefix}-${platform}"/>
+        <antcall target="build">
+            <param name="platform" value="${platform}"/>
+        </antcall>
+    </target>
+
+    <target name="build-solaris-motif">
+        <property name="platform" value="solaris-motif"/>
+        <property name="project.path" value="target/penrose-studio-${project.version}-${platform}"/>
+        <unzip src="rcp/${rcp.prefix}-${platform}.zip" dest="target/${rcp.prefix}-${platform}"/>
+        <move todir="${project.path}">
+            <fileset dir="target/${rcp.prefix}-${platform}/eclipse"/>
+        </move>
+        <delete dir="target/${rcp.prefix}-${platform}"/>
+        <antcall target="build">
+            <param name="platform" value="${platform}"/>
+        </antcall>
+    </target>
+
+    <target name="build-win32">
+        <property name="platform" value="win32"/>
+        <property name="project.path" value="target/penrose-studio-${project.version}-${platform}"/>
+        <unzip src="rcp/${rcp.prefix}-${platform}.zip" dest="target/${rcp.prefix}-${platform}"/>
+        <move todir="${project.path}">
+            <fileset dir="target/${rcp.prefix}-${platform}/eclipse"/>
+        </move>
+        <delete dir="target/${rcp.prefix}-${platform}"/>
+        <move file="${project.path}/eclipse.exe" tofile="${project.path}/penrose-studio.exe"/>
+        <antcall target="build">
+            <param name="platform" value="${platform}"/>
+        </antcall>
+    </target>
+
+<!--
+    <target name="plugin-export">
+        <pde.exportPlugins plugins="org.safehaus.penrose"
+            destination="target" filename="penrose-plugin.zip"
+            exportType="zip" exportSource="false"/>
+    </target>
+-->
+
+    <target name="build" depends="compile">
+
+        <property name="project.path" value="target/penrose-studio-${project.version}-${platform}"/>
+        <copy todir="${project.path}/conf">
+            <fileset dir="conf">
+                <include name="*.*"/>
+                <exclude name=".svn/**"/>
+            </fileset>
+        </copy>
+        <copy todir="${project.path}/configuration">
+            <fileset dir="src/eclipse/configuration">
+                <include name="*.*"/>
+                <exclude name=".svn/**"/>
+            </fileset>
+        </copy>
+        <copy todir="${project.path}/plugins">
+            <fileset dir="lib/plugins">
+                <include name="org.eclipse.core.runtime.compatibility_3.1.0.jar"/>
+                <include name="org.eclipse.ui.forms_3.1.0.jar"/>
+            </fileset>
+        </copy>
+        <property name="plugin.path" value="${project.path}/plugins/org.safehaus.penrose_${project.version}"/>
+        <mkdir dir="${plugin.path}"/>
+        <copy todir="${plugin.path}">
+            <fileset dir=".">
+                <include name="META-INF/**"/>
+                <include name="media/**"/>
+                <include name="lib/*.jar"/>
+                <include name="plugin.xml"/>
+                <include name="splash.bmp"/>
+            </fileset>
+        </copy>
+        <copy todir="${plugin.path}">
+            <fileset dir="target">
+                <include name="penrose-studio-${project.version}.jar"/>
+            </fileset>
+        </copy>
+        <copy todir="${project.path}" file="README.txt">
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+        <copy todir="${project.path}" file="LICENSE.txt"/>
+        <copy todir="${project.path}" file="COPYING.txt"/>
+        <copy todir="${project.path}" file="INSTALL-BINARY.txt"/>
+        <copy todir="${project.path}/docs">
+            <fileset dir="docs" includes="*.url"/>
+        </copy>
+        <copy todir="${project.path}" file="installer/uninstall.ico"/>
+        <copy todir="${project.path}" file="installer/uninstall.png"/>
+        <copy todir="${project.path}" file="installer/shortcuts-win32.xml"/>
+        <copy todir="${project.path}" file="installer/shortcuts-unix.xml"/>
+        <copy todir="${project.path}" file="media/images/penrose.ico"/>
+    </target>
+
+    <target name="dist-all" depends="compile">
+        <copy todir="${project.dist}"
+            file="target/${project.name}-${project.version}.jar">
+        </copy>
+        <antcall target="dist-unix">
+            <param name="platform" value="aix-motif"/>
+        </antcall>
+        <antcall target="dist-unix">
+            <param name="platform" value="hpux-motif"/>
+        </antcall>
+        <antcall target="dist-linux">
+            <param name="platform" value="linux-gtk"/>
+        </antcall>
+        <antcall target="dist-linux">
+            <param name="platform" value="linux-gtk-ia64"/>
+        </antcall>
+        <antcall target="dist-linux">
+            <param name="platform" value="linux-gtk-x86_64"/>
+        </antcall>
+        <antcall target="dist-linux">
+            <param name="platform" value="linux-motif"/>
+        </antcall>
+        <antcall target="dist-macosx-carbon"/>
+        <antcall target="dist-solaris-gtk"/>
+        <antcall target="dist-solaris-motif"/>
+        <antcall target="dist-win32"/>
+    </target>
+
+    <target name="dist-unix" depends="build-unix">
+        <antcall target="dist">
+            <param name="dist.name" value="penrose-studio-${project.version}-${platform}"/>
+        </antcall>
+    </target>
+
+    <target name="dist-linux" depends="build-linux">
+        <antcall target="dist">
+            <param name="dist.name" value="penrose-studio-${project.version}-${platform}"/>
+        </antcall>
+    </target>
+
+    <target name="dist-macosx-carbon" depends="build-macosx-carbon">
+        <antcall target="dist">
+            <param name="platform" value="macosx-carbon"/>
+            <param name="dist.name" value="penrose-studio-${project.version}-${platform}"/>
+        </antcall>
+    </target>
+
+    <target name="dist-solaris-gtk" depends="build-solaris-gtk">
+        <antcall target="dist">
+            <param name="platform" value="solaris-gtk"/>
+            <param name="dist.name" value="penrose-studio-${project.version}-${platform}"/>
+        </antcall>
+    </target>
+
+    <target name="dist-solaris-motif" depends="build-solaris-motif">
+        <antcall target="dist">
+            <param name="platform" value="solaris-motif"/>
+            <param name="dist.name" value="penrose-studio-${project.version}-${platform}"/>
+        </antcall>
+    </target>
+
+    <target name="dist-win32" depends="build-win32">
+        <antcall target="dist">
+            <param name="platform" value="win32"/>
+            <param name="dist.name" value="penrose-studio-${project.version}-${platform}"/>
+        </antcall>
+        <echo message="Creating dist/penrose-studio-${project.version}.exe"/>
+        <copy todir="target" file="penrose-studio.iss">
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+        <exec executable="${iscc.path}" os="Windows NT,Windows 2000,Windows XP,Windows 2003">
+            <arg line="/Q target/penrose-studio.iss"/>
+        </exec>
+    </target>
+
+    <target name="dist">
+        <echo message="Creating ${project.dist}/${dist.name}.jar"/>
+        <copy todir="target" file="installer/installer.xml">
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+        <mkdir dir="${project.dist}"/>
+        <izpack
+            output="${project.dist}/${dist.name}.jar"
+            basedir="${basedir}/target/${dist.name}"
+            izpackdir="${basedir}/installer/izpack"
+            input="${basedir}/target/installer.xml"
+            installertype="standard"
+        />
+    </target>
+
+    <target name="dist-src">
+        <echo message="Creating penrose-studio-${project.version}-src.zip"/>
+        <mkdir dir="${project.dist}"/>
+        <zip destfile="${project.dist}/penrose-studio-${project.version}-src.zip">
+            <zipfileset dir=".">
+                <exclude name="${project.dist}/**"/>
+                <exclude name="rcp/**"/>
+                <exclude name="target/**"/>
+            </zipfileset>
+        </zip>
+        <echo message="Creating penrose-studio-${project.version}-src.tar.gz"/>
+        <mkdir dir="target"/>
+        <tar destfile="target/penrose-studio-${project.version}-src.tar">
+            <tarfileset dir="." prefix="penrose-studio-${project.version}">
+                <exclude name="${project.dist}/**"/>
+                <exclude name="rcp/**"/>
+                <exclude name="target/**"/>
+            </tarfileset>
+        </tar>
+        <gzip destfile="${project.dist}/penrose-studio-${project.version}-src.tar.gz"
+            src="target/penrose-studio-${project.version}-src.tar"/>
+    </target>
+
+    <target name="update">
+        <svn>
+            <update dir="."/>
+        </svn>
+    </target>
+
+</project>
+

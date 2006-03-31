@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Penrose Studio
+Bundle-SymbolicName: org.safehaus.penrose; singleton:=true
+Bundle-Version: ${project.version}
+Bundle-Vendor: safehaus.org
+Bundle-Activator: org.safehaus.penrose.studio.PenrosePlugin
+Bundle-Localization: plugin
+Eclipse-AutoStart: true
+Plugin-Class: org.safehaus.penrose.studio.PenrosePlugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.runtime.compatibility,
+ org.eclipse.help,
+ org.eclipse.ui,
+ org.eclipse.ui.forms
+Bundle-ClassPath: penrose-studio-${project.version}.jar,

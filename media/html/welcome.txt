@@ -1,0 +1,7 @@
+<form>
+<p>This page will help familiarize you with the Penrose Studio.</p>
+<p>This guide consists of 3 parts:</p>
+<li>Getting Started - a series of steps to familiarize you with the Studio.</li>
+<li>About Studio - a brief description of elements in the Studio.</li>
+<li>About Eclipse - a brief description of the platform on which the Studio is built.</li>
+</form>
