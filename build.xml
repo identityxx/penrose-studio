@@ -20,8 +20,8 @@
         </fileset>
     </path>
 
-    <path id="project.classpath">
-        <fileset dir="svnant">
+    <path id="svnant.classpath">
+        <fileset dir="lib/svnant">
             <include name="**/*.jar"/>
         </fileset>
     </path>
@@ -29,7 +29,7 @@
     <taskdef name="izpack" classpath="installer/izpack/lib/compiler.jar"
         classname="com.izforge.izpack.ant.IzPackTask"/>
 
-    <taskdef resource="svntask.properties" classpathref="project.classpath"/>
+    <taskdef resource="svntask.properties" classpathref="svnant.classpath"/>
 
     <target name="default" depends="compile,dist-all"/>
 
@@ -259,6 +259,7 @@
         <copy todir="${project.path}" file="LICENSE.txt"/>
         <copy todir="${project.path}" file="COPYING.txt"/>
         <copy todir="${project.path}" file="INSTALL-BINARY.txt"/>
+        <copy todir="${project.path}" file="penrose.license"/>
         <copy todir="${project.path}/docs">
             <fileset dir="docs" includes="*.url"/>
         </copy>
@@ -314,6 +315,8 @@
             <param name="platform" value="macosx-carbon"/>
             <param name="dist.name" value="penrose-studio-${project.version}-${platform}"/>
         </antcall>
+        <zip destfile="${project.dist}/penrose-studio-${project.version}-${platform}.zip"
+            basedir="target/penrose-studio-${project.version}-${platform}"/>
     </target>
 
     <target name="dist-solaris-gtk" depends="build-solaris-gtk">
