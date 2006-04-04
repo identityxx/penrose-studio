@@ -224,7 +224,7 @@
             </fileset>
         </copy>
         <copy todir="${project.path}/configuration">
-            <fileset dir="src/eclipse/configuration">
+            <fileset dir="rcp/configuration">
                 <include name="*.*"/>
                 <exclude name=".svn/**"/>
             </fileset>
