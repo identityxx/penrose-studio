@@ -38,6 +38,7 @@ import org.eclipse.ui.part.*;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.Penrose;
+import org.safehaus.penrose.PenroseFactory;
 import org.safehaus.penrose.studio.PenrosePlugin;
 
 public class PreviewEditor extends EditorPart {
@@ -143,8 +144,9 @@ public class PreviewEditor extends EditorPart {
     public void start() {
 		try {
             log.debug("Starting Penrose");
-            
-			penrose = new Penrose(System.getProperty("user.dir")+File.separator+"tmp");
+
+            PenroseFactory penroseFactory = PenroseFactory.getInstance();
+			penrose = penroseFactory.createPenrose(System.getProperty("user.dir")+File.separator+"tmp");
 			penrose.start();
 
             log.debug("Penrose started");
