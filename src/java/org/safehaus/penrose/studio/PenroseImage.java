@@ -20,9 +20,12 @@ package org.safehaus.penrose.studio;
 public class PenroseImage {
 
     public final static String WELCOME         = "media/images/3steps.png";
+
     public final static String NEW             = "media/images/new.gif";
     public final static String CONNECT         = "media/images/connect.gif";
     public final static String SAVE            = "media/images/3floppy_unmount.png";
+    public final static String UPLOAD          = "media/images/upload.png";
+
 	public final static String REFRESH         = "media/images/refresh.gif";
 	public final static String ADD             = "media/images/folder-add.gif";
 	public final static String DELETE          = "media/images/delete.gif";
@@ -44,7 +47,8 @@ public class PenroseImage {
     public final static String ATTRIBUTE_TYPE  = "media/images/schema.png";
     public final static String PREVIEW         = "media/images/xmag.gif";
     public final static String LOGO16          = "media/images/penrose16.png";
-    public final static String ROOT_USER       = "media/images/root.png";
+    public final static String ROOT_DSE        = "media/images/rootdse.png";
+    public final static String ADMINISTRATOR   = "media/images/root.png";
     public final static String PARTITION       = "media/images/partition.png";
     public final static String SERVICE         = "media/images/service.png";
     public final static String SPLASH          = "splash.bmp";

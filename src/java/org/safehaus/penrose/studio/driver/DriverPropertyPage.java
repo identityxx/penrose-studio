@@ -76,7 +76,6 @@ public class DriverPropertyPage extends WizardPage implements ModifyListener {
     }
 
     public void setVisible(boolean visible) {
-        System.out.println("[DriverPropertyPage] setVisible: "+visible);
         super.setVisible(visible);
 
         if (visible) init();

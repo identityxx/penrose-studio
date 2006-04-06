@@ -40,6 +40,7 @@ import org.safehaus.penrose.studio.partition.action.NewLDAPProxyPartitionAction;
 import org.safehaus.penrose.studio.service.action.NewServiceAction;
 import org.safehaus.penrose.studio.project.action.OpenAction;
 import org.safehaus.penrose.studio.project.action.SaveAction;
+import org.safehaus.penrose.studio.project.action.UploadAction;
 import org.safehaus.penrose.studio.schema.action.ImportSchemaAction;
 import org.safehaus.penrose.studio.schema.action.NewSchemaAction;
 import org.apache.log4j.Logger;
@@ -50,6 +51,7 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
 
     OpenAction connectAction;
     SaveAction saveAction;
+    UploadAction uploadAction;
     IAction quitAction;
 
     NewPartitionAction newPartitionAction;
@@ -92,6 +94,9 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
 
             saveAction = new SaveAction();
             register(saveAction);
+
+            uploadAction = new UploadAction();
+            register(uploadAction);
 
             quitAction = ActionFactory.QUIT.create(window);
             quitAction.setAccelerator(SWT.ALT | SWT.F4);
@@ -169,6 +174,7 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
             fileMenu.add(new Separator());
             fileMenu.add(saveAction);
             fileMenu.add(new Separator());
+            fileMenu.add(uploadAction);
             fileMenu.add(restartAction);
 
             fileMenu.add(new Separator());
@@ -220,6 +226,9 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
 
             ActionContributionItem saveCI = new ActionContributionItem(saveAction);
             standardToolBar.add(saveCI);
+
+            ActionContributionItem uploadCI = new ActionContributionItem(uploadAction);
+            standardToolBar.add(uploadCI);
 
             ActionContributionItem restartCI = new ActionContributionItem(restartAction);
             standardToolBar.add(restartCI);

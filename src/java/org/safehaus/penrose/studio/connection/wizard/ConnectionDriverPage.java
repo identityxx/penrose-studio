@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.connection.wizard;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionListener;
@@ -64,6 +65,7 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
+            MessageDialog.openError(getShell(), "Error", e.getMessage());
         }
 /*
         Driver jndi = new Driver("LDAP");

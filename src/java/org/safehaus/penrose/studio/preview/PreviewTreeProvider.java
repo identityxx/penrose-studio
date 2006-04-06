@@ -27,6 +27,10 @@ import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.user.UserConfig;
+import org.safehaus.penrose.Penrose;
+import org.safehaus.penrose.mapping.EntryMapping;
+import org.safehaus.penrose.partition.PartitionManager;
+import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
 import org.ietf.ldap.LDAPEntry;
 import org.ietf.ldap.LDAPAttribute;
@@ -34,6 +38,7 @@ import org.ietf.ldap.LDAPAttribute;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.Iterator;
 
 public class PreviewTreeProvider extends LabelProvider implements ITableLabelProvider, ITreeContentProvider, ISelectionChangedListener {
 
@@ -80,11 +85,40 @@ public class PreviewTreeProvider extends LabelProvider implements ITableLabelPro
 		try {
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
             PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+
             UserConfig rootUserConfig = penroseConfig.getRootUserConfig();
 
-            PenroseSession session = previewEditor.penrose.newSession();
+            Penrose penrose = previewEditor.penrose;
+            PenroseSession session = penrose.newSession();
             session.bind(rootUserConfig.getDn(), rootUserConfig.getPassword());
 
+            Collection list = new ArrayList();
+
+            PartitionManager partitionManager = penrose.getPartitionManager();
+            Collection partitions = partitionManager.getPartitions();
+            for (Iterator i=partitions.iterator(); i.hasNext(); ) {
+                Partition partition = (Partition)i.next();
+                Collection entryMappings = partition.getRootEntryMappings();
+                for (Iterator j=entryMappings.iterator(); j.hasNext(); ) {
+                    EntryMapping entryMapping = (EntryMapping)j.next();
+                    String dn = entryMapping.getDn();
+                    if ("".equals(dn)) continue;
+
+                    PenroseSearchControls sc = new PenroseSearchControls();
+                    sc.setScope(PenroseSearchControls.SCOPE_BASE);
+                    PenroseSearchResults sr = session.search(dn, "(objectClass=*)", sc);
+
+                    log.debug("Returned from searching "+dn);
+                    log.debug(dn+" has next: "+sr.hasNext());
+                    if (!sr.hasNext()) continue;
+
+                    log.debug("Got result from searching "+dn);
+                    LDAPEntry entry = (LDAPEntry)sr.next();
+                    PreviewNode previewNode = new PreviewNode(entry);
+                    list.add(previewNode);
+                }
+            }
+/*
             log.debug("Searching Root DSE"+"...");
             PenroseSearchControls sc = new PenroseSearchControls();
             sc.setScope(PenroseSearchControls.SCOPE_BASE);
@@ -94,7 +128,6 @@ public class PreviewTreeProvider extends LabelProvider implements ITableLabelPro
             LDAPEntry ldapEntry = (LDAPEntry)sr.next();
 
             LDAPAttribute attribute = ldapEntry.getAttribute("namingContexts");
-            Collection list = new ArrayList();
             for (Enumeration e=attribute.getStringValues(); e.hasMoreElements(); ) {
                 String suffix = (String)e.nextElement();
 
@@ -113,7 +146,7 @@ public class PreviewTreeProvider extends LabelProvider implements ITableLabelPro
                 PreviewNode previewNode = new PreviewNode(entry);
                 list.add(previewNode);
             }
-
+*/
             session.close();
 
             result = list.toArray();

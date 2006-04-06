@@ -15,36 +15,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.root;
+package org.safehaus.penrose.studio.rootDse;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
-import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.studio.user.UserEditorInput;
-import org.safehaus.penrose.studio.user.UserEditor;
-import org.safehaus.penrose.config.PenroseConfig;
-import org.safehaus.penrose.user.UserConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchPage;
 import org.apache.log4j.Logger;
-
-import java.util.Collection;
-import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
  */
-public class RootUserNode extends Node {
+public class RootDSENode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
 
-    public RootUserNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public RootDSENode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
         this.view = view;
     }
@@ -63,14 +52,5 @@ public class RootUserNode extends Node {
     }
 
     public void open() throws Exception {
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
-        UserConfig userConfig = penroseConfig.getRootUserConfig();
-
-        UserEditorInput ei = new UserEditorInput(userConfig);
-
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        IWorkbenchPage page = window.getActivePage();
-        page.openEditor(ei, UserEditor.class.getName());
     }
 }

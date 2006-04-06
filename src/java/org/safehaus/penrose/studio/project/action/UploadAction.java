@@ -17,46 +17,35 @@
  */
 package org.safehaus.penrose.studio.project.action;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.swt.SWT;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.studio.project.ProjectDialog;
-import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.apache.log4j.Logger;
 
-public class OpenAction extends Action {
+public class UploadAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
-	public OpenAction() {
-        setText("&Connect...");
-        setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.CONNECT));
-        setAccelerator(SWT.CTRL | 'O');
-        setToolTipText("Connect to Penrose Server");
+	public UploadAction() {
+        setText("&Upload");
+        setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.UPLOAD));
+        setAccelerator(SWT.CTRL | 'S');
+        setToolTipText("Upload configuration to Penrose Server");
         setId(getClass().getName());
 	}
-	
+
 	public void run() {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
         try {
-            ProjectDialog dialog = new ProjectDialog(window.getShell(), SWT.NONE);
-            dialog.open();
-
-            if (dialog.getAction() == ProjectDialog.CANCEL) return;
-
-            Project project = dialog.getProject();
-            window.getShell().setText("Penrose Studio - "+project.getName());
-
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            penroseApplication.getApplicationConfig().setCurrentProject(project);
-            penroseApplication.connect(project);
-            penroseApplication.open();
+            penroseApplication.connect();
+    		penroseApplication.upload();
             penroseApplication.disconnect();
 
         } catch (Exception e) {
@@ -65,8 +54,7 @@ public class OpenAction extends Action {
             if (message.length() > 500) {
                 message = message.substring(0, 500) + "...";
             }
-            MessageDialog.openInformation(window.getShell(), "Open Failed", message);
+            MessageDialog.openError(window.getShell(), "Upload Failed", message);
         }
 	}
-	
 }

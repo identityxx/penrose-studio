@@ -21,6 +21,7 @@ import org.safehaus.penrose.studio.*;
 import org.safehaus.penrose.studio.directory.action.NewRootEntryAction;
 import org.safehaus.penrose.studio.directory.action.NewLDAPProxyRootEntryAction;
 import org.safehaus.penrose.studio.directory.action.NewLDAPSnapshotEntryAction;
+import org.safehaus.penrose.studio.directory.action.NewRootDSEAction;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.studio.tree.Node;
@@ -54,6 +55,7 @@ public class DirectoryNode extends Node {
     public void showMenu(IMenuManager manager) throws Exception {
 
         manager.add(new NewRootEntryAction(this));
+        manager.add(new NewRootDSEAction(this));
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         PenroseWorkbenchAdvisor workbenchAdvisor = penroseApplication.getWorkbenchAdvisor();
@@ -79,9 +81,12 @@ public class DirectoryNode extends Node {
         for (Iterator i=rootEntryMappings.iterator(); i.hasNext(); ) {
             EntryMapping entryMapping = (EntryMapping)i.next();
 
+            String dn = entryMapping.getDn();
+            if ("".equals(dn)) dn = "Root DSE";
+
             EntryNode entryNode = new EntryNode(
                     view,
-                    entryMapping.getDn(),
+                    dn,
                     ObjectsView.ENTRY,
                     PenrosePlugin.getImage(PenroseImage.HOME_NODE),
                     entryMapping,

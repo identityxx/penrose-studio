@@ -49,7 +49,9 @@ public class MappingEditor extends FormEditor implements ModifyListener {
         setSite(site);
         setInput(input);
 
-        setPartName(entry.getDn());
+        String dn = entry.getDn();
+        if ("".equals(dn)) dn = "Root DSE";
+        setPartName(dn);
     }
 
     protected void addPages() {
@@ -95,7 +97,9 @@ public class MappingEditor extends FormEditor implements ModifyListener {
 
         partition.modifyEntryMapping(entry.getDn(), entry);
 
-        setPartName(entry.getDn());
+        String dn = entry.getDn();
+        if ("".equals(dn)) dn = "Root DSE";
+        setPartName(dn);
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         penroseApplication.notifyChangeListeners();

@@ -15,47 +15,57 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.project.action;
+package org.safehaus.penrose.studio.directory.action;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.swt.SWT;
+import org.eclipse.ui.IWorkbenchPage;
+import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.studio.PenrosePlugin;
-import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.mapping.MappingEditorInput;
+import org.safehaus.penrose.studio.mapping.MappingEditor;
+import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.mapping.EntryMapping;
+import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
 
-public class SaveAction extends Action {
+public class NewRootDSEAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
-	public SaveAction() {
-        setText("&Save");
-        setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.SAVE));
-        setAccelerator(SWT.CTRL | 'S');
-        setToolTipText("Save changes to disk");
+    DirectoryNode node;
+
+	public NewRootDSEAction(DirectoryNode node) {
+        this.node = node;
+
+        setText("New Root DSE...");
         setId(getClass().getName());
 	}
-
+	
 	public void run() {
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        IWorkbenchPage page = window.getActivePage();
-        page.saveAllEditors(false);
-
         try {
+            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            IWorkbenchPage page = window.getActivePage();
+            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+
+            EntryMapping entryMapping = new EntryMapping();
+
+            Partition partition = node.getPartition();
+            partition.addEntryMapping(entryMapping);
+
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
-    		penroseApplication.save();
+            penroseApplication.notifyChangeListeners();
+
+            objectsView.show(node);
+
+            MappingEditorInput mei = new MappingEditorInput(partition, entryMapping);
+
+            page.openEditor(mei, MappingEditor.class.getName());
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
-            String message = e.toString();
-            if (message.length() > 500) {
-                message = message.substring(0, 500) + "...";
-            }
-            MessageDialog.openError(window.getShell(), "Save Failed", message);
         }
 	}
+	
 }

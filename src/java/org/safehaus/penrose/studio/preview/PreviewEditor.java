@@ -39,7 +39,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.Penrose;
 import org.safehaus.penrose.PenroseFactory;
+import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseApplication;
 
 public class PreviewEditor extends EditorPart {
 

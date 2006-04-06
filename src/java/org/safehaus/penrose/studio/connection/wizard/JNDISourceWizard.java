@@ -28,6 +28,7 @@ import org.safehaus.penrose.studio.source.wizard.JNDIAttributeWizardPage;
 import org.safehaus.penrose.mapping.Entry;
 import org.safehaus.penrose.mapping.Row;
 import org.safehaus.penrose.util.JNDIClient;
+import org.safehaus.penrose.util.EntryUtil;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -77,9 +78,9 @@ public class JNDISourceWizard extends Wizard {
 
         Row rdn;
         if (baseDn == null || "".equals(baseDn)) {
-            rdn = Entry.getRdn(client.getSuffix());
+            rdn = EntryUtil.getRdn(client.getSuffix());
         } else {
-            rdn = Entry.getRdn(baseDn);
+            rdn = EntryUtil.getRdn(baseDn);
         }
         String rdnAttr = (String)rdn.getNames().iterator().next();
         String rdnValue = (String)rdn.get(rdnAttr);
@@ -143,7 +144,7 @@ public class JNDISourceWizard extends Wizard {
 
     public IWizardPage getNextPage(IWizardPage page) {
         if (attributesPage == page) {
-            Row rdn = Entry.getRdn(baseDn);
+            Row rdn = EntryUtil.getRdn(baseDn);
             Collection names = new ArrayList();
             for (Iterator i=rdn.getNames().iterator(); i.hasNext(); ) {
                 String name = (String)i.next();

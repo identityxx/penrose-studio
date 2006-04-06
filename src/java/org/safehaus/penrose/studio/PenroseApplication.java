@@ -311,14 +311,17 @@ public class PenroseApplication implements IPlatformRunnable {
 
         partitionManager.store(workDir, penroseConfig.getPartitionConfigs());
 
-        log.debug("Uploading configuration from "+workDir);
-
-        uploadFolder(workDir);
-
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         penroseApplication.setDirty(false);
 
         validatePartitions();
+    }
+
+    public void upload() throws Exception {
+        log.debug("Uploading configuration from "+workDir);
+
+        uploadFolder(workDir);
+
     }
 
     public void downloadFolder(String remotePath, String localDir) throws Exception {
