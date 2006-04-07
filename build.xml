@@ -53,7 +53,10 @@
             </filterchain>
         </copy>
         <taskdef name="manifest-generator" classname="org.safehaus.penrose.ant.ManifestTask" classpath="target/penrose-studio-ant.jar"/>
-        <manifest-generator file="META-INF/MANIFEST.MF" dir="lib"/>
+        <manifest-generator
+            file="META-INF/MANIFEST.MF"
+            dir="lib"
+        />
     </target>
 
     <target name="compile" depends="manifest">
@@ -222,11 +225,6 @@
         <mkdir dir="${plugin.path}"/>
         <copy todir="${project.path}" file="LICENSE.txt"/>
         <copy tofile="${project.path}/penrose.license" file="licenses/freeware.license"/>
-        <copy todir="${plugin.path}/lib">
-            <fileset dir="lib/penrose">
-                <include name="*.jar"/>
-            </fileset>
-        </copy>
     </target>
 
     <target name="build-pro" if="penrose.pro">
@@ -241,7 +239,7 @@
             overwrite="true"
         />
         <copy todir="${plugin.path}/lib" overwrite="true">
-            <fileset dir="lib/penrose-pro">
+            <fileset dir="lib/penrose">
                 <include name="*.jar"/>
             </fileset>
         </copy>
