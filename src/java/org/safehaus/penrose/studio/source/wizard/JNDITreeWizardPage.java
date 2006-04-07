@@ -24,6 +24,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.util.JNDIClient;
+import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.mapping.Entry;
@@ -187,7 +188,7 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
             for (Iterator i=results.iterator(); i.hasNext(); ) {
                 LDAPEntry entry = (LDAPEntry)i.next();
                 String dn = entry.getDN();
-                String rdn = Entry.getRdn(dn).toString();
+                String rdn = EntryUtil.getRdn(dn).toString();
 
                 TreeItem it = new TreeItem(item, SWT.NONE);
                 it.setText(rdn);

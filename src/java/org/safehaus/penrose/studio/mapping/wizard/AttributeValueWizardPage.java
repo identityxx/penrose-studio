@@ -35,6 +35,7 @@ import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.SourceConfig;
 import org.safehaus.penrose.partition.FieldConfig;
+import org.safehaus.penrose.util.EntryUtil;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -224,7 +225,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
     public void setDn(String dn) {
         attributeMappings.clear();
-        Row rdn = Entry.getRdn(dn);
+        Row rdn = EntryUtil.getRdn(dn);
 
         for (Iterator i=rdn.getNames().iterator(); i.hasNext(); ) {
             String name = (String)i.next();

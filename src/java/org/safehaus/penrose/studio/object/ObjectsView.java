@@ -28,7 +28,8 @@ import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.root.RootUserNode;
+import org.safehaus.penrose.studio.rootDse.RootDSENode;
+import org.safehaus.penrose.studio.user.AdministratorNode;
 import org.safehaus.penrose.studio.service.ServicesNode;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.tree.Node;
@@ -73,7 +74,8 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
     public final static String ATTRIBUTE_TYPE    = "Attribute Type";
     public final static String SERVICES          = "Services";
     public final static String SERVICE           = "Service";
-    public final static String ROOT_USER         = "Root User";
+    public final static String ADMINISTRATOR     = "Administrator";
+    public final static String ROOT_DSE          = "Root DSE";
 
 	private TreeViewer treeViewer;
 
@@ -117,14 +119,24 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                 null
         ));
 
-        nodes.add(new RootUserNode(
+        nodes.add(new AdministratorNode(
                 this,
-                ROOT_USER,
-                ROOT_USER,
-                PenrosePlugin.getImage(PenroseImage.ROOT_USER),
-                ROOT_USER,
+                ADMINISTRATOR,
+                ADMINISTRATOR,
+                PenrosePlugin.getImage(PenroseImage.ADMINISTRATOR),
+                ADMINISTRATOR,
                 null
         ));
+/*
+        nodes.add(new RootDSENode(
+                this,
+                ROOT_DSE,
+                ROOT_DSE,
+                PenrosePlugin.getImage(PenroseImage.ROOT_DSE),
+                ROOT_DSE,
+                null
+        ));
+*/
 	}
 	
 	/**

@@ -27,7 +27,6 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.util.JNDIClient;
 import org.apache.log4j.Logger;
 
@@ -35,6 +34,8 @@ import javax.naming.Context;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 
 /**
  * @author Endi S. Dewata
@@ -175,12 +176,29 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
         testButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 String url = getURL()+"/"+getSuffix();
-                Helper.testJndiConnection(
-                        parent.getShell(),
-                        "com.sun.jndi.ldap.LdapCtxFactory",
-                        url,
-                        bindDnText.getText(),
-                        passwordText.getText());
+
+                Properties env = new Properties();
+                env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+                env.put(Context.PROVIDER_URL, url);
+                env.put(Context.SECURITY_PRINCIPAL, bindDnText.getText());
+                env.put(Context.SECURITY_CREDENTIALS, passwordText.getText());
+
+                try {
+                    JNDIClient client = new JNDIClient(env);
+                    client.close();
+                    MessageDialog.openInformation(parent.getShell(), "Test Connection Result", "Connection successful!");
+
+                } catch (Exception ex) {
+                    log.debug(ex.getMessage(), ex);
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    ex.printStackTrace(pw);
+                    String message = sw.toString();
+                    if (message.length() > 500) {
+                        message = message.substring(0, 500) + "...";
+                    }
+                    MessageDialog.openError(parent.getShell(), "Test Connection Result", "Error: "+message);
+                }
             }
         });
 

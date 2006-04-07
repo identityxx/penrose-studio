@@ -23,7 +23,6 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchPage;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.studio.PenroseApplication;
