@@ -16,6 +16,7 @@
     <path id="lib.path">
         <fileset dir="lib">
             <include name="*.jar"/>
+            <include name="penrose-pro/*.jar"/>
             <include name="plugins/*.jar"/>
         </fileset>
     </path>
@@ -214,9 +215,39 @@
     </target>
 -->
 
-    <target name="build" depends="compile">
-
+    <target name="pre-build">
         <property name="project.path" value="target/penrose-studio-${project.version}-${platform}"/>
+        <property name="plugin.path" value="${project.path}/plugins/org.safehaus.penrose_${project.version}"/>
+        <mkdir dir="${project.path}"/>
+        <mkdir dir="${plugin.path}"/>
+        <copy todir="${project.path}" file="LICENSE.txt"/>
+        <copy tofile="${project.path}/penrose.license" file="licenses/freeware.license"/>
+        <copy todir="${plugin.path}/lib">
+            <fileset dir="lib/penrose">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="build-pro" if="penrose.pro">
+        <copy
+            todir="${project.path}"
+            file="licenses/LICENSE.txt"
+            overwrite="true"
+        />
+        <copy
+            tofile="${project.path}/penrose.license"
+            file="licenses/evaluation.license"
+            overwrite="true"
+        />
+        <copy todir="${plugin.path}/lib" overwrite="true">
+            <fileset dir="lib/penrose-pro">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="build" depends="compile,pre-build,build-pro">
         <copy todir="${project.path}/conf">
             <fileset dir="conf">
                 <include name="*.*"/>
@@ -235,8 +266,6 @@
                 <include name="org.eclipse.ui.forms_3.1.0.jar"/>
             </fileset>
         </copy>
-        <property name="plugin.path" value="${project.path}/plugins/org.safehaus.penrose_${project.version}"/>
-        <mkdir dir="${plugin.path}"/>
         <copy todir="${plugin.path}">
             <fileset dir=".">
                 <include name="META-INF/**"/>
@@ -256,10 +285,8 @@
                 <expandproperties/>
             </filterchain>
         </copy>
-        <copy todir="${project.path}" file="LICENSE.txt"/>
         <copy todir="${project.path}" file="COPYING.txt"/>
         <copy todir="${project.path}" file="INSTALL-BINARY.txt"/>
-        <copy todir="${project.path}" file="penrose.license"/>
         <copy todir="${project.path}/docs">
             <fileset dir="docs" includes="*.url"/>
         </copy>

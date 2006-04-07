@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<licenses>
+  <license>
+    <product-name>Penrose Studio</product-name>
+    <product-version>1.0.0</product-version>
+    <parameter>
+      <param-name>type</param-name>
+      <param-value>FREEWARE</param-value>
+    </parameter>
+    <license-key>06172325bda5062429991102588f6652514bcb1051f3acf1a836352388ccafe20686b4d4be8c150a18c09651640d2212a0a22373e74d1a5877ff51486a632249f68308895d9774100367412ad500f422ed4575181f507d6c85d55aeb598803de82233b88a847789d965d235b2fad4abdd2eadee1fbec2ac8ab6b39fbdcc41cda</license-key>
+  </license>
+</licenses>
