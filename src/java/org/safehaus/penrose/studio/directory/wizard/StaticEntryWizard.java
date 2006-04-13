@@ -20,10 +20,12 @@ package org.safehaus.penrose.studio.directory.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.mapping.EntryMapping;
+import org.safehaus.penrose.mapping.Row;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.StaticEntryRDNWizardPage;
+import org.safehaus.penrose.util.EntryUtil;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -48,7 +50,7 @@ public class StaticEntryWizard extends Wizard {
         this.parentMapping = parentMapping;
         setWindowTitle("Adding static entry");
 
-        rdnPage = new StaticEntryRDNWizardPage();
+        rdnPage = new StaticEntryRDNWizardPage(partition, parentMapping);
         ocPage = new ObjectClassWizardPage();
         attrPage = new AttributeValueWizardPage(partition);
     }
@@ -69,7 +71,7 @@ public class StaticEntryWizard extends Wizard {
     public IWizardPage getNextPage(IWizardPage page) {
         if (rdnPage == page) {
             String rdn = rdnPage.getRdn();
-            attrPage.setDn(rdn);
+            attrPage.setRdn(EntryUtil.getRdn(rdn));
 
         } else if (ocPage == page) {
             Collection objectClasses = ocPage.getSelectedObjectClasses();
@@ -83,7 +85,7 @@ public class StaticEntryWizard extends Wizard {
         try {
             entryMapping = new EntryMapping();
             entryMapping.setRdn(rdnPage.getRdn());
-            entryMapping.setParentDn(parentMapping.getDn());
+            entryMapping.setParentDn(rdnPage.getParentDn());
             entryMapping.addObjectClasses(ocPage.getSelectedObjectClasses());
             entryMapping.addAttributeMappings(attrPage.getAttributeMappings());
 

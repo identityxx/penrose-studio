@@ -223,11 +223,17 @@
         <property name="plugin.path" value="${project.path}/plugins/org.safehaus.penrose_${project.version}"/>
         <mkdir dir="${project.path}"/>
         <mkdir dir="${plugin.path}"/>
+        <copy todir="target" file="LICENSE.txt"/>
         <copy todir="${project.path}" file="LICENSE.txt"/>
         <copy tofile="${project.path}/penrose.license" file="licenses/freeware.license"/>
     </target>
 
     <target name="build-pro" if="penrose.pro">
+        <copy
+            todir="target"
+            file="licenses/LICENSE.txt"
+            overwrite="true"
+        />
         <copy
             todir="${project.path}"
             file="licenses/LICENSE.txt"

@@ -20,10 +20,12 @@ package org.safehaus.penrose.studio.preview;
 
 public class PreviewNode {
 
-    PreviewNode parent;
+    private String title;
+    private PreviewNode parent;
     private Object object;
 
-    public PreviewNode(Object object) {
+    public PreviewNode(String title, Object object) {
+        this.title = title;
         this.object = object;
     }
 
@@ -33,5 +35,21 @@ public class PreviewNode {
 
     public void setObject(Object object) {
         this.object = object;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public PreviewNode getParent() {
+        return parent;
+    }
+
+    public void setParent(PreviewNode parent) {
+        this.parent = parent;
     }
 }

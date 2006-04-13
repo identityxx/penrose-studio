@@ -20,35 +20,43 @@ package org.safehaus.penrose.studio.mapping.wizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.mapping.EntryMapping;
+import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.studio.mapping.EntrySelectionDialog;
 import org.ietf.ldap.LDAPDN;
 
 /**
  * @author Endi S. Dewata
  */
-public class StaticEntryRDNWizardPage extends WizardPage implements SelectionListener, ModifyListener {
+public class StaticEntryRDNWizardPage extends WizardPage implements ModifyListener {
 
     public final static String NAME = "Entry RDN";
 
     Text rdnText;
+    Text parentDnText;
+    Button browseButton;
 
-    public StaticEntryRDNWizardPage() {
+    private Partition partition;
+    private EntryMapping parentMapping;
+
+    public StaticEntryRDNWizardPage(Partition partition, EntryMapping parentMapping) {
         super(NAME);
+
+        this.partition = partition;
+        this.parentMapping = parentMapping;
+
         setDescription("Enter the RDN of the entry.");
     }
 
-    public void createControl(Composite parent) {
+    public void createControl(final Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
         setControl(composite);
 
         GridLayout sectionLayout = new GridLayout();
-        sectionLayout.numColumns = 2;
+        sectionLayout.numColumns = 3;
         composite.setLayout(sectionLayout);
 
         Label nameLabel = new Label(composite, SWT.NONE);
@@ -58,13 +66,53 @@ public class StaticEntryRDNWizardPage extends WizardPage implements SelectionLis
         nameLabel.setLayoutData(gd);
 
         rdnText = new Text(composite, SWT.BORDER);
-        rdnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.horizontalSpan = 2;
+        rdnText.setLayoutData(gd);
         rdnText.addModifyListener(this);
 
         new Label(composite, SWT.NONE);
 
         Label exampleLabel = new Label(composite, SWT.NONE);
+        gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.horizontalSpan = 2;
+        exampleLabel.setLayoutData(gd);
         exampleLabel.setText("Example: ou=Users");
+
+        new Label(composite, SWT.NONE);
+
+        new Label(composite, SWT.NONE);
+
+        new Label(composite, SWT.NONE);
+
+        Label parentDnLabel = new Label(composite, SWT.NONE);
+        parentDnLabel.setText("Parent DN:");
+        parentDnLabel.setLayoutData(new GridData());
+
+        parentDnText = new Text(composite, SWT.BORDER);
+        if (parentMapping != null) {
+            parentDnText.setText(parentMapping.getDn());
+        }
+
+        parentDnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        parentDnText.addModifyListener(this);
+
+        browseButton = new Button(composite, SWT.PUSH);
+        browseButton.setText("Browse...");
+
+        browseButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                EntrySelectionDialog dialog = new EntrySelectionDialog(parent.getShell(), SWT.NONE);
+                dialog.setText("Select parent entry...");
+                dialog.setPartition(partition);
+                dialog.open();
+
+                EntryMapping parentEntry = dialog.getEntryMapping();
+                if (parentEntry == null) return;
+
+                parentDnText.setText(parentEntry.getDn());
+            }
+        });
 
         setPageComplete(validatePage());
     }
@@ -73,20 +121,25 @@ public class StaticEntryRDNWizardPage extends WizardPage implements SelectionLis
         return "".equals(rdnText.getText()) ? null : rdnText.getText();
     }
 
+    public String getParentDn() {
+        return "".equals(parentDnText.getText()) ? null : parentDnText.getText();
+    }
+
     public boolean validatePage() {
         String rdn = getRdn();
         if (rdn == null || !LDAPDN.isValid(rdn)) return false;
         return true;
     }
 
-    public void widgetSelected(SelectionEvent event) {
-        setPageComplete(validatePage());
-    }
-
-    public void widgetDefaultSelected(SelectionEvent event) {
-    }
-
     public void modifyText(ModifyEvent event) {
         setPageComplete(validatePage());
+    }
+
+    public Partition getPartition() {
+        return partition;
+    }
+
+    public void setPartition(Partition partition) {
+        this.partition = partition;
     }
 }

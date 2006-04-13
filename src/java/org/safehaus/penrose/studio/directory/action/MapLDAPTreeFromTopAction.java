@@ -24,24 +24,22 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.object.ObjectsView;
-import org.safehaus.penrose.studio.directory.EntryNode;
+import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
 
-public class NewLDAPProxyEntryAction extends Action {
+public class MapLDAPTreeFromTopAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
-    EntryNode node;
+    DirectoryNode node;
 
-	public NewLDAPProxyEntryAction(EntryNode node) {
+	public MapLDAPTreeFromTopAction(DirectoryNode node) {
         this.node = node;
 
-        setText("New LDAP Proxy Entry...");
+        setText("Map LDAP Tree...");
         setId(getClass().getName());
 	}
 	
@@ -58,8 +56,8 @@ public class NewLDAPProxyEntryAction extends Action {
 
             Wizard wizard = (Wizard)penroseApplication.newInstance(
                     "org.safehaus.penrose.studio.directory.wizard.CreateLDAPProxyWizard",
-                    new Class[] { Partition.class, EntryMapping.class },
-                    new Object[] { node.getPartition(), node.getEntryMapping() }
+                    new Class[] { Partition.class },
+                    new Object[] { node.getPartition() }
             );
 
             WizardDialog dialog = new WizardDialog(shell, wizard);

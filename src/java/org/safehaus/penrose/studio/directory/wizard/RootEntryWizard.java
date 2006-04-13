@@ -20,10 +20,12 @@ package org.safehaus.penrose.studio.directory.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.mapping.EntryMapping;
+import org.safehaus.penrose.mapping.Row;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.StaticEntryDNWizardPage;
+import org.safehaus.penrose.util.EntryUtil;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -38,13 +40,14 @@ public class RootEntryWizard extends Wizard {
     private Partition partition;
     private EntryMapping entryMapping;
 
-    public StaticEntryDNWizardPage dnPage = new StaticEntryDNWizardPage();
+    public StaticEntryDNWizardPage dnPage;
     public ObjectClassWizardPage ocPage;
     public AttributeValueWizardPage attrPage;
 
     public RootEntryWizard(Partition partition) {
         this.partition = partition;
 
+        dnPage = new StaticEntryDNWizardPage(partition);
         ocPage = new ObjectClassWizardPage();
         attrPage = new AttributeValueWizardPage(partition);
         
@@ -67,7 +70,8 @@ public class RootEntryWizard extends Wizard {
     public IWizardPage getNextPage(IWizardPage page) {
         if (dnPage == page) {
             String dn = dnPage.getDn();
-            attrPage.setDn(dn);
+            Row rdn = EntryUtil.getRdn(dn);
+            attrPage.setRdn(rdn);
 
         } else if (ocPage == page) {
             Collection objectClasses = ocPage.getSelectedObjectClasses();

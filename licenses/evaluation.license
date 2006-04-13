@@ -10,7 +10,7 @@
       <param-name>type</param-name>
       <param-value>EVALUATION</param-value>
     </parameter>
-    <license-key>44bb98db26aa43e36dfdfaaf035aa7c9b07df07dd99027f91f4eb9ab1eb84ec81bf721addf1bc4c160f0f34cedb1d0b4ae347ae2005963ff67fce9e08a2477f5cb17e489c251df7dfb15a60509102b2f50759146791c2d23599f022d966104d1a2fc2e45fa35eefbf71b329fabd31c90d329d4d8dbca054ae7e2745237a88f1d</license-key>
+    <license-key>3b84918e32807704201e2f41dcd98bfc</license-key>
   </license>
   <license>
     <product-name>Penrose Studio</product-name>
@@ -21,6 +21,6 @@
       <param-name>type</param-name>
       <param-value>EVALUATION</param-value>
     </parameter>
-    <license-key>341253fdf8169b8ba57abdb8b3a7c61be217b52aa44bac88443b28092e276c9861e498861f7c854df7165b09529a98ccda099a63060ccd42713fd86ec434573ad1fa83203a98ede7834b38afcec7e2c850c550eff26c98bc7885d8e08723ebb353e95dade9ff4cba0dc6a3e7eae1d1364d2864a3d0bf3db3e39ca72dfaafc528</license-key>
+    <license-key>2213c74212a32c858f6f440339072929</license-key>
   </license>
 </licenses>

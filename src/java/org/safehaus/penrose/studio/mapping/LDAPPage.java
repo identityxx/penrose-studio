@@ -96,19 +96,21 @@ public class LDAPPage extends FormPage {
         refresh();
     }
 
-    public Composite createEntrySection(Composite parent) {
+    public Composite createEntrySection(final Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
-        TableWrapLayout layout = new TableWrapLayout();
-        layout.numColumns = 2;
-        composite.setLayout(layout);
+        composite.setLayout(new GridLayout(3, false));
 
-        toolkit.createLabel(composite, "Parent DN:");
+        Label parentDnLabel = toolkit.createLabel(composite, "Parent DN:");
+        GridData gd = new GridData();
+        gd.widthHint = 100;
+        parentDnLabel.setLayoutData(gd);
 
         parentDnText = toolkit.createText(composite, "", SWT.BORDER);
         parentDnText.setText(entry.getParentDn() == null ? "" : entry.getParentDn());
+        gd = new GridData(GridData.FILL_HORIZONTAL);
+        parentDnText.setLayoutData(gd);
 
-        parentDnText.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
         parentDnText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 entry.setParentDn("".equals(parentDnText.getText()) ? null : parentDnText.getText());
@@ -116,14 +118,35 @@ public class LDAPPage extends FormPage {
             }
         });
 
+        Button browseButton = toolkit.createButton(composite, "Browse...", SWT.PUSH);
+        gd = new GridData();
+        gd.widthHint = 100;
+        browseButton.setLayoutData(gd);
+
+        browseButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                EntrySelectionDialog dialog = new EntrySelectionDialog(parent.getShell(), SWT.NONE);
+                dialog.setText("Select parent entry...");
+                dialog.setPartition(editor.getPartition());
+                dialog.open();
+
+                EntryMapping parentEntry = dialog.getEntryMapping();
+                if (parentEntry == null) return;
+
+                parentDnText.setText(parentEntry.getDn());
+            }
+        });
+
         toolkit.createLabel(composite, "RDN:");
 
         rdnText = toolkit.createText(composite, "", SWT.BORDER);
         rdnText.setText(entry.getRdn());
+        gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.horizontalSpan = 2;
+        rdnText.setLayoutData(gd);
 
         rdnText.setEditable(false);
         rdnText.setEnabled(false);
-        rdnText.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
 
         return composite;
     }
@@ -229,6 +252,7 @@ public class LDAPPage extends FormPage {
                     for (Iterator i=sources.iterator(); i.hasNext(); ) {
                         SourceMapping source = (SourceMapping)i.next();
                         SourceConfig sourceConfig = editor.getPartition().getSourceConfig(source.getSourceName());
+                        dialog.addVariable(source.getName());
 
                         for (Iterator j=sourceConfig.getFieldConfigs().iterator(); j.hasNext(); ) {
                             FieldConfig fieldDefinition = (FieldConfig)j.next();

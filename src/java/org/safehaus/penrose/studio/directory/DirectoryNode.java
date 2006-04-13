@@ -18,10 +18,7 @@
 package org.safehaus.penrose.studio.directory;
 
 import org.safehaus.penrose.studio.*;
-import org.safehaus.penrose.studio.directory.action.NewRootEntryAction;
-import org.safehaus.penrose.studio.directory.action.NewLDAPProxyRootEntryAction;
-import org.safehaus.penrose.studio.directory.action.NewLDAPSnapshotEntryAction;
-import org.safehaus.penrose.studio.directory.action.NewRootDSEAction;
+import org.safehaus.penrose.studio.directory.action.*;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.studio.tree.Node;
@@ -55,7 +52,6 @@ public class DirectoryNode extends Node {
     public void showMenu(IMenuManager manager) throws Exception {
 
         manager.add(new NewRootEntryAction(this));
-        manager.add(new NewRootDSEAction(this));
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         PenroseWorkbenchAdvisor workbenchAdvisor = penroseApplication.getWorkbenchAdvisor();
@@ -64,8 +60,10 @@ public class DirectoryNode extends Node {
 
         if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
             manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-            manager.add(new NewLDAPSnapshotEntryAction(this));
-            manager.add(new NewLDAPProxyRootEntryAction(this));
+            manager.add(new MapLDAPTreeFromTopAction(this));
+            manager.add(new MapRootDSEAction(this));
+            manager.add(new MapADSchemaAction(this));
+            manager.add(new CreateLDAPSnapshotEntryAction(this));
         }
     }
 

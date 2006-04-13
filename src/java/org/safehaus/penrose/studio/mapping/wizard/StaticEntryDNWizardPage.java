@@ -20,70 +20,68 @@ package org.safehaus.penrose.studio.mapping.wizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.mapping.EntryMapping;
 import org.ietf.ldap.LDAPDN;
+import org.safehaus.penrose.partition.Partition;
 
 /**
  * @author Endi S. Dewata
  */
-public class StaticEntryDNWizardPage extends WizardPage implements SelectionListener, ModifyListener {
+public class StaticEntryDNWizardPage extends WizardPage implements ModifyListener {
 
     public final static String NAME = "Entry DN";
 
     Text dnText;
 
-    public StaticEntryDNWizardPage() {
+    Partition partition;
+
+    public StaticEntryDNWizardPage(Partition partition) {
         super(NAME);
+
+        this.partition = partition;
+
         setDescription("Enter the DN of the entry.");
     }
 
-    public void createControl(Composite parent) {
+    public void createControl(final Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
         setControl(composite);
 
         GridLayout sectionLayout = new GridLayout();
-        sectionLayout.numColumns = 2;
+        sectionLayout.numColumns = 3;
         composite.setLayout(sectionLayout);
 
-        Label nameLabel = new Label(composite, SWT.NONE);
-        nameLabel.setText("DN:");
-        GridData gd = new GridData(GridData.FILL);
+        Label dnLabel = new Label(composite, SWT.NONE);
+        dnLabel.setText("DN:");
+        GridData gd = new GridData();
         gd.widthHint = 50;
-        nameLabel.setLayoutData(gd);
+        dnLabel.setLayoutData(gd);
 
         dnText = new Text(composite, SWT.BORDER);
-        dnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.horizontalSpan = 2;
+        dnText.setLayoutData(gd);
         dnText.addModifyListener(this);
 
         new Label(composite, SWT.NONE);
 
         Label exampleLabel = new Label(composite, SWT.NONE);
+        gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.horizontalSpan = 2;
+        exampleLabel.setLayoutData(gd);
         exampleLabel.setText("Example: dc=Example,dc=com");
 
         setPageComplete(validatePage());
     }
 
     public String getDn() {
-        return "".equals(dnText.getText()) ? null : dnText.getText();
+        return dnText.getText();
     }
 
     public boolean validatePage() {
-        String dn = getDn();
-        if (dn == null || !LDAPDN.isValid(dn)) return false;
-        return true;
-    }
-
-    public void widgetSelected(SelectionEvent event) {
-        setPageComplete(validatePage());
-    }
-
-    public void widgetDefaultSelected(SelectionEvent event) {
+        return LDAPDN.isValid(getDn());
     }
 
     public void modifyText(ModifyEvent event) {

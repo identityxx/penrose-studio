@@ -18,28 +18,28 @@
 package org.safehaus.penrose.studio.directory.action;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.swt.widgets.Shell;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.studio.mapping.MappingEditorInput;
-import org.safehaus.penrose.studio.mapping.MappingEditor;
 import org.safehaus.penrose.studio.object.ObjectsView;
-import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
 
-public class NewRootDSEAction extends Action {
+public class MapRootDSEAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
     DirectoryNode node;
 
-	public NewRootDSEAction(DirectoryNode node) {
+	public MapRootDSEAction(DirectoryNode node) {
         this.node = node;
 
-        setText("New Root DSE...");
+        setText("Map Root DSE...");
         setId(getClass().getName());
 	}
 	
@@ -49,19 +49,24 @@ public class NewRootDSEAction extends Action {
             IWorkbenchPage page = window.getActivePage();
             ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
-            EntryMapping entryMapping = new EntryMapping();
-
-            Partition partition = node.getPartition();
-            partition.addEntryMapping(entryMapping);
+            Shell shell = window.getShell();
 
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            if (!penroseApplication.checkCommercial()) return;
+
+            Wizard wizard = (Wizard)penroseApplication.newInstance(
+                    "org.safehaus.penrose.studio.directory.wizard.CreateRootDSEProxyWizard",
+                    new Class[] { Partition.class },
+                    new Object[] { node.getPartition() }
+            );
+
+            WizardDialog dialog = new WizardDialog(shell, wizard);
+            dialog.setPageSize(600, 300);
+            dialog.open();
+
             penroseApplication.notifyChangeListeners();
 
             objectsView.show(node);
-
-            MappingEditorInput mei = new MappingEditorInput(partition, entryMapping);
-
-            page.openEditor(mei, MappingEditor.class.getName());
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

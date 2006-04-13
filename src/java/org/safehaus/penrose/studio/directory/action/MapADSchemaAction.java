@@ -24,23 +24,22 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
 
-public class NewLDAPProxyRootEntryAction extends Action {
+public class MapADSchemaAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
     DirectoryNode node;
 
-	public NewLDAPProxyRootEntryAction(DirectoryNode node) {
+	public MapADSchemaAction(DirectoryNode node) {
         this.node = node;
 
-        setText("New LDAP Proxy Entry...");
+        setText("Map Active Directory Schema...");
         setId(getClass().getName());
 	}
 	
@@ -56,7 +55,7 @@ public class NewLDAPProxyRootEntryAction extends Action {
             if (!penroseApplication.checkCommercial()) return;
 
             Wizard wizard = (Wizard)penroseApplication.newInstance(
-                    "org.safehaus.penrose.studio.directory.wizard.CreateLDAPProxyWizard",
+                    "org.safehaus.penrose.studio.directory.wizard.CreateADSchemaProxyWizard",
                     new Class[] { Partition.class },
                     new Object[] { node.getPartition() }
             );

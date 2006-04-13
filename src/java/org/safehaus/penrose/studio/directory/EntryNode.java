@@ -35,7 +35,7 @@ import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.mapping.*;
 import org.safehaus.penrose.studio.directory.action.NewStaticEntryAction;
 import org.safehaus.penrose.studio.directory.action.NewDynamicEntryAction;
-import org.safehaus.penrose.studio.directory.action.NewLDAPProxyEntryAction;
+import org.safehaus.penrose.studio.directory.action.MapLDAPTreeAction;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
@@ -151,7 +151,7 @@ public class EntryNode extends Node {
 
             manager.add(action);
 
-            manager.add(new NewLDAPProxyEntryAction(this));
+            manager.add(new MapLDAPTreeAction(this));
         }
 
     }

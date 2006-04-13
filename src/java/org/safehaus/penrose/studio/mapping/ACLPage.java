@@ -186,7 +186,7 @@ public class ACLPage extends FormPage implements ModifyListener {
                     ACI aci = new ACI();
                     aci.setSubject(dialog.getSubject());
                     aci.setDn(dialog.getDn());
-                    aci.setTarget(dialog.getScope());
+                    aci.setTarget(dialog.getTarget());
                     aci.setAttributes(dialog.getAttributes());
                     aci.setScope(dialog.getScope());
                     aci.setAction(dialog.getAction());

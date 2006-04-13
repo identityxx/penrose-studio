@@ -63,6 +63,8 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
     private int defaultType = CONSTANT;
 
+    private boolean needRdn = true;
+
     public AttributeValueWizardPage(Partition partition) {
         super(NAME);
         this.partition = partition;
@@ -99,15 +101,14 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                     if (defaultType == VARIABLE) {
 
                         if (sourceMappings != null) {
-                            System.out.println("Sources:");
                             for (Iterator i=sourceMappings.iterator(); i.hasNext(); ) {
                                 SourceMapping sourceMapping = (SourceMapping)i.next();
                                 SourceConfig sourceConfig = partition.getSourceConfig(sourceMapping.getSourceName());
+                                dialog.addVariable(sourceMapping.getName());
 
                                 Collection fields = sourceConfig.getFieldConfigs();
                                 for (Iterator j=fields.iterator(); j.hasNext(); ) {
                                     FieldConfig field = (FieldConfig)j.next();
-                                    System.out.println(" - "+sourceMapping.getName()+"."+field.getName());
                                     dialog.addVariable(sourceMapping.getName()+"."+field.getName());
                                 }
                             }
@@ -223,9 +224,11 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
         list.remove(attributeMapping);
     }
 
-    public void setDn(String dn) {
+    public void setRdn(Row rdn) {
+
+        needRdn = !rdn.isEmpty();
+
         attributeMappings.clear();
-        Row rdn = EntryUtil.getRdn(dn);
 
         for (Iterator i=rdn.getNames().iterator(); i.hasNext(); ) {
             String name = (String)i.next();
@@ -355,6 +358,8 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
     }
 
     public boolean validatePage() {
+        if (!needRdn) return true;
+
         for (Iterator i=attributeMappings.values().iterator(); i.hasNext(); ) {
             Collection list = (Collection)i.next();
 
@@ -363,6 +368,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                 if (ad.isRdn()) return true;
             }
         }
+
         return false;
     }
 
@@ -419,5 +425,13 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
     public void setObjectClasses(Collection objectClasses) {
         this.objectClasses = objectClasses;
+    }
+
+    public boolean isNeedRdn() {
+        return needRdn;
+    }
+
+    public void setNeedRdn(boolean needRdn) {
+        this.needRdn = needRdn;
     }
 }

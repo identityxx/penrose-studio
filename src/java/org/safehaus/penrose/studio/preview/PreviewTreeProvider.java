@@ -28,6 +28,7 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.user.UserConfig;
 import org.safehaus.penrose.Penrose;
+import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.partition.PartitionManager;
 import org.safehaus.penrose.partition.Partition;
@@ -60,7 +61,7 @@ public class PreviewTreeProvider extends LabelProvider implements ITableLabelPro
 
     public Image getImage(Object element) {
         PreviewNode previewNode = (PreviewNode) element;
-        if (previewNode.parent == null) {
+        if (previewNode.getParent() == null) {
             return PenrosePlugin.getImage(PenroseImage.HOME_NODE);
         } else {
             return PenrosePlugin.getImage(PenroseImage.NODE);
@@ -69,14 +70,17 @@ public class PreviewTreeProvider extends LabelProvider implements ITableLabelPro
 
     public String getText(Object element) {
         PreviewNode previewNode = (PreviewNode) element;
+        return previewNode.getTitle();
+/*
         LDAPEntry entry = (LDAPEntry)previewNode.getObject();
         String dn = entry.getDN();
-        if (previewNode.parent == null) {
-            return dn;
+        if (previewNode.getParent() == null) {
+            return "".equals(dn) ? "Root DSE" : dn;
         } else {
             int i = dn.indexOf(",");
             return dn.substring(0, i);
         }
+*/
     }
 
     public Object[] getElements(Object inputElement) {
@@ -94,6 +98,14 @@ public class PreviewTreeProvider extends LabelProvider implements ITableLabelPro
 
             Collection list = new ArrayList();
 
+            PenroseSearchControls sc = new PenroseSearchControls();
+            sc.setScope(PenroseSearchControls.SCOPE_BASE);
+            PenroseSearchResults sr = session.search("", "(objectClass=*)", sc);
+
+            LDAPEntry rootDseEntry = (LDAPEntry)sr.next();
+            PreviewNode rootDseNode = new PreviewNode("Root DSE", rootDseEntry);
+            list.add(rootDseNode);
+/*
             PartitionManager partitionManager = penrose.getPartitionManager();
             Collection partitions = partitionManager.getPartitions();
             for (Iterator i=partitions.iterator(); i.hasNext(); ) {
@@ -104,9 +116,9 @@ public class PreviewTreeProvider extends LabelProvider implements ITableLabelPro
                     String dn = entryMapping.getDn();
                     if ("".equals(dn)) continue;
 
-                    PenroseSearchControls sc = new PenroseSearchControls();
+                    sc = new PenroseSearchControls();
                     sc.setScope(PenroseSearchControls.SCOPE_BASE);
-                    PenroseSearchResults sr = session.search(dn, "(objectClass=*)", sc);
+                    sr = session.search(dn, "(objectClass=*)", sc);
 
                     log.debug("Returned from searching "+dn);
                     log.debug(dn+" has next: "+sr.hasNext());
@@ -115,9 +127,11 @@ public class PreviewTreeProvider extends LabelProvider implements ITableLabelPro
                     log.debug("Got result from searching "+dn);
                     LDAPEntry entry = (LDAPEntry)sr.next();
                     PreviewNode previewNode = new PreviewNode(entry);
+                    previewNode.parent = rootDseNode;
                     list.add(previewNode);
                 }
             }
+*/
 /*
             log.debug("Searching Root DSE"+"...");
             PenroseSearchControls sc = new PenroseSearchControls();
@@ -164,8 +178,8 @@ public class PreviewTreeProvider extends LabelProvider implements ITableLabelPro
         Object[] children = new Object[0];
 
         try {
-            LDAPEntry entry = (LDAPEntry)previewNode.getObject();
-            String base = entry.getDN();
+            LDAPEntry parentEntry = (LDAPEntry)previewNode.getObject();
+            String baseDn = parentEntry.getDN();
             String filter = "(objectClass=*)";
 
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
@@ -175,20 +189,55 @@ public class PreviewTreeProvider extends LabelProvider implements ITableLabelPro
             PenroseSession session = previewEditor.penrose.newSession();
             session.bind(rootUserConfig.getDn(), rootUserConfig.getPassword());
 
-            PenroseSearchControls sc = new PenroseSearchControls();
-            sc.setScope(PenroseSearchControls.SCOPE_ONE);
-
-            PenroseSearchResults sr = session.search(base, filter, sc);
-
             ArrayList list = new ArrayList();
-            while (sr.hasNext()) {
-                LDAPEntry child = (LDAPEntry) sr.next();
 
-                PreviewNode childPreviewNode = new PreviewNode(child);
-                childPreviewNode.parent = previewNode;
-                list.add(childPreviewNode);
+            if ("".equals(baseDn)) {
+
+                PartitionManager partitionManager = previewEditor.penrose.getPartitionManager();
+                Collection partitions = partitionManager.getPartitions();
+
+                for (Iterator i=partitions.iterator(); i.hasNext(); ) {
+                    Partition partition = (Partition)i.next();
+                    Collection entryMappings = partition.getRootEntryMappings();
+
+                    for (Iterator j=entryMappings.iterator(); j.hasNext(); ) {
+                        EntryMapping entryMapping = (EntryMapping)j.next();
+                        String dn = entryMapping.getDn();
+                        if ("".equals(dn)) continue;
+
+                        PenroseSearchControls sc = new PenroseSearchControls();
+                        sc.setScope(PenroseSearchControls.SCOPE_BASE);
+                        PenroseSearchResults sr = session.search(dn, "(objectClass=*)", sc);
+
+                        log.debug("Returned from searching "+dn);
+                        log.debug(dn+" has next: "+sr.hasNext());
+                        if (!sr.hasNext()) continue;
+
+                        log.debug("Got result from searching "+dn);
+                        LDAPEntry entry = (LDAPEntry)sr.next();
+                        PreviewNode childPreviewNode = new PreviewNode(dn, entry);
+                        childPreviewNode.setParent(previewNode);
+                        list.add(childPreviewNode);
+                    }
+                }
+
+            } else {
+
+                PenroseSearchControls sc = new PenroseSearchControls();
+                sc.setScope(PenroseSearchControls.SCOPE_ONE);
+
+                PenroseSearchResults sr = session.search(baseDn, filter, sc);
+
+                while (sr.hasNext()) {
+                    LDAPEntry child = (LDAPEntry) sr.next();
+                    String rdn = EntryUtil.getRdn(child.getDN()).toString();
+
+                    PreviewNode childPreviewNode = new PreviewNode(rdn, child);
+                    childPreviewNode.setParent(previewNode);
+                    list.add(childPreviewNode);
+                }
             }
-            
+
             children = list.toArray();
             session.close();
 
@@ -201,7 +250,7 @@ public class PreviewTreeProvider extends LabelProvider implements ITableLabelPro
 
     public Object getParent(Object element) {
         PreviewNode previewNode = (PreviewNode) element;
-        return previewNode.parent;
+        return previewNode.getParent();
     }
 
     public boolean hasChildren(Object element) {

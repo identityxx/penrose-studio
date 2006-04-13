@@ -14,7 +14,7 @@ Compression=zip
 SolidCompression=yes
 OutputBaseFilename=penrose-studio-${project.version}
 OutputDir=..\dist
-LicenseFile=..\LICENSE.txt
+LicenseFile=LICENSE.txt
 
 [Files]
 

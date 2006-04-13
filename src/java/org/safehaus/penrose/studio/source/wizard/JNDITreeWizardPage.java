@@ -144,7 +144,8 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
             baseDnTree.removeAll();
 
             TreeItem item = new TreeItem(baseDnTree, SWT.NONE);
-            item.setText(client.getSuffix());
+            String suffix = "".equals(client.getSuffix()) ? "Root DSE" : client.getSuffix();
+            item.setText(suffix);
             item.setData("");
 
             Collection results = client.getChildren("");
@@ -177,7 +178,6 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
             TreeItem item = (TreeItem)event.item;
             String baseDn = (String)item.getData();
 
-            System.out.println(baseDn);
             TreeItem items[] = item.getItems();
             for (int i=0; i<items.length; i++) {
                 items[i].dispose();
