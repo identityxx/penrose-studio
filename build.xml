@@ -164,6 +164,11 @@
             <fileset dir="${project.path}/Eclipse.app"/>
         </move>
         <copy file="images/Eclipse.icns" todir="${project.path}/Penrose Studio.app/Contents/Resources"/>
+        <copy
+            todir="${project.path}/plugins"
+            file="rcp/org.eclipse.swt.carbon.macosx.ppc_3.1.0.jar"
+            overwrite="true"
+        />
         <chmod dir="${project.path}/Penrose Studio.app/Contents/MacOS" includes="*" perm="ugo+rx"/>
         <antcall target="build">
             <param name="platform" value="${platform}"/>
