@@ -163,7 +163,7 @@
         <move todir="${project.path}/Penrose Studio.app">
             <fileset dir="${project.path}/Eclipse.app"/>
         </move>
-        <copy file="media/images/Eclipse.icns" todir="${project.path}/Penrose Studio.app/Contents/Resources"/>
+        <copy file="images/Eclipse.icns" todir="${project.path}/Penrose Studio.app/Contents/Resources"/>
         <chmod dir="${project.path}/Penrose Studio.app/Contents/MacOS" includes="*" perm="ugo+rx"/>
         <antcall target="build">
             <param name="platform" value="${platform}"/>
@@ -273,7 +273,7 @@
         <copy todir="${plugin.path}">
             <fileset dir=".">
                 <include name="META-INF/**"/>
-                <include name="media/**"/>
+                <include name="images/**"/>
                 <include name="lib/*.jar"/>
                 <include name="plugin.xml"/>
                 <include name="splash.bmp"/>
@@ -298,7 +298,7 @@
         <copy todir="${project.path}" file="installer/uninstall.png"/>
         <copy todir="${project.path}" file="installer/shortcuts-win32.xml"/>
         <copy todir="${project.path}" file="installer/shortcuts-unix.xml"/>
-        <copy todir="${project.path}" file="media/images/penrose.ico"/>
+        <copy todir="${project.path}" file="images/penrose.ico"/>
     </target>
 
     <target name="dist-all" depends="compile">

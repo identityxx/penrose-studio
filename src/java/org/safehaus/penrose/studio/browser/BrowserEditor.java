@@ -15,14 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.preview;
+package org.safehaus.penrose.studio.browser;
 
-import java.io.File;
-import java.util.Iterator;
 import java.util.Enumeration;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -37,31 +35,27 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.*;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.Penrose;
-import org.safehaus.penrose.PenroseFactory;
+import org.ietf.ldap.*;
 import org.safehaus.penrose.util.EntryUtil;
-import org.safehaus.penrose.user.UserConfig;
-import org.safehaus.penrose.config.PenroseConfig;
-import org.safehaus.penrose.session.PenroseSession;
-import org.safehaus.penrose.session.PenroseSearchControls;
-import org.safehaus.penrose.session.PenroseSearchResults;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.ietf.ldap.LDAPEntry;
-import org.ietf.ldap.LDAPAttribute;
-import org.ietf.ldap.LDAPAttributeSet;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.util.ApplicationConfig;
+import org.safehaus.penrose.config.PenroseConfig;
+import org.safehaus.penrose.user.UserConfig;
+import org.safehaus.penrose.service.ServiceConfig;
+import org.safehaus.penrose.ldap.PenroseLDAPService;
 
-public class PreviewEditor extends EditorPart {
+public class BrowserEditor extends EditorPart {
 
 	private Logger log = Logger.getLogger(getClass());
-
-    Text baseDnText;
+	
+    Text urlText;
     Text bindDnText;
 
     Tree tree;
     Table table;
 
-	Penrose penrose;
-    PenroseSession session;
+    LDAPConnection connection = new LDAPConnection();
     String password;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -70,12 +64,6 @@ public class PreviewEditor extends EditorPart {
     }
 
     public void dispose() {
-        try {
-            if (session != null) session.close();
-            if (penrose != null) penrose.stop();
-        } catch (Exception e) {
-            log.debug(e.getMessage(), e);
-        }
     }
 
 	public void createPartControl(final Composite parent) {
@@ -86,13 +74,13 @@ public class PreviewEditor extends EditorPart {
         composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         composite.setLayout(new GridLayout(5, false));
 
-        Label baseDnLabel = new Label(composite, SWT.NONE);
-        baseDnLabel.setText("Base DN:");
+        Label urlLabel = new Label(composite, SWT.NONE);
+        urlLabel.setText("URL:");
 
-        baseDnText = new Text(composite, SWT.BORDER);
-        baseDnText.setEnabled(false);
+        urlText = new Text(composite, SWT.BORDER);
+        urlText.setEnabled(false);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-        baseDnText.setLayoutData(gd);
+        urlText.setLayoutData(gd);
 
         Label bindDnLabel = new Label(composite, SWT.NONE);
         bindDnLabel.setText("Bind DN:");
@@ -108,23 +96,28 @@ public class PreviewEditor extends EditorPart {
         changeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    PreviewDialog dialog = new PreviewDialog(parent.getShell(), SWT.NONE);
-                    dialog.setBaseDn(baseDnText.getText());
+                    LDAPUrl url = new LDAPUrl(urlText.getText());
+
+                    BrowserDialog dialog = new BrowserDialog(parent.getShell(), SWT.NONE);
+                    dialog.setHostname(url.getHost());
+                    dialog.setPort(url.getPort());
+                    dialog.setBaseDn(url.getDN());
                     dialog.setBindDn(bindDnText.getText());
                     dialog.setBindPassword(password);
                     dialog.open();
 
-                    if (dialog.getAction() == PreviewDialog.CANCEL) return;
+                    if (dialog.getAction() == BrowserDialog.CANCEL) return;
 
+                    String hostname = dialog.getHostname();
+                    int port = dialog.getPort();
                     String baseDn = dialog.getBaseDn();
                     String bindDn = dialog.getBindDn();
                     String password = dialog.getBindPassword();
 
-                    open(baseDn, bindDn, password);
+                    open(hostname, port, baseDn, bindDn, password);
 
                 } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
+                    log.debug(e.getMessage(), e);
                 }
             }
         });
@@ -176,11 +169,19 @@ public class PreviewEditor extends EditorPart {
 
         try {
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
+
+            ApplicationConfig applicationConfig = penroseApplication.getApplicationConfig();
+            Project project = applicationConfig.getCurrentProject();
+            String hostname = project.getHost();
+
             PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+            ServiceConfig serviceConfig = penroseConfig.getServiceConfig("LDAP");
+            String s = serviceConfig.getParameter(PenroseLDAPService.LDAP_PORT);
+            int port = s == null ? PenroseLDAPService.DEFAULT_LDAP_PORT : Integer.parseInt(s);
 
             UserConfig rootUserConfig = penroseConfig.getRootUserConfig();
 
-            open("", rootUserConfig.getDn(), rootUserConfig.getPassword());
+            open(hostname, port, "", rootUserConfig.getDn(), rootUserConfig.getPassword());
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
@@ -190,23 +191,18 @@ public class PreviewEditor extends EditorPart {
 	public void setFocus() {
 	}
 
-    public void open(String baseDn, String bindDn, String password) throws Exception {
+    public void open(String hostname, int port, String baseDn, String bindDn, String password) throws Exception {
 
         tree.removeAll();
 
-        if (session != null) session.close();
-        if (penrose != null) penrose.stop();
+        LDAPUrl ldapUrl = new LDAPUrl(hostname, port, baseDn);
 
-        baseDnText.setText(baseDn == null ? "" : baseDn);
+        urlText.setText(ldapUrl.toString());
         bindDnText.setText(bindDn == null ? "" : bindDn);
         this.password = password;
 
-        PenroseFactory penroseFactory = PenroseFactory.getInstance();
-        penrose = penroseFactory.createPenrose(System.getProperty("user.dir")+File.separator+"tmp");
-        penrose.start();
-
-        session = penrose.newSession();
-        session.bind(bindDn, password);
+        connection.connect(hostname, port);
+        connection.bind(3, bindDn, password.getBytes());
 
         baseDn = baseDn == null ? "" : baseDn;
         String name = "".equals(baseDn) ? "Root DSE" : baseDn;
@@ -221,7 +217,7 @@ public class PreviewEditor extends EditorPart {
         treeItem.setExpanded(true);
 
         tree.setSelection(new TreeItem[] { treeItem });
-	}
+    }
 
     public void showChildren(TreeItem parentItem) throws Exception {
 
@@ -230,11 +226,8 @@ public class PreviewEditor extends EditorPart {
         String parentDn = (String)parentItem.getData();
 
         if ("".equals(parentDn)) {
-            PenroseSearchControls sc = new PenroseSearchControls();
-            sc.setScope(PenroseSearchControls.SCOPE_BASE);
-
-            PenroseSearchResults sr = session.search("", "(objectClass=*)", sc);
-            LDAPEntry parentEntry = (LDAPEntry)sr.next();
+            LDAPSearchResults sr = connection.search("", LDAPConnection.SCOPE_BASE, "(objectClass=*)", new String[0], false);
+            LDAPEntry parentEntry = sr.next();
 
             LDAPAttribute namingContexts = parentEntry.getAttribute("namingContexts");
 
@@ -250,13 +243,10 @@ public class PreviewEditor extends EditorPart {
 
         } else {
 
-            PenroseSearchControls sc = new PenroseSearchControls();
-            sc.setScope(PenroseSearchControls.SCOPE_ONE);
+            LDAPSearchResults sr = connection.search(parentDn, LDAPConnection.SCOPE_ONE, "(objectClass=*)", new String[0], true);
 
-            PenroseSearchResults sr = session.search(parentDn, "(objectClass=*)", sc);
-
-            while (sr.hasNext()) {
-                LDAPEntry entry = (LDAPEntry)sr.next();
+            while (sr.hasMore()) {
+                LDAPEntry entry = sr.next();
                 String dn = entry.getDN();
                 String rdn = EntryUtil.getRdn(dn).toString();
 
@@ -273,15 +263,12 @@ public class PreviewEditor extends EditorPart {
 
         table.removeAll();
 
-        String parentDn = (String)treeItem.getData();
+        String dn = (String)treeItem.getData();
 
-        PenroseSearchControls sc = new PenroseSearchControls();
-        sc.setScope(PenroseSearchControls.SCOPE_BASE);
+        LDAPSearchResults sr = connection.search(dn, LDAPConnection.SCOPE_BASE, "(objectClass=*)", new String[0], false);
+        if (!sr.hasMore()) return;
 
-        PenroseSearchResults sr = session.search(parentDn, "(objectClass=*)", sc);
-        if (!sr.hasNext()) return;
-
-        LDAPEntry entry = (LDAPEntry)sr.next();
+        LDAPEntry entry = sr.next();
 
         LDAPAttributeSet attributes = entry.getAttributeSet();
 

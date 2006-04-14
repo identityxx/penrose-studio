@@ -25,8 +25,6 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.preview.PreviewEditorInput;
 import org.safehaus.penrose.studio.preview.PreviewEditor;
-import org.safehaus.penrose.studio.console.ConsoleView;
-import org.safehaus.penrose.studio.console.ConsoleView;
 import org.apache.log4j.Logger;
 
 /**
@@ -40,7 +38,7 @@ public class PreviewAction extends Action {
 
         setText("&Preview");
         setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.PREVIEW));
-        setToolTipText("Preview Virtual Directory");
+        setToolTipText("Directory Preview");
         setId(getClass().getName());
     }
 

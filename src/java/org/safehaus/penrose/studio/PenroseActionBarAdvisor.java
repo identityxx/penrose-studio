@@ -43,6 +43,7 @@ import org.safehaus.penrose.studio.project.action.SaveAction;
 import org.safehaus.penrose.studio.project.action.UploadAction;
 import org.safehaus.penrose.studio.schema.action.ImportSchemaAction;
 import org.safehaus.penrose.studio.schema.action.NewSchemaAction;
+import org.safehaus.penrose.studio.browser.action.BrowserAction;
 import org.apache.log4j.Logger;
 
 public class PenroseActionBarAdvisor extends ActionBarAdvisor {
@@ -68,6 +69,7 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
     ValidationAction validationAction;
     ConsoleAction consoleAction;
 
+    BrowserAction browserAction;
     PreviewAction previewAction;
     RestartAction restartAction;
 
@@ -116,6 +118,7 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
             validationAction = new ValidationAction();
             consoleAction = new ConsoleAction();
 
+            browserAction = new BrowserAction();
             previewAction = new PreviewAction();
             restartAction = new RestartAction();
 
@@ -238,6 +241,9 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
 
             ActionContributionItem previewCI = new ActionContributionItem(previewAction);
             previewToolBar.add(previewCI);
+
+            ActionContributionItem browserCI = new ActionContributionItem(browserAction);
+            previewToolBar.add(browserCI);
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

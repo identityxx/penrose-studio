@@ -28,6 +28,7 @@ import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.properties.SystemPropertiesNode;
 import org.safehaus.penrose.studio.rootDse.RootDSENode;
 import org.safehaus.penrose.studio.user.AdministratorNode;
 import org.safehaus.penrose.studio.service.ServicesNode;
@@ -76,6 +77,7 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
     public final static String SERVICE           = "Service";
     public final static String ADMINISTRATOR     = "Administrator";
     public final static String ROOT_DSE          = "Root DSE";
+    public final static String SYSTEM_PROPERTIES = "System Properties";
 
 	private TreeViewer treeViewer;
 
@@ -127,16 +129,15 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                 ADMINISTRATOR,
                 null
         ));
-/*
-        nodes.add(new RootDSENode(
+
+        nodes.add(new SystemPropertiesNode(
                 this,
-                ROOT_DSE,
-                ROOT_DSE,
-                PenrosePlugin.getImage(PenroseImage.ROOT_DSE),
-                ROOT_DSE,
+                SYSTEM_PROPERTIES,
+                SYSTEM_PROPERTIES,
+                PenrosePlugin.getImage(PenroseImage.SYSTEM_PROPERTIES),
+                SYSTEM_PROPERTIES,
                 null
         ));
-*/
 	}
 	
 	/**

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.preview;
+package org.safehaus.penrose.studio.browser;
 
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
@@ -24,9 +24,12 @@ import org.eclipse.jface.resource.ImageDescriptor;
 /**
  * @author Endi S. Dewata
  */
-public class PreviewEditorInput implements IEditorInput {
+public class BrowserEditorInput implements IEditorInput {
 
-    public PreviewEditorInput() {
+    private String hostname;
+    private int port;
+
+    public BrowserEditorInput() {
     }
 
     public boolean exists() {
@@ -38,7 +41,7 @@ public class PreviewEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "Preview";
+        return "Browser";
     }
 
     public IPersistableElement getPersistable() {
@@ -46,7 +49,7 @@ public class PreviewEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return "Preview";
+        return "Browser";
     }
 
     public Object getAdapter(Class aClass) {
@@ -55,8 +58,24 @@ public class PreviewEditorInput implements IEditorInput {
 
     public boolean equals(Object o) {
         if (o == null) return false;
-        if (!(o instanceof PreviewEditorInput)) return false;
+        if (!(o instanceof BrowserEditorInput)) return false;
 
         return true;
+    }
+
+    public String getHostname() {
+        return hostname;
+    }
+
+    public void setHostname(String hostname) {
+        this.hostname = hostname;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 }

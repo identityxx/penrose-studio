@@ -27,7 +27,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.apache.log4j.Logger;
@@ -60,7 +59,7 @@ public class ProjectEditorDialog extends Dialog {
         createControl(shell);
     }
 
-    public void open () {
+    public void open() {
 
         Point size = new Point(400, 300);
         shell.setSize(size);

@@ -15,18 +15,20 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.preview;
+package org.safehaus.penrose.studio.properties;
 
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.safehaus.penrose.service.ServiceConfig;
+import org.safehaus.penrose.studio.service.ServiceEditorInput;
 
 /**
  * @author Endi S. Dewata
  */
-public class PreviewEditorInput implements IEditorInput {
+public class SystemPropertiesEditorInput implements IEditorInput {
 
-    public PreviewEditorInput() {
+    public SystemPropertiesEditorInput() {
     }
 
     public boolean exists() {
@@ -38,7 +40,7 @@ public class PreviewEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "Preview";
+        return "System Properties";
     }
 
     public IPersistableElement getPersistable() {
@@ -46,16 +48,21 @@ public class PreviewEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return "Preview";
+        return "System Properties";
     }
 
     public Object getAdapter(Class aClass) {
         return null;
     }
 
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (!(o instanceof PreviewEditorInput)) return false;
+    boolean equals(Object o1, Object o2) {
+        if (o1 == null && o2 == null) return true;
+        if (o1 != null) return o1.equals(o2);
+        return o2.equals(o1);
+    }
+
+    public boolean equals(Object object) {
+        if((object == null) || (object.getClass() != getClass())) return false;
 
         return true;
     }

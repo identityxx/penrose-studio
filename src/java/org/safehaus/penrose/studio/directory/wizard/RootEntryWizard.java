@@ -26,6 +26,7 @@ import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.StaticEntryDNWizardPage;
 import org.safehaus.penrose.util.EntryUtil;
+import org.safehaus.penrose.acl.ACI;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -87,6 +88,8 @@ public class RootEntryWizard extends Wizard {
             entryMapping.setDn(dnPage.getDn());
             entryMapping.addObjectClasses(ocPage.getSelectedObjectClasses());
             entryMapping.addAttributeMappings(attrPage.getAttributeMappings());
+
+            entryMapping.addACI(new ACI("rs"));
 
             partition.addEntryMapping(entryMapping);
 
