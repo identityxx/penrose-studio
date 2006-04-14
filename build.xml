@@ -155,21 +155,19 @@
     <target name="build-macosx-carbon">
         <property name="platform" value="macosx-carbon"/>
         <property name="project.path" value="target/penrose-studio-${project.version}-${platform}"/>
+        <!-- uncompress rpc -->
         <untar src="rcp/${rcp.prefix}-${platform}.tar.gz" dest="target/${rcp.prefix}-${platform}" compression="gzip"/>
         <move todir="${project.path}">
             <fileset dir="target/${rcp.prefix}-${platform}/eclipse"/>
         </move>
         <delete dir="target/${rcp.prefix}-${platform}"/>
-        <move todir="${project.path}/Penrose Studio.app">
-            <fileset dir="${project.path}/Eclipse.app"/>
-        </move>
-        <copy file="images/Eclipse.icns" todir="${project.path}/Penrose Studio.app/Contents/Resources"/>
+        <!-- apply universal binary patch -->
         <copy
             todir="${project.path}/plugins"
             file="rcp/org.eclipse.swt.carbon.macosx.ppc_3.1.0.jar"
             overwrite="true"
         />
-        <chmod dir="${project.path}/Penrose Studio.app/Contents/MacOS" includes="*" perm="ugo+rx"/>
+        <chmod file="${project.path}/eclipse" perm="ugo+rx"/>
         <antcall target="build">
             <param name="platform" value="${platform}"/>
         </antcall>
@@ -299,10 +297,6 @@
         <copy todir="${project.path}/docs">
             <fileset dir="docs" includes="*.url"/>
         </copy>
-        <copy todir="${project.path}" file="installer/uninstall.ico"/>
-        <copy todir="${project.path}" file="installer/uninstall.png"/>
-        <copy todir="${project.path}" file="installer/shortcuts-win32.xml"/>
-        <copy todir="${project.path}" file="installer/shortcuts-unix.xml"/>
         <copy todir="${project.path}" file="images/penrose.ico"/>
     </target>
 
@@ -347,6 +341,20 @@
     </target>
 
     <target name="dist-macosx-carbon" depends="build-macosx-carbon">
+        <!-- create DMG distro -->
+        <move todir="target/Penrose Studio.app">
+            <fileset dir="${project.path}/Eclipse.app"/>
+        </move>
+        <!-- copy everything into Penrose Studio.app -->
+        <copy todir="target/Penrose Studio.app/Contents/MacOS">
+            <fileset dir="${project.path}">
+                <exclude name="eclipse"/>
+            </fileset>
+        </copy>
+        <chmod file="target/Penrose Studio.app/Contents/MacOS/eclipse" perm="ugo+rx"/>
+        <copy file="rcp/Info.plist" todir="target/Penrose Studio.app/Contents" overwrite="true"/>
+        <copy file="images/Eclipse.icns" todir="target/Penrose Studio.app/Contents/Resources" overwrite="true"/>
+        <!-- create izpack distro -->
         <antcall target="dist">
             <param name="platform" value="macosx-carbon"/>
             <param name="dist.name" value="penrose-studio-${project.version}-${platform}"/>
@@ -392,6 +400,10 @@
                 <expandproperties/>
             </filterchain>
         </copy>
+        <copy todir="target/${dist.name}" file="installer/uninstall.ico"/>
+        <copy todir="target/${dist.name}" file="installer/uninstall.png"/>
+        <copy todir="target/${dist.name}" file="installer/shortcuts-win32.xml"/>
+        <copy todir="target/${dist.name}" file="installer/shortcuts-unix.xml"/>
         <mkdir dir="${project.dist}"/>
         <izpack
             output="${project.dist}/${dist.name}.jar"
