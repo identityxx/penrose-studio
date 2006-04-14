@@ -225,7 +225,8 @@ public class PreviewEditor extends EditorPart {
 
     public void showChildren(TreeItem parentItem) throws Exception {
 
-        parentItem.removeAll();
+        TreeItem items[] = parentItem.getItems();
+        for (int i=0; i<items.length; i++) items[i].dispose();
 
         String parentDn = (String)parentItem.getData();
 
