@@ -69,7 +69,9 @@ public class JNDISourcePropertyPage {
         this.source = editor.source;
 
         ConnectionConfig connectionConfig = partition.getConnectionConfig(source.getConnectionName());
-        client = new JNDIClient(connectionConfig.getParameters());
+        if (connectionConfig != null) {
+            client = new JNDIClient(connectionConfig.getParameters());
+        }
     }
 
     public Control createControl() {
@@ -246,10 +248,13 @@ public class JNDISourcePropertyPage {
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     String oldName = fieldDefinition.getName();
 
-                    client.getSchema();
-
-                    Schema schema = client.getSchema();
-                    Collection attributeTypes = schema.getAttributeTypes();
+                    Collection attributeTypes;
+                    if (client == null) {
+                        attributeTypes = new ArrayList();
+                    } else {
+                        Schema schema = client.getSchema();
+                        attributeTypes = schema.getAttributeTypes();
+                    }
 
                     JNDIFieldDialog dialog = new JNDIFieldDialog(editor.getParent().getShell(), SWT.NONE);
                     dialog.setAttributeTypes(attributeTypes);

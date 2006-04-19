@@ -118,14 +118,12 @@ public class JDBCConnectionWizardPage extends WizardPage implements ModifyListen
     }
 
     public void setVisible(boolean visible) {
-        System.out.println("[JDBCConnectionWizardPage] setVisible: "+visible);
         super.setVisible(visible);
 
         if (visible) init();
     }
 
     public void init() {
-        System.out.println("[JDBCConnectionWizardPage] init");
         try {
             ConnectionDriverPage page = (ConnectionDriverPage)getWizard().getPage(ConnectionDriverPage.NAME);
             Driver type = page.getDriver();
@@ -225,8 +223,6 @@ public class JDBCConnectionWizardPage extends WizardPage implements ModifyListen
     }
 
     public boolean validatePage() {
-        System.out.println("[JDBCConnectionWizardPage] validatePage");
-
         ConnectionDriverPage page = (ConnectionDriverPage)getWizard().getPage(ConnectionDriverPage.NAME);
         Driver type = page.getDriver();
         if (type == null) return false;

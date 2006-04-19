@@ -27,7 +27,11 @@ import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.source.JDBCSourceCachePage;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.SourceConfig;
+import org.safehaus.penrose.mapping.EntryMapping;
+import org.safehaus.penrose.mapping.SourceMapping;
 import org.apache.log4j.Logger;
+
+import java.util.Iterator;
 
 public class JDBCSourceEditor extends MultiPageEditorPart {
 
@@ -101,6 +105,15 @@ public class JDBCSourceEditor extends MultiPageEditorPart {
 
         if (!origSource.getName().equals(source.getName())) {
             partition.renameSourceConfig(origSource, source.getName());
+
+            for (Iterator i=partition.getEntryMappings().iterator(); i.hasNext(); ) {
+                EntryMapping entryMapping = (EntryMapping)i.next();
+                for (Iterator j=entryMapping.getSourceMappings().iterator(); j.hasNext(); ) {
+                    SourceMapping sourceMapping = (SourceMapping)j.next();
+                    if (!sourceMapping.getSourceName().equals(origSource.getName())) continue;
+                    sourceMapping.setSourceName(source.getName());
+                }
+            }
         }
 
         partition.modifySourceConfig(source.getName(), source);
