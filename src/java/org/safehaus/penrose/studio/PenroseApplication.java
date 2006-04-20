@@ -38,6 +38,7 @@ import org.safehaus.penrose.studio.util.ApplicationConfig;
 import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.studio.validation.ValidationView;
+import org.safehaus.penrose.studio.logger.LoggerManager;
 import org.safehaus.penrose.schema.*;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.*;
@@ -69,6 +70,7 @@ public class PenroseApplication implements IPlatformRunnable {
     SchemaManager schemaManager;
     PartitionManager partitionManager;
     ConnectionManager connectionManager;
+    LoggerManager loggerManager = new LoggerManager();
 
     PenroseWorkbenchAdvisor workbenchAdvisor;
     ArrayList changeListeners = new ArrayList();
@@ -183,11 +185,22 @@ public class PenroseApplication implements IPlatformRunnable {
 
         loadConnections();
 
+        //loadLoggers();
+
         notifyChangeListeners();
 
         log.debug("Project opened.");
     }
 
+    public void loadLoggers() throws Exception {
+        loggerManager.clear();
+
+        for (Iterator i=client.getLoggerNames().iterator(); i.hasNext(); ) {
+            String loggerName = (String)i.next();
+            loggerManager.addLogger(loggerName);
+        }
+
+    }
     public void initSystemProperties() throws Exception {
         for (Iterator i=penroseConfig.getSystemPropertyNames().iterator(); i.hasNext(); ) {
             String name = (String)i.next();
@@ -510,5 +523,13 @@ public class PenroseApplication implements IPlatformRunnable {
              -37, -80,  64,  33,   6,  76, -45,  69, 100,  85, -49,   9, -52, -35,  21,  23,
              -91, -29,  12, -55,  -3,  76,   9,-104,  17,  82,  29,  25, -71, -83, -19, -56
         };
+    }
+
+    public LoggerManager getLoggerManager() {
+        return loggerManager;
+    }
+
+    public void setLoggerManager(LoggerManager loggerManager) {
+        this.loggerManager = loggerManager;
     }
 }

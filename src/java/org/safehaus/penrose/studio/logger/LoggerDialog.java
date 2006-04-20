@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.driver;
+package org.safehaus.penrose.studio.logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -24,13 +24,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
+import org.safehaus.penrose.studio.driver.Parameter;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 
 /**
  * @author Endi S. Dewata
  */
-public class ParameterDialog extends Dialog {
+public class LoggerDialog extends Dialog {
 
     public final static int CANCEL = 0;
     public final static int OK     = 1;
@@ -38,15 +39,13 @@ public class ParameterDialog extends Dialog {
     Shell shell;
 
     Text nameText;
-    Combo typeCombo;
-    Text displayNameText;
-    Text defaultValue;
+    Combo levelCombo;
 
     private int action;
 
-    private Parameter parameter;
+    String level;
 
-	public ParameterDialog(Shell parent, int style) {
+	public LoggerDialog(Shell parent, int style) {
 		super(parent, style);
 
         shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
@@ -65,7 +64,7 @@ public class ParameterDialog extends Dialog {
         shell.setLocation(l.x + (s.x - size.x)/2, l.y + (s.y - size.y)/2);
 
         shell.setText(getText());
-        shell.setImage(PenrosePlugin.getImage(PenroseImage.LOGO16));
+        shell.setImage(PenrosePlugin.getImage(PenroseImage.LOGGER));
         shell.open();
 
         Display display = getParent().getDisplay();
@@ -88,29 +87,21 @@ public class ParameterDialog extends Dialog {
         nameLabel.setText("Name:");
 
         nameText = new Text(composite, SWT.BORDER);
+        nameText.setEnabled(false);
         nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label typeLabel = new Label(composite, SWT.NONE);
-        typeLabel.setText("Type:");
+        typeLabel.setText("Level:");
 
-        typeCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
-        typeCombo.add("NORMAL");
-        typeCombo.add("REQUIRED");
-        typeCombo.add("HIDDEN");
-        typeCombo.add("PASSWORD");
-        typeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        Label descriptionLabel = new Label(composite, SWT.NONE);
-        descriptionLabel.setText("Display Name:");
-
-        displayNameText = new Text(composite, SWT.BORDER);
-        displayNameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        Label defaultValueLabel = new Label(composite, SWT.NONE);
-        defaultValueLabel.setText("Default Value:");
-
-        defaultValue = new Text(composite, SWT.BORDER);
-        defaultValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        levelCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
+        levelCombo.add("");
+        levelCombo.add("OFF");
+        levelCombo.add("FATAL");
+        levelCombo.add("ERROR");
+        levelCombo.add("WARN");
+        levelCombo.add("INFO");
+        levelCombo.add("DEBUG");
+        levelCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Composite buttons = new Composite(parent, SWT.NONE);
         buttons.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -121,10 +112,7 @@ public class ParameterDialog extends Dialog {
 
 		saveButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-                parameter.setName(nameText.getText());
-                parameter.setTypeAsString(typeCombo.getText());
-                parameter.setDisplayName(displayNameText.getText());
-                parameter.setDefaultValue(defaultValue.getText().equals("") ? null : defaultValue.getText());
+                level = "".equals(levelCombo.getText()) ? null : levelCombo.getText();
                 action = OK;
                 shell.close();
 			}
@@ -139,23 +127,24 @@ public class ParameterDialog extends Dialog {
 		});
 	}
 
-    public Parameter getParameter() {
-        return parameter;
-    }
-
-    public void setParameter(Parameter parameter) {
-        this.parameter = parameter;
-        nameText.setText(parameter.getName() == null ? "" : parameter.getName());
-        typeCombo.setText(parameter.getTypeAsString() == null ? "" : parameter.getTypeAsString());
-        displayNameText.setText(parameter.getDisplayName() == null ? "" : parameter.getDisplayName());
-        defaultValue.setText(parameter.getDefaultValue() == null ? "" : parameter.getDefaultValue());
-    }
-
     public int getAction() {
         return action;
     }
 
     public void setAction(int action) {
         this.action = action;
+    }
+
+    public void setLoggerName(String name) {
+        nameText.setText(name);
+    }
+
+    public void setLoggerLevel(String level) {
+        this.level = level;
+        levelCombo.setText(level == null ? "" : level);
+    }
+
+    public String getLoggerLevel() {
+        return level;
     }
 }

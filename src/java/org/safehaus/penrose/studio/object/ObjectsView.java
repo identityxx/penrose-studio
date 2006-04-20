@@ -28,6 +28,7 @@ import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.logger.LoggersNode;
 import org.safehaus.penrose.studio.properties.SystemPropertiesNode;
 import org.safehaus.penrose.studio.rootDse.RootDSENode;
 import org.safehaus.penrose.studio.user.AdministratorNode;
@@ -78,6 +79,8 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
     public final static String ADMINISTRATOR     = "Administrator";
     public final static String ROOT_DSE          = "Root DSE";
     public final static String SYSTEM_PROPERTIES = "System Properties";
+    public final static String LOGGERS           = "Loggers";
+    public final static String LOGGER            = "Logger";
 
 	private TreeViewer treeViewer;
 
@@ -138,6 +141,16 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                 SYSTEM_PROPERTIES,
                 null
         ));
+/*
+        nodes.add(new LoggersNode(
+                this,
+                LOGGERS,
+                LOGGERS,
+                PenrosePlugin.getImage(PenroseImage.SYSTEM_PROPERTIES),
+                LOGGERS,
+                null
+        ));
+*/
 	}
 	
 	/**

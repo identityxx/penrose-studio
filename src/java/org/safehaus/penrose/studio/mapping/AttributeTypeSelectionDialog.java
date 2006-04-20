@@ -32,9 +32,7 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.apache.log4j.Logger;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * @author Endi S. Dewata
@@ -159,7 +157,8 @@ public class AttributeTypeSelectionDialog extends Dialog implements SelectionLis
 
         objectClassCombo.add("");
 
-        for (Iterator i=schemaManager.getObjectClasses().iterator(); i.hasNext(); ) {
+        Collection list = sortObjectClasses(schemaManager.getObjectClasses());
+        for (Iterator i=list.iterator(); i.hasNext(); ) {
             ObjectClass oc = (ObjectClass)i.next();
             objectClassCombo.add(oc.getName());
         }
@@ -173,7 +172,8 @@ public class AttributeTypeSelectionDialog extends Dialog implements SelectionLis
 
         if ("".equals(ocName)) {
 
-            for (Iterator i=schemaManager.getAttributeTypes().iterator(); i.hasNext(); ) {
+            Collection list = sortAttributeTypes(schemaManager.getAttributeTypes());
+            for (Iterator i=list.iterator(); i.hasNext(); ) {
                 AttributeType at = (AttributeType)i.next();
 
                 TableItem item = new TableItem(attributeTable, SWT.NONE);
@@ -224,5 +224,23 @@ public class AttributeTypeSelectionDialog extends Dialog implements SelectionLis
 
     public void setAction(int action) {
         this.action = action;
+    }
+
+    public Collection sortAttributeTypes(Collection list) {
+        Map map = new TreeMap();
+        for (Iterator i=list.iterator(); i.hasNext(); ) {
+            AttributeType at = (AttributeType)i.next();
+            map.put(at.getName(), at);
+        }
+        return map.values();
+    }
+
+    public Collection sortObjectClasses(Collection list) {
+        Map map = new TreeMap();
+        for (Iterator i=list.iterator(); i.hasNext(); ) {
+            ObjectClass oc = (ObjectClass)i.next();
+            map.put(oc.getName(), oc);
+        }
+        return map.values();
     }
 }

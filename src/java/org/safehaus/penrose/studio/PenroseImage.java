@@ -54,4 +54,5 @@ public class PenroseImage {
     public final static String SERVICE           = "images/service.png";
     public final static String SPLASH            = "splash.bmp";
     public final static String SYSTEM_PROPERTIES = "images/properties.png";
+    public final static String LOGGER            = "images/logger.png";
 }
