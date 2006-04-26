@@ -13,6 +13,8 @@
     <property name="rcp.prefix" value="eclipse-RCP-3.1"/>
     <property name="iscc.path" value="ISCC.exe"/>
 
+    <tstamp/>
+
     <path id="lib.path">
         <fileset dir="lib">
             <include name="*.jar"/>
@@ -88,6 +90,9 @@
     		<patternset>
     			<exclude name="**/.svn"/>
     		</patternset>
+            <manifest>
+              <attribute name="Built-Date" value="${DSTAMP}"/>
+            </manifest>
     	</jar>
     </target>
 
@@ -221,40 +226,14 @@
     </target>
 -->
 
-    <target name="pre-build">
+    <target name="build" depends="compile">
         <property name="project.path" value="target/penrose-studio-${project.version}-${platform}"/>
         <property name="plugin.path" value="${project.path}/plugins/org.safehaus.penrose_${project.version}"/>
         <mkdir dir="${project.path}"/>
         <mkdir dir="${plugin.path}"/>
         <copy todir="target" file="LICENSE.txt"/>
         <copy todir="${project.path}" file="LICENSE.txt"/>
-        <copy tofile="${project.path}/penrose.license" file="licenses/freeware.license"/>
-    </target>
-
-    <target name="build-pro" if="penrose.pro">
-        <copy
-            todir="target"
-            file="licenses/LICENSE.txt"
-            overwrite="true"
-        />
-        <copy
-            todir="${project.path}"
-            file="licenses/LICENSE.txt"
-            overwrite="true"
-        />
-        <copy
-            tofile="${project.path}/penrose.license"
-            file="licenses/evaluation.license"
-            overwrite="true"
-        />
-        <copy todir="${plugin.path}/lib" overwrite="true">
-            <fileset dir="lib/penrose">
-                <include name="*.jar"/>
-            </fileset>
-        </copy>
-    </target>
-
-    <target name="build" depends="compile,pre-build,build-pro">
+        <copy todir="${project.path}" file="penrose.license"/>
         <copy todir="${project.path}/conf">
             <fileset dir="conf">
                 <include name="*.*"/>
