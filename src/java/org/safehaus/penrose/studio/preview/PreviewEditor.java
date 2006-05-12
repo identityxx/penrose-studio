@@ -52,6 +52,11 @@ import org.safehaus.penrose.session.PenroseSearchControls;
 import org.safehaus.penrose.session.PenroseSearchResults;
 import org.safehaus.penrose.studio.PenroseApplication;
 
+import javax.naming.directory.SearchResult;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.NamingEnumeration;
+
 public class PreviewEditor extends EditorPart {
 
 	private Logger log = Logger.getLogger(getClass());
@@ -259,7 +264,7 @@ public class PreviewEditor extends EditorPart {
             PenroseSearchResults sr = session.search(parentDn, "(objectClass=*)", sc);
 
             while (sr.hasNext()) {
-            	SearchResult entry = (SearchResult)sr.next();
+                SearchResult entry = (SearchResult)sr.next();
                 String dn = entry.getName();
                 String rdn = EntryUtil.getRdn(dn).toString();
 
@@ -293,7 +298,8 @@ public class PreviewEditor extends EditorPart {
             String name = attribute.getID();
 
             for (NamingEnumeration e = attribute.getAll(); e.hasMore(); ) {
-                String value = (String)e.next();
+                Object object = e.next();
+                String value = object instanceof byte[] ? "(binary)" : object.toString();
 
                 TableItem tableItem = new TableItem(table, SWT.NONE);
                 tableItem.setText(0, name);

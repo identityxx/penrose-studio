@@ -92,6 +92,7 @@ public class JNDIFieldDialog extends FieldDialog {
         fieldConfig.setLength(length);
         fieldConfig.setPrecision(precision);
         fieldConfig.setUnique(uniqueCheckbox.getSelection());
+        fieldConfig.setCaseSensitive(caseSensitiveCheckbox.getSelection());
     }
 
     public Composite createSelectorPage(Composite parent) {

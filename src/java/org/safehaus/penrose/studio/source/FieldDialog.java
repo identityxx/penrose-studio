@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.partition.FieldConfig;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.apache.log4j.Logger;
 
 import java.lang.reflect.Field;
 import java.sql.Types;
@@ -36,6 +37,8 @@ import java.util.*;
  * @author Endi S. Dewata
  */
 public class FieldDialog extends Dialog {
+
+    Logger log = Logger.getLogger(getClass());
 
     public final static int CANCEL = 0;
     public final static int OK     = 1;
@@ -48,6 +51,7 @@ public class FieldDialog extends Dialog {
     Text lengthText;
     Text precisionText;
     Button uniqueCheckbox;
+    Button caseSensitiveCheckbox;
 
     FieldConfig fieldConfig;
     int action;
@@ -146,6 +150,7 @@ public class FieldDialog extends Dialog {
         fieldConfig.setLength(length);
         fieldConfig.setPrecision(precision);
         fieldConfig.setUnique(uniqueCheckbox.getSelection());
+        fieldConfig.setCaseSensitive(caseSensitiveCheckbox.getSelection());
     }
 
     public Composite createSelectorPage(Composite parent) {
@@ -208,6 +213,16 @@ public class FieldDialog extends Dialog {
         gd.widthHint = 50;
 		uniqueCheckbox.setLayoutData(gd);
 
+        Label caseSensitiveLabel = new Label(composite, SWT.NONE);
+        caseSensitiveLabel.setText("Case Sensitive:");
+        gd = new GridData(GridData.FILL);
+        caseSensitiveLabel.setLayoutData(gd);
+
+        caseSensitiveCheckbox = new Button(composite, SWT.CHECK);
+        gd = new GridData(GridData.FILL);
+        gd.widthHint = 50;
+        caseSensitiveCheckbox.setLayoutData(gd);
+
         return composite;
 	}
 
@@ -231,5 +246,6 @@ public class FieldDialog extends Dialog {
         lengthText.setText(""+fieldConfig.getLength());
         precisionText.setText(""+fieldConfig.getPrecision());
         uniqueCheckbox.setSelection(fieldConfig.isUnique());
+        caseSensitiveCheckbox.setSelection(fieldConfig.isCaseSensitive());
     }
 }
