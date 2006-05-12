@@ -32,11 +32,17 @@ import org.safehaus.penrose.util.JNDIClient;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
+import org.ietf.ldap.*;
 
 import javax.naming.InitialContext;
 import javax.naming.Context;
-import java.util.Collection;
-import java.util.Iterator;
+import javax.naming.NamingEnumeration;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
+import javax.naming.directory.Attribute;
+import javax.naming.ldap.InitialLdapContext;
+import javax.naming.ldap.LdapContext;
+import java.util.*;
 
 /**
  * @author Endi S. Dewata
@@ -44,7 +50,7 @@ import java.util.Iterator;
 public class JNDIConnectionPropertiesPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
-    
+
     FormToolkit toolkit;
 
     Text nameText;
@@ -193,7 +199,7 @@ public class JNDIConnectionPropertiesPage extends FormPage {
         if (s[3] != null) suffixCombo.setText(s[3]);
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 3;
-		suffixCombo.setLayoutData(gd);
+        suffixCombo.setLayoutData(gd);
 
         suffixCombo.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
@@ -212,13 +218,11 @@ public class JNDIConnectionPropertiesPage extends FormPage {
         fetchButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 try {
-                    JNDIClient client = editor.getClient();
-                    client.init(connectionConfig.getParameters());
-
-                    Collection namingContexts = client.getNamingContexts();
+                    JNDIClient client = new JNDIClient(connectionConfig.getParameters());
+                    Collection list = client.getNamingContexts();
 
                     suffixCombo.removeAll();
-                    for (Iterator i=namingContexts.iterator(); i.hasNext(); ) {
+                    for (Iterator i=list.iterator(); i.hasNext(); ) {
                         String baseDn = (String)i.next();
                         suffixCombo.add(baseDn);
                     }
@@ -239,7 +243,7 @@ public class JNDIConnectionPropertiesPage extends FormPage {
 
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 5;
-		bindDnText.setLayoutData(gd);
+        bindDnText.setLayoutData(gd);
 
         bindDnText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
@@ -256,7 +260,7 @@ public class JNDIConnectionPropertiesPage extends FormPage {
 
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 5;
-		passwordText.setLayoutData(gd);
+        passwordText.setLayoutData(gd);
 
         passwordText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
@@ -270,7 +274,7 @@ public class JNDIConnectionPropertiesPage extends FormPage {
         Button testButton = toolkit.createButton(composite, "Test Connection", SWT.PUSH);
         gd = new GridData();
         gd.horizontalSpan = 5;
-		testButton.setLayoutData(gd);
+        testButton.setLayoutData(gd);
 
         testButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {

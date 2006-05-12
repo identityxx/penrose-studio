@@ -48,8 +48,6 @@ public class JNDIConnectionEditor extends FormEditor {
     ConnectionConfig origConnectionConfig;
     private ConnectionConfig connectionConfig;
 
-    private JNDIClient client;
-
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         JNDIConnectionEditorInput cei = (JNDIConnectionEditorInput)input;
 
@@ -60,22 +58,6 @@ public class JNDIConnectionEditor extends FormEditor {
         setSite(site);
         setInput(input);
         setPartName(partition.getName()+"/"+connectionConfig.getName());
-
-        try {
-            client = new JNDIClient(connectionConfig.getParameters());
-            
-        } catch (Exception e) {
-            log.debug(e.getMessage(), e);
-            throw new PartInitException(e.getMessage(), e);
-        }
-    }
-
-    public void dispose() {
-        try {
-            client.close();
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
     }
 
     public void addPages() {
@@ -167,10 +149,6 @@ public class JNDIConnectionEditor extends FormEditor {
         } finally {
             firePropertyChange(PROP_DIRTY);
         }
-    }
-
-    public JNDIClient getClient() {
-        return client;
     }
 
     public Partition getPartition() {

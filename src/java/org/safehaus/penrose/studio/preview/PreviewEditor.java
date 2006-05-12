@@ -21,6 +21,11 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.Enumeration;
 
+import javax.naming.NamingEnumeration;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.SearchResult;
+
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
@@ -46,9 +51,6 @@ import org.safehaus.penrose.session.PenroseSession;
 import org.safehaus.penrose.session.PenroseSearchControls;
 import org.safehaus.penrose.session.PenroseSearchResults;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.ietf.ldap.LDAPEntry;
-import org.ietf.ldap.LDAPAttribute;
-import org.ietf.ldap.LDAPAttributeSet;
 
 public class PreviewEditor extends EditorPart {
 
@@ -235,12 +237,12 @@ public class PreviewEditor extends EditorPart {
             sc.setScope(PenroseSearchControls.SCOPE_BASE);
 
             PenroseSearchResults sr = session.search("", "(objectClass=*)", sc);
-            LDAPEntry parentEntry = (LDAPEntry)sr.next();
+            SearchResult parentEntry = (SearchResult)sr.next();
 
-            LDAPAttribute namingContexts = parentEntry.getAttribute("namingContexts");
+            Attribute namingContexts = parentEntry.getAttributes().get("namingContexts");
 
-            for (Enumeration e = namingContexts.getStringValues(); e.hasMoreElements(); ) {
-                String namingContext = (String)e.nextElement();
+            for (NamingEnumeration e = namingContexts.getAll(); e.hasMore(); ) {
+                String namingContext = (String)e.next();
 
                 TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
                 treeItem.setText(namingContext);
@@ -257,8 +259,8 @@ public class PreviewEditor extends EditorPart {
             PenroseSearchResults sr = session.search(parentDn, "(objectClass=*)", sc);
 
             while (sr.hasNext()) {
-                LDAPEntry entry = (LDAPEntry)sr.next();
-                String dn = entry.getDN();
+            	SearchResult entry = (SearchResult)sr.next();
+                String dn = entry.getName();
                 String rdn = EntryUtil.getRdn(dn).toString();
 
                 TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
@@ -282,16 +284,16 @@ public class PreviewEditor extends EditorPart {
         PenroseSearchResults sr = session.search(parentDn, "(objectClass=*)", sc);
         if (!sr.hasNext()) return;
 
-        LDAPEntry entry = (LDAPEntry)sr.next();
+        SearchResult entry = (SearchResult)sr.next();
 
-        LDAPAttributeSet attributes = entry.getAttributeSet();
+        Attributes attributes = entry.getAttributes();
 
-        for (Iterator i = attributes.iterator(); i.hasNext(); ) {
-            LDAPAttribute attribute = (LDAPAttribute)i.next();
-            String name = attribute.getName();
+        for (NamingEnumeration i = attributes.getAll(); i.hasMore(); ) {
+            Attribute attribute = (Attribute)i.next();
+            String name = attribute.getID();
 
-            for (Enumeration e = attribute.getStringValues(); e.hasMoreElements(); ) {
-                String value = (String)e.nextElement();
+            for (NamingEnumeration e = attribute.getAll(); e.hasMore(); ) {
+                String value = (String)e.next();
 
                 TableItem tableItem = new TableItem(table, SWT.NONE);
                 tableItem.setText(0, name);

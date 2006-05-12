@@ -139,11 +139,7 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
 
                 } catch (Exception ex) {
                     log.debug(ex.getMessage(), ex);
-                    MessageDialog.openError(
-                            parent.getShell(),
-                            "Failed to fetch base DNs",
-                            "Error: "+ex.getMessage()
-                    );
+                    MessageDialog.openError(parent.getShell(), "Failed to fetch base DNs", "Error: "+ex.getMessage());
                 }
             }
         });
@@ -185,7 +181,7 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
 
                 try {
                     JNDIClient client = new JNDIClient(env);
-                    client.close();
+                    client.getContext().close();
                     MessageDialog.openInformation(parent.getShell(), "Test Connection Result", "Connection successful!");
 
                 } catch (Exception ex) {

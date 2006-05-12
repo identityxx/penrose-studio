@@ -27,14 +27,8 @@ import org.safehaus.penrose.util.JNDIClient;
 import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.mapping.Entry;
-import org.safehaus.penrose.connector.ConnectionManager;
-import org.safehaus.penrose.studio.PenroseApplication;
 import org.apache.log4j.Logger;
-import org.ietf.ldap.LDAPEntry;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingEnumeration;
 import javax.naming.directory.SearchResult;
 import java.util.*;
 
@@ -151,8 +145,8 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
             Collection results = client.getChildren("");
 
             for (Iterator i=results.iterator(); i.hasNext(); ) {
-                LDAPEntry entry = (LDAPEntry)i.next();
-                String dn = entry.getDN();
+                SearchResult entry = (SearchResult)i.next();
+                String dn = entry.getName();
 
                 TreeItem it = new TreeItem(item, SWT.NONE);
                 it.setText(dn);
@@ -186,8 +180,8 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
             Collection results = client.getChildren(baseDn);
 
             for (Iterator i=results.iterator(); i.hasNext(); ) {
-                LDAPEntry entry = (LDAPEntry)i.next();
-                String dn = entry.getDN();
+                SearchResult entry = (SearchResult)i.next();
+                String dn = entry.getName();
                 String rdn = EntryUtil.getRdn(dn).toString();
 
                 TreeItem it = new TreeItem(item, SWT.NONE);
