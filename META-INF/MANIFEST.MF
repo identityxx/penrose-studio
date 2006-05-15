@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Penrose Studio
 Bundle-SymbolicName: org.safehaus.penrose; singleton:=true
 Bundle-Version: 1.0
-Bundle-Vendor: safehaus.org
+Bundle-Vendor: Identyx
 Bundle-Activator: org.safehaus.penrose.studio.PenrosePlugin
 Bundle-Localization: plugin
 Eclipse-AutoStart: true
