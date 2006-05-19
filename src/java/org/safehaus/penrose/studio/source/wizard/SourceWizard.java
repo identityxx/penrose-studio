@@ -117,6 +117,9 @@ public class SourceWizard extends Wizard {
             } else if ("JNDI".equals(adapterName)) {
                 jndiTreePage.setConnectionConfig(partition, connectionConfig);
                 return jndiTreePage;
+
+            } else {
+                return null;
             }
 
         } else if (jdbcTablePage == page) {

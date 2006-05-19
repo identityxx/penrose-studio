@@ -18,6 +18,7 @@
 package org.safehaus.penrose.studio.source.wizard;
 
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
@@ -34,6 +35,8 @@ import org.safehaus.penrose.partition.TableConfig;
 import org.apache.log4j.Logger;
 
 import java.util.*;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 
 /**
  * @author Endi S. Dewata
@@ -48,6 +51,9 @@ public class JDBCFieldWizardPage extends WizardPage {
     Table selectedTable;
 
     Text filterText;
+
+    ConnectionConfig connectionConfig;
+    TableConfig tableConfig;
 
     public JDBCFieldWizardPage() {
         super(NAME);
@@ -226,6 +232,16 @@ public class JDBCFieldWizardPage extends WizardPage {
     }
 
     public void setTableConfig(ConnectionConfig connectionConfig, TableConfig tableConfig) {
+        this.connectionConfig = connectionConfig;
+        this.tableConfig = tableConfig;
+    }
+
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+        if (visible) init();
+    }
+
+    public void init() {
         try {
             String catalog = tableConfig.getCatalog();
             String schema = tableConfig.getSchema();
@@ -236,7 +252,7 @@ public class JDBCFieldWizardPage extends WizardPage {
             client.connect();
             Collection fields = client.getColumns(catalog, schema, tableName);
             client.close();
-            
+
             if (fields == null) return;
 
             Set set = new HashSet();
@@ -260,6 +276,15 @@ public class JDBCFieldWizardPage extends WizardPage {
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
+
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            String message = sw.toString();
+            if (message.length() > 500) {
+                message = message.substring(0, 500) + "...";
+            }
+            MessageDialog.openError(getShell(), "Error", "Error: "+message);
         }
     }
 
