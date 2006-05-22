@@ -51,6 +51,7 @@ import org.safehaus.penrose.session.PenroseSession;
 import org.safehaus.penrose.session.PenroseSearchControls;
 import org.safehaus.penrose.session.PenroseSearchResults;
 import org.safehaus.penrose.studio.PenroseApplication;
+import org.ietf.ldap.LDAPException;
 
 import javax.naming.directory.SearchResult;
 import javax.naming.directory.Attribute;
@@ -264,15 +265,26 @@ public class PreviewEditor extends EditorPart {
             PenroseSearchResults sr = session.search(parentDn, "(objectClass=*)", sc);
 
             while (sr.hasNext()) {
-                SearchResult entry = (SearchResult)sr.next();
-                String dn = entry.getName();
-                String rdn = EntryUtil.getRdn(dn).toString();
+                try {
+                    SearchResult entry = (SearchResult)sr.next();
+                    String dn = entry.getName();
+                    String rdn = EntryUtil.getRdn(dn).toString();
 
+                    TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
+                    treeItem.setText(rdn);
+                    treeItem.setData(dn);
+
+                    new TreeItem(treeItem, SWT.NONE);
+
+                } catch (Exception e) {
+                    TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
+                    treeItem.setText(e.getMessage());
+                }
+            }
+
+            if (sr.getReturnCode() != LDAPException.SUCCESS) {
                 TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
-                treeItem.setText(rdn);
-                treeItem.setData(dn);
-
-                new TreeItem(treeItem, SWT.NONE);
+                treeItem.setText("LDAP Error: "+sr.getReturnCode());
             }
         }
     }
@@ -282,6 +294,7 @@ public class PreviewEditor extends EditorPart {
         table.removeAll();
 
         String parentDn = (String)treeItem.getData();
+        if (parentDn == null) return;
 
         PenroseSearchControls sc = new PenroseSearchControls();
         sc.setScope(PenroseSearchControls.SCOPE_BASE);
