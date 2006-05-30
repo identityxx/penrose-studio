@@ -255,6 +255,8 @@ public class JNDIConnectionPropertiesPage extends FormPage {
         toolkit.createLabel(composite, "Credentials:");
 
         passwordText = toolkit.createText(composite, "", SWT.BORDER | SWT.PASSWORD);
+        passwordText.setEchoChar('*');
+
         value = connectionConfig.getParameter(Context.SECURITY_CREDENTIALS);
         if (value != null) passwordText.setText(value);
 
