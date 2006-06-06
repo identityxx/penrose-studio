@@ -15,14 +15,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.logger;
+package org.safehaus.penrose.studio.logging;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.log4j.LoggerConfig;
+import org.safehaus.penrose.log4j.Log4jConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
@@ -30,10 +31,6 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 import org.apache.log4j.Logger;
-
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
@@ -43,10 +40,12 @@ public class LoggerNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
+    LoggerConfig loggerConfig;
 
     public LoggerNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
         this.view = view;
+        this.loggerConfig = (LoggerConfig)object;
     }
 
     public void showMenu(IMenuManager manager) {
@@ -74,62 +73,17 @@ public class LoggerNode extends Node {
 
     public void open() throws Exception {
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseClient client = penroseApplication.getClient();
-        String loggerName = (String)getObject();
-        String level = client.getLoggerLevel(loggerName);
-
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
         LoggerDialog dialog = new LoggerDialog(shell, SWT.NONE);
-        dialog.setText("Logger");
-        dialog.setLoggerName(loggerName);
-        dialog.setLoggerLevel(level);
+        dialog.setText("Edit Logger");
+        dialog.setLoggerConfig(loggerConfig);
         dialog.open();
-
-        if (dialog.getAction() == LoggerDialog.CANCEL) return;
-
-        String newLevel = dialog.getLoggerLevel();
-        if (level == null && newLevel == null || level.equals(newLevel)) return;
-
-        client.setLoggerLevel(loggerName, newLevel);
     }
 
     public void remove() throws Exception {
-    }
-
-    public boolean hasChildren() throws Exception {
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        LoggerManager loggerManager = penroseApplication.getLoggerManager();
-        String loggerName = (String)getObject();
-        return !loggerManager.getLoggers(loggerName).isEmpty();
-    }
-
-    public Collection getChildren() throws Exception {
-
-        Collection children = new ArrayList();
-
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        LoggerManager loggerManager = penroseApplication.getLoggerManager();
-        String loggerName = (String)getObject();
-
-        for (Iterator i=loggerManager.getLoggers(loggerName).iterator(); i.hasNext(); ) {
-            String childName = (String)i.next();
-
-            int p = childName.lastIndexOf(".");
-            String rname = childName.substring(p+1);
-
-            LoggerNode loggerNode = new LoggerNode(
-                    view,
-                    rname,
-                    ObjectsView.LOGGER,
-                    PenrosePlugin.getImage(PenroseImage.SCHEMA),
-                    childName,
-                    this
-            );
-
-            children.add(loggerNode);
-        }
-
-        return children;
+        Log4jConfig loggingConfig = penroseApplication.getLoggingConfig();
+        loggingConfig.removeLoggerConfig(loggerConfig.getName());
+        penroseApplication.notifyChangeListeners();
     }
 }

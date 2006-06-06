@@ -15,21 +15,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.logger;
+package org.safehaus.penrose.studio.logging;
 
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.schema.action.ImportSchemaAction;
-import org.safehaus.penrose.studio.schema.action.NewSchemaAction;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.log4j.Log4jConfig;
+import org.safehaus.penrose.log4j.LoggerConfig;
+import org.safehaus.penrose.log4j.RootConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Action;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -51,36 +52,65 @@ public class LoggersNode extends Node {
     }
 
     public void showMenu(IMenuManager manager) {
-        manager.add(new NewSchemaAction());
-        manager.add(new ImportSchemaAction());
+
+        manager.add(new Action("Root Logger") {
+            public void run() {
+                try {
+                    open();
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Action("New Logger...") {
+            public void run() {
+                try {
+                    createLogger();
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                }
+            }
+        });
     }
 
     public void open() throws Exception {
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseClient client = penroseApplication.getClient();
-        String level = client.getLoggerLevel(null);
+        Log4jConfig loggingConfig = penroseApplication.getLoggingConfig();
+
+        RootConfig rootConfig = loggingConfig.getRootConfig();
 
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
         LoggerDialog dialog = new LoggerDialog(shell, SWT.NONE);
-        dialog.setText("Logger");
-        dialog.setLoggerName("Root Logger");
-        dialog.setLoggerLevel(level);
+        dialog.setText("Edit Logger");
+        dialog.setRootConfig(rootConfig);
+        dialog.open();
+    }
+
+    public void createLogger() throws Exception {
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        Log4jConfig loggingConfig = penroseApplication.getLoggingConfig();
+
+        LoggerConfig loggerConfig = new LoggerConfig();
+
+        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+        LoggerDialog dialog = new LoggerDialog(shell, SWT.NONE);
+        dialog.setText("Add Logger");
+        dialog.setLoggerConfig(loggerConfig);
         dialog.open();
 
         if (dialog.getAction() == LoggerDialog.CANCEL) return;
 
-        String newLevel = dialog.getLoggerLevel();
-        if (level == null && newLevel == null || level.equals(newLevel)) return;
+        loggingConfig.addLoggerConfig(loggerConfig);
 
-        client.setLoggerLevel(null, newLevel);
+        penroseApplication.notifyChangeListeners();
     }
 
     public boolean hasChildren() throws Exception {
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        LoggerManager loggerManager = penroseApplication.getLoggerManager();
-        Collection loggers = loggerManager.getLoggers();
-        if (loggers == null) return false;
-        return !loggers.isEmpty();
+        Log4jConfig loggingConfig = penroseApplication.getLoggingConfig();
+
+        return !loggingConfig.getLoggerConfigs().isEmpty();
     }
 
     public Collection getChildren() throws Exception {
@@ -88,17 +118,17 @@ public class LoggersNode extends Node {
         Collection children = new ArrayList();
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        LoggerManager loggerManager = penroseApplication.getLoggerManager();
+        Log4jConfig loggingConfig = penroseApplication.getLoggingConfig();
 
-        for (Iterator i=loggerManager.getLoggers().iterator(); i.hasNext(); ) {
-            String loggerName = (String)i.next();
+        for (Iterator i=loggingConfig.getLoggerConfigs().iterator(); i.hasNext(); ) {
+            LoggerConfig loggerConfig = (LoggerConfig)i.next();
 
             LoggerNode loggerNode = new LoggerNode(
                     view,
-                    loggerName,
+                    loggerConfig.getName(),
                     ObjectsView.LOGGER,
-                    PenrosePlugin.getImage(PenroseImage.SCHEMA),
-                    loggerName,
+                    PenrosePlugin.getImage(PenroseImage.LOGGER),
+                    loggerConfig,
                     this
             );
 
