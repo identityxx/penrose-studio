@@ -37,8 +37,8 @@ public class JDBCSourceEditor extends MultiPageEditorPart {
 
     Logger log = Logger.getLogger(getClass());
 
-	SourceConfig source;
-    SourceConfig origSource;
+	SourceConfig sourceConfig;
+    SourceConfig origSourceConfig;
 
     boolean dirty;
 
@@ -49,12 +49,12 @@ public class JDBCSourceEditor extends MultiPageEditorPart {
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         JDBCSourceEditorInput ei = (JDBCSourceEditorInput)input;
         partition = ei.getPartition();
-        origSource = ei.getSourceConfig();
-        source = (SourceConfig)origSource.clone();
+        origSourceConfig = ei.getSourceConfig();
+        sourceConfig = (SourceConfig)origSourceConfig.clone();
 
         setSite(site);
         setInput(input);
-        setPartName(partition.getName()+"/"+source.getName());
+        setPartName(partition.getName()+"/"+sourceConfig.getName());
     }
 
     protected void createPages() {
@@ -103,22 +103,22 @@ public class JDBCSourceEditor extends MultiPageEditorPart {
 
     public void store() throws Exception {
 
-        if (!origSource.getName().equals(source.getName())) {
-            partition.renameSourceConfig(origSource, source.getName());
+        if (!origSourceConfig.getName().equals(sourceConfig.getName())) {
+            partition.renameSourceConfig(origSourceConfig, sourceConfig.getName());
 
             for (Iterator i=partition.getEntryMappings().iterator(); i.hasNext(); ) {
                 EntryMapping entryMapping = (EntryMapping)i.next();
                 for (Iterator j=entryMapping.getSourceMappings().iterator(); j.hasNext(); ) {
                     SourceMapping sourceMapping = (SourceMapping)j.next();
-                    if (!sourceMapping.getSourceName().equals(origSource.getName())) continue;
-                    sourceMapping.setSourceName(source.getName());
+                    if (!sourceMapping.getSourceName().equals(origSourceConfig.getName())) continue;
+                    sourceMapping.setSourceName(sourceConfig.getName());
                 }
             }
         }
 
-        partition.modifySourceConfig(source.getName(), source);
+        partition.modifySourceConfig(sourceConfig.getName(), sourceConfig);
 
-        setPartName(partition.getName()+"/"+source.getName());
+        setPartName(partition.getName()+"/"+sourceConfig.getName());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         penroseApplication.notifyChangeListeners();
@@ -138,7 +138,7 @@ public class JDBCSourceEditor extends MultiPageEditorPart {
         try {
             dirty = false;
 
-            if (!origSource.equals(source)) {
+            if (!origSourceConfig.equals(sourceConfig)) {
                 dirty = true;
                 return;
             }

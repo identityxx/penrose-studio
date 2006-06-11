@@ -18,8 +18,6 @@
 package org.safehaus.penrose.studio.preview;
 
 import java.io.File;
-import java.util.Iterator;
-import java.util.Enumeration;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.directory.Attribute;
@@ -53,14 +51,9 @@ import org.safehaus.penrose.session.PenroseSearchResults;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.ietf.ldap.LDAPException;
 
-import javax.naming.directory.SearchResult;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
-import javax.naming.NamingEnumeration;
-
 public class PreviewEditor extends EditorPart {
 
-	private Logger log = Logger.getLogger(getClass());
+    private Logger log = Logger.getLogger(getClass());
 
     Text baseDnText;
     Text bindDnText;
@@ -68,7 +61,7 @@ public class PreviewEditor extends EditorPart {
     Tree tree;
     Table table;
 
-	Penrose penrose;
+    Penrose penrose;
     PenroseSession session;
     String password;
 
@@ -86,7 +79,7 @@ public class PreviewEditor extends EditorPart {
         }
     }
 
-	public void createPartControl(final Composite parent) {
+    public void createPartControl(final Composite parent) {
 
         parent.setLayout(new GridLayout());
 
@@ -193,10 +186,10 @@ public class PreviewEditor extends EditorPart {
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
         }
-	}
+    }
 
-	public void setFocus() {
-	}
+    public void setFocus() {
+    }
 
     public void open(String baseDn, String bindDn, String password) throws Exception {
 
@@ -229,7 +222,7 @@ public class PreviewEditor extends EditorPart {
         treeItem.setExpanded(true);
 
         tree.setSelection(new TreeItem[] { treeItem });
-	}
+    }
 
     public void showChildren(TreeItem parentItem) throws Exception {
 
@@ -239,11 +232,13 @@ public class PreviewEditor extends EditorPart {
         String parentDn = (String)parentItem.getData();
 
         if ("".equals(parentDn)) {
+            PenroseSearchResults results = new PenroseSearchResults();
+
             PenroseSearchControls sc = new PenroseSearchControls();
             sc.setScope(PenroseSearchControls.SCOPE_BASE);
 
-            PenroseSearchResults sr = session.search("", "(objectClass=*)", sc);
-            SearchResult parentEntry = (SearchResult)sr.next();
+            session.search("", "(objectClass=*)", sc, results);
+            SearchResult parentEntry = (SearchResult)results.next();
 
             Attribute namingContexts = parentEntry.getAttributes().get("namingContexts");
 
@@ -259,14 +254,16 @@ public class PreviewEditor extends EditorPart {
 
         } else {
 
+            PenroseSearchResults results = new PenroseSearchResults();
+
             PenroseSearchControls sc = new PenroseSearchControls();
             sc.setScope(PenroseSearchControls.SCOPE_ONE);
 
-            PenroseSearchResults sr = session.search(parentDn, "(objectClass=*)", sc);
+            session.search(parentDn, "(objectClass=*)", sc, results);
 
-            while (sr.hasNext()) {
+            while (results.hasNext()) {
                 try {
-                    SearchResult entry = (SearchResult)sr.next();
+                    SearchResult entry = (SearchResult)results.next();
                     String dn = entry.getName();
                     String rdn = EntryUtil.getRdn(dn).toString();
 
@@ -282,9 +279,9 @@ public class PreviewEditor extends EditorPart {
                 }
             }
 
-            if (sr.getReturnCode() != LDAPException.SUCCESS) {
+            if (results.getReturnCode() != LDAPException.SUCCESS) {
                 TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
-                treeItem.setText("LDAP Error: "+sr.getReturnCode());
+                treeItem.setText("LDAP Error: "+results.getReturnCode());
             }
         }
     }
@@ -296,13 +293,15 @@ public class PreviewEditor extends EditorPart {
         String parentDn = (String)treeItem.getData();
         if (parentDn == null) return;
 
+        PenroseSearchResults results = new PenroseSearchResults();
+
         PenroseSearchControls sc = new PenroseSearchControls();
         sc.setScope(PenroseSearchControls.SCOPE_BASE);
 
-        PenroseSearchResults sr = session.search(parentDn, "(objectClass=*)", sc);
-        if (!sr.hasNext()) return;
+        session.search(parentDn, "(objectClass=*)", sc, results);
+        if (!results.hasNext()) return;
 
-        SearchResult entry = (SearchResult)sr.next();
+        SearchResult entry = (SearchResult)results.next();
 
         Attributes attributes = entry.getAttributes();
 

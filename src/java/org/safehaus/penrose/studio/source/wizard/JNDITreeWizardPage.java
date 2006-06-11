@@ -45,6 +45,7 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
     Text baseDnText;
     Text filterText;
     Combo scopeCombo;
+    Text objectClassesText;
 
     Partition partition;
     ConnectionConfig connectionConfig;
@@ -110,6 +111,13 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
         scopeCombo.add("SUBTREE");
         scopeCombo.select(1);
         scopeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label objectClassesLabel = new Label(composite, SWT.NONE);
+        objectClassesLabel.setText("Object classes:");
+        objectClassesLabel.setLayoutData(new GridData(GridData.FILL));
+
+        objectClassesText = new Text(composite, SWT.BORDER);
+        objectClassesText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         setPageComplete(validatePage());
     }
@@ -205,6 +213,10 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
 
     public String getScope() {
         return scopeCombo.getText().trim();
+    }
+
+    public String getObjectClasses() {
+        return objectClassesText.getText().trim();
     }
 
     public boolean validatePage() {

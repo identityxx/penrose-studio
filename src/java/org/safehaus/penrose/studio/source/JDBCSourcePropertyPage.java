@@ -53,12 +53,12 @@ public class JDBCSourcePropertyPage {
 
     JDBCSourceEditor editor;
     Partition partition;
-	SourceConfig source;
+	SourceConfig sourceConfig;
 
     public JDBCSourcePropertyPage(JDBCSourceEditor editor) {
         this.editor = editor;
         this.partition = editor.partition;
-        this.source = editor.source;
+        this.sourceConfig = editor.sourceConfig;
     }
 
     public Control createControl() {
@@ -104,14 +104,14 @@ public class JDBCSourcePropertyPage {
         gd.widthHint = 100;
         sourceNameLabel.setLayoutData(gd);
 
-		sourceNameText = toolkit.createText(composite, source.getName(), SWT.BORDER);
+		sourceNameText = toolkit.createText(composite, sourceConfig.getName(), SWT.BORDER);
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
 		sourceNameText.setLayoutData(gd);
 
         sourceNameText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                source.setName(sourceNameText.getText());
+                sourceConfig.setName(sourceNameText.getText());
                 checkDirty();
             }
         });
@@ -128,11 +128,11 @@ public class JDBCSourcePropertyPage {
             connectionNameCombo.add(connectionConfig.getName());
         }
 
-        connectionNameCombo.setText(source.getConnectionName());
+        connectionNameCombo.setText(sourceConfig.getConnectionName());
 
         connectionNameCombo.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                source.setConnectionName(connectionNameCombo.getText());
+                sourceConfig.setConnectionName(connectionNameCombo.getText());
                 checkDirty();
             }
         });
@@ -150,7 +150,7 @@ public class JDBCSourcePropertyPage {
         gd.widthHint = 100;
         tableNameLabel.setLayoutData(gd);
 
-		tableNameText = toolkit.createText(composite, source.getParameter("tableName"), SWT.BORDER);
+		tableNameText = toolkit.createText(composite, sourceConfig.getParameter("tableName"), SWT.BORDER);
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
         tableNameText.setLayoutData(gd);
@@ -158,9 +158,9 @@ public class JDBCSourcePropertyPage {
         tableNameText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(tableNameText.getText())) {
-                    source.removeParameter("tableName");
+                    sourceConfig.removeParameter("tableName");
                 } else {
-                    source.setParameter("tableName", tableNameText.getText());
+                    sourceConfig.setParameter("tableName", tableNameText.getText());
                 }
                 checkDirty();
             }
@@ -171,7 +171,7 @@ public class JDBCSourcePropertyPage {
         gd.widthHint = 100;
         filterLabel.setLayoutData(gd);
 
-        filterText = toolkit.createText(composite, source.getParameter("filter"), SWT.BORDER);
+        filterText = toolkit.createText(composite, sourceConfig.getParameter("filter"), SWT.BORDER);
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
         filterText.setLayoutData(gd);
@@ -179,9 +179,9 @@ public class JDBCSourcePropertyPage {
         filterText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(filterText.getText())) {
-                    source.removeParameter("filter");
+                    sourceConfig.removeParameter("filter");
                 } else {
-                    source.setParameter("filter", filterText.getText());
+                    sourceConfig.setParameter("filter", filterText.getText());
                 }
                 checkDirty();
             }
@@ -213,11 +213,11 @@ public class JDBCSourcePropertyPage {
 
                     PenroseApplication penroseApplication = PenroseApplication.getInstance();
                     PartitionManager partitionManager = penroseApplication.getPartitionManager();
-                    Partition partition = partitionManager.getPartition(source);
+                    Partition partition = partitionManager.getPartition(sourceConfig);
 
-                    ConnectionConfig connectionConfig = partition.getConnectionConfig(source.getConnectionName());
+                    ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
 
-                    String tableName = source.getParameter(JDBCAdapter.TABLE_NAME);
+                    String tableName = sourceConfig.getParameter(JDBCAdapter.TABLE_NAME);
 
                     JDBCClient client = new JDBCClient(connectionConfig.getParameters());
                     
@@ -235,7 +235,7 @@ public class JDBCSourcePropertyPage {
                     String newName = fieldConfig.getName();
 
                     if (!oldName.equals(newName)) {
-                        source.renameFieldConfig(oldName, newName);
+                        sourceConfig.renameFieldConfig(oldName, newName);
                     }
 
                     refresh();
@@ -298,11 +298,11 @@ public class JDBCSourcePropertyPage {
 
                     PenroseApplication penroseApplication = PenroseApplication.getInstance();
                     PartitionManager partitionManager = penroseApplication.getPartitionManager();
-                    Partition partition = partitionManager.getPartition(source);
+                    Partition partition = partitionManager.getPartition(sourceConfig);
 
-                    ConnectionConfig connection = partition.getConnectionConfig(source.getConnectionName());
+                    ConnectionConfig connection = partition.getConnectionConfig(sourceConfig.getConnectionName());
 
-                    String tableName = source.getParameter(JDBCAdapter.TABLE_NAME);
+                    String tableName = sourceConfig.getParameter(JDBCAdapter.TABLE_NAME);
 
                     JDBCClient helper = new JDBCClient(
                             connection.getParameter(JDBCAdapter.DRIVER),
@@ -322,7 +322,7 @@ public class JDBCSourcePropertyPage {
 
                     if (dialog.getAction() == FieldDialog.CANCEL) return;
 
-                    source.addFieldConfig(fieldDefinition);
+                    sourceConfig.addFieldConfig(fieldDefinition);
 
                     refresh();
                     checkDirty();
@@ -348,11 +348,11 @@ public class JDBCSourcePropertyPage {
 
                     PenroseApplication penroseApplication = PenroseApplication.getInstance();
                     PartitionManager partitionManager = penroseApplication.getPartitionManager();
-                    Partition partition = partitionManager.getPartition(source);
+                    Partition partition = partitionManager.getPartition(sourceConfig);
 
-                    ConnectionConfig connection = partition.getConnectionConfig(source.getConnectionName());
+                    ConnectionConfig connection = partition.getConnectionConfig(sourceConfig.getConnectionName());
 
-                    String tableName = source.getParameter(JDBCAdapter.TABLE_NAME);
+                    String tableName = sourceConfig.getParameter(JDBCAdapter.TABLE_NAME);
 
                     JDBCClient helper = new JDBCClient(
                             connection.getParameter(JDBCAdapter.DRIVER),
@@ -375,7 +375,7 @@ public class JDBCSourcePropertyPage {
                     String newName = fieldDefinition.getName();
 
                     if (!oldName.equals(newName)) {
-                        source.renameFieldConfig(oldName, newName);
+                        sourceConfig.renameFieldConfig(oldName, newName);
                     }
 
                     refresh();
@@ -399,7 +399,7 @@ public class JDBCSourcePropertyPage {
                     TableItem items[] = fieldTable.getSelection();
                     for (int i=0; i<items.length; i++) {
                         FieldConfig fieldDefinition = (FieldConfig)items[i].getData();
-                        source.removeFieldConfig(fieldDefinition);
+                        sourceConfig.removeFieldConfig(fieldDefinition);
                     }
 
                     refresh();
@@ -419,7 +419,7 @@ public class JDBCSourcePropertyPage {
     public void refresh() {
         fieldTable.removeAll();
 
-        Collection fields = source.getFieldConfigs();
+        Collection fields = sourceConfig.getFieldConfigs();
         for (Iterator i=fields.iterator(); i.hasNext(); ) {
             FieldConfig fieldDefinition = (FieldConfig)i.next();
 

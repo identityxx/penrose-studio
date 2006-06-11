@@ -150,32 +150,32 @@ public class ValidationView extends ViewPart {
         PartitionManager partitionManager = penroseApplication.getPartitionManager();
 
 		if (object instanceof ConnectionConfig) {
-            ConnectionConfig connection = (ConnectionConfig)object;
-            Partition partition = partitionManager.getPartition(connection);
+            ConnectionConfig connectionConfig = (ConnectionConfig)object;
+            Partition partition = partitionManager.getPartition(connectionConfig);
 
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
 
-            if ("JNDI".equals(connection.getAdapterName())) {
-                page.openEditor(new JNDIConnectionEditorInput(partition, connection), JNDIConnectionEditor.class.getName());
+            if ("JNDI".equals(connectionConfig.getAdapterName())) {
+                page.openEditor(new JNDIConnectionEditorInput(partition, connectionConfig), JNDIConnectionEditor.class.getName());
                 
-            } else if ("JDBC".equals(connection.getAdapterName())) {
-                page.openEditor(new JDBCConnectionEditorInput(partition, connection), JDBCConnectionEditor.class.getName());
+            } else if ("JDBC".equals(connectionConfig.getAdapterName())) {
+                page.openEditor(new JDBCConnectionEditorInput(partition, connectionConfig), JDBCConnectionEditor.class.getName());
             }
 
 		} else if (object instanceof SourceConfig) {
-			SourceConfig sourceDefinition = (SourceConfig)object;
-            Partition partition = partitionManager.getPartition(sourceDefinition);
-            ConnectionConfig connection = partition.getConnectionConfig(sourceDefinition.getConnectionName());
+			SourceConfig sourceConfig = (SourceConfig)object;
+            Partition partition = partitionManager.getPartition(sourceConfig);
+            ConnectionConfig connection = partition.getConnectionConfig(sourceConfig.getConnectionName());
 
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
 
             if ("JDBC".equals(connection.getAdapterName())) {
-                page.openEditor(new JDBCSourceEditorInput(partition, sourceDefinition), JDBCSourceEditor.class.getName());
+                page.openEditor(new JDBCSourceEditorInput(partition, sourceConfig), JDBCSourceEditor.class.getName());
 
             } else if ("JNDI".equals(connection.getAdapterName())) {
-                page.openEditor(new JNDISourceEditorInput(partition, sourceDefinition), JNDISourceEditor.class.getName());
+                page.openEditor(new JNDISourceEditorInput(partition, sourceConfig), JNDISourceEditor.class.getName());
             }
 
 		} else if (object instanceof EntryMapping) {

@@ -48,7 +48,8 @@ public class JNDISourcePropertyPage {
 	Text baseDnText;
 	Text filterText;
 	Combo scopeCombo;
-	
+    Text objectClassesText;
+
 	Table fieldTable;
 	
     Button addButton;
@@ -219,6 +220,25 @@ public class JNDISourcePropertyPage {
                     source.removeParameter("scope");
                 } else {
                     source.setParameter("scope", scopeCombo.getText());
+                }
+                checkDirty();
+            }
+        });
+
+        toolkit.createLabel(composite, "Object Classes:");
+
+        s = source.getParameter("objectClasses");
+        objectClassesText = toolkit.createText(composite, s == null ? "" : s, SWT.BORDER);
+        gd = new GridData(GridData.FILL);
+        gd.widthHint = 200;
+        objectClassesText.setLayoutData(gd);
+
+        objectClassesText.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent event) {
+                if ("".equals(filterText.getText())) {
+                    source.removeParameter("objectClasses");
+                } else {
+                    source.setParameter("objectClasses", objectClassesText.getText());
                 }
                 checkDirty();
             }
@@ -445,6 +465,7 @@ public class JNDISourcePropertyPage {
         source.setParameter("baseDn", baseDnText.getText());
         source.setParameter("filter", filterText.getText());
         source.setParameter("scope", scopeCombo.getText());
+        source.setParameter("objectClasses", objectClassesText.getText());
 
         TableItem[] items = fieldTable.getItems();
         source.getFieldConfigs().clear();
