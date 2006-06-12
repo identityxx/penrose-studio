@@ -34,6 +34,8 @@
 
     <taskdef resource="svntask.properties" classpathref="svnant.classpath"/>
 
+    <taskdef name="manifest-generator" classname="org.safehaus.penrose.ant.ManifestTask" classpath="target/penrose-studio-ant.jar"/>
+
     <target name="clean">
         <delete dir="${project.dist}" failonerror="false"/>
     	<delete dir="target" failonerror="false"/>
@@ -52,10 +54,10 @@
                 <expandproperties/>
             </filterchain>
         </copy>
-        <taskdef name="manifest-generator" classname="org.safehaus.penrose.ant.ManifestTask" classpath="target/penrose-studio-ant.jar"/>
         <manifest-generator
             file="META-INF/MANIFEST.MF"
             dir="lib"
+            newDir="lib"
         />
     </target>
 
@@ -252,18 +254,27 @@
         </copy>
         <copy todir="${plugin.path}">
             <fileset dir=".">
-                <include name="META-INF/**"/>
                 <include name="images/**"/>
                 <include name="lib/*.jar"/>
                 <include name="plugin.xml"/>
                 <include name="splash.bmp"/>
             </fileset>
         </copy>
-        <copy todir="${plugin.path}">
+        <copy todir="${plugin.path}/lib">
             <fileset dir="target">
                 <include name="penrose-studio-${project.version}.jar"/>
             </fileset>
         </copy>
+        <copy todir="${plugin.path}/META-INF" file="MANIFEST.MF" overwrite="true">
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+        <manifest-generator
+            file="${plugin.path}/META-INF/MANIFEST.MF"
+            dir="${plugin.path}/lib"
+            newDir="lib"
+        />
         <copy todir="${project.path}" file="README.txt">
             <filterchain>
                 <expandproperties/>
