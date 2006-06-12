@@ -34,8 +34,6 @@
 
     <taskdef resource="svntask.properties" classpathref="svnant.classpath"/>
 
-    <taskdef name="manifest-generator" classname="org.safehaus.penrose.ant.ManifestTask" classpath="target/penrose-studio-ant.jar"/>
-
     <target name="clean">
         <delete dir="${project.dist}" failonerror="false"/>
     	<delete dir="target" failonerror="false"/>
@@ -54,6 +52,7 @@
                 <expandproperties/>
             </filterchain>
         </copy>
+        <taskdef name="manifest-generator" classname="org.safehaus.penrose.ant.ManifestTask" classpath="target/penrose-studio-ant.jar"/>
         <manifest-generator
             file="META-INF/MANIFEST.MF"
             dir="lib"
@@ -270,6 +269,7 @@
                 <expandproperties/>
             </filterchain>
         </copy>
+        <taskdef name="manifest-generator" classname="org.safehaus.penrose.ant.ManifestTask" classpath="target/penrose-studio-ant.jar"/>
         <manifest-generator
             file="${plugin.path}/META-INF/MANIFEST.MF"
             dir="${plugin.path}/lib"
