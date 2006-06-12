@@ -1,29 +1,73 @@
-IMPORTANT - Read this License Agreement carefully before clicking on the "Agree" button.  By clicking on the "Agree" button, you agree to be bound by the terms of the License Agreement.
+IMPORTANT - Read this License Agreement carefully before clicking on
+the "Agree" button.  By clicking on the "Agree" button, you agree to
+be bound by the terms of the License Agreement.
 --
-
 
 LICENSE AGREEMENT
 (Penrose)
 
-	THIS IS A LEGAL AGREEMENT between you (either an individual or an entity) and Identyx, Inc.  By clicking on the "Agree" button, you are agreeing to be bound by the terms and conditions of this License Agreement.  If you do not agree to the terms and conditions of this License Agreement, do not click on the "Agree" button.
+         THIS IS A LEGAL AGREEMENT between you (either an individual
+or an entity) and Identyx, Inc.  By clicking on the "Agree" button,
+you are agreeing to be bound by the terms and conditions of this
+License Agreement.  If you do not agree to the terms and conditions
+of this License Agreement, do not click on the "Agree" button.
 
 1. Grant of Limited License.
 
-	Identyx, Inc. grants to you the non-exclusive right to use the Identyx, Inc. software program, Penrose (the "Software").
+         Identyx, Inc. grants to you the non-exclusive right to use
+the Identyx, Inc. software program, Penrose (the "Software").
 
 2. Disclaimer of Warranties and Limitation of Liability.
 
-	THE SOFTWARE IS PROVIDED "AS IS," WITHOUT WARRANTY OF ANY KIND.  IDENTYX, INC. FURTHER DISCLAIMS ANY IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.  THE ENTIRE RISK ARISING OUT OF THE USE OR PERFORMANCE OF THE SOFTWARE REMAINS WITH YOU.  SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU (AND NOT IDENTYX, INC.) ASSUME THE ENTIRE COST OF ALL NECESSARY SERVICING OR REPAIR.  
+         THE SOFTWARE IS PROVIDED "AS IS," WITHOUT WARRANTY OF ANY
+KIND.  IDENTYX, INC. FURTHER DISCLAIMS ANY IMPLIED WARRANTIES,
+INCLUDING, WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+NONINFRINGEMENT.  THE ENTIRE RISK ARISING OUT OF THE USE OR
+PERFORMANCE OF THE SOFTWARE REMAINS WITH YOU.  SHOULD THE SOFTWARE
+PROVE DEFECTIVE, YOU (AND NOT IDENTYX, INC.) ASSUME THE ENTIRE COST
+OF ALL NECESSARY SERVICING OR REPAIR.
 
-	IN NO EVENT SHALL, INC. OR ANYONE ELSE INVOLVED IN THE CREATION, PRODUCTION, MARKETING, DISTRIBUTION, OR DELIVERY OF THE SOFTWARE, BE LIABLE FOR ANY DAMAGES WHATSOEVER; INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS, FOR BUSINESS INTERRUPTION, FOR LOSS OF BUSINESS INFORMATION, OR FOR OTHER MONETARY LOSS, ARISING OUT OF THE USE OF THE SOFTWARE OR THE INABILITY TO USE THE SOFTWARE, EVEN IF YOU HAVE BEEN NOTIFIED OF THE POSSIBILITY OF SUCH DAMAGES.  
+         IN NO EVENT SHALL, INC. OR ANYONE ELSE INVOLVED IN THE
+CREATION, PRODUCTION, MARKETING, DISTRIBUTION, OR DELIVERY OF THE
+SOFTWARE, BE LIABLE FOR ANY DAMAGES WHATSOEVER; INCLUDING, WITHOUT
+LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS, FOR BUSINESS
+INTERRUPTION, FOR LOSS OF BUSINESS INFORMATION, OR FOR OTHER MONETARY
+LOSS, ARISING OUT OF THE USE OF THE SOFTWARE OR THE INABILITY TO USE
+THE SOFTWARE, EVEN IF YOU HAVE BEEN NOTIFIED OF THE POSSIBILITY OF
+SUCH DAMAGES.
 
-	IN NO EVENT SHALL IDENTYX, INC. BE LIABLE FOR ANY SPECIAL, INDIRECT, OR CONSEQUENTIAL DAMAGES, OR FOR ANY DAMAGES WHATSOEVER, WHETHER IN A CONTRACT ACTION, NEGLIGENCE OR OTHER TORT ACTION, OR OTHER CLAIM OR ACTION, ARISING OUT OF, OR IN CONNECTION WITH, THE USE OR PERFORMANCE OF THE SOFTWARE OR DOCUMENTS AND OTHER INFORMATION PROVIDED TO YOU BY IDENTYX, INC., OR IN THE PROVISION OF, OR FAILURE TO PROVIDE, SERVICES OR INFORMATION.
+         IN NO EVENT SHALL IDENTYX, INC. BE LIABLE FOR ANY SPECIAL,
+INDIRECT, OR CONSEQUENTIAL DAMAGES, OR FOR ANY DAMAGES WHATSOEVER,
+WHETHER IN A CONTRACT ACTION, NEGLIGENCE OR OTHER TORT ACTION, OR
+OTHER CLAIM OR ACTION, ARISING OUT OF, OR IN CONNECTION WITH, THE USE
+OR PERFORMANCE OF THE SOFTWARE OR DOCUMENTS AND OTHER INFORMATION
+PROVIDED TO YOU BY IDENTYX, INC., OR IN THE PROVISION OF, OR FAILURE
+TO PROVIDE, SERVICES OR INFORMATION.
 
-Because some states of the United States and some countries do not allow the exclusion or limitation of the liability for consequential or incidental damages, the above disclaimer may not apply to you.  Any warranties that by law survive the foregoing disclaimers shall terminate ninety (90) days from the date you downloaded or otherwise received the Software.
+Because some states of the United States and some countries do not
+allow the exclusion or limitation of the liability for consequential
+or incidental damages, the above disclaimer may not apply to you.
+Any warranties that by law survive the foregoing disclaimers shall
+terminate ninety (90) days from the date you downloaded or otherwise
+received the Software.
 
-3. Miscellaneous.  
+3. Miscellaneous.
 
-If any litigation is brought to enforce this License Agreement, or arises out of this License Agreement, the prevailing party shall be awarded its reasonable attorneys' fees together with expenses and costs incurred in such litigation.  This Agreement shall be governed by the laws of the State of Texas, but not including the 1980 United Nations Convention on Contracts for International Sale of Goods.  Venue for any action under this Agreement shall be in Austin, Texas.  You consent to the personal jurisdiction of the courts of such venue.  This License Agreement is the complete agreement between IDENTYX, INC. and you and supersedes all prior agreements, oral or written, with respect to the subject matter hereof.
+If any litigation is brought to enforce this License Agreement, or
+arises out of this License Agreement, the prevailing party shall be
+awarded its reasonable attorneys' fees together with expenses and
+costs incurred in such litigation.  This Agreement shall be governed
+by the laws of the State of Texas, but not including the 1980 United
+Nations Convention on Contracts for International Sale of Goods.
+Venue for any action under this Agreement shall be in Austin, Texas.
+You consent to the personal jurisdiction of the courts of such
+venue.  This License Agreement is the complete agreement between
+IDENTYX, INC. and you and supersedes all prior agreements, oral or
+written, with respect to the subject matter hereof.
 
 
-COPYRIGHT NOTICE.  Copyright (c) 2005-2006 Identyx, Inc.  All rights reserved.  Any rights not expressly granted in this License Agreement are reserved.
+COPYRIGHT NOTICE.
+
+Copyright (c) 2005-2006 Identyx, Inc.  All rights reserved.  Any
+rights not expressly granted in this License Agreement are reserved.
