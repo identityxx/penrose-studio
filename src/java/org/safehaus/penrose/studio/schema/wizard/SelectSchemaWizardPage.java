@@ -26,11 +26,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.util.JNDIClient;
-import org.ietf.ldap.LDAPEntry;
-import org.ietf.ldap.LDAPAttribute;
 import org.apache.log4j.Logger;
 
-import java.util.Enumeration;
+import javax.naming.NamingEnumeration;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.SearchResult;
 
 /**
  * @author Endi S. Dewata
@@ -142,12 +142,12 @@ public class SelectSchemaWizardPage extends WizardPage {
 
         try {
             JNDIClient client = new JNDIClient(connectionConfig.getParameters());
-            LDAPEntry rootDse = client.getRootDSE();
+            SearchResult rootDse = client.getRootDSE();
 
-            LDAPAttribute schemaNamingContexts = rootDse.getAttribute("schemaNamingContext");
+            Attribute schemaNamingContexts = rootDse.getAttributes().get("schemaNamingContext");
             if (schemaNamingContexts != null) {
-                for (Enumeration e = schemaNamingContexts.getStringValues(); e.hasMoreElements(); ) {
-                    String schemaNamingContext = (String)e.nextElement();
+                for (NamingEnumeration e = schemaNamingContexts.getAll(); e.hasMore(); ) {
+                    String schemaNamingContext = (String)e.next();
 
                     sourceSchemaList.add(schemaNamingContext);
                 }

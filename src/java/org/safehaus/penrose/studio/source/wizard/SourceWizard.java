@@ -117,6 +117,9 @@ public class SourceWizard extends Wizard {
             } else if ("JNDI".equals(adapterName)) {
                 jndiTreePage.setConnectionConfig(partition, connectionConfig);
                 return jndiTreePage;
+
+            } else {
+                return null;
             }
 
         } else if (jdbcTablePage == page) {
@@ -196,6 +199,7 @@ public class SourceWizard extends Wizard {
                 sourceConfig.setParameter("baseDn", jndiTreePage.getBaseDn());
                 sourceConfig.setParameter("filter", jndiTreePage.getFilter());
                 sourceConfig.setParameter("scope", jndiTreePage.getScope());
+                sourceConfig.setParameter("objectClasses", jndiTreePage.getObjectClasses());
 
                 Collection fields = jndiFieldsPage.getFields();
                 for (Iterator i=fields.iterator(); i.hasNext(); ) {

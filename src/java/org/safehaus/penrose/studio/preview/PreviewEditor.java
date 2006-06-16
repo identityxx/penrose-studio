@@ -18,8 +18,11 @@
 package org.safehaus.penrose.studio.preview;
 
 import java.io.File;
-import java.util.Iterator;
-import java.util.Enumeration;
+
+import javax.naming.NamingEnumeration;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.SearchResult;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -46,13 +49,11 @@ import org.safehaus.penrose.session.PenroseSession;
 import org.safehaus.penrose.session.PenroseSearchControls;
 import org.safehaus.penrose.session.PenroseSearchResults;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.ietf.ldap.LDAPEntry;
-import org.ietf.ldap.LDAPAttribute;
-import org.ietf.ldap.LDAPAttributeSet;
+import org.ietf.ldap.LDAPException;
 
 public class PreviewEditor extends EditorPart {
 
-	private Logger log = Logger.getLogger(getClass());
+    private Logger log = Logger.getLogger(getClass());
 
     Text baseDnText;
     Text bindDnText;
@@ -60,7 +61,7 @@ public class PreviewEditor extends EditorPart {
     Tree tree;
     Table table;
 
-	Penrose penrose;
+    Penrose penrose;
     PenroseSession session;
     String password;
 
@@ -78,7 +79,7 @@ public class PreviewEditor extends EditorPart {
         }
     }
 
-	public void createPartControl(final Composite parent) {
+    public void createPartControl(final Composite parent) {
 
         parent.setLayout(new GridLayout());
 
@@ -185,10 +186,10 @@ public class PreviewEditor extends EditorPart {
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
         }
-	}
+    }
 
-	public void setFocus() {
-	}
+    public void setFocus() {
+    }
 
     public void open(String baseDn, String bindDn, String password) throws Exception {
 
@@ -221,7 +222,7 @@ public class PreviewEditor extends EditorPart {
         treeItem.setExpanded(true);
 
         tree.setSelection(new TreeItem[] { treeItem });
-	}
+    }
 
     public void showChildren(TreeItem parentItem) throws Exception {
 
@@ -231,16 +232,18 @@ public class PreviewEditor extends EditorPart {
         String parentDn = (String)parentItem.getData();
 
         if ("".equals(parentDn)) {
+            PenroseSearchResults results = new PenroseSearchResults();
+
             PenroseSearchControls sc = new PenroseSearchControls();
             sc.setScope(PenroseSearchControls.SCOPE_BASE);
 
-            PenroseSearchResults sr = session.search("", "(objectClass=*)", sc);
-            LDAPEntry parentEntry = (LDAPEntry)sr.next();
+            session.search("", "(objectClass=*)", sc, results);
+            SearchResult parentEntry = (SearchResult)results.next();
 
-            LDAPAttribute namingContexts = parentEntry.getAttribute("namingContexts");
+            Attribute namingContexts = parentEntry.getAttributes().get("namingContexts");
 
-            for (Enumeration e = namingContexts.getStringValues(); e.hasMoreElements(); ) {
-                String namingContext = (String)e.nextElement();
+            for (NamingEnumeration e = namingContexts.getAll(); e.hasMore(); ) {
+                String namingContext = (String)e.next();
 
                 TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
                 treeItem.setText(namingContext);
@@ -251,21 +254,34 @@ public class PreviewEditor extends EditorPart {
 
         } else {
 
+            PenroseSearchResults results = new PenroseSearchResults();
+
             PenroseSearchControls sc = new PenroseSearchControls();
             sc.setScope(PenroseSearchControls.SCOPE_ONE);
 
-            PenroseSearchResults sr = session.search(parentDn, "(objectClass=*)", sc);
+            session.search(parentDn, "(objectClass=*)", sc, results);
 
-            while (sr.hasNext()) {
-                LDAPEntry entry = (LDAPEntry)sr.next();
-                String dn = entry.getDN();
-                String rdn = EntryUtil.getRdn(dn).toString();
+            while (results.hasNext()) {
+                try {
+                    SearchResult entry = (SearchResult)results.next();
+                    String dn = entry.getName();
+                    String rdn = EntryUtil.getRdn(dn).toString();
 
+                    TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
+                    treeItem.setText(rdn);
+                    treeItem.setData(dn);
+
+                    new TreeItem(treeItem, SWT.NONE);
+
+                } catch (Exception e) {
+                    TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
+                    treeItem.setText(e.getMessage());
+                }
+            }
+
+            if (results.getReturnCode() != LDAPException.SUCCESS) {
                 TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
-                treeItem.setText(rdn);
-                treeItem.setData(dn);
-
-                new TreeItem(treeItem, SWT.NONE);
+                treeItem.setText("LDAP Error: "+results.getReturnCode());
             }
         }
     }
@@ -275,23 +291,27 @@ public class PreviewEditor extends EditorPart {
         table.removeAll();
 
         String parentDn = (String)treeItem.getData();
+        if (parentDn == null) return;
+
+        PenroseSearchResults results = new PenroseSearchResults();
 
         PenroseSearchControls sc = new PenroseSearchControls();
         sc.setScope(PenroseSearchControls.SCOPE_BASE);
 
-        PenroseSearchResults sr = session.search(parentDn, "(objectClass=*)", sc);
-        if (!sr.hasNext()) return;
+        session.search(parentDn, "(objectClass=*)", sc, results);
+        if (!results.hasNext()) return;
 
-        LDAPEntry entry = (LDAPEntry)sr.next();
+        SearchResult entry = (SearchResult)results.next();
 
-        LDAPAttributeSet attributes = entry.getAttributeSet();
+        Attributes attributes = entry.getAttributes();
 
-        for (Iterator i = attributes.iterator(); i.hasNext(); ) {
-            LDAPAttribute attribute = (LDAPAttribute)i.next();
-            String name = attribute.getName();
+        for (NamingEnumeration i = attributes.getAll(); i.hasMore(); ) {
+            Attribute attribute = (Attribute)i.next();
+            String name = attribute.getID();
 
-            for (Enumeration e = attribute.getStringValues(); e.hasMoreElements(); ) {
-                String value = (String)e.nextElement();
+            for (NamingEnumeration e = attribute.getAll(); e.hasMore(); ) {
+                Object object = e.next();
+                String value = object instanceof byte[] ? "(binary)" : object.toString();
 
                 TableItem tableItem = new TableItem(table, SWT.NONE);
                 tableItem.setText(0, name);

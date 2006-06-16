@@ -30,6 +30,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.studio.PenroseApplication;
+import org.apache.log4j.Logger;
 
 import javax.naming.Context;
 import java.util.Iterator;
@@ -39,6 +40,8 @@ import java.util.Collection;
  * @author Endi S. Dewata
  */
 public class SelectConnectionWizardPage extends WizardPage {
+
+    Logger log = Logger.getLogger(getClass());
 
     public final static String NAME = "Connection";
 
@@ -93,9 +96,10 @@ public class SelectConnectionWizardPage extends WizardPage {
                     ti.setText(0, "URL:");
                     ti.setText(1, connectionConfig.getParameter("url"));
 
+                    String username = connectionConfig.getParameter("user");
                     ti = new TableItem(infoTable, SWT.NONE);
                     ti.setText(0, "Username:");
-                    ti.setText(1, connectionConfig.getParameter("user"));
+                    ti.setText(1, username == null ? "" : username);
 
                     ti = new TableItem(infoTable, SWT.NONE);
                     ti.setText(0, "Password:");
@@ -106,9 +110,10 @@ public class SelectConnectionWizardPage extends WizardPage {
                     ti.setText(0, "URL:");
                     ti.setText(1, connectionConfig.getParameter(Context.PROVIDER_URL));
 
+                    String bindDn = connectionConfig.getParameter(Context.SECURITY_PRINCIPAL);
                     ti = new TableItem(infoTable, SWT.NONE);
                     ti.setText(0, "Bind DN:");
-                    ti.setText(1, connectionConfig.getParameter(Context.SECURITY_PRINCIPAL));
+                    ti.setText(1, bindDn == null ? "" : bindDn);
 
                     ti = new TableItem(infoTable, SWT.NONE);
                     ti.setText(0, "Password:");

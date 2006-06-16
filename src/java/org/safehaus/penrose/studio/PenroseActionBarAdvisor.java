@@ -199,6 +199,12 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
 
             serviceMenu.add(newServiceAction);
 
+            MenuManager toolsMenu = new MenuManager("&Tools", "tools");
+            menuBar.add(toolsMenu);
+
+            toolsMenu.add(previewAction);
+            toolsMenu.add(browserAction);
+
             MenuManager windowMenu = new MenuManager("&Window", "window");
             menuBar.add(windowMenu);
 

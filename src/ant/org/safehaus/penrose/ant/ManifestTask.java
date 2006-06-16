@@ -34,6 +34,7 @@ public class ManifestTask extends Task {
 
     private String file;
     private String dir;
+    private String newDir;
 
     public void execute() throws BuildException {
         try {
@@ -57,9 +58,10 @@ public class ManifestTask extends Task {
             if (!f.isFile()) continue;
             if (!f.getName().endsWith(".jar")) continue;
 
-            list.add(" "+dir+"/"+f.getName());
+            list.add(newDir+"/"+f.getName());
         }
 
+        boolean first = true;
         for (Iterator i=list.iterator(); i.hasNext();) {
             String line = (String)i.next();
 
@@ -68,7 +70,12 @@ public class ManifestTask extends Task {
             }
 
             //log(line);
-            out.println(line);
+            if (first) {
+                out.print("Bundle-ClassPath:");
+                first = false;
+            }
+
+            out.println(" "+line);
         }
 
         out.close();
@@ -88,5 +95,13 @@ public class ManifestTask extends Task {
 
     public void setFile(String file) {
         this.file = file;
+    }
+
+    public String getNewDir() {
+        return newDir;
+    }
+
+    public void setNewDir(String newDir) {
+        this.newDir = newDir;
     }
 }

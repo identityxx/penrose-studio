@@ -142,19 +142,30 @@ public class ACIDialog extends Dialog {
 
         targetCombo = new Combo(composite, SWT.READ_ONLY);
         targetCombo.add(ACI.TARGET_OBJECT);
-        //targetCombo.add(ACI.TARGET_ATTRIBUTES);
+        targetCombo.add(ACI.TARGET_ATTRIBUTES);
         targetCombo.setText(ACI.TARGET_OBJECT);
-        targetCombo.setEnabled(false);
 
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
         targetCombo.setLayoutData(gd);
-
+/*
         targetCombo.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 if (ACI.TARGET_ATTRIBUTES.equals(targetCombo.getText())) {
                     attributesText.setEnabled(true);
                 } else {
+                    attributesText.setText("");
+                    attributesText.setEnabled(false);
+                }
+            }
+        });
+*/
+        targetCombo.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent event) {
+                if (ACI.TARGET_ATTRIBUTES.equals(targetCombo.getText())) {
+                    attributesText.setEnabled(true);
+                } else {
+                    attributesText.setText("");
                     attributesText.setEnabled(false);
                 }
             }

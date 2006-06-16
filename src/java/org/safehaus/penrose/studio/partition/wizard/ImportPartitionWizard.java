@@ -61,8 +61,8 @@ public class ImportPartitionWizard extends Wizard {
 
             PartitionConfig partitionConfig = new PartitionConfig(name, path);
 
-            PartitionReader partitionReader = new PartitionReader(directory);
-            Partition partition = partitionReader.read(partitionConfig);
+            PartitionReader partitionReader = new PartitionReader();
+            Partition partition = partitionReader.read(partitionConfig, directory);
 
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
             PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();

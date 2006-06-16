@@ -3,7 +3,7 @@
 	 Copyright (c) 2000-2005, Identyx Corporation.
 	 All rights reserved.
      ====================================================================== -->
-<project name="penrose-studio" default="default" basedir=".">
+<project name="penrose-studio" default="compile" basedir=".">
 
     <description>Penrose Studio</description>
 	
@@ -12,6 +12,8 @@
     <property name="project.dist" value="dist"/>
     <property name="rcp.prefix" value="eclipse-RCP-3.1"/>
     <property name="iscc.path" value="ISCC.exe"/>
+
+    <tstamp/>
 
     <path id="lib.path">
         <fileset dir="lib">
@@ -31,8 +33,6 @@
         classname="com.izforge.izpack.ant.IzPackTask"/>
 
     <taskdef resource="svntask.properties" classpathref="svnant.classpath"/>
-
-    <target name="default" depends="compile,dist-all"/>
 
     <target name="clean">
         <delete dir="${project.dist}" failonerror="false"/>
@@ -56,6 +56,7 @@
         <manifest-generator
             file="META-INF/MANIFEST.MF"
             dir="lib"
+            newDir="lib"
         />
     </target>
 
@@ -88,6 +89,9 @@
     		<patternset>
     			<exclude name="**/.svn"/>
     		</patternset>
+            <manifest>
+              <attribute name="Built-Date" value="${DSTAMP}"/>
+            </manifest>
     	</jar>
     </target>
 
@@ -221,40 +225,14 @@
     </target>
 -->
 
-    <target name="pre-build">
+    <target name="build" depends="compile">
         <property name="project.path" value="target/penrose-studio-${project.version}-${platform}"/>
         <property name="plugin.path" value="${project.path}/plugins/org.safehaus.penrose_${project.version}"/>
         <mkdir dir="${project.path}"/>
         <mkdir dir="${plugin.path}"/>
         <copy todir="target" file="LICENSE.txt"/>
         <copy todir="${project.path}" file="LICENSE.txt"/>
-        <copy tofile="${project.path}/penrose.license" file="licenses/freeware.license"/>
-    </target>
-
-    <target name="build-pro" if="penrose.pro">
-        <copy
-            todir="target"
-            file="licenses/LICENSE.txt"
-            overwrite="true"
-        />
-        <copy
-            todir="${project.path}"
-            file="licenses/LICENSE.txt"
-            overwrite="true"
-        />
-        <copy
-            tofile="${project.path}/penrose.license"
-            file="licenses/evaluation.license"
-            overwrite="true"
-        />
-        <copy todir="${plugin.path}/lib" overwrite="true">
-            <fileset dir="lib/penrose">
-                <include name="*.jar"/>
-            </fileset>
-        </copy>
-    </target>
-
-    <target name="build" depends="compile,pre-build,build-pro">
+        <copy todir="${project.path}" file="penrose.license"/>
         <copy todir="${project.path}/conf">
             <fileset dir="conf">
                 <include name="*.*"/>
@@ -275,18 +253,28 @@
         </copy>
         <copy todir="${plugin.path}">
             <fileset dir=".">
-                <include name="META-INF/**"/>
                 <include name="images/**"/>
                 <include name="lib/*.jar"/>
                 <include name="plugin.xml"/>
                 <include name="splash.bmp"/>
             </fileset>
         </copy>
-        <copy todir="${plugin.path}">
+        <copy todir="${plugin.path}/lib">
             <fileset dir="target">
                 <include name="penrose-studio-${project.version}.jar"/>
             </fileset>
         </copy>
+        <copy todir="${plugin.path}/META-INF" file="MANIFEST.MF" overwrite="true">
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+        <taskdef name="manifest-generator" classname="org.safehaus.penrose.ant.ManifestTask" classpath="target/penrose-studio-ant.jar"/>
+        <manifest-generator
+            file="${plugin.path}/META-INF/MANIFEST.MF"
+            dir="${plugin.path}/lib"
+            newDir="lib"
+        />
         <copy todir="${project.path}" file="README.txt">
             <filterchain>
                 <expandproperties/>

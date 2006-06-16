@@ -28,8 +28,8 @@ import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.logging.LoggingNode;
 import org.safehaus.penrose.studio.properties.SystemPropertiesNode;
-import org.safehaus.penrose.studio.rootDse.RootDSENode;
 import org.safehaus.penrose.studio.user.AdministratorNode;
 import org.safehaus.penrose.studio.service.ServicesNode;
 import org.safehaus.penrose.studio.util.Helper;
@@ -78,6 +78,11 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
     public final static String ADMINISTRATOR     = "Administrator";
     public final static String ROOT_DSE          = "Root DSE";
     public final static String SYSTEM_PROPERTIES = "System Properties";
+    public final static String LOGGING           = "Logging";
+    public final static String APPENDERS         = "Appenders";
+    public final static String APPENDER          = "Appender";
+    public final static String LOGGERS           = "Loggers";
+    public final static String LOGGER            = "Logger";
 
 	private TreeViewer treeViewer;
 
@@ -89,19 +94,53 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
     private SchemasNode schemasNode;
     private ServicesNode servicesNode;
     private CachesNode cachesNode;
+    private LoggingNode loggingNode;
 
     public ObjectsView() {
-        partitionsNode = new PartitionsNode(this, PARTITIONS, PARTITIONS, PenrosePlugin.getImage(PenroseImage.FOLDER), PARTITIONS, null);
+        partitionsNode = new PartitionsNode(
+                this,
+                PARTITIONS,
+                PARTITIONS,
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                PARTITIONS,
+                null);
         nodes.add(partitionsNode);
 
-        schemasNode = new SchemasNode(this, SCHEMAS, SCHEMAS, PenrosePlugin.getImage(PenroseImage.FOLDER), SCHEMAS, null);
+        schemasNode = new SchemasNode(
+                this,
+                SCHEMAS,
+                SCHEMAS,
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                SCHEMAS,
+                null);
         nodes.add(schemasNode);
 
-        servicesNode = new ServicesNode(this, SERVICES, SERVICES, PenrosePlugin.getImage(PenroseImage.FOLDER), SERVICES, null);
+        servicesNode = new ServicesNode(
+                this,
+                SERVICES,
+                SERVICES,
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                SERVICES,
+                null);
         nodes.add(servicesNode);
 
-        cachesNode = new CachesNode(this, CACHES, CACHES, PenrosePlugin.getImage(PenroseImage.FOLDER), CACHES, null);
+        cachesNode = new CachesNode(
+                this,
+                CACHES,
+                CACHES,
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                CACHES,
+                null);
         nodes.add(cachesNode);
+
+        loggingNode = new LoggingNode(
+                this,
+                LOGGING,
+                LOGGING,
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                LOGGING,
+                null);
+        nodes.add(loggingNode);
 
         nodes.add(new EngineNode(
                 this,

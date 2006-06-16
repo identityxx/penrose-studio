@@ -23,6 +23,8 @@ import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.apache.log4j.Logger;
 
+import java.util.Collection;
+
 public class ObjectsContentProvider implements ITreeContentProvider {
 
     protected Logger log = Logger.getLogger(getClass());
@@ -42,6 +44,10 @@ public class ObjectsContentProvider implements ITreeContentProvider {
     public Object[] getChildren(Object element) {
         try {
             Node node = (Node)element;
+            
+            Collection children = node.getChildren();
+            if (children == null) return new Object[0];
+
             return node.getChildren().toArray();
 
         } catch (Exception e) {

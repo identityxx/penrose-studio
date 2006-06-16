@@ -247,15 +247,21 @@ public class BrowserEditor extends EditorPart {
             LDAPSearchResults sr = connection.search(parentDn, LDAPConnection.SCOPE_ONE, "(objectClass=*)", new String[0], true);
 
             while (sr.hasMore()) {
-                LDAPEntry entry = sr.next();
-                String dn = entry.getDN();
-                String rdn = EntryUtil.getRdn(dn).toString();
+                try {
+                    LDAPEntry entry = sr.next();
+                    String dn = entry.getDN();
+                    String rdn = EntryUtil.getRdn(dn).toString();
 
-                TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
-                treeItem.setText(rdn);
-                treeItem.setData(dn);
+                    TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
+                    treeItem.setText(rdn);
+                    treeItem.setData(dn);
 
-                new TreeItem(treeItem, SWT.NONE);
+                    new TreeItem(treeItem, SWT.NONE);
+
+                } catch (Exception e) {
+                    TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
+                    treeItem.setText(e.getMessage());
+                }
             }
         }
     }
@@ -265,6 +271,7 @@ public class BrowserEditor extends EditorPart {
         table.removeAll();
 
         String dn = (String)treeItem.getData();
+        if (dn == null) return;
 
         LDAPSearchResults sr = connection.search(dn, LDAPConnection.SCOPE_BASE, "(objectClass=*)", new String[0], false);
         if (!sr.hasMore()) return;

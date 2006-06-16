@@ -38,6 +38,7 @@ import org.safehaus.penrose.studio.util.ApplicationConfig;
 import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.studio.validation.ValidationView;
+import org.safehaus.penrose.studio.logger.LoggerManager;
 import org.safehaus.penrose.schema.*;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.*;
@@ -46,6 +47,9 @@ import org.safehaus.penrose.connector.AdapterConfig;
 import org.safehaus.penrose.license.License;
 import org.safehaus.penrose.license.LicenseUtil;
 import org.safehaus.penrose.util.ClassRegistry;
+import org.safehaus.penrose.log4j.Log4jConfigReader;
+import org.safehaus.penrose.log4j.Log4jConfig;
+import org.safehaus.penrose.log4j.Log4jConfigWriter;
 
 import javax.crypto.Cipher;
 
@@ -69,12 +73,14 @@ public class PenroseApplication implements IPlatformRunnable {
     SchemaManager schemaManager;
     PartitionManager partitionManager;
     ConnectionManager connectionManager;
+    LoggerManager loggerManager = new LoggerManager();
 
     PenroseWorkbenchAdvisor workbenchAdvisor;
     ArrayList changeListeners = new ArrayList();
 
     ClassRegistry registry;
     License license;
+    Log4jConfig loggingConfig;
 
     boolean dirty = false;
 
@@ -183,11 +189,23 @@ public class PenroseApplication implements IPlatformRunnable {
 
         loadConnections();
 
+        loadLoggingConfig();
+        //loadLoggers();
+
         notifyChangeListeners();
 
         log.debug("Project opened.");
     }
 
+    public void loadLoggers() throws Exception {
+        loggerManager.clear();
+
+        for (Iterator i=client.getLoggerNames().iterator(); i.hasNext(); ) {
+            String loggerName = (String)i.next();
+            loggerManager.addLogger(loggerName);
+        }
+
+    }
     public void initSystemProperties() throws Exception {
         for (Iterator i=penroseConfig.getSystemPropertyNames().iterator(); i.hasNext(); ) {
             String name = (String)i.next();
@@ -213,6 +231,11 @@ public class PenroseApplication implements IPlatformRunnable {
         partitionManager.setSchemaManager(schemaManager);
 
         partitionManager.load(workDir, penroseConfig.getPartitionConfigs());
+    }
+
+    public void loadLoggingConfig() throws Exception {
+        Log4jConfigReader reader = new Log4jConfigReader(new File(workDir+"/conf/log4j.xml"));
+        loggingConfig = reader.read();
     }
 
     public void loadConnections() throws Exception {
@@ -309,12 +332,19 @@ public class PenroseApplication implements IPlatformRunnable {
         PenroseConfigWriter serverConfigWriter = new PenroseConfigWriter(workDir+"/conf/server.xml");
         serverConfigWriter.write(penroseConfig);
 
+        saveLoggingConfig();
+
         partitionManager.store(workDir, penroseConfig.getPartitionConfigs());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         penroseApplication.setDirty(false);
 
         validatePartitions();
+    }
+
+    public void saveLoggingConfig() throws Exception {
+        Log4jConfigWriter writer = new Log4jConfigWriter(new File(workDir+"/conf/log4j.xml"));
+        writer.write(loggingConfig);
     }
 
     public void upload() throws Exception {
@@ -510,5 +540,21 @@ public class PenroseApplication implements IPlatformRunnable {
              -37, -80,  64,  33,   6,  76, -45,  69, 100,  85, -49,   9, -52, -35,  21,  23,
              -91, -29,  12, -55,  -3,  76,   9,-104,  17,  82,  29,  25, -71, -83, -19, -56
         };
+    }
+
+    public LoggerManager getLoggerManager() {
+        return loggerManager;
+    }
+
+    public void setLoggerManager(LoggerManager loggerManager) {
+        this.loggerManager = loggerManager;
+    }
+
+    public Log4jConfig getLoggingConfig() {
+        return loggingConfig;
+    }
+
+    public void setLoggingConfig(Log4jConfig loggingConfig) {
+        this.loggingConfig = loggingConfig;
     }
 }

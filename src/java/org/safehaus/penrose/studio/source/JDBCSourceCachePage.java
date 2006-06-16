@@ -48,7 +48,7 @@ public class JDBCSourceCachePage {
 
     public JDBCSourceCachePage(JDBCSourceEditor editor) {
         this.editor = editor;
-        this.source = editor.source;
+        this.source = editor.sourceConfig;
     }
 
     public Control createControl() {

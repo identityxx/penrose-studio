@@ -18,6 +18,7 @@
 package org.safehaus.penrose.studio.source.wizard;
 
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
@@ -34,6 +35,8 @@ import org.safehaus.penrose.partition.TableConfig;
 import org.apache.log4j.Logger;
 
 import java.util.*;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 
 /**
  * @author Endi S. Dewata
@@ -79,8 +82,22 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
 
         catalogCombo.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                showTableNames();
-                showFieldNames();
+                try {
+                    showTableNames();
+                    showFieldNames();
+
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    e.printStackTrace(pw);
+                    String message = sw.toString();
+                    if (message.length() > 500) {
+                        message = message.substring(0, 500) + "...";
+                    }
+                    MessageDialog.openError(getShell(), "Error", "Error: "+message);
+                }
             }
         });
 
@@ -93,8 +110,22 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
 
         refreshButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                showTableNames();
-                showFieldNames();
+                try {
+                    showTableNames();
+                    showFieldNames();
+
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    e.printStackTrace(pw);
+                    String message = sw.toString();
+                    if (message.length() > 500) {
+                        message = message.substring(0, 500) + "...";
+                    }
+                    MessageDialog.openError(getShell(), "Error", "Error: "+message);
+                }
             }
         });
 
@@ -106,8 +137,22 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
 
         schemaCombo.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                showTableNames();
-                showFieldNames();
+                try {
+                    showTableNames();
+                    showFieldNames();
+
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    e.printStackTrace(pw);
+                    String message = sw.toString();
+                    if (message.length() > 500) {
+                        message = message.substring(0, 500) + "...";
+                    }
+                    MessageDialog.openError(getShell(), "Error", "Error: "+message);
+                }
             }
         });
 
@@ -148,100 +193,106 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
 
     public void setConnectionConfig(ConnectionConfig connectionConfig) {
         this.connectionConfig = connectionConfig;
-
-        showCatalogsAndSchemas();
-
-        String driver   = connectionConfig.getParameter(JDBCAdapter.DRIVER);
-        String username = connectionConfig.getParameter(JDBCAdapter.USER);
-
-        if ("oracle.jdbc.driver.OracleDriver".equals(driver)) {
-            schemaCombo.setText(username.toUpperCase());
-        }
-
-        showTableNames();
-        //setPageComplete(validatePage());
     }
 
-    public void showCatalogsAndSchemas() {
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+        if (visible) init();
+    }
+
+    public void init() {
         try {
-            catalogCombo.removeAll();
-            schemaCombo.removeAll();
+            showCatalogsAndSchemas();
 
-            JDBCClient client = new JDBCClient(connectionConfig.getParameters());
-            client.connect();
+            String driver   = connectionConfig.getParameter(JDBCAdapter.DRIVER);
+            String username = connectionConfig.getParameter(JDBCAdapter.USER);
 
-            Collection catalogs = client.getCatalogs();
-            Collection schemas = client.getSchemas();
-
-            client.close();
-
-            for (Iterator i=catalogs.iterator(); i.hasNext(); ) {
-                String catalog = (String)i.next();
-                catalogCombo.add(catalog);
+            if ("oracle.jdbc.driver.OracleDriver".equals(driver)) {
+                schemaCombo.setText(username.toUpperCase());
             }
 
-            for (Iterator i=schemas.iterator(); i.hasNext(); ) {
-                String schema = (String)i.next();
-                schemaCombo.add(schema);
-            }
-            
+            showTableNames();
+            setPageComplete(validatePage());
+
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
+
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            String message = sw.toString();
+            if (message.length() > 500) {
+                message = message.substring(0, 500) + "...";
+            }
+            MessageDialog.openError(getShell(), "Error", "Error: "+message);
         }
     }
 
-    public void showTableNames() {
-        try {
-            tableTable.removeAll();
+    public void showCatalogsAndSchemas() throws Exception {
+        catalogCombo.removeAll();
+        schemaCombo.removeAll();
 
-            JDBCClient client = new JDBCClient(connectionConfig.getParameters());
+        JDBCClient client = new JDBCClient(connectionConfig.getParameters());
+        client.connect();
 
-            client.connect();
-            
-            Collection tables = client.getTables(getCatalog(), getSchema());
+        Collection catalogs = client.getCatalogs();
+        Collection schemas = client.getSchemas();
 
-            for (Iterator i=tables.iterator(); i.hasNext(); ) {
-                TableConfig tableConfig = (TableConfig)i.next();
-                String tableName = tableConfig.getName();
+        client.close();
 
-                TableItem item = new TableItem(tableTable, SWT.NONE);
-                item.setText(tableName);
-                item.setData(tableConfig);
-            }
+        for (Iterator i=catalogs.iterator(); i.hasNext(); ) {
+            String catalog = (String)i.next();
+            catalogCombo.add(catalog);
+        }
 
-            client.close();
-            
-        } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+        for (Iterator i=schemas.iterator(); i.hasNext(); ) {
+            String schema = (String)i.next();
+            schemaCombo.add(schema);
         }
     }
 
-    public void showFieldNames() {
-        try {
-            fieldTable.removeAll();
+    public void showTableNames() throws Exception {
+        tableTable.removeAll();
 
-            if (getTableName() == null) return;
+        JDBCClient client = new JDBCClient(connectionConfig.getParameters());
 
-            JDBCClient client = new JDBCClient(connectionConfig.getParameters());
+        client.connect();
 
-            client.connect();
-            
-            fields = client.getColumns(getCatalog(), getSchema(), getTableName());
+        Collection tables = client.getTables(getCatalog(), getSchema());
 
-            for (Iterator i=fields.iterator(); i.hasNext(); ) {
-                FieldConfig field = (FieldConfig)i.next();
+        for (Iterator i=tables.iterator(); i.hasNext(); ) {
+            TableConfig tableConfig = (TableConfig)i.next();
+            String tableName = tableConfig.getName();
 
-                TableItem it = new TableItem(fieldTable, SWT.NONE);
-                it.setImage(PenrosePlugin.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
-                it.setText(0, field.getName());
-                it.setText(1, field.getType());
-            }
-            
-            client.close();
-            
-        } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            TableItem item = new TableItem(tableTable, SWT.NONE);
+            item.setText(tableName);
+            item.setData(tableConfig);
         }
+
+        client.close();
+    }
+
+    public void showFieldNames() throws Exception {
+        fieldTable.removeAll();
+
+        if (getTableName() == null) return;
+
+        JDBCClient client = new JDBCClient(connectionConfig.getParameters());
+
+        client.connect();
+
+        fields = client.getColumns(getCatalog(), getSchema(), getTableName());
+
+        for (Iterator i=fields.iterator(); i.hasNext(); ) {
+            FieldConfig field = (FieldConfig)i.next();
+
+            TableItem it = new TableItem(fieldTable, SWT.NONE);
+            it.setImage(PenrosePlugin.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
+            it.setText(0, field.getName());
+            it.setText(1, field.getType());
+        }
+
+        client.close();
     }
 
     public String getCatalog() {
@@ -257,7 +308,13 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
     }
 
     public TableConfig getTableConfig() {
-        if (tableTable.getSelectionCount() == 0) return null;
+        if (tableTable.getSelectionCount() == 0) {
+            TableConfig tableConfig = new TableConfig(getTableName());
+            tableConfig.setCatalog(getCatalog());
+            tableConfig.setSchema(getSchema());
+            return tableConfig;
+        }
+        
         TableItem ti = tableTable.getSelection()[0];
         return (TableConfig)ti.getData();
     }
@@ -270,12 +327,26 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
     public void widgetSelected(SelectionEvent event) {
         if (tableTable.getSelectionCount() == 0) return;
 
-        TableItem item = tableTable.getSelection()[0];
-        String tableName = item.getText();
-        tableText.setText(tableName);
+        try {
+            TableItem item = tableTable.getSelection()[0];
+            String tableName = item.getText();
+            tableText.setText(tableName);
 
-        showFieldNames();
-        setPageComplete(validatePage());
+            showFieldNames();
+            setPageComplete(validatePage());
+
+        } catch (Exception e) {
+            log.debug(e.getMessage(), e);
+
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            String message = sw.toString();
+            if (message.length() > 500) {
+                message = message.substring(0, 500) + "...";
+            }
+            MessageDialog.openError(getShell(), "Error", "Error: "+message);
+        }
     }
 
     public void widgetDefaultSelected(SelectionEvent event) {
