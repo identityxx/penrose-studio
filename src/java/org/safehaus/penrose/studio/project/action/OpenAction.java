@@ -20,6 +20,7 @@ package org.safehaus.penrose.studio.project.action;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.project.ProjectDialog;
@@ -44,6 +45,8 @@ public class OpenAction extends Action {
 	public void run() {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+
         try {
             ProjectDialog dialog = new ProjectDialog(window.getShell(), SWT.NONE);
             dialog.open();
@@ -53,19 +56,22 @@ public class OpenAction extends Action {
             Project project = dialog.getProject();
             window.getShell().setText("Penrose Studio - "+project.getName());
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
             penroseApplication.getApplicationConfig().setCurrentProject(project);
             penroseApplication.connect(project);
-            penroseApplication.open();
+            penroseApplication.open(penroseApplication.getWorkDir());
             penroseApplication.disconnect();
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
-            String message = e.toString();
-            if (message.length() > 500) {
-                message = message.substring(0, 500) + "...";
-            }
-            MessageDialog.openInformation(window.getShell(), "Open Failed", message);
+            log.error(e.getMessage(), e);
+
+            Shell shell = window.getShell();
+
+            MessageDialog.openError(
+                    shell,
+                    "ERROR",
+                    "Failed opening "+penroseApplication.getApplicationConfig().getCurrentProject().getName()+" configuration.\n"+
+                            "See penrose-studio-log.txt for details."
+            );
         }
 	}
 	

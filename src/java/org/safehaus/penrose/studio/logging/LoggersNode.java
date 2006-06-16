@@ -79,12 +79,22 @@ public class LoggersNode extends Node {
         Log4jConfig loggingConfig = penroseApplication.getLoggingConfig();
 
         RootConfig rootConfig = loggingConfig.getRootConfig();
+        if (rootConfig == null) rootConfig = new RootConfig();
 
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
         LoggerDialog dialog = new LoggerDialog(shell, SWT.NONE);
         dialog.setText("Edit Logger");
         dialog.setRootConfig(rootConfig);
         dialog.open();
+
+        if (dialog.getAction() == LoggerDialog.CANCEL) return;
+
+        if (rootConfig.getLevel() == null && rootConfig.getAppenders().isEmpty()) {
+            loggingConfig.setRootConfig(null);
+
+        } else {
+            if (loggingConfig.getRootConfig() == null) loggingConfig.setRootConfig(rootConfig);
+        }
     }
 
     public void createLogger() throws Exception {

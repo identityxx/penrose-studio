@@ -70,7 +70,7 @@ public class AppendersNode extends Node {
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         Log4jConfig loggingConfig = penroseApplication.getLoggingConfig();
 
-        return !loggingConfig.getLoggerConfigs().isEmpty();
+        return !loggingConfig.getAppenderConfigs().isEmpty();
     }
 
     public Collection getChildren() throws Exception {
