@@ -91,7 +91,7 @@ public class PenroseApplication implements IPlatformRunnable {
         homeDir.mkdirs();
 
         String dir = System.getProperty("user.dir");
-        workDir = dir+File.separator+"tmp";
+        workDir = dir+File.separator+"work";
 
         Class clazz = Class.forName("org.safehaus.penrose.studio.util.PenroseClassRegistry");
         Constructor constructor = clazz.getConstructor(new Class[] { ClassLoader.class });
@@ -166,30 +166,30 @@ public class PenroseApplication implements IPlatformRunnable {
 	}
 
 
-    public void open() throws Exception {
+    public void open(String dir) throws Exception {
 
-        FileUtil.delete(workDir);
+        FileUtil.delete(dir);
 
         log.debug("-------------------------------------------------------------------------------------");
-        log.debug("Downloading configuration to "+workDir);
+        log.debug("Downloading configuration to "+dir);
 
-        downloadFolder("conf", workDir);
-        downloadFolder("schema", workDir);
-        downloadFolder("partitions", workDir);
+        downloadFolder("conf", dir);
+        downloadFolder("schema", dir);
+        downloadFolder("partitions", dir);
 
-        log.debug("Opening project from "+workDir);
+        log.debug("Opening project from "+dir);
 
-        PenroseConfigReader penroseConfigReader = new PenroseConfigReader(workDir+"/conf/server.xml");
+        PenroseConfigReader penroseConfigReader = new PenroseConfigReader(dir+"/conf/server.xml");
         penroseConfig = penroseConfigReader.read();
 
         initSystemProperties();
-        initSchemaManager();
-        loadPartitions();
+        initSchemaManager(dir);
+        loadPartitions(dir);
         validatePartitions();
 
         loadConnections();
 
-        loadLoggingConfig();
+        loadLoggingConfig(dir);
         //loadLoggers();
 
         notifyChangeListeners();
@@ -215,27 +215,32 @@ public class PenroseApplication implements IPlatformRunnable {
         }
     }
 
-    public void initSchemaManager() throws Exception {
+    public void initSchemaManager(String dir) throws Exception {
 
         schemaManager = new SchemaManager();
 
         for (Iterator i=penroseConfig.getSchemaConfigs().iterator(); i.hasNext(); ) {
             SchemaConfig schemaConfig = (SchemaConfig)i.next();
-            schemaManager.load(workDir, schemaConfig);
+            schemaManager.load(dir, schemaConfig);
         }
     }
 
-    public void loadPartitions() throws Exception {
+    public void loadPartitions(String dir) throws Exception {
 
         partitionManager = new PartitionManager();
         partitionManager.setSchemaManager(schemaManager);
 
-        partitionManager.load(workDir, penroseConfig.getPartitionConfigs());
+        partitionManager.load(dir, penroseConfig.getPartitionConfigs());
     }
 
-    public void loadLoggingConfig() throws Exception {
-        Log4jConfigReader reader = new Log4jConfigReader(new File(workDir+"/conf/log4j.xml"));
-        loggingConfig = reader.read();
+    public void loadLoggingConfig(String dir) throws Exception {
+        try {
+            Log4jConfigReader reader = new Log4jConfigReader(new File(dir+"/conf/log4j.xml"));
+            loggingConfig = reader.read();
+        } catch (Exception e) {
+            log.error("ERROR: "+e.getMessage());
+            loggingConfig = new Log4jConfig();
+        }
     }
 
     public void loadConnections() throws Exception {
@@ -324,17 +329,20 @@ public class PenroseApplication implements IPlatformRunnable {
         //client.close();
     }
 
-    public void save() throws Exception {
+    public void save(String dir) throws Exception {
+
+        File file = new File(dir);
+        file.mkdirs();
 
         log.debug("-------------------------------------------------------------------------------------");
-        log.debug("Saving configuration to "+workDir);
+        log.debug("Saving configuration to "+dir);
 
-        PenroseConfigWriter serverConfigWriter = new PenroseConfigWriter(workDir+"/conf/server.xml");
+        PenroseConfigWriter serverConfigWriter = new PenroseConfigWriter(dir+"/conf/server.xml");
         serverConfigWriter.write(penroseConfig);
 
-        saveLoggingConfig();
+        saveLoggingConfig(dir);
 
-        partitionManager.store(workDir, penroseConfig.getPartitionConfigs());
+        partitionManager.store(dir, penroseConfig.getPartitionConfigs());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         penroseApplication.setDirty(false);
@@ -342,15 +350,15 @@ public class PenroseApplication implements IPlatformRunnable {
         validatePartitions();
     }
 
-    public void saveLoggingConfig() throws Exception {
-        Log4jConfigWriter writer = new Log4jConfigWriter(new File(workDir+"/conf/log4j.xml"));
+    public void saveLoggingConfig(String dir) throws Exception {
+        Log4jConfigWriter writer = new Log4jConfigWriter(dir+"/conf/log4j.xml");
         writer.write(loggingConfig);
     }
 
-    public void upload() throws Exception {
-        log.debug("Uploading configuration from "+workDir);
+    public void upload(String dir) throws Exception {
+        log.debug("Uploading configuration from "+dir);
 
-        uploadFolder(workDir);
+        uploadFolder(dir);
 
     }
 

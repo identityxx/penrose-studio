@@ -45,7 +45,7 @@ public class UploadAction extends Action {
         try {
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
             penroseApplication.connect();
-    		penroseApplication.upload();
+    		penroseApplication.upload(penroseApplication.getWorkDir());
             penroseApplication.disconnect();
 
         } catch (Exception e) {
