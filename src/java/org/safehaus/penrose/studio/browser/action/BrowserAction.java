@@ -18,6 +18,7 @@
 package org.safehaus.penrose.studio.browser.action;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
@@ -49,8 +50,9 @@ public class BrowserAction extends Action {
     }
 
 	public void run() {
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        
         try {
-            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage activePage = window.getActivePage();
 
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
@@ -72,6 +74,7 @@ public class BrowserAction extends Action {
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
+            MessageDialog.openError(window.getShell(), "Error", e.getMessage());
         }
 	}
 }
