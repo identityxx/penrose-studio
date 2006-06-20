@@ -35,6 +35,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.*;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.ietf.ldap.*;
 import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.studio.PenroseApplication;
@@ -118,6 +119,7 @@ public class BrowserEditor extends EditorPart {
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
+                    MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
                 }
             }
         });
@@ -137,6 +139,7 @@ public class BrowserEditor extends EditorPart {
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
+                    MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
                 }
             }
         });
@@ -151,6 +154,7 @@ public class BrowserEditor extends EditorPart {
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
+                    MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
                 }
             }
         });
@@ -185,6 +189,7 @@ public class BrowserEditor extends EditorPart {
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
+            MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
         }
 	}
 

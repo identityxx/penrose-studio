@@ -76,6 +76,7 @@ public class PreviewEditor extends EditorPart {
             if (penrose != null) penrose.stop();
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
+            MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
         }
     }
 
@@ -145,6 +146,7 @@ public class PreviewEditor extends EditorPart {
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
+                    MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
                 }
             }
         });
@@ -159,6 +161,7 @@ public class PreviewEditor extends EditorPart {
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
+                    MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
                 }
             }
         });
@@ -185,6 +188,7 @@ public class PreviewEditor extends EditorPart {
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
+            MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
         }
     }
 
@@ -202,8 +206,10 @@ public class PreviewEditor extends EditorPart {
         bindDnText.setText(bindDn == null ? "" : bindDn);
         this.password = password;
 
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+
         PenroseFactory penroseFactory = PenroseFactory.getInstance();
-        penrose = penroseFactory.createPenrose(System.getProperty("user.dir")+File.separator+"tmp");
+        penrose = penroseFactory.createPenrose(penroseApplication.getWorkDir());
         penrose.start();
 
         session = penrose.newSession();
