@@ -18,7 +18,6 @@
 package org.safehaus.penrose.studio.console;
 
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Display;
 
 import java.io.Writer;
 import java.io.IOException;
@@ -28,20 +27,21 @@ import java.io.IOException;
  */
 public class ConsoleWriter extends Writer {
 
-    private Text text;
-    Display display;
+    StringBuffer sb = new StringBuffer();
+    Text text;
+    int length = 2000;
 
-    public ConsoleWriter(Text text) {
-        this.text = text;
-        this.display = text.getDisplay();
+    public ConsoleWriter() {
     }
 
     public void write(char cbuf[], int off, int len) throws IOException {
+        final String string = new String(cbuf, off, len);
+        sb.append(string);
+        sb.delete(0, sb.length() > length ? sb.length() - length : 0);
+
         if (text == null) return;
 
-        final String string = new String(cbuf, off, len);
-
-        display.asyncExec(
+        text.getDisplay().asyncExec(
            new Runnable() {
               public void run(){
                   text.append(string);
@@ -60,7 +60,15 @@ public class ConsoleWriter extends Writer {
         return text;
     }
 
-    public void setText(Text text) {
+    public void setText(final Text text) {
         this.text = text;
+
+        text.getDisplay().asyncExec(
+           new Runnable() {
+              public void run(){
+                  text.append(sb.toString());
+              }
+           }
+        );
     }
 }

@@ -25,7 +25,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.partition.wizard.CreatePartitionWizard;
-import org.safehaus.penrose.studio.partition.wizard.CreatePartitionWizard;
 import org.apache.log4j.Logger;
 
 public class NewPartitionAction extends Action {

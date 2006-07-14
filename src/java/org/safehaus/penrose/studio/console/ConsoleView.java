@@ -40,6 +40,10 @@ public class ConsoleView extends ViewPart {
     private ConsoleWriter writer;
 
     public ConsoleView() {
+        writer = new ConsoleWriter();
+        WriterAppender appender = new WriterAppender(new PatternLayout("%-20C{1} [%4L] %m%n"), writer);
+
+        BasicConfigurator.configure(appender);
     }
 
     public void createPartControl(Composite parent) {
@@ -53,10 +57,7 @@ public class ConsoleView extends ViewPart {
         text.setFont(font);
         text.setTextLimit(Text.LIMIT);
 
-        writer = new ConsoleWriter(text);
-        WriterAppender appender = new WriterAppender(new PatternLayout("%-20C{1} [%4L] %m%n"), writer);
-
-        BasicConfigurator.configure(appender);
+        writer.setText(text);
     }
 
     public void setFocus() {

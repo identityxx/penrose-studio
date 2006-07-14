@@ -24,9 +24,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.forms.widgets.*;
+import org.eclipse.ui.forms.editor.FormPage;
+import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.studio.source.FieldDialog;
-import org.safehaus.penrose.studio.source.JDBCSourceEditor;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseApplication;
@@ -34,7 +34,7 @@ import org.safehaus.penrose.util.JDBCClient;
 import org.safehaus.penrose.connector.JDBCAdapter;
 import org.apache.log4j.Logger;
 
-public class JDBCSourcePropertyPage {
+public class JDBCSourcePropertyPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -56,15 +56,17 @@ public class JDBCSourcePropertyPage {
 	SourceConfig sourceConfig;
 
     public JDBCSourcePropertyPage(JDBCSourceEditor editor) {
+        super(editor, "PROPERTIES", "  Properties  ");
+
         this.editor = editor;
         this.partition = editor.partition;
         this.sourceConfig = editor.sourceConfig;
     }
 
-    public Control createControl() {
-        toolkit = new FormToolkit(editor.getParent().getDisplay());
+    public void createFormContent(IManagedForm managedForm) {
+        toolkit = managedForm.getToolkit();
 
-        Form form = toolkit.createForm(editor.getParent());
+        ScrolledForm form = managedForm.getForm();
         form.setText("Source Editor");
 
         Composite body = form.getBody();
@@ -91,8 +93,8 @@ public class JDBCSourcePropertyPage {
         Control fieldsSection = createFieldsSection(section);
         section.setClient(fieldsSection);
 
-        return form;
-	}
+        refresh();
+    }
 
 	public Composite createSourceSection(Composite parent) {
 
@@ -190,7 +192,7 @@ public class JDBCSourcePropertyPage {
         return composite;
     }
 
-    public Composite createFieldsSection(Composite parent) {
+    public Composite createFieldsSection(final Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
@@ -225,7 +227,7 @@ public class JDBCSourcePropertyPage {
                     Collection fields = client.getColumns(tableName);
                     client.close();
 
-                    JDBCFieldDialog dialog = new JDBCFieldDialog(editor.getParent().getShell(), SWT.NONE);
+                    JDBCFieldDialog dialog = new JDBCFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setColumns(fields);
                     dialog.setFieldConfig(fieldConfig);
                     dialog.open();
@@ -315,7 +317,7 @@ public class JDBCSourcePropertyPage {
                     Collection fields = helper.getColumns(tableName);
                     helper.close();
 
-                    JDBCFieldDialog dialog = new JDBCFieldDialog(editor.getParent().getShell(), SWT.NONE);
+                    JDBCFieldDialog dialog = new JDBCFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setColumns(fields);
                     dialog.setFieldConfig(fieldDefinition);
                     dialog.open();
@@ -365,7 +367,7 @@ public class JDBCSourcePropertyPage {
                     Collection fields = helper.getColumns(tableName);
                     helper.close();
 
-                    JDBCFieldDialog dialog = new JDBCFieldDialog(editor.getParent().getShell(), SWT.NONE);
+                    JDBCFieldDialog dialog = new JDBCFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setColumns(fields);
                     dialog.setFieldConfig(fieldDefinition);
                     dialog.open();
@@ -435,13 +437,5 @@ public class JDBCSourcePropertyPage {
 
     public void checkDirty() {
         editor.checkDirty();
-    }
-
-    public void load() {
-        refresh();
-    }
-
-    public void dispose() {
-        toolkit.dispose();
     }
 }

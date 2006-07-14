@@ -22,7 +22,6 @@ import org.safehaus.penrose.schema.*;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.apache.log4j.Logger;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;

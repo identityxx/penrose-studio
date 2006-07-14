@@ -30,7 +30,6 @@ import org.safehaus.penrose.studio.PenroseActionBarAdvisor;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.SourceConfig;
-import org.safehaus.penrose.util.JNDIClient;
 import org.apache.log4j.Logger;
 
 import java.util.Iterator;

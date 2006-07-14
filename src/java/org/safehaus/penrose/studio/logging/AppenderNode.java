@@ -6,7 +6,6 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.log4j.AppenderConfig;
-import org.safehaus.penrose.log4j.LayoutConfig;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Image;

@@ -22,6 +22,7 @@ import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.source.JDBCSourceCachePage;
@@ -33,7 +34,7 @@ import org.apache.log4j.Logger;
 
 import java.util.Iterator;
 
-public class JDBCSourceEditor extends MultiPageEditorPart {
+public class JDBCSourceEditor extends FormEditor {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -43,7 +44,7 @@ public class JDBCSourceEditor extends MultiPageEditorPart {
     boolean dirty;
 
     Partition partition;
-    JDBCSourcePropertyPage propertyPage;
+
     JDBCSourceCachePage cachePage;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -57,42 +58,20 @@ public class JDBCSourceEditor extends MultiPageEditorPart {
         setPartName(partition.getName()+"/"+sourceConfig.getName());
     }
 
-    protected void createPages() {
+    public void addPages() {
         try {
-            propertyPage = new JDBCSourcePropertyPage(this);
-            addPage(propertyPage.createControl());
-            setPageText(0, "  Properties  ");
-
-            cachePage = new JDBCSourceCachePage(this);
-            addPage(cachePage.createControl());
-            setPageText(1, "  Cache  ");
-
-            load();
+            addPage(new JDBCSourcePropertyPage(this));
+            addPage(new JDBCSourceBrowsePage(this));
+            addPage(new JDBCSourceCachePage(this));
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
         }
     }
 
-    public Composite getParent() {
-        return getContainer();
-    }
-
-    public void dispose() {
-        propertyPage.dispose();
-        cachePage.dispose();
-        super.dispose();
-    }
-
-    public void load() throws Exception {
-        propertyPage.load();
-        cachePage.load();
-    }
-
     public void doSave(IProgressMonitor iProgressMonitor) {
         try {
             store();
-
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
         }

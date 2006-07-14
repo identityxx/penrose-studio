@@ -32,16 +32,9 @@ import org.safehaus.penrose.util.JNDIClient;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
-import org.ietf.ldap.*;
 
 import javax.naming.InitialContext;
 import javax.naming.Context;
-import javax.naming.NamingEnumeration;
-import javax.naming.directory.SearchControls;
-import javax.naming.directory.SearchResult;
-import javax.naming.directory.Attribute;
-import javax.naming.ldap.InitialLdapContext;
-import javax.naming.ldap.LdapContext;
 import java.util.*;
 
 /**

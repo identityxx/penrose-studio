@@ -17,11 +17,10 @@
  */
 package org.safehaus.penrose.studio.source;
 
-import org.eclipse.swt.widgets.*;
-import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.partition.Partition;
@@ -32,60 +31,36 @@ import org.apache.log4j.Logger;
 
 import java.util.Iterator;
 
-public class JNDISourceEditor extends MultiPageEditorPart {
+public class JNDISourceEditor extends FormEditor {
 
     Logger log = Logger.getLogger(getClass());
 
     Partition partition;
-	SourceConfig source;
-    SourceConfig origSource;
+	SourceConfig sourceConfig;
+    SourceConfig origSourceConfig;
 
     boolean dirty;
-
-    JNDISourcePropertyPage propertyPage;
-    JNDISourceCachePage cachePage;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         JNDISourceEditorInput ei = (JNDISourceEditorInput)input;
         partition = ei.getPartition();
-        origSource = ei.getSourceConfig();
-        source = (SourceConfig)origSource.clone();
+        origSourceConfig = ei.getSourceConfig();
+        sourceConfig = (SourceConfig)origSourceConfig.clone();
 
         setSite(site);
         setInput(input);
-        setPartName(partition.getName()+"/"+source.getName());
+        setPartName(partition.getName()+"/"+sourceConfig.getName());
     }
 
-    public void createPages() {
+    public void addPages() {
         try {
-            propertyPage = new JNDISourcePropertyPage(this);
-            addPage(propertyPage.createControl());
-            setPageText(0, "  Properties  ");
-
-            cachePage = new JNDISourceCachePage(this);
-            addPage(cachePage.createControl());
-            setPageText(1, "  Cache  ");
-
-            load();
+            addPage(new JNDISourcePropertyPage(this));
+            addPage(new JNDISourceBrowsePage(this));
+            addPage(new JNDISourceCachePage(this));
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
         }
-    }
-
-    public Composite getParent() {
-        return getContainer();
-    }
-
-    public void dispose() {
-        propertyPage.dispose();
-        cachePage.dispose();
-        super.dispose();
-    }
-
-    public void load() throws Exception {
-        propertyPage.load();
-        cachePage.load();
     }
 
     public void doSave(IProgressMonitor iProgressMonitor) {
@@ -101,22 +76,22 @@ public class JNDISourceEditor extends MultiPageEditorPart {
 
 	public void store() throws Exception {
 
-        if (!origSource.getName().equals(source.getName())) {
-            partition.renameSourceConfig(origSource, source.getName());
+        if (!origSourceConfig.getName().equals(sourceConfig.getName())) {
+            partition.renameSourceConfig(origSourceConfig, sourceConfig.getName());
 
             for (Iterator i=partition.getEntryMappings().iterator(); i.hasNext(); ) {
                 EntryMapping entryMapping = (EntryMapping)i.next();
                 for (Iterator j=entryMapping.getSourceMappings().iterator(); j.hasNext(); ) {
                     SourceMapping sourceMapping = (SourceMapping)j.next();
-                    if (!sourceMapping.getSourceName().equals(origSource.getName())) continue;
-                    sourceMapping.setSourceName(source.getName());
+                    if (!sourceMapping.getSourceName().equals(origSourceConfig.getName())) continue;
+                    sourceMapping.setSourceName(sourceConfig.getName());
                 }
             }
         }
 
-        partition.modifySourceConfig(source.getName(), source);
+        partition.modifySourceConfig(sourceConfig.getName(), sourceConfig);
 
-        setPartName(partition.getName()+"/"+source.getName());
+        setPartName(partition.getName()+"/"+sourceConfig.getName());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         penroseApplication.notifyChangeListeners();
@@ -136,7 +111,7 @@ public class JNDISourceEditor extends MultiPageEditorPart {
         try {
             dirty = false;
 
-            if (!origSource.equals(source)) {
+            if (!origSourceConfig.equals(sourceConfig)) {
                 dirty = true;
                 return;
             }

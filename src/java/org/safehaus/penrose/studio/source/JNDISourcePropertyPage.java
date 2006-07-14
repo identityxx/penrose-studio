@@ -25,6 +25,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.forms.widgets.*;
+import org.eclipse.ui.forms.editor.FormPage;
+import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -33,10 +35,9 @@ import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.schema.Schema;
-import org.safehaus.penrose.connector.ConnectionManager;
 import org.apache.log4j.Logger;
 
-public class JNDISourcePropertyPage {
+public class JNDISourcePropertyPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -65,9 +66,11 @@ public class JNDISourcePropertyPage {
 	String[] scopes = new String[] { "OBJECT", "ONELEVEL", "SUBTREE" };
 
     public JNDISourcePropertyPage(JNDISourceEditor editor) throws Exception {
+        super(editor, "PROPERTIES", "  Properties  ");
+
         this.editor = editor;
         this.partition = editor.partition;
-        this.source = editor.source;
+        this.source = editor.sourceConfig;
 
         ConnectionConfig connectionConfig = partition.getConnectionConfig(source.getConnectionName());
         if (connectionConfig != null) {
@@ -75,10 +78,10 @@ public class JNDISourcePropertyPage {
         }
     }
 
-    public Control createControl() {
-        toolkit = new FormToolkit(editor.getParent().getDisplay());
+    public void createFormContent(IManagedForm managedForm) {
+        toolkit = managedForm.getToolkit();
 
-        Form form = toolkit.createForm(editor.getParent());
+        ScrolledForm form = managedForm.getForm();
         form.setText("Source Editor");
 
         Composite body = form.getBody();
@@ -105,7 +108,7 @@ public class JNDISourcePropertyPage {
         Control fieldsSection = createFieldsSection(section);
         section.setClient(fieldsSection);
 
-        return form;
+        refresh();
 	}
 
 	public Composite createSourceSection(Composite parent) {
@@ -247,7 +250,7 @@ public class JNDISourcePropertyPage {
         return composite;
     }
 
-    public Composite createFieldsSection(Composite parent) {
+    public Composite createFieldsSection(final Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
@@ -276,7 +279,7 @@ public class JNDISourcePropertyPage {
                         attributeTypes = schema.getAttributeTypes();
                     }
 
-                    JNDIFieldDialog dialog = new JNDIFieldDialog(editor.getParent().getShell(), SWT.NONE);
+                    JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setAttributeTypes(attributeTypes);
                     dialog.setFieldConfig(fieldDefinition);
                     dialog.open();
@@ -351,7 +354,7 @@ public class JNDISourcePropertyPage {
                     SchemaManager schemaManager = penroseApplication.getSchemaManager();
                     Collection attributeTypes = schemaManager.getAttributeTypes();
 
-                    JNDIFieldDialog dialog = new JNDIFieldDialog(editor.getParent().getShell(), SWT.NONE);
+                    JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setAttributeTypes(attributeTypes);
                     dialog.setFieldConfig(fieldDefinition);
                     dialog.open();
@@ -386,7 +389,7 @@ public class JNDISourcePropertyPage {
                     SchemaManager schemaManager = penroseApplication.getSchemaManager();
                     Collection attributeTypes = schemaManager.getAttributeTypes();
 
-                    JNDIFieldDialog dialog = new JNDIFieldDialog(editor.getParent().getShell(), SWT.NONE);
+                    JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setAttributeTypes(attributeTypes);
                     dialog.setFieldConfig(fieldDefinition);
                     dialog.open();
@@ -505,13 +508,5 @@ public class JNDISourcePropertyPage {
 
     public void checkDirty() {
         editor.checkDirty();
-    }
-
-    public void load() {
-        refresh();
-    }
-
-    public void dispose() {
-        toolkit.dispose();
     }
 }

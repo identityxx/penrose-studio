@@ -54,7 +54,7 @@ public class RestartAction extends Action {
             if (message.length() > 500) {
                 message = message.substring(0, 500) + "...";
             }
-            MessageDialog.openInformation(window.getShell(), "Restart Failed", message);
+            MessageDialog.openError(window.getShell(), "Restart Failed", message);
         }
 	}
 }
