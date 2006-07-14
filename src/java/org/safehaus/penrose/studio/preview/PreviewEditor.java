@@ -287,7 +287,7 @@ public class PreviewEditor extends EditorPart {
 
             if (results.getReturnCode() != LDAPException.SUCCESS) {
                 TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
-                treeItem.setText("LDAP Error: "+results.getReturnCode());
+                treeItem.setText(LDAPException.resultCodeToString(results.getReturnCode()));
             }
         }
     }

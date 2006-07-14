@@ -18,6 +18,7 @@
 package org.safehaus.penrose.studio.preview.action;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
@@ -43,8 +44,8 @@ public class PreviewAction extends Action {
     }
 
 	public void run() {
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         try {
-            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage activePage = window.getActivePage();
 
             //activePage.showView(ConsoleView.class.getName());
@@ -52,6 +53,11 @@ public class PreviewAction extends Action {
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
+            String message = e.toString();
+            if (message.length() > 500) {
+                message = message.substring(0, 500) + "...";
+            }
+            MessageDialog.openError(window.getShell(), "Preview Failed", message);
         }
 	}
 }

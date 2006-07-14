@@ -28,7 +28,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
 
-import javax.naming.Context;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Iterator;

@@ -25,12 +25,14 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.*;
+import org.eclipse.ui.forms.editor.FormPage;
+import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.partition.SourceConfig;
 
 /**
  * @author Endi S. Dewata
  */
-public class JNDISourceCachePage {
+public class JNDISourceCachePage extends FormPage {
 
     FormToolkit toolkit;
 
@@ -44,17 +46,19 @@ public class JNDISourceCachePage {
     Combo loadingMethodCombo;
 
     JNDISourceEditor editor;
-	SourceConfig source;
+	SourceConfig sourceConfig;
 
     public JNDISourceCachePage(JNDISourceEditor editor) {
+        super(editor, "CACHE", "  Cache  ");
+
         this.editor = editor;
-        this.source = editor.source;
+        this.sourceConfig = editor.sourceConfig;
     }
 
-    public Control createControl() {
-        toolkit = new FormToolkit(editor.getParent().getDisplay());
+    public void createFormContent(IManagedForm managedForm) {
+        toolkit = managedForm.getToolkit();
 
-        Form form = toolkit.createForm(editor.getParent());
+        ScrolledForm form = managedForm.getForm();
         form.setText("Source Editor");
 
         Composite body = form.getBody();
@@ -80,8 +84,6 @@ public class JNDISourceCachePage {
 
         Control dataLoadingSection = createDataLoadingSection(section);
         section.setClient(dataLoadingSection);
-
-        return form;
 	}
 
 	public Composite createFilterCacheSection(Composite parent) {
@@ -94,7 +96,7 @@ public class JNDISourceCachePage {
         gd.widthHint = 100;
         filterCacheSizeLabel.setLayoutData(gd);
 
-        String value = source.getParameter(SourceConfig.QUERY_CACHE_SIZE);
+        String value = sourceConfig.getParameter(SourceConfig.QUERY_CACHE_SIZE);
         value = value == null ? ""+SourceConfig.DEFAULT_QUERY_CACHE_SIZE : value;
 		filterCacheSizeText = toolkit.createText(composite, value, SWT.BORDER);
 
@@ -105,9 +107,9 @@ public class JNDISourceCachePage {
         filterCacheSizeText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(filterCacheSizeText.getText())) {
-                    source.removeParameter(SourceConfig.QUERY_CACHE_SIZE);
+                    sourceConfig.removeParameter(SourceConfig.QUERY_CACHE_SIZE);
                 } else {
-                    source.setParameter(SourceConfig.QUERY_CACHE_SIZE, filterCacheSizeText.getText());
+                    sourceConfig.setParameter(SourceConfig.QUERY_CACHE_SIZE, filterCacheSizeText.getText());
                 }
                 checkDirty();
             }
@@ -118,7 +120,7 @@ public class JNDISourceCachePage {
         gd.widthHint = 100;
         filterCacheExpirationLabel.setLayoutData(gd);
 
-        value = source.getParameter(SourceConfig.QUERY_CACHE_EXPIRATION);
+        value = sourceConfig.getParameter(SourceConfig.QUERY_CACHE_EXPIRATION);
         value = value == null ? ""+SourceConfig.DEFAULT_QUERY_CACHE_EXPIRATION : value;
         filterCacheExpirationText = toolkit.createText(composite, value, SWT.BORDER);
 
@@ -129,9 +131,9 @@ public class JNDISourceCachePage {
         filterCacheExpirationText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(filterCacheExpirationText.getText())) {
-                    source.removeParameter(SourceConfig.QUERY_CACHE_EXPIRATION);
+                    sourceConfig.removeParameter(SourceConfig.QUERY_CACHE_EXPIRATION);
                 } else {
-                    source.setParameter(SourceConfig.QUERY_CACHE_EXPIRATION, filterCacheExpirationText.getText());
+                    sourceConfig.setParameter(SourceConfig.QUERY_CACHE_EXPIRATION, filterCacheExpirationText.getText());
                 }
                 checkDirty();
             }
@@ -150,7 +152,7 @@ public class JNDISourceCachePage {
         gd.widthHint = 100;
         dataCacheSizeLabel.setLayoutData(gd);
 
-        String value = source.getParameter(SourceConfig.DATA_CACHE_SIZE);
+        String value = sourceConfig.getParameter(SourceConfig.DATA_CACHE_SIZE);
         value = value == null ? ""+SourceConfig.DEFAULT_DATA_CACHE_SIZE : value;
         dataCacheSizeText = toolkit.createText(composite, value, SWT.BORDER);
 
@@ -161,9 +163,9 @@ public class JNDISourceCachePage {
         dataCacheSizeText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(dataCacheSizeText.getText())) {
-                    source.removeParameter(SourceConfig.DATA_CACHE_SIZE);
+                    sourceConfig.removeParameter(SourceConfig.DATA_CACHE_SIZE);
                 } else {
-                    source.setParameter(SourceConfig.DATA_CACHE_SIZE, dataCacheSizeText.getText());
+                    sourceConfig.setParameter(SourceConfig.DATA_CACHE_SIZE, dataCacheSizeText.getText());
                 }
                 checkDirty();
             }
@@ -174,7 +176,7 @@ public class JNDISourceCachePage {
         gd.widthHint = 100;
         dataCacheExpirationLabel.setLayoutData(gd);
 
-        value = source.getParameter(SourceConfig.DATA_CACHE_EXPIRATION);
+        value = sourceConfig.getParameter(SourceConfig.DATA_CACHE_EXPIRATION);
         value = value == null ? ""+SourceConfig.DEFAULT_DATA_CACHE_EXPIRATION : value;
         dataCacheExpirationText = toolkit.createText(composite, value, SWT.BORDER);
 
@@ -185,9 +187,9 @@ public class JNDISourceCachePage {
         dataCacheExpirationText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(dataCacheExpirationText.getText())) {
-                    source.removeParameter(SourceConfig.DATA_CACHE_EXPIRATION);
+                    sourceConfig.removeParameter(SourceConfig.DATA_CACHE_EXPIRATION);
                 } else {
-                    source.setParameter(SourceConfig.DATA_CACHE_EXPIRATION, dataCacheExpirationText.getText());
+                    sourceConfig.setParameter(SourceConfig.DATA_CACHE_EXPIRATION, dataCacheExpirationText.getText());
                 }
                 checkDirty();
             }
@@ -206,7 +208,7 @@ public class JNDISourceCachePage {
         gd.widthHint = 100;
         sizeLimitLabel.setLayoutData(gd);
 
-        String value = source.getParameter(SourceConfig.SIZE_LIMIT);
+        String value = sourceConfig.getParameter(SourceConfig.SIZE_LIMIT);
         value = value == null ? ""+SourceConfig.DEFAULT_SIZE_LIMIT : value;
         sizeLimitText = toolkit.createText(composite, value, SWT.BORDER);
 
@@ -217,9 +219,9 @@ public class JNDISourceCachePage {
         sizeLimitText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(sizeLimitText.getText())) {
-                    source.removeParameter(SourceConfig.SIZE_LIMIT);
+                    sourceConfig.removeParameter(SourceConfig.SIZE_LIMIT);
                 } else {
-                    source.setParameter(SourceConfig.SIZE_LIMIT, sizeLimitText.getText());
+                    sourceConfig.setParameter(SourceConfig.SIZE_LIMIT, sizeLimitText.getText());
                 }
                 checkDirty();
             }
@@ -235,7 +237,7 @@ public class JNDISourceCachePage {
         loadingMethodCombo.add(SourceConfig.LOAD_ALL);
         loadingMethodCombo.add(SourceConfig.SEARCH_AND_LOAD);
 
-        value = source.getParameter(SourceConfig.LOADING_METHOD);
+        value = sourceConfig.getParameter(SourceConfig.LOADING_METHOD);
         value = value == null ? SourceConfig.DEFAULT_LOADING_METHOD : value;
         loadingMethodCombo.setText(value);
 
@@ -246,9 +248,9 @@ public class JNDISourceCachePage {
         loadingMethodCombo.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(loadingMethodCombo.getText())) {
-                    source.removeParameter(SourceConfig.LOADING_METHOD);
+                    sourceConfig.removeParameter(SourceConfig.LOADING_METHOD);
                 } else {
-                    source.setParameter(SourceConfig.LOADING_METHOD, loadingMethodCombo.getText());
+                    sourceConfig.setParameter(SourceConfig.LOADING_METHOD, loadingMethodCombo.getText());
                 }
                 checkDirty();
             }
@@ -259,12 +261,5 @@ public class JNDISourceCachePage {
 
     public void checkDirty() {
         editor.checkDirty();
-    }
-
-    public void load() {
-    }
-
-    public void dispose() {
-        toolkit.dispose();
     }
 }

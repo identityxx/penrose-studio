@@ -29,7 +29,6 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.views.CodeAssist;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.mapping.Expression;

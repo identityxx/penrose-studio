@@ -42,8 +42,6 @@ import org.safehaus.penrose.studio.logger.LoggerManager;
 import org.safehaus.penrose.schema.*;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.connector.ConnectionManager;
-import org.safehaus.penrose.connector.AdapterConfig;
 import org.safehaus.penrose.license.License;
 import org.safehaus.penrose.license.LicenseUtil;
 import org.safehaus.penrose.util.ClassRegistry;
@@ -58,7 +56,7 @@ public class PenroseApplication implements IPlatformRunnable {
     Logger log = Logger.getLogger(getClass());
 
     public final static DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
-    public final static String RELEASE_DATE    = "03/31/2006";
+    public final static String RELEASE_DATE    = "07/01/2006";
 
     public final static String FEATURE_NOT_AVAILABLE = "This feature is available in the commercial version.";
 
@@ -72,7 +70,6 @@ public class PenroseApplication implements IPlatformRunnable {
     PenroseClient client;
     SchemaManager schemaManager;
     PartitionManager partitionManager;
-    ConnectionManager connectionManager;
     LoggerManager loggerManager = new LoggerManager();
 
     PenroseWorkbenchAdvisor workbenchAdvisor;
@@ -187,8 +184,6 @@ public class PenroseApplication implements IPlatformRunnable {
         loadPartitions(dir);
         validatePartitions();
 
-        loadConnections();
-
         loadLoggingConfig(dir);
         //loadLoggers();
 
@@ -241,30 +236,6 @@ public class PenroseApplication implements IPlatformRunnable {
             log.error("ERROR: "+e.getMessage());
             loggingConfig = new Log4jConfig();
         }
-    }
-
-    public void loadConnections() throws Exception {
-        connectionManager = new ConnectionManager();
-
-        Collection partitions = partitionManager.getPartitions();
-        for (Iterator i=partitions.iterator(); i.hasNext(); ) {
-            Partition partition = (Partition)i.next();
-
-            Collection connectionConfigs = partition.getConnectionConfigs();
-            for (Iterator j=connectionConfigs.iterator(); j.hasNext(); ) {
-                ConnectionConfig connectionConfig = (ConnectionConfig)j.next();
-
-                String adapterName = connectionConfig.getAdapterName();
-                if (adapterName == null) throw new Exception("Missing adapter name");
-
-                AdapterConfig adapterConfig = penroseConfig.getAdapterConfig(adapterName);
-                if (adapterConfig == null) throw new Exception("Undefined adapter "+adapterName);
-
-                connectionManager.init(partition, connectionConfig, adapterConfig);
-            }
-        }
-
-        connectionManager.start();
     }
 
     public void validatePartitions() throws Exception {
@@ -457,21 +428,13 @@ public class PenroseApplication implements IPlatformRunnable {
         this.client = client;
     }
 
-    public ConnectionManager getConnectionManager() {
-        return connectionManager;
-    }
-
-    public void setConnectionManager(ConnectionManager connectionManager) {
-        this.connectionManager = connectionManager;
-    }
-
     public boolean checkCommercial() {
         if (!isFreeware()) return true;
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         Shell shell = window.getShell();
 
-        MessageDialog.openInformation(
+        MessageDialog.openError(
                 shell,
                 "Feature Not Available",
                 FEATURE_NOT_AVAILABLE

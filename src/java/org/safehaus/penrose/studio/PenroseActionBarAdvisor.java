@@ -30,7 +30,6 @@ import org.safehaus.penrose.studio.welcome.action.AboutAction;
 import org.safehaus.penrose.studio.welcome.action.ShowCommercialFeaturesAction;
 import org.safehaus.penrose.studio.welcome.action.EnterLicenseKeyAction;
 import org.safehaus.penrose.studio.object.ObjectsAction;
-import org.safehaus.penrose.studio.action.*;
 import org.safehaus.penrose.studio.validation.ValidationAction;
 import org.safehaus.penrose.studio.console.ConsoleAction;
 import org.safehaus.penrose.studio.partition.action.NewPartitionAction;

@@ -20,16 +20,10 @@ package org.safehaus.penrose.studio.connection.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.connector.JDBCAdapter;
-import org.safehaus.penrose.connector.ConnectionManager;
-import org.safehaus.penrose.connector.AdapterConfig;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.studio.driver.Driver;
 import org.safehaus.penrose.studio.util.Helper;
-import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionInfoWizardPage;
-import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionParametersWizardPage;
-import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.config.PenroseConfig;
 import org.apache.log4j.Logger;
 
 import javax.naming.InitialContext;
@@ -170,13 +164,6 @@ public class ConnectionWizard extends Wizard {
             }
 
             partition.addConnectionConfig(connectionConfig);
-
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
-            AdapterConfig adapterConfig = penroseConfig.getAdapterConfig(adapterName);
-
-            ConnectionManager connectionManager = penroseApplication.getConnectionManager();
-            connectionManager.init(partition, connectionConfig, adapterConfig);
 
             return true;
 

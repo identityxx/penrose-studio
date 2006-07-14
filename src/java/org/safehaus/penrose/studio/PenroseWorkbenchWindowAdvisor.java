@@ -222,7 +222,7 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             }
 
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-            MessageDialog.openInformation(window.getShell(), "Open Failed", message);
+            MessageDialog.openError(window.getShell(), "Open Failed", message);
         }
     }
 
