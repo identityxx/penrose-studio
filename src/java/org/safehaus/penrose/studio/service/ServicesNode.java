@@ -24,7 +24,7 @@ import org.safehaus.penrose.studio.service.action.NewServiceAction;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.service.ServiceConfig;
-import org.safehaus.penrose.config.PenroseConfig;
+import org.safehaus.penrose.server.config.PenroseServerConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.apache.log4j.Logger;
@@ -62,8 +62,8 @@ public class ServicesNode extends Node {
         Collection children = new ArrayList();
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
-        for (Iterator i=penroseConfig.getServiceConfigs().iterator(); i.hasNext(); ) {
+        PenroseServerConfig penroseServerConfig = penroseApplication.getPenroseServerConfig();
+        for (Iterator i=penroseServerConfig.getServiceConfigs().iterator(); i.hasNext(); ) {
             ServiceConfig serviceConfig = (ServiceConfig)i.next();
 
             ServiceNode serviceNode = new ServiceNode(

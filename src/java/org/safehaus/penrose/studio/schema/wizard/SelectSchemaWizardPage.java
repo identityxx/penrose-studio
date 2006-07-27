@@ -25,7 +25,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.partition.ConnectionConfig;
-import org.safehaus.penrose.util.JNDIClient;
+import org.safehaus.penrose.ldap.LDAPClient;
 import org.apache.log4j.Logger;
 
 import javax.naming.NamingEnumeration;
@@ -141,7 +141,7 @@ public class SelectSchemaWizardPage extends WizardPage {
         if (connectionConfig == null) return;
 
         try {
-            JNDIClient client = new JNDIClient(connectionConfig.getParameters());
+        	LDAPClient client = new LDAPClient(connectionConfig.getParameters());
             SearchResult rootDse = client.getRootDSE();
 
             Attribute schemaNamingContexts = rootDse.getAttributes().get("schemaNamingContext");

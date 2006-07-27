@@ -27,7 +27,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.util.JNDIClient;
+import org.safehaus.penrose.ldap.LDAPClient;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;
@@ -127,7 +127,7 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
                     env.put(Context.SECURITY_PRINCIPAL, bindDnText.getText());
                     env.put(Context.SECURITY_CREDENTIALS, passwordText.getText());
 
-                    JNDIClient client = new JNDIClient(env);
+                    LDAPClient client = new LDAPClient(env);
                     Collection baseDns = client.getNamingContexts();
 
                     suffixCombo.removeAll();
@@ -180,7 +180,7 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
                 env.put(Context.SECURITY_CREDENTIALS, passwordText.getText());
 
                 try {
-                    JNDIClient client = new JNDIClient(env);
+                	LDAPClient client = new LDAPClient(env);
                     client.getContext().close();
                     MessageDialog.openInformation(parent.getShell(), "Test Connection Result", "Connection successful!");
 

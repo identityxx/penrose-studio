@@ -24,7 +24,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.util.JDBCClient;
+import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.connector.JDBCAdapter;

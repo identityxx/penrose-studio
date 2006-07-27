@@ -48,6 +48,9 @@ import org.safehaus.penrose.util.ClassRegistry;
 import org.safehaus.penrose.log4j.Log4jConfigReader;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.safehaus.penrose.log4j.Log4jConfigWriter;
+import org.safehaus.penrose.server.config.PenroseServerConfig;
+import org.safehaus.penrose.server.config.PenroseServerConfigReader;
+import org.safehaus.penrose.server.config.PenroseServerConfigWriter;
 
 import javax.crypto.Cipher;
 
@@ -66,7 +69,10 @@ public class PenroseApplication implements IPlatformRunnable {
     File homeDir;
 
     ApplicationConfig applicationConfig = new ApplicationConfig();
+
+    PenroseServerConfig penroseServerConfig = new PenroseServerConfig();
     PenroseConfig penroseConfig = new PenroseConfig();
+
     PenroseClient client;
     SchemaManager schemaManager;
     PartitionManager partitionManager;
@@ -176,7 +182,10 @@ public class PenroseApplication implements IPlatformRunnable {
 
         log.debug("Opening project from "+dir);
 
-        PenroseConfigReader penroseConfigReader = new PenroseConfigReader(dir+"/conf/server.xml");
+        PenroseServerConfigReader penroseServerConfigReader = new PenroseServerConfigReader(dir+File.separator+"conf"+File.separator+"server.xml");
+        penroseServerConfig = penroseServerConfigReader.read();
+
+        PenroseConfigReader penroseConfigReader = new PenroseConfigReader(dir+File.separator+"conf"+File.separator+"penrose.xml");
         penroseConfig = penroseConfigReader.read();
 
         initSystemProperties();
@@ -202,9 +211,9 @@ public class PenroseApplication implements IPlatformRunnable {
 
     }
     public void initSystemProperties() throws Exception {
-        for (Iterator i=penroseConfig.getSystemPropertyNames().iterator(); i.hasNext(); ) {
+        for (Iterator i=penroseServerConfig.getSystemPropertyNames().iterator(); i.hasNext(); ) {
             String name = (String)i.next();
-            String value = penroseConfig.getSystemProperty(name);
+            String value = penroseServerConfig.getSystemProperty(name);
 
             System.setProperty(name, value);
         }
@@ -230,7 +239,7 @@ public class PenroseApplication implements IPlatformRunnable {
 
     public void loadLoggingConfig(String dir) throws Exception {
         try {
-            Log4jConfigReader reader = new Log4jConfigReader(new File(dir+"/conf/log4j.xml"));
+            Log4jConfigReader reader = new Log4jConfigReader(new File(dir+File.separator+"conf"+File.separator+"log4j.xml"));
             loggingConfig = reader.read();
         } catch (Exception e) {
             log.error("ERROR: "+e.getMessage());
@@ -294,6 +303,9 @@ public class PenroseApplication implements IPlatformRunnable {
     public void connect(Project project) throws Exception {
         client = new PenroseClient(project.getType(), project.getHost(), project.getPort(), project.getUsername(), project.getPassword());
         client.connect();
+
+        String version = client.getProductVersion();
+        if (!version.equals("1.1") && !version.startsWith("1.1.")) throw new Exception("Incompatible server version: "+version);
     }
 
     public void disconnect() throws Exception {
@@ -308,8 +320,11 @@ public class PenroseApplication implements IPlatformRunnable {
         log.debug("-------------------------------------------------------------------------------------");
         log.debug("Saving configuration to "+dir);
 
-        PenroseConfigWriter serverConfigWriter = new PenroseConfigWriter(dir+"/conf/server.xml");
-        serverConfigWriter.write(penroseConfig);
+        PenroseServerConfigWriter penroseServerConfigWriter = new PenroseServerConfigWriter(dir+File.separator+"conf"+File.separator+"server.xml");
+        penroseServerConfigWriter.write(penroseServerConfig);
+
+        PenroseConfigWriter penroseConfigWriter = new PenroseConfigWriter(dir+File.separator+"conf"+File.separator+"penrose.xml");
+        penroseConfigWriter.write(penroseConfig);
 
         saveLoggingConfig(dir);
 
@@ -527,5 +542,13 @@ public class PenroseApplication implements IPlatformRunnable {
 
     public void setLoggingConfig(Log4jConfig loggingConfig) {
         this.loggingConfig = loggingConfig;
+    }
+
+    public PenroseServerConfig getPenroseServerConfig() {
+        return penroseServerConfig;
+    }
+
+    public void setPenroseServerConfig(PenroseServerConfig penroseServerConfig) {
+        this.penroseServerConfig = penroseServerConfig;
     }
 }

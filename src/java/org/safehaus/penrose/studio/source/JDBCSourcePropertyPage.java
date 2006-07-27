@@ -30,7 +30,7 @@ import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.util.JDBCClient;
+import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.connector.JDBCAdapter;
 import org.apache.log4j.Logger;
 

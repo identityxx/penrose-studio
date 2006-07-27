@@ -20,7 +20,7 @@ package org.safehaus.penrose.studio.service;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.config.PenroseConfig;
+import org.safehaus.penrose.server.config.PenroseServerConfig;
 import org.apache.log4j.Logger;
 
 import java.util.Map;
@@ -66,8 +66,8 @@ public class ServiceWizard extends Wizard {
             }
 
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
-            penroseConfig.addServiceConfig(serviceConfig);
+            PenroseServerConfig penroseServerConfig = penroseApplication.getPenroseServerConfig();
+            penroseServerConfig.addServiceConfig(serviceConfig);
 
             return true;
 

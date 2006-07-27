@@ -25,9 +25,8 @@ import org.safehaus.penrose.partition.FieldConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.studio.source.wizard.JNDIFieldWizardPage;
 import org.safehaus.penrose.studio.source.wizard.JNDIAttributeWizardPage;
-import org.safehaus.penrose.mapping.Entry;
 import org.safehaus.penrose.mapping.Row;
-import org.safehaus.penrose.util.JNDIClient;
+import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.util.EntryUtil;
 import org.apache.log4j.Logger;
 
@@ -42,7 +41,7 @@ public class JNDISourceWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private JNDIClient client;
+    private LDAPClient client;
     private Partition partition;
     private ConnectionConfig connectionConfig;
     private String baseDn;
@@ -55,12 +54,12 @@ public class JNDISourceWizard extends Wizard {
     public JNDIAttributeWizardPage attributesPage;
     public JNDIFieldWizardPage fieldsPage = new JNDIFieldWizardPage();
 
-    public JNDISourceWizard(JNDIClient client, Partition partition, ConnectionConfig connectionConfig, String baseDn) throws Exception {
+    public JNDISourceWizard(LDAPClient client, Partition partition, ConnectionConfig connectionConfig, String baseDn) throws Exception {
         this(client, partition, connectionConfig, baseDn, "(objectClass=*)", "OBJECT", new ArrayList());
     }
     
     public JNDISourceWizard(
-            JNDIClient client,
+    		LDAPClient client,
             Partition partition,
             ConnectionConfig connectionConfig,
             String baseDn,

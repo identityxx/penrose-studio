@@ -30,7 +30,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.util.JNDIClient;
+import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.schema.SchemaManager;
@@ -61,7 +61,7 @@ public class JNDISourcePropertyPage extends FormPage {
     Partition partition;
 	SourceConfig source;
 	
-	JNDIClient client;
+	LDAPClient client;
 	
 	String[] scopes = new String[] { "OBJECT", "ONELEVEL", "SUBTREE" };
 
@@ -74,7 +74,7 @@ public class JNDISourcePropertyPage extends FormPage {
 
         ConnectionConfig connectionConfig = partition.getConnectionConfig(source.getConnectionName());
         if (connectionConfig != null) {
-            client = new JNDIClient(connectionConfig.getParameters());
+            client = new LDAPClient(connectionConfig.getParameters());
         }
     }
 
