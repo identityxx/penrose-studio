@@ -48,9 +48,9 @@ import org.safehaus.penrose.util.ClassRegistry;
 import org.safehaus.penrose.log4j.Log4jConfigReader;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.safehaus.penrose.log4j.Log4jConfigWriter;
-import org.safehaus.penrose.server.config.PenroseServerConfig;
-import org.safehaus.penrose.server.config.PenroseServerConfigReader;
-import org.safehaus.penrose.server.config.PenroseServerConfigWriter;
+import org.safehaus.penrose.config.PenroseServerConfig;
+import org.safehaus.penrose.config.PenroseServerConfigReader;
+import org.safehaus.penrose.config.PenroseServerConfigWriter;
 
 import javax.crypto.Cipher;
 
@@ -238,13 +238,8 @@ public class PenroseApplication implements IPlatformRunnable {
     }
 
     public void loadLoggingConfig(String dir) throws Exception {
-        try {
-            Log4jConfigReader reader = new Log4jConfigReader(new File(dir+File.separator+"conf"+File.separator+"log4j.xml"));
-            loggingConfig = reader.read();
-        } catch (Exception e) {
-            log.error("ERROR: "+e.getMessage());
-            loggingConfig = new Log4jConfig();
-        }
+        Log4jConfigReader reader = new Log4jConfigReader(new File(dir+File.separator+"conf"+File.separator+"log4j.xml"));
+        loggingConfig = reader.read();
     }
 
     public void validatePartitions() throws Exception {

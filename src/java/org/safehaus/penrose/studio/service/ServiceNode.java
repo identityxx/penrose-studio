@@ -23,7 +23,7 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.service.ServiceConfig;
-import org.safehaus.penrose.server.config.PenroseServerConfig;
+import org.safehaus.penrose.config.PenroseServerConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.IMenuManager;

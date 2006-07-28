@@ -24,7 +24,7 @@ import org.safehaus.penrose.studio.service.action.NewServiceAction;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.service.ServiceConfig;
-import org.safehaus.penrose.server.config.PenroseServerConfig;
+import org.safehaus.penrose.config.PenroseServerConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.apache.log4j.Logger;
