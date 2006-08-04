@@ -3,13 +3,12 @@
 
 [Setup]
 
-AppName=Penrose Studio Pro
-AppVerName=Penrose Studio Pro ${project.version}
-DefaultDirName={pf}\Identyx\Penrose Studio Pro ${project.version}
-DefaultGroupName=Identyx\Penrose Studio Pro ${project.version}
-UninstallDisplayName=Penrose Studio Pro ${project.version}
+AppName=Penrose Studio
+AppVerName=Penrose Studio ${project.version}
+DefaultDirName={pf}\Identyx\Penrose Studio ${project.version}
+DefaultGroupName=Identyx\Penrose Studio ${project.version}
+UninstallDisplayName=Penrose Studio ${project.version}
 UninstallDisplayIcon={app}\penrose.ico
-;Compression=lzma
 Compression=zip
 SolidCompression=yes
 OutputBaseFilename=${project.name}-${project.version}
