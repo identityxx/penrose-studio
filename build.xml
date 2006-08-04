@@ -259,10 +259,37 @@
     </target>
 
     <target name="dist-linux" depends="build-linux" if="isLinux">
+        <antcall target="rpm">
+            <param name="rpm.prefix" value=""/>
+            <param name="rpm.home" value="/usr/src/redhat"/>
+            <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
+            <param name="rpm.name" value="${project.name}-${project.version}-1.i386.rpm"/>
+        </antcall>
         <antcall target="izpack">
             <param name="platform" value="linux-gtk"/>
             <param name="dist.name" value="${project.name}-${project.version}-${platform}"/>
         </antcall>
+    </target>
+
+    <target name="izpack" depends="init">
+        <echo message="Creating ${project.dist}/${dist.name}.jar"/>
+        <copy todir="target" file="installer/installer.xml">
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+        <copy todir="target/${dist.name}" file="installer/uninstall.ico"/>
+        <copy todir="target/${dist.name}" file="installer/uninstall.png"/>
+        <copy todir="target/${dist.name}" file="installer/shortcuts-win32.xml"/>
+        <copy todir="target/${dist.name}" file="installer/shortcuts-unix.xml"/>
+        <mkdir dir="${project.dist}"/>
+        <izpack
+            output="${project.dist}/${dist.name}.jar"
+            basedir="${basedir}/target/${dist.name}"
+            izpackdir="${basedir}/installer/izpack"
+            input="${basedir}/target/installer.xml"
+            installertype="standard"
+        />
     </target>
 
     <target name="dist-macosx-carbon" depends="build-macosx-carbon" if="isMac">
@@ -290,38 +317,22 @@
         <exec executable="${iscc.path}" os="Windows NT,Windows 2000,Windows XP,Windows 2003">
             <arg line="/Q target/penrose-studio.iss"/>
         </exec>
+        <antcall target="rpm">
+            <param name="rpm.prefix" value="${cygwin.home}"/>
+            <param name="rpm.home" value="${cygwin.home}/usr/src/rpm"/>
+            <param name="rpm.builder" value="${cygwin.home}/lib/rpm/rpmb.exe"/>
+            <param name="rpm.name" value="${project.name}-${project.version}-1.cygwin.i386.rpm"/>
+        </antcall>
     </target>
 
-    <target name="izpack" depends="init">
-        <echo message="Creating ${project.dist}/${dist.name}.jar"/>
-        <copy todir="target" file="installer/installer.xml">
-            <filterchain>
-                <expandproperties/>
-            </filterchain>
-        </copy>
-        <copy todir="target/${dist.name}" file="installer/uninstall.ico"/>
-        <copy todir="target/${dist.name}" file="installer/uninstall.png"/>
-        <copy todir="target/${dist.name}" file="installer/shortcuts-win32.xml"/>
-        <copy todir="target/${dist.name}" file="installer/shortcuts-unix.xml"/>
-        <mkdir dir="${project.dist}"/>
-        <izpack
-            output="${project.dist}/${dist.name}.jar"
-            basedir="${basedir}/target/${dist.name}"
-            izpackdir="${basedir}/installer/izpack"
-            input="${basedir}/target/installer.xml"
-            installertype="standard"
-        />
+    <target name="rpm-check" depends="init">
+        <echo message="Checking ${rpm.builder}"/>
+        <condition property="hasRpmBuilder">
+            <available file="${rpm.builder}"/>
+        </condition>
     </target>
 
-    <target name="dist-rpm" depends="dist-src">
-        <antcall target="dist-rpm-linux"/>
-        <antcall target="dist-rpm-windows"/>
-    </target>
-
-    <target name="dist-rpm-linux" if="isLinux">
-        <property name="rpm.prefix" value=""/>
-        <property name="rpm.home" value="/usr/src/redhat"/>
-        <property name="rpm.builder" value="/usr/bin/rpmbuild"/>
+    <target name="rpm-build" depends="dist-src" if="hasRpmBuilder">
         <copy todir="target" file="installer/penrose-studio.spec">
             <filterchain>
                 <expandproperties/>
@@ -334,28 +345,11 @@
             <arg line="-bb target/penrose-studio.spec"/>
         </exec>
         <copy todir="${project.dist}" failonerror="false"
-            file="${rpm.home}/RPMS/i386/${project.name}-${project.version}-1.i386.rpm">
+            file="${rpm.home}/RPMS/i386/${rpm.name}">
         </copy>
     </target>
 
-    <target name="dist-rpm-windows" if="isWindows">
-        <property name="rpm.prefix" value="${cygwin.home}"/>
-        <property name="rpm.home" value="${cygwin.home}/usr/src/rpm"/>
-        <property name="rpm.builder" value="${cygwin.home}/lib/rpm/rpmb.exe"/>
-        <copy todir="target" file="installer/penrose-studio.spec">
-            <filterchain>
-                <expandproperties/>
-            </filterchain>
-        </copy>
-        <copy todir="${rpm.home}/SOURCES" overwrite="true"
-            file="${project.dist}/${project.name}-${project.version}-src.tar.gz">
-        </copy>
-        <exec executable="${rpm.builder}">
-            <arg line="-bb target/penrose-studio.spec"/>
-        </exec>
-        <copy todir="${project.dist}" failonerror="false"
-            file="${rpm.home}/RPMS/i386/${project.name}-${project.version}-1.cygwin.i386.rpm">
-        </copy>
+    <target name="rpm" depends="rpm-check,rpm-build">
     </target>
 
     <target name="install" depends="init">
