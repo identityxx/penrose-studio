@@ -376,7 +376,7 @@
         </antcall>
     </target>
 
-    <target name="pre-install">
+    <target name="pre-install" depends="init">
         <mkdir dir="${penrose.studio.home}"/>
         <condition property="penrose.conf.missing">
           <not>
@@ -385,7 +385,7 @@
         </condition>
     </target>
 
-    <target name="copy-penrose-conf" if="penrose.conf.missing">
+    <target name="copy-penrose-conf" depends="init" if="penrose.conf.missing">
         <property name="dist.name" value="${project.name}-${project.version}-${platform}"/>
         <copy todir="${penrose.studio.home}">
             <fileset dir="target/${dist.name}">
