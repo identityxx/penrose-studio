@@ -3,13 +3,16 @@
 	 Copyright (c) 2000-2005, Identyx Corporation.
 	 All rights reserved.
      ====================================================================== -->
-<project name="penrose-studio" default="compile" basedir=".">
+<project name="penrose-studio" default="compile">
 
     <description>Penrose Studio</description>
 	
     <property name="project.name" value="penrose-studio-pro"/>
-	<property name="project.version" value="1.0"/>
+	<property name="project.version" value="1.0.5"/>
     <property name="project.dist" value="dist"/>
+
+    <property name="penrose.version" value="1.0.4"/>
+
     <property name="rcp.prefix" value="eclipse-RCP-3.1"/>
     <property name="iscc.path" value="ISCC.exe"/>
 
@@ -23,16 +26,12 @@
         </fileset>
     </path>
 
-    <path id="svnant.classpath">
-        <fileset dir="lib/svnant">
-            <include name="**/*.jar"/>
-        </fileset>
-    </path>
-
     <taskdef name="izpack" classpath="installer/izpack/lib/compiler.jar"
         classname="com.izforge.izpack.ant.IzPackTask"/>
 
-    <taskdef resource="svntask.properties" classpathref="svnant.classpath"/>
+    <target name="import">
+        <copy todir="lib" file="../penrose-1.0/target/penrose-pro-${penrose.version}.jar"/>
+    </target>
 
     <target name="clean">
         <delete dir="${project.dist}" failonerror="false"/>
@@ -232,7 +231,6 @@
         <mkdir dir="${plugin.path}"/>
         <copy todir="target" file="LICENSE.txt"/>
         <copy todir="${project.path}" file="LICENSE.txt"/>
-        <copy todir="${project.path}" file="penrose.license"/>
         <copy todir="${project.path}/conf">
             <fileset dir="conf">
                 <include name="*.*"/>
@@ -423,12 +421,6 @@
         </tar>
         <gzip destfile="${project.dist}/${project.name}-${project.version}-src.tar.gz"
             src="target/${project.name}-${project.version}-src.tar"/>
-    </target>
-
-    <target name="update">
-        <svn>
-            <update dir="."/>
-        </svn>
     </target>
 
 </project>

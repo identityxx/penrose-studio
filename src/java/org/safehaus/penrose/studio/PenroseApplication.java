@@ -56,7 +56,7 @@ public class PenroseApplication implements IPlatformRunnable {
     Logger log = Logger.getLogger(getClass());
 
     public final static DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
-    public final static String RELEASE_DATE    = "07/01/2006";
+    public final static String RELEASE_DATE    = "08/01/2006";
 
     public final static String FEATURE_NOT_AVAILABLE = "This feature is available in the commercial version.";
 

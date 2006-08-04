@@ -46,6 +46,7 @@ import org.apache.log4j.Logger;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.io.File;
 
 public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
@@ -61,7 +62,7 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         actionBarAdvisor = new PenroseActionBarAdvisor(configurer);
         return actionBarAdvisor;
     }
-    
+
     public void openIntro() {
         // log.debug("openIntro");
     }
@@ -70,63 +71,7 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         // log.debug("preWindowOpen");
 
         try {
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PublicKey publicKey = penroseApplication.getPublicKey();
-
-            String licenseFile = "penrose.license";
-
-            String filename = licenseFile;
-
-            while (true) {
-                String message = null;
-                try {
-                    LicenseManager licenseManager = new LicenseManager(publicKey);
-                    LicenseReader licenseReader = new LicenseReader(licenseManager);
-                    licenseReader.read(filename);
-
-                    License license = licenseManager.getLicense("Penrose Studio");
-
-                    boolean valid = licenseManager.isValid(license);
-
-                    if (valid) {
-                        penroseApplication.setLicense(license);
-                    } else {
-                        message = "Invalid license.";
-                    }
-
-                } catch (NoSuchAlgorithmException e) {
-                    Throwable t = e.getCause();
-                    log.debug(t.getMessage(), t);
-                    message = t.getMessage();
-
-                } catch (NullPointerException e) {
-                    message = "ERROR: NullPointerException";
-
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                    message = e.getMessage();
-                }
-
-                if (message == null) break;
-
-                Shell shell = new Shell(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-
-                LicenseDialog licenseDialog = new LicenseDialog(shell);
-                licenseDialog.setText(message);
-                licenseDialog.open();
-
-                if (licenseDialog.getAction() == LicenseDialog.CANCEL) System.exit(0);
-
-                filename = licenseDialog.getFilename();
-                if (filename == null) break;
-
-                try {
-                    FileUtil.copy(filename, licenseFile);
-                    filename = licenseFile;
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
+            checkLicense();
 
             Shell shell = new Shell(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
 
@@ -143,12 +88,73 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
             Project project = dialog.getProject();
 
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
             penroseApplication.getApplicationConfig().setCurrentProject(project);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             System.exit(0);
         }
+    }
+
+    public void checkLicense() throws Exception {
+
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PublicKey publicKey = penroseApplication.getPublicKey();
+
+        String filename = "penrose.license";
+
+        File file = new File(filename);
+        if (!file.exists()) return;
+
+        while (true) {
+            String message = null;
+            try {
+                LicenseManager licenseManager = new LicenseManager(publicKey);
+                LicenseReader licenseReader = new LicenseReader(licenseManager);
+                licenseReader.read(file);
+
+                License license = licenseManager.getLicense("Penrose Studio");
+                if (license == null) return;
+
+                boolean valid = licenseManager.isValid(license);
+                if (!valid) throw new Exception("Invalid license.");
+
+                penroseApplication.setLicense(license);
+                return;
+
+            } catch (NoSuchAlgorithmException e) {
+                Throwable t = e.getCause();
+                log.debug(t.getMessage(), t);
+                message = t.getMessage();
+
+            } catch (NullPointerException e) {
+                message = "ERROR: NullPointerException";
+
+            } catch (Exception e) {
+                log.debug(e.getMessage(), e);
+                message = e.getMessage();
+            }
+
+            Shell shell = new Shell(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+
+            LicenseDialog licenseDialog = new LicenseDialog(shell);
+            licenseDialog.setText(message);
+            licenseDialog.open();
+
+            if (licenseDialog.getAction() == LicenseDialog.CANCEL) System.exit(0);
+
+            String newFilename = licenseDialog.getFilename();
+            if (newFilename == null) break;
+
+            try {
+                File newFile = new File(newFilename);
+                FileUtil.copy(newFile, file);
+            } catch (Exception ex) {
+                log.debug(ex.getMessage(), ex);
+            }
+        }
+
     }
 
     public void createWindowContents(Shell shell) {
