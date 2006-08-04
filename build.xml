@@ -331,11 +331,8 @@
             file="${project.dist}/${project.name}-${project.version}-src.tar.gz">
         </copy>
         <exec executable="${rpm.builder}">
-            <arg line="-ba target/penrose-studio.spec"/>
+            <arg line="-bb target/penrose-studio.spec"/>
         </exec>
-        <copy todir="${project.dist}" failonerror="false"
-            file="${rpm.home}/SRPMS/${project.name}-${project.version}-1.src.rpm">
-        </copy>
         <copy todir="${project.dist}" failonerror="false"
             file="${rpm.home}/RPMS/i386/${project.name}-${project.version}-1.i386.rpm">
         </copy>
@@ -354,11 +351,8 @@
             file="${project.dist}/${project.name}-${project.version}-src.tar.gz">
         </copy>
         <exec executable="${rpm.builder}">
-            <arg line="-ba target/penrose-studio.spec"/>
+            <arg line="-bb target/penrose-studio.spec"/>
         </exec>
-        <copy todir="${project.dist}" failonerror="false"
-            file="${rpm.home}/SRPMS/${project.name}-${project.version}-1.src.rpm">
-        </copy>
         <copy todir="${project.dist}" failonerror="false"
             file="${rpm.home}/RPMS/i386/${project.name}-${project.version}-1.cygwin.i386.rpm">
         </copy>
