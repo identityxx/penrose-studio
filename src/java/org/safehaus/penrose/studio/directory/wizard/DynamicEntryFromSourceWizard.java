@@ -107,7 +107,7 @@ public class DynamicEntryFromSourceWizard extends Wizard {
             StringBuffer sb = new StringBuffer();
             for (Iterator i=attributeMappings.iterator(); i.hasNext(); ) {
                 AttributeMapping attributeMapping = (AttributeMapping)i.next();
-                if (!attributeMapping.isRdn()) continue;
+                if (!attributeMapping.isPK()) continue;
 
                 if (sb.length() > 0) sb.append("+");
 

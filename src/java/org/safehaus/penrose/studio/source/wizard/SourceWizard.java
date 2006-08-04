@@ -23,6 +23,7 @@ import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.connector.JDBCAdapter;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
+import org.safehaus.penrose.ldap.LDAPAdapter;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -196,9 +197,9 @@ public class SourceWizard extends Wizard {
                 }
 
             } else if ("JNDI".equals(adapterName)) {
-                sourceConfig.setParameter("baseDn", jndiTreePage.getBaseDn());
-                sourceConfig.setParameter("filter", jndiTreePage.getFilter());
-                sourceConfig.setParameter("scope", jndiTreePage.getScope());
+                sourceConfig.setParameter(LDAPAdapter.BASE_DN, jndiTreePage.getBaseDn());
+                sourceConfig.setParameter(LDAPAdapter.FILTER, jndiTreePage.getFilter());
+                sourceConfig.setParameter(LDAPAdapter.SCOPE, jndiTreePage.getScope());
                 sourceConfig.setParameter("objectClasses", jndiTreePage.getObjectClasses());
 
                 Collection fields = jndiFieldsPage.getFields();

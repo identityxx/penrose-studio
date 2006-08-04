@@ -285,7 +285,7 @@ public class LDAPPage extends FormPage {
                         AttributeMapping ad = (AttributeMapping)item.getData();
 
                         item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
-                        ad.setRdn(item.getChecked());
+                        ad.setRdn(item.getChecked() ? AttributeMapping.RDN_TRUE : AttributeMapping.RDN_FALSE);
                     }
                     refreshRdn();
                     checkDirty();
@@ -305,7 +305,7 @@ public class LDAPPage extends FormPage {
                         AttributeMapping ad = (AttributeMapping)item.getData();
 
                         item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
-                        ad.setRdn(item.getChecked());
+                        ad.setRdn(item.getChecked() ? AttributeMapping.RDN_TRUE : AttributeMapping.RDN_FALSE);
                     }
                     refreshRdn();
                     checkDirty();
@@ -430,7 +430,7 @@ public class LDAPPage extends FormPage {
             }
 
             TableItem item = new TableItem(attributeTable, SWT.CHECK);
-            item.setChecked(ad.isRdn());
+            item.setChecked(ad.isPK());
             item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
             item.setText(0, ad.getName());
             item.setText(1, value == null ? "" : value);

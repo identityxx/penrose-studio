@@ -27,6 +27,7 @@ import org.safehaus.penrose.studio.source.wizard.JNDIFieldWizardPage;
 import org.safehaus.penrose.studio.source.wizard.JNDIAttributeWizardPage;
 import org.safehaus.penrose.mapping.Row;
 import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.ldap.LDAPAdapter;
 import org.safehaus.penrose.util.EntryUtil;
 import org.apache.log4j.Logger;
 
@@ -107,9 +108,9 @@ public class JNDISourceWizard extends Wizard {
             sourceConfig.setName(propertyPage.getSourceName());
             sourceConfig.setConnectionName(connectionConfig.getName());
 
-            sourceConfig.setParameter("baseDn", baseDn);
-            sourceConfig.setParameter("filter", propertyPage.getFilter());
-            sourceConfig.setParameter("scope", propertyPage.getScope());
+            sourceConfig.setParameter(LDAPAdapter.BASE_DN, baseDn);
+            sourceConfig.setParameter(LDAPAdapter.FILTER, propertyPage.getFilter());
+            sourceConfig.setParameter(LDAPAdapter.SCOPE, propertyPage.getScope());
 
             Collection fields = fieldsPage.getFields();
             for (Iterator i=fields.iterator(); i.hasNext(); ) {

@@ -21,7 +21,6 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.connector.JDBCAdapter;
-import org.safehaus.penrose.studio.PenroseApplication;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -121,7 +120,7 @@ public class JDBCSourceWizard extends Wizard {
 
             for (Iterator i=fields.iterator(); i.hasNext(); ) {
                 FieldConfig field = (FieldConfig)i.next();
-                System.out.println(" - "+field.getName()+" "+field.isPrimaryKey());
+                System.out.println(" - "+field.getName()+" "+field.isPK());
                 sourceConfig.addFieldConfig(field);
             }
 

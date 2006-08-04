@@ -286,7 +286,7 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
             FieldConfig field = (FieldConfig)i.next();
 
             TableItem it = new TableItem(fieldTable, SWT.NONE);
-            it.setImage(PenrosePlugin.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
+            it.setImage(PenrosePlugin.getImage(field.isPK() ? PenroseImage.KEY : PenroseImage.NOKEY));
             it.setText(0, field.getName());
             it.setText(1, field.getType());
         }
