@@ -95,7 +95,7 @@ public class MappingEditor extends FormEditor implements ModifyListener {
             partition.renameEntryMapping(origEntry, entry.getDn());
         }
 
-        partition.modifyEntryMapping(entry.getDn(), entry);
+        partition.modifyEntryMapping(origEntry, entry);
 
         String dn = entry.getDn();
         if ("".equals(dn)) dn = "Root DSE";

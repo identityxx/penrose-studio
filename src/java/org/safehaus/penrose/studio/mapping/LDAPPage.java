@@ -240,40 +240,10 @@ public class LDAPPage extends FormPage {
         attributeTable.addMouseListener(new MouseAdapter() {
             public void mouseDoubleClick(MouseEvent event) {
                 try {
-                    if (attributeTable.getSelectionCount() == 0) return;
-
-                    TableItem item = attributeTable.getSelection()[0];
-                    AttributeMapping ad = (AttributeMapping)item.getData();
-
-                    ExpressionDialog dialog = new ExpressionDialog(editor.getParent().getShell(), SWT.NONE);
-                    dialog.setText("Edit attribute value/expression...");
-
-                    Collection sources = entry.getSourceMappings();
-                    for (Iterator i=sources.iterator(); i.hasNext(); ) {
-                        SourceMapping source = (SourceMapping)i.next();
-                        SourceConfig sourceConfig = editor.getPartition().getSourceConfig(source.getSourceName());
-                        dialog.addVariable(source.getName());
-
-                        for (Iterator j=sourceConfig.getFieldConfigs().iterator(); j.hasNext(); ) {
-                            FieldConfig fieldDefinition = (FieldConfig)j.next();
-                            dialog.addVariable(source.getName()+"."+fieldDefinition.getName());
-                        }
-                    }
-
-                    dialog.setAttributeMapping(ad);
-
-                    dialog.open();
-
-                    if (dialog.getAction() == ExpressionDialog.CANCEL) return;
-
-                    //entry.addAttributeMapping(ad);
-
-                    refresh();
-                    refreshRdn();
-                    checkDirty();
+                    editAttribute();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
 
@@ -291,7 +261,7 @@ public class LDAPPage extends FormPage {
                     checkDirty();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
 
@@ -322,6 +292,23 @@ public class LDAPPage extends FormPage {
         tc = new TableColumn(attributeTable, SWT.LEFT);
         tc.setText("Value/Expression");
         tc.setWidth(350);
+
+        Menu menu = new Menu(attributeTable);
+        attributeTable.setMenu(menu);
+
+        MenuItem mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Edit...");
+
+        mi.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                try {
+                    editAttribute();
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
 
         Composite buttons = toolkit.createComposite(composite);
         buttons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
@@ -358,6 +345,20 @@ public class LDAPPage extends FormPage {
             }
         });
 
+        Button editButton = toolkit.createButton(buttons, "Edit", SWT.PUSH);
+        editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        editButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                try {
+                    editAttribute();
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
         Button removeButton = toolkit.createButton(buttons, "Remove", SWT.PUSH);
         removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -377,6 +378,40 @@ public class LDAPPage extends FormPage {
         });
 
         return composite;
+    }
+
+    public void editAttribute() throws Exception {
+        if (attributeTable.getSelectionCount() == 0) return;
+
+        TableItem item = attributeTable.getSelection()[0];
+        AttributeMapping ad = (AttributeMapping)item.getData();
+
+        ExpressionDialog dialog = new ExpressionDialog(editor.getParent().getShell(), SWT.NONE);
+        dialog.setText("Edit attribute value/expression...");
+
+        Collection sources = entry.getSourceMappings();
+        for (Iterator i=sources.iterator(); i.hasNext(); ) {
+            SourceMapping source = (SourceMapping)i.next();
+            SourceConfig sourceConfig = editor.getPartition().getSourceConfig(source.getSourceName());
+            dialog.addVariable(source.getName());
+
+            for (Iterator j=sourceConfig.getFieldConfigs().iterator(); j.hasNext(); ) {
+                FieldConfig fieldDefinition = (FieldConfig)j.next();
+                dialog.addVariable(source.getName()+"."+fieldDefinition.getName());
+            }
+        }
+
+        dialog.setAttributeMapping(ad);
+
+        dialog.open();
+
+        if (dialog.getAction() == ExpressionDialog.CANCEL) return;
+
+        //entry.addAttributeMapping(ad);
+
+        refresh();
+        refreshRdn();
+        checkDirty();
     }
 
     public void refresh() {
