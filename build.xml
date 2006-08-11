@@ -362,6 +362,7 @@
         <antcall target="install-dist">
             <param name="platform" value="linux-gtk"/>
         </antcall>
+        <chmod dir="${penrose.studio.home}" perm="ugo+rx" includes="penrose-studio"/>
     </target>
 
     <target name="install-macosx" if="isMac">
