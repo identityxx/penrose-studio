@@ -39,9 +39,9 @@ import org.safehaus.penrose.studio.welcome.WelcomeEditor;
 import org.safehaus.penrose.studio.license.LicenseDialog;
 import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.studio.util.ApplicationConfig;
-import org.safehaus.penrose.license.LicenseManager;
-import org.safehaus.penrose.license.LicenseReader;
-import org.safehaus.penrose.license.License;
+import com.identyx.license.LicenseManager;
+import com.identyx.license.LicenseReader;
+import com.identyx.license.License;
 import org.apache.log4j.Logger;
 
 import java.security.NoSuchAlgorithmException;

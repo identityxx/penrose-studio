@@ -29,9 +29,9 @@ import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenroseWorkbenchAdvisor;
 import org.safehaus.penrose.studio.PenroseWorkbenchWindowAdvisor;
 import org.safehaus.penrose.studio.PenroseActionBarAdvisor;
-import org.safehaus.penrose.license.LicenseManager;
-import org.safehaus.penrose.license.LicenseReader;
-import org.safehaus.penrose.license.License;
+import com.identyx.license.LicenseReader;
+import com.identyx.license.LicenseManager;
+import com.identyx.license.License;
 
 /**
  * @author Endi S. Dewata
@@ -45,7 +45,7 @@ public class EnterLicenseKeyAction extends Action {
         setId(getClass().getName());
     }
 
-	public void run() {
+    public void run() {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         Shell shell = window.getShell();
 
@@ -66,7 +66,7 @@ public class EnterLicenseKeyAction extends Action {
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
 
             LicenseManager licenseManager = new LicenseManager(penroseApplication.getPublicKey());
-            
+
             LicenseReader licenseReader = new LicenseReader(licenseManager);
             licenseReader.read(licenseFile);
 
@@ -85,7 +85,7 @@ public class EnterLicenseKeyAction extends Action {
             PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
             actionBarAdvisor.getShowCommercialFeaturesAction().setChecked(true);
-            
+
             actionBarAdvisor.fillPartitionMenu();
             actionBarAdvisor.fillHelpMenu();
 
@@ -93,5 +93,5 @@ public class EnterLicenseKeyAction extends Action {
             log.debug(e.getMessage(), e);
             MessageDialog.openError(shell, "Error", e.getMessage());
         }
-	}
+    }
 }
