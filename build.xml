@@ -105,6 +105,10 @@
     			<exclude name="**/.svn"/>
     		</patternset>
             <manifest>
+              <attribute name="Specification-Version"  value="1.0"/>
+              <attribute name="Implementation-Title"   value="Penrose Studio"/>
+              <attribute name="Implementation-Version" value="${project.version}"/>
+              <attribute name="Implementation-Vendor"  value="Identyx Corporation"/>
               <attribute name="Built-Date" value="${DSTAMP}"/>
             </manifest>
     	</jar>

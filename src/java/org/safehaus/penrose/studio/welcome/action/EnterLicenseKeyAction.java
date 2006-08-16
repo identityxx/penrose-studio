@@ -64,7 +64,8 @@ public class EnterLicenseKeyAction extends Action {
             FileUtil.copy(filename, licenseFile);
 
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
-
+            penroseApplication.loadLicense();
+/*
             LicenseManager licenseManager = new LicenseManager(penroseApplication.getPublicKey());
 
             LicenseReader licenseReader = new LicenseReader(licenseManager);
@@ -79,7 +80,7 @@ public class EnterLicenseKeyAction extends Action {
             }
 
             penroseApplication.setLicense(license);
-
+*/
             PenroseWorkbenchAdvisor workbenchAdvisor = penroseApplication.getWorkbenchAdvisor();
             PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
             PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();

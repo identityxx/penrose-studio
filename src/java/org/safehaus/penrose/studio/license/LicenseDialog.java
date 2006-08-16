@@ -25,9 +25,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.Penrose;
+import org.safehaus.penrose.studio.welcome.action.EnterLicenseKeyAction;
 import org.apache.log4j.Logger;
 
 import java.text.SimpleDateFormat;
@@ -48,6 +49,7 @@ public class LicenseDialog extends Dialog {
 
     Table projectTable;
 
+    FormToolkit toolkit;
     Font boldFont;
 
     Label messageLabel;
@@ -70,12 +72,13 @@ public class LicenseDialog extends Dialog {
     }
 
     public void dispose() {
+        toolkit.dispose();
         boldFont.dispose();
     }
 
     public void open() {
 
-        Point size = new Point(400, 200);
+        Point size = new Point(450, 180);
         shell.setSize(size);
 
         Display display = shell.getDisplay();
@@ -92,7 +95,7 @@ public class LicenseDialog extends Dialog {
 
         shell.setText("License");
         shell.setImage(penroseImage);
-        
+
         shell.open();
 
         while (!shell.isDisposed()) {
@@ -104,7 +107,13 @@ public class LicenseDialog extends Dialog {
 
     public void createControl(final Shell parent) {
         try {
-            boldFont = new Font(parent.getDisplay(), "Tahoma", 16, SWT.BOLD);
+            Display display = parent.getDisplay();
+            Color backgroundColor = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+
+            toolkit = new FormToolkit(display);
+            //toolkit.setBackground(backgroundColor);
+
+            boldFont = new Font(display, "Arial", 10, SWT.BOLD);
 
             parent.setLayout(new GridLayout());
 
@@ -112,23 +121,46 @@ public class LicenseDialog extends Dialog {
             GridData gd = new GridData(GridData.FILL_HORIZONTAL);
             gd.heightHint = 25;
             blank.setLayoutData(gd);
-
+/*
             Label titleLabel = new Label(parent, SWT.CENTER);
-            titleLabel.setText("Penrose Studio");
+            titleLabel.setText(PenroseApplication.PRODUCT_NAME);
             titleLabel.setFont(boldFont);
             titleLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
             Label versionLabel = new Label(parent, SWT.CENTER);
-            versionLabel.setText("Version "+Penrose.PRODUCT_VERSION);
+            versionLabel.setText("Version "+ PenroseApplication.PRODUCT_VERSION);
             versionLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
             Label copyrightLabel = new Label(parent, SWT.CENTER);
             copyrightLabel.setText("Copyright (c) 2000-2006, Identyx Corporation.");
             copyrightLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
+*/
             messageLabel = new Label(parent, SWT.CENTER);
-            messageLabel.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_RED));
-            messageLabel.setLayoutData(new GridData(GridData.FILL_BOTH));
+            messageLabel.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_DARK_RED));
+            messageLabel.setFont(boldFont);
+            messageLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+            Link link = new Link(parent, SWT.CENTER);
+            link.setText("To get an evaluation license please register at <a>http://www.identyx.com</a>.");
+            gd = new GridData(GridData.FILL_HORIZONTAL);
+            gd.horizontalAlignment = GridData.CENTER;
+            link.setLayoutData(gd);
+
+            link.addSelectionListener(new SelectionAdapter() {
+                public void widgetSelected(SelectionEvent selectionEvent) {
+                    try {
+                        String href = "http://www.identyx.com";
+                        log.debug("Opening "+href);
+                        Runtime.getRuntime().exec( new String[] {
+                                "cmd.exe", "/c", "start", href
+                        });
+                    } catch (Exception e) {
+                        log.error(e.getMessage());
+                    }
+                }
+            });
+
+            new Label(parent, SWT.NONE);
 
             Composite buttonsPanel = new Composite(parent, SWT.NONE);
             gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -141,19 +173,28 @@ public class LicenseDialog extends Dialog {
 
             licenseButton.addSelectionListener(new SelectionAdapter() {
                 public void widgetSelected(SelectionEvent event) {
+                    try {
+/*
+                        EnterLicenseKeyAction a = new EnterLicenseKeyAction();
+                        a.run();
+                        filename = a.getFilename();
 
-                    String dir = System.getProperty("user.dir");
+                        String dir = System.getProperty("user.dir");
 
-                    FileDialog dialog = new FileDialog(parent);
-                    dialog.setText("License");
-                    dialog.setFilterPath(dir);
-                    dialog.setFilterExtensions(new String[] { "*.license", "*.*" });
+                        FileDialog dialog = new FileDialog(parent);
+                        dialog.setText("License");
+                        dialog.setFilterPath(dir);
+                        dialog.setFilterExtensions(new String[] { "*.license", "*.*" });
 
-                    filename = dialog.open();
-                    if (filename == null) return;
+                        filename = dialog.open();
 
-                    action = OK;
-                    shell.close();
+                        if (filename == null) return;
+*/
+                        action = OK;
+                        shell.close();
+                    } catch (Exception e) {
+                        log.error(e.getMessage(), e);
+                    }
                 }
             });
 /*
@@ -167,15 +208,17 @@ public class LicenseDialog extends Dialog {
                 }
             });
 */
-            Button cancelButton = new Button(buttonsPanel, SWT.PUSH);
-            cancelButton.setText("   Cancel   ");
+            Button closeButton = new Button(buttonsPanel, SWT.PUSH);
+            closeButton.setText("   Close   ");
 
-            cancelButton.addSelectionListener(new SelectionAdapter() {
+            closeButton.addSelectionListener(new SelectionAdapter() {
                 public void widgetSelected(SelectionEvent event) {
                     action = CANCEL;
                     shell.close();
                 }
             });
+
+            licenseButton.setFocus();
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

@@ -28,10 +28,9 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPlatformRunnable;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.SWT;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.config.*;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.util.ApplicationConfig;
@@ -39,11 +38,15 @@ import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.studio.validation.ValidationView;
 import org.safehaus.penrose.studio.logger.LoggerManager;
+import org.safehaus.penrose.studio.license.LicenseDialog;
+import org.safehaus.penrose.studio.welcome.action.EnterLicenseKeyAction;
 import org.safehaus.penrose.schema.*;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.*;
 import com.identyx.license.License;
 import com.identyx.license.LicenseUtil;
+import com.identyx.license.LicenseManager;
+import com.identyx.license.LicenseReader;
 import org.safehaus.penrose.util.ClassRegistry;
 import org.safehaus.penrose.log4j.Log4jConfigReader;
 import org.safehaus.penrose.log4j.Log4jConfig;
@@ -55,10 +58,14 @@ public class PenroseApplication implements IPlatformRunnable {
 
     Logger log = Logger.getLogger(getClass());
 
+    public static String PRODUCT_NAME    = "Penrose Studio";
+    public static String PRODUCT_VERSION = "1.0";
+    public static String VENDOR_NAME     = "Identyx Corporation";
+
     public final static DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
     public final static String RELEASE_DATE    = "08/01/2006";
 
-    public final static String FEATURE_NOT_AVAILABLE = "This feature is available in the commercial version.";
+    public final static String FEATURE_NOT_AVAILABLE = "This feature is only available in the commercial version.";
 
     public static PenroseApplication instance;
 
@@ -80,6 +87,19 @@ public class PenroseApplication implements IPlatformRunnable {
     Log4jConfig loggingConfig;
 
     boolean dirty = false;
+
+    static {
+        try {
+            Package pkg = PenroseApplication.class.getPackage();
+
+            PRODUCT_NAME    = pkg.getImplementationTitle() == null ? PRODUCT_NAME : pkg.getImplementationTitle();
+            PRODUCT_VERSION = pkg.getImplementationVersion() == null ? PRODUCT_VERSION : pkg.getImplementationVersion();
+            VENDOR_NAME     = pkg.getImplementationVendor() == null ? VENDOR_NAME : pkg.getImplementationVendor();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public PenroseApplication() throws Exception {
 
@@ -429,18 +449,27 @@ public class PenroseApplication implements IPlatformRunnable {
     }
 
     public boolean checkCommercial() {
-        if (!isFreeware()) return true;
+        if (license != null) return true;
 
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        Shell shell = window.getShell();
+        Shell shell = new Shell(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 
+        LicenseDialog licenseDialog = new LicenseDialog(shell);
+        licenseDialog.setText(FEATURE_NOT_AVAILABLE);
+        licenseDialog.open();
+
+        if (licenseDialog.getAction() == LicenseDialog.CANCEL) return false;
+
+        EnterLicenseKeyAction a = new EnterLicenseKeyAction();
+        a.run();
+
+        return license != null;
+/*
         MessageDialog.openError(
                 shell,
                 "Feature Not Available",
                 FEATURE_NOT_AVAILABLE
         );
-
-        return false;
+*/
     }
 
     public boolean isFreeware() {
@@ -450,6 +479,30 @@ public class PenroseApplication implements IPlatformRunnable {
         if (type != null && "FREEWARE".equals(type)) return true;
 
         return false;
+    }
+
+    public void loadLicense() throws Exception {
+
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PublicKey publicKey = penroseApplication.getPublicKey();
+
+        String filename = "penrose.license";
+
+        File file = new File(filename);
+
+        LicenseManager licenseManager = new LicenseManager(publicKey);
+        LicenseReader licenseReader = new LicenseReader(licenseManager);
+        licenseReader.read(file);
+
+        License license = licenseManager.getLicense("Penrose Studio");
+
+        boolean valid = licenseManager.isValid(license);
+        if (!valid) throw new Exception("Invalid license.");
+
+        String type = license.getParameter("type");
+        if (type != null && "FREEWARE".equals(type)) throw new Exception("Invalid license.");
+
+        penroseApplication.setLicense(license);
     }
 
     public License getLicense() {
