@@ -4,31 +4,31 @@
 
 <dict>
 	<key>CFBundleExecutable</key>
-		<string>eclipse</string>
+		<string>penrose-studio</string>
 	<key>CFBundleGetInfoString</key>
-		<string>Eclipse 3.1 for Mac OS X, Copyright IBM Corp. and others 2002, 2004. All rights reserved.</string>
+		<string>Penrose Studio 1.0. Copyright (c) 2000-2006, Identyx Corporation. All rights reserved.</string>
 	<key>CFBundleIconFile</key>
-		<string>Eclipse.icns</string>
+		<string>Penrose.icns</string>
 	<key>CFBundleIdentifier</key>
-		<string>org.eclipse.eclipse</string>
+		<string>org.safehaus.penrose</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 		<string>6.0</string>
 	<key>CFBundleName</key>
-		<string>Eclipse</string>
+		<string>Penrose Studio</string>
 	<key>CFBundlePackageType</key>
 		<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-		<string>3.1</string>
+		<string>1.0</string>
 	<key>CFBundleSignature</key>
 		<string>????</string>
 	<key>CFBundleVersion</key>
-		<string>3.1</string>
+		<string>1.0</string>
 		
 	<key>LSUIElement</key><string>1</string>
 		
 	<key>Eclipse</key>
 		<array>
-			<string>-startup</string><string>startup.jar</string>
+			<string>-startup</string><string>../../../startup.jar</string>
 			<string>-keyring</string><string>~/.eclipse_keyring</string>
 			<string>-consoleLog</string>
 			<string>-showlocation</string>

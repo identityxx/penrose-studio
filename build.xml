@@ -55,9 +55,9 @@
     </target>
 
     <target name="build-tools" depends="init">
-        <mkdir dir="target/ant"/>
-        <javac srcdir="src/ant" destdir="target/ant"/>
-        <jar destfile="target/penrose-studio-ant.jar" basedir="target/ant"/>
+        <mkdir dir="target/tools"/>
+        <javac srcdir="src/ant" destdir="target/tools"/>
+        <jar destfile="target/penrose-studio-tools.jar" basedir="target/tools"/>
     </target>
 
     <target name="manifest" depends="build-tools">
@@ -67,7 +67,7 @@
                 <expandproperties/>
             </filterchain>
         </copy>
-        <taskdef name="manifest-generator" classname="org.safehaus.penrose.ant.ManifestTask" classpath="target/penrose-studio-ant.jar"/>
+        <taskdef name="manifest-generator" classname="org.safehaus.penrose.ant.ManifestTask" classpath="target/penrose-studio-tools.jar"/>
         <manifest-generator
             file="META-INF/MANIFEST.MF"
             dir="lib"
@@ -117,9 +117,8 @@
     <target name="build" depends="compile">
         <property name="project.path" value="target/${project.name}-${project.version}-${platform}"/>
         <property name="plugin.path" value="${project.path}/plugins/org.safehaus.penrose_${project.version}"/>
-        <mkdir dir="${project.path}"/>
-        <mkdir dir="${plugin.path}"/>
         <copy todir="target" file="LICENSE.txt"/>
+        <mkdir dir="${project.path}"/>
         <copy todir="${project.path}" file="LICENSE.txt"/>
         <copy todir="${project.path}/conf">
             <fileset dir="conf">
@@ -133,6 +132,7 @@
                 <exclude name=".svn/**"/>
             </fileset>
         </copy>
+        <mkdir dir="${plugin.path}"/>
         <copy todir="${project.path}/plugins">
             <fileset dir="lib/plugins">
                 <include name="org.eclipse.core.runtime.compatibility_3.1.0.jar"/>
@@ -157,7 +157,7 @@
                 <expandproperties/>
             </filterchain>
         </copy>
-        <taskdef name="manifest-generator" classname="org.safehaus.penrose.ant.ManifestTask" classpath="target/penrose-studio-ant.jar"/>
+        <taskdef name="manifest-generator" classname="org.safehaus.penrose.ant.ManifestTask" classpath="target/penrose-studio-tools.jar"/>
         <manifest-generator
             file="${plugin.path}/META-INF/MANIFEST.MF"
             dir="${plugin.path}/lib"
@@ -176,21 +176,20 @@
         <copy todir="${project.path}" file="images/penrose.ico"/>
     </target>
 
-	<target name="dist" depends="init">
+    <target name="dist" depends="init">
         <antcall target="build-linux"/>
         <antcall target="build-macosx-carbon"/>
         <antcall target="build-win32"/>
-	</target>
+    </target>
 
     <target name="build-linux" depends="init" if="isLinux">
         <property name="platform" value="linux-gtk"/>
         <property name="project.path" value="target/${project.name}-${project.version}-${platform}"/>
         <!-- uncompress rpc -->
-        <untar src="rcp/${rcp.prefix}-${platform}.tar.gz" dest="target/${rcp.prefix}-${platform}" compression="gzip"/>
+        <untar src="rcp/${rcp.prefix}-${platform}.tar.gz" dest="target" compression="gzip"/>
         <move todir="${project.path}">
-            <fileset dir="target/${rcp.prefix}-${platform}/eclipse"/>
+            <fileset dir="target/eclipse"/>
         </move>
-        <delete dir="target/${rcp.prefix}-${platform}"/>
         <move file="${project.path}/eclipse" tofile="${project.path}/${project.name}"/>
         <chmod file="${project.path}/${project.name}" perm="ugo+rx"/>
         <antcall target="build">
@@ -201,12 +200,11 @@
     <target name="build-macosx-carbon" depends="init" if="isMac">
         <property name="platform" value="macosx-carbon"/>
         <property name="project.path" value="target/${project.name}-${project.version}-${platform}"/>
-        <!-- uncompress rpc -->
-        <untar src="rcp/${rcp.prefix}-${platform}.tar.gz" dest="target/${rcp.prefix}-${platform}" compression="gzip"/>
+        <!-- uncompress rcp -->
+        <untar src="rcp/${rcp.prefix}-${platform}.tar.gz" dest="target" compression="gzip"/>
         <move todir="${project.path}">
-            <fileset dir="target/${rcp.prefix}-${platform}/eclipse"/>
+            <fileset dir="target/eclipse"/>
         </move>
-        <delete dir="target/${rcp.prefix}-${platform}"/>
         <!-- apply universal binary patch -->
         <copy
             todir="${project.path}/plugins"
@@ -223,11 +221,10 @@
         <property name="platform" value="win32"/>
         <property name="project.path" value="target/${project.name}-${project.version}-${platform}"/>
         <!-- uncompress rpc -->
-        <unzip src="rcp/${rcp.prefix}-${platform}.zip" dest="target/${rcp.prefix}-${platform}"/>
+        <unzip src="rcp/${rcp.prefix}-${platform}.zip" dest="target"/>
         <move todir="${project.path}">
-            <fileset dir="target/${rcp.prefix}-${platform}/eclipse"/>
+            <fileset dir="target/eclipse"/>
         </move>
-        <delete dir="target/${rcp.prefix}-${platform}"/>
         <move file="${project.path}/eclipse.exe" tofile="${project.path}/penrose-studio.exe"/>
         <antcall target="build">
             <param name="platform" value="${platform}"/>
@@ -297,18 +294,23 @@
     </target>
 
     <target name="dist-macosx-carbon" depends="build-macosx-carbon" if="isMac">
-        <echo message="Creating target/Penrose Studio ${project.version}.app"/>
-        <move todir="target/Penrose Studio ${project.version}.app">
+        <echo message="Creating target/Penrose Studio.app"/>
+        <move todir="${project.path}/Penrose Studio.app">
             <fileset dir="${project.path}/Eclipse.app"/>
         </move>
-        <copy todir="target/Penrose Studio ${project.version}.app/Contents/MacOS">
-            <fileset dir="${project.path}">
-                <exclude name="eclipse"/>
-            </fileset>
-        </copy>
-        <chmod file="target/Penrose Studio ${project.version}.app/Contents/MacOS/eclipse" perm="ugo+rx"/>
-        <copy todir="target/Penrose Studio ${project.version}.app/Contents" file="rcp/Info.plist" overwrite="true"/>
-        <copy todir="target/Penrose Studio ${project.version}.app/Contents/Resources" file="images/Eclipse.icns" overwrite="true"/>
+        <delete file="${project.path}/eclipse" />
+        <move tofile="${project.path}/Penrose Studio.app/Contents/MacOS/penrose-studio" file="${project.path}/Penrose Studio.app/Contents/MacOS/eclipse" />
+        <chmod file="${project.path}/Penrose Studio.app/Contents/MacOS/penrose-studio" perm="ugo+rx"/>
+        <copy todir="${project.path}/Penrose Studio.app/Contents" file="rcp/Info.plist" overwrite="true"/>
+        <copy todir="${project.path}/Penrose Studio.app/Contents/MacOS" file="rcp/eclipse.ini" overwrite="true"/>
+        <delete file="${project.path}/Penrose Studio.app/Contents/Resources/Eclipse.icns" />
+        <copy todir="${project.path}/Penrose Studio.app/Contents/Resources" file="images/Penrose.icns" overwrite="true"/>
+        <exec executable="/usr/bin/hdiutil">
+            <arg line="create"/>
+            <arg line="-fs HFS+"/>
+            <arg line="-srcdir ${project.path}"/>
+            <arg line="${project.path}.dmg"/>
+        </exec>
     </target>
 
     <target name="dist-win32" depends="build-win32" if="isWindows">
