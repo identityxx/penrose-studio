@@ -28,7 +28,6 @@ import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.studio.directory.wizard.CreateLDAPSnapshotWizard;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
 
 public class CreateLDAPSnapshotEntryAction extends Action {

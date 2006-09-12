@@ -28,8 +28,6 @@ import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.directory.EntryNode;
 import org.safehaus.penrose.studio.directory.wizard.CreateLDAPProxyWizard;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.mapping.EntryMapping;
-import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
 
 public class MapLDAPTreeAction extends Action {

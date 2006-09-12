@@ -26,8 +26,6 @@ import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionParametersWiz
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.mapping.*;
-import org.safehaus.penrose.connector.AdapterConfig;
-import org.safehaus.penrose.connector.ConnectionManager;
 import org.safehaus.penrose.acl.ACI;
 import org.apache.log4j.Logger;
 
