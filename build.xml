@@ -8,13 +8,13 @@
     <description>Penrose Studio</description>
 	
     <property name="project.name" value="penrose-studio"/>
-	<property name="project.version" value="1.0.5"/>
+	<property name="project.version" value="1.1"/>
     <property name="project.dist" value="dist"/>
 
     <property name="prefix" value=""/>
     <property name="penrose.studio.home" value="${prefix}/usr/local/${project.name}-${project.version}"/>
 
-    <property name="penrose.version" value="1.0.4"/>
+    <property name="penrose.version" value="1.1"/>
 
     <property name="rcp.prefix" value="eclipse-RCP-3.1"/>
     <property name="iscc.path" value="ISCC.exe"/>
@@ -29,9 +29,6 @@
             <include name="plugins/*.jar"/>
         </fileset>
     </path>
-
-    <taskdef name="izpack" classpath="installer/izpack/lib/compiler.jar"
-        classname="com.izforge.izpack.ant.IzPackTask"/>
 
     <target name="init">
         <condition property="isLinux">
@@ -56,8 +53,8 @@
 
     <target name="build-tools" depends="init">
         <mkdir dir="target/tools"/>
-        <javac srcdir="src/ant" destdir="target/tools"/>
-        <jar destfile="target/penrose-studio-tools.jar" basedir="target/tools"/>
+        <javac srcdir="src/tools" destdir="target/tools"/>
+        <jar destfile="target/penrose-studio-tools-${project.version}.jar" basedir="target/tools"/>
     </target>
 
     <target name="manifest" depends="build-tools">
@@ -67,7 +64,7 @@
                 <expandproperties/>
             </filterchain>
         </copy>
-        <taskdef name="manifest-generator" classname="org.safehaus.penrose.ant.ManifestTask" classpath="target/penrose-studio-tools.jar"/>
+        <taskdef name="manifest-generator" classname="org.safehaus.penrose.tools.ManifestTask" classpath="target/penrose-studio-tools-${project.version}.jar"/>
         <manifest-generator
             file="META-INF/MANIFEST.MF"
             dir="lib"
@@ -157,7 +154,7 @@
                 <expandproperties/>
             </filterchain>
         </copy>
-        <taskdef name="manifest-generator" classname="org.safehaus.penrose.ant.ManifestTask" classpath="target/penrose-studio-tools.jar"/>
+        <taskdef name="manifest-generator" classname="org.safehaus.penrose.tools.ManifestTask" classpath="target/penrose-studio-tools-${project.version}.jar"/>
         <manifest-generator
             file="${plugin.path}/META-INF/MANIFEST.MF"
             dir="${plugin.path}/lib"
@@ -266,31 +263,6 @@
             <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
             <param name="rpm.name" value="${project.name}-${project.version}-1.i386.rpm"/>
         </antcall>
-        <antcall target="izpack">
-            <param name="platform" value="linux-gtk"/>
-            <param name="dist.name" value="${project.name}-${project.version}-${platform}"/>
-        </antcall>
-    </target>
-
-    <target name="izpack" depends="init">
-        <echo message="Creating ${project.dist}/${dist.name}.jar"/>
-        <copy todir="target" file="installer/installer.xml">
-            <filterchain>
-                <expandproperties/>
-            </filterchain>
-        </copy>
-        <copy todir="target/${dist.name}" file="installer/uninstall.ico"/>
-        <copy todir="target/${dist.name}" file="installer/uninstall.png"/>
-        <copy todir="target/${dist.name}" file="installer/shortcuts-win32.xml"/>
-        <copy todir="target/${dist.name}" file="installer/shortcuts-unix.xml"/>
-        <mkdir dir="${project.dist}"/>
-        <izpack
-            output="${project.dist}/${dist.name}.jar"
-            basedir="${basedir}/target/${dist.name}"
-            izpackdir="${basedir}/installer/izpack"
-            input="${basedir}/target/installer.xml"
-            installertype="standard"
-        />
     </target>
 
     <target name="dist-macosx-carbon" depends="build-macosx-carbon" if="isMac">

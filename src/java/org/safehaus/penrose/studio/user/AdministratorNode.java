@@ -32,9 +32,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchPage;
 import org.apache.log4j.Logger;
 
-import java.util.Collection;
-import java.util.ArrayList;
-
 /**
  * @author Endi S. Dewata
  */

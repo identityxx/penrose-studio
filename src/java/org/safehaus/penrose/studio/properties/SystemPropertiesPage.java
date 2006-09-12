@@ -23,15 +23,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.*;
-import org.safehaus.penrose.service.ServiceConfig;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
-import org.safehaus.penrose.studio.service.ServiceEditor;
 import org.apache.log4j.Logger;
 
 import java.util.Iterator;
-import java.util.TreeMap;
 import java.util.Map;
 
 /**

@@ -29,9 +29,6 @@ import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenroseWorkbenchAdvisor;
 import org.safehaus.penrose.studio.PenroseWorkbenchWindowAdvisor;
 import org.safehaus.penrose.studio.PenroseActionBarAdvisor;
-import com.identyx.license.LicenseReader;
-import com.identyx.license.LicenseManager;
-import com.identyx.license.License;
 
 /**
  * @author Endi S. Dewata

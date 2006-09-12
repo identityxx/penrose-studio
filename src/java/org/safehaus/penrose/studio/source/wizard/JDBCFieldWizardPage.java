@@ -29,7 +29,6 @@ import org.safehaus.penrose.util.JDBCClient;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.partition.FieldConfig;
-import org.safehaus.penrose.connector.JDBCAdapter;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.TableConfig;
 import org.apache.log4j.Logger;

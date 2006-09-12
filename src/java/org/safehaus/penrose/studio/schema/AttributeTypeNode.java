@@ -26,7 +26,6 @@ import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.apache.log4j.Logger;
 
 /**

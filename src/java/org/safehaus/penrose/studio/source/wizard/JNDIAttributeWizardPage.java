@@ -30,8 +30,6 @@ import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.connector.ConnectionManager;
-import org.safehaus.penrose.studio.PenroseApplication;
 import org.apache.log4j.Logger;
 
 import java.util.*;

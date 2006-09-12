@@ -17,8 +17,6 @@
  */
 package org.safehaus.penrose.studio.source;
 
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
