@@ -26,6 +26,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
+import org.safehaus.penrose.studio.directory.wizard.CreateLDAPSnapshotWizard;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
@@ -54,11 +55,7 @@ public class CreateLDAPSnapshotEntryAction extends Action {
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
             if (!penroseApplication.checkCommercial()) return;
 
-            Wizard wizard = (Wizard)penroseApplication.newInstance(
-                    "org.safehaus.penrose.studio.directory.wizard.CreateLDAPSnapshotWizard",
-                    new Class[] { Partition.class },
-                    new Object[] { node.getPartition() }
-            );
+            Wizard wizard = new CreateLDAPSnapshotWizard(node.getPartition());
 
             WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.setPageSize(600, 300);

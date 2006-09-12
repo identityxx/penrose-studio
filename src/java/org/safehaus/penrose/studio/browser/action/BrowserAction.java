@@ -31,7 +31,6 @@ import org.safehaus.penrose.studio.browser.BrowserEditorInput;
 import org.safehaus.penrose.studio.browser.BrowserEditor;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.service.ServiceConfig;
-import org.safehaus.penrose.ldap.PenroseLDAPService;
 import org.apache.log4j.Logger;
 
 /**
@@ -40,6 +39,9 @@ import org.apache.log4j.Logger;
 public class BrowserAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
+
+    public final static String LDAP_PORT             = "ldapPort";
+    public final static int DEFAULT_LDAP_PORT        = 10389;
 
     public BrowserAction() {
 
@@ -63,8 +65,8 @@ public class BrowserAction extends Action {
 
             PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
             ServiceConfig serviceConfig = penroseConfig.getServiceConfig("LDAP");
-            String s = serviceConfig.getParameter(PenroseLDAPService.LDAP_PORT);
-            int port = s == null ? PenroseLDAPService.DEFAULT_LDAP_PORT : Integer.parseInt(s);
+            String s = serviceConfig.getParameter(LDAP_PORT);
+            int port = s == null ? DEFAULT_LDAP_PORT : Integer.parseInt(s);
 
             BrowserEditorInput ei = new BrowserEditorInput();
             ei.setHostname(hostname);

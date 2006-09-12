@@ -70,13 +70,7 @@ public class JDBCConnectionEditor extends FormEditor {
 
             if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
 
-                FormPage formPage = (FormPage)penroseApplication.newInstance(
-                        "org.safehaus.penrose.studio.connection.JDBCConnectionTablesPage",
-                        new Class[] { JDBCConnectionEditor.class },
-                        new Object[] { this }
-                );
-
-                addPage(formPage);
+                addPage(new JDBCConnectionTablesPage(this));
             }
 
         } catch (Exception e) {

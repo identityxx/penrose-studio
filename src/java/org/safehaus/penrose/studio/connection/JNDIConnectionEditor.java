@@ -70,21 +70,8 @@ public class JNDIConnectionEditor extends FormEditor {
 
             if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
 
-                FormPage formPage = (FormPage)penroseApplication.newInstance(
-                        "org.safehaus.penrose.studio.connection.JNDIConnectionBrowserPage",
-                        new Class[] { JNDIConnectionEditor.class },
-                        new Object[] { this }
-                );
-
-                addPage(formPage);
-
-                formPage = (FormPage)penroseApplication.newInstance(
-                        "org.safehaus.penrose.studio.connection.JNDIConnectionSchemaPage",
-                        new Class[] { JNDIConnectionEditor.class },
-                        new Object[] { this }
-                );
-
-                addPage(formPage);
+                addPage(new JNDIConnectionBrowserPage(this));
+                addPage(new JNDIConnectionSchemaPage(this));
             }
 
         } catch (Exception e) {

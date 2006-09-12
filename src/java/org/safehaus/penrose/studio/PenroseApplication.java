@@ -21,7 +21,6 @@ import java.io.*;
 import java.util.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.lang.reflect.Constructor;
 import java.security.PublicKey;
 
 import org.apache.log4j.Logger;
@@ -47,7 +46,6 @@ import com.identyx.license.License;
 import com.identyx.license.LicenseUtil;
 import com.identyx.license.LicenseManager;
 import com.identyx.license.LicenseReader;
-import org.safehaus.penrose.util.ClassRegistry;
 import org.safehaus.penrose.log4j.Log4jConfigReader;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.safehaus.penrose.log4j.Log4jConfigWriter;
@@ -59,11 +57,11 @@ public class PenroseApplication implements IPlatformRunnable {
     Logger log = Logger.getLogger(getClass());
 
     public static String PRODUCT_NAME    = "Penrose Studio";
-    public static String PRODUCT_VERSION = "1.0";
+    public static String PRODUCT_VERSION = "1.1";
     public static String VENDOR_NAME     = "Identyx Corporation";
 
     public final static DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
-    public final static String RELEASE_DATE    = "08/01/2006";
+    public final static String RELEASE_DATE    = "09/11/2006";
 
     public final static String FEATURE_NOT_AVAILABLE = "This feature is only available in the commercial version.";
 
@@ -82,7 +80,6 @@ public class PenroseApplication implements IPlatformRunnable {
     PenroseWorkbenchAdvisor workbenchAdvisor;
     ArrayList changeListeners = new ArrayList();
 
-    ClassRegistry registry;
     License license;
     Log4jConfig loggingConfig;
 
@@ -109,10 +106,6 @@ public class PenroseApplication implements IPlatformRunnable {
 
         String dir = System.getProperty("user.dir");
         workDir = dir+File.separator+"work";
-
-        Class clazz = Class.forName("org.safehaus.penrose.studio.util.PenroseClassRegistry");
-        Constructor constructor = clazz.getConstructor(new Class[] { ClassLoader.class });
-        registry = (ClassRegistry)constructor.newInstance(new Object[] { getClass().getClassLoader() });
 
         workbenchAdvisor = new PenroseWorkbenchAdvisor();
 
@@ -538,12 +531,6 @@ public class PenroseApplication implements IPlatformRunnable {
 
     public PenroseWorkbenchAdvisor getWorkbenchAdvisor() {
         return workbenchAdvisor;
-    }
-
-    public Object newInstance(String className, Class[] paramTypes, Object[] paramValues) throws Exception {
-        Class clazz = registry.findClass(className);
-        Constructor constructor = clazz.getConstructor(paramTypes);
-        return constructor.newInstance(paramValues);
     }
 
     public PublicKey getPublicKey() throws Exception {

@@ -36,6 +36,7 @@ import org.safehaus.penrose.studio.mapping.*;
 import org.safehaus.penrose.studio.directory.action.NewStaticEntryAction;
 import org.safehaus.penrose.studio.directory.action.NewDynamicEntryAction;
 import org.safehaus.penrose.studio.directory.action.MapLDAPTreeAction;
+import org.safehaus.penrose.studio.directory.action.NewEntryFromSourceAction;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
@@ -142,15 +143,7 @@ public class EntryNode extends Node {
 
         if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
             manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-
-            Action action = (Action)penroseApplication.newInstance(
-                    "org.safehaus.penrose.studio.directory.action.NewEntryFromSourceAction",
-                    new Class[] { EntryNode.class },
-                    new Object[] { this }
-            );
-
-            manager.add(action);
-
+            manager.add(new NewEntryFromSourceAction(this));
             manager.add(new MapLDAPTreeAction(this));
         }
 
