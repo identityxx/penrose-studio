@@ -176,7 +176,7 @@
 
     <target name="dist" depends="init">
         <antcall target="build-linux"/>
-        <antcall target="build-macosx-carbon"/>
+        <antcall target="build-macosx"/>
         <antcall target="build-win32"/>
     </target>
 
@@ -195,7 +195,7 @@
         </antcall>
     </target>
 
-    <target name="build-macosx-carbon" depends="init" if="isMac">
+    <target name="build-macosx" depends="init" if="isMac">
         <property name="platform" value="macosx-carbon"/>
         <property name="project.path" value="target/${project.name}-${project.version}-${platform}"/>
         <!-- uncompress rcp -->
@@ -253,7 +253,7 @@
             file="target/${project.name}-${project.version}.jar">
         </copy>
         <antcall target="dist-linux"/>
-        <antcall target="dist-macosx-carbon"/>
+        <antcall target="dist-macosx"/>
         <antcall target="dist-win32"/>
     </target>
 
@@ -266,23 +266,49 @@
         </antcall>
     </target>
 
-    <target name="dist-macosx-carbon" depends="build-macosx-carbon" if="isMac">
-        <echo message="Creating target/Penrose Studio.app"/>
-        <move todir="${project.path}/Penrose Studio.app">
+    <target name="dist-macosx" depends="build-macosx" if="isMac">
+        <property name="app.name" value="Penrose Studio.app"/>
+        <property name="pkg.name" value="${project.name}-${project.version}.pkg"/>
+        <property name="dmg.name" value="${project.name}-${project.version}.dmg"/>
+        <echo message="Creating ${app.name}"/>
+        <mkdir dir="target/MacOS"/>
+        <move todir="target/MacOS/${app.name}">
             <fileset dir="${project.path}/Eclipse.app"/>
         </move>
         <delete file="${project.path}/eclipse" />
-        <move tofile="${project.path}/Penrose Studio.app/Contents/MacOS/penrose-studio" file="${project.path}/Penrose Studio.app/Contents/MacOS/eclipse" />
-        <chmod file="${project.path}/Penrose Studio.app/Contents/MacOS/penrose-studio" perm="ugo+rx"/>
-        <copy todir="${project.path}/Penrose Studio.app/Contents" file="rcp/Info.plist" overwrite="true"/>
-        <copy todir="${project.path}/Penrose Studio.app/Contents/MacOS" file="rcp/eclipse.ini" overwrite="true"/>
-        <delete file="${project.path}/Penrose Studio.app/Contents/Resources/Eclipse.icns" />
-        <copy todir="${project.path}/Penrose Studio.app/Contents/Resources" file="images/Penrose.icns" overwrite="true"/>
+        <move todir="target/MacOS/${app.name}/Contents/MacOS">
+            <fileset dir="${project.path}"/>
+        </move>
+        <move tofile="target/MacOS/${app.name}/Contents/MacOS/penrose-studio"
+            file="target/MacOS/${app.name}/Contents/MacOS/eclipse"
+        />
+        <chmod file="target/MacOS/${app.name}/Contents/MacOS/penrose-studio" perm="ugo+rx" />
+        <copy todir="target/MacOS/${app.name}/Contents" file="rcp/Info.plist" overwrite="true">
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+        <copy todir="target/MacOS/${app.name}/Contents/MacOS"
+            file="rcp/eclipse.ini" overwrite="true"
+        />
+        <copy todir="target/MacOS/${app.name}/Contents/Resources"
+            file="images/Penrose.icns" overwrite="true"
+        />
+        <delete file="target/MacOS/${app.name}/Contents/Resources/Eclipse.icns" />
+        <echo message="Creating ${pkg.name}"/>
+        <mkdir dir="target/${dmg.name}"/>
+        <exec executable="/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker">
+            <arg line="-build"/>
+            <arg line="-proj installer/penrose-studio.pmproj"/>
+            <arg line="-p target/${dmg.name}/${pkg.name}"/>
+        </exec>
+        <echo message="Creating ${dmg.name}"/>
+        <mkdir dir="${project.dist}"/>
         <exec executable="/usr/bin/hdiutil">
             <arg line="create"/>
             <arg line="-fs HFS+"/>
-            <arg line="-srcdir ${project.path}"/>
-            <arg line="${project.path}.dmg"/>
+            <arg line="-srcdir target/${dmg.name}"/>
+            <arg line="${project.dist}/${dmg.name}"/>
         </exec>
     </target>
 
