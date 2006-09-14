@@ -309,7 +309,7 @@
             <arg line="--target dist/${project.name}-${project.version}.dmg"/>
             <arg line="--volname &quot;Penrose Studio ${project.version}&quot;"/>
             <arg line="--license target/LICENSE.txt"/>
-            <arg line="--icon images/Penrose.icns"/>
+            <arg line="--icon images/PenroseDMG.icns"/>
             <arg line="--mkdir /.background"/>
 <!--
             <arg line="- -copy images/background.png:/.background/background.png"/>
