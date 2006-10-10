@@ -25,7 +25,7 @@ public class ADUtil {
         sourceConfig.setName(connectionConfig.getName()+" Schema");
         sourceConfig.setConnectionName(connectionConfig.getName());
 
-        sourceConfig.addFieldConfig(new FieldConfig("lDAPDisplayName", true));
+        sourceConfig.addFieldConfig(new FieldConfig("lDAPDisplayName", "true"));
         sourceConfig.addFieldConfig(new FieldConfig("objectClass"));
         sourceConfig.addFieldConfig(new FieldConfig("attributeID"));
         sourceConfig.addFieldConfig(new FieldConfig("adminDescription"));

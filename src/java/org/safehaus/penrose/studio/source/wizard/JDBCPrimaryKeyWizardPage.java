@@ -87,10 +87,10 @@ public class JDBCPrimaryKeyWizardPage extends WizardPage implements SelectionLis
                 FieldConfig field = (FieldConfig)i.next();
 
                 TableItem it = new TableItem(fieldsTable, SWT.CHECK);
-                it.setImage(PenrosePlugin.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                it.setImage(PenrosePlugin.getImage(field.isPK() ? PenroseImage.KEY : PenroseImage.NOKEY));
                 it.setText(0, field.getName());
                 it.setText(1, field.getType());
-                it.setChecked(field.isPrimaryKey());
+                it.setChecked(field.isPK());
                 it.setData(field);
             }
 
@@ -118,7 +118,7 @@ public class JDBCPrimaryKeyWizardPage extends WizardPage implements SelectionLis
         for (int i=0; i<items.length; i++) {
             TableItem item = items[i];
             FieldConfig field = (FieldConfig)item.getData();
-            field.setPrimaryKey(item.getChecked());
+            field.setPrimaryKey(item.getChecked()+"");
             item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
         }
     }

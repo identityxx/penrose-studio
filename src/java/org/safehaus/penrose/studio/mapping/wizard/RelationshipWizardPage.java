@@ -86,7 +86,7 @@ public class RelationshipWizardPage extends WizardPage implements SelectionListe
                     Collection fields = sourceDefinition.getFieldConfigs();
                     for (Iterator j=fields.iterator(); j.hasNext(); ) {
                         FieldConfig field = (FieldConfig)j.next();
-                        dialog.addField(source.getName()+"."+field.getName(), field.isPrimaryKey());
+                        dialog.addField(source.getName()+"."+field.getName(), field.isPK());
                     }
                 }
 

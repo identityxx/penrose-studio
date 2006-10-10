@@ -24,7 +24,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.util.JDBCClient;
+import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.connector.JDBCAdapter;
@@ -286,7 +286,7 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
             FieldConfig field = (FieldConfig)i.next();
 
             TableItem it = new TableItem(fieldTable, SWT.NONE);
-            it.setImage(PenrosePlugin.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
+            it.setImage(PenrosePlugin.getImage(field.isPK() ? PenroseImage.KEY : PenroseImage.NOKEY));
             it.setText(0, field.getName());
             it.setText(1, field.getType());
         }

@@ -235,7 +235,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
             AttributeMapping ad = new AttributeMapping();
             ad.setName(name);
-            ad.setRdn(true);
+            ad.setRdn(true+"");
 
             if (!"...".equals(value)) ad.setConstant(value);
 
@@ -347,10 +347,10 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                 //System.out.println(" - "+ad.getName());
 
                 TableItem it = new TableItem(attributeTable, SWT.CHECK);
-                it.setImage(PenrosePlugin.getImage(ad.isRdn() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                it.setImage(PenrosePlugin.getImage("true".equals(ad.getRdn()) ? PenroseImage.KEY : PenroseImage.NOKEY));
                 it.setText(0, ad.getName());
                 it.setText(1, value == null ? "" : value);
-                it.setChecked(ad.isRdn());
+                it.setChecked("true".equals(ad.getRdn()));
                 it.setData(ad);
             }
         }
@@ -364,7 +364,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
             for (Iterator j=list.iterator(); j.hasNext(); ) {
                 AttributeMapping ad = (AttributeMapping)j.next();
-                if (ad.isRdn()) return true;
+                if ("true".equals(ad.getRdn())) return true;
             }
         }
 
@@ -376,7 +376,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
         for (int i=0; i<items.length; i++) {
             TableItem item = items[i];
             AttributeMapping ad = (AttributeMapping)item.getData();
-            ad.setRdn(item.getChecked());
+            ad.setRdn(item.getChecked()+"");
             item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
         }
     }

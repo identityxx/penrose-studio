@@ -33,7 +33,7 @@ import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.TableConfig;
 import org.safehaus.penrose.partition.FieldConfig;
-import org.safehaus.penrose.util.JDBCClient;
+import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.connector.JDBCAdapter;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -334,7 +334,7 @@ public class JDBCConnectionTablesPage extends FormPage {
                 FieldConfig field = (FieldConfig)i.next();
 
                 TableItem it = new TableItem(fieldsTable, SWT.NONE);
-                it.setImage(PenrosePlugin.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                it.setImage(PenrosePlugin.getImage(field.isPK() ? PenroseImage.KEY : PenroseImage.NOKEY));
                 it.setText(0, field.getName());
                 it.setText(1, field.getType());
             }
