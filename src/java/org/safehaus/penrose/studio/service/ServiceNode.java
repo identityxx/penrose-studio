@@ -23,7 +23,7 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.service.ServiceConfig;
-import org.safehaus.penrose.config.PenroseServerConfig;
+import org.safehaus.penrose.config.PenroseConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.IMenuManager;
@@ -99,8 +99,8 @@ public class ServiceNode extends Node {
         if (!confirm) return;
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseServerConfig penroseServerConfig = penroseApplication.getPenroseServerConfig();
-        penroseServerConfig.removeServiceConfig(serviceConfig.getName());
+        PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+        penroseConfig.removeServiceConfig(serviceConfig.getName());
 
         penroseApplication.notifyChangeListeners();
     }

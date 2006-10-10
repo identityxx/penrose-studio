@@ -489,7 +489,7 @@ public class LDAPPage extends FormPage {
 
         //log.debug("Rdn:");
 
-        for (Iterator i=entry.getRdnAttributes().iterator(); i.hasNext(); ) {
+        for (Iterator i=entry.getRdnAttributeNames().iterator(); i.hasNext(); ) {
             AttributeMapping ad = (AttributeMapping)i.next();
             String name = ad.getName();
             Object constant = ad.getConstant();

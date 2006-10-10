@@ -48,9 +48,6 @@ import org.safehaus.penrose.util.ClassRegistry;
 import org.safehaus.penrose.log4j.Log4jConfigReader;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.safehaus.penrose.log4j.Log4jConfigWriter;
-import org.safehaus.penrose.config.PenroseServerConfig;
-import org.safehaus.penrose.config.PenroseServerConfigReader;
-import org.safehaus.penrose.config.PenroseServerConfigWriter;
 
 import javax.crypto.Cipher;
 
@@ -70,7 +67,6 @@ public class PenroseApplication implements IPlatformRunnable {
 
     ApplicationConfig applicationConfig = new ApplicationConfig();
 
-    PenroseServerConfig penroseServerConfig = new PenroseServerConfig();
     PenroseConfig penroseConfig = new PenroseConfig();
 
     PenroseClient client;
@@ -182,13 +178,9 @@ public class PenroseApplication implements IPlatformRunnable {
 
         log.debug("Opening project from "+dir);
 
-        PenroseServerConfigReader penroseServerConfigReader = new PenroseServerConfigReader(dir+File.separator+"conf"+File.separator+"server.xml");
-        penroseServerConfig = penroseServerConfigReader.read();
-
-        PenroseConfigReader penroseConfigReader = new PenroseConfigReader(dir+File.separator+"conf"+File.separator+"penrose.xml");
+        PenroseConfigReader penroseConfigReader = new PenroseConfigReader(dir+File.separator+"conf"+File.separator+"server.xml");
         penroseConfig = penroseConfigReader.read();
 
-        initSystemProperties();
         initSchemaManager(dir);
         loadPartitions(dir);
         validatePartitions();
@@ -209,14 +201,6 @@ public class PenroseApplication implements IPlatformRunnable {
             loggerManager.addLogger(loggerName);
         }
 
-    }
-    public void initSystemProperties() throws Exception {
-        for (Iterator i=penroseServerConfig.getSystemPropertyNames().iterator(); i.hasNext(); ) {
-            String name = (String)i.next();
-            String value = penroseServerConfig.getSystemProperty(name);
-
-            System.setProperty(name, value);
-        }
     }
 
     public void initSchemaManager(String dir) throws Exception {
@@ -315,10 +299,7 @@ public class PenroseApplication implements IPlatformRunnable {
         log.debug("-------------------------------------------------------------------------------------");
         log.debug("Saving configuration to "+dir);
 
-        PenroseServerConfigWriter penroseServerConfigWriter = new PenroseServerConfigWriter(dir+File.separator+"conf"+File.separator+"server.xml");
-        penroseServerConfigWriter.write(penroseServerConfig);
-
-        PenroseConfigWriter penroseConfigWriter = new PenroseConfigWriter(dir+File.separator+"conf"+File.separator+"penrose.xml");
+        PenroseConfigWriter penroseConfigWriter = new PenroseConfigWriter(dir+File.separator+"conf"+File.separator+"server.xml");
         penroseConfigWriter.write(penroseConfig);
 
         saveLoggingConfig(dir);
@@ -537,13 +518,5 @@ public class PenroseApplication implements IPlatformRunnable {
 
     public void setLoggingConfig(Log4jConfig loggingConfig) {
         this.loggingConfig = loggingConfig;
-    }
-
-    public PenroseServerConfig getPenroseServerConfig() {
-        return penroseServerConfig;
-    }
-
-    public void setPenroseServerConfig(PenroseServerConfig penroseServerConfig) {
-        this.penroseServerConfig = penroseServerConfig;
     }
 }
