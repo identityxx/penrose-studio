@@ -30,9 +30,8 @@ import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.util.JDBCClient;
 import org.safehaus.penrose.connector.JDBCAdapter;
-import org.safehaus.penrose.ldap.LDAPAdapter;
 import org.apache.log4j.Logger;
 
 public class JDBCSourcePropertyPage extends FormPage {
@@ -153,7 +152,7 @@ public class JDBCSourcePropertyPage extends FormPage {
         gd.widthHint = 100;
         tableNameLabel.setLayoutData(gd);
 
-		tableNameText = toolkit.createText(composite, sourceConfig.getParameter(JDBCAdapter.TABLE_NAME), SWT.BORDER);
+		tableNameText = toolkit.createText(composite, sourceConfig.getParameter("tableName"), SWT.BORDER);
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
         tableNameText.setLayoutData(gd);
@@ -161,9 +160,9 @@ public class JDBCSourcePropertyPage extends FormPage {
         tableNameText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(tableNameText.getText())) {
-                    sourceConfig.removeParameter(JDBCAdapter.TABLE_NAME);
+                    sourceConfig.removeParameter("tableName");
                 } else {
-                    sourceConfig.setParameter(JDBCAdapter.TABLE_NAME, tableNameText.getText());
+                    sourceConfig.setParameter("tableName", tableNameText.getText());
                 }
                 checkDirty();
             }
@@ -174,7 +173,7 @@ public class JDBCSourcePropertyPage extends FormPage {
         gd.widthHint = 100;
         filterLabel.setLayoutData(gd);
 
-        filterText = toolkit.createText(composite, sourceConfig.getParameter(LDAPAdapter.FILTER), SWT.BORDER);
+        filterText = toolkit.createText(composite, sourceConfig.getParameter("filter"), SWT.BORDER);
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
         filterText.setLayoutData(gd);
@@ -182,9 +181,9 @@ public class JDBCSourcePropertyPage extends FormPage {
         filterText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(filterText.getText())) {
-                    sourceConfig.removeParameter(LDAPAdapter.FILTER);
+                    sourceConfig.removeParameter("filter");
                 } else {
-                    sourceConfig.setParameter(LDAPAdapter.FILTER, filterText.getText());
+                    sourceConfig.setParameter("filter", filterText.getText());
                 }
                 checkDirty();
             }
@@ -254,7 +253,7 @@ public class JDBCSourcePropertyPage extends FormPage {
                 for (int i=0; i<fieldTable.getItemCount(); i++) {
                     TableItem item = fieldTable.getItem(i);
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
-                    fieldDefinition.setPrimaryKey(item.getChecked() ? FieldConfig.PRIMARY_KEY_TRUE : FieldConfig.PRIMARY_KEY_FALSE);
+                    fieldDefinition.setPrimaryKey(item.getChecked());
                     item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
                 }
 
@@ -267,7 +266,7 @@ public class JDBCSourcePropertyPage extends FormPage {
                 for (int i=0; i<fieldTable.getItemCount(); i++) {
                     TableItem item = fieldTable.getItem(i);
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
-                    fieldDefinition.setPrimaryKey(item.getChecked() ? FieldConfig.PRIMARY_KEY_TRUE : FieldConfig.PRIMARY_KEY_FALSE);
+                    fieldDefinition.setPrimaryKey(item.getChecked());
                     item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
                 }
 
@@ -427,8 +426,8 @@ public class JDBCSourcePropertyPage extends FormPage {
             FieldConfig fieldDefinition = (FieldConfig)i.next();
 
             TableItem item = new TableItem(fieldTable, SWT.CHECK);
-            item.setChecked(fieldDefinition.isPK());
-            item.setImage(PenrosePlugin.getImage(fieldDefinition.isPK() ? PenroseImage.KEY : PenroseImage.NOKEY));
+            item.setChecked(fieldDefinition.isPrimaryKey());
+            item.setImage(PenrosePlugin.getImage(fieldDefinition.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
             item.setText(0, fieldDefinition.getName().equals(fieldDefinition.getOriginalName()) ? fieldDefinition.getName() : fieldDefinition.getOriginalName());
             item.setText(1, fieldDefinition.getName().equals(fieldDefinition.getOriginalName()) ? "" : fieldDefinition.getName());
             item.setText(2, fieldDefinition.getType());

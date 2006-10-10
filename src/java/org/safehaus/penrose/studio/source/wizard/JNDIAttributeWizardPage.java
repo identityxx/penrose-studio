@@ -24,7 +24,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.util.JNDIClient;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.schema.ObjectClass;
@@ -251,7 +251,7 @@ public class JNDIAttributeWizardPage extends WizardPage {
     public void setConnectionConfig(Partition partition, ConnectionConfig connectionConfig) {
         try {
             if (schema == null) {
-                LDAPClient client = new LDAPClient(connectionConfig.getParameters());
+                JNDIClient client = new JNDIClient(connectionConfig.getParameters());
                 schema = client.getSchema();
             }
 

@@ -97,7 +97,7 @@ public class JDBCSourceWizard extends Wizard {
 
             for (Iterator i=fields.iterator(); i.hasNext(); ) {
                 FieldConfig field = (FieldConfig)i.next();
-                System.out.println(" - "+field.getName()+" "+field.isPK());
+                System.out.println(" - "+field.getName()+" "+field.isPrimaryKey());
                 sourceConfig.addFieldConfig(field);
             }
 

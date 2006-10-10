@@ -40,6 +40,9 @@ public class BrowserAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
+    public final static String LDAP_PORT             = "ldapPort";
+    public final static int DEFAULT_LDAP_PORT        = 10389;
+
     public BrowserAction() {
 
         setText("&Browser");
@@ -61,10 +64,9 @@ public class BrowserAction extends Action {
             String hostname = project.getHost();
 
             PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
-
             ServiceConfig serviceConfig = penroseConfig.getServiceConfig("LDAP");
-            String s = serviceConfig.getParameter("ldapPort");
-            int port = s == null ? 10389 : Integer.parseInt(s);
+            String s = serviceConfig.getParameter(LDAP_PORT);
+            int port = s == null ? DEFAULT_LDAP_PORT : Integer.parseInt(s);
 
             BrowserEditorInput ei = new BrowserEditorInput();
             ei.setHostname(hostname);

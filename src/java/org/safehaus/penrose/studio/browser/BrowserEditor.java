@@ -47,7 +47,10 @@ import org.safehaus.penrose.service.ServiceConfig;
 
 public class BrowserEditor extends EditorPart {
 
-    private Logger log = Logger.getLogger(getClass());
+	private Logger log = Logger.getLogger(getClass());
+
+    public final static String LDAP_PORT             = "ldapPort";
+    public final static int DEFAULT_LDAP_PORT        = 10389;
 
     Text urlText;
     Text bindDnText;
@@ -66,7 +69,7 @@ public class BrowserEditor extends EditorPart {
     public void dispose() {
     }
 
-    public void createPartControl(final Composite parent) {
+	public void createPartControl(final Composite parent) {
 
         parent.setLayout(new GridLayout());
 
@@ -178,10 +181,9 @@ public class BrowserEditor extends EditorPart {
             String hostname = project.getHost();
 
             PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
-
             ServiceConfig serviceConfig = penroseConfig.getServiceConfig("LDAP");
-            String s = serviceConfig.getParameter("ldapPort");
-            int port = s == null ? 10389 : Integer.parseInt(s);
+            String s = serviceConfig.getParameter(LDAP_PORT);
+            int port = s == null ? DEFAULT_LDAP_PORT : Integer.parseInt(s);
 
             UserConfig rootUserConfig = penroseConfig.getRootUserConfig();
 
@@ -191,10 +193,10 @@ public class BrowserEditor extends EditorPart {
             log.debug(e.getMessage(), e);
             MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
         }
-    }
+	}
 
-    public void setFocus() {
-    }
+	public void setFocus() {
+	}
 
     public void open(String hostname, int port, String baseDn, String bindDn, String password) throws Exception {
 

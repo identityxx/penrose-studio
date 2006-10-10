@@ -64,6 +64,8 @@ public class ExpressionDialog extends Dialog {
     Composite currentPanel;
     int currentType;
 
+    //Text nameText;
+
     Button binaryRadio;
     Text binaryText;
 
@@ -123,7 +125,21 @@ public class ExpressionDialog extends Dialog {
 
     public void createControl(final Shell parent) {
         parent.setLayout(new GridLayout(1, false));
+/*
+        Composite names = new Composite(parent, SWT.NONE);
+        names.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        names.setLayout(new GridLayout(2, false));
 
+        Label nameLabel = new Label(names, SWT.NONE);
+        nameLabel.setText("Name:");
+        GridData gd = new GridData();
+        gd.widthHint = 80;
+        nameLabel.setLayoutData(gd);
+
+        nameText = new Text(names, SWT.BORDER);
+        gd = new GridData(GridData.FILL_HORIZONTAL);
+        nameText.setLayoutData(gd);
+*/
         Composite types = new Composite(parent, SWT.NONE);
         types.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         types.setLayout(new GridLayout(2, false));
@@ -216,12 +232,14 @@ public class ExpressionDialog extends Dialog {
                 }
 
                 if (attributeMapping != null) {
+                    //attributeMapping.setName(getName());
                     attributeMapping.setConstant(constant);
                     attributeMapping.setVariable(variable);
                     attributeMapping.setExpression(expression);
                 }
 
                 if (fieldMapping != null) {
+                    //fieldMapping.setName(getName());
                     fieldMapping.setConstant(constant);
                     fieldMapping.setVariable(variable);
                     fieldMapping.setExpression(expression);
@@ -684,9 +702,19 @@ public class ExpressionDialog extends Dialog {
     public String getVariable() {
         return "".equals(variableCombo.getText()) ? null : variableCombo.getText();
     }
+/*
+    public void setName(String name) {
+        nameText.setText(name == null ? "" : name);
+    }
 
+    public String getName() {
+        return "".equals(nameText.getText()) ? null : nameText.getText();
+    }
+*/
     public void setAttributeMapping(AttributeMapping attributeMapping) {
         this.attributeMapping = attributeMapping;
+
+        //setName(attributeMapping.getName());
 
         Object constant = attributeMapping.getConstant();
         if (constant != null) {
@@ -721,6 +749,8 @@ public class ExpressionDialog extends Dialog {
 
     public void setFieldMapping(FieldMapping fieldMapping) {
         this.fieldMapping = fieldMapping;
+
+        //setName(fieldMapping.getName());
 
         Object constant = fieldMapping.getConstant();
         if (constant != null) {

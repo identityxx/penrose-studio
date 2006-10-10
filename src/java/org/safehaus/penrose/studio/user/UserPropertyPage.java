@@ -17,22 +17,15 @@
  */
 package org.safehaus.penrose.studio.user;
 
-import java.util.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.*;
-import org.safehaus.penrose.studio.parameter.ParameterDialog;
-import org.safehaus.penrose.studio.engine.EngineEditor;
-import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.user.UserEditor;
-import org.safehaus.penrose.engine.EngineConfig;
-import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.user.UserConfig;
 
 /**

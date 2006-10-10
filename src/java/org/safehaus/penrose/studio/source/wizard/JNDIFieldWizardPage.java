@@ -94,13 +94,13 @@ public class JNDIFieldWizardPage extends WizardPage implements SelectionListener
 
             FieldConfig field = new FieldConfig();
             field.setName(name);
-            field.setPrimaryKey(pk ? FieldConfig.PRIMARY_KEY_TRUE : FieldConfig.PRIMARY_KEY_FALSE);
+            field.setPrimaryKey(pk);
 
             TableItem it = new TableItem(fieldTable, SWT.CHECK);
             it.setImage(PenrosePlugin.getImage(pk ? PenroseImage.KEY : PenroseImage.NOKEY));
             it.setText(0, name);
             it.setText(1, field.getType());
-            it.setChecked(field.isPK());
+            it.setChecked(field.isPrimaryKey());
             it.setData(field);
         }
 
@@ -134,7 +134,7 @@ public class JNDIFieldWizardPage extends WizardPage implements SelectionListener
         for (int i=0; i<items.length; i++) {
             TableItem item = items[i];
             FieldConfig field = (FieldConfig)items[i].getData();
-            field.setPrimaryKey(item.getChecked() ? FieldConfig.PRIMARY_KEY_TRUE : FieldConfig.PRIMARY_KEY_FALSE);
+            field.setPrimaryKey(item.getChecked());
             item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
         }
     }

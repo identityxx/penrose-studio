@@ -21,7 +21,6 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
-import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.studio.PenroseApplication;
@@ -70,13 +69,7 @@ public class JDBCConnectionEditor extends FormEditor {
 
             if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
 
-                FormPage formPage = (FormPage)penroseApplication.newInstance(
-                        "org.safehaus.penrose.studio.connection.JDBCConnectionTablesPage",
-                        new Class[] { JDBCConnectionEditor.class },
-                        new Object[] { this }
-                );
-
-                addPage(formPage);
+                addPage(new JDBCConnectionTablesPage(this));
             }
 
         } catch (Exception e) {

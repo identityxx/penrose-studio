@@ -25,13 +25,16 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.Penrose;
 import org.apache.log4j.Logger;
 
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
+import java.lang.reflect.Method;
 
 public class LicenseDialog extends Dialog {
 
@@ -75,7 +78,7 @@ public class LicenseDialog extends Dialog {
 
     public void open() {
 
-        Point size = new Point(400, 200);
+        Point size = new Point(450, 180);
         shell.setSize(size);
 
         Display display = shell.getDisplay();
@@ -90,9 +93,9 @@ public class LicenseDialog extends Dialog {
 
         shell.setLocation(b.x + (b.width - size.x)/2, b.y + (b.height - size.y)/2);
 
-        shell.setText("License");
+        shell.setText("Commercial Feature");
         shell.setImage(penroseImage);
-        
+
         shell.open();
 
         while (!shell.isDisposed()) {
@@ -104,7 +107,8 @@ public class LicenseDialog extends Dialog {
 
     public void createControl(final Shell parent) {
         try {
-            boldFont = new Font(parent.getDisplay(), "Tahoma", 16, SWT.BOLD);
+            Display display = parent.getDisplay();
+            boldFont = new Font(display, "Arial", 10, SWT.BOLD);
 
             parent.setLayout(new GridLayout());
 
@@ -112,23 +116,48 @@ public class LicenseDialog extends Dialog {
             GridData gd = new GridData(GridData.FILL_HORIZONTAL);
             gd.heightHint = 25;
             blank.setLayoutData(gd);
-
+/*
             Label titleLabel = new Label(parent, SWT.CENTER);
-            titleLabel.setText("Penrose Studio");
+            titleLabel.setText(PenroseApplication.PRODUCT_NAME);
             titleLabel.setFont(boldFont);
             titleLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
             Label versionLabel = new Label(parent, SWT.CENTER);
-            versionLabel.setText("Version "+Penrose.PRODUCT_VERSION);
+            versionLabel.setText("Version "+ PenroseApplication.PRODUCT_VERSION);
             versionLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
             Label copyrightLabel = new Label(parent, SWT.CENTER);
             copyrightLabel.setText("Copyright (c) 2000-2006, Identyx Corporation.");
             copyrightLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
+*/
             messageLabel = new Label(parent, SWT.CENTER);
-            messageLabel.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_RED));
-            messageLabel.setLayoutData(new GridData(GridData.FILL_BOTH));
+            messageLabel.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_DARK_RED));
+            messageLabel.setFont(boldFont);
+            messageLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+            Link link = new Link(parent, SWT.CENTER);
+            link.setText("To get an evaluation license please register at <a>http://www.identyx.com</a>.");
+            gd = new GridData(GridData.FILL_HORIZONTAL);
+            gd.horizontalAlignment = GridData.CENTER;
+            link.setLayoutData(gd);
+
+            link.addSelectionListener(new SelectionAdapter() {
+                public void widgetSelected(SelectionEvent selectionEvent) {
+                    try {
+                        String url = "http://www.identyx.com";
+                        launchBrowser(url);
+
+                    } catch (Exception e) {
+                        log.error(e.getMessage(), e);
+                        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+                        Shell shell = window.getShell();
+
+                        MessageDialog.openError(shell, "ERROR", e.getMessage());
+                    }
+                }
+            });
+
+            new Label(parent, SWT.NONE);
 
             Composite buttonsPanel = new Composite(parent, SWT.NONE);
             gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -141,17 +170,6 @@ public class LicenseDialog extends Dialog {
 
             licenseButton.addSelectionListener(new SelectionAdapter() {
                 public void widgetSelected(SelectionEvent event) {
-
-                    String dir = System.getProperty("user.dir");
-
-                    FileDialog dialog = new FileDialog(parent);
-                    dialog.setText("License");
-                    dialog.setFilterPath(dir);
-                    dialog.setFilterExtensions(new String[] { "*.license", "*.*" });
-
-                    filename = dialog.open();
-                    if (filename == null) return;
-
                     action = OK;
                     shell.close();
                 }
@@ -167,20 +185,55 @@ public class LicenseDialog extends Dialog {
                 }
             });
 */
-            Button cancelButton = new Button(buttonsPanel, SWT.PUSH);
-            cancelButton.setText("   Cancel   ");
+            Button closeButton = new Button(buttonsPanel, SWT.PUSH);
+            closeButton.setText("   Close   ");
 
-            cancelButton.addSelectionListener(new SelectionAdapter() {
+            closeButton.addSelectionListener(new SelectionAdapter() {
                 public void widgetSelected(SelectionEvent event) {
                     action = CANCEL;
                     shell.close();
                 }
             });
 
+            licenseButton.setFocus();
+
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
         }
-	}
+    }
+
+    public void launchBrowser(String url) throws Exception {
+        String osName = System.getProperty("os.name");
+
+        if (osName.startsWith("Mac OS")) {
+            Class fileMgr = Class.forName("com.apple.eio.FileManager");
+            Method openURL = fileMgr.getDeclaredMethod(
+                    "openURL",
+                    new Class[] { String.class }
+            );
+            openURL.invoke(null, new Object[] { url });
+
+        } else if (osName.startsWith("Windows")) {
+            Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler "+url);
+
+        } else {
+            String[] browsers = {
+                    "firefox", "opera", "konqueror", "epiphany", "mozilla", "netscape"
+            };
+
+            String browser = null;
+            for (int count = 0; count < browsers.length && browser == null; count++) {
+                Process p = Runtime.getRuntime().exec(new String[] { "which", browsers[count] });
+                if (p.waitFor() == 0) browser = browsers[count];
+           }
+
+           if (browser == null) {
+              throw new Exception("Could not find web browser");
+           } else {
+              Runtime.getRuntime().exec(new String[] { browser, url });
+           }
+       }
+    }
 
     public int getAction() {
         return action;

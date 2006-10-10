@@ -36,17 +36,8 @@ import org.safehaus.penrose.studio.project.ProjectDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.welcome.WelcomeEditorInput;
 import org.safehaus.penrose.studio.welcome.WelcomeEditor;
-import org.safehaus.penrose.studio.license.LicenseDialog;
-import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.studio.util.ApplicationConfig;
-import org.safehaus.penrose.license.LicenseManager;
-import org.safehaus.penrose.license.LicenseReader;
-import org.safehaus.penrose.license.License;
 import org.apache.log4j.Logger;
-
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.io.File;
 
 public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
@@ -70,9 +61,14 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     public void preWindowOpen() {
         // log.debug("preWindowOpen");
 
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
         try {
-            checkLicense();
+            penroseApplication.loadLicense();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
 
+        try {
             Shell shell = new Shell(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
 
             IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
@@ -88,73 +84,12 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
             Project project = dialog.getProject();
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
             penroseApplication.getApplicationConfig().setCurrentProject(project);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             System.exit(0);
         }
-    }
-
-    public void checkLicense() throws Exception {
-
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PublicKey publicKey = penroseApplication.getPublicKey();
-
-        String filename = "penrose.license";
-
-        File file = new File(filename);
-        if (!file.exists()) return;
-
-        while (true) {
-            String message = null;
-            try {
-                LicenseManager licenseManager = new LicenseManager(publicKey);
-                LicenseReader licenseReader = new LicenseReader(licenseManager);
-                licenseReader.read(file);
-
-                License license = licenseManager.getLicense("Penrose Studio");
-                if (license == null) return;
-
-                boolean valid = licenseManager.isValid(license);
-                if (!valid) throw new Exception("Invalid license.");
-
-                penroseApplication.setLicense(license);
-                return;
-
-            } catch (NoSuchAlgorithmException e) {
-                Throwable t = e.getCause();
-                log.debug(t.getMessage(), t);
-                message = t.getMessage();
-
-            } catch (NullPointerException e) {
-                message = "ERROR: NullPointerException";
-
-            } catch (Exception e) {
-                log.debug(e.getMessage(), e);
-                message = e.getMessage();
-            }
-
-            Shell shell = new Shell(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-
-            LicenseDialog licenseDialog = new LicenseDialog(shell);
-            licenseDialog.setText(message);
-            licenseDialog.open();
-
-            if (licenseDialog.getAction() == LicenseDialog.CANCEL) System.exit(0);
-
-            String newFilename = licenseDialog.getFilename();
-            if (newFilename == null) break;
-
-            try {
-                File newFile = new File(newFilename);
-                FileUtil.copy(newFile, file);
-            } catch (Exception ex) {
-                log.debug(ex.getMessage(), ex);
-            }
-        }
-
     }
 
     public void createWindowContents(Shell shell) {

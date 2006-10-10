@@ -21,11 +21,8 @@ import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.partition.PartitionManager;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.apache.log4j.Logger;
-
-import java.io.File;
 
 /**
  * @author Endi S. Dewata

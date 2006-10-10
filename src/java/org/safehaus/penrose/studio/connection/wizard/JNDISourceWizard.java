@@ -26,8 +26,7 @@ import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.studio.source.wizard.JNDIFieldWizardPage;
 import org.safehaus.penrose.studio.source.wizard.JNDIAttributeWizardPage;
 import org.safehaus.penrose.mapping.Row;
-import org.safehaus.penrose.ldap.LDAPClient;
-import org.safehaus.penrose.ldap.LDAPAdapter;
+import org.safehaus.penrose.util.JNDIClient;
 import org.safehaus.penrose.util.EntryUtil;
 import org.apache.log4j.Logger;
 
@@ -42,7 +41,7 @@ public class JNDISourceWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private LDAPClient client;
+    private JNDIClient client;
     private Partition partition;
     private ConnectionConfig connectionConfig;
     private String baseDn;
@@ -55,12 +54,12 @@ public class JNDISourceWizard extends Wizard {
     public JNDIAttributeWizardPage attributesPage;
     public JNDIFieldWizardPage fieldsPage = new JNDIFieldWizardPage();
 
-    public JNDISourceWizard(LDAPClient client, Partition partition, ConnectionConfig connectionConfig, String baseDn) throws Exception {
+    public JNDISourceWizard(JNDIClient client, Partition partition, ConnectionConfig connectionConfig, String baseDn) throws Exception {
         this(client, partition, connectionConfig, baseDn, "(objectClass=*)", "OBJECT", new ArrayList());
     }
     
     public JNDISourceWizard(
-    		LDAPClient client,
+            JNDIClient client,
             Partition partition,
             ConnectionConfig connectionConfig,
             String baseDn,
@@ -108,9 +107,9 @@ public class JNDISourceWizard extends Wizard {
             sourceConfig.setName(propertyPage.getSourceName());
             sourceConfig.setConnectionName(connectionConfig.getName());
 
-            sourceConfig.setParameter(LDAPAdapter.BASE_DN, baseDn);
-            sourceConfig.setParameter(LDAPAdapter.FILTER, propertyPage.getFilter());
-            sourceConfig.setParameter(LDAPAdapter.SCOPE, propertyPage.getScope());
+            sourceConfig.setParameter("baseDn", baseDn);
+            sourceConfig.setParameter("filter", propertyPage.getFilter());
+            sourceConfig.setParameter("scope", propertyPage.getScope());
 
             Collection fields = fieldsPage.getFields();
             for (Iterator i=fields.iterator(); i.hasNext(); ) {

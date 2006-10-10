@@ -28,7 +28,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
-import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.util.JNDIClient;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
@@ -132,7 +132,7 @@ public class JNDIConnectionPropertiesPage extends FormPage {
         composite.setLayout(new GridLayout(6, false));
 
         String url = connectionConfig.getParameter(InitialContext.PROVIDER_URL);
-        String[] s = LDAPClient.parseURL(url);
+        String[] s = JNDIClient.parseURL(url);
 
         Label protocolLabel = toolkit.createLabel(composite, "Protocol:");
         GridData gd = new GridData();
@@ -211,7 +211,7 @@ public class JNDIConnectionPropertiesPage extends FormPage {
         fetchButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 try {
-                	LDAPClient client = new LDAPClient(connectionConfig.getParameters());
+                    JNDIClient client = new JNDIClient(connectionConfig.getParameters());
                     Collection list = client.getNamingContexts();
 
                     suffixCombo.removeAll();

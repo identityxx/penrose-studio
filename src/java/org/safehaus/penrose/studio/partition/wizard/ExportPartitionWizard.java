@@ -18,12 +18,8 @@
 package org.safehaus.penrose.studio.partition.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.config.PenroseConfig;
 import org.apache.log4j.Logger;
-
-import java.io.File;
 
 /**
  * @author Endi S. Dewata

@@ -22,7 +22,6 @@ import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.schema.SchemaConfig;
 import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.schema.Schema;
@@ -36,9 +35,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchPage;
 import org.apache.log4j.Logger;
-
-import java.util.Collection;
-import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata

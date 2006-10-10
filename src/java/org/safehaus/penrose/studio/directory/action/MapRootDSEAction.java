@@ -25,9 +25,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.widgets.Shell;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
+import org.safehaus.penrose.studio.directory.wizard.CreateRootDSEProxyWizard;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.object.ObjectsView;
-import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
 
 public class MapRootDSEAction extends Action {
@@ -54,11 +54,7 @@ public class MapRootDSEAction extends Action {
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
             if (!penroseApplication.checkCommercial()) return;
 
-            Wizard wizard = (Wizard)penroseApplication.newInstance(
-                    "org.safehaus.penrose.studio.directory.wizard.CreateRootDSEProxyWizard",
-                    new Class[] { Partition.class },
-                    new Object[] { node.getPartition() }
-            );
+            Wizard wizard = new CreateRootDSEProxyWizard(node.getPartition());
 
             WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.setPageSize(600, 300);

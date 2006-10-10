@@ -26,9 +26,8 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.directory.EntryNode;
+import org.safehaus.penrose.studio.directory.wizard.CreateLDAPProxyWizard;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.mapping.EntryMapping;
-import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
 
 public class MapLDAPTreeAction extends Action {
@@ -55,11 +54,7 @@ public class MapLDAPTreeAction extends Action {
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
             if (!penroseApplication.checkCommercial()) return;
 
-            Wizard wizard = (Wizard)penroseApplication.newInstance(
-                    "org.safehaus.penrose.studio.directory.wizard.CreateLDAPProxyWizard",
-                    new Class[] { Partition.class, EntryMapping.class },
-                    new Object[] { node.getPartition(), node.getEntryMapping() }
-            );
+            Wizard wizard = new CreateLDAPProxyWizard(node.getPartition(), node.getEntryMapping());
 
             WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.setPageSize(600, 300);

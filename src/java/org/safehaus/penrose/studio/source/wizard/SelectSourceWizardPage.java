@@ -24,7 +24,6 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
@@ -32,7 +31,6 @@ import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.SourceConfig;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.ldap.LDAPAdapter;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;
@@ -77,7 +75,7 @@ public class SelectSourceWizardPage extends WizardPage {
                 SourceConfig sourceConfig = (SourceConfig)ti.getData();
                 ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
 
-                String baseDn = sourceConfig.getParameter(LDAPAdapter.BASE_DN);
+                String baseDn = sourceConfig.getParameter("baseDn");
                 baseDn = baseDn == null ? "" : baseDn;
 
                 infoTable.removeAll();
@@ -104,11 +102,11 @@ public class SelectSourceWizardPage extends WizardPage {
 
                 ti = new TableItem(infoTable, SWT.NONE);
                 ti.setText(0, "Scope:");
-                ti.setText(1, sourceConfig.getParameter(LDAPAdapter.SCOPE));
+                ti.setText(1, sourceConfig.getParameter("scope"));
 
                 ti = new TableItem(infoTable, SWT.NONE);
                 ti.setText(0, "Filter:");
-                ti.setText(1, sourceConfig.getParameter(LDAPAdapter.FILTER));
+                ti.setText(1, sourceConfig.getParameter("filter"));
 
                 setPageComplete(validatePage());
             }

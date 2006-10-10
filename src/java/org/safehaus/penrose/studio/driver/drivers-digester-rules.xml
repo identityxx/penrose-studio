@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+
+ Copyright (c) 2000-2005, Identyx Corporation.
+ All rights reserved.
+
+<!DOCTYPE digester-rules PUBLIC
+  "-//Jakarta Apache //DTD digester-rules XML V1.0//EN"
+  "digester-rules.dtd">
+-->
+<digester-rules>
+
+	<pattern value="drivers">
+
+		<pattern value="driver">
+
+			<object-create-rule classname="org.safehaus.penrose.studio.driver.Driver" />
+			<set-properties-rule/>
+
+            <call-method-rule pattern="adapter-name" methodname="setAdapterName" paramcount="0" />
+            <call-method-rule pattern="driver-class" methodname="setDriverClass" paramcount="0" />
+			<call-method-rule pattern="url" methodname="setUrl" paramcount="0" />
+
+			<pattern value="parameter">
+
+                <object-create-rule classname="org.safehaus.penrose.studio.driver.Parameter" />
+                <set-properties-rule>
+                    <alias attr-name="type" prop-name="typeAsString" />
+                </set-properties-rule>
+
+                <call-method-rule pattern="display-name" methodname="setDisplayName" paramcount="0" />
+                <call-method-rule pattern="default-value" methodname="setDefaultValue" paramcount="0" />
+
+                <set-next-rule methodname="addParameter" />
+
+			</pattern>
+
+			<set-next-rule methodname="addDriver" />
+
+		</pattern>
+
+	</pattern>
+
+</digester-rules>

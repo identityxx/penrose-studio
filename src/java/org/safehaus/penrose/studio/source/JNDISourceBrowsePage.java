@@ -137,7 +137,7 @@ public class JNDISourceBrowsePage extends FormPage {
             int size = Integer.parseInt(maxSizeText.getText());
             sc.setSizeLimit(size);
 
-            connection.load(sourceConfig, null, null, sc, sr);
+            connection.load(sourceConfig, null, sc, sr);
 
             sr.close();
 

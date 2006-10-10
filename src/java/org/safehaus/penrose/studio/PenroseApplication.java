@@ -21,17 +21,15 @@ import java.io.*;
 import java.util.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.lang.reflect.Constructor;
 import java.security.PublicKey;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPlatformRunnable;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.SWT;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.config.*;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.util.ApplicationConfig;
@@ -39,12 +37,15 @@ import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.studio.validation.ValidationView;
 import org.safehaus.penrose.studio.logger.LoggerManager;
+import org.safehaus.penrose.studio.license.LicenseDialog;
+import org.safehaus.penrose.studio.welcome.action.EnterLicenseKeyAction;
 import org.safehaus.penrose.schema.*;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.license.License;
-import org.safehaus.penrose.license.LicenseUtil;
-import org.safehaus.penrose.util.ClassRegistry;
+import com.identyx.license.License;
+import com.identyx.license.LicenseUtil;
+import com.identyx.license.LicenseManager;
+import com.identyx.license.LicenseReader;
 import org.safehaus.penrose.log4j.Log4jConfigReader;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.safehaus.penrose.log4j.Log4jConfigWriter;
@@ -55,10 +56,14 @@ public class PenroseApplication implements IPlatformRunnable {
 
     Logger log = Logger.getLogger(getClass());
 
-    public final static DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
-    public final static String RELEASE_DATE    = "07/01/2006";
+    public static String PRODUCT_NAME    = "Penrose Studio";
+    public static String PRODUCT_VERSION = "1.1";
+    public static String VENDOR_NAME     = "Identyx Corporation";
 
-    public final static String FEATURE_NOT_AVAILABLE = "This feature is available in the commercial version.";
+    public final static DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
+    public final static String RELEASE_DATE    = "09/11/2006";
+
+    public final static String FEATURE_NOT_AVAILABLE = "This feature is only available in the commercial version.";
 
     public static PenroseApplication instance;
 
@@ -66,9 +71,7 @@ public class PenroseApplication implements IPlatformRunnable {
     File homeDir;
 
     ApplicationConfig applicationConfig = new ApplicationConfig();
-
     PenroseConfig penroseConfig = new PenroseConfig();
-
     PenroseClient client;
     SchemaManager schemaManager;
     PartitionManager partitionManager;
@@ -77,11 +80,23 @@ public class PenroseApplication implements IPlatformRunnable {
     PenroseWorkbenchAdvisor workbenchAdvisor;
     ArrayList changeListeners = new ArrayList();
 
-    ClassRegistry registry;
     License license;
     Log4jConfig loggingConfig;
 
     boolean dirty = false;
+
+    static {
+        try {
+            Package pkg = PenroseApplication.class.getPackage();
+
+            PRODUCT_NAME    = pkg.getImplementationTitle() == null ? PRODUCT_NAME : pkg.getImplementationTitle();
+            PRODUCT_VERSION = pkg.getImplementationVersion() == null ? PRODUCT_VERSION : pkg.getImplementationVersion();
+            VENDOR_NAME     = pkg.getImplementationVendor() == null ? VENDOR_NAME : pkg.getImplementationVendor();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public PenroseApplication() throws Exception {
 
@@ -91,10 +106,6 @@ public class PenroseApplication implements IPlatformRunnable {
 
         String dir = System.getProperty("user.dir");
         workDir = dir+File.separator+"work";
-
-        Class clazz = Class.forName("org.safehaus.penrose.studio.util.PenroseClassRegistry");
-        Constructor constructor = clazz.getConstructor(new Class[] { ClassLoader.class });
-        registry = (ClassRegistry)constructor.newInstance(new Object[] { getClass().getClassLoader() });
 
         workbenchAdvisor = new PenroseWorkbenchAdvisor();
 
@@ -178,9 +189,10 @@ public class PenroseApplication implements IPlatformRunnable {
 
         log.debug("Opening project from "+dir);
 
-        PenroseConfigReader penroseConfigReader = new PenroseConfigReader(dir+File.separator+"conf"+File.separator+"server.xml");
+        PenroseConfigReader penroseConfigReader = new PenroseConfigReader(dir+"/conf/server.xml");
         penroseConfig = penroseConfigReader.read();
 
+        initSystemProperties();
         initSchemaManager(dir);
         loadPartitions(dir);
         validatePartitions();
@@ -202,6 +214,14 @@ public class PenroseApplication implements IPlatformRunnable {
         }
 
     }
+    public void initSystemProperties() throws Exception {
+        for (Iterator i=penroseConfig.getSystemPropertyNames().iterator(); i.hasNext(); ) {
+            String name = (String)i.next();
+            String value = penroseConfig.getSystemProperty(name);
+
+            System.setProperty(name, value);
+        }
+    }
 
     public void initSchemaManager(String dir) throws Exception {
 
@@ -222,8 +242,13 @@ public class PenroseApplication implements IPlatformRunnable {
     }
 
     public void loadLoggingConfig(String dir) throws Exception {
-        Log4jConfigReader reader = new Log4jConfigReader(new File(dir+File.separator+"conf"+File.separator+"log4j.xml"));
-        loggingConfig = reader.read();
+        try {
+            Log4jConfigReader reader = new Log4jConfigReader(new File(dir+"/conf/log4j.xml"));
+            loggingConfig = reader.read();
+        } catch (Exception e) {
+            log.error("ERROR: "+e.getMessage());
+            loggingConfig = new Log4jConfig();
+        }
     }
 
     public void validatePartitions() throws Exception {
@@ -282,9 +307,6 @@ public class PenroseApplication implements IPlatformRunnable {
     public void connect(Project project) throws Exception {
         client = new PenroseClient(project.getType(), project.getHost(), project.getPort(), project.getUsername(), project.getPassword());
         client.connect();
-
-        String version = client.getProductVersion();
-        if (!version.equals("1.1") && !version.startsWith("1.1.")) throw new Exception("Incompatible server version: "+version);
     }
 
     public void disconnect() throws Exception {
@@ -299,8 +321,8 @@ public class PenroseApplication implements IPlatformRunnable {
         log.debug("-------------------------------------------------------------------------------------");
         log.debug("Saving configuration to "+dir);
 
-        PenroseConfigWriter penroseConfigWriter = new PenroseConfigWriter(dir+File.separator+"conf"+File.separator+"server.xml");
-        penroseConfigWriter.write(penroseConfig);
+        PenroseConfigWriter serverConfigWriter = new PenroseConfigWriter(dir+"/conf/server.xml");
+        serverConfigWriter.write(penroseConfig);
 
         saveLoggingConfig(dir);
 
@@ -420,18 +442,27 @@ public class PenroseApplication implements IPlatformRunnable {
     }
 
     public boolean checkCommercial() {
-        if (!isFreeware()) return true;
+        if (license != null) return true;
 
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        Shell shell = window.getShell();
+        Shell shell = new Shell(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 
+        LicenseDialog licenseDialog = new LicenseDialog(shell);
+        licenseDialog.setText(FEATURE_NOT_AVAILABLE);
+        licenseDialog.open();
+
+        if (licenseDialog.getAction() == LicenseDialog.CANCEL) return false;
+
+        EnterLicenseKeyAction a = new EnterLicenseKeyAction();
+        a.run();
+
+        return license != null;
+/*
         MessageDialog.openError(
                 shell,
                 "Feature Not Available",
                 FEATURE_NOT_AVAILABLE
         );
-
-        return false;
+*/
     }
 
     public boolean isFreeware() {
@@ -441,6 +472,30 @@ public class PenroseApplication implements IPlatformRunnable {
         if (type != null && "FREEWARE".equals(type)) return true;
 
         return false;
+    }
+
+    public void loadLicense() throws Exception {
+
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PublicKey publicKey = penroseApplication.getPublicKey();
+
+        String filename = "penrose.license";
+
+        File file = new File(filename);
+
+        LicenseManager licenseManager = new LicenseManager(publicKey);
+        LicenseReader licenseReader = new LicenseReader(licenseManager);
+        licenseReader.read(file);
+
+        License license = licenseManager.getLicense("Penrose Studio");
+
+        boolean valid = licenseManager.isValid(license);
+        if (!valid) throw new Exception("Invalid license.");
+
+        String type = license.getParameter("type");
+        if (type != null && "FREEWARE".equals(type)) throw new Exception("Invalid license.");
+
+        penroseApplication.setLicense(license);
     }
 
     public License getLicense() {
@@ -476,12 +531,6 @@ public class PenroseApplication implements IPlatformRunnable {
 
     public PenroseWorkbenchAdvisor getWorkbenchAdvisor() {
         return workbenchAdvisor;
-    }
-
-    public Object newInstance(String className, Class[] paramTypes, Object[] paramValues) throws Exception {
-        Class clazz = registry.findClass(className);
-        Constructor constructor = clazz.getConstructor(paramTypes);
-        return constructor.newInstance(paramValues);
     }
 
     public PublicKey getPublicKey() throws Exception {

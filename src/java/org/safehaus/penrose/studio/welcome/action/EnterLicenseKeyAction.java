@@ -29,9 +29,6 @@ import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenroseWorkbenchAdvisor;
 import org.safehaus.penrose.studio.PenroseWorkbenchWindowAdvisor;
 import org.safehaus.penrose.studio.PenroseActionBarAdvisor;
-import org.safehaus.penrose.license.LicenseManager;
-import org.safehaus.penrose.license.LicenseReader;
-import org.safehaus.penrose.license.License;
 
 /**
  * @author Endi S. Dewata
@@ -45,7 +42,7 @@ public class EnterLicenseKeyAction extends Action {
         setId(getClass().getName());
     }
 
-	public void run() {
+    public void run() {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         Shell shell = window.getShell();
 
@@ -64,9 +61,10 @@ public class EnterLicenseKeyAction extends Action {
             FileUtil.copy(filename, licenseFile);
 
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
-
+            penroseApplication.loadLicense();
+/*
             LicenseManager licenseManager = new LicenseManager(penroseApplication.getPublicKey());
-            
+
             LicenseReader licenseReader = new LicenseReader(licenseManager);
             licenseReader.read(licenseFile);
 
@@ -79,13 +77,13 @@ public class EnterLicenseKeyAction extends Action {
             }
 
             penroseApplication.setLicense(license);
-
+*/
             PenroseWorkbenchAdvisor workbenchAdvisor = penroseApplication.getWorkbenchAdvisor();
             PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
             PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
             actionBarAdvisor.getShowCommercialFeaturesAction().setChecked(true);
-            
+
             actionBarAdvisor.fillPartitionMenu();
             actionBarAdvisor.fillHelpMenu();
 
@@ -93,5 +91,5 @@ public class EnterLicenseKeyAction extends Action {
             log.debug(e.getMessage(), e);
             MessageDialog.openError(shell, "Error", e.getMessage());
         }
-	}
+    }
 }

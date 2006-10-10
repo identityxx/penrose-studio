@@ -26,8 +26,6 @@ import org.safehaus.penrose.partition.PartitionReader;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.apache.log4j.Logger;
 
-import java.io.File;
-
 /**
  * @author Endi S. Dewata
  */

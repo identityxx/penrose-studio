@@ -17,8 +17,6 @@
  */
 package org.safehaus.penrose.studio.preview;
 
-import java.io.File;
-
 import javax.naming.NamingEnumeration;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
