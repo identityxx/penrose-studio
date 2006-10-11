@@ -265,26 +265,6 @@
             <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
             <param name="rpm.name" value="${project.name}-${project.version}-1.i386.rpm"/>
         </antcall>
-        <property name="sfx.name" value="${project.name}-${project.version}-1.i386.rpm.bin"/>
-        <echo message="Creating ${sfx.name}"/>
-        <copy tofile="${project.dist}/${sfx.name}" file="bin/sfx-header" overwrite="true"/>
-        <exec executable="/bin/sh">
-            <arg value="-c"/>
-            <arg value="echo __LICENSE__ &gt;&gt; ${project.dist}/${sfx.name}"/>
-        </exec>
-        <exec executable="/bin/sh">
-            <arg value="-c"/>
-            <arg value="cat LICENSE.txt &gt;&gt; ${project.dist}/${sfx.name}"/>
-        </exec>
-        <exec executable="/bin/sh">
-            <arg value="-c"/>
-            <arg value="echo __CONTENT__ &gt;&gt; ${project.dist}/${sfx.name}"/>
-        </exec>
-        <exec executable="/bin/sh">
-            <arg value="-c"/>
-            <arg value="cat dist/${project.name}-${project.version}-1.i386.rpm &gt;&gt; ${project.dist}/${sfx.name}"/>
-        </exec>
-        <chmod file="${project.dist}/${sfx.name}" perm="a+rx" />
     </target>
 
     <target name="dist-macosx" depends="build-macosx" if="isMac">
@@ -379,6 +359,24 @@
         <copy todir="${project.dist}" failonerror="false"
             file="${rpm.home}/RPMS/i386/${rpm.name}">
         </copy>
+        <copy file="bin/sfx-header" tofile="${project.dist}/${rpm.name}.bin" overwrite="true"/>
+        <exec executable="/bin/sh">
+            <arg value="-c"/>
+            <arg value="echo __LICENSE__ &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
+        </exec>
+        <exec executable="/bin/sh">
+            <arg value="-c"/>
+            <arg value="cat LICENSE.txt &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
+        </exec>
+        <exec executable="/bin/sh">
+            <arg value="-c"/>
+            <arg value="echo __CONTENT__ &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
+        </exec>
+        <exec executable="/bin/sh">
+            <arg value="-c"/>
+            <arg value="cat dist/${project.name}-${project.version}-1.i386.rpm &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
+        </exec>
+        <chmod file="${project.dist}/${rpm.name}.bin" perm="a+rx"/>
     </target>
 
     <target name="rpm" depends="rpm-check,rpm-build">
