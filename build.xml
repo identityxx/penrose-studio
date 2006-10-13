@@ -172,7 +172,7 @@
             <fileset dir="docs" includes="*.url"/>
         </copy>
         <copy todir="target/${dist.name}" file="images/penrose.ico"/>
-        <fixcrlf srcDir="target" includes="**/*.txt" eol="unix"/>
+        <fixcrlf srcdir="target" includes="**/*.txt" eol="unix"/>
     </target>
 
     <target name="dist" depends="init">
