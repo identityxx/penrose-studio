@@ -24,15 +24,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/penrose-1.1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/slf4j-log4j12.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -61,15 +52,6 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/commons-digester-1.5.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/xml-apis-2.0.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -186,15 +168,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/license-1.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/hibernate3.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -286,15 +259,6 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/log4j-1.2.13.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/penrose-pro-1.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -421,6 +385,18 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/plugins/org.eclipse.ui_3.1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module" module-name="penrose-1.1" />
+    <orderEntry type="module" module-name="penrose-pro-1.1" />
+    <orderEntry type="module" module-name="license" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/xml-apis-2.8.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

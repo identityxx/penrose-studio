@@ -82,7 +82,7 @@ public class EnterLicenseKeyAction extends Action {
             PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
             PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
-            actionBarAdvisor.getShowCommercialFeaturesAction().setChecked(true);
+            //actionBarAdvisor.getShowCommercialFeaturesAction().setChecked(true);
 
             actionBarAdvisor.fillPartitionMenu();
             actionBarAdvisor.fillHelpMenu();

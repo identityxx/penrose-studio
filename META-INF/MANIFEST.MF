@@ -44,5 +44,5 @@ Bundle-ClassPath: lib/bcprov-jdk14-132.jar,
  lib/postgresql-8.1-405.jdbc3.jar,
  lib/slf4j-log4j12.jar,
  lib/xercesImpl-2.8.0.jar,
- lib/xml-apis-2.0.2.jar,
+ lib/xml-apis-2.8.0.jar,
  lib/zql.jar

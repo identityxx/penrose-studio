@@ -23,10 +23,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.util.JNDIClient;
 import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.ldap.LDAPClient;
 import org.apache.log4j.Logger;
 
 import javax.naming.directory.SearchResult;
@@ -49,7 +49,7 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
 
     Partition partition;
     ConnectionConfig connectionConfig;
-    JNDIClient client;
+    LDAPClient client;
 
     public JNDITreeWizardPage() {
         super(NAME);
@@ -128,7 +128,7 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
 
         try {
             if (client == null) {
-                client = new JNDIClient(connectionConfig.getParameters());
+                client = new LDAPClient(connectionConfig.getParameters());
             }
 
         } catch (Exception e) {

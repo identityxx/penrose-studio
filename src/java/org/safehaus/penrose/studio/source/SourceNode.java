@@ -114,7 +114,7 @@ public class SourceNode extends Node {
         if ("JDBC".equals(con.getAdapterName())) {
             page.openEditor(new JDBCSourceEditorInput(partition, sourceConfig), JDBCSourceEditor.class.getName());
 
-        } else if ("JNDI".equals(con.getAdapterName())) {
+        } else if ("LDAP".equals(con.getAdapterName())) {
             page.openEditor(new JNDISourceEditorInput(partition, sourceConfig), JNDISourceEditor.class.getName());
         }
     }

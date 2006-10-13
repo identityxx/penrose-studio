@@ -62,7 +62,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
     private int defaultType = CONSTANT;
 
-    private boolean needRdn = true;
+    private boolean needRdn = false;
 
     public AttributeValueWizardPage(Partition partition) {
         super(NAME);

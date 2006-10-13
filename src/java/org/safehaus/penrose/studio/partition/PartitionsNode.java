@@ -61,11 +61,11 @@ public class PartitionsNode extends Node {
         PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
         PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
-        if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
+        //if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
             manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
             manager.add(new NewLDAPSnapshotPartitionAction());
             manager.add(new NewLDAPProxyPartitionAction());
-        }
+        //}
     }
 
     public boolean hasChildren() throws Exception {

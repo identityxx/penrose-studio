@@ -27,6 +27,7 @@ import org.eclipse.swt.graphics.Image;
 
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
@@ -49,16 +50,20 @@ public class EnginesNode extends Node {
         Collection children = new ArrayList();
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        EngineConfig engineConfig = penroseApplication.getPenroseConfig().getEngineConfig();
+        Collection engineConfigs = penroseApplication.getPenroseConfig().getEngineConfigs();
 
-        children.add(new EngineNode(
-                view,
-                engineConfig.getName(),
-                ObjectsView.ENGINE,
-                PenrosePlugin.getImage(PenroseImage.ENGINE),
-                engineConfig,
-                this
-        ));
+        for (Iterator i=engineConfigs.iterator(); i.hasNext(); ) {
+            EngineConfig engineConfig = (EngineConfig)i.next();
+
+            children.add(new EngineNode(
+                    view,
+                    engineConfig.getName(),
+                    ObjectsView.ENGINE,
+                    PenrosePlugin.getImage(PenroseImage.ENGINE),
+                    engineConfig,
+                    this
+            ));
+        }
 
         return children;
     }

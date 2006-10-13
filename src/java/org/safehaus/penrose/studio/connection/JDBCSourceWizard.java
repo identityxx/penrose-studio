@@ -70,19 +70,13 @@ public class JDBCSourceWizard extends Wizard {
             sourceConfig.setName(propertyPage.getSourceName());
             sourceConfig.setConnectionName(connectionConfig.getName());
 
+            String catalog = tableConfig.getCatalog();
+            String schema = tableConfig.getSchema();
             String tableName = tableConfig.getName();
 
-            String schema = tableConfig.getSchema();
-            if (schema != null) {
-                tableName = schema+"."+tableName;
-            }
-
-            String catalog = tableConfig.getCatalog();
-            if (catalog != null) {
-                tableName = catalog+"."+tableName;
-            }
-
-            sourceConfig.setParameter(JDBCAdapter.TABLE_NAME, tableName);
+            sourceConfig.setParameter(JDBCAdapter.CATALOG, catalog);
+            sourceConfig.setParameter(JDBCAdapter.SCHEMA, schema);
+            sourceConfig.setParameter(JDBCAdapter.TABLE, tableName);
 
             String filter = fieldsPage.getFilter();
             if (filter != null) {

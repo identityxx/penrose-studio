@@ -49,7 +49,7 @@ public class CreateADSchemaProxyWizard extends Wizard {
         this.partition = partition;
         this.parentMapping = parentMapping;
 
-        connectionPage = new SelectConnectionWizardPage(partition, "JNDI");
+        connectionPage = new SelectConnectionWizardPage(partition, "LDAP");
         connectionPage.setDescription(
                 "Select Active Directory connection. "+
                 "The connection URL should point to the Root DSE (empty base DN)."

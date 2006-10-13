@@ -114,7 +114,7 @@ public class ConnectionNode extends Node {
         if ("JDBC".equals(connectionConfig.getAdapterName())) {
             page.openEditor(new JDBCConnectionEditorInput(partition, connectionConfig), JDBCConnectionEditor.class.getName());
 
-        } else if ("JNDI".equals(connectionConfig.getAdapterName())) {
+        } else if ("LDAP".equals(connectionConfig.getAdapterName())) {
             page.openEditor(new JNDIConnectionEditorInput(partition, connectionConfig), JNDIConnectionEditor.class.getName());
         }
     }

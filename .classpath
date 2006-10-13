@@ -20,7 +20,6 @@
 	<classpathentry kind="lib" path="lib/jmxtools-1.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/junit-3.8.1.jar"/>
 	<classpathentry kind="lib" path="lib/ldap.jar"/>
-	<classpathentry kind="lib" path="lib/license-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.13.jar"/>
 	<classpathentry kind="lib" path="lib/mx4j.jar"/>
 	<classpathentry kind="lib" path="lib/mx4j-tools.jar"/>
@@ -50,5 +49,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/penrose-pro-1.1"/>
 	<classpathentry kind="lib" path="lib/xercesImpl-2.8.0.jar"/>
 	<classpathentry kind="lib" path="lib/xml-apis-2.8.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/license"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

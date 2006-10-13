@@ -68,7 +68,7 @@ public class ConnectionWizard extends Wizard {
         if ("JDBC".equals(adapterName)) {
             if (!jdbcPage.isPageComplete()) return false;
 
-        } else if ("JNDI".equals(adapterName)) {
+        } else if ("LDAP".equals(adapterName)) {
             //if (!jndiPage.isPageComplete()) return false;
             if (!jndiInfoPage.isPageComplete()) return false;
             if (!jndiParametersPage.isPageComplete()) return false;
@@ -93,7 +93,7 @@ public class ConnectionWizard extends Wizard {
             if ("JDBC".equals(adapter)) {
                 return jdbcPage;
 
-            } else if ("JNDI".equals(adapter)) {
+            } else if ("LDAP".equals(adapter)) {
                 //return jndiPage;
                 return jndiInfoPage;
             }
@@ -149,7 +149,7 @@ public class ConnectionWizard extends Wizard {
                 String password = jdbcPage.getParameter(JDBCAdapter.PASSWORD);
                 if (password != null) connectionConfig.setParameter(JDBCAdapter.PASSWORD, password);
 
-            } else if ("JNDI".equals(adapterName)) {
+            } else if ("LDAP".equals(adapterName)) {
                 connectionConfig.setParameter(InitialContext.PROVIDER_URL, jndiInfoPage.getURL()+"/"+jndiInfoPage.getSuffix());
                 connectionConfig.setParameter(InitialContext.SECURITY_PRINCIPAL, jndiInfoPage.getBindDN());
                 connectionConfig.setParameter(InitialContext.SECURITY_CREDENTIALS, jndiInfoPage.getPassword());

@@ -36,6 +36,7 @@ import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.connector.ConnectorNode;
 import org.safehaus.penrose.studio.engine.EngineNode;
+import org.safehaus.penrose.studio.engine.EnginesNode;
 import org.safehaus.penrose.studio.schema.SchemasNode;
 import org.safehaus.penrose.studio.cache.CachesNode;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
@@ -142,12 +143,12 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                 null);
         nodes.add(loggingNode);
 
-        nodes.add(new EngineNode(
+        nodes.add(new EnginesNode(
                 this,
-                ENGINE,
-                ENGINE,
-                PenrosePlugin.getImage(PenroseImage.ENGINE),
-                ENGINE,
+                ENGINES,
+                ENGINES,
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                ENGINES,
                 this
         ));
 

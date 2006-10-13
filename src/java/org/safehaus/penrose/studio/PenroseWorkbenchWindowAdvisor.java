@@ -65,7 +65,7 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         try {
             penroseApplication.loadLicense();
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error(e.getMessage());
         }
 
         try {

@@ -67,11 +67,11 @@ public class JNDIConnectionEditor extends FormEditor {
             PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
             PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
-            if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
+            //if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
 
                 addPage(new JNDIConnectionBrowserPage(this));
                 addPage(new JNDIConnectionSchemaPage(this));
-            }
+            //}
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

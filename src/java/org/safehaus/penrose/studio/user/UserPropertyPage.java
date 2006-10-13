@@ -25,7 +25,6 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.*;
-import org.safehaus.penrose.studio.user.UserEditor;
 import org.safehaus.penrose.user.UserConfig;
 
 /**

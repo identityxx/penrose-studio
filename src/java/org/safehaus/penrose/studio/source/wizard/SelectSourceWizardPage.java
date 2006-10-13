@@ -183,7 +183,7 @@ public class SelectSourceWizardPage extends WizardPage {
         for (Iterator i=sourceConfigs.iterator(); i.hasNext(); ) {
             SourceConfig sourceConfig = (SourceConfig)i.next();
             ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
-            if (!"JNDI".equals(connectionConfig.getAdapterName())) continue;
+            if (!"LDAP".equals(connectionConfig.getAdapterName())) continue;
 
             TableItem item = new TableItem(sourceTable, SWT.NONE);
             item.setText(sourceConfig.getName());

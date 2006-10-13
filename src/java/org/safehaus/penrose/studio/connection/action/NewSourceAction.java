@@ -63,7 +63,7 @@ public class NewSourceAction extends Action {
                 dialog.setPageSize(600, 300);
                 dialog.open();
 
-            } else if ("JNDI".equals(adapterName)) {
+            } else if ("LDAP".equals(adapterName)) {
                 JNDISourceWizard wizard = new JNDISourceWizard(partition, connectionConfig);
                 WizardDialog dialog = new WizardDialog(shell, wizard);
                 dialog.setPageSize(600, 300);

@@ -69,14 +69,15 @@ public class RootEntryWizard extends Wizard {
     }
 
     public IWizardPage getNextPage(IWizardPage page) {
-        if (dnPage == page) {
-            String dn = dnPage.getDn();
-            Row rdn = EntryUtil.getRdn(dn);
-            attrPage.setRdn(rdn);
-
-        } else if (ocPage == page) {
+        if (ocPage == page) {
             Collection objectClasses = ocPage.getSelectedObjectClasses();
             attrPage.setObjectClasses(objectClasses);
+
+            if (!objectClasses.isEmpty()) {
+                String dn = dnPage.getDn();
+                Row rdn = EntryUtil.getRdn(dn);
+                attrPage.setRdn(rdn);
+            }
         }
 
         return super.getNextPage(page);

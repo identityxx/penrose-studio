@@ -91,8 +91,7 @@ public class EngineNode extends Node {
 
     public void open() throws Exception {
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        EngineConfig engineConfig = penroseApplication.getPenroseConfig().getEngineConfig();
+        EngineConfig engineConfig = (EngineConfig)getObject();
         EngineEditorInput ei = new EngineEditorInput(engineConfig);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

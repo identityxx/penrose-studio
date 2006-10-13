@@ -69,7 +69,7 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
         }
 /*
         Driver jndi = new Driver("LDAP");
-        jndi.setAdapterName("JNDI");
+        jndi.setAdapterName("LDAP");
         jndi.addParameter(new HiddenParameter("java.naming.factory.initial", "Driver", "com.sun.jndi.ldap.LdapCtxFactory"));
         jndi.addParameter(new HiddenParameter("java.naming.provider.url", "URL", "ldap://${host}:${port}/${baseDn}"));
         jndi.addParameter(new RequiredParameter("host", "Host", "localhost"));

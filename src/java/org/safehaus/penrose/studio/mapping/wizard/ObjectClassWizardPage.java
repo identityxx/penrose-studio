@@ -95,7 +95,6 @@ public class ObjectClassWizardPage extends WizardPage {
                 }
 
                 refresh();
-                setPageComplete(validatePage());
             }
         });
 
@@ -141,7 +140,6 @@ public class ObjectClassWizardPage extends WizardPage {
                 }
 
                 refresh();
-                setPageComplete(validatePage());
             }
         });
 
@@ -156,7 +154,6 @@ public class ObjectClassWizardPage extends WizardPage {
                 availableOCs.clear();
 
                 refresh();
-                setPageComplete(validatePage());
             }
         });
 
@@ -171,14 +168,12 @@ public class ObjectClassWizardPage extends WizardPage {
                 selectedOCs.clear();
 
                 refresh();
-                setPageComplete(validatePage());
             }
         });
 
         selectedTable = new Table(composite, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
         selectedTable.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        setPageComplete(validatePage());
     }
 
     public void setVisible(boolean visible) {
@@ -235,9 +230,5 @@ public class ObjectClassWizardPage extends WizardPage {
 
     public Collection getSelectedObjectClasses() {
         return selectedOCs;
-    }
-
-    public boolean validatePage() {
-        return !selectedOCs.isEmpty();
     }
 }

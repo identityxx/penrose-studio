@@ -65,7 +65,7 @@ public class SelectJNDIConnectionWizardPage extends WizardPage {
         Collection connectionConfigs = partition.getConnectionConfigs();
         for (Iterator i=connectionConfigs.iterator(); i.hasNext(); ) {
             ConnectionConfig connectionConfig = (ConnectionConfig)i.next();
-            if (!"JNDI".equals(connectionConfig.getAdapterName())) continue;
+            if (!"LDAP".equals(connectionConfig.getAdapterName())) continue;
 
             TableItem item = new TableItem(connectionTable, SWT.NONE);
             item.setText(connectionConfig.getName());

@@ -58,13 +58,13 @@ public class DirectoryNode extends Node {
         PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
         PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
-        if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
+        //if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
             manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
             manager.add(new MapLDAPTreeFromTopAction(this));
             manager.add(new MapRootDSEAction(this));
             manager.add(new MapADSchemaAction(this));
             manager.add(new CreateLDAPSnapshotEntryAction(this));
-        }
+        //}
     }
 
     public boolean hasChildren() throws Exception {

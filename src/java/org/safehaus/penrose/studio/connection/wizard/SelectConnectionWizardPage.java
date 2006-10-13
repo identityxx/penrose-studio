@@ -105,7 +105,7 @@ public class SelectConnectionWizardPage extends WizardPage {
                     ti.setText(0, "Password:");
                     ti.setText(1, "********");
 
-                } else if ("JNDI".equals(adapterName)) {
+                } else if ("LDAP".equals(adapterName)) {
                     ti = new TableItem(infoTable, SWT.NONE);
                     ti.setText(0, "URL:");
                     ti.setText(1, connectionConfig.getParameter(Context.PROVIDER_URL));

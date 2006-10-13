@@ -154,9 +154,9 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
         helpMenu.add(new Separator());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        if (penroseApplication.isFreeware()) {
-            helpMenu.add(showCommercialFeaturesAction);
-        }
+        //if (penroseApplication.isFreeware()) {
+        //    helpMenu.add(showCommercialFeaturesAction);
+        //}
 
         helpMenu.add(enterLicenseKeyAction);
 

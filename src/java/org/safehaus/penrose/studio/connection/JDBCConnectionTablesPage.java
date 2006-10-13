@@ -81,13 +81,13 @@ public class JDBCConnectionTablesPage extends FormPage {
         body.setLayout(new GridLayout());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-
+/*
         if (penroseApplication.isFreeware()) {
             Label label = toolkit.createLabel(body, PenroseApplication.FEATURE_NOT_AVAILABLE);
             label.setLayoutData(new GridData(GridData.FILL_BOTH));
             return;
         }
-
+*/
         Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Actions");
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -97,7 +97,7 @@ public class JDBCConnectionTablesPage extends FormPage {
 
         section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Catalogs and Schema");
-        section.setLayoutData(new GridData(GridData.FILL_BOTH));
+        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Control catalogsSection = createCatalogsSection(section);
         section.setClient(catalogsSection);
@@ -111,7 +111,7 @@ public class JDBCConnectionTablesPage extends FormPage {
 
         refresh();
         showTableNames();
-        showFieldNames();
+        //showFieldNames();
     }
 
     public Composite createActionsSection(final Composite parent) {
@@ -171,6 +171,7 @@ public class JDBCConnectionTablesPage extends FormPage {
         String username = connectionConfig.getParameter(JDBCAdapter.USER);
 
         if ("oracle.jdbc.driver.OracleDriver".equals(driver)) {
+            log.debug("Setting Oracle's default schema to "+username.toUpperCase());
             schemaCombo.setText(username.toUpperCase());
         }
 
@@ -237,26 +238,46 @@ public class JDBCConnectionTablesPage extends FormPage {
 
     public void refresh() {
         try {
+            log.debug("Refreshing information");
+
+            String catalog = catalogCombo.getText();
             catalogCombo.removeAll();
+
+            String schema = schemaCombo.getText();
             schemaCombo.removeAll();
 
             JDBCClient client = new JDBCClient(connectionConfig.getParameters());
             client.connect();
 
             Collection catalogs = client.getCatalogs();
-            Collection schemas = client.getSchemas();
 
-            client.close();
-
+            catalogCombo.add("");
             for (Iterator i=catalogs.iterator(); i.hasNext(); ) {
                 String catalogName = (String)i.next();
                 catalogCombo.add(catalogName);
             }
 
+            if (catalogs.contains(catalog)) {
+                catalogCombo.setText(catalog);
+            } else {
+                catalogCombo.select(0);
+            }
+
+            Collection schemas = client.getSchemas();
+
+            schemaCombo.add("");
             for (Iterator i=schemas.iterator(); i.hasNext(); ) {
                 String schemaName = (String)i.next();
                 schemaCombo.add(schemaName);
             }
+
+            if (schemas.contains(schema)) {
+                schemaCombo.setText(schema);
+            } else {
+                schemaCombo.select(0);
+            }
+
+            client.close();
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
@@ -282,6 +303,8 @@ public class JDBCConnectionTablesPage extends FormPage {
 
     public void showTableNames() {
         try {
+            log.debug("Updating table names");
+
             tablesTable.removeAll();
 
             JDBCClient client = new JDBCClient(connectionConfig.getParameters());
@@ -316,6 +339,8 @@ public class JDBCConnectionTablesPage extends FormPage {
 
     public void showFieldNames() {
         try {
+            log.debug("Updating field names");
+
             fieldsTable.removeAll();
 
             if (tablesTable.getSelectionCount() == 0) return;

@@ -67,7 +67,7 @@ public class DriverPropertyPage extends WizardPage implements ModifyListener {
 
         adapterNameCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
         adapterNameCombo.add("JDBC");
-        adapterNameCombo.add("JNDI");
+        adapterNameCombo.add("LDAP");
         adapterNameCombo.select(0);
         adapterNameCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         adapterNameCombo.addModifyListener(this);

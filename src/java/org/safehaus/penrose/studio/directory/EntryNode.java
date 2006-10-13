@@ -141,11 +141,11 @@ public class EntryNode extends Node {
         PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
         PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
-        if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
+        //if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
             manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
             manager.add(new NewEntryFromSourceAction(this));
             manager.add(new MapLDAPTreeAction(this));
-        }
+        //}
 
     }
 

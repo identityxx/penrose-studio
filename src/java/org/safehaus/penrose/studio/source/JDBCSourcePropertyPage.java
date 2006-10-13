@@ -43,7 +43,9 @@ public class JDBCSourcePropertyPage extends FormPage {
     Text sourceNameText;
 	Combo connectionNameCombo;
 
-	Text tableNameText;
+    Text catalogText;
+    Text schemaText;
+	Text tableText;
     Text filterText;
 	Table fieldTable;
 
@@ -147,22 +149,69 @@ public class JDBCSourcePropertyPage extends FormPage {
 		Composite composite = toolkit.createComposite(parent);
 		composite.setLayout(new GridLayout(2, false));
 
-		Label tableNameLabel = toolkit.createLabel(composite, "Table Name:");
+        Label catalogLabel = toolkit.createLabel(composite, "Catalog:");
         GridData gd = new GridData(GridData.FILL);
         gd.widthHint = 100;
-        tableNameLabel.setLayoutData(gd);
+        catalogLabel.setLayoutData(gd);
 
-		tableNameText = toolkit.createText(composite, sourceConfig.getParameter("tableName"), SWT.BORDER);
+        catalogText = toolkit.createText(composite, sourceConfig.getParameter(JDBCAdapter.CATALOG), SWT.BORDER);
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
-        tableNameText.setLayoutData(gd);
+        catalogText.setLayoutData(gd);
 
-        tableNameText.addModifyListener(new ModifyListener() {
+        catalogText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                if ("".equals(tableNameText.getText())) {
-                    sourceConfig.removeParameter("tableName");
+                if ("".equals(catalogText.getText())) {
+                    sourceConfig.removeParameter(JDBCAdapter.CATALOG);
                 } else {
-                    sourceConfig.setParameter("tableName", tableNameText.getText());
+                    sourceConfig.setParameter(JDBCAdapter.CATALOG, catalogText.getText());
+                }
+                checkDirty();
+            }
+        });
+
+        Label schemaLabel = toolkit.createLabel(composite, "Schema:");
+        gd = new GridData(GridData.FILL);
+        gd.widthHint = 100;
+        schemaLabel.setLayoutData(gd);
+
+        schemaText = toolkit.createText(composite, sourceConfig.getParameter(JDBCAdapter.SCHEMA), SWT.BORDER);
+        gd = new GridData(GridData.FILL);
+        gd.widthHint = 200;
+        schemaText.setLayoutData(gd);
+
+        schemaText.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent event) {
+                if ("".equals(schemaText.getText())) {
+                    sourceConfig.removeParameter(JDBCAdapter.SCHEMA);
+                } else {
+                    sourceConfig.setParameter(JDBCAdapter.SCHEMA, schemaText.getText());
+                }
+                checkDirty();
+            }
+        });
+
+		Label tableLabel = toolkit.createLabel(composite, "Table:");
+        gd = new GridData(GridData.FILL);
+        gd.widthHint = 100;
+        tableLabel.setLayoutData(gd);
+
+        String tableName = sourceConfig.getParameter(JDBCAdapter.TABLE);
+        if (tableName == null) tableName = sourceConfig.getParameter(JDBCAdapter.TABLE_NAME);
+
+		tableText = toolkit.createText(composite, tableName, SWT.BORDER);
+        gd = new GridData(GridData.FILL);
+        gd.widthHint = 200;
+        tableText.setLayoutData(gd);
+
+        tableText.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent event) {
+                if ("".equals(tableText.getText())) {
+                    sourceConfig.removeParameter(JDBCAdapter.TABLE);
+                    sourceConfig.removeParameter(JDBCAdapter.TABLE_NAME);
+                } else {
+                    sourceConfig.setParameter(JDBCAdapter.TABLE, tableText.getText());
+                    sourceConfig.removeParameter(JDBCAdapter.TABLE_NAME);
                 }
                 checkDirty();
             }
@@ -219,7 +268,12 @@ public class JDBCSourcePropertyPage extends FormPage {
 
                     ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
 
-                    String tableName = sourceConfig.getParameter(JDBCAdapter.TABLE_NAME);
+                    String catalog = sourceConfig.getParameter(JDBCAdapter.CATALOG);
+                    String schema = sourceConfig.getParameter(JDBCAdapter.SCHEMA);
+                    String tableName = sourceConfig.getParameter(JDBCAdapter.TABLE);
+                    if (tableName == null) tableName = sourceConfig.getParameter(JDBCAdapter.TABLE_NAME);
+                    if (catalog != null) tableName = catalog +"."+tableName;
+                    if (schema != null) tableName = schema +"."+tableName;
 
                     JDBCClient client = new JDBCClient(connectionConfig.getParameters());
                     
@@ -304,7 +358,12 @@ public class JDBCSourcePropertyPage extends FormPage {
 
                     ConnectionConfig connection = partition.getConnectionConfig(sourceConfig.getConnectionName());
 
-                    String tableName = sourceConfig.getParameter(JDBCAdapter.TABLE_NAME);
+                    String catalogName = sourceConfig.getParameter(JDBCAdapter.CATALOG);
+                    String schemaName = sourceConfig.getParameter(JDBCAdapter.SCHEMA);
+                    String tableName = sourceConfig.getParameter(JDBCAdapter.TABLE);
+                    if (tableName == null) tableName = sourceConfig.getParameter(JDBCAdapter.TABLE_NAME);
+                    if (catalogName != null) tableName = catalogName+"."+tableName;
+                    if (schemaName != null) tableName = schemaName+"."+tableName;
 
                     JDBCClient helper = new JDBCClient(
                             connection.getParameter(JDBCAdapter.DRIVER),
@@ -354,7 +413,12 @@ public class JDBCSourcePropertyPage extends FormPage {
 
                     ConnectionConfig connection = partition.getConnectionConfig(sourceConfig.getConnectionName());
 
-                    String tableName = sourceConfig.getParameter(JDBCAdapter.TABLE_NAME);
+                    String catalogName = sourceConfig.getParameter(JDBCAdapter.CATALOG);
+                    String schemaName = sourceConfig.getParameter(JDBCAdapter.SCHEMA);
+                    String tableName = sourceConfig.getParameter(JDBCAdapter.TABLE);
+                    if (tableName == null) tableName = sourceConfig.getParameter(JDBCAdapter.TABLE_NAME);
+                    if (catalogName != null) tableName = catalogName+"."+tableName;
+                    if (schemaName != null) tableName = schemaName+"."+tableName;
 
                     JDBCClient helper = new JDBCClient(
                             connection.getParameter(JDBCAdapter.DRIVER),

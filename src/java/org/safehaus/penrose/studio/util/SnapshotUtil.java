@@ -3,11 +3,11 @@ package org.safehaus.penrose.studio.util;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.util.JNDIClient;
 import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.Row;
 import org.safehaus.penrose.mapping.AttributeMapping;
+import org.safehaus.penrose.ldap.LDAPClient;
 
 import javax.naming.directory.SearchResult;
 import javax.naming.directory.Attributes;
@@ -22,11 +22,11 @@ import java.util.ArrayList;
  */
 public class SnapshotUtil {
 
-    public void createSnapshot(Partition partition, JNDIClient client) throws Exception {
+    public void createSnapshot(Partition partition, LDAPClient client) throws Exception {
         createEntries(partition, client, "");
     }
     
-    public void createEntries(Partition partition, JNDIClient client, String baseDn) throws Exception {
+    public void createEntries(Partition partition, LDAPClient client, String baseDn) throws Exception {
         if ("".equals(baseDn)) {
             SearchResult entry = client.getEntry(baseDn);
             if (entry == null) return;
@@ -69,7 +69,7 @@ public class SnapshotUtil {
         return newRdn+","+normalize(schema, parentDn);
     }
 
-    public EntryMapping createMapping(JNDIClient client, SearchResult entry) throws Exception {
+    public EntryMapping createMapping(LDAPClient client, SearchResult entry) throws Exception {
 
         Schema schema = client.getSchema();
 

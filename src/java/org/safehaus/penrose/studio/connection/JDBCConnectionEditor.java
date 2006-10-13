@@ -67,10 +67,9 @@ public class JDBCConnectionEditor extends FormEditor {
             PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
             PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
-            if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
-
+            //if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
                 addPage(new JDBCConnectionTablesPage(this));
-            }
+            //}
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
