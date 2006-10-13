@@ -374,7 +374,7 @@
         </exec>
         <exec executable="/bin/sh">
             <arg value="-c"/>
-            <arg value="cat dist/${project.name}-${project.version}-1.i386.rpm &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
+            <arg value="cat ${project.dist}/${rpm.name} &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
         </exec>
         <chmod file="${project.dist}/${rpm.name}.bin" perm="a+rx"/>
     </target>
