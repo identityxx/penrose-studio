@@ -54,7 +54,12 @@
 
     <target name="build-tools" depends="init">
         <mkdir dir="target/tools"/>
-        <javac srcdir="src/tools" destdir="target/tools"/>
+        <javac
+            srcdir="src/tools"
+            destdir="target/tools"
+            source="1.4"
+            target="1.4"
+        />
         <jar destfile="target/penrose-studio-tools-${project.version}.jar" basedir="target/tools"/>
     </target>
 
@@ -79,11 +84,9 @@
             srcdir="src/java"
             destdir="target/classes"
             classpathref="lib.path"
-        />
-<!--
             source="1.4"
             target="1.4"
--->
+        />
         <copy todir="target/classes">
             <fileset dir="src/java">
                 <include name="**/*.xml"/>
