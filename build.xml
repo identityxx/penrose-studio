@@ -363,19 +363,19 @@
             file="${rpm.home}/RPMS/i386/${rpm.name}">
         </copy>
         <copy file="bin/sfx-header" tofile="${project.dist}/${rpm.name}.bin" overwrite="true"/>
-        <exec executable="/bin/sh">
+        <exec executable="${rpm.prefix}/bin/sh">
             <arg value="-c"/>
             <arg value="echo __LICENSE__ &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
         </exec>
-        <exec executable="/bin/sh">
+        <exec executable="${rpm.prefix}/bin/sh">
             <arg value="-c"/>
             <arg value="cat LICENSE.txt &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
         </exec>
-        <exec executable="/bin/sh">
+        <exec executable="${rpm.prefix}/bin/sh">
             <arg value="-c"/>
             <arg value="echo __CONTENT__ &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
         </exec>
-        <exec executable="/bin/sh">
+        <exec executable="${rpm.prefix}/bin/sh">
             <arg value="-c"/>
             <arg value="cat ${project.dist}/${rpm.name} &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
         </exec>
