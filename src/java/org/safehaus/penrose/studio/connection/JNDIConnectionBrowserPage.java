@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2005, Identyx Corporation.
+ * Copyright (c) 2000-2006, Identyx Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,12 +33,12 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.util.JNDIClient;
 import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.studio.connection.wizard.JNDISourceWizard;
 import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.ldap.LDAPClient;
 import org.apache.log4j.Logger;
 
 import javax.naming.directory.SearchResult;
@@ -85,13 +85,13 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
         body.setLayout(new GridLayout());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-
+/*
         if (penroseApplication.isFreeware()) {
             Label label = toolkit.createLabel(body, PenroseApplication.FEATURE_NOT_AVAILABLE);
             label.setLayoutData(new GridData(GridData.FILL_BOTH));
             return;
         }
-
+*/
         Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Actions");
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -148,7 +148,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
                     TreeItem ti = tree.getSelection()[0];
                     SearchResult entry = (SearchResult)ti.getData();
 
-                    JNDIClient client = new JNDIClient(connectionConfig.getParameters());
+                    LDAPClient client = new LDAPClient(connectionConfig.getParameters());
                     showEntry(client, entry);
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -167,7 +167,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
         mi.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    JNDIClient client = new JNDIClient(connectionConfig.getParameters());
+                    LDAPClient client = new LDAPClient(connectionConfig.getParameters());
                     Schema schema = client.getSchema();
 
                     TreeItem treeItem = tree.getSelection()[0];
@@ -205,7 +205,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
         mi.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    JNDIClient client = new JNDIClient(connectionConfig.getParameters());
+                    LDAPClient client = new LDAPClient(connectionConfig.getParameters());
 
                     TreeItem treeItem = tree.getSelection()[0];
                     SearchResult entry = (SearchResult)treeItem.getData();
@@ -240,7 +240,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
         mi.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    JNDIClient client = new JNDIClient(connectionConfig.getParameters());
+                    LDAPClient client = new LDAPClient(connectionConfig.getParameters());
                     Schema schema = client.getSchema();
 
                     TreeItem treeItem = tree.getSelection()[0];
@@ -355,7 +355,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
         return composite;
     }
 
-    public void showEntry(JNDIClient client, SearchResult entry) throws Exception {
+    public void showEntry(LDAPClient client, SearchResult entry) throws Exception {
         table.removeAll();
 
         Attributes attributes = entry.getAttributes();
@@ -379,7 +379,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
         try {
             tree.removeAll();
 
-            JNDIClient client = new JNDIClient(connectionConfig.getParameters());
+            LDAPClient client = new LDAPClient(connectionConfig.getParameters());
             SearchResult root = client.getEntry("");
             if (root == null) return;
 
@@ -438,7 +438,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
                 items[i].dispose();
             }
 
-            JNDIClient client = new JNDIClient(connectionConfig.getParameters());
+            LDAPClient client = new LDAPClient(connectionConfig.getParameters());
             Collection results = client.getChildren(baseDn);
 
             for (Iterator i=results.iterator(); i.hasNext(); ) {

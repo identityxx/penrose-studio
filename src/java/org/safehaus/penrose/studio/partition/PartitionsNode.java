@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2005, Identyx Corporation.
+ * Copyright (c) 2000-2006, Identyx Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,11 +61,11 @@ public class PartitionsNode extends Node {
         PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
         PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
-        if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
+        //if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
             manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
             manager.add(new NewLDAPSnapshotPartitionAction());
             manager.add(new NewLDAPProxyPartitionAction());
-        }
+        //}
     }
 
     public boolean hasChildren() throws Exception {

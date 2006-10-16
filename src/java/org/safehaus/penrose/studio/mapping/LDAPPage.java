@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2005, Identyx Corporation.
+ * Copyright (c) 2000-2006, Identyx Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -255,7 +255,7 @@ public class LDAPPage extends FormPage {
                         AttributeMapping ad = (AttributeMapping)item.getData();
 
                         item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
-                        ad.setRdn(item.getChecked());
+                        ad.setRdn(item.getChecked()+"");
                     }
                     refreshRdn();
                     checkDirty();
@@ -275,7 +275,7 @@ public class LDAPPage extends FormPage {
                         AttributeMapping ad = (AttributeMapping)item.getData();
 
                         item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
-                        ad.setRdn(item.getChecked());
+                        ad.setRdn(item.getChecked()+"");
                     }
                     refreshRdn();
                     checkDirty();
@@ -465,7 +465,7 @@ public class LDAPPage extends FormPage {
             }
 
             TableItem item = new TableItem(attributeTable, SWT.CHECK);
-            item.setChecked(ad.isRdn());
+            item.setChecked("true".equals(ad.getRdn()));
             item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
             item.setText(0, ad.getName());
             item.setText(1, value == null ? "" : value);
@@ -524,8 +524,9 @@ public class LDAPPage extends FormPage {
 
         //log.debug("Rdn:");
 
-        for (Iterator i=entry.getRdnAttributes().iterator(); i.hasNext(); ) {
+        for (Iterator i=entry.getAttributeMappings().iterator(); i.hasNext(); ) {
             AttributeMapping ad = (AttributeMapping)i.next();
+            if (!"true".equals(ad.getRdn())) continue;
             String name = ad.getName();
             Object constant = ad.getConstant();
             if (constant != null) {

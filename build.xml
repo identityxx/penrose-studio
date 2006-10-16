@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <!-- ====================================================================== 
-	 Copyright (c) 2000-2005, Identyx Corporation.
-	 All rights reserved.
+         Copyright (c) 2000-2006, Identyx Corporation.
+         All rights reserved.
      ====================================================================== -->
 <project name="penrose-studio" default="compile">
 
     <description>Penrose Studio</description>
-	
+
     <property name="project.name" value="penrose-studio"/>
-	<property name="project.version" value="1.1"/>
+    <property name="project.version" value="1.1"/>
     <property name="project.dist" value="dist"/>
 
     <property name="prefix" value=""/>
@@ -43,18 +43,23 @@
     </target>
 
     <target name="import" depends="init">
-        <copy todir="lib" file="../penrose-1.1/lib/penrose-${penrose.version}.jar"/>
-        <copy todir="lib" file="../penrose-1.1/target/penrose-pro-${penrose.version}.jar"/>
+        <copy todir="lib" file="../penrose-pro/lib/penrose-${penrose.version}.jar"/>
+        <copy todir="lib" file="../penrose-pro/target/penrose-pro-${penrose.version}.jar"/>
     </target>
 
     <target name="clean" depends="init">
         <delete dir="${project.dist}" failonerror="false"/>
-    	<delete dir="target" failonerror="false"/>
+        <delete dir="target" failonerror="false"/>
     </target>
 
     <target name="build-tools" depends="init">
         <mkdir dir="target/tools"/>
-        <javac srcdir="src/tools" destdir="target/tools"/>
+        <javac
+            srcdir="src/tools"
+            destdir="target/tools"
+            source="1.4"
+            target="1.4"
+        />
         <jar destfile="target/penrose-studio-tools-${project.version}.jar" basedir="target/tools"/>
     </target>
 
@@ -74,42 +79,40 @@
     </target>
 
     <target name="compile" depends="manifest">
-    	<mkdir dir="target/classes"/>
-    	<javac
+        <mkdir dir="target/classes"/>
+        <javac
             srcdir="src/java"
             destdir="target/classes"
             classpathref="lib.path"
-        />
-<!--
             source="1.4"
             target="1.4"
--->
-    	<copy todir="target/classes">
-    		<fileset dir="src/java">
-    			<include name="**/*.xml"/>
-    			<include name="**/*.dtd"/>
-    			<include name="**/*.properties"/>
-				<include name="**/*.gif"/>
-				<include name="**/*.jpg"/>
-				<include name="**/*.png"/>
-				<include name="**/*.ico"/>
-    		</fileset>
-    		<fileset dir=".">
-    			<include name="plugin.xml"/>
-    		</fileset>
-    	</copy>
-    	<jar basedir="target/classes" destfile="target/${project.name}-${project.version}.jar">
-    		<patternset>
-    			<exclude name="**/.svn"/>
-    		</patternset>
+        />
+        <copy todir="target/classes">
+            <fileset dir="src/java">
+                <include name="**/*.xml"/>
+                <include name="**/*.dtd"/>
+                <include name="**/*.properties"/>
+                <include name="**/*.gif"/>
+                <include name="**/*.jpg"/>
+                <include name="**/*.png"/>
+                <include name="**/*.ico"/>
+            </fileset>
+            <fileset dir=".">
+                <include name="plugin.xml"/>
+            </fileset>
+        </copy>
+        <jar basedir="target/classes" destfile="target/${project.name}-${project.version}.jar">
+            <patternset>
+                <exclude name="**/.svn"/>
+            </patternset>
             <manifest>
-              <attribute name="Specification-Version"  value="1.0"/>
-              <attribute name="Implementation-Title"   value="Penrose Studio"/>
-              <attribute name="Implementation-Version" value="${project.version}"/>
-              <attribute name="Implementation-Vendor"  value="Identyx Corporation"/>
-              <attribute name="Built-Date" value="${DSTAMP}"/>
+                <attribute name="Specification-Version"  value="1.0"/>
+                <attribute name="Implementation-Title"   value="Penrose Studio"/>
+                <attribute name="Implementation-Version" value="${project.version}"/>
+                <attribute name="Implementation-Vendor"  value="Identyx Corporation"/>
+                <attribute name="Built-Date" value="${DSTAMP}"/>
             </manifest>
-    	</jar>
+        </jar>
     </target>
 
     <target name="build" depends="compile">
@@ -172,7 +175,7 @@
             <fileset dir="docs" includes="*.url"/>
         </copy>
         <copy todir="target/${dist.name}" file="images/penrose.ico"/>
-        <fixcrlf srcDir="target" includes="**/*.txt" eol="unix"/>
+        <fixcrlf srcdir="target" includes="**/*.txt" eol="unix"/>
     </target>
 
     <target name="dist" depends="init">
@@ -190,7 +193,7 @@
             <fileset dir="target/eclipse"/>
         </move>
         <move file="target/${dist.name}/eclipse" tofile="target/${dist.name}/${project.name}"/>
-        <chmod file="target/${dist.name}/${project.name}" perm="ugo+rx"/>
+        <chmod file="target/${dist.name}/${project.name}" perm="a+rx"/>
         <antcall target="build">
             <param name="platform" value="${platform}"/>
         </antcall>
@@ -210,7 +213,7 @@
             file="rcp/org.eclipse.swt.carbon.macosx.ppc_3.1.0.jar"
             overwrite="true"
         />
-        <chmod file="target/${dist.name}/eclipse" perm="ugo+rx"/>
+        <chmod file="target/${dist.name}/eclipse" perm="a+rx"/>
         <antcall target="build">
             <param name="platform" value="${platform}"/>
         </antcall>
@@ -287,7 +290,7 @@
             file="target/${dist.name}/${app.name}/Contents/MacOS/eclipse"
         />
 -->
-        <chmod file="target/${dist.name}/${app.name}/Contents/MacOS/eclipse" perm="ugo+rx" />
+        <chmod file="target/${dist.name}/${app.name}/Contents/MacOS/eclipse" perm="a+rx" />
         <copy todir="target/${dist.name}/${app.name}/Contents" file="rcp/Info.plist" overwrite="true">
             <filterchain>
                 <expandproperties/>
@@ -359,6 +362,24 @@
         <copy todir="${project.dist}" failonerror="false"
             file="${rpm.home}/RPMS/i386/${rpm.name}">
         </copy>
+        <copy file="bin/sfx-header" tofile="${project.dist}/${rpm.name}.bin" overwrite="true"/>
+        <exec executable="${rpm.prefix}/bin/sh">
+            <arg value="-c"/>
+            <arg value="echo __LICENSE__ &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
+        </exec>
+        <exec executable="${rpm.prefix}/bin/sh">
+            <arg value="-c"/>
+            <arg value="cat LICENSE.txt &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
+        </exec>
+        <exec executable="${rpm.prefix}/bin/sh">
+            <arg value="-c"/>
+            <arg value="echo __CONTENT__ &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
+        </exec>
+        <exec executable="${rpm.prefix}/bin/sh">
+            <arg value="-c"/>
+            <arg value="cat ${project.dist}/${rpm.name} &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
+        </exec>
+        <chmod file="${project.dist}/${rpm.name}.bin" perm="a+rx"/>
     </target>
 
     <target name="rpm" depends="rpm-check,rpm-build">
@@ -374,7 +395,7 @@
         <antcall target="install-dist">
             <param name="platform" value="linux-gtk"/>
         </antcall>
-        <chmod dir="${penrose.studio.home}" perm="ugo+rx" includes="penrose-studio"/>
+        <chmod dir="${penrose.studio.home}" includes="penrose-studio" perm="a+rx" />
     </target>
 
     <target name="install-macosx" if="isMac">

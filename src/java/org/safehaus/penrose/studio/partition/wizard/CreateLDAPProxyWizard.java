@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2005, Identyx Corporation.
+ * Copyright (c) 2000-2006, Identyx Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -90,7 +90,7 @@ public class CreateLDAPProxyWizard extends Wizard {
 
             ConnectionConfig connectionConfig = new ConnectionConfig();
             connectionConfig.setName(name);
-            connectionConfig.setAdapterName("JNDI");
+            connectionConfig.setAdapterName("LDAP");
             connectionConfig.setParameter(InitialContext.PROVIDER_URL, connectionInfoPage.getURL()+"/");
             connectionConfig.setParameter(InitialContext.SECURITY_PRINCIPAL, connectionInfoPage.getBindDN());
             connectionConfig.setParameter(InitialContext.SECURITY_CREDENTIALS, connectionInfoPage.getPassword());
@@ -161,7 +161,7 @@ public class CreateLDAPProxyWizard extends Wizard {
                 schemaMapping.addACI(new ACI("rs"));
             }
 
-            //AdapterConfig adapterConfig = penroseConfig.getAdapterConfig("JNDI");
+            //AdapterConfig adapterConfig = penroseConfig.getAdapterConfig("LDAP");
 
             //ConnectionManager connectionManager = penroseApplication.getConnectionManager();
             //connectionManager.init(partition, connectionConfig, adapterConfig);

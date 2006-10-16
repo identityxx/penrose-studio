@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2005, Identyx Corporation.
+ * Copyright (c) 2000-2006, Identyx Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,12 +24,12 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.util.JNDIClient;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.ldap.LDAPClient;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -251,7 +251,7 @@ public class JNDIAttributeWizardPage extends WizardPage {
     public void setConnectionConfig(Partition partition, ConnectionConfig connectionConfig) {
         try {
             if (schema == null) {
-                JNDIClient client = new JNDIClient(connectionConfig.getParameters());
+                LDAPClient client = new LDAPClient(connectionConfig.getParameters());
                 schema = client.getSchema();
             }
 

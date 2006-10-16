@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2005, Identyx Corporation.
+ * Copyright (c) 2000-2006, Identyx Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -107,7 +107,7 @@ public class DynamicEntryFromSourceWizard extends Wizard {
             StringBuffer sb = new StringBuffer();
             for (Iterator i=attributeMappings.iterator(); i.hasNext(); ) {
                 AttributeMapping attributeMapping = (AttributeMapping)i.next();
-                if (!attributeMapping.isRdn()) continue;
+                if (!"true".equals(attributeMapping.getRdn())) continue;
 
                 if (sb.length() > 0) sb.append("+");
 

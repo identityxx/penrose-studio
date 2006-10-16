@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2005, Identyx Corporation.
+ * Copyright (c) 2000-2006, Identyx Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.TableConfig;
 import org.safehaus.penrose.partition.FieldConfig;
-import org.safehaus.penrose.util.JDBCClient;
+import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.connector.JDBCAdapter;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -81,13 +81,13 @@ public class JDBCConnectionTablesPage extends FormPage {
         body.setLayout(new GridLayout());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-
+/*
         if (penroseApplication.isFreeware()) {
             Label label = toolkit.createLabel(body, PenroseApplication.FEATURE_NOT_AVAILABLE);
             label.setLayoutData(new GridData(GridData.FILL_BOTH));
             return;
         }
-
+*/
         Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Actions");
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -97,7 +97,7 @@ public class JDBCConnectionTablesPage extends FormPage {
 
         section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Catalogs and Schema");
-        section.setLayoutData(new GridData(GridData.FILL_BOTH));
+        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Control catalogsSection = createCatalogsSection(section);
         section.setClient(catalogsSection);
@@ -111,7 +111,7 @@ public class JDBCConnectionTablesPage extends FormPage {
 
         refresh();
         showTableNames();
-        showFieldNames();
+        //showFieldNames();
     }
 
     public Composite createActionsSection(final Composite parent) {
@@ -171,6 +171,7 @@ public class JDBCConnectionTablesPage extends FormPage {
         String username = connectionConfig.getParameter(JDBCAdapter.USER);
 
         if ("oracle.jdbc.driver.OracleDriver".equals(driver)) {
+            log.debug("Setting Oracle's default schema to "+username.toUpperCase());
             schemaCombo.setText(username.toUpperCase());
         }
 
@@ -237,26 +238,46 @@ public class JDBCConnectionTablesPage extends FormPage {
 
     public void refresh() {
         try {
+            log.debug("Refreshing information");
+
+            String catalog = catalogCombo.getText();
             catalogCombo.removeAll();
+
+            String schema = schemaCombo.getText();
             schemaCombo.removeAll();
 
             JDBCClient client = new JDBCClient(connectionConfig.getParameters());
             client.connect();
 
             Collection catalogs = client.getCatalogs();
-            Collection schemas = client.getSchemas();
 
-            client.close();
-
+            catalogCombo.add("");
             for (Iterator i=catalogs.iterator(); i.hasNext(); ) {
                 String catalogName = (String)i.next();
                 catalogCombo.add(catalogName);
             }
 
+            if (catalogs.contains(catalog)) {
+                catalogCombo.setText(catalog);
+            } else {
+                catalogCombo.select(0);
+            }
+
+            Collection schemas = client.getSchemas();
+
+            schemaCombo.add("");
             for (Iterator i=schemas.iterator(); i.hasNext(); ) {
                 String schemaName = (String)i.next();
                 schemaCombo.add(schemaName);
             }
+
+            if (schemas.contains(schema)) {
+                schemaCombo.setText(schema);
+            } else {
+                schemaCombo.select(0);
+            }
+
+            client.close();
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
@@ -282,6 +303,8 @@ public class JDBCConnectionTablesPage extends FormPage {
 
     public void showTableNames() {
         try {
+            log.debug("Updating table names");
+
             tablesTable.removeAll();
 
             JDBCClient client = new JDBCClient(connectionConfig.getParameters());
@@ -316,6 +339,8 @@ public class JDBCConnectionTablesPage extends FormPage {
 
     public void showFieldNames() {
         try {
+            log.debug("Updating field names");
+
             fieldsTable.removeAll();
 
             if (tablesTable.getSelectionCount() == 0) return;
@@ -334,7 +359,7 @@ public class JDBCConnectionTablesPage extends FormPage {
                 FieldConfig field = (FieldConfig)i.next();
 
                 TableItem it = new TableItem(fieldsTable, SWT.NONE);
-                it.setImage(PenrosePlugin.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                it.setImage(PenrosePlugin.getImage(field.isPK() ? PenroseImage.KEY : PenroseImage.NOKEY));
                 it.setText(0, field.getName());
                 it.setText(1, field.getType());
             }

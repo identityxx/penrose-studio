@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2005, Identyx Corporation.
+ * Copyright (c) 2000-2006, Identyx Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -105,7 +105,7 @@ public class SelectConnectionWizardPage extends WizardPage {
                     ti.setText(0, "Password:");
                     ti.setText(1, "********");
 
-                } else if ("JNDI".equals(adapterName)) {
+                } else if ("LDAP".equals(adapterName)) {
                     ti = new TableItem(infoTable, SWT.NONE);
                     ti.setText(0, "URL:");
                     ti.setText(1, connectionConfig.getParameter(Context.PROVIDER_URL));

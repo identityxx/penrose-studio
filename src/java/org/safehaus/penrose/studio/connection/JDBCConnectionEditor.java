@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2005, Identyx Corporation.
+ * Copyright (c) 2000-2006, Identyx Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,10 +67,9 @@ public class JDBCConnectionEditor extends FormEditor {
             PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
             PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
-            if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
-
+            //if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
                 addPage(new JDBCConnectionTablesPage(this));
-            }
+            //}
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

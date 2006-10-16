@@ -1,0 +1,48 @@
+#!/bin/sh
+
+FILE=$0
+OUTPUT=`basename $FILE .bin`
+
+if [ "`uname -s`" = "Linux" ]; then
+    echo_args="-e "
+    tail_args="-n "
+fi
+
+LICENSE=`awk '/^__LICENSE__/ { print NR; exit 0; }' $FILE`
+CONTENT=`awk '/^__CONTENT__/ { print NR; exit 0; }' $FILE`
+
+let LICENSE_START=LICENSE+1
+let LICENSE_END=CONTENT-1
+let CONTENT_START=CONTENT+1
+
+head -$LICENSE_END $FILE | tail ${tail_args}+$LICENSE_START | more
+
+agreed=
+while [ -z "$agreed" ]; do
+    echo
+    echo "Do you agree to the above license terms? [yes or no] "
+    read reply leftover
+    case $reply in
+       [yY] | [yY][eE][sS])
+            agreed=1
+            ;;
+       [nN] | [nN][oO])
+            echo "If you don't agree to the license you can't install this software.";
+            exit 1
+            ;;
+    esac
+done
+
+echo -n "Extracting..."
+
+tail ${tail_args}+$CONTENT_START $FILE > $OUTPUT
+
+echo "done."
+
+echo ""
+echo "Execute the following command to install this software:"
+echo ""
+echo "  rpm -i $OUTPUT"
+echo ""
+
+exit 0

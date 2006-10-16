@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2005, Identyx Corporation.
+ * Copyright (c) 2000-2006, Identyx Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -91,8 +91,7 @@ public class EngineNode extends Node {
 
     public void open() throws Exception {
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        EngineConfig engineConfig = penroseApplication.getPenroseConfig().getEngineConfig();
+        EngineConfig engineConfig = (EngineConfig)getObject();
         EngineEditorInput ei = new EngineEditorInput(engineConfig);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

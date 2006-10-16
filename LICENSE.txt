@@ -3,13 +3,13 @@ IMPORTANT - Read this License Agreement carefully before clicking on the "Agree"
 --
 
 LICENSE AGREEMENT
-(Penrose)
+(Penrose Studio)
 
          THIS IS A LEGAL AGREEMENT between you (either an individual or an entity) and Identyx, Inc.  By clicking on the "Agree" button, you are agreeing to be bound by the terms and conditions of this License Agreement.  If you do not agree to the terms and conditions of this License Agreement, do not click on the "Agree" button.
 
 1. Grant of Limited License.
 
-         Identyx, Inc. grants to you the non-exclusive right to use the Identyx, Inc. software program, Penrose (the "Software").
+         Identyx, Inc. grants to you the non-exclusive right to use the Identyx, Inc. software program, Penrose Studio (the "Software").
 
 2. Disclaimer of Warranties and Limitation of Liability.
 

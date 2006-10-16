@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2005, Identyx Corporation.
+ * Copyright (c) 2000-2006, Identyx Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ public class SelectJNDIConnectionWizardPage extends WizardPage {
         Collection connectionConfigs = partition.getConnectionConfigs();
         for (Iterator i=connectionConfigs.iterator(); i.hasNext(); ) {
             ConnectionConfig connectionConfig = (ConnectionConfig)i.next();
-            if (!"JNDI".equals(connectionConfig.getAdapterName())) continue;
+            if (!"LDAP".equals(connectionConfig.getAdapterName())) continue;
 
             TableItem item = new TableItem(connectionTable, SWT.NONE);
             item.setText(connectionConfig.getName());

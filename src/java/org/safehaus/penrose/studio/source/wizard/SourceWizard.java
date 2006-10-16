@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2005, Identyx Corporation.
+ * Copyright (c) 2000-2006, Identyx Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ public class SourceWizard extends Wizard {
             if (!jdbcFieldsPage.isPageComplete()) return false;
             if (!jdbcPrimaryKeyPage.isPageComplete()) return false;
 
-        } else if ("JNDI".equals(adapterName)) {
+        } else if ("LDAP".equals(adapterName)) {
             if (!jndiTreePage.isPageComplete()) return false;
             if (!jndiAttributesPage.isPageComplete()) return false;
             if (!jndiFieldsPage.isPageComplete()) return false;
@@ -113,7 +113,7 @@ public class SourceWizard extends Wizard {
                 jdbcTablePage.setConnectionConfig(connectionConfig);
                 return jdbcTablePage;
 
-            } else if ("JNDI".equals(adapterName)) {
+            } else if ("LDAP".equals(adapterName)) {
                 jndiTreePage.setConnectionConfig(partition, connectionConfig);
                 return jndiTreePage;
 
@@ -165,19 +165,14 @@ public class SourceWizard extends Wizard {
             String adapterName = connectionConfig.getAdapterName();
             if ("JDBC".equals(adapterName)) {
                 TableConfig tableConfig = jdbcTablePage.getTableConfig();
-                String tableName = tableConfig.getName();
-
-                String schema = tableConfig.getSchema();
-                if (schema != null) {
-                    tableName = schema+"."+tableName;
-                }
 
                 String catalog = tableConfig.getCatalog();
-                if (catalog != null) {
-                    tableName = catalog+"."+tableName;
-                }
+                String schema = tableConfig.getSchema();
+                String tableName = tableConfig.getName();
 
-                sourceConfig.setParameter(JDBCAdapter.TABLE_NAME, tableName);
+                sourceConfig.setParameter(JDBCAdapter.CATALOG, catalog);
+                sourceConfig.setParameter(JDBCAdapter.SCHEMA, schema);
+                sourceConfig.setParameter(JDBCAdapter.TABLE, tableName);
 
                 String filter = jdbcFieldsPage.getFilter();
                 if (filter != null) {
@@ -194,7 +189,7 @@ public class SourceWizard extends Wizard {
                     sourceConfig.addFieldConfig(field);
                 }
 
-            } else if ("JNDI".equals(adapterName)) {
+            } else if ("LDAP".equals(adapterName)) {
                 sourceConfig.setParameter("baseDn", jndiTreePage.getBaseDn());
                 sourceConfig.setParameter("filter", jndiTreePage.getFilter());
                 sourceConfig.setParameter("scope", jndiTreePage.getScope());

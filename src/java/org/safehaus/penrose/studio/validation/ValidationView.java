@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2005, Identyx Corporation.
+ * Copyright (c) 2000-2006, Identyx Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -156,7 +156,7 @@ public class ValidationView extends ViewPart {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
 
-            if ("JNDI".equals(connectionConfig.getAdapterName())) {
+            if ("LDAP".equals(connectionConfig.getAdapterName())) {
                 page.openEditor(new JNDIConnectionEditorInput(partition, connectionConfig), JNDIConnectionEditor.class.getName());
                 
             } else if ("JDBC".equals(connectionConfig.getAdapterName())) {
@@ -174,7 +174,7 @@ public class ValidationView extends ViewPart {
             if ("JDBC".equals(connection.getAdapterName())) {
                 page.openEditor(new JDBCSourceEditorInput(partition, sourceConfig), JDBCSourceEditor.class.getName());
 
-            } else if ("JNDI".equals(connection.getAdapterName())) {
+            } else if ("LDAP".equals(connection.getAdapterName())) {
                 page.openEditor(new JNDISourceEditorInput(partition, sourceConfig), JNDISourceEditor.class.getName());
             }
 

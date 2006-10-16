@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2005, Identyx Corporation.
+ * Copyright (c) 2000-2006, Identyx Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -408,8 +408,8 @@ public class MappingSourcePage extends FormPage implements ModifyListener {
                 }
 
                 TableItem item = new TableItem(table, SWT.CHECK);
-                item.setChecked(fieldConfig.isPrimaryKey());
-                item.setImage(PenrosePlugin.getImage(fieldConfig.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                item.setChecked(fieldConfig.isPK());
+                item.setImage(PenrosePlugin.getImage(fieldConfig.isPK() ? PenroseImage.KEY : PenroseImage.NOKEY));
                 item.setText(0, fieldConfig.getName());
                 item.setText(1, value == null ? "" : value);
                 item.setData(fieldMapping);
@@ -455,7 +455,7 @@ public class MappingSourcePage extends FormPage implements ModifyListener {
                     Collection fields = sourceDefinition.getFieldConfigs();
                     for (Iterator j=fields.iterator(); j.hasNext(); ) {
                         FieldConfig field = (FieldConfig)j.next();
-                        dialog.addField(source.getName()+"."+field.getName(), field.isPrimaryKey());
+                        dialog.addField(source.getName()+"."+field.getName(), field.isPK());
                     }
                 }
 /*
@@ -516,7 +516,7 @@ public class MappingSourcePage extends FormPage implements ModifyListener {
                         Collection fields = sourceDefinition.getFieldConfigs();
                         for (Iterator j=fields.iterator(); j.hasNext(); ) {
                             FieldConfig field = (FieldConfig)j.next();
-                            dialog.addField(source.getName()+"."+field.getName(), field.isPrimaryKey());
+                            dialog.addField(source.getName()+"."+field.getName(), field.isPK());
                         }
                     }
 /*

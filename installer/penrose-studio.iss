@@ -1,4 +1,4 @@
-; Copyright (c) 2000-2005, Identyx Corporation.
+; Copyright (c) 2000-2006, Identyx Corporation.
 ; All rights reserved.
 
 [Setup]

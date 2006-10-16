@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2005, Identyx Corporation.
+ * Copyright (c) 2000-2006, Identyx Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,11 +30,11 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.util.JNDIClient;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.ldap.LDAPClient;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -78,13 +78,13 @@ public class JNDIConnectionSchemaPage extends FormPage {
         body.setLayout(new GridLayout());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-
+/*
         if (penroseApplication.isFreeware()) {
             Label label = toolkit.createLabel(body, PenroseApplication.FEATURE_NOT_AVAILABLE);
             label.setLayoutData(new GridData(GridData.FILL_BOTH));
             return;
         }
-
+*/
         Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Actions");
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -191,7 +191,7 @@ public class JNDIConnectionSchemaPage extends FormPage {
             attributeTypesTable.removeAll();
             objectClassesTable.removeAll();
 
-            JNDIClient client = new JNDIClient(connectionConfig.getParameters());
+            LDAPClient client = new LDAPClient(connectionConfig.getParameters());
             schema = client.getSchema();
 
             Collection attributeTypes = schema.getAttributeTypes();

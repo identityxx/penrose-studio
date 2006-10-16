@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2005, Identyx Corporation.
+ * Copyright (c) 2000-2006, Identyx Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,9 +22,9 @@ import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionInfoWizardPage;
 import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionParametersWizardPage;
 import org.safehaus.penrose.studio.util.SnapshotUtil;
-import org.safehaus.penrose.util.JNDIClient;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.config.PenroseConfig;
+import org.safehaus.penrose.ldap.LDAPClient;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;
@@ -85,7 +85,7 @@ public class CreateLDAPSnapshotWizard extends Wizard {
 
             ConnectionConfig connectionConfig = new ConnectionConfig();
             connectionConfig.setName(name);
-            connectionConfig.setAdapterName("JNDI");
+            connectionConfig.setAdapterName("LDAP");
             connectionConfig.setParameter(Context.PROVIDER_URL, connectionInfoPage.getURL()+"/"+connectionInfoPage.getSuffix());
             connectionConfig.setParameter(Context.SECURITY_PRINCIPAL, connectionInfoPage.getBindDN());
             connectionConfig.setParameter(Context.SECURITY_CREDENTIALS, connectionInfoPage.getPassword());
@@ -100,7 +100,7 @@ public class CreateLDAPSnapshotWizard extends Wizard {
 
             partition.addConnectionConfig(connectionConfig);
 
-            JNDIClient client = new JNDIClient(connectionConfig.getParameters());
+            LDAPClient client = new LDAPClient(connectionConfig.getParameters());
 
             SnapshotUtil snapshotUtil = new SnapshotUtil();
             snapshotUtil.createSnapshot(partition, client);

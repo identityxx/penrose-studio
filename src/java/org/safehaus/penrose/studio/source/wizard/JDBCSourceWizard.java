@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2005, Identyx Corporation.
+ * Copyright (c) 2000-2006, Identyx Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -93,19 +93,14 @@ public class JDBCSourceWizard extends Wizard {
             sourceConfig.setConnectionName(connectionConfig.getName());
 
             TableConfig tableConfig = jdbcTablePage.getTableConfig();
-            String tableName = tableConfig.getName();
-
-            String schema = tableConfig.getSchema();
-            if (schema != null) {
-                tableName = schema+"."+tableName;
-            }
 
             String catalog = tableConfig.getCatalog();
-            if (catalog != null) {
-                tableName = catalog+"."+tableName;
-            }
+            String schema = tableConfig.getSchema();
+            String tableName = tableConfig.getName();
 
-            sourceConfig.setParameter(JDBCAdapter.TABLE_NAME, tableName);
+            sourceConfig.setParameter(JDBCAdapter.CATALOG, catalog);
+            sourceConfig.setParameter(JDBCAdapter.SCHEMA, schema);
+            sourceConfig.setParameter(JDBCAdapter.TABLE, tableName);
 
             String filter = jdbcFieldsPage.getFilter();
             if (filter != null) {
@@ -120,7 +115,7 @@ public class JDBCSourceWizard extends Wizard {
 
             for (Iterator i=fields.iterator(); i.hasNext(); ) {
                 FieldConfig field = (FieldConfig)i.next();
-                System.out.println(" - "+field.getName()+" "+field.isPrimaryKey());
+                System.out.println(" - "+field.getName()+" "+field.isPK());
                 sourceConfig.addFieldConfig(field);
             }
 

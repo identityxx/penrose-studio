@@ -20,14 +20,12 @@
 	<classpathentry kind="lib" path="lib/jmxtools-1.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/junit-3.8.1.jar"/>
 	<classpathentry kind="lib" path="lib/ldap.jar"/>
-	<classpathentry kind="lib" path="lib/license-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.13.jar"/>
 	<classpathentry kind="lib" path="lib/mx4j.jar"/>
 	<classpathentry kind="lib" path="lib/mx4j-tools.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-3.0.16-ga-bin.jar"/>
 	<classpathentry kind="lib" path="lib/postgresql-8.1-405.jdbc3.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-log4j12.jar"/>
-	<classpathentry kind="lib" path="lib/xml-apis-2.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/zql.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/plugins/org.eclipse.core.commands_3.1.0.jar"/>
@@ -43,9 +41,14 @@
 	<classpathentry kind="lib" path="lib/plugins/org.eclipse.ui.forms_3.1.0.jar"/>
 	<classpathentry kind="lib" path="lib/plugins/org.eclipse.ui.workbench_3.1.0.jar"/>
 	<classpathentry kind="lib" path="lib/plugins/org.eclipse.update.configurator_3.1.0.jar"/>
-	<classpathentry kind="lib" path="lib/commons-collections-3.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-logging-1.0.4.jar"/>
-	<classpathentry kind="lib" path="lib/penrose-1.1.jar"/>
-	<classpathentry kind="lib" path="lib/penrose-pro-1.1.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="lib" path="lib/commons-cli-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections-3.2.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang-2.1.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/penrose-1.1"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/penrose-pro-1.1"/>
+	<classpathentry kind="lib" path="lib/xercesImpl-2.8.0.jar"/>
+	<classpathentry kind="lib" path="lib/xml-apis-2.8.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/license"/>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>

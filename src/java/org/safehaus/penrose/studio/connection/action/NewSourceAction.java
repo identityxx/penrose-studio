@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2005, Identyx Corporation.
+ * Copyright (c) 2000-2006, Identyx Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ public class NewSourceAction extends Action {
                 dialog.setPageSize(600, 300);
                 dialog.open();
 
-            } else if ("JNDI".equals(adapterName)) {
+            } else if ("LDAP".equals(adapterName)) {
                 JNDISourceWizard wizard = new JNDISourceWizard(partition, connectionConfig);
                 WizardDialog dialog = new WizardDialog(shell, wizard);
                 dialog.setPageSize(600, 300);

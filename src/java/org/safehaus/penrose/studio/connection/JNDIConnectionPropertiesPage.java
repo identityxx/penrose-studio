@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2005, Identyx Corporation.
+ * Copyright (c) 2000-2006, Identyx Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,9 +28,9 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
-import org.safehaus.penrose.util.JNDIClient;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.ldap.LDAPClient;
 import org.apache.log4j.Logger;
 
 import javax.naming.InitialContext;
@@ -132,7 +132,7 @@ public class JNDIConnectionPropertiesPage extends FormPage {
         composite.setLayout(new GridLayout(6, false));
 
         String url = connectionConfig.getParameter(InitialContext.PROVIDER_URL);
-        String[] s = JNDIClient.parseURL(url);
+        String[] s = LDAPClient.parseURL(url);
 
         Label protocolLabel = toolkit.createLabel(composite, "Protocol:");
         GridData gd = new GridData();
@@ -211,7 +211,7 @@ public class JNDIConnectionPropertiesPage extends FormPage {
         fetchButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 try {
-                    JNDIClient client = new JNDIClient(connectionConfig.getParameters());
+                    LDAPClient client = new LDAPClient(connectionConfig.getParameters());
                     Collection list = client.getNamingContexts();
 
                     suffixCombo.removeAll();

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2005, Identyx Corporation.
+ * Copyright (c) 2000-2006, Identyx Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ public class EngineEditor extends MultiPageEditorPart {
 
         setSite(site);
         setInput(input);
-        setPartName("Engine");
+        setPartName("Engine - "+engineConfig.getName());
     }
 
     protected void createPages() {
@@ -57,11 +57,7 @@ public class EngineEditor extends MultiPageEditorPart {
             propertyPage = new EnginePropertyPage(this);
             addPage(propertyPage.createControl());
             setPageText(0, "  Properties  ");
-/*
-            cachePage = new EngineCachePage(this);
-            addPage(cachePage.createControl());
-            setPageText(1, "  Cache  ");
-*/
+
             load();
 
         } catch (Exception e) {
@@ -97,6 +93,8 @@ public class EngineEditor extends MultiPageEditorPart {
     public void store() throws Exception {
 
         origEngineConfig.copy(engineConfig);
+
+        setPartName("Engine - "+engineConfig.getName());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         penroseApplication.notifyChangeListeners();

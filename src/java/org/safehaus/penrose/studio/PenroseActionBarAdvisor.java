@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2005, Identyx Corporation.
+ * Copyright (c) 2000-2006, Identyx Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -154,9 +154,9 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
         helpMenu.add(new Separator());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        if (penroseApplication.isFreeware()) {
-            helpMenu.add(showCommercialFeaturesAction);
-        }
+        //if (penroseApplication.isFreeware()) {
+        //    helpMenu.add(showCommercialFeaturesAction);
+        //}
 
         helpMenu.add(enterLicenseKeyAction);
 
