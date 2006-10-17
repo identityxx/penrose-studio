@@ -106,7 +106,7 @@ public class MappingEditor extends FormEditor implements ModifyListener {
         setPartName(dn);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
 
         checkDirty();
 	}

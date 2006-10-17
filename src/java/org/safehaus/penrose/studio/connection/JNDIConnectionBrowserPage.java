@@ -191,7 +191,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
                     dialog.open();
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
+                    penroseStudio.fireChangeEvent();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -226,7 +226,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
                     dialog.open();
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
+                    penroseStudio.fireChangeEvent();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -284,7 +284,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
                     dialog.open();
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
+                    penroseStudio.fireChangeEvent();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);

@@ -117,7 +117,7 @@ public class CreateLDAPSnapshotWizard extends Wizard {
             snapshotUtil.createSnapshot(partition, client);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
+            penroseStudio.fireChangeEvent();
 
             return true;
 

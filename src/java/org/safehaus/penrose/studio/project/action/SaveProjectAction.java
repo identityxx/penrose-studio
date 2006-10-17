@@ -38,7 +38,7 @@ public class SaveProjectAction extends Action {
         setText("&Save");
         setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.SAVE));
         setAccelerator(SWT.CTRL | 'S');
-        setToolTipText("Save changes to disk");
+        setToolTipText("Save");
         setId(getClass().getName());
     }
 

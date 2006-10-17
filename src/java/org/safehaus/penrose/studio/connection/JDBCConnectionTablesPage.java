@@ -212,7 +212,7 @@ public class JDBCConnectionTablesPage extends FormPage {
                     dialog.open();
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
+                    penroseStudio.fireChangeEvent();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);

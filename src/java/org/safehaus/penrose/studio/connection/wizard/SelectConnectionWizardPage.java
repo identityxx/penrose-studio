@@ -154,7 +154,7 @@ public class SelectConnectionWizardPage extends WizardPage {
                 refresh();
 
                 PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                penroseStudio.notifyChangeListeners();
+                penroseStudio.fireChangeEvent();
             }
         });
 
@@ -180,7 +180,7 @@ public class SelectConnectionWizardPage extends WizardPage {
                 refresh();
 
                 PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                penroseStudio.notifyChangeListeners();
+                penroseStudio.fireChangeEvent();
             }
         });
 

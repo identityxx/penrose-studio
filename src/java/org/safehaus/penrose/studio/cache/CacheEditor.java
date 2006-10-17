@@ -335,7 +335,7 @@ public class CacheEditor extends EditorPart {
         origCacheConfig.copy(cacheConfig);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
 
         checkDirty();
     }

@@ -104,7 +104,7 @@ public class ConnectorEditor extends MultiPageEditorPart {
         origConnectorConfig.copy(connectorConfig);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
 
         checkDirty();
     }

@@ -101,7 +101,7 @@ public class SystemPropertiesEditor extends MultiPageEditorPart {
         origProperties.putAll(properties);
         
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
 
         checkDirty();
     }

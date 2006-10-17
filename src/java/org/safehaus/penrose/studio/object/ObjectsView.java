@@ -20,17 +20,19 @@ package org.safehaus.penrose.studio.object;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.part.*;
 import org.eclipse.jface.viewers.*;
 import org.eclipse.jface.action.*;
 import org.eclipse.swt.SWT;
-import org.safehaus.penrose.studio.util.ChangeListener;
+import org.safehaus.penrose.studio.event.ChangeListener;
+import org.safehaus.penrose.studio.event.ChangeEvent;
+import org.safehaus.penrose.studio.event.SelectionEvent;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.tree.Node;
 
 import java.util.*;
@@ -106,7 +108,6 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                 this,
                 project.getName(),
                 PROJECT,
-                PenrosePlugin.getImage(PenroseImage.SERVER),
                 project,
                 null
         );
@@ -135,7 +136,10 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
             treeViewer.setInput(getViewSite());
             treeViewer.addSelectionChangedListener(this);
 
-            Helper.hookContextMenu(treeViewer.getControl(), new IMenuListener() {
+            MenuManager menuManager = new MenuManager("#PopupMenu");
+            menuManager.setRemoveAllWhenShown(true);
+
+            menuManager.addMenuListener(new IMenuListener() {
                 public void menuAboutToShow(IMenuManager manager) {
 
                     try {
@@ -149,6 +153,23 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                     } catch (Exception e) {
                         log.debug(e.getMessage(), e);
                     }
+                }
+            });
+
+            Menu menu = menuManager.createContextMenu(treeViewer.getControl());
+            treeViewer.getControl().setMenu(menu);
+
+            treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+                public void selectionChanged(SelectionChangedEvent event) {
+
+                    StructuredSelection selection = (StructuredSelection)event.getSelection();
+                    if (selection.isEmpty()) return;
+
+                    Object object = selection.getFirstElement();
+                    SelectionEvent e = new SelectionEvent(new Date(), object);
+
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    penroseStudio.fireSelectionEvent(e);
                 }
             });
 
@@ -192,7 +213,7 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
     public void selectionChanged(SelectionChangedEvent event) {
     }
 
-    public void handleChange(Object o) {
+    public void objectChanged(ChangeEvent event) {
         treeViewer.refresh();
     }
 

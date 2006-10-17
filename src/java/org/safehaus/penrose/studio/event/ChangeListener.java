@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.util;
+package org.safehaus.penrose.studio.event;
 
 public interface ChangeListener {
 	
-	public void handleChange(Object object);
+	public void objectChanged(ChangeEvent event);
 }

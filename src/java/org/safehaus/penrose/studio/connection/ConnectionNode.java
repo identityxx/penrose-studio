@@ -137,7 +137,7 @@ public class ConnectionNode extends Node {
         partition.removeConnectionConfig(connectionConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
     }
 
     public void copy() throws Exception {
@@ -165,7 +165,7 @@ public class ConnectionNode extends Node {
         view.setClipboard(null);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
     }
 
     public boolean hasChildren() throws Exception {

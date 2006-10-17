@@ -309,7 +309,7 @@ public class ObjectClassEditor extends EditorPart implements ModifyListener, Sel
         setPartName("Object Class - "+objectClass.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
 
         checkDirty();
     }

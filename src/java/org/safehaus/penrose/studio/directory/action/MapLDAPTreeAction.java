@@ -60,7 +60,7 @@ public class MapLDAPTreeAction extends Action {
             dialog.setPageSize(600, 300);
             dialog.open();
 
-            penroseStudio.notifyChangeListeners();
+            penroseStudio.fireChangeEvent();
 
             objectsView.show(node);
 

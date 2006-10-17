@@ -74,7 +74,7 @@ public class AppendersNode extends Node {
         loggingConfig.addAppenderConfig(appenderConfig);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
     }
 
     public boolean hasChildren() throws Exception {

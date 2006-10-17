@@ -30,7 +30,10 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.studio.config.PenroseStudioConfig;
-import org.safehaus.penrose.studio.util.ChangeListener;
+import org.safehaus.penrose.studio.event.ChangeListener;
+import org.safehaus.penrose.studio.event.ChangeEvent;
+import org.safehaus.penrose.studio.event.SelectionEvent;
+import org.safehaus.penrose.studio.event.SelectionListener;
 import org.safehaus.penrose.studio.license.LicenseDialog;
 import org.safehaus.penrose.studio.welcome.action.EnterLicenseKeyAction;
 import com.identyx.license.License;
@@ -60,7 +63,9 @@ public class PenroseStudio implements IPlatformRunnable {
     PenroseStudioConfig penroseStudioConfig = new PenroseStudioConfig();
 
     PenroseWorkbenchAdvisor workbenchAdvisor;
-    ArrayList changeListeners = new ArrayList();
+
+    Collection selectionListeners = new ArrayList();
+    Collection changeListeners = new ArrayList();
 
     License license;
 
@@ -115,7 +120,7 @@ public class PenroseStudio implements IPlatformRunnable {
 			log.debug(ex.toString(), ex);
 		}
 	}
-	
+
 	public void loadApplicationConfig() {
 		File file = new File(homeDir, "config.xml");
 
@@ -131,15 +136,36 @@ public class PenroseStudio implements IPlatformRunnable {
 			log.debug(ex.toString(), ex);
 		}
 	}
-	
-	public void addChangeListener(ChangeListener changeListener) {
-		changeListeners.add(changeListener);
+
+    public void addSelectionListener(SelectionListener listener) {
+        selectionListeners.add(listener);
+    }
+
+    public void removeSelectionListener(SelectionListener listener) {
+        selectionListeners.remove(listener);
+    }
+
+    public void fireSelectionEvent(SelectionEvent event) {
+        for (Iterator i=selectionListeners.iterator(); i.hasNext(); ) {
+            SelectionListener listener = (SelectionListener)i.next();
+            listener.objectSelected(event);
+        }
+    }
+
+	public void addChangeListener(ChangeListener listener) {
+		changeListeners.add(listener);
 	}
 
-	public void notifyChangeListeners() {
-		for (int i=0; i<changeListeners.size(); i++) {
-			ChangeListener listener = (ChangeListener)changeListeners.get(i);
-			listener.handleChange(null);
+    public void removeChangeListener(ChangeListener listener) {
+        changeListeners.remove(listener);
+    }
+
+	public void fireChangeEvent() {
+        ChangeEvent event = new ChangeEvent(new Date(), null);
+
+        for (Iterator i=changeListeners.iterator(); i.hasNext(); ) {
+			ChangeListener listener = (ChangeListener)i.next();
+			listener.objectChanged(event);
 		}
 	}
 

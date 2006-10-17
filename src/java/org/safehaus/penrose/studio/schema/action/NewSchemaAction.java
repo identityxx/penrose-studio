@@ -52,7 +52,7 @@ public class NewSchemaAction extends Action {
             dialog.open();
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
+            penroseStudio.fireChangeEvent();
 
             ProjectNode projectNode = objectsView.getProjectNode("Penrose Server");
             objectsView.show(projectNode.getSchemasNode());

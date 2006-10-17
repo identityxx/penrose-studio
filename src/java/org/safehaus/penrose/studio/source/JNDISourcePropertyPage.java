@@ -482,7 +482,7 @@ public class JNDISourcePropertyPage extends FormPage {
         }
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
 
         checkDirty();
     }

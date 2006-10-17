@@ -104,12 +104,4 @@ public class Helper {
 		}
 	}
 
-	public static void hookContextMenu(Control control, IMenuListener menuListener) {
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(menuListener);
-		Menu menu = menuMgr.createContextMenu(control);
-		control.setMenu(menu);
-	}
-
 }

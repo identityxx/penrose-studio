@@ -89,7 +89,7 @@ public class JNDIConnectionEditor extends ConnectionEditor {
         setPartName(getPartition().getName()+"/"+getConnectionConfig().getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
 
         checkDirty();
     }

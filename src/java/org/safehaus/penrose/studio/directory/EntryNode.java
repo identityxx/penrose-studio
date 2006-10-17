@@ -224,7 +224,7 @@ public class EntryNode extends Node {
         }
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
     }
 
     public boolean hasChildren() throws Exception {

@@ -142,7 +142,7 @@ public class SelectSourceWizardPage extends WizardPage {
                     refresh();
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
+                    penroseStudio.fireChangeEvent();
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
@@ -168,7 +168,7 @@ public class SelectSourceWizardPage extends WizardPage {
                 refresh();
 
                 PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                penroseStudio.notifyChangeListeners();
+                penroseStudio.fireChangeEvent();
             }
         });
 

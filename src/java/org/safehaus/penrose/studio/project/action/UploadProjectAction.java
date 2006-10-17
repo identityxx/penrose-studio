@@ -29,15 +29,14 @@ import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.apache.log4j.Logger;
 
-public class UploadAction extends Action {
+public class UploadProjectAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
-	public UploadAction() {
+	public UploadProjectAction() {
         setText("&Upload");
         setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.UPLOAD));
-        setAccelerator(SWT.CTRL | 'S');
-        setToolTipText("Upload configuration to Penrose Server");
+        setToolTipText("Upload");
         setId(getClass().getName());
 	}
 

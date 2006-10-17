@@ -72,7 +72,7 @@ public class CreatePartitionWizard extends Wizard {
             partitionManager.load(projectNode.getWorkDir(), partitionConfig);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
+            penroseStudio.fireChangeEvent();
 
             return true;
 

@@ -81,7 +81,7 @@ public class ImportPartitionWizard extends Wizard {
             partitionManager.addPartition(partition);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
+            penroseStudio.fireChangeEvent();
 
             return true;
 

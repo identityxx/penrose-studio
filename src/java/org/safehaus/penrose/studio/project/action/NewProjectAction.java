@@ -50,7 +50,7 @@ public class NewProjectAction extends Action {
             ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
             objectsView.createProjectNode(project);
             
-            penroseStudio.notifyChangeListeners();
+            penroseStudio.fireChangeEvent();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

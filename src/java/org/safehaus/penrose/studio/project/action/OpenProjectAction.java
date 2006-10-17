@@ -24,8 +24,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.studio.project.ProjectDialog;
-import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -37,10 +35,10 @@ public class OpenProjectAction extends Action {
     Logger log = Logger.getLogger(getClass());
 
 	public OpenProjectAction() {
-        setText("&Connect...");
-        setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.CONNECT));
+        setText("&Open");
+        setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.OPEN));
         setAccelerator(SWT.CTRL | 'O');
-        setToolTipText("Connect to Penrose Server");
+        setToolTipText("Open");
         setId(getClass().getName());
 	}
 	
@@ -69,14 +67,6 @@ public class OpenProjectAction extends Action {
         if (projectNode == null) return;
 
         try {
-            ProjectDialog dialog = new ProjectDialog(window.getShell(), SWT.NONE);
-            dialog.open();
-
-            if (dialog.getAction() == ProjectDialog.CANCEL) return;
-
-            Project project = dialog.getProject();
-            window.getShell().setText("Penrose Studio - "+project.getName());
-
             projectNode.open();
 
         } catch (Exception e) {

@@ -22,17 +22,22 @@ public class PenroseImage {
     public final static String WELCOME           = "images/3steps.png";
 
     public final static String NEW               = "images/new.gif";
-    public final static String CONNECT           = "images/connect.gif";
+    public final static String OPEN              = "images/connect.gif";
     public final static String SAVE              = "images/3floppy_unmount.png";
     public final static String UPLOAD            = "images/upload.png";
+    public final static String CLOSE             = "images/close.png";
 
 	public final static String REFRESH           = "images/refresh.gif";
 	public final static String ADD               = "images/folder-add.gif";
 	public final static String DELETE            = "images/delete.gif";
 	public final static String KEY               = "images/key.gif";
 	public final static String NOKEY             = "images/nokey.gif";
+
     public final static String SERVER            = "images/server.png";
-	public final static String SOURCE            = "images/source.gif";
+    public final static String CONNECTED         = "images/connected.gif";
+    public final static String DISCONNECTED      = "images/server.png";
+
+    public final static String SOURCE            = "images/source.gif";
     public final static String CONNECTION        = "images/server.png";
 	public final static String FOLDER            = "images/folder_yellow.png";
     public final static String OPEN_FOLDER       = "images/folder_yellow_open.png";

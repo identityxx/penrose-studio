@@ -83,6 +83,6 @@ public class AppenderNode extends Node {
         loggingConfig.removeAppenderConfig(appenderConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
     }
 }

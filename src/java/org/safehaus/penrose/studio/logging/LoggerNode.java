@@ -99,6 +99,6 @@ public class LoggerNode extends Node {
         log4jConfig.removeLoggerConfig(loggerConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
     }
 }

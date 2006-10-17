@@ -101,7 +101,7 @@ public class SourcesNode extends Node {
         view.setClipboard(null);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
     }
 
     public boolean hasChildren() throws Exception {

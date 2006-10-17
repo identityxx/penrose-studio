@@ -178,7 +178,7 @@ public class CreateLDAPProxyWizard extends Wizard {
             //connectionManager.init(partition, connectionConfig, adapterConfig);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
+            penroseStudio.fireChangeEvent();
 
             return true;
 

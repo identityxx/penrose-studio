@@ -78,14 +78,17 @@ public class ProjectNode extends Node {
     private CachesNode cachesNode;
     private LoggingNode loggingNode;
 
-    public ProjectNode(ObjectsView view, String name, String type, Image image, Object object, Node parent) {
-        super(name, type, image, object, parent);
+    public ProjectNode(ObjectsView view, String name, String type, Object object, Node parent) {
+        super(name, type, null, object, parent);
+
         this.view = view;
+        //setImage(PenrosePlugin.getImage(PenroseImage.DISCONNECTED));
+        setImage(PenrosePlugin.getImage(PenroseImage.SERVER));
     }
 
     public void showMenu(IMenuManager manager) {
 
-        manager.add(new Action("Open", PenrosePlugin.getImageDescriptor(PenroseImage.CONNECT)) {
+        manager.add(new Action("Open", PenrosePlugin.getImageDescriptor(PenroseImage.OPEN)) {
             public void run() {
                 try {
                     open();
@@ -102,6 +105,10 @@ public class ProjectNode extends Node {
                                     "See penrose-studio-log.txt for details."
                     );
                 }
+            }
+
+            public boolean isEnabled() {
+                return !isConnected();
             }
         });
 
@@ -122,6 +129,10 @@ public class ProjectNode extends Node {
                                     "See penrose-studio-log.txt for details."
                     );
                 }
+            }
+
+            public boolean isEnabled() {
+                return isConnected();
             }
         });
 
@@ -145,6 +156,10 @@ public class ProjectNode extends Node {
                     );
                 }
             }
+
+            public boolean isEnabled() {
+                return isConnected();
+            }
         });
 
         manager.add(new Action("Upload") {
@@ -165,6 +180,10 @@ public class ProjectNode extends Node {
                     );
                 }
             }
+
+            public boolean isEnabled() {
+                return isConnected();
+            }
         });
 
         manager.add(new Action("Restart") {
@@ -184,6 +203,10 @@ public class ProjectNode extends Node {
                                     "See penrose-studio-log.txt for details."
                     );
                 }
+            }
+
+            public boolean isEnabled() {
+                return isConnected();
             }
         });
 
@@ -207,6 +230,10 @@ public class ProjectNode extends Node {
                     );
                 }
             }
+
+            public boolean isEnabled() {
+                return isConnected();
+            }
         });
 
         manager.add(new Action("Browse") {
@@ -226,6 +253,10 @@ public class ProjectNode extends Node {
                                     "See penrose-studio-log.txt for details."
                     );
                 }
+            }
+
+            public boolean isEnabled() {
+                return isConnected();
             }
         });
 
@@ -249,6 +280,10 @@ public class ProjectNode extends Node {
                     );
                 }
             }
+
+            public boolean isEnabled() {
+                return !isConnected();
+            }
         });
 
 /*
@@ -260,6 +295,10 @@ public class ProjectNode extends Node {
                     log.debug(e.getMessage(), e);
                 }
             }
+
+            public boolean isEnabled() {
+                return !isConnected();
+            }
         });
 
         manager.add(new Action("Paste") {
@@ -269,6 +308,10 @@ public class ProjectNode extends Node {
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
                 }
+            }
+
+            public boolean isEnabled() {
+                return !isConnected();
             }
         });
 */
@@ -291,10 +334,19 @@ public class ProjectNode extends Node {
                     );
                 }
             }
+
+            public boolean isEnabled() {
+                return !isConnected();
+            }
         });
     }
 
+    public boolean isConnected() {
+        return client != null;
+    }
+
     public void open() throws Exception {
+        if (isConnected()) return;
 
         Project project = getProject();
 
@@ -414,8 +466,12 @@ public class ProjectNode extends Node {
                 this
         ));
 
+        //setImage(PenrosePlugin.getImage(PenroseImage.CONNECTED));
+
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
+
+        view.show(this);
 
         log.debug("Project opened.");
     }
@@ -615,12 +671,17 @@ public class ProjectNode extends Node {
 
     public void close() throws Exception {
 
+        if (!isConnected()) return;
+
         client.close();
+        client = null;
+
+        //setImage(PenrosePlugin.getImage(PenroseImage.DISCONNECTED));
 
         children.clear();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
 
         log.debug("Project closed.");
     }
@@ -709,7 +770,7 @@ public class ProjectNode extends Node {
 
         view.removeProjectNode(project.getName());
 
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
     }
 
     public void copy() throws Exception {

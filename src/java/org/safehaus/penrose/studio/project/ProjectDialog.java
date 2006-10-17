@@ -56,7 +56,7 @@ public class ProjectDialog extends Dialog {
 		super(parent, style);
 
         penroseImage = PenrosePlugin.getImage(PenroseImage.LOGO16);
-        connectImage = PenrosePlugin.getImage(PenroseImage.CONNECT);
+        connectImage = PenrosePlugin.getImage(PenroseImage.OPEN);
         deleteImage = PenrosePlugin.getImage(PenroseImage.DELETE);
 
         shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
@@ -68,7 +68,7 @@ public class ProjectDialog extends Dialog {
         super(parent);
 
         penroseImage = PenrosePlugin.getImage(PenroseImage.LOGO16);
-        connectImage = PenrosePlugin.getImage(PenroseImage.CONNECT);
+        connectImage = PenrosePlugin.getImage(PenroseImage.OPEN);
         deleteImage = PenrosePlugin.getImage(PenroseImage.DELETE);
 
         shell = parent;

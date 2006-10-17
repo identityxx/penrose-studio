@@ -78,7 +78,7 @@ public class JNDISourceEditor extends SourceEditor {
         setPartName(getPartition().getName()+"/"+getSourceConfig().getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
 
         checkDirty();
 	}

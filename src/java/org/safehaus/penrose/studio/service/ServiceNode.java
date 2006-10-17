@@ -104,7 +104,7 @@ public class ServiceNode extends Node {
         penroseConfig.removeServiceConfig(serviceConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
     }
 
     public ServiceConfig getServiceConfig() {

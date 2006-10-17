@@ -155,7 +155,7 @@ public class NewEntryFromSourceAction extends Action {
 
             partition.addEntryMapping(entry);
 
-            penroseStudio.notifyChangeListeners();
+            penroseStudio.fireChangeEvent();
 
             objectsView.show(node);
 

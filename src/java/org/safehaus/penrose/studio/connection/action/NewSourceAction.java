@@ -71,7 +71,7 @@ public class NewSourceAction extends Action {
             }
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
+            penroseStudio.fireChangeEvent();
 
             objectsView.show(node);
 

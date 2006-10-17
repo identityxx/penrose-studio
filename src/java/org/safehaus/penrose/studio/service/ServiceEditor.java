@@ -97,7 +97,7 @@ public class ServiceEditor extends MultiPageEditorPart {
         setPartName(serviceConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
 
         checkDirty();
     }

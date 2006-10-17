@@ -124,7 +124,7 @@ public class LoggersNode extends Node {
         loggingConfig.addLoggerConfig(loggerConfig);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
     }
 
     public boolean hasChildren() throws Exception {

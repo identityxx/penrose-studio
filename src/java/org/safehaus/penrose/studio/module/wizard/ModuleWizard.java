@@ -79,7 +79,7 @@ public class ModuleWizard extends Wizard {
             }
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
+            penroseStudio.fireChangeEvent();
 
             return true;
 

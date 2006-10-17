@@ -48,7 +48,7 @@ import org.safehaus.penrose.studio.source.*;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.object.ObjectsView;
-import org.safehaus.penrose.studio.util.Helper;
+import org.safehaus.penrose.studio.util.SWTUtil;
 import org.safehaus.penrose.partition.*;
 
 public class ValidationView extends ViewPart {
@@ -69,7 +69,7 @@ public class ValidationView extends ViewPart {
 		
 		table = new Table(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
 
-		Helper.hookContextMenu(table, new IMenuListener() {
+		SWTUtil.hookContextMenu(table, new IMenuListener() {
 			public void menuAboutToShow(IMenuManager manager) {
 				Action refreshAction = new Action("Refresh") {
 					public void run() {

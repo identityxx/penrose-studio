@@ -82,7 +82,7 @@ public class SchemaEditor extends FormEditor {
         setPartName("Schema - "+origSchema.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
 
         checkDirty();
     }

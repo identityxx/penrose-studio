@@ -101,7 +101,7 @@ public class EngineEditor extends MultiPageEditorPart {
         setPartName(getEditorInput().getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
 
         checkDirty();
     }

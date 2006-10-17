@@ -56,7 +56,7 @@ public class NewStaticEntryAction extends Action {
             dialog.open();
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
+            penroseStudio.fireChangeEvent();
 
             objectsView.show(node);
 

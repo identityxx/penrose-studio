@@ -124,7 +124,7 @@ public class ModuleNode extends Node {
         partition.removeModuleConfig(moduleConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
     }
 
     public void copy() throws Exception {
@@ -163,7 +163,7 @@ public class ModuleNode extends Node {
         view.setClipboard(null);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        penroseStudio.fireChangeEvent();
     }
 
     public Partition getPartition() {
