@@ -24,13 +24,14 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.util.ApplicationConfig;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.browser.BrowserEditorInput;
 import org.safehaus.penrose.studio.browser.BrowserEditor;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.service.ServiceConfig;
+import org.safehaus.penrose.user.UserConfig;
 import org.apache.log4j.Logger;
 
 /**
@@ -44,7 +45,6 @@ public class BrowserAction extends Action {
     public final static int DEFAULT_LDAP_PORT        = 10389;
 
     public BrowserAction() {
-
         setText("&Browser");
         setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.BROWSER));
         setToolTipText("LDAP Browser");
@@ -55,24 +55,31 @@ public class BrowserAction extends Action {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         
         try {
-            IWorkbenchPage activePage = window.getActivePage();
+            IWorkbenchPage page = window.getActivePage();
+            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            ProjectNode projectNode = objectsView.getSelectedProjectNode();
+            if (projectNode == null) return;
 
-            ApplicationConfig applicationConfig = penroseApplication.getApplicationConfig();
-            Project project = applicationConfig.getCurrentProject();
+            Project project = projectNode.getProject();
             String hostname = project.getHost();
 
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+            PenroseConfig penroseConfig = projectNode.getPenroseConfig();
             ServiceConfig serviceConfig = penroseConfig.getServiceConfig("LDAP");
             String s = serviceConfig.getParameter(LDAP_PORT);
             int port = s == null ? DEFAULT_LDAP_PORT : Integer.parseInt(s);
 
+            UserConfig rootUserConfig = penroseConfig.getRootUserConfig();
+
             BrowserEditorInput ei = new BrowserEditorInput();
+            ei.setProject(project);
             ei.setHostname(hostname);
             ei.setPort(port);
+            ei.setBaseDn("");
+            ei.setBindDn(rootUserConfig.getDn());
+            ei.setBindPassword(rootUserConfig.getPassword());
 
-            activePage.openEditor(ei, BrowserEditor.class.getName());
+            page.openEditor(ei, BrowserEditor.class.getName());
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

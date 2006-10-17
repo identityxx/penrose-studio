@@ -37,9 +37,10 @@ import org.safehaus.penrose.studio.partition.action.ImportPartitionAction;
 import org.safehaus.penrose.studio.partition.action.NewLDAPSnapshotPartitionAction;
 import org.safehaus.penrose.studio.partition.action.NewLDAPProxyPartitionAction;
 import org.safehaus.penrose.studio.service.action.NewServiceAction;
-import org.safehaus.penrose.studio.project.action.OpenAction;
-import org.safehaus.penrose.studio.project.action.SaveAction;
+import org.safehaus.penrose.studio.project.action.OpenProjectAction;
+import org.safehaus.penrose.studio.project.action.SaveProjectAction;
 import org.safehaus.penrose.studio.project.action.UploadAction;
+import org.safehaus.penrose.studio.project.action.NewProjectAction;
 import org.safehaus.penrose.studio.schema.action.ImportSchemaAction;
 import org.safehaus.penrose.studio.schema.action.NewSchemaAction;
 import org.safehaus.penrose.studio.browser.action.BrowserAction;
@@ -49,8 +50,9 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
 
     Logger log = Logger.getLogger(getClass());
 
-    OpenAction connectAction;
-    SaveAction saveAction;
+    NewProjectAction newProjectAction;
+    OpenProjectAction openProjectAction;
+    SaveProjectAction saveProjectAction;
     UploadAction uploadAction;
     IAction quitAction;
 
@@ -82,6 +84,9 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
     MenuManager partitionMenu;
     MenuManager helpMenu;
 
+    IToolBarManager standardToolBar;
+    IToolBarManager previewToolBar;
+
     public PenroseActionBarAdvisor(IActionBarConfigurer configurer) {
         super(configurer);
     }
@@ -90,11 +95,14 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
         super.makeActions(window);
 
         try {
-            connectAction = new OpenAction();
-            register(connectAction);
+            newProjectAction = new NewProjectAction();
+            register(newProjectAction);
 
-            saveAction = new SaveAction();
-            register(saveAction);
+            openProjectAction = new OpenProjectAction();
+            register(openProjectAction);
+
+            saveProjectAction = new SaveProjectAction();
+            register(saveProjectAction);
 
             uploadAction = new UploadAction();
             register(uploadAction);
@@ -153,8 +161,8 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
 
         helpMenu.add(new Separator());
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        //if (penroseApplication.isFreeware()) {
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        //if (penroseStudio.isFreeware()) {
         //    helpMenu.add(showCommercialFeaturesAction);
         //}
 
@@ -172,9 +180,10 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
             MenuManager fileMenu = new MenuManager("&File", "file");
             menuBar.add(fileMenu);
 
-            fileMenu.add(connectAction);
+            fileMenu.add(newProjectAction);
+            fileMenu.add(openProjectAction);
             fileMenu.add(new Separator());
-            fileMenu.add(saveAction);
+            fileMenu.add(saveProjectAction);
             fileMenu.add(new Separator());
             fileMenu.add(uploadAction);
             fileMenu.add(restartAction);
@@ -226,13 +235,16 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
         super.fillCoolBar(coolBar);
 
         try {
-            IToolBarManager standardToolBar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+            standardToolBar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
             coolBar.add(new ToolBarContributionItem(standardToolBar, "standard"));
 
-            ActionContributionItem connectCI = new ActionContributionItem(connectAction);
-            standardToolBar.add(connectCI);
+            ActionContributionItem newProjectCI = new ActionContributionItem(newProjectAction);
+            standardToolBar.add(newProjectCI);
 
-            ActionContributionItem saveCI = new ActionContributionItem(saveAction);
+            ActionContributionItem openProjectCI = new ActionContributionItem(openProjectAction);
+            standardToolBar.add(openProjectCI);
+
+            ActionContributionItem saveCI = new ActionContributionItem(saveProjectAction);
             standardToolBar.add(saveCI);
 
             ActionContributionItem uploadCI = new ActionContributionItem(uploadAction);
@@ -241,7 +253,7 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
             ActionContributionItem restartCI = new ActionContributionItem(restartAction);
             standardToolBar.add(restartCI);
 
-            IToolBarManager previewToolBar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+            previewToolBar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
             coolBar.add(new ToolBarContributionItem(previewToolBar, "preview"));
 
             ActionContributionItem previewCI = new ActionContributionItem(previewAction);

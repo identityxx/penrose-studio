@@ -24,11 +24,15 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.mapping.AttributeTypeSelectionDialog;
 import org.safehaus.penrose.studio.mapping.ExpressionDialog;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.mapping.*;
@@ -164,8 +168,14 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                     AttributeTypeSelectionDialog dialog = new AttributeTypeSelectionDialog(parent.getShell(), SWT.NONE);
                     dialog.setText("Add attributes...");
 
-                    PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    dialog.setSchemaManager(penroseApplication.getSchemaManager());
+                    IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+                    IWorkbenchPage page = window.getActivePage();
+                    ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+
+                    ProjectNode projectNode = objectsView.getSelectedProjectNode();
+                    if (projectNode == null) return;
+
+                    dialog.setSchemaManager(projectNode.getSchemaManager());
 
                     dialog.open();
                     if (dialog.getAction() == AttributeTypeSelectionDialog.CANCEL) return;
@@ -251,9 +261,14 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
     public void init() {
         try {
+            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            IWorkbenchPage page = window.getActivePage();
+            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            SchemaManager schemaManager = penroseApplication.getSchemaManager();
+            ProjectNode projectNode = objectsView.getSelectedProjectNode();
+            if (projectNode == null) return;
+
+            SchemaManager schemaManager = projectNode.getSchemaManager();
 
             System.out.println("Object classes:");
             for (Iterator i=objectClasses.iterator(); i.hasNext(); ) {

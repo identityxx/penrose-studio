@@ -30,8 +30,9 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
@@ -49,14 +50,24 @@ public class SourceNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
+    ProjectNode projectNode;
 
     private Partition partition;
     private ConnectionConfig connectionConfig;
     private SourceConfig sourceConfig;
 
-    public SourceNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public SourceNode(
+            ObjectsView view,
+            ProjectNode projectNode,
+            String name,
+            String type,
+            Image image,
+            Object object,
+            Node parent
+    ) {
         super(name, type, image, object, parent);
         this.view = view;
+        this.projectNode = projectNode;
     }
 
     public void showMenu(IMenuManager manager) {
@@ -111,11 +122,16 @@ public class SourceNode extends Node {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
 
+        SourceEditorInput ei = new SourceEditorInput();
+        ei.setProjectNode(projectNode);
+        ei.setPartition(partition);
+        ei.setSourceConfig(sourceConfig);
+
         if ("JDBC".equals(con.getAdapterName())) {
-            page.openEditor(new JDBCSourceEditorInput(partition, sourceConfig), JDBCSourceEditor.class.getName());
+            page.openEditor(ei, JDBCSourceEditor.class.getName());
 
         } else if ("LDAP".equals(con.getAdapterName())) {
-            page.openEditor(new JNDISourceEditorInput(partition, sourceConfig), JNDISourceEditor.class.getName());
+            page.openEditor(ei, JNDISourceEditor.class.getName());
         }
     }
 
@@ -140,8 +156,8 @@ public class SourceNode extends Node {
             partition.removeSourceConfig(sourceConfig.getName());
         }
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public void copy() throws Exception {
@@ -168,8 +184,8 @@ public class SourceNode extends Node {
 
         view.setClipboard(null);
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public Partition getPartition() {

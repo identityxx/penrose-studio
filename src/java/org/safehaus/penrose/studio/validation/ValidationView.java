@@ -37,18 +37,17 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.part.*;
 import org.safehaus.penrose.mapping.*;
-import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.mapping.MappingEditorInput;
 import org.safehaus.penrose.studio.mapping.MappingEditor;
-import org.safehaus.penrose.studio.connection.JNDIConnectionEditorInput;
 import org.safehaus.penrose.studio.connection.JNDIConnectionEditor;
 import org.safehaus.penrose.studio.connection.JDBCConnectionEditor;
-import org.safehaus.penrose.studio.connection.JDBCConnectionEditorInput;
-import org.safehaus.penrose.studio.source.JDBCSourceEditorInput;
-import org.safehaus.penrose.studio.source.JNDISourceEditorInput;
+import org.safehaus.penrose.studio.connection.ConnectionEditorInput;
+import org.safehaus.penrose.studio.source.SourceEditorInput;
 import org.safehaus.penrose.studio.source.*;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.partition.*;
 
@@ -75,8 +74,16 @@ public class ValidationView extends ViewPart {
 				Action refreshAction = new Action("Refresh") {
 					public void run() {
                         try {
-                            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                            penroseApplication.validatePartitions();
+                            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+                            IWorkbenchPage page = window.getActivePage();
+                            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+
+                            Collection projectNodes = objectsView.getProjectNodes();
+                            for (Iterator i=projectNodes.iterator(); i.hasNext(); ) {
+                                ProjectNode projectNode = (ProjectNode)i.next();
+                                projectNode.validate();
+                            }
+
                         } catch (Exception e) {
                             log.debug(e.getMessage(), e);
                         }
@@ -146,21 +153,28 @@ public class ValidationView extends ViewPart {
         TableItem item = table.getSelection()[0];
 		Object object = item.getData();
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PartitionManager partitionManager = penroseApplication.getPartitionManager();
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        IWorkbenchPage page = window.getActivePage();
+        ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+
+        ProjectNode projectNode = objectsView.getSelectedProjectNode();
+        if (projectNode == null) return;
+
+        PartitionManager partitionManager = projectNode.getPartitionManager();
 
 		if (object instanceof ConnectionConfig) {
             ConnectionConfig connectionConfig = (ConnectionConfig)object;
             Partition partition = partitionManager.getPartition(connectionConfig);
 
-            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-            IWorkbenchPage page = window.getActivePage();
+            ConnectionEditorInput ei = new ConnectionEditorInput();
+            ei.setPartition(partition);
+            ei.setConnectionConfig(connectionConfig);
 
             if ("LDAP".equals(connectionConfig.getAdapterName())) {
-                page.openEditor(new JNDIConnectionEditorInput(partition, connectionConfig), JNDIConnectionEditor.class.getName());
+                page.openEditor(ei, JNDIConnectionEditor.class.getName());
                 
             } else if ("JDBC".equals(connectionConfig.getAdapterName())) {
-                page.openEditor(new JDBCConnectionEditorInput(partition, connectionConfig), JDBCConnectionEditor.class.getName());
+                page.openEditor(ei, JDBCConnectionEditor.class.getName());
             }
 
 		} else if (object instanceof SourceConfig) {
@@ -168,24 +182,24 @@ public class ValidationView extends ViewPart {
             Partition partition = partitionManager.getPartition(sourceConfig);
             ConnectionConfig connection = partition.getConnectionConfig(sourceConfig.getConnectionName());
 
-            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-            IWorkbenchPage page = window.getActivePage();
+            SourceEditorInput ei = new SourceEditorInput();
+            ei.setPartition(partition);
+            ei.setSourceConfig(sourceConfig);
 
             if ("JDBC".equals(connection.getAdapterName())) {
-                page.openEditor(new JDBCSourceEditorInput(partition, sourceConfig), JDBCSourceEditor.class.getName());
+                page.openEditor(ei, JDBCSourceEditor.class.getName());
 
             } else if ("LDAP".equals(connection.getAdapterName())) {
-                page.openEditor(new JNDISourceEditorInput(partition, sourceConfig), JNDISourceEditor.class.getName());
+                page.openEditor(ei, JNDISourceEditor.class.getName());
             }
 
 		} else if (object instanceof EntryMapping) {
-            EntryMapping entryDefinition = (EntryMapping)object;
-            Partition partition = partitionManager.getPartition(entryDefinition);
+            EntryMapping entryMapping = (EntryMapping)object;
+            Partition partition = partitionManager.getPartition(entryMapping);
 
-            MappingEditorInput mei = new MappingEditorInput(partition, entryDefinition);
-
-            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-            IWorkbenchPage page = window.getActivePage();
+            MappingEditorInput mei = new MappingEditorInput();
+            mei.setPartition(partition);
+            mei.setEntryDefinition(entryMapping);
 
             page.openEditor(mei, MappingEditor.class.getName());
 		}

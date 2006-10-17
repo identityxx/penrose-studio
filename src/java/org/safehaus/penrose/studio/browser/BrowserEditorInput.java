@@ -20,14 +20,19 @@ package org.safehaus.penrose.studio.browser;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.safehaus.penrose.studio.project.Project;
 
 /**
  * @author Endi S. Dewata
  */
 public class BrowserEditorInput implements IEditorInput {
 
+    private Project project;
     private String hostname;
     private int port;
+    private String baseDn;
+    private String bindDn;
+    private String bindPassword;
 
     public BrowserEditorInput() {
     }
@@ -41,7 +46,7 @@ public class BrowserEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "Browser";
+        return "["+project.getName()+"] Browser";
     }
 
     public IPersistableElement getPersistable() {
@@ -49,7 +54,7 @@ public class BrowserEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return "Browser";
+        return getName();
     }
 
     public Object getAdapter(Class aClass) {
@@ -77,5 +82,37 @@ public class BrowserEditorInput implements IEditorInput {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public String getBaseDn() {
+        return baseDn;
+    }
+
+    public void setBaseDn(String baseDn) {
+        this.baseDn = baseDn;
+    }
+
+    public String getBindDn() {
+        return bindDn;
+    }
+
+    public void setBindDn(String bindDn) {
+        this.bindDn = bindDn;
+    }
+
+    public String getBindPassword() {
+        return bindPassword;
+    }
+
+    public void setBindPassword(String bindPassword) {
+        this.bindPassword = bindPassword;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

@@ -45,14 +45,14 @@ public class JDBCSourceCachePage extends FormPage {
     Text sizeLimitText;
     Combo loadingMethodCombo;
 
-    JDBCSourceEditor editor;
+    SourceEditor editor;
 	SourceConfig sourceConfig;
 
-    public JDBCSourceCachePage(JDBCSourceEditor editor) {
+    public JDBCSourceCachePage(SourceEditor editor) {
         super(editor, "CACHE", "  Cache  ");
 
         this.editor = editor;
-        this.sourceConfig = editor.sourceConfig;
+        this.sourceConfig = editor.getSourceConfig();
     }
 
     public void createFormContent(IManagedForm managedForm) {

@@ -18,6 +18,7 @@
 package org.safehaus.penrose.studio.partition;
 
 import org.safehaus.penrose.studio.*;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.partition.action.NewPartitionAction;
 import org.safehaus.penrose.studio.partition.action.ImportPartitionAction;
 import org.safehaus.penrose.studio.partition.action.NewLDAPSnapshotPartitionAction;
@@ -47,7 +48,7 @@ public class PartitionsNode extends Node {
 
     ObjectsView view;
 
-    public PartitionsNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public PartitionsNode(ObjectsView view, String name, String type, Image image, Object object, Node parent) {
         super(name, type, image, object, parent);
         this.view = view;
     }
@@ -56,8 +57,8 @@ public class PartitionsNode extends Node {
         manager.add(new NewPartitionAction());
         manager.add(new ImportPartitionAction());
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseWorkbenchAdvisor workbenchAdvisor = penroseApplication.getWorkbenchAdvisor();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
         PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
         PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
@@ -69,8 +70,8 @@ public class PartitionsNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PartitionManager partitionManager = penroseApplication.getPartitionManager();
+        ProjectNode projectNode = (ProjectNode)getParent();
+        PartitionManager partitionManager = projectNode.getPartitionManager();
         if (partitionManager == null) return false;
         return !partitionManager.getPartitions().isEmpty();
     }
@@ -79,9 +80,10 @@ public class PartitionsNode extends Node {
 
         Collection children = new ArrayList();
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
-        PartitionManager partitionManager = penroseApplication.getPartitionManager();
+        ProjectNode projectNode = (ProjectNode)getParent();
+
+        PenroseConfig penroseConfig = projectNode.getPenroseConfig();
+        PartitionManager partitionManager = projectNode.getPartitionManager();
         
         Collection partitionConfigs = penroseConfig.getPartitionConfigs();
         for (Iterator i=partitionConfigs.iterator(); i.hasNext(); ) {
@@ -90,6 +92,7 @@ public class PartitionsNode extends Node {
 
             PartitionNode partitionNode = new PartitionNode(
                     view,
+                    projectNode,
                     partitionConfig.getName(),
                     ObjectsView.PARTITION,
                     PenrosePlugin.getImage(PenroseImage.PARTITION),

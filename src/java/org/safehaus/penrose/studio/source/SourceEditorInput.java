@@ -22,19 +22,16 @@ import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.SourceConfig;
+import org.safehaus.penrose.studio.project.ProjectNode;
 
 /**
  * @author Endi S. Dewata
  */
-public class JDBCSourceEditorInput implements IEditorInput {
+public class SourceEditorInput implements IEditorInput {
 
+    private ProjectNode projectNode;
     private Partition partition;
     private SourceConfig sourceConfig;
-
-    public JDBCSourceEditorInput(Partition partition, SourceConfig sourceDefinition) {
-        this.partition = partition;
-        this.sourceConfig = sourceDefinition;
-    }
 
     public boolean exists() {
         return true;
@@ -62,9 +59,9 @@ public class JDBCSourceEditorInput implements IEditorInput {
 
     public boolean equals(Object o) {
         if (o == null) return false;
-        if (!(o instanceof JDBCSourceEditorInput)) return false;
+        if (!(o instanceof SourceEditorInput)) return false;
 
-        JDBCSourceEditorInput cei = (JDBCSourceEditorInput)o;
+        SourceEditorInput cei = (SourceEditorInput)o;
         return sourceConfig.equals(cei.sourceConfig);
     }
 
@@ -82,5 +79,13 @@ public class JDBCSourceEditorInput implements IEditorInput {
 
     public void setPartition(Partition partition) {
         this.partition = partition;
+    }
+
+    public ProjectNode getProjectNode() {
+        return projectNode;
+    }
+
+    public void setProjectNode(ProjectNode projectNode) {
+        this.projectNode = projectNode;
     }
 }

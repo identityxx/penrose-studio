@@ -26,7 +26,6 @@ import org.eclipse.swt.events.*;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
-import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.mapping.*;
@@ -177,8 +176,7 @@ public class LDAPPage extends FormPage {
                     ObjectClassSelectionDialog dialog = new ObjectClassSelectionDialog(editor.getParent().getShell(), SWT.NONE);
                     dialog.setText("Add object classes...");
 
-                    PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    SchemaManager schemaManager = penroseApplication.getSchemaManager();
+                    SchemaManager schemaManager = editor.projectNode.getSchemaManager();
 
                     Collection ocNames = new ArrayList();
                     for (Iterator i=schemaManager.getObjectClasses().iterator(); i.hasNext(); ) {
@@ -323,8 +321,7 @@ public class LDAPPage extends FormPage {
                     AttributeTypeSelectionDialog dialog = new AttributeTypeSelectionDialog(editor.getParent().getShell(), SWT.NONE);
                     dialog.setText("Add attributes...");
 
-                    PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    dialog.setSchemaManager(penroseApplication.getSchemaManager());
+                    dialog.setSchemaManager(editor.projectNode.getSchemaManager());
 
                     dialog.open();
                     if (dialog.getAction() == AttributeTypeSelectionDialog.CANCEL) return;
@@ -479,8 +476,7 @@ public class LDAPPage extends FormPage {
 
     public Map getObjectClasses(Collection ocNames) {
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        SchemaManager schemaManager = penroseApplication.getSchemaManager();
+        SchemaManager schemaManager = editor.projectNode.getSchemaManager();
 
         Map objectClasses = new TreeMap();
 

@@ -22,19 +22,16 @@ import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.SchemaConfig;
+import org.safehaus.penrose.studio.project.ProjectNode;
 
 /**
  * @author Endi S. Dewata
  */
 public class SchemaEditorInput implements IEditorInput {
 
+    private ProjectNode projectNode;
     private SchemaConfig schemaConfig;
     private Schema schema;
-
-    public SchemaEditorInput(SchemaConfig schemaConfig, Schema schema) {
-        this.schemaConfig = schemaConfig;
-        this.schema = schema;
-    }
 
     public SchemaConfig getSchemaConfig() {
         return schemaConfig;
@@ -85,5 +82,13 @@ public class SchemaEditorInput implements IEditorInput {
         if (!schema.equals(ei.schema)) return false;
 
         return true;
+    }
+
+    public ProjectNode getProjectNode() {
+        return projectNode;
+    }
+
+    public void setProjectNode(ProjectNode projectNode) {
+        this.projectNode = projectNode;
     }
 }

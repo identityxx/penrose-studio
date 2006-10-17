@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.mapping.*;
@@ -57,7 +57,7 @@ public class JNDISourcePropertyPage extends FormPage {
     Button editButton;
     Button removeButton;
 
-    JNDISourceEditor editor;
+    SourceEditor editor;
     Partition partition;
 	SourceConfig source;
 	
@@ -65,12 +65,12 @@ public class JNDISourcePropertyPage extends FormPage {
 	
 	String[] scopes = new String[] { "OBJECT", "ONELEVEL", "SUBTREE" };
 
-    public JNDISourcePropertyPage(JNDISourceEditor editor) throws Exception {
+    public JNDISourcePropertyPage(SourceEditor editor) throws Exception {
         super(editor, "PROPERTIES", "  Properties  ");
 
         this.editor = editor;
-        this.partition = editor.partition;
-        this.source = editor.sourceConfig;
+        this.partition = editor.getPartition();
+        this.source = editor.getSourceConfig();
 
         ConnectionConfig connectionConfig = partition.getConnectionConfig(source.getConnectionName());
         if (connectionConfig != null) {
@@ -350,8 +350,7 @@ public class JNDISourcePropertyPage extends FormPage {
                 try {
                     FieldConfig fieldDefinition = new FieldConfig();
 
-                    PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    SchemaManager schemaManager = penroseApplication.getSchemaManager();
+                    SchemaManager schemaManager = editor.getProjectNode().getSchemaManager();
                     Collection attributeTypes = schemaManager.getAttributeTypes();
 
                     JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
@@ -385,8 +384,7 @@ public class JNDISourcePropertyPage extends FormPage {
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     String oldName = fieldDefinition.getName();
 
-                    PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    SchemaManager schemaManager = penroseApplication.getSchemaManager();
+                    SchemaManager schemaManager = editor.getProjectNode().getSchemaManager();
                     Collection attributeTypes = schemaManager.getAttributeTypes();
 
                     JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
@@ -483,8 +481,8 @@ public class JNDISourcePropertyPage extends FormPage {
             source.addFieldConfig(field);
         }
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
 
         checkDirty();
     }

@@ -17,7 +17,7 @@
  */
 package org.safehaus.penrose.studio.connection;
 
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.connection.action.NewConnectionAction;
@@ -47,7 +47,7 @@ public class ConnectionsNode extends Node {
 
     private Partition partition;
 
-    public ConnectionsNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public ConnectionsNode(ObjectsView view, String name, String type, Image image, Object object, Node parent) {
         super(name, type, image, object, parent);
         this.view = view;
     }
@@ -90,8 +90,8 @@ public class ConnectionsNode extends Node {
 
         view.setClipboard(null);
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public boolean hasChildren() throws Exception {

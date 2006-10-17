@@ -31,6 +31,7 @@ public class PenroseImage {
 	public final static String DELETE            = "images/delete.gif";
 	public final static String KEY               = "images/key.gif";
 	public final static String NOKEY             = "images/nokey.gif";
+    public final static String SERVER            = "images/server.png";
 	public final static String SOURCE            = "images/source.gif";
     public final static String CONNECTION        = "images/server.png";
 	public final static String FOLDER            = "images/folder_yellow.png";

@@ -26,15 +26,10 @@ import org.safehaus.penrose.partition.Partition;
 /**
  * @author Endi S. Dewata
  */
-public class JNDIConnectionEditorInput implements IEditorInput {
+public class ConnectionEditorInput implements IEditorInput {
 
     private Partition partition;
     private ConnectionConfig connectionConfig;
-
-    public JNDIConnectionEditorInput(Partition partition, ConnectionConfig connectionConfig) {
-        this.partition = partition;
-        this.connectionConfig = connectionConfig;
-    }
 
     public boolean exists() {
         return true;
@@ -60,12 +55,27 @@ public class JNDIConnectionEditorInput implements IEditorInput {
         return null;
     }
 
+    public int hashCode() {
+        return (partition == null ? 0 : partition.hashCode()) +
+                (connectionConfig == null ? 0 : connectionConfig.hashCode());
+    }
+
+    boolean equals(Object o1, Object o2) {
+        if (o1 == null && o2 == null) return true;
+        if (o1 != null) return o1.equals(o2);
+        return o2.equals(o1);
+    }
+
     public boolean equals(Object o) {
         if (o == null) return false;
-        if (!(o instanceof JNDIConnectionEditorInput)) return false;
+        if (!(o instanceof ConnectionEditorInput)) return false;
 
-        JNDIConnectionEditorInput cei = (JNDIConnectionEditorInput)o;
-        return connectionConfig.equals(cei.connectionConfig);
+        ConnectionEditorInput cei = (ConnectionEditorInput)o;
+
+        if (!equals(partition, cei.partition)) return false;
+        if (!equals(connectionConfig, cei.connectionConfig)) return false;
+
+        return true;
     }
 
     public ConnectionConfig getConnectionConfig() {

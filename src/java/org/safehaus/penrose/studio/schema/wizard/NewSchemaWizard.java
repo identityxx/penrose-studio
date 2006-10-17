@@ -18,7 +18,11 @@
 package org.safehaus.penrose.studio.schema.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchPage;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.schema.SchemaConfig;
 import org.safehaus.penrose.schema.SchemaManager;
@@ -76,18 +80,24 @@ public class NewSchemaWizard extends Wizard {
             schemaConfig.setName(name);
             schemaConfig.setPath(path);
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            String workDir = penroseApplication.getWorkDir();
+            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            IWorkbenchPage page = window.getActivePage();
+            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+
+            ProjectNode projectNode = objectsView.getSelectedProjectNode();
+            if (projectNode == null) return false;
+
+            String workDir = projectNode.getWorkDir();
 
             Schema schema = new Schema(schemaConfig);
 
             SchemaWriter schemaWriter = new SchemaWriter(workDir);
             schemaWriter.write(schema);
 
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+            PenroseConfig penroseConfig = projectNode.getPenroseConfig();
             penroseConfig.addSchemaConfig(schemaConfig);
 
-            SchemaManager schemaManager = penroseApplication.getSchemaManager();
+            SchemaManager schemaManager = projectNode.getSchemaManager();
             schemaManager.addSchema(schema);
 
             return true;

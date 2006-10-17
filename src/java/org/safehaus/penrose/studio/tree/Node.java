@@ -31,9 +31,9 @@ public class Node {
     private String type;
     private Image image;
     private Object object;
-    private Object parent;
+    private Node parent;
 
-    public Node(String name, String type, Image image, Object object, Object parent) {
+    public Node(String name, String type, Image image, Object object, Node parent) {
         this.name = name;
         this.type = type;
         this.image = image;
@@ -73,11 +73,11 @@ public class Node {
         this.object = object;
     }
 
-    public Object getParent() {
+    public Node getParent() {
         return parent;
     }
 
-    public void setParent(Object parent) {
+    public void setParent(Node parent) {
         this.parent = parent;
     }
 

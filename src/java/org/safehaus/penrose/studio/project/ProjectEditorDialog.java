@@ -69,7 +69,7 @@ public class ProjectEditorDialog extends Dialog {
 
         shell.setLocation(l.x + (s.x - size.x)/2, l.y + (s.y - size.y)/2);
 
-        shell.setText("Connect");
+        shell.setText("Edit");
         shell.setImage(PenrosePlugin.getImage(PenroseImage.LOGO16));
 
         shell.open();

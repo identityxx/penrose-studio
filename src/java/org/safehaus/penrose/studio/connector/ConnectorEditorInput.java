@@ -21,17 +21,16 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.connector.ConnectorConfig;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.project.ProjectNode;
 
 /**
  * @author Endi S. Dewata
  */
 public class ConnectorEditorInput implements IEditorInput {
 
+    private ProjectNode projectNode;
     private ConnectorConfig connectorConfig;
-
-    public ConnectorEditorInput(ConnectorConfig sourceDefinition) {
-        this.connectorConfig = sourceDefinition;
-    }
 
     public boolean exists() {
         return true;
@@ -42,7 +41,7 @@ public class ConnectorEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return connectorConfig.getName();
+        return "["+projectNode.getName()+"] Connector - "+connectorConfig.getName();
     }
 
     public IPersistableElement getPersistable() {
@@ -50,19 +49,32 @@ public class ConnectorEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return connectorConfig.getName();
+        return getName();
     }
 
     public Object getAdapter(Class aClass) {
         return null;
     }
 
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (!(o instanceof ConnectorEditorInput)) return false;
+    boolean equals(Object o1, Object o2) {
+        if (o1 == null && o2 == null) return true;
+        if (o1 != null) return o1.equals(o2);
+        return o2.equals(o1);
+    }
 
-        ConnectorEditorInput cei = (ConnectorEditorInput)o;
-        return connectorConfig.equals(cei.connectorConfig);
+    public boolean equals(Object object) {
+        if (object == null || object.getClass() != getClass()) return false;
+
+        ConnectorEditorInput ei = (ConnectorEditorInput)object;
+
+        if (!equals(connectorConfig, ei.connectorConfig)) return false;
+
+        return true;
+    }
+
+    public int hashCode() {
+        return (projectNode == null ? 0 : projectNode.hashCode()) +
+                (connectorConfig == null ? 0 : connectorConfig.hashCode());
     }
 
     public ConnectorConfig getConnectorConfig() {
@@ -71,5 +83,13 @@ public class ConnectorEditorInput implements IEditorInput {
 
     public void setConnectorConfig(ConnectorConfig connectorConfig) {
         this.connectorConfig = connectorConfig;
+    }
+
+    public ProjectNode getProjectNode() {
+        return projectNode;
+    }
+
+    public void setProjectNode(ProjectNode projectNode) {
+        this.projectNode = projectNode;
     }
 }

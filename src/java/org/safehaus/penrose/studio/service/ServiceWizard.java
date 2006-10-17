@@ -18,8 +18,12 @@
 package org.safehaus.penrose.studio.service;
 
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.service.ServiceConfig;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.apache.log4j.Logger;
 
@@ -65,8 +69,14 @@ public class ServiceWizard extends Wizard {
                 serviceConfig.setParameter(name, value);
             }
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            IWorkbenchPage page = window.getActivePage();
+            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+
+            ProjectNode projectNode = objectsView.getSelectedProjectNode();
+            if (projectNode == null) return false;
+
+            PenroseConfig penroseConfig = projectNode.getPenroseConfig();
             penroseConfig.addServiceConfig(serviceConfig);
 
             return true;

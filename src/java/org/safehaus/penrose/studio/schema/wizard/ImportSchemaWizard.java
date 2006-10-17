@@ -18,7 +18,11 @@
 package org.safehaus.penrose.studio.schema.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchPage;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.schema.SchemaConfig;
@@ -56,8 +60,14 @@ public class ImportSchemaWizard extends Wizard {
             String name = namePage.getSchemaName();
             String path = schemaExtDir+"/"+name+".schema";
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            String workDir = penroseApplication.getWorkDir();
+            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            IWorkbenchPage page = window.getActivePage();
+            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+
+            ProjectNode projectNode = objectsView.getSelectedProjectNode();
+            if (projectNode == null) return false;
+
+            String workDir = projectNode.getWorkDir();
 
             String file1 = filePage.getFilename();
             String file2 = workDir+File.separator+path;
@@ -67,11 +77,11 @@ public class ImportSchemaWizard extends Wizard {
             schemaConfig.setName(name);
             schemaConfig.setPath(path);
 
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+            PenroseConfig penroseConfig = projectNode.getPenroseConfig();
             penroseConfig.addSchemaConfig(schemaConfig);
 
-            SchemaManager schemaManager = penroseApplication.getSchemaManager();
-            schemaManager.load(penroseApplication.getWorkDir(), schemaConfig);
+            SchemaManager schemaManager = projectNode.getSchemaManager();
+            schemaManager.load(projectNode.getWorkDir(), schemaConfig);
 
             return true;
 

@@ -41,12 +41,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.Penrose;
 import org.safehaus.penrose.PenroseFactory;
 import org.safehaus.penrose.util.EntryUtil;
-import org.safehaus.penrose.user.UserConfig;
-import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.session.PenroseSession;
 import org.safehaus.penrose.session.PenroseSearchControls;
 import org.safehaus.penrose.session.PenroseSearchResults;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.ietf.ldap.LDAPException;
 
 public class PreviewEditor extends EditorPart {
@@ -177,12 +175,12 @@ public class PreviewEditor extends EditorPart {
         tc.setWidth(400);
 
         try {
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+            PreviewEditorInput ei = (PreviewEditorInput)getEditorInput();
+            String baseDn = ei.getBaseDn();
+            String bindDn = ei.getBindDn();
+            String bindPassword = ei.getBindPassword();
 
-            UserConfig rootUserConfig = penroseConfig.getRootUserConfig();
-
-            open("", rootUserConfig.getDn(), rootUserConfig.getPassword());
+            open(baseDn, bindDn, bindPassword);
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
@@ -204,10 +202,11 @@ public class PreviewEditor extends EditorPart {
         bindDnText.setText(bindDn == null ? "" : bindDn);
         this.password = password;
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PreviewEditorInput ei = (PreviewEditorInput)getEditorInput();
+        ProjectNode projectNode = ei.getProjectNode();
 
         PenroseFactory penroseFactory = PenroseFactory.getInstance();
-        penrose = penroseFactory.createPenrose(penroseApplication.getWorkDir());
+        penrose = penroseFactory.createPenrose(projectNode.getWorkDir());
         penrose.start();
 
         session = penrose.newSession();

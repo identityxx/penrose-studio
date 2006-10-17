@@ -21,17 +21,16 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.user.UserConfig;
+import org.safehaus.penrose.studio.project.Project;
 
 /**
  * @author Endi S. Dewata
  */
 public class UserEditorInput implements IEditorInput {
 
+    private Project project;
+    private String name;
     private UserConfig userConfig;
-
-    public UserEditorInput(UserConfig userConfig) {
-        this.userConfig = userConfig;
-    }
 
     public boolean exists() {
         return true;
@@ -42,7 +41,7 @@ public class UserEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return userConfig.getDn();
+        return "["+project.getName()+"] "+(name == null ? userConfig.getDn() : name);
     }
 
     public IPersistableElement getPersistable() {
@@ -50,16 +49,15 @@ public class UserEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return userConfig.getDn();
+        return getName();
     }
 
     public Object getAdapter(Class aClass) {
         return null;
     }
 
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (!(o instanceof UserEditorInput)) return false;
+    public boolean equals(Object object) {
+        if (object == null || object.getClass() != getClass()) return false;
 
         return true;
     }
@@ -70,5 +68,17 @@ public class UserEditorInput implements IEditorInput {
 
     public void setUserConfig(UserConfig userConfig) {
         this.userConfig = userConfig;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

@@ -18,8 +18,12 @@
 package org.safehaus.penrose.studio.connection;
 
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.schema.*;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.object.ObjectsView;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -75,10 +79,16 @@ public class SchemaExportWizard extends Wizard {
         }
     }
 
-    public void removeDuplicates() {
+    public void removeDuplicates() throws Exception {
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        SchemaManager schemaManager = penroseApplication.getSchemaManager();
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        IWorkbenchPage page = window.getActivePage();
+        ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+
+        ProjectNode projectNode = objectsView.getSelectedProjectNode();
+        if (projectNode == null) return;
+
+        SchemaManager schemaManager = projectNode.getSchemaManager();
 
         Collection attributeTypes = schemaManager.getAttributeTypes();
         for (Iterator i=attributeTypes.iterator(); i.hasNext(); ) {

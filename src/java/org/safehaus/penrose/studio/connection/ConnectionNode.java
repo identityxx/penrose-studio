@@ -28,7 +28,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.connection.action.NewSourceAction;
@@ -52,7 +52,7 @@ public class ConnectionNode extends Node {
     private Partition partition;
     private ConnectionConfig connectionConfig;
 
-    public ConnectionNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public ConnectionNode(ObjectsView view, String name, String type, Image image, Object object, Node parent) {
         super(name, type, image, object, parent);
         this.view = view;
     }
@@ -111,11 +111,15 @@ public class ConnectionNode extends Node {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
 
+        ConnectionEditorInput ei = new ConnectionEditorInput();
+        ei.setPartition(partition);
+        ei.setConnectionConfig(connectionConfig);
+
         if ("JDBC".equals(connectionConfig.getAdapterName())) {
-            page.openEditor(new JDBCConnectionEditorInput(partition, connectionConfig), JDBCConnectionEditor.class.getName());
+            page.openEditor(ei, JDBCConnectionEditor.class.getName());
 
         } else if ("LDAP".equals(connectionConfig.getAdapterName())) {
-            page.openEditor(new JNDIConnectionEditorInput(partition, connectionConfig), JNDIConnectionEditor.class.getName());
+            page.openEditor(ei, JNDIConnectionEditor.class.getName());
         }
     }
 
@@ -132,8 +136,8 @@ public class ConnectionNode extends Node {
 
         partition.removeConnectionConfig(connectionConfig.getName());
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public void copy() throws Exception {
@@ -160,8 +164,8 @@ public class ConnectionNode extends Node {
 
         view.setClipboard(null);
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public boolean hasChildren() throws Exception {

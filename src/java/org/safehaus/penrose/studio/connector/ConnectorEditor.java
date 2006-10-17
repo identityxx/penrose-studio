@@ -23,7 +23,8 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.connector.ConnectorConfig;
 import org.apache.log4j.Logger;
 
@@ -34,7 +35,9 @@ public class ConnectorEditor extends MultiPageEditorPart {
 
     Logger log = Logger.getLogger(getClass());
 
-	ConnectorConfig connectorConfig;
+    ProjectNode projectNode;
+
+    ConnectorConfig connectorConfig;
     ConnectorConfig origConnectorConfig;
 
     boolean dirty;
@@ -43,13 +46,15 @@ public class ConnectorEditor extends MultiPageEditorPart {
     //ConnectorCachePage cachePage;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+        setSite(site);
+        setInput(input);
+
         ConnectorEditorInput ei = (ConnectorEditorInput)input;
+        projectNode = ei.getProjectNode();
         origConnectorConfig = ei.getConnectorConfig();
         connectorConfig = (ConnectorConfig)origConnectorConfig.clone();
 
-        setSite(site);
-        setInput(input);
-        setPartName("Connector");
+        setPartName(input.getName());
     }
 
     protected void createPages() {
@@ -98,8 +103,8 @@ public class ConnectorEditor extends MultiPageEditorPart {
 
         origConnectorConfig.copy(connectorConfig);
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
 
         checkDirty();
     }

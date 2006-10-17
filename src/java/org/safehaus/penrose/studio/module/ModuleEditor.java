@@ -33,7 +33,7 @@ import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
 import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
@@ -462,8 +462,8 @@ public class ModuleEditor extends EditorPart {
 
         setPartName(partition.getName()+"/"+moduleConfig.getName());
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
 
         checkDirty();
     }

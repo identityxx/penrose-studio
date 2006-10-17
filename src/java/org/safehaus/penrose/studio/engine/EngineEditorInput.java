@@ -21,17 +21,16 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.engine.EngineConfig;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.project.ProjectNode;
 
 /**
  * @author Endi S. Dewata
  */
 public class EngineEditorInput implements IEditorInput {
 
+    private ProjectNode projectNode;
     private EngineConfig engineConfig;
-
-    public EngineEditorInput(EngineConfig engineConfig) {
-        this.engineConfig = engineConfig;
-    }
 
     public boolean exists() {
         return true;
@@ -42,7 +41,7 @@ public class EngineEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return engineConfig.getName();
+        return "["+projectNode.getName()+"] Engine - "+engineConfig.getName();
     }
 
     public IPersistableElement getPersistable() {
@@ -50,19 +49,32 @@ public class EngineEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return engineConfig.getName();
+        return getName();
     }
 
     public Object getAdapter(Class aClass) {
         return null;
     }
 
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (!(o instanceof EngineEditorInput)) return false;
+    boolean equals(Object o1, Object o2) {
+        if (o1 == null && o2 == null) return true;
+        if (o1 != null) return o1.equals(o2);
+        return o2.equals(o1);
+    }
 
-        EngineEditorInput cei = (EngineEditorInput)o;
-        return engineConfig.equals(cei.engineConfig);
+    public boolean equals(Object object) {
+        if (object == null || object.getClass() != getClass()) return false;
+
+        EngineEditorInput ei = (EngineEditorInput)object;
+
+        if (!equals(engineConfig, ei.engineConfig)) return false;
+
+        return true;
+    }
+
+    public int hashCode() {
+        return (projectNode == null ? 0 : projectNode.hashCode()) +
+                (engineConfig == null ? 0 : engineConfig.hashCode());
     }
 
     public EngineConfig getEngineConfig() {
@@ -71,5 +83,13 @@ public class EngineEditorInput implements IEditorInput {
 
     public void setEngineConfig(EngineConfig engineConfig) {
         this.engineConfig = engineConfig;
+    }
+
+    public ProjectNode getProjectNode() {
+        return projectNode;
+    }
+
+    public void setProjectNode(ProjectNode projectNode) {
+        this.projectNode = projectNode;
     }
 }

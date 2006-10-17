@@ -25,7 +25,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.mapping.*;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
 
@@ -33,7 +34,9 @@ public class MappingEditor extends FormEditor implements ModifyListener {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Partition partition;
+    ProjectNode projectNode;
+
+    Partition partition;
 	EntryMapping entry;
     EntryMapping origEntry;
 
@@ -42,6 +45,7 @@ public class MappingEditor extends FormEditor implements ModifyListener {
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         MappingEditorInput mei = (MappingEditorInput)input;
 
+        projectNode = mei.getProjectNode();
         partition = mei.getPartition();
         origEntry = mei.getEntryDefinition();
         entry = (EntryMapping)origEntry.clone();
@@ -101,8 +105,8 @@ public class MappingEditor extends FormEditor implements ModifyListener {
         if ("".equals(dn)) dn = "Root DSE";
         setPartName(dn);
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
 
         checkDirty();
 	}

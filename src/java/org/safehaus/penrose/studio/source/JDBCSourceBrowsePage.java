@@ -13,7 +13,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.connector.AdapterConfig;
 import org.safehaus.penrose.connector.Connection;
 import org.safehaus.penrose.config.PenroseConfig;
@@ -35,16 +35,16 @@ public class JDBCSourceBrowsePage extends FormPage {
 
     Table table;
 
-    JDBCSourceEditor editor;
+    SourceEditor editor;
     Partition partition;
     SourceConfig sourceConfig;
 
-    public JDBCSourceBrowsePage(JDBCSourceEditor editor) {
+    public JDBCSourceBrowsePage(SourceEditor editor) {
         super(editor, "BROWSE", "  Browse  ");
 
         this.editor = editor;
-        this.partition = editor.partition;
-        this.sourceConfig = editor.sourceConfig;
+        this.partition = editor.getPartition();
+        this.sourceConfig = editor.getSourceConfig();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -118,10 +118,9 @@ public class JDBCSourceBrowsePage extends FormPage {
         table.removeAll();
 
         try {
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
-
-            PartitionManager partitionManager = penroseApplication.getPartitionManager();
+            ProjectNode projectNode = editor.getProjectNode();
+            PenroseConfig penroseConfig = projectNode.getPenroseConfig();
+            PartitionManager partitionManager = projectNode.getPartitionManager();
             Partition partition = partitionManager.getPartition(sourceConfig);
             ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
 

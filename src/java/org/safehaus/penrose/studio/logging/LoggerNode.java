@@ -21,7 +21,8 @@ import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.log4j.LoggerConfig;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.eclipse.swt.graphics.Image;
@@ -40,11 +41,21 @@ public class LoggerNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
+    ProjectNode projectNode;
     LoggerConfig loggerConfig;
 
-    public LoggerNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public LoggerNode(
+            ObjectsView view,
+            ProjectNode projectNode,
+            String name,
+            String type,
+            Image image,
+            Object object,
+            Node parent 
+    ) {
         super(name, type, image, object, parent);
         this.view = view;
+        this.projectNode = projectNode;
         this.loggerConfig = (LoggerConfig)object;
     }
 
@@ -73,17 +84,21 @@ public class LoggerNode extends Node {
 
     public void open() throws Exception {
 
+        Log4jConfig log4jConfig = projectNode.getLog4jConfig();
+
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
         LoggerDialog dialog = new LoggerDialog(shell, SWT.NONE);
         dialog.setText("Edit Logger");
+        dialog.setLog4jConfig(log4jConfig);
         dialog.setLoggerConfig(loggerConfig);
         dialog.open();
     }
 
     public void remove() throws Exception {
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        Log4jConfig loggingConfig = penroseApplication.getLoggingConfig();
-        loggingConfig.removeLoggerConfig(loggerConfig.getName());
-        penroseApplication.notifyChangeListeners();
+        Log4jConfig log4jConfig = projectNode.getLog4jConfig();
+        log4jConfig.removeLoggerConfig(loggerConfig.getName());
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 }

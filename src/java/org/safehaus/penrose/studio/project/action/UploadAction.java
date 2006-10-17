@@ -21,10 +21,12 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.SWT;
-import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.object.ObjectsView;
 import org.apache.log4j.Logger;
 
 public class UploadAction extends Action {
@@ -43,10 +45,13 @@ public class UploadAction extends Action {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
         try {
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            penroseApplication.connect();
-    		penroseApplication.upload(penroseApplication.getWorkDir());
-            penroseApplication.disconnect();
+            IWorkbenchPage page = window.getActivePage();
+            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+
+            ProjectNode projectNode = objectsView.getSelectedProjectNode();
+            if (projectNode == null) return;
+
+    		projectNode.upload();
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

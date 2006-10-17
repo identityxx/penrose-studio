@@ -25,6 +25,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.partition.wizard.ExportPartitionWizard;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
 
@@ -53,7 +54,8 @@ public class ExportPartitionAction extends Action {
             dialog.setPageSize(600, 300);
             dialog.open();
 
-            objectsView.show(objectsView.getPartitionsNode());
+            ProjectNode projectNode = objectsView.getProjectNode("Penrose Server");
+            objectsView.show(projectNode.getPartitionsNode());
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

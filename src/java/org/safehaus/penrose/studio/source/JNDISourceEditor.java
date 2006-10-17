@@ -20,36 +20,20 @@ package org.safehaus.penrose.studio.source;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.SourceConfig;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.SourceMapping;
-import org.apache.log4j.Logger;
 
 import java.util.Iterator;
 
-public class JNDISourceEditor extends FormEditor {
-
-    Logger log = Logger.getLogger(getClass());
-
-    Partition partition;
-	SourceConfig sourceConfig;
-    SourceConfig origSourceConfig;
-
-    boolean dirty;
+public class JNDISourceEditor extends SourceEditor {
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        JNDISourceEditorInput ei = (JNDISourceEditorInput)input;
-        partition = ei.getPartition();
-        origSourceConfig = ei.getSourceConfig();
-        sourceConfig = (SourceConfig)origSourceConfig.clone();
-
         setSite(site);
         setInput(input);
-        setPartName(partition.getName()+"/"+sourceConfig.getName());
+
+        setPartName(getPartition().getName()+"/"+getSourceConfig().getName());
     }
 
     public void addPages() {
@@ -76,59 +60,30 @@ public class JNDISourceEditor extends FormEditor {
 
 	public void store() throws Exception {
 
-        if (!origSourceConfig.getName().equals(sourceConfig.getName())) {
-            partition.renameSourceConfig(origSourceConfig, sourceConfig.getName());
+        if (!getOriginalSourceConfig().getName().equals(getSourceConfig().getName())) {
+            getPartition().renameSourceConfig(getOriginalSourceConfig(), getSourceConfig().getName());
 
-            for (Iterator i=partition.getEntryMappings().iterator(); i.hasNext(); ) {
+            for (Iterator i=getPartition().getEntryMappings().iterator(); i.hasNext(); ) {
                 EntryMapping entryMapping = (EntryMapping)i.next();
                 for (Iterator j=entryMapping.getSourceMappings().iterator(); j.hasNext(); ) {
                     SourceMapping sourceMapping = (SourceMapping)j.next();
-                    if (!sourceMapping.getSourceName().equals(origSourceConfig.getName())) continue;
-                    sourceMapping.setSourceName(sourceConfig.getName());
+                    if (!sourceMapping.getSourceName().equals(getOriginalSourceConfig().getName())) continue;
+                    sourceMapping.setSourceName(getSourceConfig().getName());
                 }
             }
         }
 
-        partition.modifySourceConfig(sourceConfig.getName(), sourceConfig);
+        getPartition().modifySourceConfig(getSourceConfig().getName(), getSourceConfig());
 
-        setPartName(partition.getName()+"/"+sourceConfig.getName());
+        setPartName(getPartition().getName()+"/"+getSourceConfig().getName());
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
 
         checkDirty();
 	}
 
-    public boolean isDirty() {
-        return dirty;
-    }
-
     public boolean isSaveAsAllowed() {
         return false;
-    }
-
-    public void checkDirty() {
-        try {
-            dirty = false;
-
-            if (!origSourceConfig.equals(sourceConfig)) {
-                dirty = true;
-                return;
-            }
-
-        } catch (Exception e) {
-            log.debug(e.getMessage(), e);
-
-        } finally {
-            firePropertyChange(PROP_DIRTY);
-        }
-    }
-
-    public Partition getPartition() {
-        return partition;
-    }
-
-    public void setPartition(Partition partition) {
-        this.partition = partition;
     }
 }

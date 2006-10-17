@@ -14,7 +14,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.connector.AdapterConfig;
 import org.safehaus.penrose.connector.Connection;
@@ -36,16 +36,16 @@ public class JNDISourceBrowsePage extends FormPage {
 
     Table table;
 
-    JNDISourceEditor editor;
+    SourceEditor editor;
     Partition partition;
     SourceConfig sourceConfig;
 
-    public JNDISourceBrowsePage(JNDISourceEditor editor) {
+    public JNDISourceBrowsePage(SourceEditor editor) {
         super(editor, "BROWSE", "  Browse  ");
 
         this.editor = editor;
-        this.partition = editor.partition;
-        this.sourceConfig = editor.sourceConfig;
+        this.partition = editor.getPartition();
+        this.sourceConfig = editor.getSourceConfig();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -119,10 +119,10 @@ public class JNDISourceBrowsePage extends FormPage {
         table.removeAll();
 
         try {
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+            ProjectNode projectNode = editor.getProjectNode();
+            PenroseConfig penroseConfig = projectNode.getPenroseConfig();
 
-            PartitionManager partitionManager = penroseApplication.getPartitionManager();
+            PartitionManager partitionManager = projectNode.getPartitionManager();
             Partition partition = partitionManager.getPartition(sourceConfig);
             ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
 

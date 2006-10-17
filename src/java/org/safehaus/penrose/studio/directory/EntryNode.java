@@ -30,6 +30,7 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.studio.*;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.mapping.*;
@@ -53,13 +54,23 @@ public class EntryNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
+    ProjectNode projectNode;
 
     private Partition partition;
     private EntryMapping entryMapping;
 
-    public EntryNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public EntryNode(
+            ObjectsView view,
+            ProjectNode projectNode,
+            String name,
+            String type,
+            Image image,
+            Object object,
+            Node parent
+    ) {
         super(name, type, image, object, parent);
         this.view = view;
+        this.projectNode = projectNode;
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -136,8 +147,8 @@ public class EntryNode extends Node {
 
     public void showCommercialMenu(IMenuManager manager) throws Exception {
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseWorkbenchAdvisor workbenchAdvisor = penroseApplication.getWorkbenchAdvisor();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
         PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
         PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
@@ -151,7 +162,10 @@ public class EntryNode extends Node {
 
     public void open() throws Exception {
 
-        MappingEditorInput mei = new MappingEditorInput(partition, entryMapping);
+        MappingEditorInput mei = new MappingEditorInput();
+        mei.setProjectNode(projectNode);
+        mei.setPartition(partition);
+        mei.setEntryDefinition(entryMapping);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -161,7 +175,10 @@ public class EntryNode extends Node {
 
     public void editSources() throws Exception {
 
-        MappingEditorInput mei = new MappingEditorInput(partition, entryMapping);
+        MappingEditorInput mei = new MappingEditorInput();
+        mei.setProjectNode(projectNode);
+        mei.setPartition(partition);
+        mei.setEntryDefinition(entryMapping);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -172,7 +189,10 @@ public class EntryNode extends Node {
 
     public void editACL() throws Exception {
 
-        MappingEditorInput mei = new MappingEditorInput(partition, entryMapping);
+        MappingEditorInput mei = new MappingEditorInput();
+        mei.setProjectNode(projectNode);
+        mei.setPartition(partition);
+        mei.setEntryDefinition(entryMapping);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -203,8 +223,8 @@ public class EntryNode extends Node {
             partition.removeEntryMapping(entryMapping);
         }
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public boolean hasChildren() throws Exception {
@@ -221,6 +241,7 @@ public class EntryNode extends Node {
 
             EntryNode entryNode = new EntryNode(
                     view,
+                    projectNode,
                     childMapping.getRdn(),
                     ObjectsView.ENTRY,
                     PenrosePlugin.getImage(PenroseImage.NODE),

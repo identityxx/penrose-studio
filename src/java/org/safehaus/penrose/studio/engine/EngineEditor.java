@@ -23,7 +23,8 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.engine.EngineConfig;
 import org.apache.log4j.Logger;
 
@@ -34,7 +35,8 @@ public class EngineEditor extends MultiPageEditorPart {
 
     Logger log = Logger.getLogger(getClass());
 
-	EngineConfig engineConfig;
+    ProjectNode projectNode;
+    EngineConfig engineConfig;
     EngineConfig origEngineConfig;
 
     boolean dirty;
@@ -43,13 +45,15 @@ public class EngineEditor extends MultiPageEditorPart {
     //EngineCachePage cachePage;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+        setSite(site);
+        setInput(input);
+
         EngineEditorInput ei = (EngineEditorInput)input;
+        projectNode = ei.getProjectNode();
         origEngineConfig = ei.getEngineConfig();
         engineConfig = (EngineConfig)origEngineConfig.clone();
 
-        setSite(site);
-        setInput(input);
-        setPartName("Engine - "+engineConfig.getName());
+        setPartName(input.getName());
     }
 
     protected void createPages() {
@@ -94,10 +98,10 @@ public class EngineEditor extends MultiPageEditorPart {
 
         origEngineConfig.copy(engineConfig);
 
-        setPartName("Engine - "+engineConfig.getName());
+        setPartName(getEditorInput().getName());
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
 
         checkDirty();
     }

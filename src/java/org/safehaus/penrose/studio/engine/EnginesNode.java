@@ -17,9 +17,9 @@
  */
 package org.safehaus.penrose.studio.engine;
 
-import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.engine.EngineConfig;
@@ -36,7 +36,7 @@ public class EnginesNode extends Node {
 
     ObjectsView view;
 
-    public EnginesNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public EnginesNode(ObjectsView view, String name, String type, Image image, Object object, Node parent) {
         super(name, type, image, object, parent);
         this.view = view;
     }
@@ -49,8 +49,8 @@ public class EnginesNode extends Node {
 
         Collection children = new ArrayList();
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        Collection engineConfigs = penroseApplication.getPenroseConfig().getEngineConfigs();
+        ProjectNode projectNode = (ProjectNode)getParent();
+        Collection engineConfigs = projectNode.getPenroseConfig().getEngineConfigs();
 
         for (Iterator i=engineConfigs.iterator(); i.hasNext(); ) {
             EngineConfig engineConfig = (EngineConfig)i.next();

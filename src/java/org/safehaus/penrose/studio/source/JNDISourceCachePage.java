@@ -45,14 +45,14 @@ public class JNDISourceCachePage extends FormPage {
     Text sizeLimitText;
     Combo loadingMethodCombo;
 
-    JNDISourceEditor editor;
+    SourceEditor editor;
 	SourceConfig sourceConfig;
 
-    public JNDISourceCachePage(JNDISourceEditor editor) {
+    public JNDISourceCachePage(SourceEditor editor) {
         super(editor, "CACHE", "  Cache  ");
 
         this.editor = editor;
-        this.sourceConfig = editor.sourceConfig;
+        this.sourceConfig = editor.getSourceConfig();
     }
 
     public void createFormContent(IManagedForm managedForm) {

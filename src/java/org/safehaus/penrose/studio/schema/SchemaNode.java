@@ -20,8 +20,9 @@ package org.safehaus.penrose.studio.schema;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenrosePlugin;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.schema.SchemaConfig;
 import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.schema.Schema;
@@ -44,12 +45,22 @@ public class SchemaNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
+    ProjectNode projectNode;
 
     private SchemaConfig schemaConfig;
 
-    public SchemaNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public SchemaNode(
+            ObjectsView view,
+            ProjectNode projectNode,
+            String name,
+            String type,
+            Image image,
+            Object object,
+            Node parent
+    ) {
         super(name, type, image, object, parent);
         this.view = view;
+        this.projectNode = projectNode;
     }
 
     public void showMenu(IMenuManager manager) {
@@ -87,10 +98,13 @@ public class SchemaNode extends Node {
 
     public void open() throws Exception {
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        SchemaManager schemaManager = penroseApplication.getSchemaManager();
+        SchemaManager schemaManager = projectNode.getSchemaManager();
         Schema schema = schemaManager.getSchema(schemaConfig.getName());
-        SchemaEditorInput ei = new SchemaEditorInput(schemaConfig, schema);
+
+        SchemaEditorInput ei = new SchemaEditorInput();
+        ei.setProjectNode(projectNode);
+        ei.setSchemaConfig(schemaConfig);
+        ei.setSchema(schema);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -108,53 +122,20 @@ public class SchemaNode extends Node {
 
         if (!confirm) return;
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+        PenroseConfig penroseConfig = projectNode.getPenroseConfig();
         penroseConfig.removeSchemaConfig(schemaConfig.getName());
 
-        SchemaManager schemaManager = penroseApplication.getSchemaManager();
+        SchemaManager schemaManager = projectNode.getSchemaManager();
         schemaManager.removeSchema(schemaConfig.getName());
 
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public boolean hasChildren() throws Exception {
         return false;
     }
-/*
-    public Collection getChildren() throws Exception {
 
-        Collection children = new ArrayList();
-
-        AttributeTypesNode attributeTypesNode = new AttributeTypesNode(
-                view,
-                ObjectsView.ATTRIBUTE_TYPES,
-                ObjectsView.ATTRIBUTE_TYPES,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
-                ObjectsView.ATTRIBUTE_TYPES,
-                this
-        );
-
-        attributeTypesNode.setSchemaConfig(schemaConfig);
-
-        children.add(attributeTypesNode);
-
-        ObjectClassesNode objectClassesNode = new ObjectClassesNode(
-                view,
-                ObjectsView.OBJECT_CLASSES,
-                ObjectsView.OBJECT_CLASSES,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
-                ObjectsView.OBJECT_CLASSES,
-                this
-        );
-
-        objectClassesNode.setSchemaConfig(schemaConfig);
-
-        children.add(objectClassesNode);
-
-        return children;
-    }
-*/
     public SchemaConfig getSchemaConfig() {
         return schemaConfig;
     }

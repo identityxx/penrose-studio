@@ -17,9 +17,9 @@
  */
 package org.safehaus.penrose.studio.schema;
 
-import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.schema.action.ImportSchemaAction;
 import org.safehaus.penrose.studio.schema.action.NewSchemaAction;
 import org.safehaus.penrose.studio.object.ObjectsView;
@@ -43,7 +43,14 @@ public class SchemasNode extends Node {
 
     ObjectsView view;
 
-    public SchemasNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public SchemasNode(
+            ObjectsView view,
+            String name,
+            String type,
+            Image image,
+            Object object,
+            Node parent
+    ) {
         super(name, type, image, object, parent);
         this.view = view;
     }
@@ -54,8 +61,8 @@ public class SchemasNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+        ProjectNode projectNode = (ProjectNode)getParent();
+        PenroseConfig penroseConfig = projectNode.getPenroseConfig();
         return !penroseConfig.getSchemaConfigs().isEmpty();
     }
 
@@ -63,8 +70,8 @@ public class SchemasNode extends Node {
 
         Collection children = new ArrayList();
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+        ProjectNode projectNode = (ProjectNode)getParent();
+        PenroseConfig penroseConfig = projectNode.getPenroseConfig();
 
         Collection schemaConfigs = penroseConfig.getSchemaConfigs();
         for (Iterator i=schemaConfigs.iterator(); i.hasNext(); ) {
@@ -72,6 +79,7 @@ public class SchemasNode extends Node {
 
             SchemaNode schemaNode = new SchemaNode(
                     view,
+                    projectNode,
                     schemaConfig.getName(),
                     ObjectsView.SCHEMA,
                     PenrosePlugin.getImage(PenroseImage.SCHEMA),

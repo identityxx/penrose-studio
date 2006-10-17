@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.*;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
 import org.safehaus.penrose.cache.CacheConfig;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.apache.log4j.Logger;
 
@@ -57,8 +57,9 @@ public class EngineCachePage {
 
     public EngineCachePage(EngineEditor editor) {
         this.editor = editor;
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseConfig serverConfig = penroseApplication.getPenroseConfig();
+
+        ProjectNode projectNode = editor.projectNode;
+        PenroseConfig serverConfig = projectNode.getPenroseConfig();
         this.cacheConfig = serverConfig.getEntryCacheConfig();
     }
 

@@ -24,8 +24,12 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.preview.PreviewEditorInput;
 import org.safehaus.penrose.studio.preview.PreviewEditor;
+import org.safehaus.penrose.user.UserConfig;
+import org.safehaus.penrose.config.PenroseConfig;
 import org.apache.log4j.Logger;
 
 /**
@@ -46,10 +50,23 @@ public class PreviewAction extends Action {
 	public void run() {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         try {
-            IWorkbenchPage activePage = window.getActivePage();
+            IWorkbenchPage page = window.getActivePage();
+            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
-            //activePage.showView(ConsoleView.class.getName());
-            activePage.openEditor(new PreviewEditorInput(), PreviewEditor.class.getName());
+            ProjectNode projectNode = objectsView.getSelectedProjectNode();
+            if (projectNode == null) return;
+
+            PenroseConfig penroseConfig = projectNode.getPenroseConfig();
+
+            UserConfig rootUserConfig = penroseConfig.getRootUserConfig();
+
+            PreviewEditorInput ei = new PreviewEditorInput();
+            ei.setProjectNode(projectNode);
+            ei.setBaseDn("");
+            ei.setBindDn(rootUserConfig.getDn());
+            ei.setBindPassword(rootUserConfig.getPassword());
+
+            page.openEditor(ei, PreviewEditor.class.getName());
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

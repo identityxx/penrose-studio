@@ -33,7 +33,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.module.ModuleMappingDialog;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
 import org.safehaus.penrose.schema.ObjectClass;
@@ -293,7 +293,7 @@ public class ObjectClassEditor extends EditorPart implements ModifyListener, Sel
 
     public void store() throws Exception {
 
-        //Schema schema = PenroseApplication.getSchema();
+        //Schema schema = PenroseStudio.getSchema();
 
         boolean rename = !oidText.getText().equals(objectClass.getOid());
         if (rename) {
@@ -308,8 +308,8 @@ public class ObjectClassEditor extends EditorPart implements ModifyListener, Sel
 
         setPartName("Object Class - "+objectClass.getName());
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
 
         checkDirty();
     }

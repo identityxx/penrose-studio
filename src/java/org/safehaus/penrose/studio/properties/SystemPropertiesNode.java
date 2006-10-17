@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.properties;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
@@ -36,7 +37,7 @@ public class SystemPropertiesNode extends Node {
 
     ObjectsView view;
 
-    public SystemPropertiesNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public SystemPropertiesNode(ObjectsView view, String name, String type, Image image, Object object, Node parent) {
         super(name, type, image, object, parent);
         this.view = view;
     }
@@ -55,7 +56,12 @@ public class SystemPropertiesNode extends Node {
     }
 
     public void open() throws Exception {
+
+        ProjectNode projectNode = (ProjectNode)getParent();
+
         SystemPropertiesEditorInput ei = new SystemPropertiesEditorInput();
+        ei.setProject(projectNode.getProject());
+        ei.setPenroseConfig(projectNode.getPenroseConfig());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();

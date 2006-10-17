@@ -27,7 +27,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.studio.directory.wizard.CreateLDAPProxyWizard;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.apache.log4j.Logger;
 
 public class MapLDAPTreeFromTopAction extends Action {
@@ -51,8 +51,8 @@ public class MapLDAPTreeFromTopAction extends Action {
 
             Shell shell = window.getShell();
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            //if (!penroseApplication.checkCommercial()) return;
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            //if (!penroseStudio.checkCommercial()) return;
 
             Wizard wizard = new CreateLDAPProxyWizard(node.getPartition());
 
@@ -60,7 +60,7 @@ public class MapLDAPTreeFromTopAction extends Action {
             dialog.setPageSize(600, 300);
             dialog.open();
 
-            penroseApplication.notifyChangeListeners();
+            penroseStudio.notifyChangeListeners();
 
             objectsView.show(node);
 

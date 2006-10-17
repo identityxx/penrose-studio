@@ -15,6 +15,7 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
 import org.safehaus.penrose.log4j.AppenderConfig;
 import org.safehaus.penrose.log4j.LayoutConfig;
+import org.safehaus.penrose.log4j.Log4jConfig;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -35,8 +36,9 @@ public class AppenderDialog extends Dialog {
 
     Table parametersTable;
 
-    private int action;
+    int action;
 
+    Log4jConfig log4jConfig;
     AppenderConfig appenderConfig;
 
     public AppenderDialog(Shell parent, int style) {
@@ -318,5 +320,13 @@ public class AppenderDialog extends Dialog {
                 item.setText(1, value);
             }
         }
+    }
+
+    public Log4jConfig getLog4jConfig() {
+        return log4jConfig;
+    }
+
+    public void setLog4jConfig(Log4jConfig log4jConfig) {
+        this.log4jConfig = log4jConfig;
     }
 }

@@ -22,19 +22,16 @@ import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.studio.project.ProjectNode;
 
 /**
  * @author Endi S. Dewata
  */
 public class MappingEditorInput implements IEditorInput {
 
+    private ProjectNode projectNode;
     private Partition partition;
     private EntryMapping entryDefinition;
-
-    public MappingEditorInput(Partition partition, EntryMapping entryDefinition) {
-        this.partition = partition;
-        this.entryDefinition = entryDefinition;
-    }
 
     public boolean exists() {
         return true;
@@ -82,5 +79,13 @@ public class MappingEditorInput implements IEditorInput {
 
     public void setPartition(Partition partition) {
         this.partition = partition;
+    }
+
+    public ProjectNode getProjectNode() {
+        return projectNode;
+    }
+
+    public void setProjectNode(ProjectNode projectNode) {
+        this.projectNode = projectNode;
     }
 }

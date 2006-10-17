@@ -37,7 +37,7 @@ import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.connector.JDBCAdapter;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -80,10 +80,10 @@ public class JDBCConnectionTablesPage extends FormPage {
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
 /*
-        if (penroseApplication.isFreeware()) {
-            Label label = toolkit.createLabel(body, PenroseApplication.FEATURE_NOT_AVAILABLE);
+        if (penroseStudio.isFreeware()) {
+            Label label = toolkit.createLabel(body, PenroseStudio.FEATURE_NOT_AVAILABLE);
             label.setLayoutData(new GridData(GridData.FILL_BOTH));
             return;
         }
@@ -211,8 +211,8 @@ public class JDBCConnectionTablesPage extends FormPage {
                     dialog.setPageSize(600, 300);
                     dialog.open();
 
-                    PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    penroseApplication.notifyChangeListeners();
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    penroseStudio.notifyChangeListeners();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);

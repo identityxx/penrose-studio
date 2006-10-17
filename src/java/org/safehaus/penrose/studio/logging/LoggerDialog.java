@@ -26,7 +26,6 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.log4j.LoggerConfig;
 import org.safehaus.penrose.log4j.RootConfig;
 import org.safehaus.penrose.log4j.Log4jConfig;
@@ -52,6 +51,7 @@ public class LoggerDialog extends Dialog {
 
     private int action;
 
+    Log4jConfig log4jConfig;
     LoggerConfig loggerConfig;
     RootConfig rootConfig;
 
@@ -189,9 +189,7 @@ public class LoggerDialog extends Dialog {
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
 
-                PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                Log4jConfig loggingConfig = penroseApplication.getLoggingConfig();
-                Collection appenderConfigs = loggingConfig.getAppenderConfigs();
+                Collection appenderConfigs = log4jConfig.getAppenderConfigs();
 
                 AppenderSelectionDialog dialog = new AppenderSelectionDialog(shell, SWT.NONE);
                 dialog.setText("Appenders");
@@ -299,5 +297,13 @@ public class LoggerDialog extends Dialog {
         setLoggerLevel(rootConfig.getLevel());
         additivityCheckbox.setEnabled(false);
         setAppenders(rootConfig.getAppenders());
+    }
+
+    public Log4jConfig getLog4jConfig() {
+        return log4jConfig;
+    }
+
+    public void setLog4jConfig(Log4jConfig log4jConfig) {
+        this.log4jConfig = log4jConfig;
     }
 }

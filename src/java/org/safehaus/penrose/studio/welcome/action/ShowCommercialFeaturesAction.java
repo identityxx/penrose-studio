@@ -19,7 +19,7 @@ package org.safehaus.penrose.studio.welcome.action;
 
 import org.eclipse.jface.action.Action;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseWorkbenchAdvisor;
 import org.safehaus.penrose.studio.PenroseWorkbenchWindowAdvisor;
 import org.safehaus.penrose.studio.PenroseActionBarAdvisor;
@@ -39,8 +39,8 @@ public class ShowCommercialFeaturesAction extends Action {
 
 	public void run() {
         try {
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseWorkbenchAdvisor workbenchAdvisor = penroseApplication.getWorkbenchAdvisor();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            PenroseWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
             PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
             PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 

@@ -20,50 +20,33 @@ package org.safehaus.penrose.studio.connection;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseWorkbenchAdvisor;
 import org.safehaus.penrose.studio.PenroseWorkbenchWindowAdvisor;
 import org.safehaus.penrose.studio.PenroseActionBarAdvisor;
-import org.safehaus.penrose.partition.ConnectionConfig;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.SourceConfig;
-import org.apache.log4j.Logger;
 
 import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
  */
-public class JNDIConnectionEditor extends FormEditor {
-
-    Logger log = Logger.getLogger(getClass());
-    
-    boolean dirty;
-
-    private Partition partition;
-    ConnectionConfig origConnectionConfig;
-    private ConnectionConfig connectionConfig;
+public class JNDIConnectionEditor extends ConnectionEditor {
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        JNDIConnectionEditorInput cei = (JNDIConnectionEditorInput)input;
-
-        partition = cei.getPartition();
-        origConnectionConfig = cei.getConnectionConfig();
-        connectionConfig = (ConnectionConfig)origConnectionConfig.clone();
-
         setSite(site);
         setInput(input);
-        setPartName(partition.getName()+"/"+connectionConfig.getName());
+
+        setPartName(getPartition().getName()+"/"+getConnectionConfig().getName());
     }
 
     public void addPages() {
         try {
             addPage(new JNDIConnectionPropertiesPage(this));
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseWorkbenchAdvisor workbenchAdvisor = penroseApplication.getWorkbenchAdvisor();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            PenroseWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
             PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
             PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
@@ -91,64 +74,27 @@ public class JNDIConnectionEditor extends FormEditor {
 
     public void store() throws Exception {
 
-        if (!origConnectionConfig.getName().equals(connectionConfig.getName())) {
-            partition.renameConnectionConfig(origConnectionConfig, connectionConfig.getName());
+        if (!getOriginalConnectionConfig().getName().equals(getConnectionConfig().getName())) {
+            getPartition().renameConnectionConfig(getOriginalConnectionConfig(), getConnectionConfig().getName());
 
-            for (Iterator i=partition.getSourceConfigs().iterator(); i.hasNext(); ) {
+            for (Iterator i=getPartition().getSourceConfigs().iterator(); i.hasNext(); ) {
                 SourceConfig sourceConfig = (SourceConfig)i.next();
-                if (!sourceConfig.getConnectionName().equals(origConnectionConfig.getName())) continue;
-                sourceConfig.setConnectionName(connectionConfig.getName());
+                if (!sourceConfig.getConnectionName().equals(getOriginalConnectionConfig().getName())) continue;
+                sourceConfig.setConnectionName(getConnectionConfig().getName());
             }
         }
 
-        partition.modifyConnectionConfig(connectionConfig.getName(), connectionConfig);
+        getPartition().modifyConnectionConfig(getConnectionConfig().getName(), getConnectionConfig());
 
-        setPartName(partition.getName()+"/"+connectionConfig.getName());
+        setPartName(getPartition().getName()+"/"+getConnectionConfig().getName());
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
 
         checkDirty();
     }
 
-    public boolean isDirty() {
-        return dirty;
-    }
-
     public boolean isSaveAsAllowed() {
         return false;
-    }
-
-    public void checkDirty() {
-        try {
-            dirty = false;
-
-            if (!origConnectionConfig.equals(connectionConfig)) {
-                dirty = true;
-                return;
-            }
-
-        } catch (Exception e) {
-            log.debug(e.getMessage(), e);
-
-        } finally {
-            firePropertyChange(PROP_DIRTY);
-        }
-    }
-
-    public Partition getPartition() {
-        return partition;
-    }
-
-    public void setPartition(Partition partition) {
-        this.partition = partition;
-    }
-
-    public ConnectionConfig getConnectionConfig() {
-        return connectionConfig;
-    }
-
-    public void setConnectionConfig(ConnectionConfig connectionConfig) {
-        this.connectionConfig = connectionConfig;
     }
 }

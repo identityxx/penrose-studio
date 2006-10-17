@@ -18,8 +18,9 @@
 package org.safehaus.penrose.studio.source;
 
 import org.safehaus.penrose.studio.PenrosePlugin;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.source.action.NewSourceAction;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
@@ -44,12 +45,22 @@ public class SourcesNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
+    ProjectNode projectNode;
 
     private Partition partition;
 
-    public SourcesNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public SourcesNode(
+            ObjectsView view,
+            ProjectNode projectNode,
+            String name,
+            String type,
+            Image image,
+            Object object,
+            Node parent
+    ) {
         super(name, type, image, object, parent);
         this.view = view;
+        this.projectNode = projectNode;
     }
 
     public void showMenu(IMenuManager manager) {
@@ -89,8 +100,8 @@ public class SourcesNode extends Node {
 
         view.setClipboard(null);
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public boolean hasChildren() throws Exception {
@@ -107,6 +118,7 @@ public class SourcesNode extends Node {
 
             SourceNode sourceNode = new SourceNode(
                     view,
+                    projectNode,
                     sourceConfig.getName(),
                     ObjectsView.SOURCE,
                     PenrosePlugin.getImage(PenroseImage.SOURCE),

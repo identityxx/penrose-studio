@@ -58,7 +58,12 @@ public class ObjectsContentProvider implements ITreeContentProvider {
     }
 
     public Object[] getElements(Object inputElement) {
-        return view.nodes.toArray();
+        /*
+        PenroseStudio penroseApplication = PenroseStudio.getInstance();
+        ApplicationConfig applicationConfig = penroseApplication.getApplicationConfig();
+        return applicationConfig.getProjects().toArray();
+        */
+        return view.projects.values().toArray();
     }
 
     public Object getParent(Object element) {

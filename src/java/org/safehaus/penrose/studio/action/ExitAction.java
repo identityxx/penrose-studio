@@ -22,38 +22,32 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.studio.PenroseApplication;
 
 public class ExitAction implements IWorkbenchWindowActionDelegate {
 
-	private IWorkbenchWindow window;
+    private IWorkbenchWindow window;
 
-	public ExitAction() {
-	}
+    public ExitAction() {
+    }
 
-	public void run(IAction action) {
-		boolean confirmed = true;
+    public void run(IAction action) {
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        if (penroseApplication.isDirty()) {
-            confirmed = MessageDialog.openConfirm(
-                    window.getShell(),
-                    "Confirm Exit",
-                    "Are you sure you want to exit?\nYou will lose unsaved works!");
-        }
+        boolean confirmed = MessageDialog.openConfirm(
+                window.getShell(),
+                "Confirm Exit",
+                "Are you sure you want to exit?"
+        );
 
-		if (confirmed) {
-			System.exit(0);
-		}
-	}
+        if (confirmed) System.exit(0);
+    }
 
-	public void selectionChanged(IAction action, ISelection selection) {
-	}
+    public void selectionChanged(IAction action, ISelection selection) {
+    }
 
-	public void dispose() {
-	}
+    public void dispose() {
+    }
 
-	public void init(IWorkbenchWindow window) {
+    public void init(IWorkbenchWindow window) {
         this.window = window;
-	}
+    }
 }

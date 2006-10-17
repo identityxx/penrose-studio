@@ -25,7 +25,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.jface.action.Action;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.directory.EntryNode;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.mapping.SourceDialog;
 import org.safehaus.penrose.mapping.SourceMapping;
 import org.safehaus.penrose.mapping.EntryMapping;
@@ -62,8 +62,8 @@ public class NewEntryFromSourceAction extends Action {
 
             Shell shell = window.getShell();
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            //if (!penroseApplication.checkCommercial()) return;
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            //if (!penroseStudio.checkCommercial()) return;
 
             Partition partition = node.getPartition();
             EntryMapping entryMapping = node.getEntryMapping();
@@ -155,7 +155,7 @@ public class NewEntryFromSourceAction extends Action {
 
             partition.addEntryMapping(entry);
 
-            penroseApplication.notifyChangeListeners();
+            penroseStudio.notifyChangeListeners();
 
             objectsView.show(node);
 

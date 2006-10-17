@@ -37,7 +37,7 @@ import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.studio.connection.wizard.JNDISourceWizard;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.apache.log4j.Logger;
 
@@ -84,10 +84,10 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
 /*
-        if (penroseApplication.isFreeware()) {
-            Label label = toolkit.createLabel(body, PenroseApplication.FEATURE_NOT_AVAILABLE);
+        if (penroseStudio.isFreeware()) {
+            Label label = toolkit.createLabel(body, PenroseStudio.FEATURE_NOT_AVAILABLE);
             label.setLayoutData(new GridData(GridData.FILL_BOTH));
             return;
         }
@@ -190,8 +190,8 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
                     dialog.setPageSize(600, 300);
                     dialog.open();
 
-                    PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    penroseApplication.notifyChangeListeners();
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    penroseStudio.notifyChangeListeners();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -225,8 +225,8 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
                     dialog.setPageSize(600, 300);
                     dialog.open();
 
-                    PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    penroseApplication.notifyChangeListeners();
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    penroseStudio.notifyChangeListeners();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -283,8 +283,8 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
                     dialog.setPageSize(600, 300);
                     dialog.open();
 
-                    PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    penroseApplication.notifyChangeListeners();
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    penroseStudio.notifyChangeListeners();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);

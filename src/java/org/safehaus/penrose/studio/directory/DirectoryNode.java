@@ -18,6 +18,7 @@
 package org.safehaus.penrose.studio.directory;
 
 import org.safehaus.penrose.studio.*;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.directory.action.*;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.mapping.EntryMapping;
@@ -41,20 +42,30 @@ public class DirectoryNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
+    ProjectNode projectNode;
 
     private Partition partition;
 
-    public DirectoryNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public DirectoryNode(
+            ObjectsView view,
+            ProjectNode projectNode,
+            String name,
+            String type,
+            Image image,
+            Object object,
+            Node parent
+    ) {
         super(name, type, image, object, parent);
         this.view = view;
+        this.projectNode = projectNode;
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
 
         manager.add(new NewRootEntryAction(this));
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseWorkbenchAdvisor workbenchAdvisor = penroseApplication.getWorkbenchAdvisor();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
         PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
         PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
@@ -84,6 +95,7 @@ public class DirectoryNode extends Node {
 
             EntryNode entryNode = new EntryNode(
                     view,
+                    projectNode,
                     dn,
                     ObjectsView.ENTRY,
                     PenrosePlugin.getImage(PenroseImage.HOME_NODE),

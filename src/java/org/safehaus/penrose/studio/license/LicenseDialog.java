@@ -118,12 +118,12 @@ public class LicenseDialog extends Dialog {
             blank.setLayoutData(gd);
 /*
             Label titleLabel = new Label(parent, SWT.CENTER);
-            titleLabel.setText(PenroseApplication.PRODUCT_NAME);
+            titleLabel.setText(PenroseStudio.PRODUCT_NAME);
             titleLabel.setFont(boldFont);
             titleLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
             Label versionLabel = new Label(parent, SWT.CENTER);
-            versionLabel.setText("Version "+ PenroseApplication.PRODUCT_VERSION);
+            versionLabel.setText("Version "+ PenroseStudio.PRODUCT_VERSION);
             versionLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
             Label copyrightLabel = new Label(parent, SWT.CENTER);

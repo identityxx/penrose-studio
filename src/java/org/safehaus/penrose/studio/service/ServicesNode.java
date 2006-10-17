@@ -19,7 +19,7 @@ package org.safehaus.penrose.studio.service;
 
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.service.action.NewServiceAction;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
@@ -42,7 +42,7 @@ public class ServicesNode extends Node {
 
     ObjectsView view;
 
-    public ServicesNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public ServicesNode(ObjectsView view, String name, String type, Image image, Object object, Node parent) {
         super(name, type, image, object, parent);
         this.view = view;
     }
@@ -61,8 +61,8 @@ public class ServicesNode extends Node {
 
         Collection children = new ArrayList();
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+        ProjectNode projectNode = (ProjectNode)getParent();
+        PenroseConfig penroseConfig = projectNode.getPenroseConfig();
         for (Iterator i=penroseConfig.getServiceConfigs().iterator(); i.hasNext(); ) {
             ServiceConfig serviceConfig = (ServiceConfig)i.next();
 

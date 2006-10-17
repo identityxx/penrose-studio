@@ -29,7 +29,6 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.connector.JDBCAdapter;
 import org.apache.log4j.Logger;
@@ -53,16 +52,16 @@ public class JDBCSourcePropertyPage extends FormPage {
     Button editButton;
     Button removeButton;
 
-    JDBCSourceEditor editor;
+    SourceEditor editor;
     Partition partition;
 	SourceConfig sourceConfig;
 
-    public JDBCSourcePropertyPage(JDBCSourceEditor editor) {
+    public JDBCSourcePropertyPage(SourceEditor editor) {
         super(editor, "PROPERTIES", "  Properties  ");
 
         this.editor = editor;
-        this.partition = editor.partition;
-        this.sourceConfig = editor.sourceConfig;
+        this.partition = editor.getPartition();
+        this.sourceConfig = editor.getSourceConfig();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -262,8 +261,7 @@ public class JDBCSourcePropertyPage extends FormPage {
                     FieldConfig fieldConfig = (FieldConfig)item.getData();
                     String oldName = fieldConfig.getName();
 
-                    PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    PartitionManager partitionManager = penroseApplication.getPartitionManager();
+                    PartitionManager partitionManager = editor.getProjectNode().getPartitionManager();
                     Partition partition = partitionManager.getPartition(sourceConfig);
 
                     ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
@@ -352,8 +350,7 @@ public class JDBCSourcePropertyPage extends FormPage {
                 try {
                     FieldConfig fieldDefinition = new FieldConfig();
 
-                    PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    PartitionManager partitionManager = penroseApplication.getPartitionManager();
+                    PartitionManager partitionManager = editor.getProjectNode().getPartitionManager();
                     Partition partition = partitionManager.getPartition(sourceConfig);
 
                     ConnectionConfig connection = partition.getConnectionConfig(sourceConfig.getConnectionName());
@@ -407,8 +404,7 @@ public class JDBCSourcePropertyPage extends FormPage {
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     String oldName = fieldDefinition.getName();
 
-                    PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    PartitionManager partitionManager = penroseApplication.getPartitionManager();
+                    PartitionManager partitionManager = editor.getProjectNode().getPartitionManager();
                     Partition partition = partitionManager.getPartition(sourceConfig);
 
                     ConnectionConfig connection = partition.getConnectionConfig(sourceConfig.getConnectionName());
