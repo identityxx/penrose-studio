@@ -21,6 +21,7 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.log4j.Log4jConfig;
@@ -86,7 +87,8 @@ public class LoggersNode extends Node {
     }
 
     public void open() throws Exception {
-        Log4jConfig loggingConfig = projectNode.getLog4jConfig();
+        Project project = projectNode.getProject();
+        Log4jConfig loggingConfig = project.getLog4jConfig();
 
         RootConfig rootConfig = loggingConfig.getRootConfig();
         if (rootConfig == null) rootConfig = new RootConfig();
@@ -109,7 +111,8 @@ public class LoggersNode extends Node {
 
     public void createLogger() throws Exception {
 
-        Log4jConfig loggingConfig = projectNode.getLog4jConfig();
+        Project project = projectNode.getProject();
+        Log4jConfig loggingConfig = project.getLog4jConfig();
 
         LoggerConfig loggerConfig = new LoggerConfig();
 
@@ -128,7 +131,8 @@ public class LoggersNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        Log4jConfig loggingConfig = projectNode.getLog4jConfig();
+        Project project = projectNode.getProject();
+        Log4jConfig loggingConfig = project.getLog4jConfig();
         return !loggingConfig.getLoggerConfigs().isEmpty();
     }
 
@@ -136,7 +140,8 @@ public class LoggersNode extends Node {
 
         Collection children = new ArrayList();
 
-        Log4jConfig loggingConfig = projectNode.getLog4jConfig();
+        Project project = projectNode.getProject();
+        Log4jConfig loggingConfig = project.getLog4jConfig();
 
         for (Iterator i=loggingConfig.getLoggerConfigs().iterator(); i.hasNext(); ) {
             LoggerConfig loggerConfig = (LoggerConfig)i.next();

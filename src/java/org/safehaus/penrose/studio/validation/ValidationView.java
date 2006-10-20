@@ -46,7 +46,9 @@ import org.safehaus.penrose.studio.connection.ConnectionEditorInput;
 import org.safehaus.penrose.studio.source.SourceEditorInput;
 import org.safehaus.penrose.studio.source.*;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.util.SWTUtil;
 import org.safehaus.penrose.partition.*;
@@ -74,14 +76,10 @@ public class ValidationView extends ViewPart {
 				Action refreshAction = new Action("Refresh") {
 					public void run() {
                         try {
-                            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-                            IWorkbenchPage page = window.getActivePage();
-                            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
-
-                            Collection projectNodes = objectsView.getProjectNodes();
-                            for (Iterator i=projectNodes.iterator(); i.hasNext(); ) {
-                                ProjectNode projectNode = (ProjectNode)i.next();
-                                projectNode.validate();
+                            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                            for (Iterator i=penroseStudio.getProjects().iterator(); i.hasNext(); ) {
+                                Project project = (Project)i.next();
+                                project.validate();
                             }
 
                         } catch (Exception e) {
@@ -160,7 +158,8 @@ public class ValidationView extends ViewPart {
         ProjectNode projectNode = objectsView.getSelectedProjectNode();
         if (projectNode == null) return;
 
-        PartitionManager partitionManager = projectNode.getPartitionManager();
+        Project project = projectNode.getProject();
+        PartitionManager partitionManager = project.getPartitionManager();
 
 		if (object instanceof ConnectionConfig) {
             ConnectionConfig connectionConfig = (ConnectionConfig)object;

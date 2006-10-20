@@ -123,7 +123,7 @@ public class SourceNode extends Node {
         IWorkbenchPage page = window.getActivePage();
 
         SourceEditorInput ei = new SourceEditorInput();
-        ei.setProjectNode(projectNode);
+        ei.setProject(projectNode.getProject());
         ei.setPartition(partition);
         ei.setSourceConfig(sourceConfig);
 

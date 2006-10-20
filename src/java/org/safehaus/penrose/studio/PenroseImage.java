@@ -27,6 +27,10 @@ public class PenroseImage {
     public final static String UPLOAD            = "images/upload.png";
     public final static String CLOSE             = "images/close.png";
 
+    public final static String CUT               = "images/cut.png";
+    public final static String COPY              = "images/copy.png";
+    public final static String PASTE             = "images/paste.png";
+
 	public final static String REFRESH           = "images/refresh.gif";
 	public final static String ADD               = "images/folder-add.gif";
 	public final static String DELETE            = "images/delete.gif";

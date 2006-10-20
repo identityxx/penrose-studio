@@ -22,6 +22,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.config.PenroseConfig;
@@ -77,10 +78,11 @@ public class ImportSchemaWizard extends Wizard {
             schemaConfig.setName(name);
             schemaConfig.setPath(path);
 
-            PenroseConfig penroseConfig = projectNode.getPenroseConfig();
+            Project project = projectNode.getProject();
+            PenroseConfig penroseConfig = project.getPenroseConfig();
             penroseConfig.addSchemaConfig(schemaConfig);
 
-            SchemaManager schemaManager = projectNode.getSchemaManager();
+            SchemaManager schemaManager = project.getSchemaManager();
             schemaManager.load(projectNode.getWorkDir(), schemaConfig);
 
             return true;

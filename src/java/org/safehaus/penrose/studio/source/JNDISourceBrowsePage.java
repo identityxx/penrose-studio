@@ -14,7 +14,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.connector.AdapterConfig;
 import org.safehaus.penrose.connector.Connection;
@@ -119,10 +119,10 @@ public class JNDISourceBrowsePage extends FormPage {
         table.removeAll();
 
         try {
-            ProjectNode projectNode = editor.getProjectNode();
-            PenroseConfig penroseConfig = projectNode.getPenroseConfig();
+            Project project = editor.getProject();
+            PenroseConfig penroseConfig = project.getPenroseConfig();
 
-            PartitionManager partitionManager = projectNode.getPartitionManager();
+            PartitionManager partitionManager = project.getPartitionManager();
             Partition partition = partitionManager.getPartition(sourceConfig);
             ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
 

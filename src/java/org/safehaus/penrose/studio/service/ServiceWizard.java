@@ -23,6 +23,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.apache.log4j.Logger;
@@ -76,7 +77,8 @@ public class ServiceWizard extends Wizard {
             ProjectNode projectNode = objectsView.getSelectedProjectNode();
             if (projectNode == null) return false;
 
-            PenroseConfig penroseConfig = projectNode.getPenroseConfig();
+            Project project = projectNode.getProject();
+            PenroseConfig penroseConfig = project.getPenroseConfig();
             penroseConfig.addServiceConfig(serviceConfig);
 
             return true;

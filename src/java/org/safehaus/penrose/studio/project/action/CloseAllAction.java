@@ -9,16 +9,18 @@ import org.eclipse.swt.widgets.Shell;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.object.ObjectsView;
 
 import java.util.Iterator;
 
-public class CloseAllProjectsAction extends Action {
+public class CloseAllAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
-    public CloseAllProjectsAction() {
+    public CloseAllAction() {
         setText("&Close All");
         setToolTipText("Close All");
         setId(getClass().getName());
@@ -26,30 +28,14 @@ public class CloseAllProjectsAction extends Action {
 
     public void run() {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        IWorkbenchPage page = window.getActivePage();
         Shell shell = window.getShell();
 
-        ObjectsView objectsView;
-
-        try {
-            objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-
-            MessageDialog.openError(
-                    shell,
-                    "ERROR",
-                    "Failed closing project.\n"+
-                            "See penrose-studio-log.txt for details."
-            );
-            return;
-        }
-
-        for (Iterator i=objectsView.getProjectNodes().iterator(); i.hasNext(); ) {
-            ProjectNode projectNode = (ProjectNode)i.next();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        for (Iterator i=penroseStudio.getProjects().iterator(); i.hasNext(); ) {
+            Project project = (Project)i.next();
 
             try {
-                projectNode.close();
+                penroseStudio.close(project);
 
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
@@ -57,7 +43,7 @@ public class CloseAllProjectsAction extends Action {
                 MessageDialog.openError(
                         shell,
                         "ERROR",
-                        "Failed closing "+projectNode.getName()+".\n"+
+                        "Failed closing "+project.getName()+".\n"+
                                 "See penrose-studio-log.txt for details."
                 );
             }

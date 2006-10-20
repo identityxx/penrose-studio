@@ -22,6 +22,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.schema.SchemaConfig;
@@ -94,10 +95,11 @@ public class NewSchemaWizard extends Wizard {
             SchemaWriter schemaWriter = new SchemaWriter(workDir);
             schemaWriter.write(schema);
 
-            PenroseConfig penroseConfig = projectNode.getPenroseConfig();
+            Project project = projectNode.getProject();
+            PenroseConfig penroseConfig = project.getPenroseConfig();
             penroseConfig.addSchemaConfig(schemaConfig);
 
-            SchemaManager schemaManager = projectNode.getSchemaManager();
+            SchemaManager schemaManager = project.getSchemaManager();
             schemaManager.addSchema(schema);
 
             return true;

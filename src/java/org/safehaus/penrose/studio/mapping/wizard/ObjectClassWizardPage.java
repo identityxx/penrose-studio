@@ -28,6 +28,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;
@@ -91,7 +92,8 @@ public class ObjectClassWizardPage extends WizardPage {
                     ProjectNode projectNode = objectsView.getSelectedProjectNode();
                     if (projectNode == null) return;
 
-                    SchemaManager schemaManager = projectNode.getSchemaManager();
+                    Project project = projectNode.getProject();
+                    SchemaManager schemaManager = project.getSchemaManager();
 
                     TableItem items[] = availableTable.getSelection();
                     for (int i=0; i<items.length; i++) {
@@ -127,7 +129,8 @@ public class ObjectClassWizardPage extends WizardPage {
                     ProjectNode projectNode = objectsView.getSelectedProjectNode();
                     if (projectNode == null) return;
 
-                    SchemaManager schemaManager = projectNode.getSchemaManager();
+                    Project project = projectNode.getProject();
+                    SchemaManager schemaManager = project.getSchemaManager();
 
                     TableItem items[] = selectedTable.getSelection();
                     for (int i=0; i<items.length; i++) {
@@ -216,7 +219,8 @@ public class ObjectClassWizardPage extends WizardPage {
             ProjectNode projectNode = objectsView.getSelectedProjectNode();
             if (projectNode == null) return;
 
-            Schema schema = projectNode.getSchemaManager().getAllSchema();
+            Project project = projectNode.getProject();
+            Schema schema = project.getSchemaManager().getAllSchema();
 
             Collection ocNames = new ArrayList();
             for (Iterator i=schema.getObjectClasses().iterator(); i.hasNext(); ) {

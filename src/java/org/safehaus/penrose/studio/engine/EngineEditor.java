@@ -24,7 +24,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.engine.EngineConfig;
 import org.apache.log4j.Logger;
 
@@ -35,7 +35,7 @@ public class EngineEditor extends MultiPageEditorPart {
 
     Logger log = Logger.getLogger(getClass());
 
-    ProjectNode projectNode;
+    Project project;
     EngineConfig engineConfig;
     EngineConfig origEngineConfig;
 
@@ -49,7 +49,7 @@ public class EngineEditor extends MultiPageEditorPart {
         setInput(input);
 
         EngineEditorInput ei = (EngineEditorInput)input;
-        projectNode = ei.getProjectNode();
+        project = ei.getProject();
         origEngineConfig = ei.getEngineConfig();
         engineConfig = (EngineConfig)origEngineConfig.clone();
 

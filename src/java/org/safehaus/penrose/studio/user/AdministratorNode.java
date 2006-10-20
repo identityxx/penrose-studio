@@ -61,7 +61,7 @@ public class AdministratorNode extends Node {
     public void open() throws Exception {
         ProjectNode projectNode = (ProjectNode)getParent();
         Project project = projectNode.getProject();
-        PenroseConfig penroseConfig = projectNode.getPenroseConfig();
+        PenroseConfig penroseConfig = project.getPenroseConfig();
         UserConfig userConfig = penroseConfig.getRootUserConfig();
 
         UserEditorInput ei = new UserEditorInput();

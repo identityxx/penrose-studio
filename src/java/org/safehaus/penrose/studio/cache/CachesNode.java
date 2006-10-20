@@ -20,6 +20,7 @@ package org.safehaus.penrose.studio.cache;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.cache.CacheConfig;
@@ -49,7 +50,8 @@ public class CachesNode extends Node {
         Collection children = new ArrayList();
 
         ProjectNode projectNode = (ProjectNode)getParent();
-        CacheConfig entryCacheConfig = projectNode.getPenroseConfig().getEntryCacheConfig();
+        Project project = projectNode.getProject();
+        CacheConfig entryCacheConfig = project.getPenroseConfig().getEntryCacheConfig();
         if (entryCacheConfig != null) {
             children.add(new CacheNode(
                     view,
@@ -61,7 +63,7 @@ public class CachesNode extends Node {
             ));
         }
 
-        CacheConfig sourceCacheConfig = projectNode.getPenroseConfig().getSourceCacheConfig();
+        CacheConfig sourceCacheConfig = project.getPenroseConfig().getSourceCacheConfig();
         if (sourceCacheConfig != null) {
             children.add(new CacheNode(
                     view,

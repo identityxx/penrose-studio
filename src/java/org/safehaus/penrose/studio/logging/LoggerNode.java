@@ -23,6 +23,7 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.log4j.LoggerConfig;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.eclipse.swt.graphics.Image;
@@ -84,7 +85,8 @@ public class LoggerNode extends Node {
 
     public void open() throws Exception {
 
-        Log4jConfig log4jConfig = projectNode.getLog4jConfig();
+        Project project = projectNode.getProject();
+        Log4jConfig log4jConfig = project.getLog4jConfig();
 
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
         LoggerDialog dialog = new LoggerDialog(shell, SWT.NONE);
@@ -95,7 +97,8 @@ public class LoggerNode extends Node {
     }
 
     public void remove() throws Exception {
-        Log4jConfig log4jConfig = projectNode.getLog4jConfig();
+        Project project = projectNode.getProject();
+        Log4jConfig log4jConfig = project.getLog4jConfig();
         log4jConfig.removeLoggerConfig(loggerConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();

@@ -24,6 +24,7 @@ import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionInfoWizardPage;
 import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionParametersWizardPage;
 import org.safehaus.penrose.studio.util.SnapshotUtil;
@@ -88,10 +89,11 @@ public class CreateLDAPSnapshotWizard extends Wizard {
             ProjectNode projectNode = objectsView.getSelectedProjectNode();
             if (projectNode == null) return false;
 
-            PenroseConfig penroseConfig = projectNode.getPenroseConfig();
+            Project project = projectNode.getProject();
+            PenroseConfig penroseConfig = project.getPenroseConfig();
             penroseConfig.addPartitionConfig(partitionConfig);
 
-            PartitionManager partitionManager = projectNode.getPartitionManager();
+            PartitionManager partitionManager = project.getPartitionManager();
             Partition partition = partitionManager.load(projectNode.getWorkDir(), partitionConfig);
 
             ConnectionConfig connectionConfig = new ConnectionConfig();

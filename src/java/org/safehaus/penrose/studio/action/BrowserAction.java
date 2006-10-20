@@ -15,18 +15,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.browser.action;
+package org.safehaus.penrose.studio.action;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.swt.widgets.Shell;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.object.ObjectsView;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.tree.Node;
+import org.safehaus.penrose.studio.event.ChangeListener;
+import org.safehaus.penrose.studio.event.SelectionListener;
+import org.safehaus.penrose.studio.event.ChangeEvent;
+import org.safehaus.penrose.studio.event.SelectionEvent;
+import org.safehaus.penrose.studio.project.ProjectConfig;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.browser.BrowserEditorInput;
 import org.safehaus.penrose.studio.browser.BrowserEditor;
 import org.safehaus.penrose.config.PenroseConfig;
@@ -37,7 +44,7 @@ import org.apache.log4j.Logger;
 /**
  * @author Endi S. Dewata
  */
-public class BrowserAction extends Action {
+public class BrowserAction extends Action implements ChangeListener, SelectionListener {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -53,18 +60,20 @@ public class BrowserAction extends Action {
 
 	public void run() {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        Shell shell = window.getShell();
         
         try {
-            IWorkbenchPage page = window.getActivePage();
-            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            Node node = penroseStudio.getSelectedNode();
+            if (node == null) return;
 
-            ProjectNode projectNode = objectsView.getSelectedProjectNode();
-            if (projectNode == null) return;
-
+            ProjectNode projectNode = (ProjectNode)node;
             Project project = projectNode.getProject();
-            String hostname = project.getHost();
 
-            PenroseConfig penroseConfig = projectNode.getPenroseConfig();
+            ProjectConfig projectConfig = project.getProjectConfig();
+            String hostname = projectConfig.getHost();
+
+            PenroseConfig penroseConfig = project.getPenroseConfig();
             ServiceConfig serviceConfig = penroseConfig.getServiceConfig("LDAP");
             String s = serviceConfig.getParameter(LDAP_PORT);
             int port = s == null ? DEFAULT_LDAP_PORT : Integer.parseInt(s);
@@ -72,18 +81,46 @@ public class BrowserAction extends Action {
             UserConfig rootUserConfig = penroseConfig.getRootUserConfig();
 
             BrowserEditorInput ei = new BrowserEditorInput();
-            ei.setProject(project);
+            ei.setProject(projectConfig);
             ei.setHostname(hostname);
             ei.setPort(port);
             ei.setBaseDn("");
             ei.setBindDn(rootUserConfig.getDn());
             ei.setBindPassword(rootUserConfig.getPassword());
 
+            IWorkbenchPage page = window.getActivePage();
             page.openEditor(ei, BrowserEditor.class.getName());
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
-            MessageDialog.openError(window.getShell(), "Error", e.getMessage());
+            log.error(e.getMessage(), e);
+
+            MessageDialog.openError(
+                    shell,
+                    "ERROR",
+                    e.getMessage()
+            );
         }
 	}
+
+    public void updateStatus(Object object) {
+        if (object instanceof ProjectNode) {
+            ProjectNode projectNode = (ProjectNode)object;
+            Project project = projectNode.getProject();
+            setEnabled(project.isConnected());
+
+        } else {
+            setEnabled(false);
+        }
+    }
+
+    public void objectChanged(ChangeEvent event) {
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Node node = penroseStudio.getSelectedNode();
+        updateStatus(node);
+    }
+
+    public void objectSelected(SelectionEvent event) {
+        Object object = event.getObject();
+        updateStatus(object);
+    }
 }

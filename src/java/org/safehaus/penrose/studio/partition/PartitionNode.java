@@ -29,6 +29,7 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.partition.action.ExportPartitionAction;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.connection.ConnectionsNode;
@@ -122,10 +123,11 @@ public class PartitionNode extends Node {
         if (!confirm) return;
 
         ProjectNode projectNode = (ProjectNode)getParent();
-        PenroseConfig penroseConfig = projectNode.getPenroseConfig();
+        Project project = projectNode.getProject();
+        PenroseConfig penroseConfig = project.getPenroseConfig();
         penroseConfig.removePartitionConfig(partitionConfig.getName());
 
-        PartitionManager partitionManager = projectNode.getPartitionManager();
+        PartitionManager partitionManager = project.getPartitionManager();
         partitionManager.removePartition(partitionConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -153,10 +155,11 @@ public class PartitionNode extends Node {
         newPartitionConfig.setName(name);
 
         ProjectNode projectNode = (ProjectNode)getParent();
-        PenroseConfig penroseConfig = projectNode.getPenroseConfig();
+        Project project = projectNode.getProject();
+        PenroseConfig penroseConfig = project.getPenroseConfig();
         penroseConfig.addPartitionConfig(newPartitionConfig);
 
-        PartitionManager partitionManager = projectNode.getPartitionManager();
+        PartitionManager partitionManager = project.getPartitionManager();
         partitionManager.load(projectNode.getWorkDir(), newPartitionConfig);
 
         view.setClipboard(null);

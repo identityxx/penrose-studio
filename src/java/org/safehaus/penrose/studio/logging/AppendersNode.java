@@ -6,6 +6,7 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.safehaus.penrose.log4j.AppenderConfig;
 import org.apache.log4j.Logger;
@@ -59,7 +60,8 @@ public class AppendersNode extends Node {
 
     public void createAppender() throws Exception {
 
-        Log4jConfig loggingConfig = projectNode.getLog4jConfig();
+        Project project = projectNode.getProject();
+        Log4jConfig loggingConfig = project.getLog4jConfig();
 
         AppenderConfig appenderConfig = new AppenderConfig();
 
@@ -78,7 +80,8 @@ public class AppendersNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        Log4jConfig loggingConfig = projectNode.getLog4jConfig();
+        Project project = projectNode.getProject();
+        Log4jConfig loggingConfig = project.getLog4jConfig();
         return !loggingConfig.getAppenderConfigs().isEmpty();
     }
 
@@ -86,7 +89,8 @@ public class AppendersNode extends Node {
 
         Collection children = new ArrayList();
 
-        Log4jConfig loggingConfig = projectNode.getLog4jConfig();
+        Project project = projectNode.getProject();
+        Log4jConfig loggingConfig = project.getLog4jConfig();
 
         for (Iterator i=loggingConfig.getAppenderConfigs().iterator(); i.hasNext(); ) {
             AppenderConfig appenderConfig = (AppenderConfig)i.next();

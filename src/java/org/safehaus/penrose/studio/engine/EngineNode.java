@@ -94,11 +94,12 @@ public class EngineNode extends Node {
 
         EnginesNode enginesNode = (EnginesNode)getParent();
         ProjectNode projectNode = (ProjectNode)enginesNode.getParent();
+        Project project = projectNode.getProject();
 
         EngineConfig engineConfig = (EngineConfig)getObject();
 
         EngineEditorInput ei = new EngineEditorInput();
-        ei.setProjectNode(projectNode);
+        ei.setProject(project);
         ei.setEngineConfig(engineConfig);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

@@ -33,7 +33,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.welcome.WelcomeEditorInput;
 import org.safehaus.penrose.studio.welcome.WelcomeEditor;
-import org.safehaus.penrose.studio.config.PenroseStudioConfig;
 import org.apache.log4j.Logger;
 
 public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
@@ -111,24 +110,14 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     public void postWindowCreate() {
         // log.debug("postWindowCreate");
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseStudioConfig penroseStudioConfig = penroseStudio.getApplicationConfig();
 
         try {
-            //penroseStudio.connect();
-            //penroseStudio.open(penroseStudio.getWorkDir());
-            //penroseStudio.disconnect();
-
             IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 
-            //Project project = penroseStudio.getApplicationConfig().getCurrentProject();
-            //configurer.setTitle("Penrose Studio - "+project.getName());
             configurer.setTitle("Penrose Studio");
 
-            //IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
             IWorkbenchWindow window = configurer.getWindow();
 
-            //IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
             page.openEditor(new WelcomeEditorInput(), WelcomeEditor.class.getName());
 

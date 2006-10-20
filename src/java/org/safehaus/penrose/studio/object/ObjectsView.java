@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.part.*;
 import org.eclipse.jface.viewers.*;
 import org.eclipse.jface.action.*;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.safehaus.penrose.studio.event.ChangeListener;
 import org.safehaus.penrose.studio.event.ChangeEvent;
@@ -31,8 +32,8 @@ import org.safehaus.penrose.studio.event.SelectionEvent;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.ProjectsNode;
 import org.safehaus.penrose.studio.tree.Node;
 
 import java.util.*;
@@ -40,6 +41,10 @@ import java.util.*;
 public class ObjectsView extends ViewPart implements ChangeListener, ISelectionChangedListener {
 
     Logger log = Logger.getLogger(getClass());
+
+    public final static String SERVERS           = "Servers";
+    public final static String LOCAL_FILES       = "Local Files";
+    public final static String LIBRARIES         = "Libraries";
 
     public final static String PROJECT           = "Project";
 
@@ -85,49 +90,47 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
     public final static String LOGGERS           = "Loggers";
     public final static String LOGGER            = "Logger";
 
-    private TreeViewer treeViewer;
+    TreeViewer treeViewer;
 
     Object clipboard;
 
-    Map projects = new TreeMap();
+    Collection nodes = new ArrayList();
+    ProjectsNode projectsNode;
 
     public ObjectsView() {
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.loadApplicationConfig();
-
-        Collection list = penroseStudio.getApplicationConfig().getProjects();
-        for (Iterator i=list.iterator(); i.hasNext(); ) {
-            Project project = (Project)i.next();
-            createProjectNode(project);
-        }
-    }
-
-    public void createProjectNode(Project project) {
-        ProjectNode projectNode = new ProjectNode(
+        projectsNode = new ProjectsNode(
                 this,
-                project.getName(),
-                PROJECT,
-                project,
+                SERVERS,
+                SERVERS,
+                SERVERS,
                 null
         );
 
-        projects.put(project.getName(), projectNode);
+        nodes.add(projectsNode);
+
+        Node localPartitions = new Node(
+                LOCAL_FILES,
+                LOCAL_FILES,
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                LOCAL_FILES,
+                null
+        );
+
+        nodes.add(localPartitions);
+
+        Node library = new Node(
+                LIBRARIES,
+                LIBRARIES,
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                LIBRARIES,
+                null
+        );
+
+        nodes.add(library);
     }
 
-    public void removeProjectNode(String projectName) {
-        projects.remove(projectName);
-    }
-
-    public Collection getProjectNodes() {
-        return projects.values();
-    }
-
-    public ProjectNode getProjectNode(String name) {
-        return (ProjectNode)projects.get(name);
-    }
-
-    public void createPartControl(Composite parent) {
+    public void createPartControl(final Composite parent) {
         try {
             treeViewer = new TreeViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
 
@@ -151,7 +154,13 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                         node.showMenu(manager);
 
                     } catch (Exception e) {
-                        log.debug(e.getMessage(), e);
+                        log.error(e.getMessage(), e);
+
+                        MessageDialog.openError(
+                                parent.getShell(),
+                                "ERROR",
+                                e.getMessage()
+                        );
                     }
                 }
             });
@@ -162,14 +171,25 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
             treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
                 public void selectionChanged(SelectionChangedEvent event) {
 
-                    StructuredSelection selection = (StructuredSelection)event.getSelection();
-                    if (selection.isEmpty()) return;
+                    try {
+                        StructuredSelection selection = (StructuredSelection)event.getSelection();
+                        if (selection.isEmpty()) return;
 
-                    Object object = selection.getFirstElement();
-                    SelectionEvent e = new SelectionEvent(new Date(), object);
+                        Object object = selection.getFirstElement();
+                        SelectionEvent e = new SelectionEvent(new Date(), object);
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.fireSelectionEvent(e);
+                        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                        penroseStudio.fireSelectionEvent(e);
+                        
+                    } catch (Exception e) {
+                        log.error(e.getMessage(), e);
+
+                        MessageDialog.openError(
+                                parent.getShell(),
+                                "ERROR",
+                                e.getMessage()
+                        );
+                    }
                 }
             });
 
@@ -185,13 +205,21 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                         treeViewer.refresh();
 
                     } catch (Exception e) {
-                        log.debug(e.getMessage(), e);
+                        log.error(e.getMessage(), e);
+
+                        MessageDialog.openError(
+                                parent.getShell(),
+                                "ERROR",
+                                e.getMessage()
+                        );
                     }
                 }
             });
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.addChangeListener(this);
+
+            show(projectsNode);
 
         } catch (Exception ex) {
             log.debug(ex.toString(), ex);
@@ -243,5 +271,9 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
 
         if (node == null) return null;
         return (ProjectNode)node;
+    }
+
+    public Collection getNodes() {
+        return nodes;
     }
 }

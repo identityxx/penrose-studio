@@ -29,13 +29,23 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.studio.config.PenroseStudioConfig;
+import org.safehaus.penrose.studio.config.PenroseStudioConfigReader;
+import org.safehaus.penrose.studio.config.PenroseStudioConfigWriter;
 import org.safehaus.penrose.studio.event.ChangeListener;
 import org.safehaus.penrose.studio.event.ChangeEvent;
 import org.safehaus.penrose.studio.event.SelectionEvent;
 import org.safehaus.penrose.studio.event.SelectionListener;
 import org.safehaus.penrose.studio.license.LicenseDialog;
 import org.safehaus.penrose.studio.welcome.action.EnterLicenseKeyAction;
+import org.safehaus.penrose.studio.action.PenroseStudioActions;
+import org.safehaus.penrose.studio.project.ProjectConfig;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.util.PenroseStudioClipboard;
+import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.tree.Node;
 import com.identyx.license.License;
 import com.identyx.license.LicenseUtil;
 import com.identyx.license.LicenseManager;
@@ -60,9 +70,13 @@ public class PenroseStudio implements IPlatformRunnable {
 
     File homeDir;
 
-    PenroseStudioConfig penroseStudioConfig = new PenroseStudioConfig();
+    PenroseStudioClipboard clipboard;
+    PenroseStudioConfig penroseStudioConfig;
+    PenroseStudioActions actions;
 
     PenroseWorkbenchAdvisor workbenchAdvisor;
+
+    Map projects = new TreeMap();
 
     Collection selectionListeners = new ArrayList();
     Collection changeListeners = new ArrayList();
@@ -88,6 +102,8 @@ public class PenroseStudio implements IPlatformRunnable {
         homeDir = new File(userHome, ".penrose");
         homeDir.mkdirs();
 
+        init();
+
         workbenchAdvisor = new PenroseWorkbenchAdvisor();
 
         PenroseStudio.instance = this;
@@ -100,8 +116,9 @@ public class PenroseStudio implements IPlatformRunnable {
     public Object run(Object args) {
 
         Display display = PlatformUI.createDisplay();
-
         try {
+            clipboard = new PenroseStudioClipboard(display);
+
             int rc = PlatformUI.createAndRunWorkbench(display, workbenchAdvisor);
             if (rc == PlatformUI.RETURN_RESTART) return IPlatformRunnable.EXIT_RESTART;
 
@@ -112,30 +129,75 @@ public class PenroseStudio implements IPlatformRunnable {
         }
     }
 
-	public void saveApplicationConfig() {
-		try {
-			File file = new File(homeDir, "config.xml");
-			penroseStudioConfig.save(file);
-		} catch (Exception ex) {
+    public void open(Project project) throws Exception {
+        project.open();
+        fireChangeEvent();
+    }
+
+    public void close(Project project) throws Exception {
+        project.close();
+        fireChangeEvent();
+    }
+
+    public void save() throws Exception {
+        File file = new File(homeDir, "config.xml");
+        log.debug("Saving projects into "+file.getAbsolutePath());
+
+        if (penroseStudioConfig == null) return;
+
+        PenroseStudioConfigWriter writer = new PenroseStudioConfigWriter(file);
+        writer.write(penroseStudioConfig);
+
+        fireChangeEvent();
+	}
+
+	public void init() {
+        try {
+            actions = new PenroseStudioActions(this);
+
+            File file = new File(homeDir, "config.xml");
+            log.debug("Loading projects from "+file.getAbsolutePath());
+
+            if (file.exists()) {
+                PenroseStudioConfigReader reader = new PenroseStudioConfigReader(file);
+                penroseStudioConfig = reader.read();
+
+            } else {
+                penroseStudioConfig = new PenroseStudioConfig();
+            }
+
+            Collection projectConfigs = penroseStudioConfig.getProjectConfigs();
+
+            for (Iterator i=projectConfigs.iterator(); i.hasNext(); ) {
+                ProjectConfig projectConfig = (ProjectConfig)i.next();
+                Project project = new Project(projectConfig);
+                projects.put(projectConfig.getName(), project);
+            }
+
+        } catch (Exception ex) {
 			log.debug(ex.toString(), ex);
 		}
 	}
 
-	public void loadApplicationConfig() {
-		File file = new File(homeDir, "config.xml");
+    public void addProject(ProjectConfig projectConfig) {
+        penroseStudioConfig.addProjectConfig(projectConfig);
+        projects.put(projectConfig.getName(), new Project(projectConfig));
+        fireChangeEvent();
+    }
 
-        if (!file.exists()) {
-            saveApplicationConfig();
-        }
+    public void removeProject(String name) {
+        penroseStudioConfig.removeProjectConfig(name);
+        projects.remove(name);
+        fireChangeEvent();
+    }
 
-        log.debug("Loading projects from "+file.getAbsolutePath());
+    public Project getProject(String name) {
+        return (Project)projects.get(name);
+    }
 
-		try {
-			penroseStudioConfig.load(file);
-		} catch (Exception ex) {
-			log.debug(ex.toString(), ex);
-		}
-	}
+    public Collection getProjects() {
+        return projects.values();
+    }
 
     public void addSelectionListener(SelectionListener listener) {
         selectionListeners.add(listener);
@@ -169,7 +231,7 @@ public class PenroseStudio implements IPlatformRunnable {
 		}
 	}
 
-	public PenroseStudioConfig getApplicationConfig() {
+	public PenroseStudioConfig getPenroseStudioConfig() {
 		return penroseStudioConfig;
 	}
 
@@ -283,5 +345,44 @@ public class PenroseStudio implements IPlatformRunnable {
              -37, -80,  64,  33,   6,  76, -45,  69, 100,  85, -49,   9, -52, -35,  21,  23,
              -91, -29,  12, -55,  -3,  76,   9,-104,  17,  82,  29,  25, -71, -83, -19, -56
         };
+    }
+
+    public PenroseStudioActions getActions() {
+        return actions;
+    }
+
+    public void setActions(PenroseStudioActions actions) {
+        this.actions = actions;
+    }
+
+    public PenroseStudioClipboard getClipboard() {
+        return clipboard;
+    }
+
+    public void setClipboard(PenroseStudioClipboard clipboard) {
+        this.clipboard = clipboard;
+    }
+
+    public Node getSelectedNode() {
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+
+        try {
+            IWorkbenchPage page = window.getActivePage();
+            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+
+            Node node = objectsView.getSelectedNode();
+            return node;
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    public void show(Node node) throws Exception {
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        IWorkbenchPage page = window.getActivePage();
+        ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+        objectsView.show(node);
     }
 }

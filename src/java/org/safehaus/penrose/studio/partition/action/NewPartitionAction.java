@@ -26,6 +26,8 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.partition.wizard.CreatePartitionWizard;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.apache.log4j.Logger;
 
 public class NewPartitionAction extends Action {
@@ -50,8 +52,9 @@ public class NewPartitionAction extends Action {
             dialog.setPageSize(600, 300);
             dialog.open();
 
-            ProjectNode projectNode = objectsView.getProjectNode("Penrose Server");
-            objectsView.show(projectNode.getPartitionsNode());
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            Project project = penroseStudio.getProject("Penrose Server");
+            objectsView.show(project);
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

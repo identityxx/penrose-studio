@@ -1,104 +1,354 @@
-/**
- * Copyright (c) 2000-2006, Identyx Corporation.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- */
 package org.safehaus.penrose.studio.project;
 
-import org.dom4j.Element;
-import org.dom4j.tree.DefaultElement;
 import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.config.PenroseConfig;
+import org.safehaus.penrose.config.PenroseConfigReader;
+import org.safehaus.penrose.config.PenroseConfigWriter;
+import org.safehaus.penrose.schema.SchemaManager;
+import org.safehaus.penrose.schema.SchemaConfig;
+import org.safehaus.penrose.partition.*;
+import org.safehaus.penrose.log4j.Log4jConfig;
+import org.safehaus.penrose.log4j.Log4jConfigReader;
+import org.safehaus.penrose.log4j.Log4jConfigWriter;
+import org.safehaus.penrose.studio.util.FileUtil;
+import org.safehaus.penrose.studio.validation.ValidationView;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.ArrayList;
+
+/**
+ * @author Endi S. Dewata
+ */
 public class Project {
 
-	private String name;
-    private String type = PenroseClient.PENROSE;
-	private String host = "localhost";
-    private int port = 0;
-    private String username;
-    private String password;
+    Logger log = LoggerFactory.getLogger(getClass());
 
-    public Project() {
+    private ProjectConfig projectConfig;
+
+    private PenroseClient client;
+    private PenroseConfig penroseConfig;
+    private SchemaManager schemaManager;
+    private PartitionManager partitionManager;
+    private Log4jConfig log4jConfig;
+
+    public Project(ProjectConfig projectConfig) {
+        this.projectConfig = projectConfig;
     }
 
-    public Project(Project project) {
-        name = project.getName();
-        type = project.getType();
-        host = project.getHost();
-        port = project.getPort();
-        username = project.getUsername();
-        password = project.getPassword();
-    }
-    
-	public Element toElement() {
-		Element element = new DefaultElement("project");
-		element.addAttribute("name", name);
-        element.addAttribute("type", type);
-		element.addAttribute("host", host);
-        if (port > 0) element.addAttribute("port", ""+port);
-		element.addAttribute("username", username);
-		element.addAttribute("password", password);
-		return element;
-	}
-
-	public String getHost() {
-		return host;
-	}
-
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-    public int getPort() {
-        return port;
+    public String getName() {
+        return projectConfig.getName();
     }
 
-    public void setPort(int port) {
-        this.port = port;
+    public ProjectConfig getProjectConfig() {
+        return projectConfig;
     }
 
-    public String getType() {
-        return type;
+    public void setProjectConfig(ProjectConfig projectConfig) {
+        this.projectConfig = projectConfig;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public PenroseClient getClient() {
+        return client;
     }
+
+    public void setClient(PenroseClient client) {
+        this.client = client;
+    }
+
+    public PenroseConfig getPenroseConfig() {
+        return penroseConfig;
+    }
+
+    public void setPenroseConfig(PenroseConfig penroseConfig) {
+        this.penroseConfig = penroseConfig;
+    }
+
+    public SchemaManager getSchemaManager() {
+        return schemaManager;
+    }
+
+    public void setSchemaManager(SchemaManager schemaManager) {
+        this.schemaManager = schemaManager;
+    }
+
+    public PartitionManager getPartitionManager() {
+        return partitionManager;
+    }
+
+    public void setPartitionManager(PartitionManager partitionManager) {
+        this.partitionManager = partitionManager;
+    }
+
+    public Log4jConfig getLog4jConfig() {
+        return log4jConfig;
+    }
+
+    public void setLog4jConfig(Log4jConfig log4jConfig) {
+        this.log4jConfig = log4jConfig;
+    }
+
+    public boolean isConnected() {
+        return client != null;
+    }
+
+    public String getWorkDir() {
+        return System.getProperty("user.dir")+File.separator+"work"+File.separator+projectConfig.getName();
+    }
+
+    public void open() throws Exception {
+        if (isConnected()) return;
+
+        log.debug("-------------------------------------------------------------------------------------");
+        log.debug("Opening project "+projectConfig.getName());
+
+        client = new PenroseClient(
+                projectConfig.getType(),
+                projectConfig.getHost(),
+                projectConfig.getPort(),
+                projectConfig.getUsername(),
+                projectConfig.getPassword()
+        );
+
+        client.connect();
+
+        String dir = getWorkDir();
+        FileUtil.delete(dir);
+
+        log.debug("Downloading configuration to "+dir);
+
+        downloadFolder("conf", dir);
+        downloadFolder("schema", dir);
+        downloadFolder("partitions", dir);
+
+        log.debug("Opening project from "+dir);
+
+        PenroseConfigReader penroseConfigReader = new PenroseConfigReader(dir +"/conf/server.xml");
+        penroseConfig = penroseConfigReader.read();
+
+        initSystemProperties();
+        initSchemaManager(dir);
+        loadPartitions(dir);
+        validate();
+
+        loadLoggingConfig(dir);
+
+        log.debug("Project opened.");
+    }
+
+    public void downloadFolder(String remotePath, String localDir) throws Exception {
+        File outputDir = new File(localDir);
+        outputDir.mkdirs();
+
+        Collection filenames = client.listFiles(remotePath);
+        for (Iterator i = filenames.iterator(); i.hasNext(); ) {
+            String filename = (String)i.next();
+            download(filename, outputDir);
+        }
+    }
+
+    public void download(String filename, File localDir) throws Exception {
+        log.debug("Downloading "+filename);
+
+        byte content[] = client.download(filename);
+        if (content == null) return;
+
+        File file = new File(localDir, filename);
+        file.getParentFile().mkdirs();
+
+        FileOutputStream out = new FileOutputStream(file);
+        out.write(content);
+
+        out.close();
+    }
+
+    public void initSystemProperties() throws Exception {
+        for (Iterator i=penroseConfig.getSystemPropertyNames().iterator(); i.hasNext(); ) {
+            String name = (String)i.next();
+            String value = penroseConfig.getSystemProperty(name);
+
+            System.setProperty(name, value);
+        }
+    }
+
+    public void initSchemaManager(String dir) throws Exception {
+
+        schemaManager = new SchemaManager();
+
+        for (Iterator i=penroseConfig.getSchemaConfigs().iterator(); i.hasNext(); ) {
+            SchemaConfig schemaConfig = (SchemaConfig)i.next();
+            schemaManager.load(dir, schemaConfig);
+        }
+    }
+
+    public void loadPartitions(String dir) throws Exception {
+
+        partitionManager = new PartitionManager();
+        partitionManager.setSchemaManager(schemaManager);
+
+        partitionManager.load(dir, penroseConfig.getPartitionConfigs());
+    }
+
+    public void validate() throws Exception {
+        if (client == null) return;
+
+        PartitionValidator partitionValidator = new PartitionValidator();
+        partitionValidator.setPenroseConfig(penroseConfig);
+        partitionValidator.setSchemaManager(schemaManager);
+
+        Collection results = new ArrayList();
+
+        for (Iterator i=penroseConfig.getPartitionConfigs().iterator(); i.hasNext(); ) {
+            PartitionConfig partitionConfig = (PartitionConfig)i.next();
+
+            Partition partition = partitionManager.getPartition(partitionConfig.getName());
+            Collection list = partitionValidator.validate(partition);
+
+            for (Iterator j=list.iterator(); j.hasNext(); ) {
+                PartitionValidationResult resultPartition = (PartitionValidationResult)j.next();
+
+                if (resultPartition.getType().equals(PartitionValidationResult.ERROR)) {
+                    log.error("ERROR: "+resultPartition.getMessage()+" ["+resultPartition.getSource()+"]");
+                } else {
+                    log.warn("WARNING: "+resultPartition.getMessage()+" ["+resultPartition.getSource()+"]");
+                }
+            }
+
+            results.addAll(list);
+        }
+
+        IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        if (!results.isEmpty()) {
+            activePage.showView(ValidationView.class.getName());
+        }
+
+        ValidationView view = (ValidationView)activePage.findView(ValidationView.class.getName());
+        if (view != null) {
+            view.setResults(results);
+            view.refresh();
+        }
+    }
+
+    public void loadLoggingConfig(String dir) throws Exception {
+        try {
+            Log4jConfigReader reader = new Log4jConfigReader(new File(dir+"/conf/log4j.xml"));
+            log4jConfig = reader.read();
+        } catch (Exception e) {
+            log.error("ERROR: "+e.getMessage(), e);
+            log4jConfig = new Log4jConfig();
+        }
+    }
+
+    public void save() throws Exception {
+
+        File workFolder = new File(getWorkDir());
+        File tmpFolder = new File(getWorkDir()+".tmp");
+        File backupFolder = new File(getWorkDir()+".bak");
+
+        FileUtil.delete(tmpFolder);
+        FileUtil.copyFolder(workFolder, tmpFolder);
+
+        String dir = tmpFolder.getAbsolutePath();
+
+        File file = new File(dir);
+        file.mkdirs();
+
+        log.debug("-------------------------------------------------------------------------------------");
+        log.debug("Saving configuration to "+dir);
+
+        PenroseConfigWriter serverConfigWriter = new PenroseConfigWriter(dir+"/conf/server.xml");
+        serverConfigWriter.write(penroseConfig);
+
+        saveLoggingConfig(dir);
+
+        partitionManager.store(dir, penroseConfig.getPartitionConfigs());
+
+        FileUtil.delete(backupFolder);
+        workFolder.renameTo(backupFolder);
+        tmpFolder.renameTo(workFolder);
+
+        validate();
+
+        log.debug("Project saved.");
+    }
+
+    public void saveLoggingConfig(String dir) throws Exception {
+        Log4jConfigWriter writer = new Log4jConfigWriter(dir+"/conf/log4j.xml");
+        writer.write(log4jConfig);
+    }
+
+    public void upload() throws Exception {
+
+        String dir = getWorkDir();
+
+        log.debug("Uploading configuration from "+dir);
+
+        uploadFolder(dir);
+    }
+
+    public void uploadFolder(String localDir) throws Exception {
+        File inputDir = new File(localDir);
+
+        Collection files = listFiles(localDir);
+        for (Iterator i=files.iterator(); i.hasNext(); ) {
+            String filename = (String)i.next();
+            upload(inputDir, filename);
+        }
+    }
+
+    public void upload(File localDir, String filename) throws Exception {
+        log.debug("Uploading "+filename);
+
+        File file = new File(localDir, filename);
+        FileInputStream in = new FileInputStream(file);
+
+        byte content[] = new byte[(int)file.length()];
+        in.read(content);
+
+        in.close();
+
+        client.upload(filename, content);
+    }
+
+    public Collection listFiles(String directory) throws Exception {
+        Collection results = new ArrayList();
+        listFiles(null, new File(directory), results);
+        return results;
+    }
+
+    public void listFiles(String prefix, File directory, Collection results) throws Exception {
+        File children[] = directory.listFiles();
+        for (int i=0; i<children.length; i++) {
+            if (children[i].isDirectory()) {
+                listFiles((prefix == null ? "" : prefix+"/")+children[i].getName(), children[i], results);
+            } else {
+                results.add((prefix == null ? "" : prefix+"/")+children[i].getName());
+            }
+        }
+    }
+
+    public void restart() throws Exception {
+        client.restart();
+
+        log.debug("Project restarted.");
+    }
+
+    public void close() throws Exception {
+
+        if (!isConnected()) return;
+
+        client.close();
+        client = null;
+
+        log.debug("Project closed.");
+    }
+
 }
-

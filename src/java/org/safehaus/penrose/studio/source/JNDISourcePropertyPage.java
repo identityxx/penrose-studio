@@ -30,6 +30,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.schema.SchemaManager;
@@ -350,7 +351,8 @@ public class JNDISourcePropertyPage extends FormPage {
                 try {
                     FieldConfig fieldDefinition = new FieldConfig();
 
-                    SchemaManager schemaManager = editor.getProjectNode().getSchemaManager();
+                    Project project = editor.getProject();
+                    SchemaManager schemaManager = project.getSchemaManager();
                     Collection attributeTypes = schemaManager.getAttributeTypes();
 
                     JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
@@ -384,7 +386,8 @@ public class JNDISourcePropertyPage extends FormPage {
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     String oldName = fieldDefinition.getName();
 
-                    SchemaManager schemaManager = editor.getProjectNode().getSchemaManager();
+                    Project project = editor.getProject();
+                    SchemaManager schemaManager = project.getSchemaManager();
                     Collection attributeTypes = schemaManager.getAttributeTypes();
 
                     JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);

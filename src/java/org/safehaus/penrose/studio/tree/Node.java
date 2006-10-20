@@ -19,13 +19,19 @@ package org.safehaus.penrose.studio.tree;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
+import org.safehaus.penrose.studio.util.PenroseStudioClipboard;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.io.Serializable;
 
 /**
  * @author Endi S. Dewata
  */
 public class Node {
+
+    Logger log = LoggerFactory.getLogger(getClass());
 
     private String name;
     private String type;
@@ -121,5 +127,11 @@ public class Node {
 
     public Collection getChildren() throws Exception {
         return null;
+    }
+
+    public void copy(PenroseStudioClipboard clipboard) throws Exception {
+    }
+
+    public void paste(PenroseStudioClipboard clipboard) throws Exception {
     }
 }

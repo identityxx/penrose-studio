@@ -93,10 +93,11 @@ public class ConnectorNode extends Node {
     public void open() throws Exception {
 
         ProjectNode projectNode = (ProjectNode)getParent();
-        ConnectorConfig connectorConfig = projectNode.getPenroseConfig().getConnectorConfig();
+        Project project = projectNode.getProject();
+        ConnectorConfig connectorConfig = project.getPenroseConfig().getConnectorConfig();
 
         ConnectorEditorInput ei = new ConnectorEditorInput();
-        ei.setProjectNode(projectNode);
+        ei.setProject(project);
         ei.setConnectorConfig(connectorConfig);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

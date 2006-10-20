@@ -20,14 +20,14 @@ package org.safehaus.penrose.studio.browser;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.project.ProjectConfig;
 
 /**
  * @author Endi S. Dewata
  */
 public class BrowserEditorInput implements IEditorInput {
 
-    private Project project;
+    private ProjectConfig projectConfig;
     private String hostname;
     private int port;
     private String baseDn;
@@ -46,7 +46,7 @@ public class BrowserEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "["+project.getName()+"] Browser";
+        return "["+projectConfig.getName()+"] Browser";
     }
 
     public IPersistableElement getPersistable() {
@@ -108,11 +108,11 @@ public class BrowserEditorInput implements IEditorInput {
         this.bindPassword = bindPassword;
     }
 
-    public Project getProject() {
-        return project;
+    public ProjectConfig getProject() {
+        return projectConfig;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setProject(ProjectConfig projectConfig) {
+        this.projectConfig = projectConfig;
     }
 }

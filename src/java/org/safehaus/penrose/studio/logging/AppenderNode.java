@@ -6,6 +6,7 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.log4j.AppenderConfig;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.apache.log4j.Logger;
@@ -67,7 +68,8 @@ public class AppenderNode extends Node {
 
     public void open() throws Exception {
 
-        Log4jConfig log4jConfig = projectNode.getLog4jConfig();
+        Project project = projectNode.getProject();
+        Log4jConfig log4jConfig = project.getLog4jConfig();
 
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
         AppenderDialog dialog = new AppenderDialog(shell, SWT.NONE);
@@ -79,7 +81,8 @@ public class AppenderNode extends Node {
 
     public void remove() throws Exception {
 
-        Log4jConfig loggingConfig = projectNode.getLog4jConfig();
+        Project project = projectNode.getProject();
+        Log4jConfig loggingConfig = project.getLog4jConfig();
         loggingConfig.removeAppenderConfig(appenderConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();

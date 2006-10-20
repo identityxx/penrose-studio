@@ -23,6 +23,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.schema.*;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.apache.log4j.Logger;
 
@@ -88,7 +89,8 @@ public class SchemaExportWizard extends Wizard {
         ProjectNode projectNode = objectsView.getSelectedProjectNode();
         if (projectNode == null) return;
 
-        SchemaManager schemaManager = projectNode.getSchemaManager();
+        Project project = projectNode.getProject();
+        SchemaManager schemaManager = project.getSchemaManager();
 
         Collection attributeTypes = schemaManager.getAttributeTypes();
         for (Iterator i=attributeTypes.iterator(); i.hasNext(); ) {

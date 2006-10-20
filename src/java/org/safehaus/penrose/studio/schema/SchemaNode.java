@@ -23,6 +23,7 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.schema.SchemaConfig;
 import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.schema.Schema;
@@ -98,11 +99,12 @@ public class SchemaNode extends Node {
 
     public void open() throws Exception {
 
-        SchemaManager schemaManager = projectNode.getSchemaManager();
+        Project project = projectNode.getProject();
+        SchemaManager schemaManager = project.getSchemaManager();
         Schema schema = schemaManager.getSchema(schemaConfig.getName());
 
         SchemaEditorInput ei = new SchemaEditorInput();
-        ei.setProjectNode(projectNode);
+        ei.setProject(project);
         ei.setSchemaConfig(schemaConfig);
         ei.setSchema(schema);
 
@@ -122,10 +124,11 @@ public class SchemaNode extends Node {
 
         if (!confirm) return;
 
-        PenroseConfig penroseConfig = projectNode.getPenroseConfig();
+        Project project = projectNode.getProject();
+        PenroseConfig penroseConfig = project.getPenroseConfig();
         penroseConfig.removeSchemaConfig(schemaConfig.getName());
 
-        SchemaManager schemaManager = projectNode.getSchemaManager();
+        SchemaManager schemaManager = project.getSchemaManager();
         schemaManager.removeSchema(schemaConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();

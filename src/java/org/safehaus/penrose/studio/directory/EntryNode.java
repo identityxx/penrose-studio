@@ -163,7 +163,7 @@ public class EntryNode extends Node {
     public void open() throws Exception {
 
         MappingEditorInput mei = new MappingEditorInput();
-        mei.setProjectNode(projectNode);
+        mei.setProject(projectNode.getProject());
         mei.setPartition(partition);
         mei.setEntryDefinition(entryMapping);
 
@@ -176,7 +176,7 @@ public class EntryNode extends Node {
     public void editSources() throws Exception {
 
         MappingEditorInput mei = new MappingEditorInput();
-        mei.setProjectNode(projectNode);
+        mei.setProject(projectNode.getProject());
         mei.setPartition(partition);
         mei.setEntryDefinition(entryMapping);
 
@@ -190,7 +190,7 @@ public class EntryNode extends Node {
     public void editACL() throws Exception {
 
         MappingEditorInput mei = new MappingEditorInput();
-        mei.setProjectNode(projectNode);
+        mei.setProject(projectNode.getProject());
         mei.setPartition(partition);
         mei.setEntryDefinition(entryMapping);
 

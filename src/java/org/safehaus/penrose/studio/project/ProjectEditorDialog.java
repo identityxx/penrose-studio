@@ -47,7 +47,7 @@ public class ProjectEditorDialog extends Dialog {
 	Text usernameText;
 	Text passwordText;
 
-	private Project project;
+	private ProjectConfig projectConfig;
 	
     private int action;
 
@@ -195,27 +195,27 @@ public class ProjectEditorDialog extends Dialog {
     }
 
 	public void store() {
-		project.setName("".equals(nameText.getText()) ? null : nameText.getText());
-        project.setType(typeCombo.getText());
-        project.setHost("".equals(hostText.getText()) ? null : hostText.getText());
-        project.setPort("".equals(portText.getText()) ? 0 : Integer.parseInt(portText.getText()));
-        project.setUsername("".equals(usernameText.getText()) ? null : usernameText.getText());
-        project.setPassword("".equals(passwordText.getText()) ? null : passwordText.getText());
+        projectConfig.setName("".equals(nameText.getText()) ? null : nameText.getText());
+        projectConfig.setType(typeCombo.getText());
+        projectConfig.setHost("".equals(hostText.getText()) ? null : hostText.getText());
+        projectConfig.setPort("".equals(portText.getText()) ? 0 : Integer.parseInt(portText.getText()));
+        projectConfig.setUsername("".equals(usernameText.getText()) ? null : usernameText.getText());
+        projectConfig.setPassword("".equals(passwordText.getText()) ? null : passwordText.getText());
 	}
 
-    public Project getProject() {
-        return project;
+    public ProjectConfig getProjectConfig() {
+        return projectConfig;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setProjectConfig(ProjectConfig projectConfig) {
+        this.projectConfig = projectConfig;
 
-        nameText.setText(project.getName() == null ? "" : project.getName());
-        typeCombo.setText(project.getType() == null ? PenroseClient.PENROSE : project.getType());
-        hostText.setText(project.getHost() == null ? "localhost" : project.getHost());
-        portText.setText(project.getPort() == 0 ? "" : ""+project.getPort());
-        usernameText.setText(project.getUsername() == null ? "" : project.getUsername());
-        passwordText.setText(project.getPassword() == null ? "" : project.getPassword());
+        nameText.setText(projectConfig.getName() == null ? "" : projectConfig.getName());
+        typeCombo.setText(projectConfig.getType() == null ? PenroseClient.PENROSE : projectConfig.getType());
+        hostText.setText(projectConfig.getHost() == null ? "localhost" : projectConfig.getHost());
+        portText.setText(projectConfig.getPort() == 0 ? "" : ""+projectConfig.getPort());
+        usernameText.setText(projectConfig.getUsername() == null ? "" : projectConfig.getUsername());
+        passwordText.setText(projectConfig.getPassword() == null ? "" : projectConfig.getPassword());
     }
 
     public int getAction() {

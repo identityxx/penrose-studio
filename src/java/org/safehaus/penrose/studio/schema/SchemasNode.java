@@ -20,6 +20,7 @@ package org.safehaus.penrose.studio.schema;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.schema.action.ImportSchemaAction;
 import org.safehaus.penrose.studio.schema.action.NewSchemaAction;
 import org.safehaus.penrose.studio.object.ObjectsView;
@@ -62,7 +63,8 @@ public class SchemasNode extends Node {
 
     public boolean hasChildren() throws Exception {
         ProjectNode projectNode = (ProjectNode)getParent();
-        PenroseConfig penroseConfig = projectNode.getPenroseConfig();
+        Project project = projectNode.getProject();
+        PenroseConfig penroseConfig = project.getPenroseConfig();
         return !penroseConfig.getSchemaConfigs().isEmpty();
     }
 
@@ -71,7 +73,8 @@ public class SchemasNode extends Node {
         Collection children = new ArrayList();
 
         ProjectNode projectNode = (ProjectNode)getParent();
-        PenroseConfig penroseConfig = projectNode.getPenroseConfig();
+        Project project = projectNode.getProject();
+        PenroseConfig penroseConfig = project.getPenroseConfig();
 
         Collection schemaConfigs = penroseConfig.getSchemaConfigs();
         for (Iterator i=schemaConfigs.iterator(); i.hasNext(); ) {

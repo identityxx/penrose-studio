@@ -20,7 +20,6 @@ package org.safehaus.penrose.studio.object;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -63,7 +62,7 @@ public class ObjectsContentProvider implements ITreeContentProvider {
         ApplicationConfig applicationConfig = penroseApplication.getApplicationConfig();
         return applicationConfig.getProjects().toArray();
         */
-        return view.projects.values().toArray();
+        return view.getNodes().toArray();
     }
 
     public Object getParent(Object element) {

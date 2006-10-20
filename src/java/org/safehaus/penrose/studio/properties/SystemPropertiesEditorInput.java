@@ -21,6 +21,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.config.PenroseConfig;
+import org.safehaus.penrose.studio.project.ProjectConfig;
 import org.safehaus.penrose.studio.project.Project;
 
 /**

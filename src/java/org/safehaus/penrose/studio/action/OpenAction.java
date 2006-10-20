@@ -15,26 +15,31 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.project.action;
+package org.safehaus.penrose.studio.action;
 
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.event.SelectionEvent;
+import org.safehaus.penrose.studio.event.SelectionListener;
+import org.safehaus.penrose.studio.event.ChangeEvent;
+import org.safehaus.penrose.studio.event.ChangeListener;
+import org.safehaus.penrose.studio.tree.Node;
 import org.apache.log4j.Logger;
 
-public class OpenProjectAction extends Action {
+public class OpenAction extends Action implements ChangeListener, SelectionListener {
 
     Logger log = Logger.getLogger(getClass());
 
-	public OpenProjectAction() {
+	public OpenAction() {
         setText("&Open");
         setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.OPEN));
         setAccelerator(SWT.CTRL | 'O');
@@ -43,31 +48,20 @@ public class OpenProjectAction extends Action {
 	}
 	
 	public void run() {
+
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        IWorkbenchPage page = window.getActivePage();
         Shell shell = window.getShell();
 
-        ObjectsView objectsView;
-
         try {
-            objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            Node node = penroseStudio.getSelectedNode();
+            if (node == null) return;
 
-            MessageDialog.openError(
-                    shell,
-                    "ERROR",
-                    "Failed opening project.\n"+
-                            "See penrose-studio-log.txt for details."
-            );
-            return;
-        }
+            ProjectNode projectNode = (ProjectNode)node;
+            Project project = projectNode.getProject();
 
-        ProjectNode projectNode = objectsView.getSelectedProjectNode();
-        if (projectNode == null) return;
-
-        try {
-            projectNode.open();
+            penroseStudio.open(project);
+            penroseStudio.show(projectNode);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -75,10 +69,30 @@ public class OpenProjectAction extends Action {
             MessageDialog.openError(
                     shell,
                     "ERROR",
-                    "Failed opening "+projectNode.getName()+".\n"+
-                            "See penrose-studio-log.txt for details."
+                    e.getMessage()
             );
         }
 	}
-	
+
+    public void updateStatus(Object object) {
+        if (object instanceof ProjectNode) {
+            ProjectNode projectNode = (ProjectNode)object;
+            Project project = projectNode.getProject();
+            setEnabled(!project.isConnected());
+
+        } else {
+            setEnabled(false);
+        }
+    }
+
+    public void objectChanged(ChangeEvent event) {
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Node node = penroseStudio.getSelectedNode();
+        updateStatus(node);
+    }
+
+    public void objectSelected(SelectionEvent event) {
+        Object object = event.getObject();
+        updateStatus(object);
+    }
 }

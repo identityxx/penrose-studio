@@ -20,6 +20,7 @@ package org.safehaus.penrose.studio.engine;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.engine.EngineConfig;
@@ -50,7 +51,8 @@ public class EnginesNode extends Node {
         Collection children = new ArrayList();
 
         ProjectNode projectNode = (ProjectNode)getParent();
-        Collection engineConfigs = projectNode.getPenroseConfig().getEngineConfigs();
+        Project project = projectNode.getProject();
+        Collection engineConfigs = project.getPenroseConfig().getEngineConfigs();
 
         for (Iterator i=engineConfigs.iterator(); i.hasNext(); ) {
             EngineConfig engineConfig = (EngineConfig)i.next();

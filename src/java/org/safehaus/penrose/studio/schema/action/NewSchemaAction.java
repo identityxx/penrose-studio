@@ -26,6 +26,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.schema.wizard.NewSchemaWizard;
 import org.apache.log4j.Logger;
 
@@ -52,10 +53,10 @@ public class NewSchemaAction extends Action {
             dialog.open();
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.fireChangeEvent();
+            Project project = penroseStudio.getProject("Penrose Server");
+            objectsView.show(project);
 
-            ProjectNode projectNode = objectsView.getProjectNode("Penrose Server");
-            objectsView.show(projectNode.getSchemasNode());
+            penroseStudio.fireChangeEvent();
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

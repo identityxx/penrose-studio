@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.partition;
 
 import org.safehaus.penrose.studio.*;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.partition.action.NewPartitionAction;
 import org.safehaus.penrose.studio.partition.action.ImportPartitionAction;
 import org.safehaus.penrose.studio.partition.action.NewLDAPSnapshotPartitionAction;
@@ -71,7 +72,8 @@ public class PartitionsNode extends Node {
 
     public boolean hasChildren() throws Exception {
         ProjectNode projectNode = (ProjectNode)getParent();
-        PartitionManager partitionManager = projectNode.getPartitionManager();
+        Project project = projectNode.getProject();
+        PartitionManager partitionManager = project.getPartitionManager();
         if (partitionManager == null) return false;
         return !partitionManager.getPartitions().isEmpty();
     }
@@ -81,9 +83,10 @@ public class PartitionsNode extends Node {
         Collection children = new ArrayList();
 
         ProjectNode projectNode = (ProjectNode)getParent();
+        Project project = projectNode.getProject();
 
-        PenroseConfig penroseConfig = projectNode.getPenroseConfig();
-        PartitionManager partitionManager = projectNode.getPartitionManager();
+        PenroseConfig penroseConfig = project.getPenroseConfig();
+        PartitionManager partitionManager = project.getPartitionManager();
         
         Collection partitionConfigs = penroseConfig.getPartitionConfigs();
         for (Iterator i=partitionConfigs.iterator(); i.hasNext(); ) {

@@ -32,6 +32,7 @@ import org.safehaus.penrose.studio.mapping.AttributeTypeSelectionDialog;
 import org.safehaus.penrose.studio.mapping.ExpressionDialog;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.SchemaManager;
@@ -175,7 +176,8 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                     ProjectNode projectNode = objectsView.getSelectedProjectNode();
                     if (projectNode == null) return;
 
-                    dialog.setSchemaManager(projectNode.getSchemaManager());
+                    Project project = projectNode.getProject();
+                    dialog.setSchemaManager(project.getSchemaManager());
 
                     dialog.open();
                     if (dialog.getAction() == AttributeTypeSelectionDialog.CANCEL) return;
@@ -268,7 +270,8 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
             ProjectNode projectNode = objectsView.getSelectedProjectNode();
             if (projectNode == null) return;
 
-            SchemaManager schemaManager = projectNode.getSchemaManager();
+            Project project = projectNode.getProject();
+            SchemaManager schemaManager = project.getSchemaManager();
 
             System.out.println("Object classes:");
             for (Iterator i=objectClasses.iterator(); i.hasNext(); ) {
