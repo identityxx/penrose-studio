@@ -95,7 +95,7 @@ public class PartitionsNode extends Node {
 
             PartitionNode partitionNode = new PartitionNode(
                     view,
-                    projectNode,
+                    project,
                     partitionConfig.getName(),
                     ObjectsView.PARTITION,
                     PenrosePlugin.getImage(PenroseImage.PARTITION),

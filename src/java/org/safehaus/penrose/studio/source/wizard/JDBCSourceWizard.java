@@ -29,29 +29,22 @@ import java.util.Iterator;
 /**
  * @author Endi S. Dewata
  */
-public class JDBCSourceWizard extends Wizard {
+public class JDBCSourceWizard extends SourceWizard {
 
     Logger log = Logger.getLogger(getClass());
-
-    private Partition partition;
-    private ConnectionConfig connectionConfig;
-    private SourceConfig sourceConfig;
 
     public SourceWizardPage propertyPage;
     public JDBCTableWizardPage jdbcTablePage;
     public JDBCFieldWizardPage jdbcFieldsPage;
     public JDBCPrimaryKeyWizardPage jdbcPrimaryKeyPage;
 
-    public JDBCSourceWizard(Partition partition, ConnectionConfig connectionConfig) {
-        this.partition = partition;
-        this.connectionConfig = connectionConfig;
-
+    public JDBCSourceWizard() {
         propertyPage = new SourceWizardPage();
         jdbcTablePage = new JDBCTableWizardPage();
         jdbcFieldsPage = new JDBCFieldWizardPage();
         jdbcPrimaryKeyPage = new JDBCPrimaryKeyWizardPage();
 
-        setWindowTitle(connectionConfig.getName()+" - New Source");
+        setWindowTitle("New Source");
     }
 
     public boolean canFinish() {
@@ -129,31 +122,7 @@ public class JDBCSourceWizard extends Wizard {
         }
     }
 
-    public SourceConfig getSourceConfig() {
-        return sourceConfig;
-    }
-
-    public void setSourceConfig(SourceConfig connection) {
-        this.sourceConfig = connection;
-    }
-
     public boolean needsPreviousAndNextButtons() {
         return true;
-    }
-
-    public ConnectionConfig getConnectionConfig() {
-        return connectionConfig;
-    }
-
-    public void setConnectionConfig(ConnectionConfig connectionConfig) {
-        this.connectionConfig = connectionConfig;
-    }
-
-    public Partition getPartition() {
-        return partition;
-    }
-
-    public void setPartition(Partition partition) {
-        this.partition = partition;
     }
 }

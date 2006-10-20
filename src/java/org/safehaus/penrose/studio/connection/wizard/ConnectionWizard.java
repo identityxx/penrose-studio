@@ -46,8 +46,8 @@ public class ConnectionWizard extends Wizard {
     public ConnectionDriverPage driverPage = new ConnectionDriverPage();
     public JDBCConnectionWizardPage jdbcPage = new JDBCConnectionWizardPage();
 
-    public JNDIConnectionInfoWizardPage jndiInfoPage = new JNDIConnectionInfoWizardPage();
-    public JNDIConnectionParametersWizardPage jndiParametersPage = new JNDIConnectionParametersWizardPage();
+    public LDAPConnectionInfoWizardPage jndiInfoPage = new LDAPConnectionInfoWizardPage();
+    public LDAPConnectionParametersWizardPage jndiParametersPage = new LDAPConnectionParametersWizardPage();
 
     public ConnectionWizard(Partition partition) {
         this.partition = partition;

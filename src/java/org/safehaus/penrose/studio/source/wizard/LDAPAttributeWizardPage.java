@@ -37,7 +37,7 @@ import java.util.*;
 /**
  * @author Endi S. Dewata
  */
-public class JNDIAttributeWizardPage extends WizardPage {
+public class LDAPAttributeWizardPage extends WizardPage {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -57,11 +57,11 @@ public class JNDIAttributeWizardPage extends WizardPage {
     Collection attributeNames;
     Schema schema;
 
-    public JNDIAttributeWizardPage() throws Exception {
+    public LDAPAttributeWizardPage() throws Exception {
         this(new ArrayList());
     }
 
-    public JNDIAttributeWizardPage(Collection attributeNames) throws Exception {
+    public LDAPAttributeWizardPage(Collection attributeNames) throws Exception {
         super(NAME);
 
         this.attributeNames = attributeNames;

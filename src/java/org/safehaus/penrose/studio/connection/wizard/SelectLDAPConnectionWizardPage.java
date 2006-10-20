@@ -35,7 +35,7 @@ import java.util.Collection;
 /**
  * @author Endi S. Dewata
  */
-public class SelectJNDIConnectionWizardPage extends WizardPage {
+public class SelectLDAPConnectionWizardPage extends WizardPage {
 
     public final static String NAME = "Connection";
 
@@ -44,7 +44,7 @@ public class SelectJNDIConnectionWizardPage extends WizardPage {
 
     Partition partition;
 
-    public SelectJNDIConnectionWizardPage(Partition partition) {
+    public SelectLDAPConnectionWizardPage(Partition partition) {
         super(NAME);
         this.partition = partition;
         setDescription("Select connection.");

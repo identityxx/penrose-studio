@@ -45,7 +45,7 @@ import java.io.PrintWriter;
 /**
  * @author Endi S. Dewata
  */
-public class JNDIConnectionSchemaPage extends FormPage {
+public class LDAPConnectionSchemaPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -54,13 +54,13 @@ public class JNDIConnectionSchemaPage extends FormPage {
     Table objectClassesTable;
     Table attributeTypesTable;
 
-    JNDIConnectionEditor editor;
+    LDAPConnectionEditor editor;
     Partition partition;
     ConnectionConfig connectionConfig;
 
     Schema schema;
 
-    public JNDIConnectionSchemaPage(JNDIConnectionEditor editor) {
+    public LDAPConnectionSchemaPage(LDAPConnectionEditor editor) {
         super(editor, "SCHEMA", "  Schema  ");
 
         this.editor = editor;

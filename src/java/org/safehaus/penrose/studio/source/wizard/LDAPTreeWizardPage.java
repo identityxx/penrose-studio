@@ -35,7 +35,7 @@ import java.util.*;
 /**
  * @author Endi S. Dewata
  */
-public class JNDITreeWizardPage extends WizardPage implements SelectionListener, TreeListener {
+public class LDAPTreeWizardPage extends WizardPage implements SelectionListener, TreeListener {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -51,7 +51,7 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
     ConnectionConfig connectionConfig;
     LDAPClient client;
 
-    public JNDITreeWizardPage() {
+    public LDAPTreeWizardPage() {
         super(NAME);
         setDescription("Select a subtree.");
     }

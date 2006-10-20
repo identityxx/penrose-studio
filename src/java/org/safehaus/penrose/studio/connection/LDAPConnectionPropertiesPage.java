@@ -40,7 +40,7 @@ import java.util.*;
 /**
  * @author Endi S. Dewata
  */
-public class JNDIConnectionPropertiesPage extends FormPage {
+public class LDAPConnectionPropertiesPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -58,11 +58,11 @@ public class JNDIConnectionPropertiesPage extends FormPage {
 
     String url;
 
-    JNDIConnectionEditor editor;
+    LDAPConnectionEditor editor;
     Partition partition;
     ConnectionConfig connectionConfig;
 
-    public JNDIConnectionPropertiesPage(JNDIConnectionEditor editor) {
+    public LDAPConnectionPropertiesPage(LDAPConnectionEditor editor) {
         super(editor, "PROPERTIES", "  Properties  ");
 
         this.editor = editor;

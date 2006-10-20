@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.directory;
 
 import org.safehaus.penrose.studio.*;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.directory.action.*;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.mapping.EntryMapping;
@@ -42,13 +43,13 @@ public class DirectoryNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
-    ProjectNode projectNode;
+    Project project;
 
     private Partition partition;
 
     public DirectoryNode(
             ObjectsView view,
-            ProjectNode projectNode,
+            Project project,
             String name,
             String type,
             Image image,
@@ -57,7 +58,7 @@ public class DirectoryNode extends Node {
     ) {
         super(name, type, image, object, parent);
         this.view = view;
-        this.projectNode = projectNode;
+        this.project = project;
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -95,7 +96,7 @@ public class DirectoryNode extends Node {
 
             EntryNode entryNode = new EntryNode(
                     view,
-                    projectNode,
+                    project,
                     dn,
                     ObjectsView.ENTRY,
                     PenrosePlugin.getImage(PenroseImage.HOME_NODE),

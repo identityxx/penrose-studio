@@ -27,7 +27,7 @@ import org.safehaus.penrose.mapping.SourceMapping;
 
 import java.util.Iterator;
 
-public class JNDISourceEditor extends SourceEditor {
+public class LDAPSourceEditor extends SourceEditor {
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         setSite(site);
@@ -38,9 +38,9 @@ public class JNDISourceEditor extends SourceEditor {
 
     public void addPages() {
         try {
-            addPage(new JNDISourcePropertyPage(this));
-            addPage(new JNDISourceBrowsePage(this));
-            addPage(new JNDISourceCachePage(this));
+            addPage(new LDAPSourcePropertyPage(this));
+            addPage(new LDAPSourceBrowsePage(this));
+            addPage(new LDAPSourceCachePage(this));
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

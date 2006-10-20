@@ -59,20 +59,20 @@
             icon="images/server.png"
             class="org.safehaus.penrose.studio.connection.JDBCConnectionEditor"/>
        <editor
-            id="org.safehaus.penrose.studio.connection.JNDIConnectionEditor"
+            id="org.safehaus.penrose.studio.connection.LDAPConnectionEditor"
             name="JNDI Connection"
             icon="images/server.png"
-            class="org.safehaus.penrose.studio.connection.JNDIConnectionEditor"/>
+            class="org.safehaus.penrose.studio.connection.LDAPConnectionEditor"/>
        <editor
             id="org.safehaus.penrose.studio.source.JDBCSourceEditor"
             name="Source"
             icon="images/source.gif"
             class="org.safehaus.penrose.studio.source.JDBCSourceEditor"/>
        <editor
-            id="org.safehaus.penrose.studio.source.JNDISourceEditor"
+            id="org.safehaus.penrose.studio.source.LDAPSourceEditor"
             name="Source"
             icon="images/source.gif"
-            class="org.safehaus.penrose.studio.source.JNDISourceEditor"/>
+            class="org.safehaus.penrose.studio.source.LDAPSourceEditor"/>
        <editor
             id="org.safehaus.penrose.studio.mapping.MappingEditor"
             name="Mapping"

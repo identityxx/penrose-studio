@@ -30,7 +30,7 @@ import org.eclipse.swt.layout.GridData;
 /**
  * @author Endi S. Dewata
  */
-public class JNDISourceWizardPage extends WizardPage implements SelectionListener, ModifyListener {
+public class LDAPSourceWizardPage extends WizardPage implements SelectionListener, ModifyListener {
 
     public final static String NAME = "Source Property";
 
@@ -44,11 +44,11 @@ public class JNDISourceWizardPage extends WizardPage implements SelectionListene
     String filter;
     String scope;
 
-    public JNDISourceWizardPage(String sourceName, String baseDn) {
+    public LDAPSourceWizardPage(String sourceName, String baseDn) {
         this(sourceName, baseDn, "(objectClass=*)", "OBJECT");
     }
 
-    public JNDISourceWizardPage(String sourceName, String baseDn, String filter, String scope) {
+    public LDAPSourceWizardPage(String sourceName, String baseDn, String filter, String scope) {
         super(NAME);
 
         this.sourceName = sourceName;

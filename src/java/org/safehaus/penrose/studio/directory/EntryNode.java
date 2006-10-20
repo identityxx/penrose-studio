@@ -30,7 +30,7 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.studio.*;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.mapping.*;
@@ -54,14 +54,14 @@ public class EntryNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
-    ProjectNode projectNode;
+    Project project;
 
     private Partition partition;
     private EntryMapping entryMapping;
 
     public EntryNode(
             ObjectsView view,
-            ProjectNode projectNode,
+            Project project,
             String name,
             String type,
             Image image,
@@ -70,7 +70,7 @@ public class EntryNode extends Node {
     ) {
         super(name, type, image, object, parent);
         this.view = view;
-        this.projectNode = projectNode;
+        this.project = project;
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -163,7 +163,7 @@ public class EntryNode extends Node {
     public void open() throws Exception {
 
         MappingEditorInput mei = new MappingEditorInput();
-        mei.setProject(projectNode.getProject());
+        mei.setProject(project);
         mei.setPartition(partition);
         mei.setEntryDefinition(entryMapping);
 
@@ -176,7 +176,7 @@ public class EntryNode extends Node {
     public void editSources() throws Exception {
 
         MappingEditorInput mei = new MappingEditorInput();
-        mei.setProject(projectNode.getProject());
+        mei.setProject(project);
         mei.setPartition(partition);
         mei.setEntryDefinition(entryMapping);
 
@@ -190,7 +190,7 @@ public class EntryNode extends Node {
     public void editACL() throws Exception {
 
         MappingEditorInput mei = new MappingEditorInput();
-        mei.setProject(projectNode.getProject());
+        mei.setProject(project);
         mei.setPartition(partition);
         mei.setEntryDefinition(entryMapping);
 
@@ -241,7 +241,7 @@ public class EntryNode extends Node {
 
             EntryNode entryNode = new EntryNode(
                     view,
-                    projectNode,
+                    project,
                     childMapping.getRdn(),
                     ObjectsView.ENTRY,
                     PenrosePlugin.getImage(PenroseImage.NODE),

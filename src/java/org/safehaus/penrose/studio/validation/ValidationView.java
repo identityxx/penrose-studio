@@ -40,13 +40,14 @@ import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.mapping.MappingEditorInput;
 import org.safehaus.penrose.studio.mapping.MappingEditor;
-import org.safehaus.penrose.studio.connection.JNDIConnectionEditor;
+import org.safehaus.penrose.studio.connection.LDAPConnectionEditor;
 import org.safehaus.penrose.studio.connection.JDBCConnectionEditor;
 import org.safehaus.penrose.studio.connection.ConnectionEditorInput;
 import org.safehaus.penrose.studio.source.SourceEditorInput;
 import org.safehaus.penrose.studio.source.*;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.adapter.PenroseStudioAdapter;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.object.ObjectsView;
@@ -169,14 +170,20 @@ public class ValidationView extends ViewPart {
             ei.setPartition(partition);
             ei.setConnectionConfig(connectionConfig);
 
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            PenroseStudioAdapter adapter = penroseStudio.getAdapter(connectionConfig.getAdapterName());
+            page.openEditor(ei, adapter.getConnectionEditorClassName());
+
+            /*
             if ("LDAP".equals(connectionConfig.getAdapterName())) {
-                page.openEditor(ei, JNDIConnectionEditor.class.getName());
+                page.openEditor(ei, LDAPConnectionEditor.class.getName());
                 
             } else if ("JDBC".equals(connectionConfig.getAdapterName())) {
                 page.openEditor(ei, JDBCConnectionEditor.class.getName());
             }
+            */
 
-		} else if (object instanceof SourceConfig) {
+        } else if (object instanceof SourceConfig) {
 			SourceConfig sourceConfig = (SourceConfig)object;
             Partition partition = partitionManager.getPartition(sourceConfig);
             ConnectionConfig connection = partition.getConnectionConfig(sourceConfig.getConnectionName());
@@ -185,12 +192,18 @@ public class ValidationView extends ViewPart {
             ei.setPartition(partition);
             ei.setSourceConfig(sourceConfig);
 
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            PenroseStudioAdapter adapter = penroseStudio.getAdapter(connection.getAdapterName());
+            page.openEditor(ei, adapter.getSourceEditorClassName());
+
+            /*
             if ("JDBC".equals(connection.getAdapterName())) {
                 page.openEditor(ei, JDBCSourceEditor.class.getName());
 
             } else if ("LDAP".equals(connection.getAdapterName())) {
-                page.openEditor(ei, JNDISourceEditor.class.getName());
+                page.openEditor(ei, LDAPSourceEditor.class.getName());
             }
+            */
 
 		} else if (object instanceof EntryMapping) {
             EntryMapping entryMapping = (EntryMapping)object;

@@ -25,7 +25,7 @@ import org.safehaus.penrose.mapping.AttributeValues;
 import java.util.Collection;
 import java.util.Iterator;
 
-public class JNDISourceBrowsePage extends FormPage {
+public class LDAPSourceBrowsePage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -40,7 +40,7 @@ public class JNDISourceBrowsePage extends FormPage {
     Partition partition;
     SourceConfig sourceConfig;
 
-    public JNDISourceBrowsePage(SourceEditor editor) {
+    public LDAPSourceBrowsePage(SourceEditor editor) {
         super(editor, "BROWSE", "  Browse  ");
 
         this.editor = editor;

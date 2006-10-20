@@ -23,8 +23,8 @@ import org.safehaus.penrose.partition.SourceConfig;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.FieldConfig;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.studio.source.wizard.JNDIFieldWizardPage;
-import org.safehaus.penrose.studio.source.wizard.JNDIAttributeWizardPage;
+import org.safehaus.penrose.studio.source.wizard.LDAPFieldWizardPage;
+import org.safehaus.penrose.studio.source.wizard.LDAPAttributeWizardPage;
 import org.safehaus.penrose.mapping.Row;
 import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.ldap.LDAPClient;
@@ -37,7 +37,7 @@ import java.util.ArrayList;
 /**
  * @author Endi S. Dewata
  */
-public class JNDISourceWizard extends Wizard {
+public class LDAPSourceWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -50,15 +50,15 @@ public class JNDISourceWizard extends Wizard {
     private Collection attributeNames;
     private SourceConfig sourceConfig;
 
-    public JNDISourceWizardPage propertyPage;
-    public JNDIAttributeWizardPage attributesPage;
-    public JNDIFieldWizardPage fieldsPage = new JNDIFieldWizardPage();
+    public LDAPSourceWizardPage propertyPage;
+    public LDAPAttributeWizardPage attributesPage;
+    public LDAPFieldWizardPage fieldsPage = new LDAPFieldWizardPage();
 
-    public JNDISourceWizard(LDAPClient client, Partition partition, ConnectionConfig connectionConfig, String baseDn) throws Exception {
+    public LDAPSourceWizard(LDAPClient client, Partition partition, ConnectionConfig connectionConfig, String baseDn) throws Exception {
         this(client, partition, connectionConfig, baseDn, "(objectClass=*)", "OBJECT", new ArrayList());
     }
     
-    public JNDISourceWizard(
+    public LDAPSourceWizard(
             LDAPClient client,
             Partition partition,
             ConnectionConfig connectionConfig,
@@ -85,9 +85,9 @@ public class JNDISourceWizard extends Wizard {
         String rdnValue = (String)rdn.get(rdnAttr);
         String name = rdnValue.replaceAll("\\s", "").toLowerCase();
 
-        propertyPage = new JNDISourceWizardPage(name, baseDn, filter, scope);
+        propertyPage = new LDAPSourceWizardPage(name, baseDn, filter, scope);
         
-        attributesPage = new JNDIAttributeWizardPage(attributeNames);
+        attributesPage = new LDAPAttributeWizardPage(attributeNames);
         attributesPage.setConnectionConfig(partition, connectionConfig);
 
         setWindowTitle(connectionConfig.getName()+" - New Source");

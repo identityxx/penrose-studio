@@ -32,7 +32,8 @@ import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.adapter.PenroseStudioAdapter;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
@@ -50,7 +51,7 @@ public class SourceNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
-    ProjectNode projectNode;
+    Project project;
 
     private Partition partition;
     private ConnectionConfig connectionConfig;
@@ -58,7 +59,7 @@ public class SourceNode extends Node {
 
     public SourceNode(
             ObjectsView view,
-            ProjectNode projectNode,
+            Project project,
             String name,
             String type,
             Image image,
@@ -67,7 +68,7 @@ public class SourceNode extends Node {
     ) {
         super(name, type, image, object, parent);
         this.view = view;
-        this.projectNode = projectNode;
+        this.project = project;
     }
 
     public void showMenu(IMenuManager manager) {
@@ -123,16 +124,22 @@ public class SourceNode extends Node {
         IWorkbenchPage page = window.getActivePage();
 
         SourceEditorInput ei = new SourceEditorInput();
-        ei.setProject(projectNode.getProject());
+        ei.setProject(project);
         ei.setPartition(partition);
         ei.setSourceConfig(sourceConfig);
 
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseStudioAdapter adapter = penroseStudio.getAdapter(con.getAdapterName());
+        page.openEditor(ei, adapter.getSourceEditorClassName());
+
+        /*
         if ("JDBC".equals(con.getAdapterName())) {
             page.openEditor(ei, JDBCSourceEditor.class.getName());
 
         } else if ("LDAP".equals(con.getAdapterName())) {
-            page.openEditor(ei, JNDISourceEditor.class.getName());
+            page.openEditor(ei, LDAPSourceEditor.class.getName());
         }
+        */
     }
 
     public void remove() throws Exception {

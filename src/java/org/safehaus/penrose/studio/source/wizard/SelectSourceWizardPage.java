@@ -134,7 +134,7 @@ public class SelectSourceWizardPage extends WizardPage {
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    SourceWizard wizard = new SourceWizard(partition);
+                    NewSourceWizard wizard = new NewSourceWizard(partition);
                     WizardDialog dialog = new WizardDialog(parent.getShell(), wizard);
                     dialog.setPageSize(600, 300);
                     dialog.open();

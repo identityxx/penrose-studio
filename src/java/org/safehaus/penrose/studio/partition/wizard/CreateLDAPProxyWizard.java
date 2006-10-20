@@ -27,8 +27,8 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.util.ADUtil;
 import org.safehaus.penrose.studio.util.SchemaUtil;
-import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionInfoWizardPage;
-import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionParametersWizardPage;
+import org.safehaus.penrose.studio.connection.wizard.LDAPConnectionInfoWizardPage;
+import org.safehaus.penrose.studio.connection.wizard.LDAPConnectionParametersWizardPage;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.mapping.*;
@@ -49,8 +49,8 @@ public class CreateLDAPProxyWizard extends Wizard {
     Logger log = Logger.getLogger(getClass());
 
     public PartitionProxyPage infoPage = new PartitionProxyPage();
-    public JNDIConnectionInfoWizardPage connectionInfoPage = new JNDIConnectionInfoWizardPage();
-    public JNDIConnectionParametersWizardPage connectionParametersPage = new JNDIConnectionParametersWizardPage();
+    public LDAPConnectionInfoWizardPage connectionInfoPage = new LDAPConnectionInfoWizardPage();
+    public LDAPConnectionParametersWizardPage connectionParametersPage = new LDAPConnectionParametersWizardPage();
 
     public CreateLDAPProxyWizard() {
 

@@ -54,14 +54,14 @@ public class PartitionNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
-    ProjectNode projectNode;
+    Project project;
 
     private PartitionConfig partitionConfig;
     private Partition partition;
 
     public PartitionNode(
             ObjectsView view,
-            ProjectNode projectNode,
+            Project project,
             String name,
             String type,
             Image image,
@@ -70,7 +70,7 @@ public class PartitionNode extends Node {
     ) {
         super(name, type, image, object, parent);
         this.view = view;
-        this.projectNode = projectNode;
+        this.project = project;
     }
 
     public void showMenu(IMenuManager manager) {
@@ -122,8 +122,6 @@ public class PartitionNode extends Node {
 
         if (!confirm) return;
 
-        ProjectNode projectNode = (ProjectNode)getParent();
-        Project project = projectNode.getProject();
         PenroseConfig penroseConfig = project.getPenroseConfig();
         penroseConfig.removePartitionConfig(partitionConfig.getName());
 
@@ -154,13 +152,11 @@ public class PartitionNode extends Node {
 
         newPartitionConfig.setName(name);
 
-        ProjectNode projectNode = (ProjectNode)getParent();
-        Project project = projectNode.getProject();
         PenroseConfig penroseConfig = project.getPenroseConfig();
         penroseConfig.addPartitionConfig(newPartitionConfig);
 
         PartitionManager partitionManager = project.getPartitionManager();
-        partitionManager.load(projectNode.getWorkDir(), newPartitionConfig);
+        partitionManager.load(this.project.getWorkDir(), newPartitionConfig);
 
         view.setClipboard(null);
     }
@@ -175,7 +171,7 @@ public class PartitionNode extends Node {
 
         DirectoryNode directoryNode = new DirectoryNode(
                 view,
-                projectNode,
+                project,
                 ObjectsView.DIRECTORY,
                 ObjectsView.DIRECTORY,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
@@ -202,7 +198,7 @@ public class PartitionNode extends Node {
 
         SourcesNode sourcesNode = new SourcesNode(
                 view,
-                projectNode,
+                project,
                 ObjectsView.SOURCES,
                 ObjectsView.SOURCES,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),

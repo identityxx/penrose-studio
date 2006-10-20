@@ -34,7 +34,7 @@ import java.util.*;
 /**
  * @author Endi S. Dewata
  */
-public class JNDIFieldWizardPage extends WizardPage implements SelectionListener, MouseListener {
+public class LDAPFieldWizardPage extends WizardPage implements SelectionListener, MouseListener {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -42,7 +42,7 @@ public class JNDIFieldWizardPage extends WizardPage implements SelectionListener
 
     Table fieldTable;
 
-    public JNDIFieldWizardPage() {
+    public LDAPFieldWizardPage() {
         super(NAME);
         setDescription("Select primary key fields.");
     }

@@ -35,7 +35,7 @@ import java.util.Iterator;
 /**
  * @author Endi S. Dewata
  */
-public class JNDIConnectionParametersWizardPage extends WizardPage implements ModifyListener {
+public class LDAPConnectionParametersWizardPage extends WizardPage implements ModifyListener {
 
     public final static String NAME = "Connection Parameters";
 
@@ -43,7 +43,7 @@ public class JNDIConnectionParametersWizardPage extends WizardPage implements Mo
 
     Map parameters = new TreeMap();
 
-    public JNDIConnectionParametersWizardPage() {
+    public LDAPConnectionParametersWizardPage() {
         super(NAME);
         setDescription("Enter connection parameters.");
     }

@@ -36,7 +36,7 @@ import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;
-import org.safehaus.penrose.studio.connection.wizard.JNDISourceWizard;
+import org.safehaus.penrose.studio.connection.wizard.LDAPSourceWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.apache.log4j.Logger;
@@ -52,7 +52,7 @@ import java.io.PrintWriter;
 /**
  * @author Endi S. Dewata
  */
-public class JNDIConnectionBrowserPage extends FormPage implements TreeListener {
+public class LDAPConnectionBrowserPage extends FormPage implements TreeListener {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -61,13 +61,13 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
     Tree tree;
     Table table;
 
-    JNDIConnectionEditor editor;
+    LDAPConnectionEditor editor;
     Partition partition;
     ConnectionConfig connectionConfig;
 
     Schema schema;
 
-    public JNDIConnectionBrowserPage(JNDIConnectionEditor editor) {
+    public LDAPConnectionBrowserPage(LDAPConnectionEditor editor) {
         super(editor, "BROWSER", "  Browser  ");
 
         this.editor = editor;
@@ -176,7 +176,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
 
                     Collection attributeNames = getAttributeNames(schema, entry);
 
-                    JNDISourceWizard wizard = new JNDISourceWizard(
+                    LDAPSourceWizard wizard = new LDAPSourceWizard(
                             client,
                             partition,
                             connectionConfig,
@@ -211,7 +211,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
                     SearchResult entry = (SearchResult)treeItem.getData();
                     String baseDn = entry.getName();
 
-                    JNDISourceWizard wizard = new JNDISourceWizard(
+                    LDAPSourceWizard wizard = new LDAPSourceWizard(
                             client,
                             partition,
                             connectionConfig,
@@ -269,7 +269,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
 
                     Collection attributeNames = getAttributeNames(schema, entry);
 
-                    JNDISourceWizard wizard = new JNDISourceWizard(
+                    LDAPSourceWizard wizard = new LDAPSourceWizard(
                             client,
                             partition,
                             connectionConfig,

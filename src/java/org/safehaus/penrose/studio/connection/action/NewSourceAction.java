@@ -23,10 +23,13 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.adapter.PenroseStudioAdapter;
 import org.safehaus.penrose.studio.source.wizard.JDBCSourceWizard;
-import org.safehaus.penrose.studio.source.wizard.JNDISourceWizard;
+import org.safehaus.penrose.studio.source.wizard.LDAPSourceWizard;
+import org.safehaus.penrose.studio.source.wizard.SourceWizard;
 import org.safehaus.penrose.studio.connection.ConnectionNode;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
@@ -57,20 +60,28 @@ public class NewSourceAction extends Action {
             ConnectionConfig connectionConfig = node.getConnectionConfig();
             String adapterName = connectionConfig.getAdapterName();
 
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            PenroseStudioAdapter adapter = penroseStudio.getAdapter(adapterName);
+
+            Class clazz = Class.forName(adapter.getSourceWizardClassName());
+            SourceWizard wizard = (SourceWizard)clazz.newInstance();
+            wizard.setPartition(partition);
+            wizard.setConnectionConfig(connectionConfig);
+
+            /*
+            Wizard wizard = null;
             if ("JDBC".equals(adapterName)) {
-                JDBCSourceWizard wizard = new JDBCSourceWizard(partition, connectionConfig);
-                WizardDialog dialog = new WizardDialog(shell, wizard);
-                dialog.setPageSize(600, 300);
-                dialog.open();
+                wizard = new JDBCSourceWizard(partition, connectionConfig);
 
             } else if ("LDAP".equals(adapterName)) {
-                JNDISourceWizard wizard = new JNDISourceWizard(partition, connectionConfig);
-                WizardDialog dialog = new WizardDialog(shell, wizard);
-                dialog.setPageSize(600, 300);
-                dialog.open();
+                wizard = new LDAPSourceWizard(partition, connectionConfig);
             }
+            */
+            
+            WizardDialog dialog = new WizardDialog(shell, wizard);
+            dialog.setPageSize(600, 300);
+            dialog.open();
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.fireChangeEvent();
 
             objectsView.show(node);

@@ -46,6 +46,9 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.util.PenroseStudioClipboard;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
+import org.safehaus.penrose.studio.adapter.PenroseStudioJDBCAdapter;
+import org.safehaus.penrose.studio.adapter.PenroseStudioLDAPAdapter;
+import org.safehaus.penrose.studio.adapter.PenroseStudioAdapter;
 import com.identyx.license.License;
 import com.identyx.license.LicenseUtil;
 import com.identyx.license.LicenseManager;
@@ -77,6 +80,7 @@ public class PenroseStudio implements IPlatformRunnable {
     PenroseWorkbenchAdvisor workbenchAdvisor;
 
     Map projects = new TreeMap();
+    Map adapters = new TreeMap();
 
     Collection selectionListeners = new ArrayList();
     Collection changeListeners = new ArrayList();
@@ -107,6 +111,41 @@ public class PenroseStudio implements IPlatformRunnable {
         workbenchAdvisor = new PenroseWorkbenchAdvisor();
 
         PenroseStudio.instance = this;
+    }
+
+    public void init() throws Exception {
+
+        actions = new PenroseStudioActions(this);
+
+        File file = new File(homeDir, "config.xml");
+        log.debug("Loading projects from "+file.getAbsolutePath());
+
+        if (file.exists()) {
+            PenroseStudioConfigReader reader = new PenroseStudioConfigReader(file);
+            penroseStudioConfig = reader.read();
+
+        } else {
+            penroseStudioConfig = new PenroseStudioConfig();
+        }
+
+        Collection projectConfigs = penroseStudioConfig.getProjectConfigs();
+
+        for (Iterator i=projectConfigs.iterator(); i.hasNext(); ) {
+            ProjectConfig projectConfig = (ProjectConfig)i.next();
+            Project project = new Project(projectConfig);
+            projects.put(projectConfig.getName(), project);
+        }
+
+        addAdapter(new PenroseStudioJDBCAdapter("JDBC"));
+        addAdapter(new PenroseStudioLDAPAdapter("LDAP"));
+    }
+
+    public void addAdapter(PenroseStudioAdapter adapter) {
+        adapters.put(adapter.getName(), adapter);
+    }
+
+    public PenroseStudioAdapter getAdapter(String name) {
+        return (PenroseStudioAdapter)adapters.get(name);
     }
 
     public static PenroseStudio getInstance() {
@@ -149,34 +188,6 @@ public class PenroseStudio implements IPlatformRunnable {
         writer.write(penroseStudioConfig);
 
         fireChangeEvent();
-	}
-
-	public void init() {
-        try {
-            actions = new PenroseStudioActions(this);
-
-            File file = new File(homeDir, "config.xml");
-            log.debug("Loading projects from "+file.getAbsolutePath());
-
-            if (file.exists()) {
-                PenroseStudioConfigReader reader = new PenroseStudioConfigReader(file);
-                penroseStudioConfig = reader.read();
-
-            } else {
-                penroseStudioConfig = new PenroseStudioConfig();
-            }
-
-            Collection projectConfigs = penroseStudioConfig.getProjectConfigs();
-
-            for (Iterator i=projectConfigs.iterator(); i.hasNext(); ) {
-                ProjectConfig projectConfig = (ProjectConfig)i.next();
-                Project project = new Project(projectConfig);
-                projects.put(projectConfig.getName(), project);
-            }
-
-        } catch (Exception ex) {
-			log.debug(ex.toString(), ex);
-		}
 	}
 
     public void addProject(ProjectConfig projectConfig) {

@@ -17,13 +17,12 @@
  */
 package org.safehaus.penrose.studio.source.wizard;
 
-import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.partition.SourceConfig;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.FieldConfig;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.studio.source.wizard.JNDITreeWizardPage;
+import org.safehaus.penrose.studio.source.wizard.LDAPTreeWizardPage;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -32,30 +31,20 @@ import java.util.Iterator;
 /**
  * @author Endi S. Dewata
  */
-public class JNDISourceWizard extends Wizard {
-
-    Logger log = Logger.getLogger(getClass());
-
-    private Partition partition;
-    private ConnectionConfig connectionConfig;
-    private SourceConfig sourceConfig;
+public class LDAPSourceWizard extends SourceWizard {
 
     public SourceWizardPage propertyPage;
-    public JNDITreeWizardPage jndiTreePage;
-    public JNDIAttributeWizardPage jndiAttributesPage;
-    public JNDIFieldWizardPage jndiFieldsPage;
+    public LDAPTreeWizardPage jndiTreePage;
+    public LDAPAttributeWizardPage jndiAttributesPage;
+    public LDAPFieldWizardPage jndiFieldsPage;
 
-    public JNDISourceWizard(Partition partition, ConnectionConfig connectionConfig) throws Exception {
-        this.partition = partition;
-        this.connectionConfig = connectionConfig;
-
+    public LDAPSourceWizard() throws Exception {
         propertyPage = new SourceWizardPage();
+        jndiTreePage = new LDAPTreeWizardPage();
+        jndiAttributesPage = new LDAPAttributeWizardPage();
+        jndiFieldsPage = new LDAPFieldWizardPage();
 
-        jndiTreePage = new JNDITreeWizardPage();
-        jndiAttributesPage = new JNDIAttributeWizardPage();
-        jndiFieldsPage = new JNDIFieldWizardPage();
-
-        setWindowTitle(connectionConfig.getName()+" - New Source");
+        setWindowTitle("New Source");
     }
 
     public boolean canFinish() {
@@ -117,31 +106,7 @@ public class JNDISourceWizard extends Wizard {
         }
     }
 
-    public SourceConfig getSourceConfig() {
-        return sourceConfig;
-    }
-
-    public void setSourceConfig(SourceConfig connection) {
-        this.sourceConfig = connection;
-    }
-
     public boolean needsPreviousAndNextButtons() {
         return true;
-    }
-
-    public ConnectionConfig getConnectionConfig() {
-        return connectionConfig;
-    }
-
-    public void setConnectionConfig(ConnectionConfig connectionConfig) {
-        this.connectionConfig = connectionConfig;
-    }
-
-    public Partition getPartition() {
-        return partition;
-    }
-
-    public void setPartition(Partition partition) {
-        this.partition = partition;
     }
 }

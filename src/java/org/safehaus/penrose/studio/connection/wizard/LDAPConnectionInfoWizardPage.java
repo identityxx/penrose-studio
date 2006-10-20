@@ -40,7 +40,7 @@ import java.io.PrintWriter;
 /**
  * @author Endi S. Dewata
  */
-public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyListener {
+public class LDAPConnectionInfoWizardPage extends WizardPage implements ModifyListener {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -56,7 +56,7 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
     Text bindDnText;
     Text passwordText;
 
-    public JNDIConnectionInfoWizardPage() {
+    public LDAPConnectionInfoWizardPage() {
         super(NAME);
         setDescription("Enter connection information.");
     }

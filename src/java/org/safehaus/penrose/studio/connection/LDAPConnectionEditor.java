@@ -32,7 +32,7 @@ import java.util.Iterator;
 /**
  * @author Endi S. Dewata
  */
-public class JNDIConnectionEditor extends ConnectionEditor {
+public class LDAPConnectionEditor extends ConnectionEditor {
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         setSite(site);
@@ -43,7 +43,7 @@ public class JNDIConnectionEditor extends ConnectionEditor {
 
     public void addPages() {
         try {
-            addPage(new JNDIConnectionPropertiesPage(this));
+            addPage(new LDAPConnectionPropertiesPage(this));
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             PenroseWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
@@ -52,8 +52,8 @@ public class JNDIConnectionEditor extends ConnectionEditor {
 
             //if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
 
-                addPage(new JNDIConnectionBrowserPage(this));
-                addPage(new JNDIConnectionSchemaPage(this));
+                addPage(new LDAPConnectionBrowserPage(this));
+                addPage(new LDAPConnectionSchemaPage(this));
             //}
 
         } catch (Exception e) {

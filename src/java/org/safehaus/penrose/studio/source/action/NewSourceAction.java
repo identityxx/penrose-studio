@@ -25,7 +25,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.source.wizard.SourceWizard;
+import org.safehaus.penrose.studio.source.wizard.NewSourceWizard;
 import org.safehaus.penrose.studio.source.SourcesNode;
 import org.apache.log4j.Logger;
 
@@ -50,7 +50,7 @@ public class NewSourceAction extends Action {
 
             Shell shell = window.getShell();
 
-            SourceWizard wizard = new SourceWizard(node.getPartition());
+            NewSourceWizard wizard = new NewSourceWizard(node.getPartition());
             WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.setPageSize(600, 300);
             dialog.open();

@@ -20,7 +20,7 @@ package org.safehaus.penrose.studio.source;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.source.action.NewSourceAction;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
@@ -45,13 +45,13 @@ public class SourcesNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
-    ProjectNode projectNode;
+    Project project;
 
     private Partition partition;
 
     public SourcesNode(
             ObjectsView view,
-            ProjectNode projectNode,
+            Project project,
             String name,
             String type,
             Image image,
@@ -60,7 +60,7 @@ public class SourcesNode extends Node {
     ) {
         super(name, type, image, object, parent);
         this.view = view;
-        this.projectNode = projectNode;
+        this.project = project;
     }
 
     public void showMenu(IMenuManager manager) {
@@ -118,7 +118,7 @@ public class SourcesNode extends Node {
 
             SourceNode sourceNode = new SourceNode(
                     view,
-                    projectNode,
+                    project,
                     sourceConfig.getName(),
                     ObjectsView.SOURCE,
                     PenrosePlugin.getImage(PenroseImage.SOURCE),

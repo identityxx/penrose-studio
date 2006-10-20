@@ -32,7 +32,7 @@ import org.safehaus.penrose.partition.SourceConfig;
 /**
  * @author Endi S. Dewata
  */
-public class JNDISourceCachePage extends FormPage {
+public class LDAPSourceCachePage extends FormPage {
 
     FormToolkit toolkit;
 
@@ -48,7 +48,7 @@ public class JNDISourceCachePage extends FormPage {
     SourceEditor editor;
 	SourceConfig sourceConfig;
 
-    public JNDISourceCachePage(SourceEditor editor) {
+    public LDAPSourceCachePage(SourceEditor editor) {
         super(editor, "CACHE", "  Cache  ");
 
         this.editor = editor;

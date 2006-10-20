@@ -30,6 +30,7 @@ import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.adapter.PenroseStudioAdapter;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.connection.action.NewSourceAction;
 import org.safehaus.penrose.studio.tree.Node;
@@ -115,12 +116,18 @@ public class ConnectionNode extends Node {
         ei.setPartition(partition);
         ei.setConnectionConfig(connectionConfig);
 
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseStudioAdapter adapter = penroseStudio.getAdapter(connectionConfig.getAdapterName());
+        page.openEditor(ei, adapter.getConnectionEditorClassName());
+
+        /*
         if ("JDBC".equals(connectionConfig.getAdapterName())) {
             page.openEditor(ei, JDBCConnectionEditor.class.getName());
 
         } else if ("LDAP".equals(connectionConfig.getAdapterName())) {
-            page.openEditor(ei, JNDIConnectionEditor.class.getName());
+            page.openEditor(ei, LDAPConnectionEditor.class.getName());
         }
+        */
     }
 
     public void remove() throws Exception {

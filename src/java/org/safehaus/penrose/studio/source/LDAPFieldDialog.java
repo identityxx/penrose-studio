@@ -30,12 +30,12 @@ import java.util.*;
 /**
  * @author Endi S. Dewata
  */
-public class JNDIFieldDialog extends FieldDialog {
+public class LDAPFieldDialog extends FieldDialog {
 
     Table attributeTypeTable;
     Map items = new HashMap();
 
-	public JNDIFieldDialog(Shell parent, int style) {
+	public LDAPFieldDialog(Shell parent, int style) {
 		super(parent, style);
         setText("Field Editor");
 
