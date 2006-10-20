@@ -3,9 +3,9 @@
 	<name>penrose-studio-1.1</name>
 	<comment></comment>
 	<projects>
-		<project>license</projectConfig>
-		<projectConfig>penrose-1.1</project>
-		<project>penrose-pro-1.1</projectConfig>
+		<project>license</project>
+		<project>penrose-1.1</project>
+		<project>penrose-pro-1.1</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

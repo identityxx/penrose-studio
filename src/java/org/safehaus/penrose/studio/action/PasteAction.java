@@ -12,8 +12,8 @@ import org.safehaus.penrose.studio.event.SelectionListener;
 import org.safehaus.penrose.studio.event.SelectionEvent;
 import org.safehaus.penrose.studio.event.ChangeEvent;
 import org.safehaus.penrose.studio.event.ChangeListener;
-import org.safehaus.penrose.studio.project.ProjectsNode;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServersNode;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.util.PenroseStudioClipboard;
 import org.safehaus.penrose.studio.tree.Node;
 
@@ -59,10 +59,10 @@ public class PasteAction extends Action implements ChangeListener, SelectionList
         if (clipboard.isEmpty()) {
             setEnabled(false);
 
-        } else if (object instanceof ProjectsNode) {
+        } else if (object instanceof ServersNode) {
             setEnabled(true);
 
-        } else if (object instanceof ProjectNode) {
+        } else if (object instanceof ServerNode) {
             setEnabled(true);
 
         } else {

@@ -33,7 +33,7 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.adapter.PenroseStudioAdapter;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
@@ -51,7 +51,7 @@ public class SourceNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
-    Project project;
+    Server server;
 
     private Partition partition;
     private ConnectionConfig connectionConfig;
@@ -59,7 +59,7 @@ public class SourceNode extends Node {
 
     public SourceNode(
             ObjectsView view,
-            Project project,
+            Server server,
             String name,
             String type,
             Image image,
@@ -68,7 +68,7 @@ public class SourceNode extends Node {
     ) {
         super(name, type, image, object, parent);
         this.view = view;
-        this.project = project;
+        this.server = server;
     }
 
     public void showMenu(IMenuManager manager) {
@@ -124,7 +124,7 @@ public class SourceNode extends Node {
         IWorkbenchPage page = window.getActivePage();
 
         SourceEditorInput ei = new SourceEditorInput();
-        ei.setProject(project);
+        ei.setProject(server);
         ei.setPartition(partition);
         ei.setSourceConfig(sourceConfig);
 

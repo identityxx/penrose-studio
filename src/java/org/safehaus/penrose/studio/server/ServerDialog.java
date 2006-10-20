@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.project;
+package org.safehaus.penrose.studio.server;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -29,11 +29,11 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
-import org.safehaus.penrose.studio.project.ProjectConfig;
+import org.safehaus.penrose.studio.server.ServerConfig;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.apache.log4j.Logger;
 
-public class ProjectDialog extends Dialog {
+public class ServerDialog extends Dialog {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -48,11 +48,11 @@ public class ProjectDialog extends Dialog {
 
     Table projectTable;
 
-    private ProjectConfig projectConfig;
+    private ServerConfig serverConfig;
 
     private int action;
 
-	public ProjectDialog(Shell parent, int style) throws Exception {
+	public ServerDialog(Shell parent, int style) throws Exception {
 		super(parent, style);
 
         penroseImage = PenrosePlugin.getImage(PenroseImage.LOGO16);
@@ -64,7 +64,7 @@ public class ProjectDialog extends Dialog {
         createControl(shell);
     }
 
-    public ProjectDialog(Shell parent) throws Exception {
+    public ServerDialog(Shell parent) throws Exception {
         super(parent);
 
         penroseImage = PenrosePlugin.getImage(PenroseImage.LOGO16);
@@ -115,14 +115,14 @@ public class ProjectDialog extends Dialog {
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
 
-            Collection list = penroseStudio.getPenroseStudioConfig().getProjectConfigs();
+            Collection list = penroseStudio.getPenroseStudioConfig().getServerConfigs();
             for (Iterator i=list.iterator(); i.hasNext(); ) {
-                ProjectConfig projectConfig = (ProjectConfig)i.next();
+                ServerConfig serverConfig = (ServerConfig)i.next();
 
                 TableItem item = new TableItem(projectTable, SWT.NONE);
-				item.setText(projectConfig.getName());
+				item.setText(serverConfig.getName());
                 item.setImage(penroseImage);
-                item.setData(projectConfig);
+                item.setData(serverConfig);
 			}
 
         } catch (Exception e) {
@@ -198,7 +198,7 @@ public class ProjectDialog extends Dialog {
                     if (projectTable.getSelectionCount() == 0) return;
 
                     TableItem item = projectTable.getSelection()[0];
-                    projectConfig = (ProjectConfig)item.getData();
+                    serverConfig = (ServerConfig)item.getData();
 
                 } catch (Exception ex) {
                     log.debug(ex.getMessage(), ex);
@@ -213,29 +213,29 @@ public class ProjectDialog extends Dialog {
         pasteMenuItem.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 try {
-                    if (projectConfig == null) return;
+                    if (serverConfig == null) return;
 
                     int counter = 2;
-                    String newName = projectConfig.getName()+" ("+counter+")";
+                    String newName = serverConfig.getName()+" ("+counter+")";
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    while (penroseStudio.getPenroseStudioConfig().getProjectConfig(newName) != null) {
+                    while (penroseStudio.getPenroseStudioConfig().getServerConfig(newName) != null) {
                         counter++;
-                        newName = projectConfig.getName()+" ("+counter+")";
+                        newName = serverConfig.getName()+" ("+counter+")";
                     }
 
-                    ProjectConfig newProjectConfig = new ProjectConfig(projectConfig);
-                    newProjectConfig.setName(newName);
+                    ServerConfig newServerConfig = new ServerConfig(serverConfig);
+                    newServerConfig.setName(newName);
 
-                    penroseStudio.addProject(newProjectConfig);
+                    penroseStudio.addServer(newServerConfig);
                     penroseStudio.save();
 
                     TableItem item = new TableItem(projectTable, SWT.NONE);
-                    item.setText(newProjectConfig.getName());
+                    item.setText(newServerConfig.getName());
                     item.setImage(penroseImage);
-                    item.setData(newProjectConfig);
+                    item.setData(newServerConfig);
 
-                    projectConfig = null;
+                    serverConfig = null;
 
                 } catch (Exception ex) {
                     log.debug(ex.getMessage(), ex);
@@ -360,20 +360,20 @@ public class ProjectDialog extends Dialog {
         if (projectTable.getSelectionCount() == 0) return;
 
         TableItem item = projectTable.getSelection()[0];
-        ProjectConfig projectConfig = (ProjectConfig)item.getData();
-        String server = projectConfig.getHost()+(projectConfig.getPort() == 0 ? "" : ":"+projectConfig.getPort());
+        ServerConfig serverConfig = (ServerConfig)item.getData();
+        String server = serverConfig.getHost()+(serverConfig.getPort() == 0 ? "" : ":"+serverConfig.getPort());
 
         try {
 /*
             PenroseStudio penroseApplication = PenroseStudio.getInstance();
-            penroseApplication.connect(project);
+            penroseApplication.connect(server);
             penroseApplication.disconnect();
 
-            PenroseClient client = new PenroseClient(projectConfig.getHost(), project.getPort(), projectConfig.getUsername(), projectConfig.getPassword());
+            PenroseClient client = new PenroseClient(serverConfig.getHost(), server.getPort(), projectConfig.getUsername(), serverConfig.getPassword());
             client.connect();
             client.close();
 */
-            this.projectConfig = projectConfig;
+            this.serverConfig = serverConfig;
 
             action = OK;
             shell.close();
@@ -384,34 +384,34 @@ public class ProjectDialog extends Dialog {
 	}
 	
 	public void newSession() throws Exception {
-		ProjectConfig projectConfig = new ProjectConfig();
-        projectConfig.setHost("localhost");
-        projectConfig.setPort(1099);
+		ServerConfig serverConfig = new ServerConfig();
+        serverConfig.setHost("localhost");
+        serverConfig.setPort(1099);
 
-		ProjectEditorDialog dialog = new ProjectEditorDialog(shell, SWT.NONE);
-        dialog.setProjectConfig(projectConfig);
+		ServerEditorDialog dialog = new ServerEditorDialog(shell, SWT.NONE);
+        dialog.setServerConfig(serverConfig);
 		dialog.open();
 
-        if (dialog.getAction() == ProjectEditorDialog.CANCEL) return;
+        if (dialog.getAction() == ServerEditorDialog.CANCEL) return;
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.addProject(projectConfig);
+        penroseStudio.addServer(serverConfig);
         penroseStudio.save();
 
         TableItem item = new TableItem(projectTable, SWT.NONE);
-        item.setText(projectConfig.getName());
+        item.setText(serverConfig.getName());
         item.setImage(penroseImage);
-        item.setData(projectConfig);
+        item.setData(serverConfig);
 	}
 	
 	public void deleteProject() throws Exception {
         if (projectTable.getSelectionCount() == 0) return;
 
 		TableItem item = projectTable.getSelection()[0];
-        ProjectConfig projectConfig = (ProjectConfig)item.getData();
+        ServerConfig serverConfig = (ServerConfig)item.getData();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-		penroseStudio.removeProject(projectConfig.getName());
+		penroseStudio.removeServer(serverConfig.getName());
         penroseStudio.save();
 
 		item.dispose();
@@ -421,35 +421,35 @@ public class ProjectDialog extends Dialog {
         if (projectTable.getSelectionCount() == 0) return;
 
         TableItem item = projectTable.getSelection()[0];
-		ProjectConfig projectConfig = (ProjectConfig)item.getData();
-        String oldProjectName = projectConfig.getName();
-        System.out.println("Editing project: "+oldProjectName);
+		ServerConfig serverConfig = (ServerConfig)item.getData();
+        String oldProjectName = serverConfig.getName();
+        System.out.println("Editing server: "+oldProjectName);
 
-		ProjectEditorDialog dialog = new ProjectEditorDialog(shell, SWT.NONE);
-        dialog.setProjectConfig(projectConfig);
+		ServerEditorDialog dialog = new ServerEditorDialog(shell, SWT.NONE);
+        dialog.setServerConfig(serverConfig);
 		dialog.open();
 
-        if (dialog.getAction() == ProjectEditorDialog.CANCEL) return;
+        if (dialog.getAction() == ServerEditorDialog.CANCEL) return;
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
 
-        if (!oldProjectName.equals(projectConfig.getName())) {
-            penroseStudio.removeProject(oldProjectName);
-            penroseStudio.addProject(projectConfig);
+        if (!oldProjectName.equals(serverConfig.getName())) {
+            penroseStudio.removeServer(oldProjectName);
+            penroseStudio.addServer(serverConfig);
         }
 
         penroseStudio.save();
 
-        item.setText(projectConfig.getName());
+        item.setText(serverConfig.getName());
         projectTable.redraw();
     }
 
-    public ProjectConfig getProject() {
-        return projectConfig;
+    public ServerConfig getProject() {
+        return serverConfig;
     }
 
-    public void setProject(ProjectConfig projectConfig) {
-        this.projectConfig = projectConfig;
+    public void setProject(ServerConfig serverConfig) {
+        this.serverConfig = serverConfig;
     }
 
     public int getAction() {

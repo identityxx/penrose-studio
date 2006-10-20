@@ -40,16 +40,13 @@ import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.mapping.MappingEditorInput;
 import org.safehaus.penrose.studio.mapping.MappingEditor;
-import org.safehaus.penrose.studio.connection.LDAPConnectionEditor;
-import org.safehaus.penrose.studio.connection.JDBCConnectionEditor;
 import org.safehaus.penrose.studio.connection.ConnectionEditorInput;
 import org.safehaus.penrose.studio.source.SourceEditorInput;
-import org.safehaus.penrose.studio.source.*;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.adapter.PenroseStudioAdapter;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.util.SWTUtil;
 import org.safehaus.penrose.partition.*;
@@ -78,9 +75,9 @@ public class ValidationView extends ViewPart {
 					public void run() {
                         try {
                             PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                            for (Iterator i=penroseStudio.getProjects().iterator(); i.hasNext(); ) {
-                                Project project = (Project)i.next();
-                                project.validate();
+                            for (Iterator i=penroseStudio.getServers().iterator(); i.hasNext(); ) {
+                                Server server = (Server)i.next();
+                                server.validate();
                             }
 
                         } catch (Exception e) {
@@ -156,11 +153,11 @@ public class ValidationView extends ViewPart {
         IWorkbenchPage page = window.getActivePage();
         ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
-        ProjectNode projectNode = objectsView.getSelectedProjectNode();
-        if (projectNode == null) return;
+        ServerNode serverNode = objectsView.getSelectedProjectNode();
+        if (serverNode == null) return;
 
-        Project project = projectNode.getProject();
-        PartitionManager partitionManager = project.getPartitionManager();
+        Server server = serverNode.getProject();
+        PartitionManager partitionManager = server.getPartitionManager();
 
 		if (object instanceof ConnectionConfig) {
             ConnectionConfig connectionConfig = (ConnectionConfig)object;

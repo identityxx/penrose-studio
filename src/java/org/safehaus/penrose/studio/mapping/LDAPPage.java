@@ -28,7 +28,7 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.SchemaManager;
@@ -177,8 +177,8 @@ public class LDAPPage extends FormPage {
                     ObjectClassSelectionDialog dialog = new ObjectClassSelectionDialog(editor.getParent().getShell(), SWT.NONE);
                     dialog.setText("Add object classes...");
 
-                    Project project = editor.getProject();
-                    SchemaManager schemaManager = project.getSchemaManager();
+                    Server server = editor.getProject();
+                    SchemaManager schemaManager = server.getSchemaManager();
 
                     Collection ocNames = new ArrayList();
                     for (Iterator i=schemaManager.getObjectClasses().iterator(); i.hasNext(); ) {
@@ -323,8 +323,8 @@ public class LDAPPage extends FormPage {
                     AttributeTypeSelectionDialog dialog = new AttributeTypeSelectionDialog(editor.getParent().getShell(), SWT.NONE);
                     dialog.setText("Add attributes...");
 
-                    Project project = editor.getProject();
-                    dialog.setSchemaManager(project.getSchemaManager());
+                    Server server = editor.getProject();
+                    dialog.setSchemaManager(server.getSchemaManager());
 
                     dialog.open();
                     if (dialog.getAction() == AttributeTypeSelectionDialog.CANCEL) return;
@@ -479,8 +479,8 @@ public class LDAPPage extends FormPage {
 
     public Map getObjectClasses(Collection ocNames) {
 
-        Project project = editor.getProject();
-        SchemaManager schemaManager = project.getSchemaManager();
+        Server server = editor.getProject();
+        SchemaManager schemaManager = server.getSchemaManager();
 
         Map objectClasses = new TreeMap();
 

@@ -32,8 +32,8 @@ import org.safehaus.penrose.studio.event.SelectionEvent;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.ProjectsNode;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.ServersNode;
 import org.safehaus.penrose.studio.tree.Node;
 
 import java.util.*;
@@ -95,11 +95,11 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
     Object clipboard;
 
     Collection nodes = new ArrayList();
-    ProjectsNode projectsNode;
+    ServersNode serversNode;
 
     public ObjectsView() {
 
-        projectsNode = new ProjectsNode(
+        serversNode = new ServersNode(
                 this,
                 SERVERS,
                 SERVERS,
@@ -107,7 +107,7 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                 null
         );
 
-        nodes.add(projectsNode);
+        nodes.add(serversNode);
 
         Node localPartitions = new Node(
                 LOCAL_FILES,
@@ -180,7 +180,7 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
 
                         PenroseStudio penroseStudio = PenroseStudio.getInstance();
                         penroseStudio.fireSelectionEvent(e);
-                        
+
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
 
@@ -219,7 +219,7 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.addChangeListener(this);
 
-            show(projectsNode);
+            show(serversNode);
 
         } catch (Exception ex) {
             log.debug(ex.toString(), ex);
@@ -264,13 +264,13 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
         return (Node)selection.getFirstElement();
     }
 
-    public ProjectNode getSelectedProjectNode() {
+    public ServerNode getSelectedProjectNode() {
         Node node = getSelectedNode();
 
-        while (node != null && !(node instanceof ProjectNode)) node = node.getParent();
+        while (node != null && !(node instanceof ServerNode)) node = node.getParent();
 
         if (node == null) return null;
-        return (ProjectNode)node;
+        return (ServerNode)node;
     }
 
     public Collection getNodes() {

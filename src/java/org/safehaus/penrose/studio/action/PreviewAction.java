@@ -31,8 +31,8 @@ import org.safehaus.penrose.studio.event.ChangeListener;
 import org.safehaus.penrose.studio.event.SelectionListener;
 import org.safehaus.penrose.studio.event.ChangeEvent;
 import org.safehaus.penrose.studio.event.SelectionEvent;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.preview.PreviewEditorInput;
 import org.safehaus.penrose.studio.preview.PreviewEditor;
 import org.safehaus.penrose.user.UserConfig;
@@ -62,14 +62,14 @@ public class PreviewAction extends Action implements ChangeListener, SelectionLi
             Node node = penroseStudio.getSelectedNode();
             if (node == null) return;
 
-            ProjectNode projectNode = (ProjectNode)node;
-            Project project = projectNode.getProject();
-            PenroseConfig penroseConfig = project.getPenroseConfig();
+            ServerNode serverNode = (ServerNode)node;
+            Server server = serverNode.getProject();
+            PenroseConfig penroseConfig = server.getPenroseConfig();
 
             UserConfig rootUserConfig = penroseConfig.getRootUserConfig();
 
             PreviewEditorInput ei = new PreviewEditorInput();
-            ei.setProjectNode(projectNode);
+            ei.setProjectNode(serverNode);
             ei.setBaseDn("");
             ei.setBindDn(rootUserConfig.getDn());
             ei.setBindPassword(rootUserConfig.getPassword());
@@ -89,10 +89,10 @@ public class PreviewAction extends Action implements ChangeListener, SelectionLi
 	}
 
     public void updateStatus(Object object) {
-        if (object instanceof ProjectNode) {
-            ProjectNode projectNode = (ProjectNode)object;
-            Project project = projectNode.getProject();
-            setEnabled(project.isConnected());
+        if (object instanceof ServerNode) {
+            ServerNode serverNode = (ServerNode)object;
+            Server server = serverNode.getProject();
+            setEnabled(server.isConnected());
 
         } else {
             setEnabled(false);

@@ -22,15 +22,14 @@ import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.SchemaConfig;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
  */
 public class SchemaEditorInput implements IEditorInput {
 
-    private Project project;
+    private Server server;
     private SchemaConfig schemaConfig;
     private Schema schema;
 
@@ -85,11 +84,11 @@ public class SchemaEditorInput implements IEditorInput {
         return true;
     }
 
-    public Project getProject() {
-        return project;
+    public Server getProject() {
+        return server;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setProject(Server server) {
+        this.server = server;
     }
 }

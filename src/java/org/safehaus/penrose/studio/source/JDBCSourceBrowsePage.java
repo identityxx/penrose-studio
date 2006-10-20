@@ -13,7 +13,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.connector.AdapterConfig;
 import org.safehaus.penrose.connector.Connection;
 import org.safehaus.penrose.config.PenroseConfig;
@@ -118,9 +118,9 @@ public class JDBCSourceBrowsePage extends FormPage {
         table.removeAll();
 
         try {
-            Project project = editor.getProject();
-            PenroseConfig penroseConfig = project.getPenroseConfig();
-            PartitionManager partitionManager = project.getPartitionManager();
+            Server server = editor.getProject();
+            PenroseConfig penroseConfig = server.getPenroseConfig();
+            PartitionManager partitionManager = server.getPartitionManager();
             Partition partition = partitionManager.getPartition(sourceConfig);
             ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
 

@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.project;
+package org.safehaus.penrose.studio.server;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
@@ -15,13 +15,13 @@ import java.util.*;
 /**
  * @author Endi S. Dewata
  */
-public class ProjectsNode extends Node {
+public class ServersNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
 
-    public ProjectsNode(
+    public ServersNode(
             ObjectsView view,
             String name,
             String type,
@@ -46,17 +46,17 @@ public class ProjectsNode extends Node {
         Object object = clipboard.get();
         log.debug("Pasting: "+object);
         
-        if (object instanceof ProjectConfig) {
-            ProjectConfig projectConfig = (ProjectConfig)object;
-            projectConfig.setName(projectConfig.getName()+" (2)");
-            penroseStudio.addProject(projectConfig);
+        if (object instanceof ServerConfig) {
+            ServerConfig serverConfig = (ServerConfig)object;
+            serverConfig.setName(serverConfig.getName()+" (2)");
+            penroseStudio.addServer(serverConfig);
         }
     }
 
     public boolean hasChildren() throws Exception {
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        return !penroseStudio.getProjects().isEmpty();
+        return !penroseStudio.getServers().isEmpty();
     }
 
     public Collection getChildren() throws Exception {
@@ -65,18 +65,18 @@ public class ProjectsNode extends Node {
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
 
-        for (Iterator i=penroseStudio.getProjects().iterator(); i.hasNext(); ) {
-            Project project = (Project)i.next();
+        for (Iterator i=penroseStudio.getServers().iterator(); i.hasNext(); ) {
+            Server server = (Server)i.next();
 
-            ProjectNode projectNode = new ProjectNode(
+            ServerNode serverNode = new ServerNode(
                     view,
-                    project.getName(),
+                    server.getName(),
                     ObjectsView.PROJECT,
-                    project,
+                    server,
                     this
             );
 
-            children.add(projectNode);
+            children.add(serverNode);
         }
 
         return children;

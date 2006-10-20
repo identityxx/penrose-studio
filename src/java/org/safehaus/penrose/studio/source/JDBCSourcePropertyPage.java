@@ -29,7 +29,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.connector.JDBCAdapter;
 import org.apache.log4j.Logger;
@@ -262,8 +262,8 @@ public class JDBCSourcePropertyPage extends FormPage {
                     FieldConfig fieldConfig = (FieldConfig)item.getData();
                     String oldName = fieldConfig.getName();
 
-                    Project project = editor.getProject();
-                    PartitionManager partitionManager = project.getPartitionManager();
+                    Server server = editor.getProject();
+                    PartitionManager partitionManager = server.getPartitionManager();
                     Partition partition = partitionManager.getPartition(sourceConfig);
 
                     ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
@@ -352,8 +352,8 @@ public class JDBCSourcePropertyPage extends FormPage {
                 try {
                     FieldConfig fieldDefinition = new FieldConfig();
 
-                    Project project = editor.getProject();
-                    PartitionManager partitionManager = project.getPartitionManager();
+                    Server server = editor.getProject();
+                    PartitionManager partitionManager = server.getPartitionManager();
                     Partition partition = partitionManager.getPartition(sourceConfig);
 
                     ConnectionConfig connection = partition.getConnectionConfig(sourceConfig.getConnectionName());
@@ -407,8 +407,8 @@ public class JDBCSourcePropertyPage extends FormPage {
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     String oldName = fieldDefinition.getName();
 
-                    Project project = editor.getProject();
-                    PartitionManager partitionManager = project.getPartitionManager();
+                    Server server = editor.getProject();
+                    PartitionManager partitionManager = server.getPartitionManager();
                     Partition partition = partitionManager.getPartition(sourceConfig);
 
                     ConnectionConfig connection = partition.getConnectionConfig(sourceConfig.getConnectionName());

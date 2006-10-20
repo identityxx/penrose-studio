@@ -25,7 +25,7 @@ import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.swt.SWT;
 import org.safehaus.penrose.studio.object.ObjectsView;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.event.SelectionListener;
 import org.safehaus.penrose.studio.event.SelectionEvent;
 import org.safehaus.penrose.studio.event.ChangeListener;
@@ -247,11 +247,11 @@ public class PenroseActionBarAdvisor
             IWorkbenchPage page = window.getActivePage();
             ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
-            ProjectNode projectNode = objectsView.getSelectedProjectNode();
-            if (projectNode == null) {
+            ServerNode serverNode = objectsView.getSelectedProjectNode();
+            if (serverNode == null) {
                 setConnected(false);
             } else {
-                setConnected(projectNode.isConnected());
+                setConnected(serverNode.isConnected());
             }
 
         } catch (Exception e) {

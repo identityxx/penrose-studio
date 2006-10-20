@@ -22,8 +22,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.partition.PartitionManager;
@@ -72,14 +72,14 @@ public class ImportPartitionWizard extends Wizard {
             IWorkbenchPage page = window.getActivePage();
             ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
-            ProjectNode projectNode = objectsView.getSelectedProjectNode();
-            if (projectNode == null) return false;
+            ServerNode serverNode = objectsView.getSelectedProjectNode();
+            if (serverNode == null) return false;
 
-            Project project = projectNode.getProject();
-            PenroseConfig penroseConfig = project.getPenroseConfig();
+            Server server = serverNode.getProject();
+            PenroseConfig penroseConfig = server.getPenroseConfig();
             penroseConfig.addPartitionConfig(partitionConfig);
 
-            PartitionManager partitionManager = project.getPartitionManager();
+            PartitionManager partitionManager = server.getPartitionManager();
             partitionManager.addPartition(partition);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();

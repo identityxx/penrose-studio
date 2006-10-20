@@ -24,7 +24,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.connector.ConnectorConfig;
 import org.apache.log4j.Logger;
 
@@ -35,7 +35,7 @@ public class ConnectorEditor extends MultiPageEditorPart {
 
     Logger log = Logger.getLogger(getClass());
 
-    Project project;
+    Server server;
 
     ConnectorConfig connectorConfig;
     ConnectorConfig origConnectorConfig;
@@ -50,7 +50,7 @@ public class ConnectorEditor extends MultiPageEditorPart {
         setInput(input);
 
         ConnectorEditorInput ei = (ConnectorEditorInput)input;
-        project = ei.getProject();
+        server = ei.getProject();
         origConnectorConfig = ei.getConnectorConfig();
         connectorConfig = (ConnectorConfig)origConnectorConfig.clone();
 

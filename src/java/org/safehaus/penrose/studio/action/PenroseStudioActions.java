@@ -1,6 +1,6 @@
 package org.safehaus.penrose.studio.action;
 
-import org.safehaus.penrose.studio.project.action.*;
+import org.safehaus.penrose.studio.server.action.*;
 import org.safehaus.penrose.studio.partition.action.NewPartitionAction;
 import org.safehaus.penrose.studio.partition.action.ImportPartitionAction;
 import org.safehaus.penrose.studio.partition.action.NewLDAPSnapshotPartitionAction;

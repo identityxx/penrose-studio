@@ -4,7 +4,7 @@ import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Image;
 
@@ -33,11 +33,11 @@ public class LoggingNode extends Node {
 
         Collection children = new ArrayList();
 
-        ProjectNode projectNode = (ProjectNode)getParent();
+        ServerNode serverNode = (ServerNode)getParent();
 
         children.add(new AppendersNode(
                 view,
-                projectNode,
+                serverNode,
                 ObjectsView.APPENDERS,
                 ObjectsView.APPENDERS,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
@@ -47,7 +47,7 @@ public class LoggingNode extends Node {
 
         children.add(new LoggersNode(
                 view,
-                projectNode,
+                serverNode,
                 ObjectsView.LOGGERS,
                 ObjectsView.LOGGERS,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),

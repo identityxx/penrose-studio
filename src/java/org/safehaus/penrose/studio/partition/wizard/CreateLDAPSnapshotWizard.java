@@ -23,8 +23,8 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.object.ObjectsView;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.connection.wizard.LDAPConnectionInfoWizardPage;
 import org.safehaus.penrose.studio.connection.wizard.LDAPConnectionParametersWizardPage;
 import org.safehaus.penrose.studio.util.SnapshotUtil;
@@ -86,15 +86,15 @@ public class CreateLDAPSnapshotWizard extends Wizard {
             IWorkbenchPage page = window.getActivePage();
             ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
-            ProjectNode projectNode = objectsView.getSelectedProjectNode();
-            if (projectNode == null) return false;
+            ServerNode serverNode = objectsView.getSelectedProjectNode();
+            if (serverNode == null) return false;
 
-            Project project = projectNode.getProject();
-            PenroseConfig penroseConfig = project.getPenroseConfig();
+            Server server = serverNode.getProject();
+            PenroseConfig penroseConfig = server.getPenroseConfig();
             penroseConfig.addPartitionConfig(partitionConfig);
 
-            PartitionManager partitionManager = project.getPartitionManager();
-            Partition partition = partitionManager.load(projectNode.getWorkDir(), partitionConfig);
+            PartitionManager partitionManager = server.getPartitionManager();
+            Partition partition = partitionManager.load(serverNode.getWorkDir(), partitionConfig);
 
             ConnectionConfig connectionConfig = new ConnectionConfig();
             connectionConfig.setName(name);

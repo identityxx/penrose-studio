@@ -15,13 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.project;
+package org.safehaus.penrose.studio.server;
 
 import org.safehaus.penrose.management.PenroseClient;
 
 import java.io.Serializable;
 
-public class ProjectConfig implements Serializable {
+public class ServerConfig implements Serializable {
 
     private String name;
     private String type = PenroseClient.PENROSE;
@@ -30,16 +30,16 @@ public class ProjectConfig implements Serializable {
     private String username;
     private String password;
 
-    public ProjectConfig() {
+    public ServerConfig() {
     }
 
-    public ProjectConfig(ProjectConfig projectConfig) {
-        name = projectConfig.getName();
-        type = projectConfig.getType();
-        host = projectConfig.getHost();
-        port = projectConfig.getPort();
-        username = projectConfig.getUsername();
-        password = projectConfig.getPassword();
+    public ServerConfig(ServerConfig serverConfig) {
+        name = serverConfig.getName();
+        type = serverConfig.getType();
+        host = serverConfig.getHost();
+        port = serverConfig.getPort();
+        username = serverConfig.getUsername();
+        password = serverConfig.getPassword();
     }
 
     public String getHost() {

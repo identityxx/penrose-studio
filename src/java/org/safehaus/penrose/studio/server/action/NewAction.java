@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.project.action;
+package org.safehaus.penrose.studio.server.action;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -10,8 +10,8 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.ProjectConfig;
-import org.safehaus.penrose.studio.project.ProjectEditorDialog;
+import org.safehaus.penrose.studio.server.ServerConfig;
+import org.safehaus.penrose.studio.server.ServerEditorDialog;
 
 public class NewAction extends Action {
 
@@ -30,18 +30,18 @@ public class NewAction extends Action {
         Shell shell = window.getShell();
 
         try {
-            ProjectConfig projectConfig = new ProjectConfig();
-            projectConfig.setHost("localhost");
-            projectConfig.setPort(1099);
+            ServerConfig serverConfig = new ServerConfig();
+            serverConfig.setHost("localhost");
+            serverConfig.setPort(1099);
 
-            ProjectEditorDialog dialog = new ProjectEditorDialog(shell, SWT.NONE);
-            dialog.setProjectConfig(projectConfig);
+            ServerEditorDialog dialog = new ServerEditorDialog(shell, SWT.NONE);
+            dialog.setServerConfig(serverConfig);
             dialog.open();
 
-            if (dialog.getAction() == ProjectEditorDialog.CANCEL) return;
+            if (dialog.getAction() == ServerEditorDialog.CANCEL) return;
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.addProject(projectConfig);
+            penroseStudio.addServer(serverConfig);
             penroseStudio.save();
 
         } catch (Exception e) {
@@ -50,7 +50,7 @@ public class NewAction extends Action {
             MessageDialog.openError(
                     shell,
                     "ERROR",
-                    "Failed creating new project.\n"+
+                    "Failed creating new server.\n"+
                             "See penrose-studio-log.txt for details."
             );
         }

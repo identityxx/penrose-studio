@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.event.SelectionEvent;
 import org.safehaus.penrose.studio.event.SelectionListener;
 import org.safehaus.penrose.studio.event.ChangeEvent;
@@ -53,7 +53,7 @@ public class CopyAction extends Action implements ChangeListener, SelectionListe
     }
 
     public void updateStatus(Object object) {
-        if (object instanceof ProjectNode) {
+        if (object instanceof ServerNode) {
             setEnabled(true);
         } else {
             setEnabled(false);

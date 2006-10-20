@@ -19,8 +19,8 @@ package org.safehaus.penrose.studio.schema;
 
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.schema.action.ImportSchemaAction;
 import org.safehaus.penrose.studio.schema.action.NewSchemaAction;
 import org.safehaus.penrose.studio.object.ObjectsView;
@@ -62,9 +62,9 @@ public class SchemasNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        ProjectNode projectNode = (ProjectNode)getParent();
-        Project project = projectNode.getProject();
-        PenroseConfig penroseConfig = project.getPenroseConfig();
+        ServerNode serverNode = (ServerNode)getParent();
+        Server server = serverNode.getProject();
+        PenroseConfig penroseConfig = server.getPenroseConfig();
         return !penroseConfig.getSchemaConfigs().isEmpty();
     }
 
@@ -72,9 +72,9 @@ public class SchemasNode extends Node {
 
         Collection children = new ArrayList();
 
-        ProjectNode projectNode = (ProjectNode)getParent();
-        Project project = projectNode.getProject();
-        PenroseConfig penroseConfig = project.getPenroseConfig();
+        ServerNode serverNode = (ServerNode)getParent();
+        Server server = serverNode.getProject();
+        PenroseConfig penroseConfig = server.getPenroseConfig();
 
         Collection schemaConfigs = penroseConfig.getSchemaConfigs();
         for (Iterator i=schemaConfigs.iterator(); i.hasNext(); ) {
@@ -82,7 +82,7 @@ public class SchemasNode extends Node {
 
             SchemaNode schemaNode = new SchemaNode(
                     view,
-                    projectNode,
+                    serverNode,
                     schemaConfig.getName(),
                     ObjectsView.SCHEMA,
                     PenrosePlugin.getImage(PenroseImage.SCHEMA),

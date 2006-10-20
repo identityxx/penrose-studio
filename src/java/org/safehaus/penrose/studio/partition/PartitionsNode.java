@@ -18,8 +18,8 @@
 package org.safehaus.penrose.studio.partition;
 
 import org.safehaus.penrose.studio.*;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.partition.action.NewPartitionAction;
 import org.safehaus.penrose.studio.partition.action.ImportPartitionAction;
 import org.safehaus.penrose.studio.partition.action.NewLDAPSnapshotPartitionAction;
@@ -71,9 +71,9 @@ public class PartitionsNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        ProjectNode projectNode = (ProjectNode)getParent();
-        Project project = projectNode.getProject();
-        PartitionManager partitionManager = project.getPartitionManager();
+        ServerNode serverNode = (ServerNode)getParent();
+        Server server = serverNode.getProject();
+        PartitionManager partitionManager = server.getPartitionManager();
         if (partitionManager == null) return false;
         return !partitionManager.getPartitions().isEmpty();
     }
@@ -82,11 +82,11 @@ public class PartitionsNode extends Node {
 
         Collection children = new ArrayList();
 
-        ProjectNode projectNode = (ProjectNode)getParent();
-        Project project = projectNode.getProject();
+        ServerNode serverNode = (ServerNode)getParent();
+        Server server = serverNode.getProject();
 
-        PenroseConfig penroseConfig = project.getPenroseConfig();
-        PartitionManager partitionManager = project.getPartitionManager();
+        PenroseConfig penroseConfig = server.getPenroseConfig();
+        PartitionManager partitionManager = server.getPartitionManager();
         
         Collection partitionConfigs = penroseConfig.getPartitionConfigs();
         for (Iterator i=partitionConfigs.iterator(); i.hasNext(); ) {
@@ -95,7 +95,7 @@ public class PartitionsNode extends Node {
 
             PartitionNode partitionNode = new PartitionNode(
                     view,
-                    project,
+                    server,
                     partitionConfig.getName(),
                     ObjectsView.PARTITION,
                     PenrosePlugin.getImage(PenroseImage.PARTITION),

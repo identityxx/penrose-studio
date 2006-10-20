@@ -23,8 +23,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -57,11 +57,11 @@ public class OpenAction extends Action implements ChangeListener, SelectionListe
             Node node = penroseStudio.getSelectedNode();
             if (node == null) return;
 
-            ProjectNode projectNode = (ProjectNode)node;
-            Project project = projectNode.getProject();
+            ServerNode serverNode = (ServerNode)node;
+            Server server = serverNode.getProject();
 
-            penroseStudio.open(project);
-            penroseStudio.show(projectNode);
+            penroseStudio.open(server);
+            penroseStudio.show(serverNode);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -75,10 +75,10 @@ public class OpenAction extends Action implements ChangeListener, SelectionListe
 	}
 
     public void updateStatus(Object object) {
-        if (object instanceof ProjectNode) {
-            ProjectNode projectNode = (ProjectNode)object;
-            Project project = projectNode.getProject();
-            setEnabled(!project.isConnected());
+        if (object instanceof ServerNode) {
+            ServerNode serverNode = (ServerNode)object;
+            Server server = serverNode.getProject();
+            setEnabled(!server.isConnected());
 
         } else {
             setEnabled(false);

@@ -27,8 +27,8 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;
@@ -89,11 +89,11 @@ public class ObjectClassWizardPage extends WizardPage {
                     IWorkbenchPage page = window.getActivePage();
                     ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
-                    ProjectNode projectNode = objectsView.getSelectedProjectNode();
-                    if (projectNode == null) return;
+                    ServerNode serverNode = objectsView.getSelectedProjectNode();
+                    if (serverNode == null) return;
 
-                    Project project = projectNode.getProject();
-                    SchemaManager schemaManager = project.getSchemaManager();
+                    Server server = serverNode.getProject();
+                    SchemaManager schemaManager = server.getSchemaManager();
 
                     TableItem items[] = availableTable.getSelection();
                     for (int i=0; i<items.length; i++) {
@@ -126,11 +126,11 @@ public class ObjectClassWizardPage extends WizardPage {
                     IWorkbenchPage page = window.getActivePage();
                     ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
-                    ProjectNode projectNode = objectsView.getSelectedProjectNode();
-                    if (projectNode == null) return;
+                    ServerNode serverNode = objectsView.getSelectedProjectNode();
+                    if (serverNode == null) return;
 
-                    Project project = projectNode.getProject();
-                    SchemaManager schemaManager = project.getSchemaManager();
+                    Server server = serverNode.getProject();
+                    SchemaManager schemaManager = server.getSchemaManager();
 
                     TableItem items[] = selectedTable.getSelection();
                     for (int i=0; i<items.length; i++) {
@@ -216,11 +216,11 @@ public class ObjectClassWizardPage extends WizardPage {
             IWorkbenchPage page = window.getActivePage();
             ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
-            ProjectNode projectNode = objectsView.getSelectedProjectNode();
-            if (projectNode == null) return;
+            ServerNode serverNode = objectsView.getSelectedProjectNode();
+            if (serverNode == null) return;
 
-            Project project = projectNode.getProject();
-            Schema schema = project.getSchemaManager().getAllSchema();
+            Server server = serverNode.getProject();
+            Schema schema = server.getSchemaManager().getAllSchema();
 
             Collection ocNames = new ArrayList();
             for (Iterator i=schema.getObjectClasses().iterator(); i.hasNext(); ) {

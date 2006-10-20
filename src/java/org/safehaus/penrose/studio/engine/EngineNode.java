@@ -25,8 +25,8 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.engine.EngineConfig;
 import org.apache.log4j.Logger;
 
@@ -93,13 +93,13 @@ public class EngineNode extends Node {
     public void open() throws Exception {
 
         EnginesNode enginesNode = (EnginesNode)getParent();
-        ProjectNode projectNode = (ProjectNode)enginesNode.getParent();
-        Project project = projectNode.getProject();
+        ServerNode serverNode = (ServerNode)enginesNode.getParent();
+        Server server = serverNode.getProject();
 
         EngineConfig engineConfig = (EngineConfig)getObject();
 
         EngineEditorInput ei = new EngineEditorInput();
-        ei.setProject(project);
+        ei.setProject(server);
         ei.setEngineConfig(engineConfig);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

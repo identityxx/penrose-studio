@@ -11,13 +11,13 @@ UninstallDisplayName=Penrose Studio ${project.version}
 UninstallDisplayIcon={app}\penrose.ico
 Compression=zip
 SolidCompression=yes
-OutputBaseFilename=${projectConfig.name}-${project.version}
+OutputBaseFilename=${project.name}-${project.version}
 OutputDir=..\dist
 LicenseFile=LICENSE.txt
 
 [Files]
 
-Source: "${projectConfig.name}-${project.version}-win32\*"; DestDir: "{app}"; Flags: recursesubdirs;
+Source: "${project.name}-${project.version}-win32\*"; DestDir: "{app}"; Flags: recursesubdirs;
 
 [Icons]
 

@@ -26,7 +26,7 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
 
@@ -34,7 +34,7 @@ public class MappingEditor extends FormEditor implements ModifyListener {
 
     Logger log = Logger.getLogger(getClass());
 
-    Project project;
+    Server server;
 
     Partition partition;
 	EntryMapping entry;
@@ -45,7 +45,7 @@ public class MappingEditor extends FormEditor implements ModifyListener {
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         MappingEditorInput mei = (MappingEditorInput)input;
 
-        project = mei.getProject();
+        server = mei.getProject();
         partition = mei.getPartition();
         origEntry = mei.getEntryDefinition();
         entry = (EntryMapping)origEntry.clone();
@@ -148,12 +148,12 @@ public class MappingEditor extends FormEditor implements ModifyListener {
         this.partition = partition;
     }
 
-    public Project getProject() {
-        return project;
+    public Server getProject() {
+        return server;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setProject(Server server) {
+        this.server = server;
     }
 }
 

@@ -19,8 +19,8 @@ package org.safehaus.penrose.studio.user;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.user.UserConfig;
 import org.eclipse.swt.graphics.Image;
@@ -59,14 +59,14 @@ public class AdministratorNode extends Node {
     }
 
     public void open() throws Exception {
-        ProjectNode projectNode = (ProjectNode)getParent();
-        Project project = projectNode.getProject();
-        PenroseConfig penroseConfig = project.getPenroseConfig();
+        ServerNode serverNode = (ServerNode)getParent();
+        Server server = serverNode.getProject();
+        PenroseConfig penroseConfig = server.getPenroseConfig();
         UserConfig userConfig = penroseConfig.getRootUserConfig();
 
         UserEditorInput ei = new UserEditorInput();
         ei.setName("Administrator");
-        ei.setProject(project);
+        ei.setProject(server);
         ei.setUserConfig(userConfig);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

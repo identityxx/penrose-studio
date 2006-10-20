@@ -20,27 +20,27 @@ package org.safehaus.penrose.studio.config;
 import java.util.*;
 
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.project.ProjectConfig;
+import org.safehaus.penrose.studio.server.ServerConfig;
 
 public class PenroseStudioConfig {
 
     Logger log = Logger.getLogger(getClass());
 
-    Map projectConfigs = new TreeMap();
+    Map serverConfigs = new TreeMap();
 
-    public void addProjectConfig(ProjectConfig projectConfig) {
-        projectConfigs.put(projectConfig.getName(), projectConfig);
+    public void addServerConfig(ServerConfig serverConfig) {
+        serverConfigs.put(serverConfig.getName(), serverConfig);
     }
 
-    public ProjectConfig getProjectConfig(String name) {
-        return (ProjectConfig)projectConfigs.get(name);
+    public ServerConfig getServerConfig(String name) {
+        return (ServerConfig)serverConfigs.get(name);
     }
 
-    public void removeProjectConfig(String name) {
-        projectConfigs.remove(name);
+    public void removeServerConfig(String name) {
+        serverConfigs.remove(name);
     }
 
-    public Collection getProjectConfigs() {
-        return projectConfigs.values();
+    public Collection getServerConfigs() {
+        return serverConfigs.values();
     }
 }

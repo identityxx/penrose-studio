@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.object.ObjectsView;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.event.SelectionEvent;
 import org.safehaus.penrose.studio.event.SelectionListener;
 import org.safehaus.penrose.studio.event.ChangeEvent;
@@ -36,8 +36,8 @@ public class CutAction extends Action implements ChangeListener, SelectionListen
             IWorkbenchPage page = window.getActivePage();
             ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
-            ProjectNode projectNode = objectsView.getSelectedProjectNode();
-            if (projectNode == null) return;
+            ServerNode serverNode = objectsView.getSelectedProjectNode();
+            if (serverNode == null) return;
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -52,7 +52,7 @@ public class CutAction extends Action implements ChangeListener, SelectionListen
     }
 
     public void updateStatus(Object object) {
-        if (object instanceof ProjectNode) {
+        if (object instanceof ServerNode) {
             setEnabled(true);
         } else {
             setEnabled(false);

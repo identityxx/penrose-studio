@@ -20,14 +20,14 @@ package org.safehaus.penrose.studio.preview;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServerNode;
 
 /**
  * @author Endi S. Dewata
  */
 public class PreviewEditorInput implements IEditorInput {
 
-    private ProjectNode projectNode;
+    private ServerNode serverNode;
     private String baseDn;
     private String bindDn;
     private String bindPassword;
@@ -87,11 +87,11 @@ public class PreviewEditorInput implements IEditorInput {
         this.baseDn = baseDn;
     }
 
-    public ProjectNode getProjectNode() {
-        return projectNode;
+    public ServerNode getProjectNode() {
+        return serverNode;
     }
 
-    public void setProjectNode(ProjectNode projectNode) {
-        this.projectNode = projectNode;
+    public void setProjectNode(ServerNode serverNode) {
+        this.serverNode = serverNode;
     }
 }

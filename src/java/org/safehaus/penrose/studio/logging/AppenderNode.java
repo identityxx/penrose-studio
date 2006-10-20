@@ -5,8 +5,8 @@ import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.log4j.AppenderConfig;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.apache.log4j.Logger;
@@ -25,12 +25,12 @@ public class AppenderNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
-    ProjectNode projectNode;
+    ServerNode serverNode;
     AppenderConfig appenderConfig;
 
     public AppenderNode(
             ObjectsView view,
-            ProjectNode projectNode,
+            ServerNode serverNode,
             String name,
             String type,
             Image image,
@@ -39,7 +39,7 @@ public class AppenderNode extends Node {
     ) {
         super(name, type, image, object, parent);
         this.view = view;
-        this.projectNode = projectNode;
+        this.serverNode = serverNode;
         this.appenderConfig = (AppenderConfig)object;
     }
 
@@ -68,8 +68,8 @@ public class AppenderNode extends Node {
 
     public void open() throws Exception {
 
-        Project project = projectNode.getProject();
-        Log4jConfig log4jConfig = project.getLog4jConfig();
+        Server server = serverNode.getProject();
+        Log4jConfig log4jConfig = server.getLog4jConfig();
 
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
         AppenderDialog dialog = new AppenderDialog(shell, SWT.NONE);
@@ -81,8 +81,8 @@ public class AppenderNode extends Node {
 
     public void remove() throws Exception {
 
-        Project project = projectNode.getProject();
-        Log4jConfig loggingConfig = project.getLog4jConfig();
+        Server server = serverNode.getProject();
+        Log4jConfig loggingConfig = server.getLog4jConfig();
         loggingConfig.removeAppenderConfig(appenderConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();

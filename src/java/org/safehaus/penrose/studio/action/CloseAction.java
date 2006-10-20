@@ -14,8 +14,8 @@ import org.safehaus.penrose.studio.event.SelectionListener;
 import org.safehaus.penrose.studio.event.SelectionEvent;
 import org.safehaus.penrose.studio.event.ChangeListener;
 import org.safehaus.penrose.studio.event.ChangeEvent;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 
 public class CloseAction extends Action implements ChangeListener, SelectionListener {
 
@@ -38,9 +38,9 @@ public class CloseAction extends Action implements ChangeListener, SelectionList
             Node node = penroseStudio.getSelectedNode();
             if (node == null) return;
 
-            ProjectNode projectNode = (ProjectNode)node;
-            Project project = projectNode.getProject();
-            penroseStudio.close(project);
+            ServerNode serverNode = (ServerNode)node;
+            Server server = serverNode.getProject();
+            penroseStudio.close(server);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -54,10 +54,10 @@ public class CloseAction extends Action implements ChangeListener, SelectionList
     }
 
     public void updateStatus(Object object) {
-        if (object instanceof ProjectNode) {
-            ProjectNode projectNode = (ProjectNode)object;
-            Project project = projectNode.getProject();
-            setEnabled(project.isConnected());
+        if (object instanceof ServerNode) {
+            ServerNode serverNode = (ServerNode)object;
+            Server server = serverNode.getProject();
+            setEnabled(server.isConnected());
 
         } else {
             setEnabled(false);

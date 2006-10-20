@@ -21,15 +21,14 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.config.PenroseConfig;
-import org.safehaus.penrose.studio.project.ProjectConfig;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
  */
 public class SystemPropertiesEditorInput implements IEditorInput {
 
-    private Project project;
+    private Server server;
     private PenroseConfig penroseConfig;
 
     public SystemPropertiesEditorInput() {
@@ -44,7 +43,7 @@ public class SystemPropertiesEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "["+project.getName()+"] System Properties";
+        return "["+server.getName()+"] System Properties";
     }
 
     public IPersistableElement getPersistable() {
@@ -76,7 +75,7 @@ public class SystemPropertiesEditorInput implements IEditorInput {
     }
 
     public int hashCode() {
-        return (project == null ? 0 : project.hashCode()) +
+        return (server == null ? 0 : server.hashCode()) +
                 (penroseConfig == null ? 0 : penroseConfig.hashCode());
     }
 
@@ -88,11 +87,11 @@ public class SystemPropertiesEditorInput implements IEditorInput {
         this.penroseConfig = penroseConfig;
     }
 
-    public Project getProject() {
-        return project;
+    public Server getProject() {
+        return server;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setProject(Server server) {
+        this.server = server;
     }
 }

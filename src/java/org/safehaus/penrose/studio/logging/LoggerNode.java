@@ -22,8 +22,8 @@ import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.log4j.LoggerConfig;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.eclipse.swt.graphics.Image;
@@ -42,12 +42,12 @@ public class LoggerNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
-    ProjectNode projectNode;
+    ServerNode serverNode;
     LoggerConfig loggerConfig;
 
     public LoggerNode(
             ObjectsView view,
-            ProjectNode projectNode,
+            ServerNode serverNode,
             String name,
             String type,
             Image image,
@@ -56,7 +56,7 @@ public class LoggerNode extends Node {
     ) {
         super(name, type, image, object, parent);
         this.view = view;
-        this.projectNode = projectNode;
+        this.serverNode = serverNode;
         this.loggerConfig = (LoggerConfig)object;
     }
 
@@ -85,8 +85,8 @@ public class LoggerNode extends Node {
 
     public void open() throws Exception {
 
-        Project project = projectNode.getProject();
-        Log4jConfig log4jConfig = project.getLog4jConfig();
+        Server server = serverNode.getProject();
+        Log4jConfig log4jConfig = server.getLog4jConfig();
 
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
         LoggerDialog dialog = new LoggerDialog(shell, SWT.NONE);
@@ -97,8 +97,8 @@ public class LoggerNode extends Node {
     }
 
     public void remove() throws Exception {
-        Project project = projectNode.getProject();
-        Log4jConfig log4jConfig = project.getLog4jConfig();
+        Server server = serverNode.getProject();
+        Log4jConfig log4jConfig = server.getLog4jConfig();
         log4jConfig.removeLoggerConfig(loggerConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();

@@ -26,8 +26,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.partition.wizard.CreateLDAPProxyWizard;
 import org.apache.log4j.Logger;
 
@@ -55,8 +54,8 @@ public class NewLDAPProxyPartitionAction extends Action {
             dialog.open();
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            Project project = penroseStudio.getProject("Penrose Server");
-            objectsView.show(project);
+            Server server = penroseStudio.getProject("Penrose Server");
+            objectsView.show(server);
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.project;
+package org.safehaus.penrose.studio.server;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
@@ -31,7 +31,7 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.apache.log4j.Logger;
 
-public class ProjectEditorDialog extends Dialog {
+public class ServerEditorDialog extends Dialog {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -47,11 +47,11 @@ public class ProjectEditorDialog extends Dialog {
 	Text usernameText;
 	Text passwordText;
 
-	private ProjectConfig projectConfig;
+	private ServerConfig serverConfig;
 	
     private int action;
 
-	public ProjectEditorDialog(Shell parent, int style) {
+	public ServerEditorDialog(Shell parent, int style) {
         super(parent, style);
 
         shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
@@ -195,27 +195,27 @@ public class ProjectEditorDialog extends Dialog {
     }
 
 	public void store() {
-        projectConfig.setName("".equals(nameText.getText()) ? null : nameText.getText());
-        projectConfig.setType(typeCombo.getText());
-        projectConfig.setHost("".equals(hostText.getText()) ? null : hostText.getText());
-        projectConfig.setPort("".equals(portText.getText()) ? 0 : Integer.parseInt(portText.getText()));
-        projectConfig.setUsername("".equals(usernameText.getText()) ? null : usernameText.getText());
-        projectConfig.setPassword("".equals(passwordText.getText()) ? null : passwordText.getText());
+        serverConfig.setName("".equals(nameText.getText()) ? null : nameText.getText());
+        serverConfig.setType(typeCombo.getText());
+        serverConfig.setHost("".equals(hostText.getText()) ? null : hostText.getText());
+        serverConfig.setPort("".equals(portText.getText()) ? 0 : Integer.parseInt(portText.getText()));
+        serverConfig.setUsername("".equals(usernameText.getText()) ? null : usernameText.getText());
+        serverConfig.setPassword("".equals(passwordText.getText()) ? null : passwordText.getText());
 	}
 
-    public ProjectConfig getProjectConfig() {
-        return projectConfig;
+    public ServerConfig getServerConfig() {
+        return serverConfig;
     }
 
-    public void setProjectConfig(ProjectConfig projectConfig) {
-        this.projectConfig = projectConfig;
+    public void setServerConfig(ServerConfig serverConfig) {
+        this.serverConfig = serverConfig;
 
-        nameText.setText(projectConfig.getName() == null ? "" : projectConfig.getName());
-        typeCombo.setText(projectConfig.getType() == null ? PenroseClient.PENROSE : projectConfig.getType());
-        hostText.setText(projectConfig.getHost() == null ? "localhost" : projectConfig.getHost());
-        portText.setText(projectConfig.getPort() == 0 ? "" : ""+projectConfig.getPort());
-        usernameText.setText(projectConfig.getUsername() == null ? "" : projectConfig.getUsername());
-        passwordText.setText(projectConfig.getPassword() == null ? "" : projectConfig.getPassword());
+        nameText.setText(serverConfig.getName() == null ? "" : serverConfig.getName());
+        typeCombo.setText(serverConfig.getType() == null ? PenroseClient.PENROSE : serverConfig.getType());
+        hostText.setText(serverConfig.getHost() == null ? "localhost" : serverConfig.getHost());
+        portText.setText(serverConfig.getPort() == 0 ? "" : ""+serverConfig.getPort());
+        usernameText.setText(serverConfig.getUsername() == null ? "" : serverConfig.getUsername());
+        passwordText.setText(serverConfig.getPassword() == null ? "" : serverConfig.getPassword());
     }
 
     public int getAction() {

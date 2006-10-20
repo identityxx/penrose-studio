@@ -73,14 +73,14 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             //configurer.setShowCoolBar(true);
             //configurer.setShowStatusLine(true);
 
-            ProjectDialog dialog = new ProjectDialog(shell);
+            ServerDialog dialog = new ServerDialog(shell);
             dialog.open();
 
-            if (dialog.getAction() == ProjectDialog.CANCEL) System.exit(0);
+            if (dialog.getAction() == ServerDialog.CANCEL) System.exit(0);
 
-            Project project = dialog.getProject();
+            Server server = dialog.getProject();
 
-            penroseStudio.getApplicationConfig().setCurrentProject(project);
+            penroseStudio.getApplicationConfig().setCurrentProject(server);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

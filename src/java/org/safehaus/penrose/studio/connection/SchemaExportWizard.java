@@ -22,8 +22,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.schema.*;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.apache.log4j.Logger;
 
@@ -86,11 +86,11 @@ public class SchemaExportWizard extends Wizard {
         IWorkbenchPage page = window.getActivePage();
         ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
-        ProjectNode projectNode = objectsView.getSelectedProjectNode();
-        if (projectNode == null) return;
+        ServerNode serverNode = objectsView.getSelectedProjectNode();
+        if (serverNode == null) return;
 
-        Project project = projectNode.getProject();
-        SchemaManager schemaManager = project.getSchemaManager();
+        Server server = serverNode.getProject();
+        SchemaManager schemaManager = server.getSchemaManager();
 
         Collection attributeTypes = schemaManager.getAttributeTypes();
         for (Iterator i=attributeTypes.iterator(); i.hasNext(); ) {

@@ -5,8 +5,8 @@ Release: 1
 License: Commercial
 Vendor: Identyx, Inc.
 Group: System Environment/Base
-Source: ${project.name}-${projectConfig.version}-src.tar.gz
-BuildRoot: /var/tmp/${project.name}-${projectConfig.version}
+Source: ${project.name}-${project.version}-src.tar.gz
+BuildRoot: /var/tmp/${project.name}-${project.version}
 
 %description
 Penrose is a Java-based virtual directory server. Virtual directory enables federating (aggregating) identity data from multiple heterogeneous sources like directory, databases, flat files, and web services - real-time - and makes it available to identity consumers via LDAP.
@@ -23,7 +23,7 @@ ant -Dproject.version=${project.version} -Dprefix=${rpm.prefix}$RPM_BUILD_ROOT i
 
 %post
 cat << EOF
-Penrose Studio ${projectConfig.version} has been installed in /usr/local/${projectConfig.name}-${project.version}.
+Penrose Studio ${project.version} has been installed in /usr/local/${project.name}-${project.version}.
 EOF
 
 %clean
@@ -32,4 +32,4 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 
-/usr/local/${project.name}-${projectConfig.version}
+/usr/local/${project.name}-${project.version}

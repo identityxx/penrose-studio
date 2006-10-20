@@ -2,7 +2,7 @@ package org.safehaus.penrose.studio.source;
 
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.IEditorInput;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.partition.SourceConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
@@ -14,7 +14,7 @@ public abstract class SourceEditor extends FormEditor {
 
     public Logger log = Logger.getLogger(getClass());
 
-    private Project project;
+    private Server server;
     private Partition partition;
 
     private SourceConfig originalSourceConfig;
@@ -26,18 +26,18 @@ public abstract class SourceEditor extends FormEditor {
         super.setInput(input);
 
         SourceEditorInput ei = (SourceEditorInput)input;
-        project = ei.getProject();
+        server = ei.getProject();
         partition = ei.getPartition();
         originalSourceConfig = ei.getSourceConfig();
         sourceConfig = (SourceConfig)getOriginalSourceConfig().clone();
     }
 
-    public Project getProject() {
-        return project;
+    public Server getProject() {
+        return server;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setProject(Server server) {
+        this.server = server;
     }
 
     public SourceConfig getOriginalSourceConfig() {

@@ -31,9 +31,9 @@ import org.safehaus.penrose.studio.event.ChangeListener;
 import org.safehaus.penrose.studio.event.SelectionListener;
 import org.safehaus.penrose.studio.event.ChangeEvent;
 import org.safehaus.penrose.studio.event.SelectionEvent;
-import org.safehaus.penrose.studio.project.ProjectConfig;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerConfig;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.browser.BrowserEditorInput;
 import org.safehaus.penrose.studio.browser.BrowserEditor;
 import org.safehaus.penrose.config.PenroseConfig;
@@ -67,13 +67,13 @@ public class BrowserAction extends Action implements ChangeListener, SelectionLi
             Node node = penroseStudio.getSelectedNode();
             if (node == null) return;
 
-            ProjectNode projectNode = (ProjectNode)node;
-            Project project = projectNode.getProject();
+            ServerNode serverNode = (ServerNode)node;
+            Server server = serverNode.getProject();
 
-            ProjectConfig projectConfig = project.getProjectConfig();
-            String hostname = projectConfig.getHost();
+            ServerConfig serverConfig = server.getServerConfig();
+            String hostname = serverConfig.getHost();
 
-            PenroseConfig penroseConfig = project.getPenroseConfig();
+            PenroseConfig penroseConfig = server.getPenroseConfig();
             ServiceConfig serviceConfig = penroseConfig.getServiceConfig("LDAP");
             String s = serviceConfig.getParameter(LDAP_PORT);
             int port = s == null ? DEFAULT_LDAP_PORT : Integer.parseInt(s);
@@ -81,7 +81,7 @@ public class BrowserAction extends Action implements ChangeListener, SelectionLi
             UserConfig rootUserConfig = penroseConfig.getRootUserConfig();
 
             BrowserEditorInput ei = new BrowserEditorInput();
-            ei.setProject(projectConfig);
+            ei.setProject(serverConfig);
             ei.setHostname(hostname);
             ei.setPort(port);
             ei.setBaseDn("");
@@ -103,10 +103,10 @@ public class BrowserAction extends Action implements ChangeListener, SelectionLi
 	}
 
     public void updateStatus(Object object) {
-        if (object instanceof ProjectNode) {
-            ProjectNode projectNode = (ProjectNode)object;
-            Project project = projectNode.getProject();
-            setEnabled(project.isConnected());
+        if (object instanceof ServerNode) {
+            ServerNode serverNode = (ServerNode)object;
+            Server server = serverNode.getProject();
+            setEnabled(server.isConnected());
 
         } else {
             setEnabled(false);

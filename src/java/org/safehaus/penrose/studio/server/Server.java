@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.project;
+package org.safehaus.penrose.studio.server;
 
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.config.PenroseConfig;
@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.ArrayList;
@@ -28,11 +27,11 @@ import java.util.ArrayList;
 /**
  * @author Endi S. Dewata
  */
-public class Project {
+public class Server {
 
     Logger log = LoggerFactory.getLogger(getClass());
 
-    private ProjectConfig projectConfig;
+    private ServerConfig serverConfig;
 
     private PenroseClient client;
     private PenroseConfig penroseConfig;
@@ -40,20 +39,20 @@ public class Project {
     private PartitionManager partitionManager;
     private Log4jConfig log4jConfig;
 
-    public Project(ProjectConfig projectConfig) {
-        this.projectConfig = projectConfig;
+    public Server(ServerConfig serverConfig) {
+        this.serverConfig = serverConfig;
     }
 
     public String getName() {
-        return projectConfig.getName();
+        return serverConfig.getName();
     }
 
-    public ProjectConfig getProjectConfig() {
-        return projectConfig;
+    public ServerConfig getServerConfig() {
+        return serverConfig;
     }
 
-    public void setProjectConfig(ProjectConfig projectConfig) {
-        this.projectConfig = projectConfig;
+    public void setServerConfig(ServerConfig serverConfig) {
+        this.serverConfig = serverConfig;
     }
 
     public PenroseClient getClient() {
@@ -101,21 +100,21 @@ public class Project {
     }
 
     public String getWorkDir() {
-        return System.getProperty("user.dir")+File.separator+"work"+File.separator+projectConfig.getName();
+        return System.getProperty("user.dir")+File.separator+"work"+File.separator+serverConfig.getName();
     }
 
     public void open() throws Exception {
         if (isConnected()) return;
 
         log.debug("-------------------------------------------------------------------------------------");
-        log.debug("Opening project "+projectConfig.getName());
+        log.debug("Opening server "+serverConfig.getName());
 
         client = new PenroseClient(
-                projectConfig.getType(),
-                projectConfig.getHost(),
-                projectConfig.getPort(),
-                projectConfig.getUsername(),
-                projectConfig.getPassword()
+                serverConfig.getType(),
+                serverConfig.getHost(),
+                serverConfig.getPort(),
+                serverConfig.getUsername(),
+                serverConfig.getPassword()
         );
 
         client.connect();
@@ -129,7 +128,7 @@ public class Project {
         downloadFolder("schema", dir);
         downloadFolder("partitions", dir);
 
-        log.debug("Opening project from "+dir);
+        log.debug("Opening server from "+dir);
 
         PenroseConfigReader penroseConfigReader = new PenroseConfigReader(dir +"/conf/server.xml");
         penroseConfig = penroseConfigReader.read();
@@ -141,7 +140,7 @@ public class Project {
 
         loadLoggingConfig(dir);
 
-        log.debug("Project opened.");
+        log.debug("Server opened.");
     }
 
     public void downloadFolder(String remotePath, String localDir) throws Exception {
@@ -277,7 +276,7 @@ public class Project {
 
         validate();
 
-        log.debug("Project saved.");
+        log.debug("Server saved.");
     }
 
     public void saveLoggingConfig(String dir) throws Exception {
@@ -338,7 +337,7 @@ public class Project {
     public void restart() throws Exception {
         client.restart();
 
-        log.debug("Project restarted.");
+        log.debug("Server restarted.");
     }
 
     public void close() throws Exception {
@@ -348,7 +347,7 @@ public class Project {
         client.close();
         client = null;
 
-        log.debug("Project closed.");
+        log.debug("Server closed.");
     }
 
 }

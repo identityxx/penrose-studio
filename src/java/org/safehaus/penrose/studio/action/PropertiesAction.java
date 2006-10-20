@@ -11,9 +11,9 @@ import org.safehaus.penrose.studio.event.SelectionListener;
 import org.safehaus.penrose.studio.event.SelectionEvent;
 import org.safehaus.penrose.studio.event.ChangeEvent;
 import org.safehaus.penrose.studio.event.ChangeListener;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.project.ProjectEditorDialog;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.server.ServerEditorDialog;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
@@ -40,25 +40,25 @@ public class PropertiesAction extends Action implements ChangeListener, Selectio
             IWorkbenchPage page = window.getActivePage();
             ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
-            ProjectNode projectNode = objectsView.getSelectedProjectNode();
-            if (projectNode == null) return;
+            ServerNode serverNode = objectsView.getSelectedProjectNode();
+            if (serverNode == null) return;
 
-            Project project = projectNode.getProject();
+            Server server = serverNode.getProject();
 
-            String oldProjectName = project.getName();
+            String oldProjectName = server.getName();
             System.out.println("Editing project: "+oldProjectName);
 
-            ProjectEditorDialog dialog = new ProjectEditorDialog(shell, SWT.NONE);
-            dialog.setProjectConfig(project.getProjectConfig());
+            ServerEditorDialog dialog = new ServerEditorDialog(shell, SWT.NONE);
+            dialog.setServerConfig(server.getServerConfig());
             dialog.open();
 
-            if (dialog.getAction() == ProjectEditorDialog.CANCEL) return;
+            if (dialog.getAction() == ServerEditorDialog.CANCEL) return;
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
 
-            if (!oldProjectName.equals(project.getName())) {
-                penroseStudio.removeProject(oldProjectName);
-                penroseStudio.addProject(project.getProjectConfig());
+            if (!oldProjectName.equals(server.getName())) {
+                penroseStudio.removeServer(oldProjectName);
+                penroseStudio.addServer(server.getServerConfig());
             }
 
             penroseStudio.save();
@@ -77,7 +77,7 @@ public class PropertiesAction extends Action implements ChangeListener, Selectio
     }
 
     public void updateStatus(Object object) {
-        if (object instanceof ProjectNode) {
+        if (object instanceof ServerNode) {
             setEnabled(true);
         } else {
             setEnabled(false);

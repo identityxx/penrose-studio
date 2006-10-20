@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.project;
+package org.safehaus.penrose.studio.server;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
@@ -8,8 +8,6 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.action.PenroseStudioActions;
 import org.safehaus.penrose.studio.util.PenroseStudioClipboard;
-import org.safehaus.penrose.studio.preview.PreviewEditorInput;
-import org.safehaus.penrose.studio.preview.PreviewEditor;
 import org.safehaus.penrose.studio.browser.BrowserEditorInput;
 import org.safehaus.penrose.studio.browser.BrowserEditor;
 import org.safehaus.penrose.studio.properties.SystemPropertiesNode;
@@ -26,7 +24,6 @@ import org.safehaus.penrose.user.UserConfig;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.PlatformUI;
@@ -41,7 +38,7 @@ import java.io.File;
 /**
  * @author Endi S. Dewata
  */
-public class ProjectNode extends Node {
+public class ServerNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -50,7 +47,7 @@ public class ProjectNode extends Node {
 
     ObjectsView view;
 
-    public ProjectNode(ObjectsView view, String name, String type, Object object, Node parent) {
+    public ServerNode(ObjectsView view, String name, String type, Object object, Node parent) {
         super(name, type, PenrosePlugin.getImage(PenroseImage.SERVER), object, parent);
         this.view = view;
     }
@@ -87,27 +84,27 @@ public class ProjectNode extends Node {
     }
 
     public boolean isConnected() {
-        Project project = getProject();
-        return project.isConnected();
+        Server server = getProject();
+        return server.isConnected();
     }
 
     public void open() throws Exception {
         if (isConnected()) return;
 
-        Project project = getProject();
+        Server server = getProject();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.open(project);
+        penroseStudio.open(server);
         penroseStudio.show(this);
     }
 
     public void browse() throws Exception {
 
-        Project project = getProject();
-        ProjectConfig projectConfig = project.getProjectConfig();
-        PenroseConfig penroseConfig = project.getPenroseConfig();
+        Server server = getProject();
+        ServerConfig serverConfig = server.getServerConfig();
+        PenroseConfig penroseConfig = server.getPenroseConfig();
 
-        String hostname = projectConfig.getHost();
+        String hostname = serverConfig.getHost();
 
         ServiceConfig serviceConfig = penroseConfig.getServiceConfig("LDAP");
         String s = serviceConfig.getParameter(LDAP_PORT);
@@ -116,7 +113,7 @@ public class ProjectNode extends Node {
         UserConfig rootUserConfig = penroseConfig.getRootUserConfig();
 
         BrowserEditorInput ei = new BrowserEditorInput();
-        ei.setProject(projectConfig);
+        ei.setProject(serverConfig);
         ei.setHostname(hostname);
         ei.setPort(port);
         ei.setBaseDn("");
@@ -130,26 +127,26 @@ public class ProjectNode extends Node {
 
     public void remove() throws Exception {
 
-        Project project = getProject();
-        ProjectConfig projectConfig = project.getProjectConfig();
+        Server server = getProject();
+        ServerConfig serverConfig = server.getServerConfig();
 
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 
         boolean confirm = MessageDialog.openQuestion(
                 shell,
                 "Confirmation",
-                "Remove Project \""+projectConfig.getName()+"\"?");
+                "Remove Server \""+serverConfig.getName()+"\"?");
 
         if (!confirm) return;
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.removeProject(projectConfig.getName());
+        penroseStudio.removeServer(serverConfig.getName());
         penroseStudio.save();
     }
 
     public void copy(PenroseStudioClipboard clipboard) throws Exception {
-        Project project = getProject();
-        clipboard.put(project.getProjectConfig());
+        Server server = getProject();
+        clipboard.put(server.getServerConfig());
     }
 
     public void paste(PenroseStudioClipboard clipboard) throws Exception {
@@ -245,14 +242,14 @@ public class ProjectNode extends Node {
                 this
         ));
 
-        Project project = getProject();
-        log.debug("["+project.getName()+"] getChildren: "+children.size());
+        Server server = getProject();
+        log.debug("["+server.getName()+"] getChildren: "+children.size());
 
         return children;
     }
 
-    public Project getProject() {
-        return (Project)getObject();
+    public Server getProject() {
+        return (Server)getObject();
     }
 
     public String getWorkDir() {

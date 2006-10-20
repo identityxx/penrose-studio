@@ -5,8 +5,8 @@ import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.safehaus.penrose.log4j.AppenderConfig;
 import org.apache.log4j.Logger;
@@ -29,11 +29,11 @@ public class AppendersNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
-    ProjectNode projectNode;
+    ServerNode serverNode;
 
     public AppendersNode(
             ObjectsView view,
-            ProjectNode projectNode,
+            ServerNode serverNode,
             String name,
             String type,
             Image image,
@@ -42,7 +42,7 @@ public class AppendersNode extends Node {
     ) {
         super(name, type, image, object, parent);
         this.view = view;
-        this.projectNode = projectNode;
+        this.serverNode = serverNode;
     }
 
     public void showMenu(IMenuManager manager) {
@@ -60,8 +60,8 @@ public class AppendersNode extends Node {
 
     public void createAppender() throws Exception {
 
-        Project project = projectNode.getProject();
-        Log4jConfig loggingConfig = project.getLog4jConfig();
+        Server server = serverNode.getProject();
+        Log4jConfig loggingConfig = server.getLog4jConfig();
 
         AppenderConfig appenderConfig = new AppenderConfig();
 
@@ -80,8 +80,8 @@ public class AppendersNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        Project project = projectNode.getProject();
-        Log4jConfig loggingConfig = project.getLog4jConfig();
+        Server server = serverNode.getProject();
+        Log4jConfig loggingConfig = server.getLog4jConfig();
         return !loggingConfig.getAppenderConfigs().isEmpty();
     }
 
@@ -89,15 +89,15 @@ public class AppendersNode extends Node {
 
         Collection children = new ArrayList();
 
-        Project project = projectNode.getProject();
-        Log4jConfig loggingConfig = project.getLog4jConfig();
+        Server server = serverNode.getProject();
+        Log4jConfig loggingConfig = server.getLog4jConfig();
 
         for (Iterator i=loggingConfig.getAppenderConfigs().iterator(); i.hasNext(); ) {
             AppenderConfig appenderConfig = (AppenderConfig)i.next();
 
             AppenderNode appenderNode = new AppenderNode(
                     view,
-                    projectNode,
+                    serverNode,
                     appenderConfig.getName(),
                     ObjectsView.APPENDER,
                     PenrosePlugin.getImage(PenroseImage.APPENDER),

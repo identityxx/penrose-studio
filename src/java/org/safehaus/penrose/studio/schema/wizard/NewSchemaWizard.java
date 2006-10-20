@@ -21,8 +21,8 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.schema.SchemaConfig;
@@ -85,21 +85,21 @@ public class NewSchemaWizard extends Wizard {
             IWorkbenchPage page = window.getActivePage();
             ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
-            ProjectNode projectNode = objectsView.getSelectedProjectNode();
-            if (projectNode == null) return false;
+            ServerNode serverNode = objectsView.getSelectedProjectNode();
+            if (serverNode == null) return false;
 
-            String workDir = projectNode.getWorkDir();
+            String workDir = serverNode.getWorkDir();
 
             Schema schema = new Schema(schemaConfig);
 
             SchemaWriter schemaWriter = new SchemaWriter(workDir);
             schemaWriter.write(schema);
 
-            Project project = projectNode.getProject();
-            PenroseConfig penroseConfig = project.getPenroseConfig();
+            Server server = serverNode.getProject();
+            PenroseConfig penroseConfig = server.getPenroseConfig();
             penroseConfig.addSchemaConfig(schemaConfig);
 
-            SchemaManager schemaManager = project.getSchemaManager();
+            SchemaManager schemaManager = server.getSchemaManager();
             schemaManager.addSchema(schema);
 
             return true;

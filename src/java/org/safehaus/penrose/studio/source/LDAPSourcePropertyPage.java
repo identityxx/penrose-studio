@@ -30,7 +30,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.schema.SchemaManager;
@@ -351,8 +351,8 @@ public class LDAPSourcePropertyPage extends FormPage {
                 try {
                     FieldConfig fieldDefinition = new FieldConfig();
 
-                    Project project = editor.getProject();
-                    SchemaManager schemaManager = project.getSchemaManager();
+                    Server server = editor.getProject();
+                    SchemaManager schemaManager = server.getSchemaManager();
                     Collection attributeTypes = schemaManager.getAttributeTypes();
 
                     LDAPFieldDialog dialog = new LDAPFieldDialog(parent.getShell(), SWT.NONE);
@@ -386,8 +386,8 @@ public class LDAPSourcePropertyPage extends FormPage {
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     String oldName = fieldDefinition.getName();
 
-                    Project project = editor.getProject();
-                    SchemaManager schemaManager = project.getSchemaManager();
+                    Server server = editor.getProject();
+                    SchemaManager schemaManager = server.getSchemaManager();
                     Collection attributeTypes = schemaManager.getAttributeTypes();
 
                     LDAPFieldDialog dialog = new LDAPFieldDialog(parent.getShell(), SWT.NONE);

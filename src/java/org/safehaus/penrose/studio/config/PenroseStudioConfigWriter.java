@@ -4,7 +4,7 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.dom4j.Element;
 import org.dom4j.tree.DefaultElement;
-import org.safehaus.penrose.studio.project.ProjectConfig;
+import org.safehaus.penrose.studio.server.ServerConfig;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -31,8 +31,8 @@ public class PenroseStudioConfigWriter {
         write(toElement(config));
     }
 
-    public void write(ProjectConfig projectConfig) throws Exception {
-        write(toElement(projectConfig));
+    public void write(ServerConfig serverConfig) throws Exception {
+        write(toElement(serverConfig));
     }
     
     public void write(Element element) throws Exception {
@@ -53,25 +53,25 @@ public class PenroseStudioConfigWriter {
 
         Element element = new DefaultElement("config");
 
-        Collection projects = config.getProjectConfigs();
+        Collection projects = config.getServerConfigs();
         for (Iterator i=projects.iterator(); i.hasNext(); ) {
-            ProjectConfig projectConfig = (ProjectConfig)i.next();
-            element.add(toElement(projectConfig));
+            ServerConfig serverConfig = (ServerConfig)i.next();
+            element.add(toElement(serverConfig));
         }
 
         return element;
     }
 
-    public Element toElement(ProjectConfig projectConfig) {
+    public Element toElement(ServerConfig serverConfig) {
 
         Element element = new DefaultElement("project");
 
-        element.addAttribute("name", projectConfig.getName());
-        element.addAttribute("type", projectConfig.getType());
-        element.addAttribute("host", projectConfig.getHost());
-        if (projectConfig.getPort() > 0) element.addAttribute("port", ""+projectConfig.getPort());
-        element.addAttribute("username", projectConfig.getUsername());
-        element.addAttribute("password", projectConfig.getPassword());
+        element.addAttribute("name", serverConfig.getName());
+        element.addAttribute("type", serverConfig.getType());
+        element.addAttribute("host", serverConfig.getHost());
+        if (serverConfig.getPort() > 0) element.addAttribute("port", ""+serverConfig.getPort());
+        element.addAttribute("username", serverConfig.getUsername());
+        element.addAttribute("password", serverConfig.getPassword());
 
         return element;
     }

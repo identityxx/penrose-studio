@@ -21,14 +21,14 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.engine.EngineConfig;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
  */
 public class EngineEditorInput implements IEditorInput {
 
-    private Project project;
+    private Server server;
     private EngineConfig engineConfig;
 
     public boolean exists() {
@@ -40,7 +40,7 @@ public class EngineEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "["+project.getName()+"] Engine - "+engineConfig.getName();
+        return "["+server.getName()+"] Engine - "+engineConfig.getName();
     }
 
     public IPersistableElement getPersistable() {
@@ -72,7 +72,7 @@ public class EngineEditorInput implements IEditorInput {
     }
 
     public int hashCode() {
-        return (project == null ? 0 : project.hashCode()) +
+        return (server == null ? 0 : server.hashCode()) +
                 (engineConfig == null ? 0 : engineConfig.hashCode());
     }
 
@@ -84,11 +84,11 @@ public class EngineEditorInput implements IEditorInput {
         this.engineConfig = engineConfig;
     }
 
-    public Project getProject() {
-        return project;
+    public Server getProject() {
+        return server;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setProject(Server server) {
+        this.server = server;
     }
 }

@@ -12,7 +12,7 @@
     <property name="project.dist" value="dist"/>
 
     <property name="prefix" value=""/>
-    <property name="penrose.studio.home" value="${prefix}/usr/local/${project.name}-${projectConfig.version}"/>
+    <property name="penrose.studio.home" value="${prefix}/usr/local/${project.name}-${project.version}"/>
 
     <property name="penrose.version" value="1.1"/>
 
@@ -101,7 +101,7 @@
                 <include name="plugin.xml"/>
             </fileset>
         </copy>
-        <jar basedir="target/classes" destfile="target/${projectConfig.name}-${project.version}.jar">
+        <jar basedir="target/classes" destfile="target/${project.name}-${project.version}.jar">
             <patternset>
                 <exclude name="**/.svn"/>
             </patternset>
@@ -116,7 +116,7 @@
     </target>
 
     <target name="build" depends="compile">
-        <property name="dist.name" value="${project.name}-${projectConfig.version}-${platform}"/>
+        <property name="dist.name" value="${project.name}-${project.version}-${platform}"/>
         <property name="plugin.path" value="target/${dist.name}/plugins/org.safehaus.penrose_${project.version}"/>
         <copy todir="target" file="LICENSE.txt"/>
         <mkdir dir="target/${dist.name}"/>
@@ -150,7 +150,7 @@
         </copy>
         <copy todir="${plugin.path}/lib">
             <fileset dir="target">
-                <include name="${project.name}-${projectConfig.version}.jar"/>
+                <include name="${project.name}-${project.version}.jar"/>
             </fileset>
         </copy>
         <copy todir="${plugin.path}/META-INF" file="MANIFEST.MF" overwrite="true">
@@ -186,7 +186,7 @@
 
     <target name="build-linux" depends="init" if="isLinux">
         <property name="platform" value="linux-gtk"/>
-        <property name="dist.name" value="${projectConfig.name}-${project.version}-${platform}"/>
+        <property name="dist.name" value="${project.name}-${project.version}-${platform}"/>
         <!-- uncompress rpc -->
         <untar src="rcp/${rcp.prefix}-${platform}.tar.gz" dest="target" compression="gzip"/>
         <move todir="target/${dist.name}">
@@ -201,7 +201,7 @@
 
     <target name="build-macosx" depends="init" if="isMac">
         <property name="platform" value="macosx-carbon"/>
-        <property name="dist.name" value="${projectConfig.name}-${project.version}-${platform}"/>
+        <property name="dist.name" value="${project.name}-${project.version}-${platform}"/>
         <!-- uncompress rcp -->
         <untar src="rcp/${rcp.prefix}-${platform}.tar.gz" dest="target" compression="gzip"/>
         <move todir="target/${dist.name}">
@@ -221,7 +221,7 @@
 
     <target name="build-win32" depends="init" if="isWindows">
         <property name="platform" value="win32"/>
-        <property name="dist.name" value="${project.name}-${projectConfig.version}-${platform}"/>
+        <property name="dist.name" value="${project.name}-${project.version}-${platform}"/>
         <!-- uncompress rpc -->
         <unzip src="rcp/${rcp.prefix}-${platform}.zip" dest="target"/>
         <move todir="target/${dist.name}">
@@ -242,10 +242,10 @@
 -->
 
     <target name="dist-src" depends="init">
-        <echo message="Creating ${project.name}-${projectConfig.version}-src.tar.gz"/>
+        <echo message="Creating ${project.name}-${project.version}-src.tar.gz"/>
         <mkdir dir="${project.dist}"/>
-        <tar destfile="${project.dist}/${projectConfig.name}-${projectConfig.version}-src.tar.gz" compression="gzip">
-            <tarfileset dir="." prefix="${project.name}-${projectConfig.version}">
+        <tar destfile="${project.dist}/${project.name}-${project.version}-src.tar.gz" compression="gzip">
+            <tarfileset dir="." prefix="${project.name}-${project.version}">
                 <exclude name="${project.dist}/**"/>
                 <exclude name="target/**"/>
             </tarfileset>
@@ -254,7 +254,7 @@
 
     <target name="dist-all" depends="compile">
         <copy todir="${project.dist}"
-            file="target/${project.name}-${projectConfig.version}.jar">
+            file="target/${project.name}-${project.version}.jar">
         </copy>
         <antcall target="dist-linux"/>
         <antcall target="dist-macosx"/>
@@ -266,13 +266,13 @@
             <param name="rpm.prefix" value=""/>
             <param name="rpm.home" value="/usr/src/redhat"/>
             <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
-            <param name="rpm.name" value="${project.name}-${projectConfig.version}-1.i386.rpm"/>
+            <param name="rpm.name" value="${project.name}-${project.version}-1.i386.rpm"/>
         </antcall>
     </target>
 
     <target name="dist-macosx" depends="build-macosx" if="isMac">
         <property name="app.name" value="Penrose Studio.app"/>
-        <property name="dist.name" value="${project.name}-${projectConfig.version}-${platform}"/>
+        <property name="dist.name" value="${project.name}-${project.version}-${platform}"/>
 
         <echo message="Creating ${app.name}"/>
         <mkdir dir="target/${dist.name}"/>
@@ -305,11 +305,11 @@
         <delete file="target/${dist.name}/${app.name}/Contents/Resources/Eclipse.icns"/>
         <mkdir dir="target/${dist.name}/.background"/>
 
-        <echo message="Creating ${projectConfig.name}-${project.version}.dmg"/>
+        <echo message="Creating ${project.name}-${project.version}.dmg"/>
         <mkdir dir="${project.dist}"/>
         <exec executable="bin/pkg-dmg">
             <arg line="--source target/${dist.name}"/>
-            <arg line="--target dist/${projectConfig.name}-${project.version}.dmg"/>
+            <arg line="--target dist/${project.name}-${project.version}.dmg"/>
             <arg line="--volname &quot;Penrose Studio ${project.version}&quot;"/>
             <arg line="--license target/LICENSE.txt"/>
             <arg line="--icon images/PenroseDMG.icns"/>
@@ -323,7 +323,7 @@
     </target>
 
     <target name="dist-win32" depends="build-win32" if="isWindows">
-        <echo message="Creating ${projectConfig.dist}/${projectConfig.name}-${project.version}.exe"/>
+        <echo message="Creating ${project.dist}/${project.name}-${project.version}.exe"/>
         <copy todir="target" file="installer/penrose-studio.iss">
             <filterchain>
                 <expandproperties/>
@@ -336,7 +336,7 @@
             <param name="rpm.prefix" value="${cygwin.home}"/>
             <param name="rpm.home" value="${cygwin.home}/usr/src/rpm"/>
             <param name="rpm.builder" value="${cygwin.home}/lib/rpm/rpmb.exe"/>
-            <param name="rpm.name" value="${project.name}-${projectConfig.version}-1.cygwin.i386.rpm"/>
+            <param name="rpm.name" value="${project.name}-${project.version}-1.cygwin.i386.rpm"/>
         </antcall>
     </target>
 
@@ -354,7 +354,7 @@
             </filterchain>
         </copy>
         <copy todir="${rpm.home}/SOURCES" overwrite="true"
-            file="${project.dist}/${projectConfig.name}-${projectConfig.version}-src.tar.gz">
+            file="${project.dist}/${project.name}-${project.version}-src.tar.gz">
         </copy>
         <exec executable="${rpm.builder}">
             <arg line="-bb target/penrose-studio.spec"/>
@@ -377,7 +377,7 @@
         </exec>
         <exec executable="${rpm.prefix}/bin/sh">
             <arg value="-c"/>
-            <arg value="cat ${project.dist}/${rpm.name} &gt;&gt; ${projectConfig.dist}/${rpm.name}.bin"/>
+            <arg value="cat ${project.dist}/${rpm.name} &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
         </exec>
         <chmod file="${project.dist}/${rpm.name}.bin" perm="a+rx"/>
     </target>
@@ -420,7 +420,7 @@
     </target>
 
     <target name="copy-penrose-conf" depends="init" if="penrose.conf.missing">
-        <property name="dist.name" value="${projectConfig.name}-${project.version}-${platform}"/>
+        <property name="dist.name" value="${project.name}-${project.version}-${platform}"/>
         <copy todir="${penrose.studio.home}">
             <fileset dir="target/${dist.name}">
                 <include name="conf/**/*"/>
@@ -429,7 +429,7 @@
     </target>
 
     <target name="install-dist" depends="pre-install,copy-penrose-conf">
-        <property name="dist.name" value="${projectConfig.name}-${project.version}-${platform}"/>
+        <property name="dist.name" value="${project.name}-${project.version}-${platform}"/>
         <delete failonerror="false">
             <fileset dir="${penrose.studio.home}" includes="lib/*"/>
         </delete>

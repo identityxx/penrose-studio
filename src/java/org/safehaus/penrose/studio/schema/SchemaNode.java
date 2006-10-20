@@ -22,8 +22,8 @@ import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.schema.SchemaConfig;
 import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.schema.Schema;
@@ -46,13 +46,13 @@ public class SchemaNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
-    ProjectNode projectNode;
+    ServerNode serverNode;
 
     private SchemaConfig schemaConfig;
 
     public SchemaNode(
             ObjectsView view,
-            ProjectNode projectNode,
+            ServerNode serverNode,
             String name,
             String type,
             Image image,
@@ -61,7 +61,7 @@ public class SchemaNode extends Node {
     ) {
         super(name, type, image, object, parent);
         this.view = view;
-        this.projectNode = projectNode;
+        this.serverNode = serverNode;
     }
 
     public void showMenu(IMenuManager manager) {
@@ -99,12 +99,12 @@ public class SchemaNode extends Node {
 
     public void open() throws Exception {
 
-        Project project = projectNode.getProject();
-        SchemaManager schemaManager = project.getSchemaManager();
+        Server server = serverNode.getProject();
+        SchemaManager schemaManager = server.getSchemaManager();
         Schema schema = schemaManager.getSchema(schemaConfig.getName());
 
         SchemaEditorInput ei = new SchemaEditorInput();
-        ei.setProject(project);
+        ei.setProject(server);
         ei.setSchemaConfig(schemaConfig);
         ei.setSchema(schema);
 
@@ -124,11 +124,11 @@ public class SchemaNode extends Node {
 
         if (!confirm) return;
 
-        Project project = projectNode.getProject();
-        PenroseConfig penroseConfig = project.getPenroseConfig();
+        Server server = serverNode.getProject();
+        PenroseConfig penroseConfig = server.getPenroseConfig();
         penroseConfig.removeSchemaConfig(schemaConfig.getName());
 
-        SchemaManager schemaManager = project.getSchemaManager();
+        SchemaManager schemaManager = server.getSchemaManager();
         schemaManager.removeSchema(schemaConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();

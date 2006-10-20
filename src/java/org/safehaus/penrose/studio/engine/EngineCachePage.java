@@ -57,7 +57,7 @@ public class EngineCachePage {
     public EngineCachePage(EngineEditor editor) {
         this.editor = editor;
 
-        PenroseConfig serverConfig = editor.project.getPenroseConfig();
+        PenroseConfig serverConfig = editor.server.getPenroseConfig();
         this.cacheConfig = serverConfig.getEntryCacheConfig();
     }
 

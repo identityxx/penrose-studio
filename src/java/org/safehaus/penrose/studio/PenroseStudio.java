@@ -41,8 +41,8 @@ import org.safehaus.penrose.studio.event.SelectionListener;
 import org.safehaus.penrose.studio.license.LicenseDialog;
 import org.safehaus.penrose.studio.welcome.action.EnterLicenseKeyAction;
 import org.safehaus.penrose.studio.action.PenroseStudioActions;
-import org.safehaus.penrose.studio.project.ProjectConfig;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerConfig;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.util.PenroseStudioClipboard;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
@@ -79,7 +79,7 @@ public class PenroseStudio implements IPlatformRunnable {
 
     PenroseWorkbenchAdvisor workbenchAdvisor;
 
-    Map projects = new TreeMap();
+    Map servers = new TreeMap();
     Map adapters = new TreeMap();
 
     Collection selectionListeners = new ArrayList();
@@ -128,12 +128,12 @@ public class PenroseStudio implements IPlatformRunnable {
             penroseStudioConfig = new PenroseStudioConfig();
         }
 
-        Collection projectConfigs = penroseStudioConfig.getProjectConfigs();
+        Collection serverConfigs = penroseStudioConfig.getServerConfigs();
 
-        for (Iterator i=projectConfigs.iterator(); i.hasNext(); ) {
-            ProjectConfig projectConfig = (ProjectConfig)i.next();
-            Project project = new Project(projectConfig);
-            projects.put(projectConfig.getName(), project);
+        for (Iterator i=serverConfigs.iterator(); i.hasNext(); ) {
+            ServerConfig serverConfig = (ServerConfig)i.next();
+            Server server = new Server(serverConfig);
+            servers.put(serverConfig.getName(), server);
         }
 
         addAdapter(new PenroseStudioJDBCAdapter("JDBC"));
@@ -168,13 +168,13 @@ public class PenroseStudio implements IPlatformRunnable {
         }
     }
 
-    public void open(Project project) throws Exception {
-        project.open();
+    public void open(Server server) throws Exception {
+        server.open();
         fireChangeEvent();
     }
 
-    public void close(Project project) throws Exception {
-        project.close();
+    public void close(Server server) throws Exception {
+        server.close();
         fireChangeEvent();
     }
 
@@ -190,24 +190,24 @@ public class PenroseStudio implements IPlatformRunnable {
         fireChangeEvent();
 	}
 
-    public void addProject(ProjectConfig projectConfig) {
-        penroseStudioConfig.addProjectConfig(projectConfig);
-        projects.put(projectConfig.getName(), new Project(projectConfig));
+    public void addServer(ServerConfig serverConfig) {
+        penroseStudioConfig.addServerConfig(serverConfig);
+        servers.put(serverConfig.getName(), new Server(serverConfig));
         fireChangeEvent();
     }
 
-    public void removeProject(String name) {
-        penroseStudioConfig.removeProjectConfig(name);
-        projects.remove(name);
+    public void removeServer(String name) {
+        penroseStudioConfig.removeServerConfig(name);
+        servers.remove(name);
         fireChangeEvent();
     }
 
-    public Project getProject(String name) {
-        return (Project)projects.get(name);
+    public Server getProject(String name) {
+        return (Server)servers.get(name);
     }
 
-    public Collection getProjects() {
-        return projects.values();
+    public Collection getServers() {
+        return servers.values();
     }
 
     public void addSelectionListener(SelectionListener listener) {

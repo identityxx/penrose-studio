@@ -31,8 +31,8 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.mapping.AttributeTypeSelectionDialog;
 import org.safehaus.penrose.studio.mapping.ExpressionDialog;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.SchemaManager;
@@ -173,11 +173,11 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                     IWorkbenchPage page = window.getActivePage();
                     ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
-                    ProjectNode projectNode = objectsView.getSelectedProjectNode();
-                    if (projectNode == null) return;
+                    ServerNode serverNode = objectsView.getSelectedProjectNode();
+                    if (serverNode == null) return;
 
-                    Project project = projectNode.getProject();
-                    dialog.setSchemaManager(project.getSchemaManager());
+                    Server server = serverNode.getProject();
+                    dialog.setSchemaManager(server.getSchemaManager());
 
                     dialog.open();
                     if (dialog.getAction() == AttributeTypeSelectionDialog.CANCEL) return;
@@ -267,11 +267,11 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
             IWorkbenchPage page = window.getActivePage();
             ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
-            ProjectNode projectNode = objectsView.getSelectedProjectNode();
-            if (projectNode == null) return;
+            ServerNode serverNode = objectsView.getSelectedProjectNode();
+            if (serverNode == null) return;
 
-            Project project = projectNode.getProject();
-            SchemaManager schemaManager = project.getSchemaManager();
+            Server server = serverNode.getProject();
+            SchemaManager schemaManager = server.getSchemaManager();
 
             System.out.println("Object classes:");
             for (Iterator i=objectClasses.iterator(); i.hasNext(); ) {

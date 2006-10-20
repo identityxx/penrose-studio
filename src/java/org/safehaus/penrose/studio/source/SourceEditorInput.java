@@ -22,14 +22,14 @@ import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.SourceConfig;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
  */
 public class SourceEditorInput implements IEditorInput {
 
-    private Project project;
+    private Server server;
     private Partition partition;
     private SourceConfig sourceConfig;
 
@@ -81,11 +81,11 @@ public class SourceEditorInput implements IEditorInput {
         this.partition = partition;
     }
 
-    public Project getProject() {
-        return project;
+    public Server getProject() {
+        return server;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setProject(Server server) {
+        this.server = server;
     }
 }

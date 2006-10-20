@@ -22,8 +22,8 @@ import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.eclipse.swt.graphics.Image;
@@ -100,9 +100,9 @@ public class ServiceNode extends Node {
 
         if (!confirm) return;
 
-        ProjectNode projectNode = (ProjectNode)getParent();
-        Project project = projectNode.getProject();
-        PenroseConfig penroseConfig = project.getPenroseConfig();
+        ServerNode serverNode = (ServerNode)getParent();
+        Server server = serverNode.getProject();
+        PenroseConfig penroseConfig = server.getPenroseConfig();
         penroseConfig.removeServiceConfig(serviceConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();

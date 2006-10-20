@@ -44,7 +44,7 @@ import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.session.PenroseSession;
 import org.safehaus.penrose.session.PenroseSearchControls;
 import org.safehaus.penrose.session.PenroseSearchResults;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.ietf.ldap.LDAPException;
 
 public class PreviewEditor extends EditorPart {
@@ -203,10 +203,10 @@ public class PreviewEditor extends EditorPart {
         this.password = password;
 
         PreviewEditorInput ei = (PreviewEditorInput)getEditorInput();
-        ProjectNode projectNode = ei.getProjectNode();
+        ServerNode serverNode = ei.getProjectNode();
 
         PenroseFactory penroseFactory = PenroseFactory.getInstance();
-        penrose = penroseFactory.createPenrose(projectNode.getWorkDir());
+        penrose = penroseFactory.createPenrose(serverNode.getWorkDir());
         penrose.start();
 
         session = penrose.newSession();
