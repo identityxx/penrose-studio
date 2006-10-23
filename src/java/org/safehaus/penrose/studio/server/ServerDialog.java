@@ -361,7 +361,7 @@ public class ServerDialog extends Dialog {
 
         TableItem item = projectTable.getSelection()[0];
         ServerConfig serverConfig = (ServerConfig)item.getData();
-        String server = serverConfig.getHost()+(serverConfig.getPort() == 0 ? "" : ":"+serverConfig.getPort());
+        String server = serverConfig.getHostname()+(serverConfig.getPort() == 0 ? "" : ":"+serverConfig.getPort());
 
         try {
 /*
@@ -385,7 +385,7 @@ public class ServerDialog extends Dialog {
 	
 	public void newSession() throws Exception {
 		ServerConfig serverConfig = new ServerConfig();
-        serverConfig.setHost("localhost");
+        serverConfig.setHostname("localhost");
         serverConfig.setPort(1099);
 
 		ServerEditorDialog dialog = new ServerEditorDialog(shell, SWT.NONE);
@@ -423,7 +423,6 @@ public class ServerDialog extends Dialog {
         TableItem item = projectTable.getSelection()[0];
 		ServerConfig serverConfig = (ServerConfig)item.getData();
         String oldProjectName = serverConfig.getName();
-        System.out.println("Editing server: "+oldProjectName);
 
 		ServerEditorDialog dialog = new ServerEditorDialog(shell, SWT.NONE);
         dialog.setServerConfig(serverConfig);

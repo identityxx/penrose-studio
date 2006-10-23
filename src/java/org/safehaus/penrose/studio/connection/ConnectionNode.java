@@ -33,6 +33,7 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.adapter.PenroseStudioAdapter;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.connection.action.NewSourceAction;
+import org.safehaus.penrose.studio.connection.editor.ConnectionEditorInput;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.ConnectionConfig;

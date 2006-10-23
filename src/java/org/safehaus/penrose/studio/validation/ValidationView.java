@@ -40,7 +40,7 @@ import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.mapping.MappingEditorInput;
 import org.safehaus.penrose.studio.mapping.MappingEditor;
-import org.safehaus.penrose.studio.connection.ConnectionEditorInput;
+import org.safehaus.penrose.studio.connection.editor.ConnectionEditorInput;
 import org.safehaus.penrose.studio.source.SourceEditorInput;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;

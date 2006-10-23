@@ -54,15 +54,20 @@
             icon="images/penrose16.ico"
             class="org.safehaus.penrose.studio.welcome.WelcomeEditor"/>
        <editor
-            id="org.safehaus.penrose.studio.connection.JDBCConnectionEditor"
+            id="org.safehaus.penrose.studio.server.editor.ServerEditor"
+            name="Server"
+            icon="images/server.png"
+            class="org.safehaus.penrose.studio.server.editor.ServerEditor"/>
+       <editor
+            id="org.safehaus.penrose.studio.connection.editor.JDBCConnectionEditor"
             name="JDBC Connection"
             icon="images/server.png"
-            class="org.safehaus.penrose.studio.connection.JDBCConnectionEditor"/>
+            class="org.safehaus.penrose.studio.connection.editor.JDBCConnectionEditor"/>
        <editor
-            id="org.safehaus.penrose.studio.connection.LDAPConnectionEditor"
-            name="JNDI Connection"
+            id="org.safehaus.penrose.studio.connection.editor.LDAPConnectionEditor"
+            name="LDAP Connection"
             icon="images/server.png"
-            class="org.safehaus.penrose.studio.connection.LDAPConnectionEditor"/>
+            class="org.safehaus.penrose.studio.connection.editor.LDAPConnectionEditor"/>
        <editor
             id="org.safehaus.penrose.studio.source.JDBCSourceEditor"
             name="Source"

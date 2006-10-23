@@ -46,15 +46,15 @@ public class ConnectionWizard extends Wizard {
     public ConnectionDriverPage driverPage = new ConnectionDriverPage();
     public JDBCConnectionWizardPage jdbcPage = new JDBCConnectionWizardPage();
 
-    public LDAPConnectionInfoWizardPage jndiInfoPage = new LDAPConnectionInfoWizardPage();
-    public LDAPConnectionParametersWizardPage jndiParametersPage = new LDAPConnectionParametersWizardPage();
+    public LDAPConnectionInfoWizardPage ldapInfoPage = new LDAPConnectionInfoWizardPage();
+    public LDAPConnectionParametersWizardPage ldapParametersPage = new LDAPConnectionParametersWizardPage();
 
     public ConnectionWizard(Partition partition) {
         this.partition = partition;
 
         Map parameters = new TreeMap();
         parameters.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        jndiParametersPage.setParameters(parameters);
+        ldapParametersPage.setParameters(parameters);
 
         setWindowTitle("New Connection");
     }
@@ -70,8 +70,8 @@ public class ConnectionWizard extends Wizard {
 
         } else if ("LDAP".equals(adapterName)) {
             //if (!jndiPage.isPageComplete()) return false;
-            if (!jndiInfoPage.isPageComplete()) return false;
-            if (!jndiParametersPage.isPageComplete()) return false;
+            if (!ldapInfoPage.isPageComplete()) return false;
+            if (!ldapParametersPage.isPageComplete()) return false;
         }
 
         return true;
@@ -82,8 +82,8 @@ public class ConnectionWizard extends Wizard {
         addPage(driverPage);
         addPage(jdbcPage);
         //addPage(jndiPage);
-        addPage(jndiInfoPage);
-        addPage(jndiParametersPage);
+        addPage(ldapInfoPage);
+        addPage(ldapParametersPage);
     }
 
     public IWizardPage getNextPage(IWizardPage page) {
@@ -95,16 +95,16 @@ public class ConnectionWizard extends Wizard {
 
             } else if ("LDAP".equals(adapter)) {
                 //return jndiPage;
-                return jndiInfoPage;
+                return ldapInfoPage;
             }
 
         } else if (page == jdbcPage) {
             return null;
 
-        } else if (page == jndiInfoPage) {
-            return jndiParametersPage;
+        } else if (page == ldapInfoPage) {
+            return ldapParametersPage;
 
-        } else if (page == jndiParametersPage) {
+        } else if (page == ldapParametersPage) {
             return null;
         }
 
@@ -115,11 +115,11 @@ public class ConnectionWizard extends Wizard {
         if (page == jdbcPage) {
             return driverPage;
 
-        } else if (page == jndiInfoPage) {
+        } else if (page == ldapInfoPage) {
             return driverPage;
 
-        } else if (page == jndiParametersPage) {
-            return jndiInfoPage;
+        } else if (page == ldapParametersPage) {
+            return ldapInfoPage;
         }
 
         return super.getPreviousPage(page);
@@ -150,11 +150,11 @@ public class ConnectionWizard extends Wizard {
                 if (password != null) connectionConfig.setParameter(JDBCAdapter.PASSWORD, password);
 
             } else if ("LDAP".equals(adapterName)) {
-                connectionConfig.setParameter(InitialContext.PROVIDER_URL, jndiInfoPage.getURL()+"/"+jndiInfoPage.getSuffix());
-                connectionConfig.setParameter(InitialContext.SECURITY_PRINCIPAL, jndiInfoPage.getBindDN());
-                connectionConfig.setParameter(InitialContext.SECURITY_CREDENTIALS, jndiInfoPage.getPassword());
+                connectionConfig.setParameter(InitialContext.PROVIDER_URL, ldapInfoPage.getURL()+"/"+ldapInfoPage.getSuffix());
+                connectionConfig.setParameter(InitialContext.SECURITY_PRINCIPAL, ldapInfoPage.getBindDN());
+                connectionConfig.setParameter(InitialContext.SECURITY_CREDENTIALS, ldapInfoPage.getPassword());
 
-                Map parameters = jndiParametersPage.getParameters();
+                Map parameters = ldapParametersPage.getParameters();
                 for (Iterator i=parameters.keySet().iterator(); i.hasNext(); ) {
                     String paramName = (String)i.next();
                     String paramValue = (String)parameters.get(paramName);

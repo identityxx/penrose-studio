@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.connection;
+package org.safehaus.penrose.studio.connection.editor;
 
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
@@ -28,6 +28,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
+import org.safehaus.penrose.studio.connection.editor.LDAPConnectionEditor;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.ldap.LDAPClient;
@@ -273,7 +274,7 @@ public class LDAPConnectionPropertiesPage extends FormPage {
 
         testButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                Helper.testJndiConnection(
+                Helper.testLDAPConnection(
                         editor.getSite().getShell(),
                         "com.sun.jndi.ldap.LdapCtxFactory",
                         getURL(),

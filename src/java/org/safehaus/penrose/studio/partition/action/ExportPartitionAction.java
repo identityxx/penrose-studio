@@ -56,7 +56,7 @@ public class ExportPartitionAction extends Action {
             dialog.open();
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            Server server = penroseStudio.getProject("Penrose Server");
+            Server server = penroseStudio.getServer("Penrose Server");
             objectsView.show(server);
 
         } catch (Exception e) {

@@ -26,7 +26,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.widgets.*;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.apache.log4j.Logger;
@@ -197,7 +197,7 @@ public class ServerEditorDialog extends Dialog {
 	public void store() {
         serverConfig.setName("".equals(nameText.getText()) ? null : nameText.getText());
         serverConfig.setType(typeCombo.getText());
-        serverConfig.setHost("".equals(hostText.getText()) ? null : hostText.getText());
+        serverConfig.setHostname("".equals(hostText.getText()) ? null : hostText.getText());
         serverConfig.setPort("".equals(portText.getText()) ? 0 : Integer.parseInt(portText.getText()));
         serverConfig.setUsername("".equals(usernameText.getText()) ? null : usernameText.getText());
         serverConfig.setPassword("".equals(passwordText.getText()) ? null : passwordText.getText());
@@ -212,7 +212,7 @@ public class ServerEditorDialog extends Dialog {
 
         nameText.setText(serverConfig.getName() == null ? "" : serverConfig.getName());
         typeCombo.setText(serverConfig.getType() == null ? PenroseClient.PENROSE : serverConfig.getType());
-        hostText.setText(serverConfig.getHost() == null ? "localhost" : serverConfig.getHost());
+        hostText.setText(serverConfig.getHostname() == null ? "localhost" : serverConfig.getHostname());
         portText.setText(serverConfig.getPort() == 0 ? "" : ""+serverConfig.getPort());
         usernameText.setText(serverConfig.getUsername() == null ? "" : serverConfig.getUsername());
         passwordText.setText(serverConfig.getPassword() == null ? "" : serverConfig.getPassword());

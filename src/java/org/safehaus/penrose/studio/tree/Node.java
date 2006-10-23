@@ -134,4 +134,8 @@ public class Node {
 
     public void paste(PenroseStudioClipboard clipboard) throws Exception {
     }
+
+    public void delete() throws Exception {
+
+    }
 }

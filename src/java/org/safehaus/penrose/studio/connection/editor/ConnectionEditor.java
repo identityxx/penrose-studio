@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.connection;
+package org.safehaus.penrose.studio.connection.editor;
 
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.IEditorInput;

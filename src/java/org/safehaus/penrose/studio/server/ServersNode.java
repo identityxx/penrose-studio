@@ -48,8 +48,19 @@ public class ServersNode extends Node {
         
         if (object instanceof ServerConfig) {
             ServerConfig serverConfig = (ServerConfig)object;
-            serverConfig.setName(serverConfig.getName()+" (2)");
+
+            int counter = 1;
+            String name;
+
+            do {
+                counter++;
+                name = serverConfig.getName()+" ("+counter+")";
+                
+            } while (penroseStudio.getServer(name) != null);
+
+            serverConfig.setName(name);
             penroseStudio.addServer(serverConfig);
+            penroseStudio.save();
         }
     }
 

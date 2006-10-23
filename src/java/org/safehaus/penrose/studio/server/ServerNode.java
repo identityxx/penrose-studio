@@ -6,6 +6,8 @@ import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.server.editor.ServerEditorInput;
+import org.safehaus.penrose.studio.server.editor.ServerEditor;
 import org.safehaus.penrose.studio.action.PenroseStudioActions;
 import org.safehaus.penrose.studio.util.PenroseStudioClipboard;
 import org.safehaus.penrose.studio.browser.BrowserEditorInput;
@@ -89,13 +91,14 @@ public class ServerNode extends Node {
     }
 
     public void open() throws Exception {
-        if (isConnected()) return;
-
         Server server = getProject();
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.open(server);
-        penroseStudio.show(this);
+        ServerEditorInput ei = new ServerEditorInput();
+        ei.setServer(server);
+
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        IWorkbenchPage page = window.getActivePage();
+        page.openEditor(ei, ServerEditor.class.getName());
     }
 
     public void browse() throws Exception {
@@ -104,7 +107,7 @@ public class ServerNode extends Node {
         ServerConfig serverConfig = server.getServerConfig();
         PenroseConfig penroseConfig = server.getPenroseConfig();
 
-        String hostname = serverConfig.getHost();
+        String hostname = serverConfig.getHostname();
 
         ServiceConfig serviceConfig = penroseConfig.getServiceConfig("LDAP");
         String s = serviceConfig.getParameter(LDAP_PORT);
@@ -125,7 +128,7 @@ public class ServerNode extends Node {
         activePage.openEditor(ei, BrowserEditor.class.getName());
     }
 
-    public void remove() throws Exception {
+    public void delete() throws Exception {
 
         Server server = getProject();
         ServerConfig serverConfig = server.getServerConfig();

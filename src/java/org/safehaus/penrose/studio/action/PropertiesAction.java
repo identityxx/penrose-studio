@@ -3,7 +3,6 @@ package org.safehaus.penrose.studio.action;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.SWT;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchPage;
@@ -13,7 +12,8 @@ import org.safehaus.penrose.studio.event.ChangeEvent;
 import org.safehaus.penrose.studio.event.ChangeListener;
 import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.server.ServerEditorDialog;
+import org.safehaus.penrose.studio.server.editor.ServerEditorInput;
+import org.safehaus.penrose.studio.server.editor.ServerEditor;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
@@ -40,30 +40,16 @@ public class PropertiesAction extends Action implements ChangeListener, Selectio
             IWorkbenchPage page = window.getActivePage();
             ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
-            ServerNode serverNode = objectsView.getSelectedProjectNode();
-            if (serverNode == null) return;
+            Node node = objectsView.getSelectedNode();
+            if (node == null) return;
 
+            ServerNode serverNode = (ServerNode)node;
             Server server = serverNode.getProject();
 
-            String oldProjectName = server.getName();
-            System.out.println("Editing project: "+oldProjectName);
+            ServerEditorInput ei = new ServerEditorInput();
+            ei.setServer(server);
 
-            ServerEditorDialog dialog = new ServerEditorDialog(shell, SWT.NONE);
-            dialog.setServerConfig(server.getServerConfig());
-            dialog.open();
-
-            if (dialog.getAction() == ServerEditorDialog.CANCEL) return;
-
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-
-            if (!oldProjectName.equals(server.getName())) {
-                penroseStudio.removeServer(oldProjectName);
-                penroseStudio.addServer(server.getServerConfig());
-            }
-
-            penroseStudio.save();
-
-            log.debug("Project updated.");
+            page.openEditor(ei, ServerEditor.class.getName());
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

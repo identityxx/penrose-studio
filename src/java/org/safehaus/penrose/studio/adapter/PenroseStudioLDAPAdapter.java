@@ -2,7 +2,7 @@ package org.safehaus.penrose.studio.adapter;
 
 import org.safehaus.penrose.studio.source.LDAPSourceEditor;
 import org.safehaus.penrose.studio.source.wizard.LDAPSourceWizard;
-import org.safehaus.penrose.studio.connection.LDAPConnectionEditor;
+import org.safehaus.penrose.studio.connection.editor.LDAPConnectionEditor;
 
 /**
  * @author Endi S. Dewata

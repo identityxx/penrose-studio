@@ -19,11 +19,8 @@ package org.safehaus.penrose.studio.source.wizard;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.partition.SourceConfig;
-import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.FieldConfig;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.studio.source.wizard.LDAPTreeWizardPage;
-import org.apache.log4j.Logger;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -34,15 +31,15 @@ import java.util.Iterator;
 public class LDAPSourceWizard extends SourceWizard {
 
     public SourceWizardPage propertyPage;
-    public LDAPTreeWizardPage jndiTreePage;
-    public LDAPAttributeWizardPage jndiAttributesPage;
-    public LDAPFieldWizardPage jndiFieldsPage;
+    public LDAPTreeWizardPage ldapTreePage;
+    public LDAPAttributeWizardPage ldapAttributesPage;
+    public LDAPFieldWizardPage ldapFieldsPage;
 
     public LDAPSourceWizard() throws Exception {
         propertyPage = new SourceWizardPage();
-        jndiTreePage = new LDAPTreeWizardPage();
-        jndiAttributesPage = new LDAPAttributeWizardPage();
-        jndiFieldsPage = new LDAPFieldWizardPage();
+        ldapTreePage = new LDAPTreeWizardPage();
+        ldapAttributesPage = new LDAPAttributeWizardPage();
+        ldapFieldsPage = new LDAPFieldWizardPage();
 
         setWindowTitle("New Source");
     }
@@ -50,30 +47,30 @@ public class LDAPSourceWizard extends SourceWizard {
     public boolean canFinish() {
         if (!propertyPage.isPageComplete()) return false;
 
-        if (!jndiTreePage.isPageComplete()) return false;
-        if (!jndiAttributesPage.isPageComplete()) return false;
-        if (!jndiFieldsPage.isPageComplete()) return false;
+        if (!ldapTreePage.isPageComplete()) return false;
+        if (!ldapAttributesPage.isPageComplete()) return false;
+        if (!ldapFieldsPage.isPageComplete()) return false;
 
         return true;
     }
 
     public void addPages() {
         addPage(propertyPage);
-        addPage(jndiTreePage);
-        addPage(jndiAttributesPage);
-        addPage(jndiFieldsPage);
+        addPage(ldapTreePage);
+        addPage(ldapAttributesPage);
+        addPage(ldapFieldsPage);
     }
 
     public IWizardPage getNextPage(IWizardPage page) {
         if (propertyPage == page) {
-            jndiTreePage.setConnectionConfig(partition, connectionConfig);
+            ldapTreePage.setConnectionConfig(partition, connectionConfig);
 
-        } else if (jndiTreePage == page) {
-            jndiAttributesPage.setConnectionConfig(partition, connectionConfig);
+        } else if (ldapTreePage == page) {
+            ldapAttributesPage.setConnectionConfig(partition, connectionConfig);
 
-        } else if (jndiAttributesPage == page) {
-            Collection attributeTypes = jndiAttributesPage.getAttributeTypes();
-            jndiFieldsPage.setAttributeTypes(attributeTypes);
+        } else if (ldapAttributesPage == page) {
+            Collection attributeTypes = ldapAttributesPage.getAttributeTypes();
+            ldapFieldsPage.setAttributeTypes(attributeTypes);
         }
 
         return super.getNextPage(page);
@@ -85,12 +82,12 @@ public class LDAPSourceWizard extends SourceWizard {
             sourceConfig.setName(propertyPage.getSourceName());
             sourceConfig.setConnectionName(connectionConfig.getName());
 
-            sourceConfig.setParameter("baseDn", jndiTreePage.getBaseDn());
-            sourceConfig.setParameter("filter", jndiTreePage.getFilter());
-            sourceConfig.setParameter("scope", jndiTreePage.getScope());
-            sourceConfig.setParameter("objectClasses", jndiTreePage.getObjectClasses());
+            sourceConfig.setParameter("baseDn", ldapTreePage.getBaseDn());
+            sourceConfig.setParameter("filter", ldapTreePage.getFilter());
+            sourceConfig.setParameter("scope", ldapTreePage.getScope());
+            sourceConfig.setParameter("objectClasses", ldapTreePage.getObjectClasses());
 
-            Collection fields = jndiFieldsPage.getFields();
+            Collection fields = ldapFieldsPage.getFields();
             for (Iterator i=fields.iterator(); i.hasNext(); ) {
                 FieldConfig field = (FieldConfig)i.next();
                 sourceConfig.addFieldConfig(field);

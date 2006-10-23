@@ -202,7 +202,7 @@ public class PenroseStudio implements IPlatformRunnable {
         fireChangeEvent();
     }
 
-    public Server getProject(String name) {
+    public Server getServer(String name) {
         return (Server)servers.get(name);
     }
 
@@ -375,18 +375,30 @@ public class PenroseStudio implements IPlatformRunnable {
     }
 
     public Node getSelectedNode() {
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
         try {
+            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
             ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
-            Node node = objectsView.getSelectedNode();
-            return node;
+            return objectsView.getSelectedNode();
 
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
             return null;
+        }
+    }
+
+    public Collection getSelectedNodes() {
+
+        try {
+            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            IWorkbenchPage page = window.getActivePage();
+            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+
+            return objectsView.getSelectedNodes();
+            
+        } catch (Exception e) {
+            return new ArrayList();
         }
     }
 

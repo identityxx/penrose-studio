@@ -17,15 +17,15 @@
  */
 package org.safehaus.penrose.studio.server;
 
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 
 import java.io.Serializable;
 
-public class ServerConfig implements Serializable {
+public class ServerConfig implements Cloneable, Serializable {
 
     private String name;
     private String type = PenroseClient.PENROSE;
-    private String host = "localhost";
+    private String hostname = "localhost";
     private int port = 0;
     private String username;
     private String password;
@@ -34,20 +34,23 @@ public class ServerConfig implements Serializable {
     }
 
     public ServerConfig(ServerConfig serverConfig) {
-        name = serverConfig.getName();
-        type = serverConfig.getType();
-        host = serverConfig.getHost();
-        port = serverConfig.getPort();
-        username = serverConfig.getUsername();
-        password = serverConfig.getPassword();
+        copy(serverConfig);
     }
 
     public String getHost() {
-        return host;
+        return hostname;
     }
 
-    public void setHost(String host) {
-        this.host = host;
+    public void setHost(String hostname) {
+        this.hostname = hostname;
+    }
+
+    public String getHostname() {
+        return hostname;
+    }
+
+    public void setHostname(String hostname) {
+        this.hostname = hostname;
     }
 
     public String getName() {
@@ -88,6 +91,51 @@ public class ServerConfig implements Serializable {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public int hashCode() {
+        return (name == null ? 0 : name.hashCode()) +
+                (type == null ? 0 : type.hashCode()) +
+                (hostname == null ? 0 : hostname.hashCode()) +
+                (port) +
+                (username == null ? 0 : username.hashCode()) +
+                (password == null ? 0 : password.hashCode());
+    }
+
+    boolean equals(Object o1, Object o2) {
+        if (o1 == null && o2 == null) return true;
+        if (o1 != null) return o1.equals(o2);
+        return o2.equals(o1);
+    }
+
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if((object == null) || (object.getClass() != this.getClass())) return false;
+
+        ServerConfig serverConfig = (ServerConfig)object;
+        if (!equals(name, serverConfig.name)) return false;
+        if (!equals(type, serverConfig.type)) return false;
+        if (!equals(hostname, serverConfig.hostname)) return false;
+        if (port != serverConfig.port) return false;
+        if (!equals(username, serverConfig.username)) return false;
+        if (!equals(password, serverConfig.password)) return false;
+
+        return true;
+    }
+
+    public void copy(ServerConfig serverConfig) {
+        name = serverConfig.name;
+        type = serverConfig.type;
+        hostname = serverConfig.hostname;
+        port = serverConfig.port;
+        username = serverConfig.username;
+        password = serverConfig.password;
+    }
+
+    public Object clone() {
+        ServerConfig serverConfig = new ServerConfig();
+        serverConfig.copy(this);
+        return serverConfig;
     }
 }
 

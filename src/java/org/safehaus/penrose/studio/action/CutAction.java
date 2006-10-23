@@ -36,8 +36,8 @@ public class CutAction extends Action implements ChangeListener, SelectionListen
             IWorkbenchPage page = window.getActivePage();
             ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
-            ServerNode serverNode = objectsView.getSelectedProjectNode();
-            if (serverNode == null) return;
+            Node node = objectsView.getSelectedNode();
+            if (node == null) return;
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

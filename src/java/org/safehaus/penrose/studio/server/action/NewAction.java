@@ -31,7 +31,7 @@ public class NewAction extends Action {
 
         try {
             ServerConfig serverConfig = new ServerConfig();
-            serverConfig.setHost("localhost");
+            serverConfig.setHostname("localhost");
             serverConfig.setPort(1099);
 
             ServerEditorDialog dialog = new ServerEditorDialog(shell, SWT.NONE);

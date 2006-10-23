@@ -18,6 +18,9 @@ import org.safehaus.penrose.studio.event.ChangeListener;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.server.ServerNode;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 public class DeleteAction extends Action implements ChangeListener, SelectionListener {
 
     Logger log = Logger.getLogger(getClass());
@@ -37,10 +40,11 @@ public class DeleteAction extends Action implements ChangeListener, SelectionLis
             IWorkbenchPage page = window.getActivePage();
             ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
-            ServerNode serverNode = objectsView.getSelectedProjectNode();
-            if (serverNode == null) return;
-
-            serverNode.remove();
+            Collection nodes = objectsView.getSelectedNodes();
+            for (Iterator i=nodes.iterator(); i.hasNext(); ) {
+                Node node = (Node)i.next();
+                node.delete();
+            }
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

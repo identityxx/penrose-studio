@@ -79,7 +79,7 @@ public class Helper {
 		}
 	}
 	
-	public static void testJndiConnection(Shell shell, String initialContext, String providerUrl, String principal, String credentials) {
+	public static void testLDAPConnection(Shell shell, String initialContext, String providerUrl, String principal, String credentials) {
 		InitialDirContext ic = null;
 		try {
 			Properties env = new Properties();

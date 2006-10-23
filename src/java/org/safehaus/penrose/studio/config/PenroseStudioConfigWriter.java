@@ -68,7 +68,7 @@ public class PenroseStudioConfigWriter {
 
         element.addAttribute("name", serverConfig.getName());
         element.addAttribute("type", serverConfig.getType());
-        element.addAttribute("host", serverConfig.getHost());
+        element.addAttribute("host", serverConfig.getHostname());
         if (serverConfig.getPort() > 0) element.addAttribute("port", ""+serverConfig.getPort());
         element.addAttribute("username", serverConfig.getUsername());
         element.addAttribute("password", serverConfig.getPassword());

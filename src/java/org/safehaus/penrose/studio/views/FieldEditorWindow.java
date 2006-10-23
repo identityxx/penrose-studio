@@ -43,22 +43,22 @@ public class FieldEditorWindow {
 	Text name;
 	Text description;
 	Button jdbcButton;
-	Button jndiButton;
+	Button ldapButton;
 	
 	Text jdbcDriver;
 	Text jdbcUrl;
 	Text jdbcUsername;
 	Text jdbcPassword;
 	
-	Text jndiProviderUrl;
-	Text jndiInitialContext;
-	Text jndiSecurityPrincipal;
-	Text jndiSecurityCredentials;
+	Text ldapProviderUrl;
+	Text ldapInitialContext;
+	Text ldapSecurityPrincipal;
+	Text ldapSecurityCredentials;
 
 	Button editOnCopy;
 
 	Section jdbcSection;
-	Section jndiSection;
+	Section ldapSection;
 	
 	Button saveButton;
 	
@@ -78,8 +78,8 @@ public class FieldEditorWindow {
 		form.setText("Source Editor");
 		// Sections
 		createHeadSection(new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.TOP));
-		jdbcSection = createJdbcSourceSection(new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.TOP));
-		jndiSection = createJndiSourceSection(new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.TOP));
+		jdbcSection = createJDBCSourceSection(new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.TOP));
+		ldapSection = createLDAPSourceSection(new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.TOP));
 		createFootSection(new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.TOP));
 		// Open shell
 	    shell.open();
@@ -88,7 +88,7 @@ public class FieldEditorWindow {
 	    	load(source);
 	    }
 		jdbcSection.setExpanded(jdbcButton.getSelection());
-		jndiSection.setExpanded(jndiButton.getSelection());
+		ldapSection.setExpanded(ldapButton.getSelection());
 	}
 	
 	FieldEditorWindow(Shell parent) {
@@ -143,14 +143,14 @@ public class FieldEditorWindow {
 		});
 		// "" [x] Directory Source
 		toolkit.createLabel(sectionClient, "");
-		jndiButton = toolkit.createButton(sectionClient, "Directory Source (JNDI): LDAP or directories", SWT.RADIO);
-		jndiButton.addSelectionListener(new SelectionListener() {
+		ldapButton = toolkit.createButton(sectionClient, "Directory Source: LDAP or directories", SWT.RADIO);
+		ldapButton.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				jndiSection.setEnabled(jndiButton.getSelection());
-				jndiSection.setVisible(jndiButton.getSelection());
-				jndiSection.setExpanded(jndiButton.getSelection());
+				ldapSection.setEnabled(ldapButton.getSelection());
+				ldapSection.setVisible(ldapButton.getSelection());
+				ldapSection.setExpanded(ldapButton.getSelection());
 			}
 		});
 		// end
@@ -209,7 +209,7 @@ public class FieldEditorWindow {
 	/**
 	 * "Jdbc Source" Section
 	 */
-	public Section createJdbcSourceSection(TableWrapData layoutData) {
+	public Section createJDBCSourceSection(TableWrapData layoutData) {
 		Section section = toolkit.createSection(form.getBody(), 
 				Section.DESCRIPTION | Section.EXPANDED);
 		section.setLayoutData(layoutData);
@@ -248,7 +248,7 @@ public class FieldEditorWindow {
 	/**
 	 * "Jndi Source" Section
 	 */
-	public Section createJndiSourceSection(TableWrapData layoutData) {
+	public Section createLDAPSourceSection(TableWrapData layoutData) {
 		Section section = toolkit.createSection(form.getBody(), 
 				Section.DESCRIPTION | Section.EXPANDED);
 		section.setLayoutData(layoutData);
@@ -257,28 +257,28 @@ public class FieldEditorWindow {
 				form.reflow(true);
 			}
 		});
-		section.setDescription("Edit JNDI Source parameters below.");
+		section.setDescription("Edit LDAP Source parameters below.");
 		Composite sectionClient = toolkit.createComposite(section);
 		TableWrapLayout sectionLayout = new TableWrapLayout();
 		sectionLayout.numColumns = 2;
 		sectionClient.setLayout(sectionLayout);
 		// JNDI Initial: (text)
 		toolkit.createLabel(sectionClient, "JNDI Initial Context:");
-		jndiInitialContext = toolkit.createText(sectionClient, "", SWT.BORDER);
-		jndiInitialContext.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+		ldapInitialContext = toolkit.createText(sectionClient, "", SWT.BORDER);
+		ldapInitialContext.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
 		// JNDI Provider: (text)
-		toolkit.createLabel(sectionClient, "JNDI Provider URL:");
-		jndiProviderUrl = toolkit.createText(sectionClient, "", SWT.BORDER);
-		jndiProviderUrl.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+		toolkit.createLabel(sectionClient, "URL:");
+		ldapProviderUrl = toolkit.createText(sectionClient, "", SWT.BORDER);
+		ldapProviderUrl.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
 		// Principal: (text)
 		toolkit.createLabel(sectionClient, "Principal:");
-		jndiSecurityPrincipal = toolkit.createText(sectionClient, "", SWT.BORDER);
-		jndiSecurityPrincipal.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+		ldapSecurityPrincipal = toolkit.createText(sectionClient, "", SWT.BORDER);
+		ldapSecurityPrincipal.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
 		// Credentials: (text)
 		toolkit.createLabel(sectionClient, "Credentials:");
-		jndiSecurityCredentials = toolkit.createText(sectionClient, "", SWT.BORDER
+		ldapSecurityCredentials = toolkit.createText(sectionClient, "", SWT.BORDER
 				| SWT.PASSWORD);
-		jndiSecurityCredentials.setLayoutData(new TableWrapData(TableWrapData.LEFT));
+		ldapSecurityCredentials.setLayoutData(new TableWrapData(TableWrapData.LEFT));
 		// end
 		section.setClient(sectionClient);
 		return section;

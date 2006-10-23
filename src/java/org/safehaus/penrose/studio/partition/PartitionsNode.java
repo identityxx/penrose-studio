@@ -73,9 +73,8 @@ public class PartitionsNode extends Node {
     public boolean hasChildren() throws Exception {
         ServerNode serverNode = (ServerNode)getParent();
         Server server = serverNode.getProject();
-        PartitionManager partitionManager = server.getPartitionManager();
-        if (partitionManager == null) return false;
-        return !partitionManager.getPartitions().isEmpty();
+        PenroseConfig penroseConfig = server.getPenroseConfig();
+        return !penroseConfig.getPartitionConfigs().isEmpty();
     }
 
     public Collection getChildren() throws Exception {
@@ -87,7 +86,7 @@ public class PartitionsNode extends Node {
 
         PenroseConfig penroseConfig = server.getPenroseConfig();
         PartitionManager partitionManager = server.getPartitionManager();
-        
+
         Collection partitionConfigs = penroseConfig.getPartitionConfigs();
         for (Iterator i=partitionConfigs.iterator(); i.hasNext(); ) {
             PartitionConfig partitionConfig = (PartitionConfig)i.next();

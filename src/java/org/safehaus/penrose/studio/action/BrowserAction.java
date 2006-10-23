@@ -71,7 +71,7 @@ public class BrowserAction extends Action implements ChangeListener, SelectionLi
             Server server = serverNode.getProject();
 
             ServerConfig serverConfig = server.getServerConfig();
-            String hostname = serverConfig.getHost();
+            String hostname = serverConfig.getHostname();
 
             PenroseConfig penroseConfig = server.getPenroseConfig();
             ServiceConfig serviceConfig = penroseConfig.getServiceConfig("LDAP");

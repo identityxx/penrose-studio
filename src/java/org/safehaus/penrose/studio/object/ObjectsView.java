@@ -264,6 +264,13 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
         return (Node)selection.getFirstElement();
     }
 
+    public Collection getSelectedNodes() {
+        StructuredSelection selection = (StructuredSelection)treeViewer.getSelection();
+        if (selection.isEmpty()) return null;
+
+        return selection.toList();
+    }
+
     public ServerNode getSelectedProjectNode() {
         Node node = getSelectedNode();
 

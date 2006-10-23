@@ -2,7 +2,7 @@ package org.safehaus.penrose.studio.adapter;
 
 import org.safehaus.penrose.studio.source.JDBCSourceEditor;
 import org.safehaus.penrose.studio.source.wizard.JDBCSourceWizard;
-import org.safehaus.penrose.studio.connection.JDBCConnectionEditor;
+import org.safehaus.penrose.studio.connection.editor.JDBCConnectionEditor;
 
 /**
  * @author Endi S. Dewata

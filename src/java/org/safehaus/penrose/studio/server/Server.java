@@ -1,6 +1,7 @@
 package org.safehaus.penrose.studio.server;
 
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
+import org.safehaus.penrose.client.ServiceManagerClient;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.config.PenroseConfigReader;
 import org.safehaus.penrose.config.PenroseConfigWriter;
@@ -111,7 +112,7 @@ public class Server {
 
         client = new PenroseClient(
                 serverConfig.getType(),
-                serverConfig.getHost(),
+                serverConfig.getHostname(),
                 serverConfig.getPort(),
                 serverConfig.getUsername(),
                 serverConfig.getPassword()
@@ -335,7 +336,8 @@ public class Server {
     }
 
     public void restart() throws Exception {
-        client.restart();
+        ServiceManagerClient serviceManager = client.getServiceManagerClient();
+        serviceManager.restart();
 
         log.debug("Server restarted.");
     }

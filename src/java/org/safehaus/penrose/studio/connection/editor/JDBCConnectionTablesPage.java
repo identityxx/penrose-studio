@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.connection;
+package org.safehaus.penrose.studio.connection.editor;
 
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.*;
@@ -38,6 +38,7 @@ import org.safehaus.penrose.connector.JDBCAdapter;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.connection.JDBCSourceWizard;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;

@@ -2,7 +2,7 @@ package org.safehaus.penrose.studio.adapter;
 
 import org.safehaus.penrose.studio.source.SourceEditor;
 import org.safehaus.penrose.studio.source.wizard.SourceWizard;
-import org.safehaus.penrose.studio.connection.ConnectionEditor;
+import org.safehaus.penrose.studio.connection.editor.ConnectionEditor;
 
 /**
  * @author Endi S. Dewata
