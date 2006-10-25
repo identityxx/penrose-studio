@@ -30,6 +30,8 @@ import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionManager;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.config.PenroseConfig;
+import org.safehaus.penrose.client.PenroseClient;
+import org.safehaus.penrose.client.PartitionManagerClient;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
@@ -48,6 +50,7 @@ public class PartitionsNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
+    Server server;
 
     public PartitionsNode(ObjectsView view, String name, String type, Image image, Object object, Node parent) {
         super(name, type, image, object, parent);
@@ -58,35 +61,35 @@ public class PartitionsNode extends Node {
         manager.add(new NewPartitionAction());
         manager.add(new ImportPartitionAction());
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
-        PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
-        PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
-
-        //if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
-            manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-            manager.add(new NewLDAPSnapshotPartitionAction());
-            manager.add(new NewLDAPProxyPartitionAction());
-        //}
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+        manager.add(new NewLDAPSnapshotPartitionAction());
+        manager.add(new NewLDAPProxyPartitionAction());
     }
 
     public boolean hasChildren() throws Exception {
-        ServerNode serverNode = (ServerNode)getParent();
-        Server server = serverNode.getProject();
         PenroseConfig penroseConfig = server.getPenroseConfig();
         return !penroseConfig.getPartitionConfigs().isEmpty();
+/*
+        PenroseClient client = server.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        return !partitionManagerClient.getPartitionNames().isEmpty();
+*/
     }
 
     public Collection getChildren() throws Exception {
 
         Collection children = new ArrayList();
 
-        ServerNode serverNode = (ServerNode)getParent();
-        Server server = serverNode.getProject();
-
-        PenroseConfig penroseConfig = server.getPenroseConfig();
         PartitionManager partitionManager = server.getPartitionManager();
+/*
+        PenroseClient client = server.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 
+        for (Iterator i=partitionManagerClient.getPartitionNames().iterator(); i.hasNext(); ) {
+            String partitionName = (String)i.next();
+            PartitionConfig partitionConfig = partitionManagerClient.getPartitionConfig(partitionName);
+*/
+        PenroseConfig penroseConfig = server.getPenroseConfig();
         Collection partitionConfigs = penroseConfig.getPartitionConfigs();
         for (Iterator i=partitionConfigs.iterator(); i.hasNext(); ) {
             PartitionConfig partitionConfig = (PartitionConfig)i.next();
@@ -109,5 +112,13 @@ public class PartitionsNode extends Node {
         }
 
         return children;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

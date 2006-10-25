@@ -92,7 +92,7 @@ public class ObjectClassWizardPage extends WizardPage {
                     ServerNode serverNode = objectsView.getSelectedProjectNode();
                     if (serverNode == null) return;
 
-                    Server server = serverNode.getProject();
+                    Server server = serverNode.getServer();
                     SchemaManager schemaManager = server.getSchemaManager();
 
                     TableItem items[] = availableTable.getSelection();
@@ -129,7 +129,7 @@ public class ObjectClassWizardPage extends WizardPage {
                     ServerNode serverNode = objectsView.getSelectedProjectNode();
                     if (serverNode == null) return;
 
-                    Server server = serverNode.getProject();
+                    Server server = serverNode.getServer();
                     SchemaManager schemaManager = server.getSchemaManager();
 
                     TableItem items[] = selectedTable.getSelection();
@@ -219,7 +219,7 @@ public class ObjectClassWizardPage extends WizardPage {
             ServerNode serverNode = objectsView.getSelectedProjectNode();
             if (serverNode == null) return;
 
-            Server server = serverNode.getProject();
+            Server server = serverNode.getServer();
             Schema schema = server.getSchemaManager().getAllSchema();
 
             Collection ocNames = new ArrayList();

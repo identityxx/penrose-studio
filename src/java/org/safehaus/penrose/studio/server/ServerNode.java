@@ -86,12 +86,12 @@ public class ServerNode extends Node {
     }
 
     public boolean isConnected() {
-        Server server = getProject();
+        Server server = getServer();
         return server.isConnected();
     }
 
     public void open() throws Exception {
-        Server server = getProject();
+        Server server = getServer();
 
         ServerEditorInput ei = new ServerEditorInput();
         ei.setServer(server);
@@ -103,7 +103,7 @@ public class ServerNode extends Node {
 
     public void browse() throws Exception {
 
-        Server server = getProject();
+        Server server = getServer();
         ServerConfig serverConfig = server.getServerConfig();
         PenroseConfig penroseConfig = server.getPenroseConfig();
 
@@ -130,7 +130,7 @@ public class ServerNode extends Node {
 
     public void delete() throws Exception {
 
-        Server server = getProject();
+        Server server = getServer();
         ServerConfig serverConfig = server.getServerConfig();
 
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
@@ -148,7 +148,7 @@ public class ServerNode extends Node {
     }
 
     public void copy(PenroseStudioClipboard clipboard) throws Exception {
-        Server server = getProject();
+        Server server = getServer();
         clipboard.put(server.getServerConfig());
     }
 
@@ -164,14 +164,18 @@ public class ServerNode extends Node {
         Collection children = new ArrayList();
         if (!isConnected()) return children;
 
-        children.add(new PartitionsNode(
+        PartitionsNode partitionsNode = new PartitionsNode(
                 view,
                 ObjectsView.PARTITIONS,
                 ObjectsView.PARTITIONS,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
                 ObjectsView.PARTITIONS,
                 this
-        ));
+        );
+
+        partitionsNode.setServer(getServer());
+
+        children.add(partitionsNode);
 
         children.add(new SchemasNode(
                 view,
@@ -245,13 +249,13 @@ public class ServerNode extends Node {
                 this
         ));
 
-        Server server = getProject();
+        Server server = getServer();
         log.debug("["+server.getName()+"] getChildren: "+children.size());
 
         return children;
     }
 
-    public Server getProject() {
+    public Server getServer() {
         return (Server)getObject();
     }
 

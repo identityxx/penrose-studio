@@ -15,7 +15,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.connector.AdapterConfig;
-import org.safehaus.penrose.connector.Connection;
+import org.safehaus.penrose.connection.Connection;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.session.PenroseSearchControls;
 import org.safehaus.penrose.session.PenroseSearchResults;
@@ -127,7 +128,7 @@ public class JDBCSourceBrowsePage extends FormPage {
             AdapterConfig adapterConfig = penroseConfig.getAdapterConfig(connectionConfig.getAdapterName());
 
             Connection connection = new Connection(connectionConfig, adapterConfig);
-            connection.init();
+            connection.start();
 
             PenroseSearchResults sr = new PenroseSearchResults();
             PenroseSearchControls sc = new PenroseSearchControls();
@@ -165,7 +166,7 @@ public class JDBCSourceBrowsePage extends FormPage {
                 }
             }
 
-            connection.close();
+            connection.stop();
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

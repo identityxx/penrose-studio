@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>penrose-studio-1.1</name>
+	<name>penrose-studio</name>
 	<comment></comment>
 	<projects>
 		<project>license</project>
-		<project>penrose-1.1</project>
-		<project>penrose-pro-1.1</project>
+		<project>penrose</project>
+		<project>penrose-pro</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

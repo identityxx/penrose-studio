@@ -27,20 +27,15 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
-import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.partition.ConnectionConfig;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.studio.connection.wizard.LDAPSourceWizard;
-import org.safehaus.penrose.studio.connection.editor.LDAPConnectionEditor;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.ldap.LDAPClient;
-import org.apache.log4j.Logger;
 
 import javax.naming.directory.SearchResult;
 import javax.naming.directory.Attributes;
@@ -53,46 +48,24 @@ import java.io.PrintWriter;
 /**
  * @author Endi S. Dewata
  */
-public class LDAPConnectionBrowserPage extends FormPage implements TreeListener {
-
-    Logger log = Logger.getLogger(getClass());
-
-    FormToolkit toolkit;
+public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements TreeListener {
 
     Tree tree;
     Table table;
-
-    LDAPConnectionEditor editor;
-    Partition partition;
-    ConnectionConfig connectionConfig;
 
     Schema schema;
 
     public LDAPConnectionBrowserPage(LDAPConnectionEditor editor) {
         super(editor, "BROWSER", "  Browser  ");
-
-        this.editor = editor;
-        this.partition = editor.getPartition();
-        this.connectionConfig = editor.getConnectionConfig();
     }
 
     public void createFormContent(IManagedForm managedForm) {
-        toolkit = managedForm.getToolkit();
+        super.createFormContent(managedForm);
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Browser");
-
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-/*
-        if (penroseStudio.isFreeware()) {
-            Label label = toolkit.createLabel(body, PenroseStudio.FEATURE_NOT_AVAILABLE);
-            label.setLayoutData(new GridData(GridData.FILL_BOTH));
-            return;
-        }
-*/
         Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Actions");
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -113,8 +86,6 @@ public class LDAPConnectionBrowserPage extends FormPage implements TreeListener 
 
         Control entrySection = createEntrySection(section);
         section.setClient(entrySection);
-
-        refresh();
     }
 
     public Composite createActionsSection(final Composite parent) {

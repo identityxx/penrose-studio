@@ -30,13 +30,14 @@ import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.adapter.PenroseStudioAdapter;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.connection.action.NewSourceAction;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorInput;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -51,6 +52,7 @@ public class ConnectionNode extends Node {
 
     ObjectsView view;
 
+    private Server server;
     private Partition partition;
     private ConnectionConfig connectionConfig;
 
@@ -114,21 +116,13 @@ public class ConnectionNode extends Node {
         IWorkbenchPage page = window.getActivePage();
 
         ConnectionEditorInput ei = new ConnectionEditorInput();
+        ei.setServer(server);
         ei.setPartition(partition);
         ei.setConnectionConfig(connectionConfig);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         PenroseStudioAdapter adapter = penroseStudio.getAdapter(connectionConfig.getAdapterName());
         page.openEditor(ei, adapter.getConnectionEditorClassName());
-
-        /*
-        if ("JDBC".equals(connectionConfig.getAdapterName())) {
-            page.openEditor(ei, JDBCConnectionEditor.class.getName());
-
-        } else if ("LDAP".equals(connectionConfig.getAdapterName())) {
-            page.openEditor(ei, LDAPConnectionEditor.class.getName());
-        }
-        */
     }
 
     public void remove() throws Exception {
@@ -201,5 +195,13 @@ public class ConnectionNode extends Node {
 
     public void setConnectionConfig(ConnectionConfig connectionConfig) {
         this.connectionConfig = connectionConfig;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

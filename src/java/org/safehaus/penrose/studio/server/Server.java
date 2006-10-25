@@ -13,6 +13,8 @@ import org.safehaus.penrose.log4j.Log4jConfigReader;
 import org.safehaus.penrose.log4j.Log4jConfigWriter;
 import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.studio.validation.ValidationView;
+import org.safehaus.penrose.interpreter.InterpreterManager;
+import org.safehaus.penrose.connection.ConnectionManager;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.slf4j.LoggerFactory;
@@ -36,8 +38,12 @@ public class Server {
 
     private PenroseClient client;
     private PenroseConfig penroseConfig;
+
+    private InterpreterManager interpreterManager;
     private SchemaManager schemaManager;
+    private ConnectionManager connectionManager;
     private PartitionManager partitionManager;
+
     private Log4jConfig log4jConfig;
 
     public Server(ServerConfig serverConfig) {
@@ -135,7 +141,9 @@ public class Server {
         penroseConfig = penroseConfigReader.read();
 
         initSystemProperties();
+        initInterpreterManager();
         initSchemaManager(dir);
+        initConnectionManager();
         loadPartitions(dir);
         validate();
 
@@ -179,6 +187,10 @@ public class Server {
         }
     }
 
+    public void initInterpreterManager() throws Exception {
+        interpreterManager = new InterpreterManager();
+    }
+
     public void initSchemaManager(String dir) throws Exception {
 
         schemaManager = new SchemaManager();
@@ -189,12 +201,23 @@ public class Server {
         }
     }
 
+    public void initConnectionManager() throws Exception {
+        connectionManager = new ConnectionManager();
+    }
+
     public void loadPartitions(String dir) throws Exception {
 
         partitionManager = new PartitionManager();
+        partitionManager.setPenroseConfig(penroseConfig);
         partitionManager.setSchemaManager(schemaManager);
+        partitionManager.setInterpreterManager(interpreterManager);
+        partitionManager.setConnectionManager(connectionManager);
+        partitionManager.init();
 
-        partitionManager.load(dir, penroseConfig.getPartitionConfigs());
+        for (Iterator i=penroseConfig.getPartitionConfigs().iterator(); i.hasNext(); ) {
+            PartitionConfig partitionConfig = (PartitionConfig)i.next();
+            partitionManager.load(dir, partitionConfig);
+        }
     }
 
     public void validate() throws Exception {
@@ -352,4 +375,11 @@ public class Server {
         log.debug("Server closed.");
     }
 
+    public InterpreterManager getInterpreterManager() {
+        return interpreterManager;
+    }
+
+    public void setInterpreterManager(InterpreterManager interpreterManager) {
+        this.interpreterManager = interpreterManager;
+    }
 }

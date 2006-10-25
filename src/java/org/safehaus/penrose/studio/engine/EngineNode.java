@@ -94,7 +94,7 @@ public class EngineNode extends Node {
 
         EnginesNode enginesNode = (EnginesNode)getParent();
         ServerNode serverNode = (ServerNode)enginesNode.getParent();
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
 
         EngineConfig engineConfig = (EngineConfig)getObject();
 

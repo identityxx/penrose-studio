@@ -63,7 +63,7 @@ public class SchemasNode extends Node {
 
     public boolean hasChildren() throws Exception {
         ServerNode serverNode = (ServerNode)getParent();
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
         PenroseConfig penroseConfig = server.getPenroseConfig();
         return !penroseConfig.getSchemaConfigs().isEmpty();
     }
@@ -73,7 +73,7 @@ public class SchemasNode extends Node {
         Collection children = new ArrayList();
 
         ServerNode serverNode = (ServerNode)getParent();
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
         PenroseConfig penroseConfig = server.getPenroseConfig();
 
         Collection schemaConfigs = penroseConfig.getSchemaConfigs();

@@ -99,7 +99,7 @@ public class SchemaNode extends Node {
 
     public void open() throws Exception {
 
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
         SchemaManager schemaManager = server.getSchemaManager();
         Schema schema = schemaManager.getSchema(schemaConfig.getName());
 
@@ -124,7 +124,7 @@ public class SchemaNode extends Node {
 
         if (!confirm) return;
 
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
         PenroseConfig penroseConfig = server.getPenroseConfig();
         penroseConfig.removeSchemaConfig(schemaConfig.getName());
 

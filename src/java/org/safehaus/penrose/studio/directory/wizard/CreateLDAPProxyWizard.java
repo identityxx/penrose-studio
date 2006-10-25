@@ -22,6 +22,7 @@ import org.safehaus.penrose.studio.source.wizard.SelectSourceWizardPage;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.util.EntryUtil;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;

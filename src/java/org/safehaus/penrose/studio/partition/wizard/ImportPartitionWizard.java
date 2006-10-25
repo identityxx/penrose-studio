@@ -75,7 +75,7 @@ public class ImportPartitionWizard extends Wizard {
             ServerNode serverNode = objectsView.getSelectedProjectNode();
             if (serverNode == null) return false;
 
-            Server server = serverNode.getProject();
+            Server server = serverNode.getServer();
             PenroseConfig penroseConfig = server.getPenroseConfig();
             penroseConfig.addPartitionConfig(partitionConfig);
 

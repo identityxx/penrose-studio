@@ -24,6 +24,7 @@ import org.safehaus.penrose.connector.JDBCAdapter;
 import org.safehaus.penrose.studio.source.wizard.SourceWizardPage;
 import org.safehaus.penrose.studio.source.wizard.JDBCPrimaryKeyWizardPage;
 import org.safehaus.penrose.studio.source.wizard.*;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;

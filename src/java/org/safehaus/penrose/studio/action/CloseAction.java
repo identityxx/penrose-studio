@@ -39,7 +39,7 @@ public class CloseAction extends Action implements ChangeListener, SelectionList
             if (node == null) return;
 
             ServerNode serverNode = (ServerNode)node;
-            Server server = serverNode.getProject();
+            Server server = serverNode.getServer();
             penroseStudio.close(server);
 
         } catch (Exception e) {
@@ -56,7 +56,7 @@ public class CloseAction extends Action implements ChangeListener, SelectionList
     public void updateStatus(Object object) {
         if (object instanceof ServerNode) {
             ServerNode serverNode = (ServerNode)object;
-            Server server = serverNode.getProject();
+            Server server = serverNode.getServer();
             setEnabled(server.isConnected());
 
         } else {

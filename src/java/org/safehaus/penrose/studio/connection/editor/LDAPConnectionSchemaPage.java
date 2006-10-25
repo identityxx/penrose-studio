@@ -23,21 +23,15 @@ import org.eclipse.swt.SWT;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
-import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.partition.ConnectionConfig;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.AttributeType;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.connection.editor.LDAPConnectionEditor;
 import org.safehaus.penrose.studio.connection.SchemaExportWizard;
 import org.safehaus.penrose.ldap.LDAPClient;
-import org.apache.log4j.Logger;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -47,46 +41,24 @@ import java.io.PrintWriter;
 /**
  * @author Endi S. Dewata
  */
-public class LDAPConnectionSchemaPage extends FormPage {
-
-    Logger log = Logger.getLogger(getClass());
-
-    FormToolkit toolkit;
+public class LDAPConnectionSchemaPage extends ConnectionEditorPage {
 
     Table objectClassesTable;
     Table attributeTypesTable;
-
-    LDAPConnectionEditor editor;
-    Partition partition;
-    ConnectionConfig connectionConfig;
 
     Schema schema;
 
     public LDAPConnectionSchemaPage(LDAPConnectionEditor editor) {
         super(editor, "SCHEMA", "  Schema  ");
-
-        this.editor = editor;
-        this.partition = editor.getPartition();
-        this.connectionConfig = editor.getConnectionConfig();
     }
 
     public void createFormContent(IManagedForm managedForm) {
-        toolkit = managedForm.getToolkit();
+        super.createFormContent(managedForm);
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Schema");
-
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-/*
-        if (penroseStudio.isFreeware()) {
-            Label label = toolkit.createLabel(body, PenroseStudio.FEATURE_NOT_AVAILABLE);
-            label.setLayoutData(new GridData(GridData.FILL_BOTH));
-            return;
-        }
-*/
         Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Actions");
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -107,8 +79,6 @@ public class LDAPConnectionSchemaPage extends FormPage {
 
         Control attributeTypesSection = createAttributeTypesSection(section);
         section.setClient(attributeTypesSection);
-
-        refresh();
     }
 
     public Composite createActionsSection(final Composite parent) {

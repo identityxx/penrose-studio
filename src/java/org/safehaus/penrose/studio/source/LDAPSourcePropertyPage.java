@@ -36,6 +36,7 @@ import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
 public class LDAPSourcePropertyPage extends FormPage {

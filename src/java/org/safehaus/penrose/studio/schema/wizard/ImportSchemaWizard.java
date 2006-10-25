@@ -78,7 +78,7 @@ public class ImportSchemaWizard extends Wizard {
             schemaConfig.setName(name);
             schemaConfig.setPath(path);
 
-            Server server = serverNode.getProject();
+            Server server = serverNode.getServer();
             PenroseConfig penroseConfig = server.getPenroseConfig();
             penroseConfig.addSchemaConfig(schemaConfig);
 

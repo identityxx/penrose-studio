@@ -32,6 +32,7 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.connector.JDBCAdapter;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
 public class JDBCSourcePropertyPage extends FormPage {

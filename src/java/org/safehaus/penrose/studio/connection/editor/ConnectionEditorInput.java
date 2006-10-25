@@ -20,14 +20,16 @@ package org.safehaus.penrose.studio.connection.editor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.partition.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
  */
 public class ConnectionEditorInput implements IEditorInput {
 
+    private Server server;
     private Partition partition;
     private ConnectionConfig connectionConfig;
 
@@ -92,5 +94,13 @@ public class ConnectionEditorInput implements IEditorInput {
 
     public void setPartition(Partition partition) {
         this.partition = partition;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

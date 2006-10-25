@@ -50,7 +50,7 @@ public class ConnectorsNode extends Node {
         Collection children = new ArrayList();
 
         ServerNode serverNode = (ServerNode)getParent();
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
         ConnectorConfig connectorConfig = server.getPenroseConfig().getConnectorConfig();
 
         children.add(new ConnectorNode(

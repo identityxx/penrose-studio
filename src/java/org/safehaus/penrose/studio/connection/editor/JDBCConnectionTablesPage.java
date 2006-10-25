@@ -25,12 +25,9 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
-import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.partition.ConnectionConfig;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.TableConfig;
 import org.safehaus.penrose.partition.FieldConfig;
 import org.safehaus.penrose.jdbc.JDBCClient;
@@ -39,7 +36,6 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.connection.JDBCSourceWizard;
-import org.apache.log4j.Logger;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -49,46 +45,24 @@ import java.io.PrintWriter;
 /**
  * @author Endi S. Dewata
  */
-public class JDBCConnectionTablesPage extends FormPage {
-
-    Logger log = Logger.getLogger(getClass());
-
-    FormToolkit toolkit;
+public class JDBCConnectionTablesPage extends ConnectionEditorPage {
 
     Combo catalogCombo;
     Combo schemaCombo;
     Table tablesTable;
     Table fieldsTable;
 
-    JDBCConnectionEditor editor;
-    Partition partition;
-    ConnectionConfig connectionConfig;
-
     public JDBCConnectionTablesPage(JDBCConnectionEditor editor) {
         super(editor, "TABLES", "  Tables  ");
-
-        this.editor = editor;
-        this.partition = editor.getPartition();
-        this.connectionConfig = editor.getConnectionConfig();
     }
 
     public void createFormContent(IManagedForm managedForm) {
-        toolkit = managedForm.getToolkit();
+        super.createFormContent(managedForm);
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Tables");
-
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-/*
-        if (penroseStudio.isFreeware()) {
-            Label label = toolkit.createLabel(body, PenroseStudio.FEATURE_NOT_AVAILABLE);
-            label.setLayoutData(new GridData(GridData.FILL_BOTH));
-            return;
-        }
-*/
         Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Actions");
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -109,10 +83,6 @@ public class JDBCConnectionTablesPage extends FormPage {
 
         Control tablesSection = createTablesSection(section);
         section.setClient(tablesSection);
-
-        refresh();
-        showTableNames();
-        //showFieldNames();
     }
 
     public Composite createActionsSection(final Composite parent) {
@@ -125,7 +95,6 @@ public class JDBCConnectionTablesPage extends FormPage {
         refresh.addHyperlinkListener(new HyperlinkAdapter() {
             public void linkActivated(HyperlinkEvent event) {
                 refresh();
-                showTableNames();
                 showFieldNames();
             }
         });
@@ -242,15 +211,20 @@ public class JDBCConnectionTablesPage extends FormPage {
             log.debug("Refreshing information");
 
             String catalog = catalogCombo.getText();
-            catalogCombo.removeAll();
-
             String schema = schemaCombo.getText();
+
+            catalogCombo.removeAll();
             schemaCombo.removeAll();
+            tablesTable.removeAll();
 
             JDBCClient client = new JDBCClient(connectionConfig.getParameters());
             client.connect();
 
             Collection catalogs = client.getCatalogs();
+            Collection schemas = client.getSchemas();
+            Collection tables = client.getTables(getCatalog(), getSchema());
+
+            client.close();
 
             catalogCombo.add("");
             for (Iterator i=catalogs.iterator(); i.hasNext(); ) {
@@ -264,8 +238,6 @@ public class JDBCConnectionTablesPage extends FormPage {
                 catalogCombo.select(0);
             }
 
-            Collection schemas = client.getSchemas();
-
             schemaCombo.add("");
             for (Iterator i=schemas.iterator(); i.hasNext(); ) {
                 String schemaName = (String)i.next();
@@ -278,7 +250,13 @@ public class JDBCConnectionTablesPage extends FormPage {
                 schemaCombo.select(0);
             }
 
-            client.close();
+            for (Iterator i=tables.iterator(); i.hasNext(); ) {
+                TableConfig tableConfig = (TableConfig)i.next();
+
+                TableItem item = new TableItem(tablesTable, SWT.NONE);
+                item.setText(tableConfig.getName());
+                item.setData(tableConfig);
+            }
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

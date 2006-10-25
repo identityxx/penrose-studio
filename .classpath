@@ -45,10 +45,10 @@
 	<classpathentry kind="lib" path="lib/commons-cli-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-collections-3.2.jar"/>
 	<classpathentry kind="lib" path="lib/commons-lang-2.1.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/penrose-1.1"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/penrose-pro-1.1"/>
 	<classpathentry kind="lib" path="lib/xercesImpl-2.8.0.jar"/>
 	<classpathentry kind="lib" path="lib/xml-apis-2.8.0.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/license"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/penrose-pro"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/penrose"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

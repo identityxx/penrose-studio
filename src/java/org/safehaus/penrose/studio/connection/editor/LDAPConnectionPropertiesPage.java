@@ -23,16 +23,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.events.*;
 import org.eclipse.ui.forms.widgets.*;
-import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
-import org.safehaus.penrose.studio.connection.editor.LDAPConnectionEditor;
-import org.safehaus.penrose.partition.ConnectionConfig;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.ldap.LDAPClient;
-import org.apache.log4j.Logger;
 
 import javax.naming.InitialContext;
 import javax.naming.Context;
@@ -41,11 +36,7 @@ import java.util.*;
 /**
  * @author Endi S. Dewata
  */
-public class LDAPConnectionPropertiesPage extends FormPage {
-
-    Logger log = Logger.getLogger(getClass());
-
-    FormToolkit toolkit;
+public class LDAPConnectionPropertiesPage extends ConnectionEditorPage {
 
     Text nameText;
     Combo protocolCombo;
@@ -59,24 +50,14 @@ public class LDAPConnectionPropertiesPage extends FormPage {
 
     String url;
 
-    LDAPConnectionEditor editor;
-    Partition partition;
-    ConnectionConfig connectionConfig;
-
-    public LDAPConnectionPropertiesPage(LDAPConnectionEditor editor) {
-        super(editor, "PROPERTIES", "  Properties  ");
-
-        this.editor = editor;
-        this.partition = editor.getPartition();
-        this.connectionConfig = editor.getConnectionConfig();
+    public LDAPConnectionPropertiesPage(ConnectionEditor editor) {
+        super(editor, "LDAP", "  LDAP Properties  ");
     }
 
     public void createFormContent(IManagedForm managedForm) {
-        toolkit = managedForm.getToolkit();
+        super.createFormContent(managedForm);
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Connection Editor");
-
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
@@ -100,8 +81,6 @@ public class LDAPConnectionPropertiesPage extends FormPage {
 
         Control parametersSection = createParametersSection(section);
         section.setClient(parametersSection);
-
-        refresh();
     }
 
     public Composite createNameSection(final Composite parent) {

@@ -2,7 +2,7 @@ package org.safehaus.penrose.studio.util;
 
 import org.safehaus.penrose.partition.SourceConfig;
 import org.safehaus.penrose.partition.FieldConfig;
-import org.safehaus.penrose.partition.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.AttributeMapping;
@@ -13,14 +13,14 @@ import org.safehaus.penrose.mapping.SourceMapping;
  * @author Endi S. Dewata
  */
 public class ADUtil {
-    
+
     public EntryMapping createSchemaProxy(
             Partition partition,
             ConnectionConfig connectionConfig,
             String sourceSchemaDn,
             String destSchemaDn
             ) throws Exception {
-        
+
         SourceConfig sourceConfig = new SourceConfig();
         sourceConfig.setName(connectionConfig.getName()+" Schema");
         sourceConfig.setConnectionName(connectionConfig.getName());

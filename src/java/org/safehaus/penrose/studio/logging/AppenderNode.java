@@ -68,7 +68,7 @@ public class AppenderNode extends Node {
 
     public void open() throws Exception {
 
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
         Log4jConfig log4jConfig = server.getLog4jConfig();
 
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
@@ -81,7 +81,7 @@ public class AppenderNode extends Node {
 
     public void remove() throws Exception {
 
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
         Log4jConfig loggingConfig = server.getLog4jConfig();
         loggingConfig.removeAppenderConfig(appenderConfig.getName());
 

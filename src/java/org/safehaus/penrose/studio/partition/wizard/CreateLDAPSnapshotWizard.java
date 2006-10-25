@@ -31,6 +31,7 @@ import org.safehaus.penrose.studio.util.SnapshotUtil;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;
@@ -89,7 +90,7 @@ public class CreateLDAPSnapshotWizard extends Wizard {
             ServerNode serverNode = objectsView.getSelectedProjectNode();
             if (serverNode == null) return false;
 
-            Server server = serverNode.getProject();
+            Server server = serverNode.getServer();
             PenroseConfig penroseConfig = server.getPenroseConfig();
             penroseConfig.addPartitionConfig(partitionConfig);
 

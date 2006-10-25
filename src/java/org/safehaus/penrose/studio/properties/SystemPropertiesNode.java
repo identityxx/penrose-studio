@@ -59,7 +59,7 @@ public class SystemPropertiesNode extends Node {
     public void open() throws Exception {
 
         ServerNode serverNode = (ServerNode)getParent();
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
 
         SystemPropertiesEditorInput ei = new SystemPropertiesEditorInput();
         ei.setProject(server);

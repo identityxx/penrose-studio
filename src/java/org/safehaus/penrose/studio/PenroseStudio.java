@@ -22,6 +22,7 @@ import java.util.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.security.PublicKey;
+import java.rmi.RMISecurityManager;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPlatformRunnable;
@@ -61,7 +62,7 @@ public class PenroseStudio implements IPlatformRunnable {
     Logger log = Logger.getLogger(getClass());
 
     public static String PRODUCT_NAME    = "Penrose Studio";
-    public static String PRODUCT_VERSION = "1.1";
+    public static String PRODUCT_VERSION = "1.2";
     public static String VENDOR_NAME     = "Identyx Corporation";
 
     public final static DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
@@ -94,6 +95,10 @@ public class PenroseStudio implements IPlatformRunnable {
             PRODUCT_NAME    = pkg.getImplementationTitle() == null ? PRODUCT_NAME : pkg.getImplementationTitle();
             PRODUCT_VERSION = pkg.getImplementationVersion() == null ? PRODUCT_VERSION : pkg.getImplementationVersion();
             VENDOR_NAME     = pkg.getImplementationVendor() == null ? VENDOR_NAME : pkg.getImplementationVendor();
+
+            System.setProperty("java.rmi.server.codebase", "file:lib/penrose-shared-1.2.jar");
+            System.setProperty("java.security.policy", "conf/penrose.policy");
+            System.setSecurityManager(new RMISecurityManager());
 
         } catch (Exception e) {
             e.printStackTrace();

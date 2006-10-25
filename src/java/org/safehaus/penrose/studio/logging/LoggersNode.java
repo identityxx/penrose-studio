@@ -87,7 +87,7 @@ public class LoggersNode extends Node {
     }
 
     public void open() throws Exception {
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
         Log4jConfig loggingConfig = server.getLog4jConfig();
 
         RootConfig rootConfig = loggingConfig.getRootConfig();
@@ -111,7 +111,7 @@ public class LoggersNode extends Node {
 
     public void createLogger() throws Exception {
 
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
         Log4jConfig loggingConfig = server.getLog4jConfig();
 
         LoggerConfig loggerConfig = new LoggerConfig();
@@ -131,7 +131,7 @@ public class LoggersNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
         Log4jConfig loggingConfig = server.getLog4jConfig();
         return !loggingConfig.getLoggerConfigs().isEmpty();
     }
@@ -140,7 +140,7 @@ public class LoggersNode extends Node {
 
         Collection children = new ArrayList();
 
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
         Log4jConfig loggingConfig = server.getLog4jConfig();
 
         for (Iterator i=loggingConfig.getLoggerConfigs().iterator(); i.hasNext(); ) {

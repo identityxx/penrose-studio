@@ -50,7 +50,7 @@ public class CachesNode extends Node {
         Collection children = new ArrayList();
 
         ServerNode serverNode = (ServerNode)getParent();
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
         CacheConfig entryCacheConfig = server.getPenroseConfig().getEntryCacheConfig();
         if (entryCacheConfig != null) {
             children.add(new CacheNode(

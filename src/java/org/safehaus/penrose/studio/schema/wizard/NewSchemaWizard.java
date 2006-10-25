@@ -95,7 +95,7 @@ public class NewSchemaWizard extends Wizard {
             SchemaWriter schemaWriter = new SchemaWriter(workDir);
             schemaWriter.write(schema);
 
-            Server server = serverNode.getProject();
+            Server server = serverNode.getServer();
             PenroseConfig penroseConfig = server.getPenroseConfig();
             penroseConfig.addSchemaConfig(schemaConfig);
 

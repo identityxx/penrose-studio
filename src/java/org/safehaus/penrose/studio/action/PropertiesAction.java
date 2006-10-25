@@ -44,7 +44,7 @@ public class PropertiesAction extends Action implements ChangeListener, Selectio
             if (node == null) return;
 
             ServerNode serverNode = (ServerNode)node;
-            Server server = serverNode.getProject();
+            Server server = serverNode.getServer();
 
             ServerEditorInput ei = new ServerEditorInput();
             ei.setServer(server);

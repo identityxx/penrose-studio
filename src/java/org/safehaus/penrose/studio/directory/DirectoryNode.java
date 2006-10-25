@@ -42,13 +42,12 @@ public class DirectoryNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
-    Server server;
 
+    private Server server;
     private Partition partition;
 
     public DirectoryNode(
             ObjectsView view,
-            Server server,
             String name,
             String type,
             Image image,
@@ -57,7 +56,6 @@ public class DirectoryNode extends Node {
     ) {
         super(name, type, image, object, parent);
         this.view = view;
-        this.server = server;
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -118,5 +116,13 @@ public class DirectoryNode extends Node {
 
     public void setPartition(Partition partition) {
         this.partition = partition;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

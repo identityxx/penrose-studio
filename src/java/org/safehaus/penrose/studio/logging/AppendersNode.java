@@ -60,7 +60,7 @@ public class AppendersNode extends Node {
 
     public void createAppender() throws Exception {
 
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
         Log4jConfig loggingConfig = server.getLog4jConfig();
 
         AppenderConfig appenderConfig = new AppenderConfig();
@@ -80,7 +80,7 @@ public class AppendersNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
         Log4jConfig loggingConfig = server.getLog4jConfig();
         return !loggingConfig.getAppenderConfigs().isEmpty();
     }
@@ -89,7 +89,7 @@ public class AppendersNode extends Node {
 
         Collection children = new ArrayList();
 
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
         Log4jConfig loggingConfig = server.getLog4jConfig();
 
         for (Iterator i=loggingConfig.getAppenderConfigs().iterator(); i.hasNext(); ) {

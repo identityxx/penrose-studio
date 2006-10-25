@@ -2,7 +2,7 @@ package org.safehaus.penrose.studio.source.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.partition.SourceConfig;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;

@@ -93,7 +93,7 @@ public class ConnectorNode extends Node {
     public void open() throws Exception {
 
         ServerNode serverNode = (ServerNode)getParent();
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
         ConnectorConfig connectorConfig = server.getPenroseConfig().getConnectorConfig();
 
         ConnectorEditorInput ei = new ConnectorEditorInput();

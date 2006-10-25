@@ -51,7 +51,7 @@ public class EnginesNode extends Node {
         Collection children = new ArrayList();
 
         ServerNode serverNode = (ServerNode)getParent();
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
         Collection engineConfigs = server.getPenroseConfig().getEngineConfigs();
 
         for (Iterator i=engineConfigs.iterator(); i.hasNext(); ) {

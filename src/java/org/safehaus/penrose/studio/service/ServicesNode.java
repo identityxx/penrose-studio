@@ -63,7 +63,7 @@ public class ServicesNode extends Node {
         Collection children = new ArrayList();
 
         ServerNode serverNode = (ServerNode)getParent();
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
         PenroseConfig penroseConfig = server.getPenroseConfig();
         for (Iterator i=penroseConfig.getServiceConfigs().iterator(); i.hasNext(); ) {
             ServiceConfig serviceConfig = (ServiceConfig)i.next();

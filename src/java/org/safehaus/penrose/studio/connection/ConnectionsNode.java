@@ -20,11 +20,12 @@ package org.safehaus.penrose.studio.connection;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.connection.action.NewConnectionAction;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
@@ -45,6 +46,7 @@ public class ConnectionsNode extends Node {
 
     ObjectsView view;
 
+    private Server server;
     private Partition partition;
 
     public ConnectionsNode(ObjectsView view, String name, String type, Image image, Object object, Node parent) {
@@ -115,6 +117,7 @@ public class ConnectionsNode extends Node {
                     this
             );
 
+            connectionNode.setServer(server);
             connectionNode.setPartition(partition);
             connectionNode.setConnectionConfig(connectionConfig);
 
@@ -130,5 +133,13 @@ public class ConnectionsNode extends Node {
 
     public void setPartition(Partition partition) {
         this.partition = partition;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

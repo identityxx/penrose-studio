@@ -176,7 +176,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                     ServerNode serverNode = objectsView.getSelectedProjectNode();
                     if (serverNode == null) return;
 
-                    Server server = serverNode.getProject();
+                    Server server = serverNode.getServer();
                     dialog.setSchemaManager(server.getSchemaManager());
 
                     dialog.open();
@@ -270,7 +270,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
             ServerNode serverNode = objectsView.getSelectedProjectNode();
             if (serverNode == null) return;
 
-            Server server = serverNode.getProject();
+            Server server = serverNode.getServer();
             SchemaManager schemaManager = server.getSchemaManager();
 
             System.out.println("Object classes:");

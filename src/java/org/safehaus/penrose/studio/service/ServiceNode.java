@@ -101,7 +101,7 @@ public class ServiceNode extends Node {
         if (!confirm) return;
 
         ServerNode serverNode = (ServerNode)getParent();
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
         PenroseConfig penroseConfig = server.getPenroseConfig();
         penroseConfig.removeServiceConfig(serviceConfig.getName());
 

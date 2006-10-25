@@ -23,15 +23,12 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.adapter.PenroseStudioAdapter;
-import org.safehaus.penrose.studio.source.wizard.JDBCSourceWizard;
-import org.safehaus.penrose.studio.source.wizard.LDAPSourceWizard;
 import org.safehaus.penrose.studio.source.wizard.SourceWizard;
 import org.safehaus.penrose.studio.connection.ConnectionNode;
-import org.safehaus.penrose.partition.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
 

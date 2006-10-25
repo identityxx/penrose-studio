@@ -60,7 +60,7 @@ public class AdministratorNode extends Node {
 
     public void open() throws Exception {
         ServerNode serverNode = (ServerNode)getParent();
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
         PenroseConfig penroseConfig = server.getPenroseConfig();
         UserConfig userConfig = penroseConfig.getRootUserConfig();
 

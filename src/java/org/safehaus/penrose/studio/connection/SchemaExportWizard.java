@@ -89,7 +89,7 @@ public class SchemaExportWizard extends Wizard {
         ServerNode serverNode = objectsView.getSelectedProjectNode();
         if (serverNode == null) return;
 
-        Server server = serverNode.getProject();
+        Server server = serverNode.getServer();
         SchemaManager schemaManager = server.getSchemaManager();
 
         Collection attributeTypes = schemaManager.getAttributeTypes();

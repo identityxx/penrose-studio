@@ -33,6 +33,7 @@ import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.acl.ACI;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
 import javax.naming.InitialContext;
@@ -94,7 +95,7 @@ public class CreateLDAPProxyWizard extends Wizard {
             ServerNode serverNode = objectsView.getSelectedProjectNode();
             if (serverNode == null) return false;
 
-            Server server = serverNode.getProject();
+            Server server = serverNode.getServer();
             PenroseConfig penroseConfig = server.getPenroseConfig();
             penroseConfig.addPartitionConfig(partitionConfig);
 

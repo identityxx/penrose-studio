@@ -155,7 +155,7 @@ public class PartitionNode extends Node {
         penroseConfig.addPartitionConfig(newPartitionConfig);
 
         PartitionManager partitionManager = server.getPartitionManager();
-        partitionManager.load(this.server.getWorkDir(), newPartitionConfig);
+        partitionManager.load(server.getWorkDir(), newPartitionConfig);
 
         view.setClipboard(null);
     }
@@ -170,7 +170,6 @@ public class PartitionNode extends Node {
 
         DirectoryNode directoryNode = new DirectoryNode(
                 view,
-                server,
                 ObjectsView.DIRECTORY,
                 ObjectsView.DIRECTORY,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
@@ -178,6 +177,7 @@ public class PartitionNode extends Node {
                 this
         );
 
+        directoryNode.setServer(server);
         directoryNode.setPartition(partition);
 
         children.add(directoryNode);
@@ -187,10 +187,11 @@ public class PartitionNode extends Node {
                 ObjectsView.CONNECTIONS,
                 ObjectsView.CONNECTIONS,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
-                partition,
+                ObjectsView.CONNECTIONS,
                 this
         );
 
+        connectionsNode.setServer(server);
         connectionsNode.setPartition(partition);
 
         children.add(connectionsNode);
