@@ -391,7 +391,6 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="penrose" />
-    <orderEntry type="module" module-name="penrose-pro-1.1" />
     <orderEntry type="module" module-name="license" />
     <orderEntry type="module-library">
       <library>
@@ -402,6 +401,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="penrose-pro" />
     <orderEntryProperties />
   </component>
 </module>
