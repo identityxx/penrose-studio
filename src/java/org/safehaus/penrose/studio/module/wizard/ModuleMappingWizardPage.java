@@ -24,7 +24,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.module.ModuleMapping;
-import org.safehaus.penrose.studio.module.ModuleMappingDialog;
+import org.safehaus.penrose.studio.module.editor.ModuleMappingDialog;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;

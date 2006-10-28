@@ -18,7 +18,6 @@
 package org.safehaus.penrose.studio.properties;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
 import org.eclipse.swt.graphics.Image;
@@ -36,11 +35,8 @@ public class SystemPropertiesNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
-
-    public SystemPropertiesNode(ObjectsView view, String name, String type, Image image, Object object, Node parent) {
-        super(name, type, image, object, parent);
-        this.view = view;
+    public SystemPropertiesNode(String name, Image image, Object object, Node parent) {
+        super(name, image, object, parent);
     }
 
     public void showMenu(IMenuManager manager) {

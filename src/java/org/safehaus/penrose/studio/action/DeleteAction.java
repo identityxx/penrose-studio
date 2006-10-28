@@ -5,7 +5,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchPage;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -15,8 +14,6 @@ import org.safehaus.penrose.studio.event.SelectionEvent;
 import org.safehaus.penrose.studio.event.SelectionListener;
 import org.safehaus.penrose.studio.event.ChangeEvent;
 import org.safehaus.penrose.studio.event.ChangeListener;
-import org.safehaus.penrose.studio.object.ObjectsView;
-import org.safehaus.penrose.studio.server.ServerNode;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -36,44 +33,40 @@ public class DeleteAction extends Action implements ChangeListener, SelectionLis
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         Shell shell = window.getShell();
 
-        try {
-            IWorkbenchPage page = window.getActivePage();
-            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Collection nodes = penroseStudio.getSelectedNodes();
 
-            Collection nodes = objectsView.getSelectedNodes();
-            for (Iterator i=nodes.iterator(); i.hasNext(); ) {
-                Node node = (Node)i.next();
+        for (Iterator i=nodes.iterator(); i.hasNext(); ) {
+            Node node = (Node)i.next();
+
+            try {
+                boolean confirm = MessageDialog.openQuestion(
+                        shell,
+                        "Confirmation",
+                        "Remove "+node.getName()+"?"
+                );
+
+                if (!confirm) continue;
+
                 node.delete();
+
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+
+                MessageDialog.openError(
+                        shell,
+                        "Error",
+                        "Failed deleting "+node.getName()+"."
+                );
             }
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-
-            MessageDialog.openError(
-                    shell,
-                    "ERROR",
-                    "Failed creating new project.\n"+
-                            "See penrose-studio-log.txt for details."
-            );
         }
-    }
 
-    public void updateStatus(Object object) {
-        if (object instanceof ServerNode) {
-            setEnabled(true);
-        } else {
-            setEnabled(false);
-        }
+        penroseStudio.fireChangeEvent();
     }
 
     public void objectChanged(ChangeEvent event) {
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Node node = penroseStudio.getSelectedNode();
-        updateStatus(node);
     }
 
     public void objectSelected(SelectionEvent event) {
-        Object object = event.getObject();
-        updateStatus(object);
     }
 }

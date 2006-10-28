@@ -18,11 +18,11 @@
 package org.safehaus.penrose.studio.logging;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.action.PenroseStudioActions;
+import org.safehaus.penrose.studio.logging.editor.LoggerDialog;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.log4j.LoggerConfig;
 import org.safehaus.penrose.log4j.Log4jConfig;
@@ -31,7 +31,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.apache.log4j.Logger;
 
 /**
@@ -41,36 +43,32 @@ public class LoggerNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
-    ServerNode serverNode;
+    Server server;
     LoggerConfig loggerConfig;
 
     public LoggerNode(
-            ObjectsView view,
-            ServerNode serverNode,
+            Server server,
             String name,
-            String type,
             Image image,
             Object object,
-            Node parent 
+            Node parent
     ) {
-        super(name, type, image, object, parent);
-        this.view = view;
-        this.serverNode = serverNode;
+        super(name, image, object, parent);
+        this.server = server;
         this.loggerConfig = (LoggerConfig)object;
     }
 
     public void showMenu(IMenuManager manager) {
 
-        manager.add(new Action("Open") {
-            public void run() {
-                try {
-                    open();
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseStudioActions actions = penroseStudio.getActions();
+
+        manager.add(actions.getOpenAction());
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(actions.getCopyAction());
+        manager.add(actions.getPasteAction());
 
         manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
             public void run() {
@@ -85,7 +83,6 @@ public class LoggerNode extends Node {
 
     public void open() throws Exception {
 
-        Server server = serverNode.getServer();
         Log4jConfig log4jConfig = server.getLog4jConfig();
 
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
@@ -96,8 +93,19 @@ public class LoggerNode extends Node {
         dialog.open();
     }
 
+    public Object copy() throws Exception {
+        return loggerConfig;
+    }
+
+    public boolean canPaste(Object object) throws Exception {
+        return getParent().canPaste(object);
+    }
+
+    public void paste(Object object) throws Exception {
+        getParent().paste(object);
+    }
+
     public void remove() throws Exception {
-        Server server = serverNode.getServer();
         Log4jConfig log4jConfig = server.getLog4jConfig();
         log4jConfig.removeLoggerConfig(loggerConfig.getName());
 

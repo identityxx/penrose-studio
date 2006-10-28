@@ -14,15 +14,10 @@
 	<classpathentry kind="lib" path="lib/hsqldb-1.7.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/java-getopt-1.0.12.jar"/>
 	<classpathentry kind="lib" path="lib/jbossall-client.jar"/>
-	<classpathentry kind="lib" path="lib/jmx.jar"/>
-	<classpathentry kind="lib" path="lib/jmxremote.jar"/>
-	<classpathentry kind="lib" path="lib/jmxri-1.2.1.jar"/>
-	<classpathentry kind="lib" path="lib/jmxtools-1.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/junit-3.8.1.jar"/>
 	<classpathentry kind="lib" path="lib/ldap.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.13.jar"/>
 	<classpathentry kind="lib" path="lib/mx4j.jar"/>
-	<classpathentry kind="lib" path="lib/mx4j-tools.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-3.0.16-ga-bin.jar"/>
 	<classpathentry kind="lib" path="lib/postgresql-8.1-405.jdbc3.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-log4j12.jar"/>
@@ -50,5 +45,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/license"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/penrose-pro"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/penrose"/>
+	<classpathentry kind="lib" path="lib/mx4j-remote.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

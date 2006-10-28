@@ -18,13 +18,9 @@
 package org.safehaus.penrose.studio.partition.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.util.ADUtil;
 import org.safehaus.penrose.studio.util.SchemaUtil;
 import org.safehaus.penrose.studio.connection.wizard.LDAPConnectionInfoWizardPage;
@@ -34,6 +30,7 @@ import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.source.SourceConfig;
 import org.apache.log4j.Logger;
 
 import javax.naming.InitialContext;
@@ -88,11 +85,8 @@ public class CreateLDAPProxyWizard extends Wizard {
             partitionConfig.setName(name);
             partitionConfig.setPath(path);
 
-            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-            IWorkbenchPage page = window.getActivePage();
-            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
-
-            ServerNode serverNode = objectsView.getSelectedProjectNode();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            ServerNode serverNode = penroseStudio.getSelectedServerNode();
             if (serverNode == null) return false;
 
             Server server = serverNode.getServer();
@@ -180,7 +174,6 @@ public class CreateLDAPProxyWizard extends Wizard {
             //ConnectionManager connectionManager = penroseStudio.getConnectionManager();
             //connectionManager.init(partition, connectionConfig, adapterConfig);
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.fireChangeEvent();
 
             return true;

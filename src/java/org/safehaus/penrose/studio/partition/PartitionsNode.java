@@ -18,20 +18,17 @@
 package org.safehaus.penrose.studio.partition;
 
 import org.safehaus.penrose.studio.*;
-import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.action.PenroseStudioActions;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.partition.action.NewPartitionAction;
 import org.safehaus.penrose.studio.partition.action.ImportPartitionAction;
 import org.safehaus.penrose.studio.partition.action.NewLDAPSnapshotPartitionAction;
 import org.safehaus.penrose.studio.partition.action.NewLDAPProxyPartitionAction;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionManager;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.config.PenroseConfig;
-import org.safehaus.penrose.client.PenroseClient;
-import org.safehaus.penrose.client.PartitionManagerClient;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
@@ -49,26 +46,63 @@ public class PartitionsNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
     Server server;
 
-    public PartitionsNode(ObjectsView view, String name, String type, Image image, Object object, Node parent) {
-        super(name, type, image, object, parent);
-        this.view = view;
+    public PartitionsNode(String name, Image image, Object object, Node parent) {
+        super(name, image, object, parent);
     }
 
     public void showMenu(IMenuManager manager) {
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseStudioActions actions = penroseStudio.getActions();
+
         manager.add(new NewPartitionAction());
         manager.add(new ImportPartitionAction());
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
         manager.add(new NewLDAPSnapshotPartitionAction());
         manager.add(new NewLDAPProxyPartitionAction());
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(actions.getPasteAction());
+    }
+
+    public boolean canPaste(Object object) throws Exception {
+        return object instanceof Partition;
+    }
+
+    public void paste(Object object) throws Exception {
+
+        Partition newPartition = (Partition)object;
+        String originalName = newPartition.getName();
+        PartitionManager partitionManager = server.getPartitionManager();
+
+        int counter = 1;
+        String name = originalName;
+        while (partitionManager.getPartition(name) != null) {
+            counter++;
+            name = newPartition.getName()+" ("+counter+")";
+        }
+
+        PartitionConfig partitionConfig = newPartition.getPartitionConfig();
+        partitionConfig.setName(name);
+        partitionConfig.setPath("partitions/"+name);
+
+        partitionManager.addPartition(newPartition);
+
+        PenroseConfig penroseConfig = server.getPenroseConfig();
+        penroseConfig.addPartitionConfig(partitionConfig);
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.fireChangeEvent();
     }
 
     public boolean hasChildren() throws Exception {
-        PenroseConfig penroseConfig = server.getPenroseConfig();
-        return !penroseConfig.getPartitionConfigs().isEmpty();
+        PartitionManager partitionManager = server.getPartitionManager();
+        return !partitionManager.getAllPartitions().isEmpty();
 /*
         PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
@@ -89,23 +123,17 @@ public class PartitionsNode extends Node {
             String partitionName = (String)i.next();
             PartitionConfig partitionConfig = partitionManagerClient.getPartitionConfig(partitionName);
 */
-        PenroseConfig penroseConfig = server.getPenroseConfig();
-        Collection partitionConfigs = penroseConfig.getPartitionConfigs();
-        for (Iterator i=partitionConfigs.iterator(); i.hasNext(); ) {
-            PartitionConfig partitionConfig = (PartitionConfig)i.next();
-            Partition partition = partitionManager.getPartition(partitionConfig.getName());
+        for (Iterator i=partitionManager.getAllPartitions().iterator(); i.hasNext(); ) {
+            Partition partition = (Partition)i.next();
 
             PartitionNode partitionNode = new PartitionNode(
-                    view,
                     server,
-                    partitionConfig.getName(),
-                    ObjectsView.PARTITION,
+                    partition.getName(),
                     PenrosePlugin.getImage(PenroseImage.PARTITION),
-                    partitionConfig,
+                    partition,
                     this
             );
 
-            partitionNode.setPartitionConfig(partitionConfig);
             partitionNode.setPartition(partition);
 
             children.add(partitionNode);

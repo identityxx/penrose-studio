@@ -1,11 +1,11 @@
 package org.safehaus.penrose.studio.logging;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.action.PenroseStudioActions;
+import org.safehaus.penrose.studio.logging.editor.AppenderDialog;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.safehaus.penrose.log4j.AppenderConfig;
@@ -15,7 +15,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchActionConstants;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -28,24 +30,23 @@ public class AppendersNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
-    ServerNode serverNode;
+    Server server;
 
     public AppendersNode(
-            ObjectsView view,
-            ServerNode serverNode,
+            Server server,
             String name,
-            String type,
             Image image,
             Object object,
             Node parent
     ) {
-        super(name, type, image, object, parent);
-        this.view = view;
-        this.serverNode = serverNode;
+        super(name, image, object, parent);
+        this.server = server;
     }
 
     public void showMenu(IMenuManager manager) {
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseStudioActions actions = penroseStudio.getActions();
 
         manager.add(new Action("New Appender...") {
             public void run() {
@@ -56,11 +57,14 @@ public class AppendersNode extends Node {
                 }
             }
         });
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(actions.getPasteAction());
     }
 
     public void createAppender() throws Exception {
 
-        Server server = serverNode.getServer();
         Log4jConfig loggingConfig = server.getLog4jConfig();
 
         AppenderConfig appenderConfig = new AppenderConfig();
@@ -79,8 +83,27 @@ public class AppendersNode extends Node {
         penroseStudio.fireChangeEvent();
     }
 
+    public boolean canPaste(Object object) throws Exception {
+        return object instanceof AppenderConfig;
+    }
+
+    public void paste(Object object) throws Exception {
+        AppenderConfig appenderConfig = (AppenderConfig)object;
+        Log4jConfig loggingConfig = server.getLog4jConfig();
+
+        int counter = 1;
+        String name = appenderConfig.getName();
+
+        while (loggingConfig.getAppenderConfig(name) != null) {
+            counter++;
+            name = appenderConfig.getName()+" ("+counter+")";
+        }
+
+        appenderConfig.setName(name);
+        loggingConfig.addAppenderConfig(appenderConfig);
+    }
+
     public boolean hasChildren() throws Exception {
-        Server server = serverNode.getServer();
         Log4jConfig loggingConfig = server.getLog4jConfig();
         return !loggingConfig.getAppenderConfigs().isEmpty();
     }
@@ -89,17 +112,14 @@ public class AppendersNode extends Node {
 
         Collection children = new ArrayList();
 
-        Server server = serverNode.getServer();
         Log4jConfig loggingConfig = server.getLog4jConfig();
 
         for (Iterator i=loggingConfig.getAppenderConfigs().iterator(); i.hasNext(); ) {
             AppenderConfig appenderConfig = (AppenderConfig)i.next();
 
             AppenderNode appenderNode = new AppenderNode(
-                    view,
-                    serverNode,
+                    server,
                     appenderConfig.getName(),
-                    ObjectsView.APPENDER,
                     PenrosePlugin.getImage(PenroseImage.APPENDER),
                     appenderConfig,
                     this

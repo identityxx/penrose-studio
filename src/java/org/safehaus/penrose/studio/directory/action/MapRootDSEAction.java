@@ -22,12 +22,10 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.widgets.Shell;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.studio.directory.wizard.CreateRootDSEProxyWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.apache.log4j.Logger;
 
 public class MapRootDSEAction extends Action {
@@ -46,9 +44,6 @@ public class MapRootDSEAction extends Action {
 	public void run() {
         try {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-            IWorkbenchPage page = window.getActivePage();
-            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
-
             Shell shell = window.getShell();
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -60,9 +55,8 @@ public class MapRootDSEAction extends Action {
             dialog.setPageSize(600, 300);
             dialog.open();
 
+            penroseStudio.show(node);
             penroseStudio.fireChangeEvent();
-
-            objectsView.show(node);
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

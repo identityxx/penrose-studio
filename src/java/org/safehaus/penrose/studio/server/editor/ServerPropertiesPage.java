@@ -15,7 +15,7 @@ import org.eclipse.swt.SWT;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.ServerConfig;
-import org.safehaus.penrose.studio.server.ServerEditorDialog;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.PenroseStudio;
 
 /**
@@ -49,7 +49,7 @@ public class ServerPropertiesPage extends FormPage {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("[Server] "+serverConfig.getName());
+        form.setText(serverConfig.getName());
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout(2, false));
@@ -124,7 +124,39 @@ public class ServerPropertiesPage extends FormPage {
         section.setClient(composite);
         composite.setLayout(new GridLayout());
 
-        Hyperlink editLink = toolkit.createHyperlink(composite, "Edit server properties", SWT.NONE);
+        Hyperlink openLink = toolkit.createHyperlink(composite, "Connect", SWT.NONE);
+
+        openLink.addHyperlinkListener(new HyperlinkAdapter() {
+            public void linkActivated(HyperlinkEvent event) {
+                try {
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+
+                    ServerNode serverNode = penroseStudio.getServerNode(server.getName());
+                    serverNode.connect();
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+        Hyperlink closeLink = toolkit.createHyperlink(composite, "Disconnect", SWT.NONE);
+
+        closeLink.addHyperlinkListener(new HyperlinkAdapter() {
+            public void linkActivated(HyperlinkEvent event) {
+                try {
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+
+                    ServerNode serverNode = penroseStudio.getServerNode(server.getName());
+                    serverNode.disconnect();
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+        Hyperlink editLink = toolkit.createHyperlink(composite, "Properties", SWT.NONE);
 
         editLink.addHyperlinkListener(new HyperlinkAdapter() {
             public void linkActivated(HyperlinkEvent event) {
@@ -146,33 +178,7 @@ public class ServerPropertiesPage extends FormPage {
 
                     penroseStudio.save();
 
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        });
-
-        Hyperlink openLink = toolkit.createHyperlink(composite, "Open server", SWT.NONE);
-
-        openLink.addHyperlinkListener(new HyperlinkAdapter() {
-            public void linkActivated(HyperlinkEvent event) {
-                try {
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.open(server);
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        });
-
-        Hyperlink closeLink = toolkit.createHyperlink(composite, "Close server", SWT.NONE);
-
-        closeLink.addHyperlinkListener(new HyperlinkAdapter() {
-            public void linkActivated(HyperlinkEvent event) {
-                try {
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.close(server);
+                    penroseStudio.fireChangeEvent();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);

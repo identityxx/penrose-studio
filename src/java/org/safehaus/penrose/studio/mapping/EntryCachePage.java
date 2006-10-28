@@ -95,7 +95,7 @@ public class EntryCachePage extends FormPage {
         gd.widthHint = 100;
         filterCacheSizeLabel.setLayoutData(gd);
 
-        String value = entry.getParameter(EntryMapping.QUERY_CACHE_SIZE);
+        String value = entry.getParameter(EntryMapping.FILTER_CACHE_SIZE);
         value = value == null ? ""+EntryMapping.DEFAULT_QUERY_CACHE_SIZE : value;
 		filterCacheSizeText = toolkit.createText(composite, value, SWT.BORDER);
 
@@ -106,9 +106,9 @@ public class EntryCachePage extends FormPage {
         filterCacheSizeText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(filterCacheSizeText.getText())) {
-                    entry.removeParameter(EntryMapping.QUERY_CACHE_SIZE);
+                    entry.removeParameter(EntryMapping.FILTER_CACHE_SIZE);
                 } else {
-                    entry.setParameter(EntryMapping.QUERY_CACHE_SIZE, filterCacheSizeText.getText());
+                    entry.setParameter(EntryMapping.FILTER_CACHE_SIZE, filterCacheSizeText.getText());
                 }
                 checkDirty();
             }
@@ -119,7 +119,7 @@ public class EntryCachePage extends FormPage {
         gd.widthHint = 100;
         filterCacheExpirationLabel.setLayoutData(gd);
 
-        value = entry.getParameter(EntryMapping.QUERY_CACHE_EXPIRATION);
+        value = entry.getParameter(EntryMapping.FILTER_CACHE_EXPIRATION);
         value = value == null ? ""+EntryMapping.DEFAULT_QUERY_CACHE_EXPIRATION : value;
         filterCacheExpirationText = toolkit.createText(composite, value, SWT.BORDER);
 
@@ -130,9 +130,9 @@ public class EntryCachePage extends FormPage {
         filterCacheExpirationText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(filterCacheExpirationText.getText())) {
-                    entry.removeParameter(EntryMapping.QUERY_CACHE_EXPIRATION);
+                    entry.removeParameter(EntryMapping.FILTER_CACHE_EXPIRATION);
                 } else {
-                    entry.setParameter(EntryMapping.QUERY_CACHE_EXPIRATION, filterCacheExpirationText.getText());
+                    entry.setParameter(EntryMapping.FILTER_CACHE_EXPIRATION, filterCacheExpirationText.getText());
                 }
                 checkDirty();
             }

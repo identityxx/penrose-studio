@@ -18,24 +18,22 @@
 package org.safehaus.penrose.studio.schema;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.object.ObjectsView;
-import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.schema.editor.SchemaEditor;
+import org.safehaus.penrose.studio.schema.editor.SchemaEditorInput;
+import org.safehaus.penrose.studio.action.PenroseStudioActions;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.schema.SchemaConfig;
 import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.apache.log4j.Logger;
 
 /**
@@ -45,36 +43,30 @@ public class SchemaNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
-    ServerNode serverNode;
+    Server server;
 
     private SchemaConfig schemaConfig;
 
     public SchemaNode(
-            ObjectsView view,
-            ServerNode serverNode,
+            Server server,
             String name,
-            String type,
             Image image,
             Object object,
             Node parent
     ) {
-        super(name, type, image, object, parent);
-        this.view = view;
-        this.serverNode = serverNode;
+        super(name, image, object, parent);
+        this.server = server;
     }
 
     public void showMenu(IMenuManager manager) {
 
-        manager.add(new Action("Open") {
-            public void run() {
-                try {
-                    open();
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseStudioActions actions = penroseStudio.getActions();
+
+        manager.add(actions.getOpenAction());
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
 /*
         manager.add(new Action("Paste") {
             public void run() {
@@ -86,20 +78,10 @@ public class SchemaNode extends Node {
             }
         });
 */
-        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
-            public void run() {
-                try {
-                    remove();
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
+        manager.add(actions.getOpenAction());
     }
 
     public void open() throws Exception {
-
-        Server server = serverNode.getServer();
         SchemaManager schemaManager = server.getSchemaManager();
         Schema schema = schemaManager.getSchema(schemaConfig.getName());
 
@@ -113,26 +95,12 @@ public class SchemaNode extends Node {
         page.openEditor(ei, SchemaEditor.class.getName());
     }
 
-    public void remove() throws Exception {
-
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
-        boolean confirm = MessageDialog.openQuestion(
-                shell,
-                "Confirmation",
-                "Remove Schema \""+schemaConfig.getName()+"\"?");
-
-        if (!confirm) return;
-
-        Server server = serverNode.getServer();
+    public void delete() throws Exception {
         PenroseConfig penroseConfig = server.getPenroseConfig();
         penroseConfig.removeSchemaConfig(schemaConfig.getName());
 
         SchemaManager schemaManager = server.getSchemaManager();
         schemaManager.removeSchema(schemaConfig.getName());
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.fireChangeEvent();
     }
 
     public boolean hasChildren() throws Exception {

@@ -18,9 +18,9 @@
 package org.safehaus.penrose.studio.directory;
 
 import org.safehaus.penrose.studio.*;
+import org.safehaus.penrose.studio.action.PenroseStudioActions;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.directory.action.*;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
@@ -41,39 +41,49 @@ public class DirectoryNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
-
     private Server server;
     private Partition partition;
 
     public DirectoryNode(
-            ObjectsView view,
             String name,
-            String type,
             Image image,
             Object object,
             Node parent
     ) {
-        super(name, type, image, object, parent);
-        this.view = view;
+        super(name, image, object, parent);
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
 
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseStudioActions actions = penroseStudio.getActions();
+
         manager.add(new NewRootEntryAction(this));
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
-        PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
-        PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+        manager.add(new MapLDAPTreeFromTopAction(this));
+        manager.add(new MapRootDSEAction(this));
+        manager.add(new MapADSchemaAction(this));
+        manager.add(new CreateLDAPSnapshotEntryAction(this));
 
-        //if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
-            manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-            manager.add(new MapLDAPTreeFromTopAction(this));
-            manager.add(new MapRootDSEAction(this));
-            manager.add(new MapADSchemaAction(this));
-            manager.add(new CreateLDAPSnapshotEntryAction(this));
-        //}
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(actions.getPasteAction());
+    }
+
+
+    public boolean canPaste(Object object) throws Exception {
+        return object instanceof EntryMapping;
+    }
+
+    public void paste(Object object) throws Exception {
+        EntryMapping newEntryMapping = (EntryMapping)object;
+        newEntryMapping.setParentDn(null);
+
+        partition.addEntryMapping(newEntryMapping);
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.fireChangeEvent();
     }
 
     public boolean hasChildren() throws Exception {
@@ -92,10 +102,8 @@ public class DirectoryNode extends Node {
             if ("".equals(dn)) dn = "Root DSE";
 
             EntryNode entryNode = new EntryNode(
-                    view,
                     server,
                     dn,
-                    ObjectsView.ENTRY,
                     PenrosePlugin.getImage(PenroseImage.HOME_NODE),
                     entryMapping,
                     this

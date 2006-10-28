@@ -18,16 +18,13 @@
 package org.safehaus.penrose.studio.partition;
 
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.action.PenroseStudioActions;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.partition.action.ExportPartitionAction;
 import org.safehaus.penrose.studio.object.ObjectsView;
@@ -37,7 +34,6 @@ import org.safehaus.penrose.studio.module.ModulesNode;
 import org.safehaus.penrose.studio.source.SourcesNode;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.partition.PartitionManager;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.apache.log4j.Logger;
@@ -52,112 +48,53 @@ public class PartitionNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
     Server server;
 
-    private PartitionConfig partitionConfig;
     private Partition partition;
 
     public PartitionNode(
-            ObjectsView view,
             Server server,
             String name,
-            String type,
             Image image,
             Object object,
             Node parent
     ) {
-        super(name, type, image, object, parent);
-        this.view = view;
+        super(name, image, object, parent);
         this.server = server;
     }
 
     public void showMenu(IMenuManager manager) {
 
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseStudioActions actions = penroseStudio.getActions();
+
         manager.add(new ExportPartitionAction(partition));
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-/*
-        manager.add(new Action("Copy") {
-            public void run() {
-                try {
-                    copy();
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
-
-        manager.add(new Action("Paste") {
-            public void run() {
-                try {
-                    paste();
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
-*/
-        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
-            public void run() {
-                try {
-                    remove();
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
+        manager.add(actions.getCopyAction());
+        manager.add(actions.getPasteAction());
+        manager.add(actions.getDeleteAction());
     }
 
-    public void remove() throws Exception {
-
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
-        boolean confirm = MessageDialog.openQuestion(
-                shell,
-                "Confirmation",
-                "Remove Partition \""+partitionConfig.getName()+"\"?");
-
-        if (!confirm) return;
-
+    public void delete() throws Exception {
         PenroseConfig penroseConfig = server.getPenroseConfig();
-        penroseConfig.removePartitionConfig(partitionConfig.getName());
+        penroseConfig.removePartitionConfig(partition.getName());
 
         PartitionManager partitionManager = server.getPartitionManager();
-        partitionManager.removePartition(partitionConfig.getName());
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.fireChangeEvent();
+        partitionManager.removePartition(partition.getName());
     }
 
-    public void copy() throws Exception {
-        view.setClipboard(getObject());
+    public Object copy() throws Exception {
+        return partition;
     }
 
-    public void paste() throws Exception {
+    public boolean canPaste(Object object) throws Exception {
+        return getParent().canPaste(object);
+    }
 
-        Object clipboard = view.getClipboard();
-
-        PartitionConfig newPartitionConfig = (PartitionConfig)((PartitionConfig)clipboard).clone();
-        String originalName = newPartitionConfig.getName();
-
-        int counter = 1;
-        String name = originalName;
-        while (partition.getConnectionConfig(name) != null) {
-            counter++;
-            name = newPartitionConfig.getName()+" ("+counter+")";
-        }
-
-        newPartitionConfig.setName(name);
-
-        PenroseConfig penroseConfig = server.getPenroseConfig();
-        penroseConfig.addPartitionConfig(newPartitionConfig);
-
-        PartitionManager partitionManager = server.getPartitionManager();
-        partitionManager.load(server.getWorkDir(), newPartitionConfig);
-
-        view.setClipboard(null);
+    public void paste(Object object) throws Exception {
+        getParent().paste(object);
     }
 
     public boolean hasChildren() throws Exception {
@@ -169,8 +106,6 @@ public class PartitionNode extends Node {
         Collection children = new ArrayList();
 
         DirectoryNode directoryNode = new DirectoryNode(
-                view,
-                ObjectsView.DIRECTORY,
                 ObjectsView.DIRECTORY,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
                 ObjectsView.DIRECTORY,
@@ -183,8 +118,6 @@ public class PartitionNode extends Node {
         children.add(directoryNode);
 
         ConnectionsNode connectionsNode = new ConnectionsNode(
-                view,
-                ObjectsView.CONNECTIONS,
                 ObjectsView.CONNECTIONS,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
                 ObjectsView.CONNECTIONS,
@@ -197,9 +130,7 @@ public class PartitionNode extends Node {
         children.add(connectionsNode);
 
         SourcesNode sourcesNode = new SourcesNode(
-                view,
                 server,
-                ObjectsView.SOURCES,
                 ObjectsView.SOURCES,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
                 ObjectsView.SOURCES,
@@ -211,8 +142,6 @@ public class PartitionNode extends Node {
         children.add(sourcesNode);
 
         ModulesNode modulesNode = new ModulesNode(
-                view,
-                ObjectsView.MODULES,
                 ObjectsView.MODULES,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
                 ObjectsView.MODULES,
@@ -224,14 +153,6 @@ public class PartitionNode extends Node {
         children.add(modulesNode);
 
         return children;
-    }
-
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
-    }
-
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
     }
 
     public Partition getPartition() {

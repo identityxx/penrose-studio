@@ -19,11 +19,9 @@ package org.safehaus.penrose.studio.connection.action;
 
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.adapter.PenroseStudioAdapter;
 import org.safehaus.penrose.studio.source.wizard.SourceWizard;
@@ -48,9 +46,6 @@ public class NewSourceAction extends Action {
 	public void run() {
         try {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-            IWorkbenchPage page = window.getActivePage();
-            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
-
             Shell shell = window.getShell();
 
             Partition partition = node.getPartition();
@@ -79,9 +74,8 @@ public class NewSourceAction extends Action {
             dialog.setPageSize(600, 300);
             dialog.open();
 
+            penroseStudio.show(node);
             penroseStudio.fireChangeEvent();
-
-            objectsView.show(node);
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

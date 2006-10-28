@@ -1,11 +1,9 @@
 package org.safehaus.penrose.studio.logging;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.object.ObjectsView;
-import org.safehaus.penrose.studio.PenrosePlugin;
-import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.action.PenroseStudioActions;
+import org.safehaus.penrose.studio.logging.editor.AppenderDialog;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.log4j.AppenderConfig;
 import org.safehaus.penrose.log4j.Log4jConfig;
@@ -14,8 +12,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchActionConstants;
 
 /**
  * @author Endi S. Dewata
@@ -24,51 +23,37 @@ public class AppenderNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
-    ServerNode serverNode;
+    Server server;
     AppenderConfig appenderConfig;
 
     public AppenderNode(
-            ObjectsView view,
-            ServerNode serverNode,
+            Server server,
             String name,
-            String type,
             Image image,
             Object object,
             Node parent
     ) {
-        super(name, type, image, object, parent);
-        this.view = view;
-        this.serverNode = serverNode;
+        super(name, image, object, parent);
+        this.server = server;
         this.appenderConfig = (AppenderConfig)object;
     }
 
     public void showMenu(IMenuManager manager) {
 
-        manager.add(new Action("Open") {
-            public void run() {
-                try {
-                    open();
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseStudioActions actions = penroseStudio.getActions();
 
-        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
-            public void run() {
-                try {
-                    remove();
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
+        manager.add(actions.getOpenAction());
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(actions.getCopyAction());
+        manager.add(actions.getPasteAction());
+        manager.add(actions.getDeleteAction());
     }
 
     public void open() throws Exception {
 
-        Server server = serverNode.getServer();
         Log4jConfig log4jConfig = server.getLog4jConfig();
 
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
@@ -79,13 +64,20 @@ public class AppenderNode extends Node {
         dialog.open();
     }
 
-    public void remove() throws Exception {
+    public Object copy() throws Exception {
+        return appenderConfig;
+    }
 
-        Server server = serverNode.getServer();
+    public boolean canPaste(Object object) throws Exception {
+        return getParent().canPaste(object);
+    }
+
+    public void paste(Object object) throws Exception {
+        getParent().paste(object);
+    }
+
+    public void delete() throws Exception {
         Log4jConfig loggingConfig = server.getLog4jConfig();
         loggingConfig.removeAppenderConfig(appenderConfig.getName());
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.fireChangeEvent();
     }
 }

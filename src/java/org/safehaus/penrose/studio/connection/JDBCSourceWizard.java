@@ -20,11 +20,14 @@ package org.safehaus.penrose.studio.connection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.connector.JDBCAdapter;
+import org.safehaus.penrose.jdbc.JDBCAdapter;
 import org.safehaus.penrose.studio.source.wizard.SourceWizardPage;
 import org.safehaus.penrose.studio.source.wizard.JDBCPrimaryKeyWizardPage;
 import org.safehaus.penrose.studio.source.wizard.*;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.FieldConfig;
+import org.safehaus.penrose.jdbc.TableConfig;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;

@@ -26,9 +26,6 @@ public class PenroseStudioClipboard {
     }
 
     public void put(Serializable[] objects) {
-
-        for (int i=0; i<objects.length; i++) log.debug("Put: "+objects[i]);
-
         clipboard.setContents(
                 objects,
                 new Transfer[] { SerializableTransfer.getInstance() }
@@ -39,8 +36,6 @@ public class PenroseStudioClipboard {
         Serializable object = (Serializable)clipboard.getContents(
                 SerializableTransfer.getInstance()
         );
-
-        log.debug("Get: "+object);
 
         return object;
     }

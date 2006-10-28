@@ -19,12 +19,10 @@ package org.safehaus.penrose.studio.tree;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
-import org.safehaus.penrose.studio.util.PenroseStudioClipboard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.io.Serializable;
 
 /**
  * @author Endi S. Dewata
@@ -34,14 +32,12 @@ public class Node {
     Logger log = LoggerFactory.getLogger(getClass());
 
     private String name;
-    private String type;
     private Image image;
     private Object object;
     private Node parent;
 
-    public Node(String name, String type, Image image, Object object, Node parent) {
+    public Node(String name, Image image, Object object, Node parent) {
         this.name = name;
-        this.type = type;
         this.image = image;
         this.object = object;
         this.parent = parent;
@@ -53,14 +49,6 @@ public class Node {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public Image getImage() {
@@ -89,7 +77,6 @@ public class Node {
 
     public int hashCode() {
         return (name == null ? 0 : name.hashCode()) +
-                (type == null ? 0 : type.hashCode()) +
                 (image == null ? 0 : image.hashCode()) +
                 (object == null ? 0 : object.hashCode()) +
                 (parent == null ? 0 : parent.hashCode());
@@ -107,7 +94,6 @@ public class Node {
 
         Node node = (Node)o;
         if (!equals(name, node.name)) return false;
-        if (!equals(type, node.type)) return false;
         if (!equals(image, node.image)) return false;
         if (!equals(object, node.object)) return false;
         if (!equals(parent, node.parent)) return false;
@@ -129,13 +115,17 @@ public class Node {
         return null;
     }
 
-    public void copy(PenroseStudioClipboard clipboard) throws Exception {
+    public Object copy() throws Exception {
+        return object;
     }
 
-    public void paste(PenroseStudioClipboard clipboard) throws Exception {
+    public boolean canPaste(Object object) throws Exception {
+        return false;
+    }
+
+    public void paste(Object object) throws Exception {
     }
 
     public void delete() throws Exception {
-
     }
 }

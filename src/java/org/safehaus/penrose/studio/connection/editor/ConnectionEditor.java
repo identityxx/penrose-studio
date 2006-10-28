@@ -2,20 +2,24 @@ package org.safehaus.penrose.studio.connection.editor;
 
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.partition.SourceConfig;
+import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.adapter.PenroseStudioAdapter;
 import org.safehaus.penrose.studio.server.Server;
 import org.apache.log4j.Logger;
 
 import java.util.Iterator;
+import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
  */
-public abstract class ConnectionEditor extends FormEditor {
+public class ConnectionEditor extends FormEditor {
 
     public Logger log = Logger.getLogger(getClass());
 
@@ -27,6 +31,11 @@ public abstract class ConnectionEditor extends FormEditor {
 
     private boolean dirty;
 
+    public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+        setSite(site);
+        setInput(input);
+    }
+
     public void setInput(IEditorInput input) {
         super.setInput(input);
 
@@ -36,7 +45,28 @@ public abstract class ConnectionEditor extends FormEditor {
         originalConnectionConfig = ei.getConnectionConfig();
         connectionConfig = (ConnectionConfig)originalConnectionConfig.clone();
 
-        setPartName(partition.getName()+"/"+connectionConfig.getName());
+        setPartName(connectionConfig.getName());
+    }
+
+    public void addPages() {
+        try {
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            PenroseStudioAdapter adapter = penroseStudio.getAdapter(connectionConfig.getAdapterName());
+            
+            if (adapter != null) {
+                Collection pages = adapter.createConnectionEditorPages(this);
+
+                for (Iterator i=pages.iterator(); i.hasNext(); ) {
+                    ConnectionEditorPage page = (ConnectionEditorPage)i.next();
+                    addPage(page);
+                }
+            }
+
+            addPage(new ConnectionAdvancedPage(this));
+
+        } catch (Exception e) {
+            log.debug(e.getMessage(), e);
+        }
     }
 
     public boolean isDirty() {
@@ -108,19 +138,19 @@ public abstract class ConnectionEditor extends FormEditor {
 
     public void store() throws Exception {
 
-        if (!getOriginalConnectionConfig().getName().equals(getConnectionConfig().getName())) {
-            getPartition().renameConnectionConfig(getOriginalConnectionConfig(), getConnectionConfig().getName());
+        if (!originalConnectionConfig.getName().equals(connectionConfig.getName())) {
+            partition.renameConnectionConfig(originalConnectionConfig, connectionConfig.getName());
 
-            for (Iterator i=getPartition().getSourceConfigs().iterator(); i.hasNext(); ) {
+            for (Iterator i=partition.getSourceConfigs().iterator(); i.hasNext(); ) {
                 SourceConfig sourceConfig = (SourceConfig)i.next();
-                if (!sourceConfig.getConnectionName().equals(getOriginalConnectionConfig().getName())) continue;
-                sourceConfig.setConnectionName(getConnectionConfig().getName());
+                if (!sourceConfig.getConnectionName().equals(originalConnectionConfig.getName())) continue;
+                sourceConfig.setConnectionName(connectionConfig.getName());
             }
         }
 
-        getPartition().modifyConnectionConfig(getConnectionConfig().getName(), getConnectionConfig());
+        getPartition().modifyConnectionConfig(connectionConfig.getName(), connectionConfig);
 
-        setPartName(getPartition().getName()+"/"+getConnectionConfig().getName());
+        setPartName(connectionConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.fireChangeEvent();

@@ -1,8 +1,11 @@
 package org.safehaus.penrose.studio.adapter;
 
-import org.safehaus.penrose.studio.source.SourceEditor;
+import org.safehaus.penrose.studio.source.editor.SourceEditor;
 import org.safehaus.penrose.studio.source.wizard.SourceWizard;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditor;
+
+import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
@@ -26,15 +29,15 @@ public class PenroseStudioAdapter {
         this.name = name;
     }
 
-    public String getConnectionEditorClassName() {
-        return ConnectionEditor.class.getName();
-    }
-
-    public String getSourceEditorClassName() {
-        return SourceEditor.class.getName();
-    }
-
     public String getSourceWizardClassName() {
         return SourceWizard.class.getName();
+    }
+
+    public Collection createConnectionEditorPages(ConnectionEditor editor) {
+        return new ArrayList();
+    }
+
+    public Collection createSourceEditorPages(SourceEditor editor) {
+        return new ArrayList();
     }
 }

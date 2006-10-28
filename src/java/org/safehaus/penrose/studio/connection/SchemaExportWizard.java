@@ -18,13 +18,10 @@
 package org.safehaus.penrose.studio.connection;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.schema.*;
 import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -82,11 +79,8 @@ public class SchemaExportWizard extends Wizard {
 
     public void removeDuplicates() throws Exception {
 
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        IWorkbenchPage page = window.getActivePage();
-        ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
-
-        ServerNode serverNode = objectsView.getSelectedProjectNode();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        ServerNode serverNode = penroseStudio.getSelectedServerNode();
         if (serverNode == null) return;
 
         Server server = serverNode.getServer();

@@ -32,8 +32,8 @@ import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.SchemaManager;
-import org.safehaus.penrose.partition.SourceConfig;
-import org.safehaus.penrose.partition.FieldConfig;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.FieldConfig;
 import org.apache.log4j.Logger;
 
 import java.util.*;

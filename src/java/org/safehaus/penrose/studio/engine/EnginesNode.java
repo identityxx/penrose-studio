@@ -19,12 +19,15 @@ package org.safehaus.penrose.studio.engine;
 
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.action.PenroseStudioActions;
 import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.engine.EngineConfig;
+import org.safehaus.penrose.config.PenroseConfig;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.jface.action.IMenuManager;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -35,11 +38,42 @@ import java.util.Iterator;
  */
 public class EnginesNode extends Node {
 
-    ObjectsView view;
+    Server server;
 
-    public EnginesNode(ObjectsView view, String name, String type, Image image, Object object, Node parent) {
-        super(name, type, image, object, parent);
-        this.view = view;
+    public EnginesNode(Server server, String name, Image image, Object object, Node parent) {
+        super(name, image, object, parent);
+        this.server = server;
+    }
+
+    public void showMenu(IMenuManager manager) {
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseStudioActions actions = penroseStudio.getActions();
+
+        manager.add(actions.getPasteAction());
+    }
+
+    public boolean canPaste(Object object) throws Exception {
+        return object instanceof EngineConfig;
+    }
+
+    public void paste(Object object) throws Exception {
+        EngineConfig engineConfig = (EngineConfig)object;
+        PenroseConfig penroseConfig = server.getPenroseConfig();
+
+        int counter = 1;
+        String name = engineConfig.getName();
+
+        while (penroseConfig.getEngineConfig(name) != null) {
+            counter++;
+            name = engineConfig.getName()+" ("+counter+")";
+        }
+
+        engineConfig.setName(name);
+        penroseConfig.addEngineConfig(engineConfig);
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.fireChangeEvent();
     }
 
     public boolean hasChildren() throws Exception {
@@ -58,9 +92,8 @@ public class EnginesNode extends Node {
             EngineConfig engineConfig = (EngineConfig)i.next();
 
             children.add(new EngineNode(
-                    view,
+                    server,
                     engineConfig.getName(),
-                    ObjectsView.ENGINE,
                     PenrosePlugin.getImage(PenroseImage.ENGINE),
                     engineConfig,
                     this
@@ -68,5 +101,13 @@ public class EnginesNode extends Node {
         }
 
         return children;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

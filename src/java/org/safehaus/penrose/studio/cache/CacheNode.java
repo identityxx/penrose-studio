@@ -18,13 +18,13 @@
 package org.safehaus.penrose.studio.cache;
 
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Action;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.graphics.Image;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.action.PenroseStudioActions;
 import org.safehaus.penrose.cache.CacheConfig;
 import org.apache.log4j.Logger;
 
@@ -35,24 +35,16 @@ public class CacheNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
-
-    public CacheNode(ObjectsView view, String name, String type, Image image, Object object, Node parent) {
-        super(name, type, image, object, parent);
-        this.view = view;
+    public CacheNode(String name, Image image, Object object, Node parent) {
+        super(name, image, object, parent);
     }
 
     public void showMenu(IMenuManager manager) {
 
-        manager.add(new Action("Open") {
-            public void run() {
-                try {
-                    open();
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseStudioActions actions = penroseStudio.getActions();
+
+        manager.add(actions.getOpenAction());
 /*
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
@@ -97,9 +89,4 @@ public class CacheNode extends Node {
         IWorkbenchPage page = window.getActivePage();
         page.openEditor(ei, CacheEditor.class.getName());
     }
-
-    public void copy() throws Exception {
-        view.setClipboard(getObject());
-    }
-
 }

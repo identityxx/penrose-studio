@@ -16,7 +16,6 @@ import org.safehaus.penrose.studio.server.editor.ServerEditorInput;
 import org.safehaus.penrose.studio.server.editor.ServerEditor;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.apache.log4j.Logger;
 
 /**
@@ -36,19 +35,18 @@ public class PropertiesAction extends Action implements ChangeListener, Selectio
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         Shell shell = window.getShell();
 
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Node node = penroseStudio.getSelectedNode();
+        if (node == null) return;
+
         try {
-            IWorkbenchPage page = window.getActivePage();
-            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
-
-            Node node = objectsView.getSelectedNode();
-            if (node == null) return;
-
             ServerNode serverNode = (ServerNode)node;
             Server server = serverNode.getServer();
 
             ServerEditorInput ei = new ServerEditorInput();
             ei.setServer(server);
 
+            IWorkbenchPage page = window.getActivePage();
             page.openEditor(ei, ServerEditor.class.getName());
 
         } catch (Exception e) {

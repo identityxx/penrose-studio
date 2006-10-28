@@ -20,18 +20,14 @@ package org.safehaus.penrose.studio.directory;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.studio.*;
+import org.safehaus.penrose.studio.action.PenroseStudioActions;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.mapping.*;
 import org.safehaus.penrose.studio.directory.action.NewStaticEntryAction;
@@ -40,6 +36,7 @@ import org.safehaus.penrose.studio.directory.action.MapLDAPTreeAction;
 import org.safehaus.penrose.studio.directory.action.NewEntryFromSourceAction;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.util.EntryUtil;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -53,37 +50,28 @@ public class EntryNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
     Server server;
 
     private Partition partition;
     private EntryMapping entryMapping;
 
     public EntryNode(
-            ObjectsView view,
             Server server,
             String name,
-            String type,
             Image image,
             Object object,
             Node parent
     ) {
-        super(name, type, image, object, parent);
-        this.view = view;
+        super(name, image, object, parent);
         this.server = server;
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
 
-        manager.add(new Action("Open") {
-            public void run() {
-                try {
-                    open();
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseStudioActions actions = penroseStudio.getActions();
+
+        manager.add(actions.getOpenAction());
 
         manager.add(new Action("Edit sources") {
             public void run() {
@@ -114,35 +102,9 @@ public class EntryNode extends Node {
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        manager.add(new Action("Copy") {
-            public void run() {
-                try {
-                    //copy(connection);
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
-
-        manager.add(new Action("Paste") {
-            public void run() {
-                try {
-                    //paste(connection);
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
-
-        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
-            public void run() {
-                try {
-                    remove();
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
+        manager.add(actions.getCopyAction());
+        manager.add(actions.getPasteAction());
+        manager.add(actions.getDeleteAction());
     }
 
     public void showCommercialMenu(IMenuManager manager) throws Exception {
@@ -201,30 +163,33 @@ public class EntryNode extends Node {
         editor.showACLPage();
     }
 
-    public void remove() throws Exception {
+    public Object copy() throws Exception {
+        return null;
+        //return entryMapping;
+    }
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+    public boolean canPaste(Object object) throws Exception {
+        return object instanceof EntryMapping;
+    }
 
-        TreeViewer treeViewer = view.getTreeViewer();
-        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
+    public void paste(Object object) throws Exception {
+        EntryMapping newEntryMapping = (EntryMapping)object;
 
-        boolean confirm = MessageDialog.openQuestion(shell,
-                "Confirmation", "Remove selected entries?");
+        String rdn = newEntryMapping.getRdn();
+        String dn = entryMapping.getDn();
+        String newDn = EntryUtil.append(rdn, dn);
 
-        if (!confirm) return;
+        newEntryMapping.setDn(newDn);
 
-        for (Iterator i=selection.iterator(); i.hasNext(); ) {
-            Node node = (Node)i.next();
-            if (!(node instanceof EntryNode)) continue;
-
-            EntryNode entryNode = (EntryNode)node;
-
-            EntryMapping entryMapping = entryNode.getEntryMapping();
-            partition.removeEntryMapping(entryMapping);
-        }
+        partition.addEntryMapping(newEntryMapping);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.fireChangeEvent();
+    }
+
+    public void delete() throws Exception {
+        EntryMapping entryMapping = getEntryMapping();
+        partition.removeEntryMapping(entryMapping);
     }
 
     public boolean hasChildren() throws Exception {
@@ -240,10 +205,8 @@ public class EntryNode extends Node {
             EntryMapping childMapping = (EntryMapping)i.next();
 
             EntryNode entryNode = new EntryNode(
-                    view,
                     server,
                     childMapping.getRdn(),
-                    ObjectsView.ENTRY,
                     PenrosePlugin.getImage(PenroseImage.NODE),
                     childMapping,
                     this

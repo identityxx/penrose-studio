@@ -18,23 +18,18 @@
 package org.safehaus.penrose.studio.connection;
 
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.graphics.Image;
-import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.action.PenroseStudioActions;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.adapter.PenroseStudioAdapter;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.connection.action.NewSourceAction;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorInput;
+import org.safehaus.penrose.studio.connection.editor.ConnectionEditor;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.connection.ConnectionConfig;
@@ -50,28 +45,21 @@ public class ConnectionNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
 
     private Server server;
     private Partition partition;
     private ConnectionConfig connectionConfig;
 
-    public ConnectionNode(ObjectsView view, String name, String type, Image image, Object object, Node parent) {
-        super(name, type, image, object, parent);
-        this.view = view;
+    public ConnectionNode(String name, Image image, Object object, Node parent) {
+        super(name, image, object, parent);
     }
 
     public void showMenu(IMenuManager manager) {
 
-        manager.add(new Action("Open") {
-            public void run() {
-                try {
-                    open();
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseStudioActions actions = penroseStudio.getActions();
+
+        manager.add(actions.getOpenAction());
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
@@ -79,35 +67,9 @@ public class ConnectionNode extends Node {
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        manager.add(new Action("Copy") {
-            public void run() {
-                try {
-                    copy();
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
-
-        manager.add(new Action("Paste") {
-            public void run() {
-                try {
-                    paste();
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
-
-        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
-            public void run() {
-                try {
-                    remove();
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
+        manager.add(actions.getCopyAction());
+        manager.add(actions.getPasteAction());
+        manager.add(actions.getDeleteAction());
     }
 
     public void open() throws Exception {
@@ -120,39 +82,19 @@ public class ConnectionNode extends Node {
         ei.setPartition(partition);
         ei.setConnectionConfig(connectionConfig);
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseStudioAdapter adapter = penroseStudio.getAdapter(connectionConfig.getAdapterName());
-        page.openEditor(ei, adapter.getConnectionEditorClassName());
+        page.openEditor(ei, ConnectionEditor.class.getName());
     }
 
-    public void remove() throws Exception {
-
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
-        boolean confirm = MessageDialog.openQuestion(
-                shell,
-                "Confirmation",
-                "Remove Connection \""+connectionConfig.getName()+"\"?");
-
-        if (!confirm) return;
-
-        partition.removeConnectionConfig(connectionConfig.getName());
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.fireChangeEvent();
+    public Object copy() throws Exception {
+        return connectionConfig;
     }
 
-    public void copy() throws Exception {
-        view.setClipboard(connectionConfig);
+    public boolean canPaste(Object object) throws Exception {
+        return object instanceof ConnectionConfig;
     }
 
-    public void paste() throws Exception {
-
-        Object newObject = view.getClipboard();
-
-        if (!(newObject instanceof ConnectionConfig)) return;
-
-        ConnectionConfig newConnectionConfig = (ConnectionConfig)((ConnectionConfig)newObject).clone();
+    public void paste(Object object) throws Exception {
+        ConnectionConfig newConnectionConfig = (ConnectionConfig)object;
 
         int counter = 1;
         String name = newConnectionConfig.getName();
@@ -163,11 +105,10 @@ public class ConnectionNode extends Node {
 
         newConnectionConfig.setName(name);
         partition.addConnectionConfig(newConnectionConfig);
+    }
 
-        view.setClipboard(null);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.fireChangeEvent();
+    public void delete() throws Exception {
+        partition.removeConnectionConfig(connectionConfig.getName());
     }
 
     public boolean hasChildren() throws Exception {

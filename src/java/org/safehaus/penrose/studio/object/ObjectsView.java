@@ -30,10 +30,9 @@ import org.safehaus.penrose.studio.event.ChangeListener;
 import org.safehaus.penrose.studio.event.ChangeEvent;
 import org.safehaus.penrose.studio.event.SelectionEvent;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenrosePlugin;
-import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.ServersNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.tree.Node;
 
 import java.util.*;
@@ -100,15 +99,13 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
     public ObjectsView() {
 
         serversNode = new ServersNode(
-                this,
-                SERVERS,
                 SERVERS,
                 SERVERS,
                 null
         );
 
         nodes.add(serversNode);
-
+/*
         Node localPartitions = new Node(
                 LOCAL_FILES,
                 LOCAL_FILES,
@@ -128,6 +125,21 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
         );
 
         nodes.add(library);
+*/
+    }
+
+    public Collection getServerNodes() throws Exception {
+        return serversNode.getChildren();
+    }
+
+    public ServerNode getServerNode(String name) throws Exception {
+        Collection serverNodes = serversNode.getChildren();
+        for (Iterator i=serverNodes.iterator(); i.hasNext(); ) {
+            ServerNode serverNode = (ServerNode)i.next();
+            Server server = serverNode.getServer();
+            if (name.equals(server.getName())) return serverNode;
+        }
+        return null;
     }
 
     public void createPartControl(final Composite parent) {
@@ -271,7 +283,7 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
         return selection.toList();
     }
 
-    public ServerNode getSelectedProjectNode() {
+    public ServerNode getSelectedServerNode() {
         Node node = getSelectedNode();
 
         while (node != null && !(node instanceof ServerNode)) node = node.getParent();

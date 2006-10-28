@@ -24,8 +24,10 @@ public class PenroseStudioActions {
 
     private NewAction newAction;
     private OpenAction openAction;
-    private CloseAction closeAction;
-    private CloseAllAction closeAllAction;
+
+    private ConnectAction connectAction;
+    private DisconnectAction disconnectAction;
+    private DisconnectAllAction disconnectAllAction;
 
     private SaveAction saveAction;
     private UploadAction uploadAction;
@@ -71,11 +73,15 @@ public class PenroseStudioActions {
         penroseStudio.addChangeListener(openAction);
         penroseStudio.addSelectionListener(openAction);
 
-        closeAction = new CloseAction();
-        penroseStudio.addChangeListener(closeAction);
-        penroseStudio.addSelectionListener(closeAction);
+        connectAction = new ConnectAction();
+        penroseStudio.addChangeListener(connectAction);
+        penroseStudio.addSelectionListener(connectAction);
 
-        closeAllAction = new CloseAllAction();
+        disconnectAction = new DisconnectAction();
+        penroseStudio.addChangeListener(disconnectAction);
+        penroseStudio.addSelectionListener(disconnectAction);
+
+        disconnectAllAction = new DisconnectAllAction();
 
         saveAction = new SaveAction();
         penroseStudio.addChangeListener(saveAction);
@@ -147,8 +153,8 @@ public class PenroseStudioActions {
     }
 
     public void setConnected(boolean connected) {
-        //openAction.setEnabled(!connected);
-        //closeAction.setEnabled(connected);
+        //connectAction.setEnabled(!connected);
+        //disconnectAction.setEnabled(connected);
         //saveAction.setEnabled(connected);
         uploadAction.setEnabled(connected);
         //deleteAction.setEnabled(!connected);
@@ -176,28 +182,28 @@ public class PenroseStudioActions {
         this.newAction = newAction;
     }
 
-    public OpenAction getOpenAction() {
-        return openAction;
+    public ConnectAction getConnectAction() {
+        return connectAction;
     }
 
-    public void setOpenAction(OpenAction openAction) {
-        this.openAction = openAction;
+    public void setConnectAction(ConnectAction connectAction) {
+        this.connectAction = connectAction;
     }
 
-    public CloseAction getCloseAction() {
-        return closeAction;
+    public DisconnectAction getDisconnectAction() {
+        return disconnectAction;
     }
 
-    public void setCloseAction(CloseAction closeAction) {
-        this.closeAction = closeAction;
+    public void setDisconnectAction(DisconnectAction disconnectAction) {
+        this.disconnectAction = disconnectAction;
     }
 
-    public CloseAllAction getCloseAllAction() {
-        return closeAllAction;
+    public DisconnectAllAction getDisconnectAllAction() {
+        return disconnectAllAction;
     }
 
-    public void setCloseAllAction(CloseAllAction closeAllAction) {
-        this.closeAllAction = closeAllAction;
+    public void setDisconnectAllAction(DisconnectAllAction disconnectAllAction) {
+        this.disconnectAllAction = disconnectAllAction;
     }
 
     public SaveAction getSaveAction() {
@@ -398,5 +404,13 @@ public class PenroseStudioActions {
 
     public void setPropertiesAction(PropertiesAction propertiesAction) {
         this.propertiesAction = propertiesAction;
+    }
+
+    public OpenAction getOpenAction() {
+        return openAction;
+    }
+
+    public void setOpenAction(OpenAction openAction) {
+        this.openAction = openAction;
     }
 }

@@ -12,8 +12,6 @@ import org.safehaus.penrose.studio.event.SelectionListener;
 import org.safehaus.penrose.studio.event.SelectionEvent;
 import org.safehaus.penrose.studio.event.ChangeEvent;
 import org.safehaus.penrose.studio.event.ChangeListener;
-import org.safehaus.penrose.studio.server.ServersNode;
-import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.util.PenroseStudioClipboard;
 import org.safehaus.penrose.studio.tree.Node;
 
@@ -32,38 +30,39 @@ public class PasteAction extends Action implements ChangeListener, SelectionList
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         Shell shell = window.getShell();
 
-        try {
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            Node node = penroseStudio.getSelectedNode();
-            if (node == null) return;
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Node node = penroseStudio.getSelectedNode();
+        if (node == null) return;
 
+        try {
             PenroseStudioClipboard clipboard = penroseStudio.getClipboard();
-            node.paste(clipboard);
+            Object content = clipboard.get();
+            node.paste(content);
+
+            penroseStudio.fireChangeEvent();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
 
             MessageDialog.openError(
                     shell,
-                    "ERROR",
-                    "Failed pasting project.\n"+
-                            "See penrose-studio-log.txt for details."
+                    "Error",
+                    "Failed pasting "+node.getName()+"."
             );
         }
     }
 
-    public void updateStatus(Object object) {
+    public void updateStatus(Object object) throws Exception {
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         PenroseStudioClipboard clipboard = penroseStudio.getClipboard();
 
         if (clipboard.isEmpty()) {
             setEnabled(false);
 
-        } else if (object instanceof ServersNode) {
-            setEnabled(true);
-
-        } else if (object instanceof ServerNode) {
-            setEnabled(true);
+        } else if (object instanceof Node) {
+            Node node = (Node)object;
+            Object content = clipboard.get();
+            setEnabled(node.canPaste(content));
 
         } else {
             setEnabled(false);
@@ -71,13 +70,21 @@ public class PasteAction extends Action implements ChangeListener, SelectionList
     }
 
     public void objectChanged(ChangeEvent event) {
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Node node = penroseStudio.getSelectedNode();
-        updateStatus(node);
+        try {
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            Node node = penroseStudio.getSelectedNode();
+            updateStatus(node);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     public void objectSelected(SelectionEvent event) {
-        Object object = event.getObject();
-        updateStatus(object);
+        try {
+            Object object = event.getObject();
+            updateStatus(object);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 }

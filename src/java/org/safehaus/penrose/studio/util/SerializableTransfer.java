@@ -32,13 +32,13 @@ public class SerializableTransfer extends ByteArrayTransfer {
             return;
         }
 
-        log.debug("Object class: "+object.getClass());
+        //log.debug("Object class: "+object.getClass());
         if (!(object instanceof Serializable)) {
             log.debug("Object not serializable");
             return;
         }
 
-        log.debug("TransferData: "+transferData);
+        //log.debug("TransferData: "+transferData);
         if (!isSupportedType(transferData)) {
             log.debug("Object type not supported");
             return;
@@ -66,7 +66,7 @@ public class SerializableTransfer extends ByteArrayTransfer {
 
     public Object nativeToJava(TransferData transferData) {
 
-        log.debug("TransferData: "+transferData);
+        //log.debug("TransferData: "+transferData);
 
         if (!isSupportedType(transferData)) {
             log.debug("Object type not supported");

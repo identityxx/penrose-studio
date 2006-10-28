@@ -19,12 +19,9 @@ package org.safehaus.penrose.studio;
 
 import org.eclipse.jface.action.*;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.swt.SWT;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.event.SelectionListener;
 import org.safehaus.penrose.studio.event.SelectionEvent;
@@ -61,9 +58,9 @@ public class PenroseActionBarAdvisor
             PenroseStudioActions penroseStudioActions = penroseStudio.getActions();
 
             register(penroseStudioActions.getNewAction());
-            register(penroseStudioActions.getOpenAction());
-            register(penroseStudioActions.getCloseAction());
-            register(penroseStudioActions.getCloseAllAction());
+            register(penroseStudioActions.getConnectAction());
+            register(penroseStudioActions.getDisconnectAction());
+            register(penroseStudioActions.getDisconnectAllAction());
             register(penroseStudioActions.getSaveAction());
             register(penroseStudioActions.getUploadAction());
             register(penroseStudioActions.getExitAction());
@@ -129,9 +126,9 @@ public class PenroseActionBarAdvisor
             menuBar.add(fileMenu);
 
             fileMenu.add(penroseStudioActions.getNewAction());
-            fileMenu.add(penroseStudioActions.getOpenAction());
-            fileMenu.add(penroseStudioActions.getCloseAction());
-            fileMenu.add(penroseStudioActions.getCloseAllAction());
+            fileMenu.add(penroseStudioActions.getConnectAction());
+            fileMenu.add(penroseStudioActions.getDisconnectAction());
+            fileMenu.add(penroseStudioActions.getDisconnectAllAction());
             fileMenu.add(new Separator());
             fileMenu.add(penroseStudioActions.getSaveAction());
             fileMenu.add(new Separator());
@@ -203,10 +200,10 @@ public class PenroseActionBarAdvisor
             ActionContributionItem newProjectCI = new ActionContributionItem(penroseStudioActions.getNewAction());
             standardToolBar.add(newProjectCI);
 
-            ActionContributionItem openProjectCI = new ActionContributionItem(penroseStudioActions.getOpenAction());
+            ActionContributionItem openProjectCI = new ActionContributionItem(penroseStudioActions.getConnectAction());
             standardToolBar.add(openProjectCI);
 
-            ActionContributionItem closeProjectCI = new ActionContributionItem(penroseStudioActions.getCloseAction());
+            ActionContributionItem closeProjectCI = new ActionContributionItem(penroseStudioActions.getDisconnectAction());
             standardToolBar.add(closeProjectCI);
 
             ActionContributionItem saveCI = new ActionContributionItem(penroseStudioActions.getSaveAction());
@@ -242,12 +239,9 @@ public class PenroseActionBarAdvisor
 
     public void update() {
         try {
-            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            ServerNode serverNode = penroseStudio.getSelectedServerNode();
 
-            IWorkbenchPage page = window.getActivePage();
-            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
-
-            ServerNode serverNode = objectsView.getSelectedProjectNode();
             if (serverNode == null) {
                 setConnected(false);
             } else {

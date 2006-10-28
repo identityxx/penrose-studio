@@ -18,11 +18,8 @@ public class LoggingNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
-
-    public LoggingNode(ObjectsView view, String name, String type, Image image, Object object, Node parent) {
-        super(name, type, image, object, parent);
-        this.view = view;
+    public LoggingNode(String name, Image image, Object object, Node parent) {
+        super(name, image, object, parent);
     }
 
     public boolean hasChildren() throws Exception {
@@ -36,9 +33,7 @@ public class LoggingNode extends Node {
         ServerNode serverNode = (ServerNode)getParent();
 
         children.add(new AppendersNode(
-                view,
-                serverNode,
-                ObjectsView.APPENDERS,
+                serverNode.getServer(),
                 ObjectsView.APPENDERS,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
                 ObjectsView.APPENDERS,
@@ -46,9 +41,7 @@ public class LoggingNode extends Node {
         ));
 
         children.add(new LoggersNode(
-                view,
-                serverNode,
-                ObjectsView.LOGGERS,
+                serverNode.getServer(),
                 ObjectsView.LOGGERS,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
                 ObjectsView.LOGGERS,

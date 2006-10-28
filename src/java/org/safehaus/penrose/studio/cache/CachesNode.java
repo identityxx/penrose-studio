@@ -34,11 +34,8 @@ import java.util.ArrayList;
  */
 public class CachesNode extends Node {
 
-    ObjectsView view;
-
-    public CachesNode(ObjectsView view, String name, String type, Image image, Object object, Node parent) {
-        super(name, type, image, object, parent);
-        this.view = view;
+    public CachesNode(String name, Image image, Object object, Node parent) {
+        super(name, image, object, parent);
     }
 
     public boolean hasChildren() throws Exception {
@@ -54,8 +51,6 @@ public class CachesNode extends Node {
         CacheConfig entryCacheConfig = server.getPenroseConfig().getEntryCacheConfig();
         if (entryCacheConfig != null) {
             children.add(new CacheNode(
-                    view,
-                    ObjectsView.ENTRY_CACHE,
                     ObjectsView.ENTRY_CACHE,
                     PenrosePlugin.getImage(PenroseImage.CACHE),
                     entryCacheConfig,
@@ -66,8 +61,6 @@ public class CachesNode extends Node {
         CacheConfig sourceCacheConfig = server.getPenroseConfig().getSourceCacheConfig();
         if (sourceCacheConfig != null) {
             children.add(new CacheNode(
-                    view,
-                    ObjectsView.SOURCE_CACHE,
                     ObjectsView.SOURCE_CACHE,
                     PenrosePlugin.getImage(PenroseImage.CACHE),
                     sourceCacheConfig,

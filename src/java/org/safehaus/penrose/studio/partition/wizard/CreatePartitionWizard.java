@@ -18,13 +18,9 @@
 package org.safehaus.penrose.studio.partition.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.partition.PartitionManager;
 import org.safehaus.penrose.config.PenroseConfig;
@@ -59,11 +55,8 @@ public class CreatePartitionWizard extends Wizard {
             partitionConfig.setName(name);
             partitionConfig.setPath(path);
 
-            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-            IWorkbenchPage page = window.getActivePage();
-            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
-
-            ServerNode serverNode = objectsView.getSelectedProjectNode();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            ServerNode serverNode = penroseStudio.getSelectedServerNode();
             if (serverNode == null) return false;
 
             Server server = serverNode.getServer();
@@ -73,7 +66,6 @@ public class CreatePartitionWizard extends Wizard {
             PartitionManager partitionManager = server.getPartitionManager();
             partitionManager.load(serverNode.getWorkDir(), partitionConfig);
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.fireChangeEvent();
 
             return true;

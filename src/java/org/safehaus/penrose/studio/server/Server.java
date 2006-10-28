@@ -1,7 +1,7 @@
 package org.safehaus.penrose.studio.server;
 
 import org.safehaus.penrose.client.PenroseClient;
-import org.safehaus.penrose.client.ServiceManagerClient;
+import org.safehaus.penrose.service.ServiceManagerClient;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.config.PenroseConfigReader;
 import org.safehaus.penrose.config.PenroseConfigWriter;
@@ -15,6 +15,8 @@ import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.studio.validation.ValidationView;
 import org.safehaus.penrose.interpreter.InterpreterManager;
 import org.safehaus.penrose.connection.ConnectionManager;
+import org.safehaus.penrose.source.SourceManager;
+import org.safehaus.penrose.module.ModuleManager;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.slf4j.LoggerFactory;
@@ -42,6 +44,8 @@ public class Server {
     private InterpreterManager interpreterManager;
     private SchemaManager schemaManager;
     private ConnectionManager connectionManager;
+    private SourceManager sourceManager;
+    private ModuleManager moduleManager;
     private PartitionManager partitionManager;
 
     private Log4jConfig log4jConfig;
@@ -144,6 +148,8 @@ public class Server {
         initInterpreterManager();
         initSchemaManager(dir);
         initConnectionManager();
+        initSourceManager();
+        initModuleManager();
         loadPartitions(dir);
         validate();
 
@@ -205,6 +211,17 @@ public class Server {
         connectionManager = new ConnectionManager();
     }
 
+    public void initSourceManager() throws Exception {
+        sourceManager = new SourceManager();
+        sourceManager.setPenroseConfig(penroseConfig);
+        sourceManager.setConnectionManager(connectionManager);
+        sourceManager.init();
+    }
+
+    public void initModuleManager() throws Exception {
+        moduleManager = new ModuleManager();
+    }
+
     public void loadPartitions(String dir) throws Exception {
 
         partitionManager = new PartitionManager();
@@ -212,6 +229,8 @@ public class Server {
         partitionManager.setSchemaManager(schemaManager);
         partitionManager.setInterpreterManager(interpreterManager);
         partitionManager.setConnectionManager(connectionManager);
+        partitionManager.setSourceManager(sourceManager);
+        partitionManager.setModuleManager(moduleManager);
         partitionManager.init();
 
         for (Iterator i=penroseConfig.getPartitionConfigs().iterator(); i.hasNext(); ) {

@@ -23,7 +23,6 @@ import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.schema.action.ImportSchemaAction;
 import org.safehaus.penrose.studio.schema.action.NewSchemaAction;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.schema.SchemaConfig;
@@ -42,18 +41,13 @@ public class SchemasNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
-
     public SchemasNode(
-            ObjectsView view,
             String name,
-            String type,
             Image image,
             Object object,
             Node parent
     ) {
-        super(name, type, image, object, parent);
-        this.view = view;
+        super(name, image, object, parent);
     }
 
     public void showMenu(IMenuManager manager) {
@@ -81,10 +75,8 @@ public class SchemasNode extends Node {
             SchemaConfig schemaConfig = (SchemaConfig)i.next();
 
             SchemaNode schemaNode = new SchemaNode(
-                    view,
-                    serverNode,
+                    server,
                     schemaConfig.getName(),
-                    ObjectsView.SCHEMA,
                     PenrosePlugin.getImage(PenroseImage.SCHEMA),
                     schemaConfig,
                     this

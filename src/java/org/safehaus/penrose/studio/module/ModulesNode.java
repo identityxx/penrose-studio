@@ -17,17 +17,16 @@
  */
 package org.safehaus.penrose.studio.module;
 
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.action.PenroseStudioActions;
 import org.safehaus.penrose.studio.module.action.NewModuleAction;
 import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
 import org.safehaus.penrose.partition.Partition;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.swt.graphics.Image;
@@ -44,39 +43,30 @@ public class ModulesNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
-
     private Partition partition;
 
-    public ModulesNode(ObjectsView view, String name, String type, Image image, Object object, Node parent) {
-        super(name, type, image, object, parent);
-        this.view = view;
+    public ModulesNode(String name, Image image, Object object, Node parent) {
+        super(name, image, object, parent);
     }
 
     public void showMenu(IMenuManager manager) {
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseStudioActions actions = penroseStudio.getActions();
 
         manager.add(new NewModuleAction(this));
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        manager.add(new Action("Paste") {
-            public void run() {
-                try {
-                    paste();
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
+        manager.add(actions.getPasteAction());
     }
 
-    public void paste() throws Exception {
+    public boolean canPaste(Object object) throws Exception {
+        return object instanceof ModuleConfig;
+    }
 
-        Object newObject = view.getClipboard();
-
-        if (!(newObject instanceof ModuleConfig)) return;
-
-        ModuleConfig newModuleConfig = (ModuleConfig)((ModuleConfig)newObject).clone();
+    public void paste(Object object) throws Exception {
+        ModuleConfig newModuleConfig = (ModuleConfig)object;
         String oldName = newModuleConfig.getName();
 
         int counter = 1;
@@ -98,11 +88,6 @@ public class ModulesNode extends Node {
                 partition.addModuleMapping(mapping);
             }
         }
-
-        view.setClipboard(null);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.fireChangeEvent();
     }
 
     public boolean hasChildren() throws Exception {
@@ -118,9 +103,7 @@ public class ModulesNode extends Node {
             ModuleConfig moduleConfig = (ModuleConfig)i.next();
 
             ModuleNode moduleNode = new ModuleNode(
-                    view,
                     moduleConfig.getName(),
-                    ObjectsView.MODULE,
                     PenrosePlugin.getImage(PenroseImage.MODULE),
                     moduleConfig,
                     this

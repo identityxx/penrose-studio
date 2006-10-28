@@ -33,8 +33,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.driver.Parameter;
 import org.safehaus.penrose.studio.driver.Driver;
-import org.safehaus.penrose.studio.connection.wizard.ConnectionDriverPage;
-import org.safehaus.penrose.connector.JDBCAdapter;
+import org.safehaus.penrose.jdbc.JDBCAdapter;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;

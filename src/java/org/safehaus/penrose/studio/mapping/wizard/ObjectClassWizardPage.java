@@ -24,12 +24,9 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.SchemaManager;
@@ -85,11 +82,8 @@ public class ObjectClassWizardPage extends WizardPage {
                 try {
                     if (availableTable.getSelectionCount() == 0) return;
 
-                    IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-                    IWorkbenchPage page = window.getActivePage();
-                    ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
-
-                    ServerNode serverNode = objectsView.getSelectedProjectNode();
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    ServerNode serverNode = penroseStudio.getSelectedServerNode();
                     if (serverNode == null) return;
 
                     Server server = serverNode.getServer();
@@ -122,11 +116,8 @@ public class ObjectClassWizardPage extends WizardPage {
                 try {
                     if (selectedTable.getSelectionCount() == 0) return;
 
-                    IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-                    IWorkbenchPage page = window.getActivePage();
-                    ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
-
-                    ServerNode serverNode = objectsView.getSelectedProjectNode();
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    ServerNode serverNode = penroseStudio.getSelectedServerNode();
                     if (serverNode == null) return;
 
                     Server server = serverNode.getServer();
@@ -212,11 +203,8 @@ public class ObjectClassWizardPage extends WizardPage {
 
     public void init() {
         try {
-            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-            IWorkbenchPage page = window.getActivePage();
-            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
-
-            ServerNode serverNode = objectsView.getSelectedProjectNode();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            ServerNode serverNode = penroseStudio.getSelectedServerNode();
             if (serverNode == null) return;
 
             Server server = serverNode.getServer();

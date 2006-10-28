@@ -9,12 +9,10 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.server.editor.ServerEditorInput;
 import org.safehaus.penrose.studio.server.editor.ServerEditor;
 import org.safehaus.penrose.studio.action.PenroseStudioActions;
-import org.safehaus.penrose.studio.util.PenroseStudioClipboard;
 import org.safehaus.penrose.studio.browser.BrowserEditorInput;
 import org.safehaus.penrose.studio.browser.BrowserEditor;
 import org.safehaus.penrose.studio.properties.SystemPropertiesNode;
 import org.safehaus.penrose.studio.user.AdministratorNode;
-import org.safehaus.penrose.studio.connector.ConnectorNode;
 import org.safehaus.penrose.studio.engine.EnginesNode;
 import org.safehaus.penrose.studio.logging.LoggingNode;
 import org.safehaus.penrose.studio.cache.CachesNode;
@@ -24,10 +22,8 @@ import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.safehaus.penrose.user.UserConfig;
 import org.apache.log4j.Logger;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -47,11 +43,8 @@ public class ServerNode extends Node {
     public final static String LDAP_PORT             = "ldapPort";
     public final static int DEFAULT_LDAP_PORT        = 10389;
 
-    ObjectsView view;
-
-    public ServerNode(ObjectsView view, String name, String type, Object object, Node parent) {
-        super(name, type, PenrosePlugin.getImage(PenroseImage.SERVER), object, parent);
-        this.view = view;
+    public ServerNode(String name, Object object, Node parent) {
+        super(name, PenrosePlugin.getImage(PenroseImage.SERVER), object, parent);
     }
 
     public void showMenu(IMenuManager manager) {
@@ -60,7 +53,11 @@ public class ServerNode extends Node {
         PenroseStudioActions actions = penroseStudio.getActions();
 
         manager.add(actions.getOpenAction());
-        manager.add(actions.getCloseAction());
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(actions.getConnectAction());
+        manager.add(actions.getDisconnectAction());
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
@@ -101,6 +98,27 @@ public class ServerNode extends Node {
         page.openEditor(ei, ServerEditor.class.getName());
     }
 
+    public void connect() throws Exception {
+        Server server = getServer();
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+
+        server.open();
+        penroseStudio.show(this);
+
+        penroseStudio.fireChangeEvent();
+    }
+
+    public void disconnect() throws Exception {
+        Server server = getServer();
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+
+        server.close();
+
+        penroseStudio.fireChangeEvent();
+    }
+
     public void browse() throws Exception {
 
         Server server = getServer();
@@ -128,32 +146,26 @@ public class ServerNode extends Node {
         activePage.openEditor(ei, BrowserEditor.class.getName());
     }
 
-    public void delete() throws Exception {
+    public Object copy() throws Exception {
+        Server server = getServer();
+        return server.getServerConfig();
+    }
 
+    public boolean canPaste(Object object) throws Exception {
+        return getParent().canPaste(object);
+    }
+
+    public void paste(Object object) throws Exception {
+        getParent().paste(object);
+    }
+
+    public void delete() throws Exception {
         Server server = getServer();
         ServerConfig serverConfig = server.getServerConfig();
-
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
-        boolean confirm = MessageDialog.openQuestion(
-                shell,
-                "Confirmation",
-                "Remove Server \""+serverConfig.getName()+"\"?");
-
-        if (!confirm) return;
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.removeServer(serverConfig.getName());
         penroseStudio.save();
-    }
-
-    public void copy(PenroseStudioClipboard clipboard) throws Exception {
-        Server server = getServer();
-        clipboard.put(server.getServerConfig());
-    }
-
-    public void paste(PenroseStudioClipboard clipboard) throws Exception {
-        getParent().paste(clipboard);
     }
 
     public boolean hasChildren() throws Exception {
@@ -165,8 +177,6 @@ public class ServerNode extends Node {
         if (!isConnected()) return children;
 
         PartitionsNode partitionsNode = new PartitionsNode(
-                view,
-                ObjectsView.PARTITIONS,
                 ObjectsView.PARTITIONS,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
                 ObjectsView.PARTITIONS,
@@ -178,26 +188,24 @@ public class ServerNode extends Node {
         children.add(partitionsNode);
 
         children.add(new SchemasNode(
-                view,
-                ObjectsView.SCHEMAS,
                 ObjectsView.SCHEMAS,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
                 ObjectsView.SCHEMAS,
                 this
         ));
 
-        children.add(new ServicesNode(
-                view,
-                ObjectsView.SERVICES,
+        ServicesNode servicesNode = new ServicesNode(
                 ObjectsView.SERVICES,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
                 ObjectsView.SERVICES,
                 this
-        ));
+        );
+
+        servicesNode.setServer(getServer());
+
+        children.add(servicesNode);
 
         children.add(new CachesNode(
-                view,
-                ObjectsView.CACHES,
                 ObjectsView.CACHES,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
                 ObjectsView.CACHES,
@@ -205,35 +213,23 @@ public class ServerNode extends Node {
         ));
 
         children.add(new LoggingNode(
-                view,
-                ObjectsView.LOGGING,
                 ObjectsView.LOGGING,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
                 ObjectsView.LOGGING,
                 this
         ));
 
-        children.add(new EnginesNode(
-                view,
-                ObjectsView.ENGINES,
+        EnginesNode enginesNode = new EnginesNode(
+                getServer(),
                 ObjectsView.ENGINES,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
                 ObjectsView.ENGINES,
                 this
-        ));
+        );
 
-        children.add(new ConnectorNode(
-                view,
-                ObjectsView.CONNECTOR,
-                ObjectsView.CONNECTOR,
-                PenrosePlugin.getImage(PenroseImage.CONNECTOR),
-                ObjectsView.CONNECTOR,
-                this
-        ));
+        children.add(enginesNode);
 
         children.add(new AdministratorNode(
-                view,
-                ObjectsView.ADMINISTRATOR,
                 ObjectsView.ADMINISTRATOR,
                 PenrosePlugin.getImage(PenroseImage.ADMINISTRATOR),
                 ObjectsView.ADMINISTRATOR,
@@ -241,16 +237,11 @@ public class ServerNode extends Node {
         ));
 
         children.add(new SystemPropertiesNode(
-                view,
-                ObjectsView.SYSTEM_PROPERTIES,
                 ObjectsView.SYSTEM_PROPERTIES,
                 PenrosePlugin.getImage(PenroseImage.SYSTEM_PROPERTIES),
                 ObjectsView.SYSTEM_PROPERTIES,
                 this
         ));
-
-        Server server = getServer();
-        log.debug("["+server.getName()+"] getChildren: "+children.size());
 
         return children;
     }

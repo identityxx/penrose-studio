@@ -44,11 +44,12 @@ import org.safehaus.penrose.studio.welcome.action.EnterLicenseKeyAction;
 import org.safehaus.penrose.studio.action.PenroseStudioActions;
 import org.safehaus.penrose.studio.server.ServerConfig;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.util.PenroseStudioClipboard;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.adapter.PenroseStudioJDBCAdapter;
-import org.safehaus.penrose.studio.adapter.PenroseStudioLDAPAdapter;
+import org.safehaus.penrose.studio.jdbc.PenroseStudioJDBCAdapter;
+import org.safehaus.penrose.studio.ldap.PenroseStudioLDAPAdapter;
 import org.safehaus.penrose.studio.adapter.PenroseStudioAdapter;
 import com.identyx.license.License;
 import com.identyx.license.LicenseUtil;
@@ -173,16 +174,6 @@ public class PenroseStudio implements IPlatformRunnable {
         }
     }
 
-    public void open(Server server) throws Exception {
-        server.open();
-        fireChangeEvent();
-    }
-
-    public void close(Server server) throws Exception {
-        server.close();
-        fireChangeEvent();
-    }
-
     public void save() throws Exception {
         File file = new File(homeDir, "config.xml");
         log.debug("Saving projects into "+file.getAbsolutePath());
@@ -191,8 +182,6 @@ public class PenroseStudio implements IPlatformRunnable {
 
         PenroseStudioConfigWriter writer = new PenroseStudioConfigWriter(file);
         writer.write(penroseStudioConfig);
-
-        fireChangeEvent();
 	}
 
     public void addServer(ServerConfig serverConfig) {
@@ -380,7 +369,6 @@ public class PenroseStudio implements IPlatformRunnable {
     }
 
     public Node getSelectedNode() {
-
         try {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
@@ -393,8 +381,20 @@ public class PenroseStudio implements IPlatformRunnable {
         }
     }
 
-    public Collection getSelectedNodes() {
+    public ServerNode getSelectedServerNode() {
+        try {
+            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            IWorkbenchPage page = window.getActivePage();
+            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
 
+            return objectsView.getSelectedServerNode();
+
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public Collection getSelectedNodes() {
         try {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
@@ -412,5 +412,29 @@ public class PenroseStudio implements IPlatformRunnable {
         IWorkbenchPage page = window.getActivePage();
         ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
         objectsView.show(node);
+    }
+
+    public Collection getServerNodes() {
+        try {
+            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            IWorkbenchPage page = window.getActivePage();
+            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+            return objectsView.getServerNodes();
+
+        } catch (Exception e) {
+            return new ArrayList();
+        }
+    }
+
+    public ServerNode getServerNode(String name) {
+        try {
+            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            IWorkbenchPage page = window.getActivePage();
+            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+            return objectsView.getServerNode(name);
+
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

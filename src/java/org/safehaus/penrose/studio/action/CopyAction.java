@@ -8,13 +8,14 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.event.SelectionEvent;
 import org.safehaus.penrose.studio.event.SelectionListener;
 import org.safehaus.penrose.studio.event.ChangeEvent;
 import org.safehaus.penrose.studio.event.ChangeListener;
 import org.safehaus.penrose.studio.util.PenroseStudioClipboard;
 import org.safehaus.penrose.studio.tree.Node;
+
+import java.io.Serializable;
 
 public class CopyAction extends Action implements ChangeListener, SelectionListener {
 
@@ -31,43 +32,57 @@ public class CopyAction extends Action implements ChangeListener, SelectionListe
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         Shell shell = window.getShell();
 
-        try {
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            Node node = penroseStudio.getSelectedNode();
-            if (node == null) return;
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Node node = penroseStudio.getSelectedNode();
+        if (node == null) return;
 
+        try {
+            Object object = node.copy();
+            if (object == null) return;
+            if (!(object instanceof Serializable)) return;
+
+            Serializable content = (Serializable)object;
             PenroseStudioClipboard clipboard = penroseStudio.getClipboard();
-            node.copy(clipboard);
-            penroseStudio.fireChangeEvent();
+            clipboard.put(content);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
 
             MessageDialog.openError(
                     shell,
-                    "ERROR",
-                    "Failed copying project.\n"+
-                            "See penrose-studio-log.txt for details."
+                    "Error",
+                    "Failed copying "+node.getName()+"."
             );
         }
     }
 
-    public void updateStatus(Object object) {
-        if (object instanceof ServerNode) {
-            setEnabled(true);
+    public void updateStatus(Object object) throws Exception {
+        if (object instanceof Node) {
+            Node node = (Node)object;
+            Object content = node.copy();
+            setEnabled(content != null);
+
         } else {
             setEnabled(false);
         }
     }
 
     public void objectChanged(ChangeEvent event) {
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Node node = penroseStudio.getSelectedNode();
-        updateStatus(node);
+        try {
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            Node node = penroseStudio.getSelectedNode();
+            updateStatus(node);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     public void objectSelected(SelectionEvent event) {
-        Object object = event.getObject();
-        updateStatus(object);
+        try {
+            Object object = event.getObject();
+            updateStatus(object);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 }

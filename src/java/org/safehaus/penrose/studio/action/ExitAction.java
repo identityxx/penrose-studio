@@ -39,7 +39,7 @@ public class ExitAction extends Action {
 
         boolean confirmed = MessageDialog.openConfirm(
                 shell,
-                "Confirm Exit",
+                "Confirm",
                 "Are you sure you want to exit?"
         );
 

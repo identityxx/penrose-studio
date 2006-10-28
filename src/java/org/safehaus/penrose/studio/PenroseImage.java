@@ -22,10 +22,11 @@ public class PenroseImage {
     public final static String WELCOME           = "images/3steps.png";
 
     public final static String NEW               = "images/new.gif";
-    public final static String OPEN              = "images/connect.gif";
     public final static String SAVE              = "images/3floppy_unmount.png";
     public final static String UPLOAD            = "images/upload.png";
-    public final static String CLOSE             = "images/close.png";
+
+    public final static String CONNECT           = "images/connect.gif";
+    public final static String DISCONNECT        = "images/close.png";
 
     public final static String CUT               = "images/cut.png";
     public final static String COPY              = "images/copy.png";

@@ -18,8 +18,8 @@
 package org.safehaus.penrose.studio.source.wizard;
 
 import org.eclipse.jface.wizard.IWizardPage;
-import org.safehaus.penrose.partition.SourceConfig;
-import org.safehaus.penrose.partition.FieldConfig;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.studio.source.wizard.LDAPTreeWizardPage;
 
 import java.util.Collection;

@@ -18,16 +18,20 @@
 package org.safehaus.penrose.studio.engine;
 
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.swt.graphics.Image;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.engine.editor.EngineEditor;
+import org.safehaus.penrose.studio.engine.editor.EngineEditorInput;
+import org.safehaus.penrose.studio.action.PenroseStudioActions;
 import org.safehaus.penrose.engine.EngineConfig;
+import org.safehaus.penrose.config.PenroseConfig;
 import org.apache.log4j.Logger;
 
 /**
@@ -37,73 +41,64 @@ public class EngineNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
+    Server server;
 
-    public EngineNode(ObjectsView view, String name, String type, Image image, Object object, Node parent) {
-        super(name, type, image, object, parent);
-        this.view = view;
+    public EngineNode(Server server, String name, Image image, Object object, Node parent) {
+        super(name, image, object, parent);
+        this.server = server;
+    }
+
+    public EngineConfig getEngineConfig() {
+        return (EngineConfig)getObject();
+    }
+
+    public void setEngineConfig(EngineConfig engineConfig) {
+        setObject(engineConfig);
     }
 
     public void showMenu(IMenuManager manager) {
 
-        manager.add(new Action("Open") {
-            public void run() {
-                try {
-                    open();
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
-/*
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseStudioActions actions = penroseStudio.getActions();
+
+        manager.add(actions.getOpenAction());
+
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        manager.add(new Action("Copy") {
-            public void run() {
-                try {
-                    view.copy(connectorConfig);
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
-
-        manager.add(new Action("Paste") {
-            public void run() {
-                try {
-                    view.paste(connectorConfig);
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
-
-        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
-            public void run() {
-                try {
-                    remove();
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
-*/
+        manager.add(actions.getCopyAction());
+        manager.add(actions.getPasteAction());
+        manager.add(actions.getDeleteAction());
     }
 
     public void open() throws Exception {
-
-        EnginesNode enginesNode = (EnginesNode)getParent();
-        ServerNode serverNode = (ServerNode)enginesNode.getParent();
-        Server server = serverNode.getServer();
-
-        EngineConfig engineConfig = (EngineConfig)getObject();
-
         EngineEditorInput ei = new EngineEditorInput();
         ei.setProject(server);
-        ei.setEngineConfig(engineConfig);
+        ei.setEngineConfig(getEngineConfig());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
         page.openEditor(ei, EngineEditor.class.getName());
+    }
+
+    public boolean canPaste(Object object) throws Exception {
+        return getParent().canPaste(object);
+    }
+
+    public void paste(Object object) throws Exception {
+        getParent().paste(object);
+    }
+
+    public void delete() throws Exception {
+        EngineConfig engineConfig = getEngineConfig();
+        PenroseConfig penroseConfig = server.getPenroseConfig();
+        penroseConfig.removeEngineConfig(engineConfig.getName());
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

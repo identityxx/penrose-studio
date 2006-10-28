@@ -31,15 +31,15 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.mapping.AttributeTypeSelectionDialog;
 import org.safehaus.penrose.studio.mapping.ExpressionDialog;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.SourceConfig;
-import org.safehaus.penrose.partition.FieldConfig;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.FieldConfig;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -169,11 +169,8 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                     AttributeTypeSelectionDialog dialog = new AttributeTypeSelectionDialog(parent.getShell(), SWT.NONE);
                     dialog.setText("Add attributes...");
 
-                    IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-                    IWorkbenchPage page = window.getActivePage();
-                    ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
-
-                    ServerNode serverNode = objectsView.getSelectedProjectNode();
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    ServerNode serverNode = penroseStudio.getSelectedServerNode();
                     if (serverNode == null) return;
 
                     Server server = serverNode.getServer();
@@ -263,11 +260,8 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
     public void init() {
         try {
-            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-            IWorkbenchPage page = window.getActivePage();
-            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
-
-            ServerNode serverNode = objectsView.getSelectedProjectNode();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            ServerNode serverNode = penroseStudio.getSelectedServerNode();
             if (serverNode == null) return;
 
             Server server = serverNode.getServer();

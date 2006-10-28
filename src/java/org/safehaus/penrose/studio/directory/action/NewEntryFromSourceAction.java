@@ -19,11 +19,9 @@ package org.safehaus.penrose.studio.directory.action;
 
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
 import org.eclipse.jface.action.Action;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.directory.EntryNode;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.mapping.SourceDialog;
@@ -31,8 +29,8 @@ import org.safehaus.penrose.mapping.SourceMapping;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.AttributeMapping;
 import org.safehaus.penrose.mapping.FieldMapping;
-import org.safehaus.penrose.partition.SourceConfig;
-import org.safehaus.penrose.partition.FieldConfig;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.filter.*;
 import org.apache.log4j.Logger;
@@ -57,9 +55,6 @@ public class NewEntryFromSourceAction extends Action {
 	public void run() {
         try {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-            IWorkbenchPage page = window.getActivePage();
-            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
-
             Shell shell = window.getShell();
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -155,9 +150,8 @@ public class NewEntryFromSourceAction extends Action {
 
             partition.addEntryMapping(entry);
 
+            penroseStudio.show(node);
             penroseStudio.fireChangeEvent();
-
-            objectsView.show(node);
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

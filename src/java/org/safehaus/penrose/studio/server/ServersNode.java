@@ -1,11 +1,9 @@
 package org.safehaus.penrose.studio.server;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.util.PenroseStudioClipboard;
 import org.safehaus.penrose.studio.action.PenroseStudioActions;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IMenuManager;
@@ -19,17 +17,12 @@ public class ServersNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
-
     public ServersNode(
-            ObjectsView view,
             String name,
-            String type,
             Object object,
             Node parent
     ) {
-        super(name, type, PenrosePlugin.getImage(PenroseImage.FOLDER), object, parent);
-        this.view = view;
+        super(name, PenrosePlugin.getImage(PenroseImage.FOLDER), object, parent);
     }
 
     public void showMenu(IMenuManager manager) {
@@ -40,28 +33,25 @@ public class ServersNode extends Node {
         manager.add(actions.getPasteAction());
     }
 
-    public void paste(PenroseStudioClipboard clipboard) throws Exception {
+    public boolean canPaste(Object object) throws Exception {
+        return object instanceof ServerConfig;
+    }
 
+    public void paste(Object object) throws Exception {
+        ServerConfig serverConfig = (ServerConfig)object;
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Object object = clipboard.get();
-        log.debug("Pasting: "+object);
-        
-        if (object instanceof ServerConfig) {
-            ServerConfig serverConfig = (ServerConfig)object;
 
-            int counter = 1;
-            String name;
+        int counter = 1;
+        String name = serverConfig.getName();
 
-            do {
-                counter++;
-                name = serverConfig.getName()+" ("+counter+")";
-                
-            } while (penroseStudio.getServer(name) != null);
-
-            serverConfig.setName(name);
-            penroseStudio.addServer(serverConfig);
-            penroseStudio.save();
+        while (penroseStudio.getServer(name) != null) {
+            counter++;
+            name = serverConfig.getName()+" ("+counter+")";
         }
+
+        serverConfig.setName(name);
+        penroseStudio.addServer(serverConfig);
+        penroseStudio.save();
     }
 
     public boolean hasChildren() throws Exception {
@@ -80,9 +70,7 @@ public class ServersNode extends Node {
             Server server = (Server)i.next();
 
             ServerNode serverNode = new ServerNode(
-                    view,
                     server.getName(),
-                    ObjectsView.PROJECT,
                     server,
                     this
             );
