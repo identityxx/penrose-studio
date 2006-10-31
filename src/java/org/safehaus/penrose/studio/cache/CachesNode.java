@@ -19,7 +19,6 @@ package org.safehaus.penrose.studio.cache;
 
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
@@ -34,8 +33,11 @@ import java.util.ArrayList;
  */
 public class CachesNode extends Node {
 
-    public CachesNode(String name, Image image, Object object, Node parent) {
+    Server server;
+
+    public CachesNode(Server server, String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
+        this.server = server;
     }
 
     public boolean hasChildren() throws Exception {
@@ -46,8 +48,6 @@ public class CachesNode extends Node {
 
         Collection children = new ArrayList();
 
-        ServerNode serverNode = (ServerNode)getParent();
-        Server server = serverNode.getServer();
         CacheConfig entryCacheConfig = server.getPenroseConfig().getEntryCacheConfig();
         if (entryCacheConfig != null) {
             children.add(new CacheNode(

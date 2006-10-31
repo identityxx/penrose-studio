@@ -23,6 +23,8 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.action.PenroseStudioActions;
 import org.safehaus.penrose.studio.module.action.NewModuleAction;
+import org.safehaus.penrose.studio.module.action.NewPollingConnectorModuleAction;
+import org.safehaus.penrose.studio.module.action.NewLDAPSyncModuleAction;
 import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
 import org.safehaus.penrose.partition.Partition;
@@ -55,6 +57,8 @@ public class ModulesNode extends Node {
         PenroseStudioActions actions = penroseStudio.getActions();
 
         manager.add(new NewModuleAction(this));
+        manager.add(new NewPollingConnectorModuleAction(this));
+        manager.add(new NewLDAPSyncModuleAction(this));
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 

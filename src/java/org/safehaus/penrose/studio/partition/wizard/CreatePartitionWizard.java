@@ -60,8 +60,6 @@ public class CreatePartitionWizard extends Wizard {
             if (serverNode == null) return false;
 
             Server server = serverNode.getServer();
-            PenroseConfig penroseConfig = server.getPenroseConfig();
-            penroseConfig.addPartitionConfig(partitionConfig);
 
             PartitionManager partitionManager = server.getPartitionManager();
             partitionManager.load(serverNode.getWorkDir(), partitionConfig);

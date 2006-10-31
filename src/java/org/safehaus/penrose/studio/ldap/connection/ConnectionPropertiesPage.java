@@ -117,10 +117,10 @@ public class ConnectionPropertiesPage extends ConnectionEditorPage {
             }
         });
 
-        Label descriptionNameLabel = getToolkit().createLabel(composite, "Description:");
+        Label descriptionLabel = getToolkit().createLabel(composite, "Description:");
         gd = new GridData();
         gd.widthHint = 100;
-        descriptionNameLabel.setLayoutData(gd);
+        descriptionLabel.setLayoutData(gd);
 
         descriptionText = getToolkit().createText(composite, "", SWT.BORDER);
         descriptionText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));

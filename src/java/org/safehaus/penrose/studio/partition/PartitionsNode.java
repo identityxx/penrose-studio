@@ -48,8 +48,9 @@ public class PartitionsNode extends Node {
 
     Server server;
 
-    public PartitionsNode(String name, Image image, Object object, Node parent) {
+    public PartitionsNode(Server server, String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
+        this.server = server;
     }
 
     public void showMenu(IMenuManager manager) {
@@ -92,9 +93,6 @@ public class PartitionsNode extends Node {
         partitionConfig.setPath("partitions/"+name);
 
         partitionManager.addPartition(newPartition);
-
-        PenroseConfig penroseConfig = server.getPenroseConfig();
-        penroseConfig.addPartitionConfig(partitionConfig);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.fireChangeEvent();

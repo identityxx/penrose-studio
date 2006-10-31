@@ -20,6 +20,9 @@ package org.safehaus.penrose.studio.partition;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -27,6 +30,8 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.action.PenroseStudioActions;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.partition.action.ExportPartitionAction;
+import org.safehaus.penrose.studio.partition.editor.PartitionEditorInput;
+import org.safehaus.penrose.studio.partition.editor.PartitionEditor;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.connection.ConnectionsNode;
 import org.safehaus.penrose.studio.tree.Node;
@@ -35,7 +40,6 @@ import org.safehaus.penrose.studio.source.SourcesNode;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionManager;
-import org.safehaus.penrose.config.PenroseConfig;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -50,7 +54,7 @@ public class PartitionNode extends Node {
 
     Server server;
 
-    private Partition partition;
+    Partition partition;
 
     public PartitionNode(
             Server server,
@@ -68,6 +72,10 @@ public class PartitionNode extends Node {
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         PenroseStudioActions actions = penroseStudio.getActions();
 
+        manager.add(actions.getOpenAction());
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
         manager.add(new ExportPartitionAction(partition));
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -77,10 +85,17 @@ public class PartitionNode extends Node {
         manager.add(actions.getDeleteAction());
     }
 
-    public void delete() throws Exception {
-        PenroseConfig penroseConfig = server.getPenroseConfig();
-        penroseConfig.removePartitionConfig(partition.getName());
+    public void open() throws Exception {
+        PartitionEditorInput ei = new PartitionEditorInput();
+        ei.setServer(server);
+        ei.setPartitionConfig(partition.getPartitionConfig());
 
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        IWorkbenchPage page = window.getActivePage();
+        page.openEditor(ei, PartitionEditor.class.getName());
+    }
+
+    public void delete() throws Exception {
         PartitionManager partitionManager = server.getPartitionManager();
         partitionManager.removePartition(partition.getName());
     }

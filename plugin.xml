@@ -89,10 +89,10 @@
            icon="images/properties.png"
            class="org.safehaus.penrose.studio.properties.SystemPropertiesEditor"/>
        <editor
-           id="org.safehaus.penrose.studio.cache.CacheEditor"
+           id="org.safehaus.penrose.studio.partition.editor.PartitionEditor"
            name="Cache"
            icon="images/cache.png"
-           class="org.safehaus.penrose.studio.cache.CacheEditor"/>
+           class="org.safehaus.penrose.studio.partition.editor.PartitionEditor"/>
        <editor
            id="org.safehaus.penrose.studio.engine.editor.EngineEditor"
            name="Engine"

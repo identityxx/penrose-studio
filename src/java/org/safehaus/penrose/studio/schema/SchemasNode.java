@@ -19,6 +19,8 @@ package org.safehaus.penrose.studio.schema;
 
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.action.PenroseStudioActions;
 import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.schema.action.ImportSchemaAction;
@@ -28,6 +30,8 @@ import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.schema.SchemaConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -41,23 +45,53 @@ public class SchemasNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
+    Server server;
+
     public SchemasNode(
+            Server server,
             String name,
             Image image,
             Object object,
             Node parent
     ) {
         super(name, image, object, parent);
+        this.server = server;
     }
 
     public void showMenu(IMenuManager manager) {
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseStudioActions actions = penroseStudio.getActions();
+
         manager.add(new NewSchemaAction());
         manager.add(new ImportSchemaAction());
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(actions.getPasteAction());
+    }
+
+    public boolean canPaste(Object object) throws Exception {
+        return object instanceof SchemaConfig;
+    }
+
+    public void paste(Object object) throws Exception {
+        SchemaConfig schemaConfig = (SchemaConfig)object;
+
+        PenroseConfig penroseConfig = server.getPenroseConfig();
+
+        int counter = 1;
+        String name = schemaConfig.getName();
+
+        while (penroseConfig.getSchemaConfig(name) != null) {
+            counter++;
+            name = schemaConfig.getName()+" ("+counter+")";
+        }
+
+        schemaConfig.setName(name);
+        penroseConfig.addSchemaConfig(schemaConfig);
     }
 
     public boolean hasChildren() throws Exception {
-        ServerNode serverNode = (ServerNode)getParent();
-        Server server = serverNode.getServer();
         PenroseConfig penroseConfig = server.getPenroseConfig();
         return !penroseConfig.getSchemaConfigs().isEmpty();
     }
@@ -66,8 +100,6 @@ public class SchemasNode extends Node {
 
         Collection children = new ArrayList();
 
-        ServerNode serverNode = (ServerNode)getParent();
-        Server server = serverNode.getServer();
         PenroseConfig penroseConfig = server.getPenroseConfig();
 
         Collection schemaConfigs = penroseConfig.getSchemaConfigs();

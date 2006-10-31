@@ -67,18 +67,9 @@ public class SchemaNode extends Node {
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-/*
-        manager.add(new Action("Paste") {
-            public void run() {
-                try {
-                    paste();
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                }
-            }
-        });
-*/
-        manager.add(actions.getOpenAction());
+        manager.add(actions.getCopyAction());
+        manager.add(actions.getPasteAction());
+        manager.add(actions.getDeleteAction());
     }
 
     public void open() throws Exception {
@@ -93,6 +84,19 @@ public class SchemaNode extends Node {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
         page.openEditor(ei, SchemaEditor.class.getName());
+    }
+
+    public Object copy() throws Exception {
+        return null;
+        //return schemaConfig;
+    }
+
+    public boolean canPaste(Object object) throws Exception {
+        return getParent().canPaste(object);
+    }
+
+    public void paste(Object object) throws Exception {
+        getParent().paste(object);
     }
 
     public void delete() throws Exception {

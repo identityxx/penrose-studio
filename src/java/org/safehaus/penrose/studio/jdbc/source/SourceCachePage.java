@@ -78,10 +78,10 @@ public class SourceCachePage extends SourceEditorPage {
     }
 
     public void refresh() {
-        String value = getSourceConfig().getParameter(SourceConfig.FILTER_CACHE_SIZE);
+        String value = getSourceConfig().getParameter(SourceConfig.QUERY_CACHE_SIZE);
         filterCacheSizeText.setText(value == null ? "" : value);
 
-        value = getSourceConfig().getParameter(SourceConfig.FILTER_CACHE_EXPIRATION);
+        value = getSourceConfig().getParameter(SourceConfig.QUERY_CACHE_EXPIRATION);
         filterCacheExpirationText.setText(value == null ? "" : value);
 
         value = getSourceConfig().getParameter(SourceConfig.DATA_CACHE_SIZE);
@@ -116,9 +116,9 @@ public class SourceCachePage extends SourceEditorPage {
         filterCacheSizeText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(filterCacheSizeText.getText())) {
-                    getSourceConfig().removeParameter(SourceConfig.FILTER_CACHE_SIZE);
+                    getSourceConfig().removeParameter(SourceConfig.QUERY_CACHE_SIZE);
                 } else {
-                    getSourceConfig().setParameter(SourceConfig.FILTER_CACHE_SIZE, filterCacheSizeText.getText());
+                    getSourceConfig().setParameter(SourceConfig.QUERY_CACHE_SIZE, filterCacheSizeText.getText());
                 }
                 checkDirty();
             }
@@ -140,9 +140,9 @@ public class SourceCachePage extends SourceEditorPage {
         filterCacheExpirationText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(filterCacheExpirationText.getText())) {
-                    getSourceConfig().removeParameter(SourceConfig.FILTER_CACHE_EXPIRATION);
+                    getSourceConfig().removeParameter(SourceConfig.QUERY_CACHE_EXPIRATION);
                 } else {
-                    getSourceConfig().setParameter(SourceConfig.FILTER_CACHE_EXPIRATION, filterCacheExpirationText.getText());
+                    getSourceConfig().setParameter(SourceConfig.QUERY_CACHE_EXPIRATION, filterCacheExpirationText.getText());
                 }
                 checkDirty();
             }

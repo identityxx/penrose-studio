@@ -17,6 +17,8 @@ import org.safehaus.penrose.interpreter.InterpreterManager;
 import org.safehaus.penrose.connection.ConnectionManager;
 import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.module.ModuleManager;
+import org.safehaus.penrose.cache.SourceCacheManager;
+import org.safehaus.penrose.cache.EntryCacheManager;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.slf4j.LoggerFactory;
@@ -43,7 +45,10 @@ public class Server {
 
     private InterpreterManager interpreterManager;
     private SchemaManager schemaManager;
+
     private ConnectionManager connectionManager;
+    private SourceCacheManager sourceCacheManager;
+    private EntryCacheManager  entryCacheManager;
     private SourceManager sourceManager;
     private ModuleManager moduleManager;
     private PartitionManager partitionManager;
@@ -211,6 +216,17 @@ public class Server {
         connectionManager = new ConnectionManager();
     }
 
+    public void initSourceCacheManager() throws Exception {
+        sourceCacheManager = new SourceCacheManager();
+        sourceCacheManager.setConnectionManager(connectionManager);
+    }
+
+    public void initEntryCacheManager() throws Exception {
+        entryCacheManager = new EntryCacheManager();
+        entryCacheManager.setConnectionManager(connectionManager);
+        entryCacheManager.init();
+    }
+
     public void initSourceManager() throws Exception {
         sourceManager = new SourceManager();
         sourceManager.setPenroseConfig(penroseConfig);
@@ -233,10 +249,7 @@ public class Server {
         partitionManager.setModuleManager(moduleManager);
         partitionManager.init();
 
-        for (Iterator i=penroseConfig.getPartitionConfigs().iterator(); i.hasNext(); ) {
-            PartitionConfig partitionConfig = (PartitionConfig)i.next();
-            partitionManager.load(dir, partitionConfig);
-        }
+        partitionManager.load(dir+File.separator+"partitions");
     }
 
     public void validate() throws Exception {
@@ -248,10 +261,10 @@ public class Server {
 
         Collection results = new ArrayList();
 
-        for (Iterator i=penroseConfig.getPartitionConfigs().iterator(); i.hasNext(); ) {
-            PartitionConfig partitionConfig = (PartitionConfig)i.next();
+        Collection partitions = partitionManager.getPartitions();
+        for (Iterator i=partitions.iterator(); i.hasNext(); ) {
+            Partition partition = (Partition)i.next();
 
-            Partition partition = partitionManager.getPartition(partitionConfig.getName());
             Collection list = partitionValidator.validate(partition);
 
             for (Iterator j=list.iterator(); j.hasNext(); ) {
@@ -311,7 +324,7 @@ public class Server {
 
         saveLoggingConfig(dir);
 
-        partitionManager.store(dir, penroseConfig.getPartitionConfigs());
+        partitionManager.store(dir);
 
         FileUtil.delete(backupFolder);
         workFolder.renameTo(backupFolder);
@@ -400,5 +413,21 @@ public class Server {
 
     public void setInterpreterManager(InterpreterManager interpreterManager) {
         this.interpreterManager = interpreterManager;
+    }
+
+    public SourceCacheManager getSourceCacheManager() {
+        return sourceCacheManager;
+    }
+
+    public void setSourceCacheManager(SourceCacheManager sourceCacheManager) {
+        this.sourceCacheManager = sourceCacheManager;
+    }
+
+    public EntryCacheManager getEntryCacheManager() {
+        return entryCacheManager;
+    }
+
+    public void setEntryCacheManager(EntryCacheManager entryCacheManager) {
+        this.entryCacheManager = entryCacheManager;
     }
 }

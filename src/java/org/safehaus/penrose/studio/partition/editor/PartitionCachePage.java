@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.cache;
+package org.safehaus.penrose.studio.partition.editor;
 
 import java.util.Iterator;
 
@@ -24,96 +24,80 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.*;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.forms.widgets.*;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.studio.PenroseStudio;
+import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
 import org.safehaus.penrose.cache.CacheConfig;
-import org.apache.log4j.Logger;
 
-public class CacheEditor extends EditorPart {
-
-    Logger log = Logger.getLogger(getClass());
-
-    CacheConfig origCacheConfig;
-	CacheConfig cacheConfig;
-
-    FormToolkit toolkit;
+public class PartitionCachePage extends PartitionEditorPage {
 
     Text cacheClassText;
-	Text descriptionText;
+    Text descriptionText;
 
-	Table parametersTable;
+    Table parametersTable;
 
-    Button addButton;
-    Button editButton;
-    Button removeButton;
+    CacheConfig cacheConfig;
 
-    boolean dirty;
+    public PartitionCachePage(PartitionEditor editor, String name, String label, CacheConfig cacheConfig) {
+        super(editor, name, label);
 
-    public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-
-        log.debug("Initialing CacheEditor");
-
-        CacheEditorInput ei = (CacheEditorInput)input;
-        origCacheConfig = ei.getCacheConfig();
-        cacheConfig = (CacheConfig)origCacheConfig.clone();
-
-        setSite(site);
-        setInput(input);
-        setPartName(ei.getName());
-
-        log.debug("Done initialing CacheEditor");
+        this.cacheConfig = cacheConfig;
     }
 
-    public void createPartControl(Composite parent) {
-        try {
-            log.debug("Creating part control");
+    public void createFormContent(IManagedForm managedForm) {
+        super.createFormContent(managedForm);
 
-            toolkit = new FormToolkit(parent.getDisplay());
+        ScrolledForm form = managedForm.getForm();
+        Composite body = form.getBody();
+        body.setLayout(new GridLayout());
 
-            ScrolledForm form = toolkit.createScrolledForm(parent);
-            form.setText("Cache Editor");
+        Section propertiesSection = getToolkit().createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        propertiesSection.setText("Properties");
+        propertiesSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-            Composite body = form.getBody();
-            body.setLayout(new GridLayout());
+        Control propertiesControl = createPropertiesControl(propertiesSection);
+        propertiesSection.setClient(propertiesControl);
 
-            Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-            section.setText("Properties");
-            section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Section parametersSection = getToolkit().createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        parametersSection.setText("Parameters");
+        parametersSection.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-            Control propertiesSection = createPropertiesSection(section);
-            section.setClient(propertiesSection);
+        Control parametersControl = createParametersControl(parametersSection);
+        parametersSection.setClient(parametersControl);
+    }
 
-            section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-            section.setText("Parameters");
-            section.setLayoutData(new GridData(GridData.FILL_BOTH));
+    public void refresh() {
 
-            Control parametersSection = createParametersSection(section);
-            section.setClient(parametersSection);
+        String cacheClass = cacheConfig.getCacheClass() == null ? "" : cacheConfig.getCacheClass();
+        cacheClassText.setText(cacheClass);
 
-            log.debug("Done creating part control");
+        String description = cacheConfig.getDescription() == null ? "" : cacheConfig.getDescription();
+        descriptionText.setText(description);
 
-	    } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+        parametersTable.removeAll();
+
+        for (Iterator i=cacheConfig.getParameterNames().iterator(); i.hasNext(); ) {
+            String name = (String)i.next();
+            String value = cacheConfig.getParameter(name);
+
+            TableItem tableItem = new TableItem(parametersTable, SWT.NONE);
+            tableItem.setText(0, name);
+            tableItem.setText(1, value);
         }
-	}
 
-	public Composite createPropertiesSection(final Composite parent) {
+    }
 
-		Composite composite = toolkit.createComposite(parent);
-		composite.setLayout(new GridLayout(2, false));
+    public Composite createPropertiesControl(final Composite parent) {
 
-        Label cacheClassLabel = toolkit.createLabel(composite, "Class Name:");
+        Composite composite = getToolkit().createComposite(parent);
+        composite.setLayout(new GridLayout(2, false));
+
+        Label cacheClassLabel = getToolkit().createLabel(composite, "Class Name:");
         GridData gd = new GridData(GridData.FILL);
         gd.widthHint = 100;
         cacheClassLabel.setLayoutData(gd);
 
-        cacheClassText = toolkit.createText(composite, cacheConfig.getCacheClass() == null ? "" : cacheConfig.getCacheClass(), SWT.BORDER);
+        cacheClassText = getToolkit().createText(composite, "", SWT.BORDER);
         cacheClassText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         cacheClassText.addModifyListener(new ModifyListener() {
@@ -123,13 +107,12 @@ public class CacheEditor extends EditorPart {
             }
         });
 
-        Label descriptionLabel = toolkit.createLabel(composite, "Description:");
+        Label descriptionLabel = getToolkit().createLabel(composite, "Description:");
         gd = new GridData(GridData.FILL);
         gd.widthHint = 100;
         descriptionLabel.setLayoutData(gd);
 
-        descriptionText = toolkit.createText(composite, cacheConfig.getDescription() == null ? "" : cacheConfig.getDescription(), SWT.BORDER);
-        if (cacheConfig.getDescription() != null) descriptionText.setText(cacheConfig.getDescription());
+        descriptionText = getToolkit().createText(composite, "", SWT.BORDER);
         descriptionText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         descriptionText.addModifyListener(new ModifyListener() {
@@ -142,21 +125,21 @@ public class CacheEditor extends EditorPart {
         return composite;
     }
 
-    public Composite createParametersSection(final Composite parent) {
+    public Composite createParametersControl(final Composite parent) {
 
-		Composite composite = toolkit.createComposite(parent);
+        Composite composite = getToolkit().createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
 
-		parametersTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
-		parametersTable.setHeaderVisible(true);
-		parametersTable.setLinesVisible(true);
+        parametersTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+        parametersTable.setHeaderVisible(true);
+        parametersTable.setLinesVisible(true);
 
         GridData gd = new GridData(GridData.FILL_BOTH);
         parametersTable.setLayoutData(gd);
 
-		TableColumn tc = new TableColumn(parametersTable, SWT.LEFT);
-		tc.setText("Name");
-		tc.setWidth(250);
+        TableColumn tc = new TableColumn(parametersTable, SWT.LEFT);
+        tc.setText("Name");
+        tc.setWidth(250);
 
         tc = new TableColumn(parametersTable, SWT.LEFT);
         tc.setText("Value");
@@ -200,12 +183,12 @@ public class CacheEditor extends EditorPart {
             }
         });
 
-        Composite buttons = toolkit.createComposite(composite);
+        Composite buttons = getToolkit().createComposite(composite);
         gd = new GridData(GridData.FILL_VERTICAL);
         buttons.setLayoutData(gd);
         buttons.setLayout(new GridLayout());
 
-        addButton = toolkit.createButton(buttons, "Add", SWT.PUSH);
+        Button addButton = getToolkit().createButton(buttons, "Add", SWT.PUSH);
         addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         addButton.addSelectionListener(new SelectionAdapter() {
@@ -228,7 +211,7 @@ public class CacheEditor extends EditorPart {
             }
         });
 
-        editButton = toolkit.createButton(buttons, "Edit", SWT.PUSH);
+        Button editButton = getToolkit().createButton(buttons, "Edit", SWT.PUSH);
         editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         editButton.addSelectionListener(new SelectionAdapter() {
@@ -269,7 +252,7 @@ public class CacheEditor extends EditorPart {
             }
         });
 
-        removeButton = toolkit.createButton(buttons, "Remove", SWT.PUSH);
+        Button removeButton = getToolkit().createButton(buttons, "Remove", SWT.PUSH);
         removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         removeButton.addSelectionListener(new SelectionAdapter() {
@@ -294,70 +277,6 @@ public class CacheEditor extends EditorPart {
 
         refresh();
 
-		return composite;
-	}
-
-    public void refresh() {
-
-        parametersTable.removeAll();
-
-        for (Iterator i=cacheConfig.getParameterNames().iterator(); i.hasNext(); ) {
-            String name = (String)i.next();
-            String value = cacheConfig.getParameter(name);
-
-            TableItem tableItem = new TableItem(parametersTable, SWT.NONE);
-            tableItem.setText(0, name);
-            tableItem.setText(1, value);
-        }
-
-    }
-
-    public void doSave(IProgressMonitor iProgressMonitor) {
-        try {
-            store();
-        } catch (Exception e) {
-            log.debug(e.getMessage(), e);
-        }
-    }
-
-    public void doSaveAs() {
-    }
-
-    public boolean isSaveAsAllowed() {
-        return false;
-    }
-
-    public void setFocus() {
-    }
-
-    public void store() throws Exception {
-
-        origCacheConfig.copy(cacheConfig);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.fireChangeEvent();
-
-        checkDirty();
-    }
-
-    public boolean isDirty() {
-        return dirty;
-    }
-
-    public void checkDirty() {
-        try {
-            dirty = false;
-
-            if (!origCacheConfig.equals(cacheConfig)) {
-                dirty = true;
-                return;
-            }
-
-        } catch (Exception e) {
-            log.debug(e.getMessage(), e);
-
-        } finally {
-            firePropertyChange(PROP_DIRTY);
-        }
+        return composite;
     }
 }

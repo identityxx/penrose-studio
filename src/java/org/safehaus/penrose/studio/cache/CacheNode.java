@@ -83,10 +83,10 @@ public class CacheNode extends Node {
     public void open() throws Exception {
 
         CacheConfig cacheConfig = (CacheConfig)getObject();
-        CacheEditorInput ei = new CacheEditorInput(getName(), cacheConfig);
+        //CacheEditorInput ei = new CacheEditorInput(getName(), cacheConfig);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
-        page.openEditor(ei, CacheEditor.class.getName());
+        //page.openEditor(ei, CacheEditor.class.getName());
     }
 }

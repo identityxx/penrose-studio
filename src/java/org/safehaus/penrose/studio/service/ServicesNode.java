@@ -45,8 +45,9 @@ public class ServicesNode extends Node {
 
     Server server;
 
-    public ServicesNode(String name, Image image, Object object, Node parent) {
+    public ServicesNode(Server server, String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
+        this.server = server;
     }
 
     public void showMenu(IMenuManager manager) {

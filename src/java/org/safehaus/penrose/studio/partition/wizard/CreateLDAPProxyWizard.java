@@ -90,8 +90,6 @@ public class CreateLDAPProxyWizard extends Wizard {
             if (serverNode == null) return false;
 
             Server server = serverNode.getServer();
-            PenroseConfig penroseConfig = server.getPenroseConfig();
-            penroseConfig.addPartitionConfig(partitionConfig);
 
             PartitionManager partitionManager = server.getPartitionManager();
             Partition partition = partitionManager.load(serverNode.getWorkDir(), partitionConfig);

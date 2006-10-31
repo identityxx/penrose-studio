@@ -176,42 +176,38 @@ public class ServerNode extends Node {
         Collection children = new ArrayList();
         if (!isConnected()) return children;
 
-        PartitionsNode partitionsNode = new PartitionsNode(
+        children.add(new PartitionsNode(
+                getServer(),
                 ObjectsView.PARTITIONS,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
                 ObjectsView.PARTITIONS,
                 this
-        );
-
-        partitionsNode.setServer(getServer());
-
-        children.add(partitionsNode);
+        ));
 
         children.add(new SchemasNode(
+                getServer(),
                 ObjectsView.SCHEMAS,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
                 ObjectsView.SCHEMAS,
                 this
         ));
 
-        ServicesNode servicesNode = new ServicesNode(
+        children.add(new ServicesNode(
+                getServer(),
                 ObjectsView.SERVICES,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
                 ObjectsView.SERVICES,
                 this
-        );
-
-        servicesNode.setServer(getServer());
-
-        children.add(servicesNode);
-
+        ));
+/*
         children.add(new CachesNode(
+                getServer(),
                 ObjectsView.CACHES,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
                 ObjectsView.CACHES,
                 this
         ));
-
+*/
         children.add(new LoggingNode(
                 ObjectsView.LOGGING,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
@@ -219,15 +215,13 @@ public class ServerNode extends Node {
                 this
         ));
 
-        EnginesNode enginesNode = new EnginesNode(
+        children.add(new EnginesNode(
                 getServer(),
                 ObjectsView.ENGINES,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
                 ObjectsView.ENGINES,
                 this
-        );
-
-        children.add(enginesNode);
+        ));
 
         children.add(new AdministratorNode(
                 ObjectsView.ADMINISTRATOR,
