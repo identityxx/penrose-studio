@@ -57,7 +57,7 @@ public class PenroseApplication implements IPlatformRunnable {
     Logger log = Logger.getLogger(getClass());
 
     public static String PRODUCT_NAME    = "Penrose Studio";
-    public static String PRODUCT_VERSION = "1.1.1";
+    public static String PRODUCT_VERSION = "1.1.2";
     public static String VENDOR_NAME     = "Identyx Corporation";
 
     public final static DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");

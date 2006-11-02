@@ -8,13 +8,13 @@
     <description>Penrose Studio</description>
 
     <property name="project.name" value="penrose-studio"/>
-    <property name="project.version" value="1.1.1"/>
+    <property name="project.version" value="1.1.2"/>
     <property name="project.dist" value="dist"/>
 
     <property name="prefix" value=""/>
     <property name="penrose.studio.home" value="${prefix}/usr/local/${project.name}-${project.version}"/>
 
-    <property name="penrose.version" value="1.1.1"/>
+    <property name="penrose.version" value="1.1.2"/>
 
     <property name="rcp.prefix" value="eclipse-RCP-3.1"/>
     <property name="iscc.path" value="ISCC.exe"/>
