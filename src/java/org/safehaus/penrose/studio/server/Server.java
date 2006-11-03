@@ -249,7 +249,11 @@ public class Server {
         partitionManager.setModuleManager(moduleManager);
         partitionManager.init();
 
-        partitionManager.load(dir+File.separator+"partitions");
+        PartitionConfig partitionConfig = new PartitionConfig();
+        partitionConfig.setName("DEFAULT");
+        partitionManager.load(dir+File.separator+"conf", partitionConfig);
+
+        partitionManager.loadPartitions(dir+File.separator+"partitions");
     }
 
     public void validate() throws Exception {
@@ -324,7 +328,9 @@ public class Server {
 
         saveLoggingConfig(dir);
 
-        partitionManager.store(dir);
+        PartitionConfig partitionConfig = partitionManager.getPartitionConfig("DEFAULT");
+        partitionManager.store(dir+File.separator+"conf", partitionConfig);
+        partitionManager.storePartitions(dir+File.separator+"partitions");
 
         FileUtil.delete(backupFolder);
         workFolder.renameTo(backupFolder);

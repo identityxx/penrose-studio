@@ -199,15 +199,7 @@ public class ServerNode extends Node {
                 ObjectsView.SERVICES,
                 this
         ));
-/*
-        children.add(new CachesNode(
-                getServer(),
-                ObjectsView.CACHES,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
-                ObjectsView.CACHES,
-                this
-        ));
-*/
+
         children.add(new LoggingNode(
                 ObjectsView.LOGGING,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),

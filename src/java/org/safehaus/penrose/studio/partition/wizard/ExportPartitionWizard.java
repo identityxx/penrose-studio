@@ -51,8 +51,11 @@ public class ExportPartitionWizard extends Wizard {
 
             String directory = locationPage.getLocation();
 
-            PartitionWriter partitionWriter = new PartitionWriter(directory);
-            partitionWriter.write(partition);
+            PartitionConfigWriter partitionConfigWriter = new PartitionConfigWriter();
+            partitionConfigWriter.write(directory, partition.getPartitionConfig());
+
+            PartitionWriter partitionWriter = new PartitionWriter();
+            partitionWriter.write(directory, partition);
 
             return true;
 

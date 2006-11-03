@@ -25,7 +25,6 @@ import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.partition.PartitionManager;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionReader;
-import org.safehaus.penrose.config.PenroseConfig;
 import org.apache.log4j.Logger;
 
 /**
@@ -55,14 +54,13 @@ public class ImportPartitionWizard extends Wizard {
         try {
 
             String name = namePage.getPartitionName();
-            String path = "partitions/"+name;
 
             String directory = locationPage.getLocation();
 
-            PartitionConfig partitionConfig = new PartitionConfig(name, path);
+            PartitionConfig partitionConfig = new PartitionConfig(name);
 
             PartitionReader partitionReader = new PartitionReader();
-            Partition partition = partitionReader.read(partitionConfig, directory);
+            Partition partition = partitionReader.read(directory, partitionConfig);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             ServerNode serverNode = penroseStudio.getSelectedServerNode();

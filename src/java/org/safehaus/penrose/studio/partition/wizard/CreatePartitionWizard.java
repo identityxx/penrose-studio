@@ -23,6 +23,7 @@ import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.partition.PartitionManager;
+import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.apache.log4j.Logger;
 
@@ -53,16 +54,16 @@ public class CreatePartitionWizard extends Wizard {
 
             PartitionConfig partitionConfig = new PartitionConfig();
             partitionConfig.setName(name);
-            partitionConfig.setPath(path);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             ServerNode serverNode = penroseStudio.getSelectedServerNode();
             if (serverNode == null) return false;
 
             Server server = serverNode.getServer();
-
             PartitionManager partitionManager = server.getPartitionManager();
-            partitionManager.load(serverNode.getWorkDir(), partitionConfig);
+
+            Partition partition = new Partition(partitionConfig);
+            partitionManager.addPartition(partition);
 
             penroseStudio.fireChangeEvent();
 

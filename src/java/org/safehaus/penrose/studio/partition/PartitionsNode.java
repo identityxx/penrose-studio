@@ -90,7 +90,6 @@ public class PartitionsNode extends Node {
 
         PartitionConfig partitionConfig = newPartition.getPartitionConfig();
         partitionConfig.setName(name);
-        partitionConfig.setPath("partitions/"+name);
 
         partitionManager.addPartition(newPartition);
 

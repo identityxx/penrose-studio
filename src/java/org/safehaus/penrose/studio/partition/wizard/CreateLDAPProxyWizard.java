@@ -83,16 +83,16 @@ public class CreateLDAPProxyWizard extends Wizard {
 
             PartitionConfig partitionConfig = new PartitionConfig();
             partitionConfig.setName(name);
-            partitionConfig.setPath(path);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             ServerNode serverNode = penroseStudio.getSelectedServerNode();
             if (serverNode == null) return false;
 
             Server server = serverNode.getServer();
-
             PartitionManager partitionManager = server.getPartitionManager();
-            Partition partition = partitionManager.load(serverNode.getWorkDir(), partitionConfig);
+
+            Partition partition = new Partition(partitionConfig);
+            partitionManager.addPartition(partition);
 
             ConnectionConfig connectionConfig = new ConnectionConfig();
             connectionConfig.setName(name);
