@@ -59,6 +59,8 @@ public class BrowserEditor extends EditorPart {
     Table table;
 
     LDAPConnection connection = new LDAPConnection();
+
+    String bindDn;
     String password;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -105,7 +107,7 @@ public class BrowserEditor extends EditorPart {
                     dialog.setHostname(url.getHost());
                     dialog.setPort(url.getPort());
                     dialog.setBaseDn(url.getDN());
-                    dialog.setBindDn(bindDnText.getText());
+                    dialog.setBindDn(bindDn);
                     dialog.setBindPassword(password);
                     dialog.open();
 
@@ -114,10 +116,11 @@ public class BrowserEditor extends EditorPart {
                     String hostname = dialog.getHostname();
                     int port = dialog.getPort();
                     String baseDn = dialog.getBaseDn();
-                    String bindDn = dialog.getBindDn();
-                    String password = dialog.getBindPassword();
 
-                    open(hostname, port, baseDn, bindDn, password);
+                    bindDn = dialog.getBindDn();
+                    password = dialog.getBindPassword();
+
+                    open(hostname, port, baseDn);
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
@@ -186,8 +189,10 @@ public class BrowserEditor extends EditorPart {
             int port = s == null ? DEFAULT_LDAP_PORT : Integer.parseInt(s);
 
             UserConfig rootUserConfig = penroseConfig.getRootUserConfig();
+            bindDn = rootUserConfig.getDn();
+            password = rootUserConfig.getPassword();
 
-            open(hostname, port, "", rootUserConfig.getDn(), rootUserConfig.getPassword());
+            open(hostname, port, "");
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
@@ -198,18 +203,18 @@ public class BrowserEditor extends EditorPart {
 	public void setFocus() {
 	}
 
-    public void open(String hostname, int port, String baseDn, String bindDn, String password) throws Exception {
+    public void open(String hostname, int port, String baseDn) throws Exception {
 
         tree.removeAll();
+        connection.disconnect();
 
         LDAPUrl ldapUrl = new LDAPUrl(hostname, port, baseDn);
 
         urlText.setText(ldapUrl.toString());
         bindDnText.setText(bindDn == null ? "" : bindDn);
-        this.password = password;
 
         connection.connect(hostname, port);
-        connection.bind(3, bindDn, password.getBytes());
+        connection.bind(3, bindDn, password == null ? null : password.getBytes());
 
         baseDn = baseDn == null ? "" : baseDn;
         String name = "".equals(baseDn) ? "Root DSE" : baseDn;
