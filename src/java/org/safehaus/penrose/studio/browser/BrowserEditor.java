@@ -191,6 +191,7 @@ public class BrowserEditor extends EditorPart {
     public void open(String hostname, int port, String baseDn, String bindDn, String password) throws Exception {
 
         tree.removeAll();
+        connection.disconnect();
 
         LDAPUrl ldapUrl = new LDAPUrl(hostname, port, baseDn);
 
@@ -199,7 +200,7 @@ public class BrowserEditor extends EditorPart {
         this.password = password;
 
         connection.connect(hostname, port);
-        connection.bind(3, bindDn, password.getBytes());
+        connection.bind(3, bindDn, password == null ? null : password.getBytes());
 
         baseDn = baseDn == null ? "" : baseDn;
         String name = "".equals(baseDn) ? "Root DSE" : baseDn;

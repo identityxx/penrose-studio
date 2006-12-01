@@ -203,6 +203,48 @@ public class ACLPage extends FormPage implements ModifyListener {
             }
         });
 
+        Button editButton = toolkit.createButton(buttons, "Edit", SWT.PUSH);
+        editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        editButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                try {
+                    if (aclTable.getSelectionCount() == 0) return;
+
+                    TableItem item = aclTable.getSelection()[0];
+                    ACI aci = (ACI)item.getData();
+
+                    ACIDialog dialog = new ACIDialog(editor.getParent().getShell(), SWT.NONE);
+                    dialog.setText("Edit ACL...");
+
+                    dialog.setSubject(aci.getSubject());
+                    dialog.setDn(aci.getDn());
+                    dialog.setTarget(aci.getTarget());
+                    dialog.setAttributes(aci.getAttributes());
+                    dialog.setScope(aci.getScope());
+                    dialog.setAction(aci.getAction());
+                    dialog.setPermission(aci.getPermission());
+
+                    dialog.open();
+                    if (!dialog.isSaved()) return;
+
+                    aci.setSubject(dialog.getSubject());
+                    aci.setDn(dialog.getDn());
+                    aci.setTarget(dialog.getTarget());
+                    aci.setAttributes(dialog.getAttributes());
+                    aci.setScope(dialog.getScope());
+                    aci.setAction(dialog.getAction());
+                    aci.setPermission(dialog.getPermission());
+
+                    refreshACL();
+                    checkDirty();
+
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                }
+            }
+        });
+
         Button removeButton = toolkit.createButton(buttons, "Remove", SWT.PUSH);
         removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
