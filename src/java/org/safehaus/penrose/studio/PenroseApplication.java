@@ -56,12 +56,12 @@ public class PenroseApplication implements IPlatformRunnable {
 
     Logger log = Logger.getLogger(getClass());
 
-    public static String PRODUCT_NAME    = "Penrose Studio";
-    public static String PRODUCT_VERSION = "1.1.2";
-    public static String VENDOR_NAME     = "Identyx Corporation";
+    public static String PRODUCT_NAME;
+    public static String PRODUCT_VERSION;
+    public static String VENDOR_NAME;
 
     public final static DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
-    public final static String RELEASE_DATE    = "09/11/2006";
+    public final static String RELEASE_DATE    = "12/01/2006";
 
     public final static String FEATURE_NOT_AVAILABLE = "This feature is only available in the commercial version.";
 

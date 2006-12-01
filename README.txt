@@ -1,6 +1,6 @@
 Penrose Studio
 --------------
-Version ${project.version}
+Version ${product.version}
 Copyright (c) 2000-2006, Identyx Corporation.
 
 Overview
