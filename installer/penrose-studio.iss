@@ -4,20 +4,20 @@
 [Setup]
 
 AppName=Penrose Studio
-AppVerName=Penrose Studio ${project.version}
-DefaultDirName={pf}\Identyx\Penrose Studio ${project.version}
-DefaultGroupName=Identyx\Penrose Studio ${project.version}
-UninstallDisplayName=Penrose Studio ${project.version}
+AppVerName=Penrose Studio ${product.version}
+DefaultDirName={pf}\Identyx\Penrose Studio ${product.version}
+DefaultGroupName=Identyx\Penrose Studio ${product.version}
+UninstallDisplayName=Penrose Studio ${product.version}
 UninstallDisplayIcon={app}\penrose.ico
 Compression=zip
 SolidCompression=yes
-OutputBaseFilename=${project.name}-${project.version}
+OutputBaseFilename=${project.name}-${product.version}
 OutputDir=..\dist
 LicenseFile=LICENSE.txt
 
 [Files]
 
-Source: "${project.name}-${project.version}-win32\*"; DestDir: "{app}"; Flags: recursesubdirs;
+Source: "${project.name}-${product.version}-win32\*"; DestDir: "{app}"; Flags: recursesubdirs;
 
 [Icons]
 
