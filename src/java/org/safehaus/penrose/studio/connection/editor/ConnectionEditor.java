@@ -63,6 +63,7 @@ public class ConnectionEditor extends FormEditor {
             }
 
             addPage(new ConnectionAdvancedPage(this));
+            addPage(new ConnectionStatusPage(this));
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

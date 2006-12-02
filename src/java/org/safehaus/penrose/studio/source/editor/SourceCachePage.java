@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.jdbc.source;
+package org.safehaus.penrose.studio.source.editor;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
@@ -27,8 +27,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
-import org.safehaus.penrose.studio.source.editor.SourceEditor;
 
 /**
  * @author Endi S. Dewata

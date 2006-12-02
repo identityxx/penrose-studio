@@ -7,7 +7,7 @@ import org.safehaus.penrose.studio.adapter.PenroseStudioAdapter;
 import org.safehaus.penrose.studio.jdbc.connection.ConnectionPropertiesPage;
 import org.safehaus.penrose.studio.jdbc.connection.ConnectionTablesPage;
 import org.safehaus.penrose.studio.jdbc.source.SourcePropertiesPage;
-import org.safehaus.penrose.studio.jdbc.source.SourceCachePage;
+import org.safehaus.penrose.studio.source.editor.SourceCachePage;
 import org.safehaus.penrose.studio.jdbc.source.SourceBrowsePage;
 
 import java.util.Collection;
@@ -43,7 +43,6 @@ public class PenroseStudioJDBCAdapter extends PenroseStudioAdapter {
 
         pages.add(new SourcePropertiesPage(editor));
         pages.add(new SourceBrowsePage(editor));
-        pages.add(new SourceCachePage(editor));
 
         return pages;
     }

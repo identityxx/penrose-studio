@@ -47,7 +47,7 @@ public class SourceEditor extends FormEditor {
         originalSourceConfig = ei.getSourceConfig();
         sourceConfig = (SourceConfig)getOriginalSourceConfig().clone();
 
-        setPartName(getSourceConfig().getName());
+        setPartName("["+server.getName()+"] "+partition.getName()+" - "+getSourceConfig().getName());
     }
 
     public void addPages() {
@@ -68,7 +68,9 @@ public class SourceEditor extends FormEditor {
                 }
             }
 
+            addPage(new SourceCachePage(this));
             addPage(new SourceAdvancedPage(this));
+            addPage(new SourceStatusPage(this));
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
@@ -149,7 +151,7 @@ public class SourceEditor extends FormEditor {
 
         getPartition().modifySourceConfig(sourceConfig.getName(), sourceConfig);
 
-        setPartName(sourceConfig.getName());
+        setPartName("["+server.getName()+"] "+partition.getName()+" - "+getSourceConfig().getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.fireChangeEvent();
