@@ -285,7 +285,13 @@ public class BrowserEditor extends EditorPart {
         String dn = (String)treeItem.getData();
         if (dn == null) return;
 
-        LDAPSearchResults sr = connection.search(dn, LDAPConnection.SCOPE_BASE, "(objectClass=*)", new String[0], false);
+        LDAPSearchResults sr;
+        if ("".equals(dn)) {
+            sr = connection.search(dn, LDAPConnection.SCOPE_BASE, "(objectClass=*)", new String[] { "*", "+" }, false);
+        } else {
+            sr = connection.search(dn, LDAPConnection.SCOPE_BASE, "(objectClass=*)", new String[0], false);
+        }
+
         if (!sr.hasMore()) return;
 
         LDAPEntry entry = sr.next();
