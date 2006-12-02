@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.connection;
+package org.safehaus.penrose.studio.connection.editor;
 
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.*;
@@ -37,6 +37,7 @@ import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.studio.connection.wizard.JNDISourceWizard;
+import org.safehaus.penrose.studio.connection.editor.JNDIConnectionEditor;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.apache.log4j.Logger;

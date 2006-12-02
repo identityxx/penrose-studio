@@ -15,10 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.source;
+package org.safehaus.penrose.studio.source.editor;
 
 import java.util.*;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
@@ -27,55 +26,46 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.mapping.*;
-import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.schema.SchemaManager;
-import org.safehaus.penrose.schema.Schema;
-import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.source.editor.JDBCSourceEditor;
+import org.safehaus.penrose.studio.source.JDBCFieldDialog;
+import org.safehaus.penrose.studio.source.FieldDialog;
+import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.connector.JDBCAdapter;
 import org.apache.log4j.Logger;
 
-public class JNDISourcePropertyPage extends FormPage {
+public class JDBCSourcePropertyPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
     FormToolkit toolkit;
 
-	Text sourceNameText;
-    Combo connectionNameCombo;
+    Text sourceNameText;
+	Combo connectionNameCombo;
 
-	Text baseDnText;
-	Text filterText;
-	Combo scopeCombo;
-    Text objectClassesText;
-
+    Text catalogText;
+    Text schemaText;
+	Text tableText;
+    Text filterText;
 	Table fieldTable;
-	
+
     Button addButton;
     Button editButton;
     Button removeButton;
 
-    JNDISourceEditor editor;
+    JDBCSourceEditor editor;
     Partition partition;
-	SourceConfig source;
-	
-	LDAPClient client;
-	
-	String[] scopes = new String[] { "OBJECT", "ONELEVEL", "SUBTREE" };
+	SourceConfig sourceConfig;
 
-    public JNDISourcePropertyPage(JNDISourceEditor editor) throws Exception {
+    public JDBCSourcePropertyPage(JDBCSourceEditor editor) {
         super(editor, "PROPERTIES", "  Properties  ");
 
         this.editor = editor;
         this.partition = editor.partition;
-        this.source = editor.sourceConfig;
-
-        ConnectionConfig connectionConfig = partition.getConnectionConfig(source.getConnectionName());
-        if (connectionConfig != null) {
-            client = new LDAPClient(connectionConfig.getParameters());
-        }
+        this.sourceConfig = editor.sourceConfig;
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -95,11 +85,11 @@ public class JNDISourcePropertyPage extends FormPage {
         section.setClient(sourceSection);
 
         section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Directory Info");
+        section.setText("Database Info");
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Control directorySection = createDirectorySection(section);
-        section.setClient(directorySection);
+        Control tableSection = createDatabaseSection(section);
+        section.setClient(tableSection);
 
         section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Fields");
@@ -109,7 +99,7 @@ public class JNDISourcePropertyPage extends FormPage {
         section.setClient(fieldsSection);
 
         refresh();
-	}
+    }
 
 	public Composite createSourceSection(Composite parent) {
 
@@ -121,14 +111,14 @@ public class JNDISourcePropertyPage extends FormPage {
         gd.widthHint = 100;
         sourceNameLabel.setLayoutData(gd);
 
-        sourceNameText = toolkit.createText(composite, source.getName(), SWT.BORDER);
+		sourceNameText = toolkit.createText(composite, sourceConfig.getName(), SWT.BORDER);
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
 		sourceNameText.setLayoutData(gd);
 
         sourceNameText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                source.setName(sourceNameText.getText());
+                sourceConfig.setName(sourceNameText.getText());
                 checkDirty();
             }
         });
@@ -145,49 +135,97 @@ public class JNDISourcePropertyPage extends FormPage {
             connectionNameCombo.add(connectionConfig.getName());
         }
 
-        connectionNameCombo.setText(source.getConnectionName());
+        connectionNameCombo.setText(sourceConfig.getConnectionName());
 
         connectionNameCombo.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                source.setConnectionName(connectionNameCombo.getText());
+                sourceConfig.setConnectionName(connectionNameCombo.getText());
                 checkDirty();
             }
         });
 
-        return composite;
+		return composite;
 	}
 	
-	public Composite createDirectorySection(Composite parent) {
+	public Composite createDatabaseSection(Composite parent) {
 
 		Composite composite = toolkit.createComposite(parent);
 		composite.setLayout(new GridLayout(2, false));
 
-		Label baseDnLabel = toolkit.createLabel(composite, "Base DN:");
+        Label catalogLabel = toolkit.createLabel(composite, "Catalog:");
         GridData gd = new GridData(GridData.FILL);
         gd.widthHint = 100;
-        baseDnLabel.setLayoutData(gd);
+        catalogLabel.setLayoutData(gd);
 
-        String s = source.getParameter("baseDn");
-		baseDnText = toolkit.createText(composite, s == null ? "" : s, SWT.BORDER);
+        catalogText = toolkit.createText(composite, sourceConfig.getParameter(JDBCAdapter.CATALOG), SWT.BORDER);
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
-        baseDnText.setLayoutData(gd);
+        catalogText.setLayoutData(gd);
 
-        baseDnText.addModifyListener(new ModifyListener() {
+        catalogText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                if ("".equals(baseDnText.getText())) {
-                    source.removeParameter("baseDn");
+                if ("".equals(catalogText.getText())) {
+                    sourceConfig.removeParameter(JDBCAdapter.CATALOG);
                 } else {
-                    source.setParameter("baseDn", baseDnText.getText());
+                    sourceConfig.setParameter(JDBCAdapter.CATALOG, catalogText.getText());
                 }
                 checkDirty();
             }
         });
 
-		toolkit.createLabel(composite, "Filter:");
+        Label schemaLabel = toolkit.createLabel(composite, "Schema:");
+        gd = new GridData(GridData.FILL);
+        gd.widthHint = 100;
+        schemaLabel.setLayoutData(gd);
 
-        s = source.getParameter("filter");
-		filterText = toolkit.createText(composite, s == null ? "" : s, SWT.BORDER);
+        schemaText = toolkit.createText(composite, sourceConfig.getParameter(JDBCAdapter.SCHEMA), SWT.BORDER);
+        gd = new GridData(GridData.FILL);
+        gd.widthHint = 200;
+        schemaText.setLayoutData(gd);
+
+        schemaText.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent event) {
+                if ("".equals(schemaText.getText())) {
+                    sourceConfig.removeParameter(JDBCAdapter.SCHEMA);
+                } else {
+                    sourceConfig.setParameter(JDBCAdapter.SCHEMA, schemaText.getText());
+                }
+                checkDirty();
+            }
+        });
+
+		Label tableLabel = toolkit.createLabel(composite, "Table:");
+        gd = new GridData(GridData.FILL);
+        gd.widthHint = 100;
+        tableLabel.setLayoutData(gd);
+
+        String tableName = sourceConfig.getParameter(JDBCAdapter.TABLE);
+        if (tableName == null) tableName = sourceConfig.getParameter(JDBCAdapter.TABLE_NAME);
+
+		tableText = toolkit.createText(composite, tableName, SWT.BORDER);
+        gd = new GridData(GridData.FILL);
+        gd.widthHint = 200;
+        tableText.setLayoutData(gd);
+
+        tableText.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent event) {
+                if ("".equals(tableText.getText())) {
+                    sourceConfig.removeParameter(JDBCAdapter.TABLE);
+                    sourceConfig.removeParameter(JDBCAdapter.TABLE_NAME);
+                } else {
+                    sourceConfig.setParameter(JDBCAdapter.TABLE, tableText.getText());
+                    sourceConfig.removeParameter(JDBCAdapter.TABLE_NAME);
+                }
+                checkDirty();
+            }
+        });
+
+        Label filterLabel = toolkit.createLabel(composite, "Filter:");
+        gd = new GridData(GridData.FILL);
+        gd.widthHint = 100;
+        filterLabel.setLayoutData(gd);
+
+        filterText = toolkit.createText(composite, sourceConfig.getParameter("filter"), SWT.BORDER);
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
         filterText.setLayoutData(gd);
@@ -195,53 +233,9 @@ public class JNDISourcePropertyPage extends FormPage {
         filterText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(filterText.getText())) {
-                    source.removeParameter("filter");
+                    sourceConfig.removeParameter("filter");
                 } else {
-                    source.setParameter("filter", filterText.getText());
-                }
-                checkDirty();
-            }
-        });
-
-		toolkit.createLabel(composite, "Scope:");
-
-        s = source.getParameter("scope");
-		scopeCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
-		for (int i=0; i<scopes.length; i++) {
-			scopeCombo.add(scopes[i]);
-            if (scopes[i].equals(s)) {
-                scopeCombo.select(i);
-            }
-		}
-        gd = new GridData(GridData.FILL);
-        gd.widthHint = 200;
-        scopeCombo.setLayoutData(gd);
-
-        scopeCombo.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                if ("".equals(scopeCombo.getText())) {
-                    source.removeParameter("scope");
-                } else {
-                    source.setParameter("scope", scopeCombo.getText());
-                }
-                checkDirty();
-            }
-        });
-
-        toolkit.createLabel(composite, "Object Classes:");
-
-        s = source.getParameter("objectClasses");
-        objectClassesText = toolkit.createText(composite, s == null ? "" : s, SWT.BORDER);
-        gd = new GridData(GridData.FILL);
-        gd.widthHint = 200;
-        objectClassesText.setLayoutData(gd);
-
-        objectClassesText.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent event) {
-                if ("".equals(filterText.getText())) {
-                    source.removeParameter("objectClasses");
-                } else {
-                    source.setParameter("objectClasses", objectClassesText.getText());
+                    sourceConfig.setParameter("filter", filterText.getText());
                 }
                 checkDirty();
             }
@@ -255,41 +249,52 @@ public class JNDISourcePropertyPage extends FormPage {
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
 
-        fieldTable = toolkit.createTable(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.CHECK | SWT.MULTI);
+		fieldTable = toolkit.createTable(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.CHECK | SWT.MULTI);
         fieldTable.setHeaderVisible(true);
         fieldTable.setLinesVisible(true);
 
         fieldTable.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		fieldTable.addMouseListener(new MouseAdapter() {
+        fieldTable.addMouseListener(new MouseAdapter() {
             public void mouseDoubleClick(MouseEvent event) {
                 try {
                     if (fieldTable.getSelectionCount() == 0) return;
 
                     int index = fieldTable.getSelectionIndex();
                     TableItem item = fieldTable.getSelection()[0];
-                    FieldConfig fieldDefinition = (FieldConfig)item.getData();
-                    String oldName = fieldDefinition.getName();
+                    FieldConfig fieldConfig = (FieldConfig)item.getData();
+                    String oldName = fieldConfig.getName();
 
-                    Collection attributeTypes;
-                    if (client == null) {
-                        attributeTypes = new ArrayList();
-                    } else {
-                        Schema schema = client.getSchema();
-                        attributeTypes = schema.getAttributeTypes();
-                    }
+                    PenroseApplication penroseApplication = PenroseApplication.getInstance();
+                    PartitionManager partitionManager = penroseApplication.getPartitionManager();
+                    Partition partition = partitionManager.getPartition(sourceConfig);
 
-                    JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
-                    dialog.setAttributeTypes(attributeTypes);
-                    dialog.setFieldConfig(fieldDefinition);
+                    ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
+
+                    String catalog = sourceConfig.getParameter(JDBCAdapter.CATALOG);
+                    String schema = sourceConfig.getParameter(JDBCAdapter.SCHEMA);
+                    String tableName = sourceConfig.getParameter(JDBCAdapter.TABLE);
+                    if (tableName == null) tableName = sourceConfig.getParameter(JDBCAdapter.TABLE_NAME);
+                    if (catalog != null) tableName = catalog +"."+tableName;
+                    if (schema != null) tableName = schema +"."+tableName;
+
+                    JDBCClient client = new JDBCClient(connectionConfig.getParameters());
+                    
+                    client.connect();
+                    Collection fields = client.getColumns(tableName);
+                    client.close();
+
+                    JDBCFieldDialog dialog = new JDBCFieldDialog(parent.getShell(), SWT.NONE);
+                    dialog.setColumns(fields);
+                    dialog.setFieldConfig(fieldConfig);
                     dialog.open();
 
                     if (dialog.getAction() == FieldDialog.CANCEL) return;
 
-                    String newName = fieldDefinition.getName();
+                    String newName = fieldConfig.getName();
 
                     if (!oldName.equals(newName)) {
-                        source.renameFieldConfig(oldName, newName);
+                        sourceConfig.renameFieldConfig(oldName, newName);
                     }
 
                     refresh();
@@ -301,30 +306,30 @@ public class JNDISourcePropertyPage extends FormPage {
                 }
             }
 
-			public void mouseUp(MouseEvent e) {
-				for (int i=0; i<fieldTable.getItemCount(); i++) {
-					TableItem item = fieldTable.getItem(i);
+            public void mouseUp(MouseEvent e) {
+                for (int i=0; i<fieldTable.getItemCount(); i++) {
+                    TableItem item = fieldTable.getItem(i);
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     fieldDefinition.setPrimaryKey(item.getChecked()+"");
-					item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
-				}
+                    item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                }
 
                 checkDirty();
-			}
-		});
+            }
+        });
 
-		fieldTable.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				for (int i=0; i<fieldTable.getItemCount(); i++) {
-					TableItem item = fieldTable.getItem(i);
+        fieldTable.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+                for (int i=0; i<fieldTable.getItemCount(); i++) {
+                    TableItem item = fieldTable.getItem(i);
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     fieldDefinition.setPrimaryKey(item.getChecked()+"");
-					item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
-				}
+                    item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                }
 
                 checkDirty();
-			}
-		});
+            }
+        });
 
         TableColumn tc = new TableColumn(fieldTable, SWT.NONE);
         tc.setText("Name");
@@ -351,17 +356,37 @@ public class JNDISourcePropertyPage extends FormPage {
                     FieldConfig fieldDefinition = new FieldConfig();
 
                     PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    SchemaManager schemaManager = penroseApplication.getSchemaManager();
-                    Collection attributeTypes = schemaManager.getAttributeTypes();
+                    PartitionManager partitionManager = penroseApplication.getPartitionManager();
+                    Partition partition = partitionManager.getPartition(sourceConfig);
 
-                    JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
-                    dialog.setAttributeTypes(attributeTypes);
+                    ConnectionConfig connection = partition.getConnectionConfig(sourceConfig.getConnectionName());
+
+                    String catalogName = sourceConfig.getParameter(JDBCAdapter.CATALOG);
+                    String schemaName = sourceConfig.getParameter(JDBCAdapter.SCHEMA);
+                    String tableName = sourceConfig.getParameter(JDBCAdapter.TABLE);
+                    if (tableName == null) tableName = sourceConfig.getParameter(JDBCAdapter.TABLE_NAME);
+                    if (catalogName != null) tableName = catalogName+"."+tableName;
+                    if (schemaName != null) tableName = schemaName+"."+tableName;
+
+                    JDBCClient helper = new JDBCClient(
+                            connection.getParameter(JDBCAdapter.DRIVER),
+                            connection.getParameter(JDBCAdapter.URL),
+                            connection.getParameter(JDBCAdapter.USER),
+                            connection.getParameter(JDBCAdapter.PASSWORD)
+                    );
+
+                    helper.connect();
+                    Collection fields = helper.getColumns(tableName);
+                    helper.close();
+
+                    JDBCFieldDialog dialog = new JDBCFieldDialog(parent.getShell(), SWT.NONE);
+                    dialog.setColumns(fields);
                     dialog.setFieldConfig(fieldDefinition);
                     dialog.open();
 
                     if (dialog.getAction() == FieldDialog.CANCEL) return;
 
-                    source.addFieldConfig(fieldDefinition);
+                    sourceConfig.addFieldConfig(fieldDefinition);
 
                     refresh();
                     checkDirty();
@@ -386,11 +411,31 @@ public class JNDISourcePropertyPage extends FormPage {
                     String oldName = fieldDefinition.getName();
 
                     PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    SchemaManager schemaManager = penroseApplication.getSchemaManager();
-                    Collection attributeTypes = schemaManager.getAttributeTypes();
+                    PartitionManager partitionManager = penroseApplication.getPartitionManager();
+                    Partition partition = partitionManager.getPartition(sourceConfig);
 
-                    JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
-                    dialog.setAttributeTypes(attributeTypes);
+                    ConnectionConfig connection = partition.getConnectionConfig(sourceConfig.getConnectionName());
+
+                    String catalogName = sourceConfig.getParameter(JDBCAdapter.CATALOG);
+                    String schemaName = sourceConfig.getParameter(JDBCAdapter.SCHEMA);
+                    String tableName = sourceConfig.getParameter(JDBCAdapter.TABLE);
+                    if (tableName == null) tableName = sourceConfig.getParameter(JDBCAdapter.TABLE_NAME);
+                    if (catalogName != null) tableName = catalogName+"."+tableName;
+                    if (schemaName != null) tableName = schemaName+"."+tableName;
+
+                    JDBCClient helper = new JDBCClient(
+                            connection.getParameter(JDBCAdapter.DRIVER),
+                            connection.getParameter(JDBCAdapter.URL),
+                            connection.getParameter(JDBCAdapter.USER),
+                            connection.getParameter(JDBCAdapter.PASSWORD)
+                    );
+
+                    helper.connect();
+                    Collection fields = helper.getColumns(tableName);
+                    helper.close();
+
+                    JDBCFieldDialog dialog = new JDBCFieldDialog(parent.getShell(), SWT.NONE);
+                    dialog.setColumns(fields);
                     dialog.setFieldConfig(fieldDefinition);
                     dialog.open();
 
@@ -399,7 +444,7 @@ public class JNDISourcePropertyPage extends FormPage {
                     String newName = fieldDefinition.getName();
 
                     if (!oldName.equals(newName)) {
-                        source.renameFieldConfig(oldName, newName);
+                        sourceConfig.renameFieldConfig(oldName, newName);
                     }
 
                     refresh();
@@ -423,7 +468,7 @@ public class JNDISourcePropertyPage extends FormPage {
                     TableItem items[] = fieldTable.getSelection();
                     for (int i=0; i<items.length; i++) {
                         FieldConfig fieldDefinition = (FieldConfig)items[i].getData();
-                        source.removeFieldConfig(fieldDefinition);
+                        sourceConfig.removeFieldConfig(fieldDefinition);
                     }
 
                     refresh();
@@ -440,59 +485,10 @@ public class JNDISourcePropertyPage extends FormPage {
 		return composite;
 	}
 
-    public void store() throws Exception {
-
-        Partition partition = editor.getPartition();
-
-        if (!sourceNameText.getText().equals(source.getName())) {
-
-            String oldName = source.getName();
-            String newName = sourceNameText.getText();
-
-            Collection entries = partition.getEntryMappings();
-            for (Iterator i=entries.iterator(); i.hasNext(); ) {
-                EntryMapping entry = (EntryMapping)i.next();
-
-                SourceMapping s = entry.removeSourceMapping(oldName);
-                if (s == null) continue;
-
-                s.setName(newName);
-                entry.addSourceMapping(s);
-            }
-
-            partition.removeSourceConfig(oldName);
-            source.setName(newName);
-            partition.addSourceConfig(source);
-        }
-
-        source.setParameter("baseDn", baseDnText.getText());
-        source.setParameter("filter", filterText.getText());
-        source.setParameter("scope", scopeCombo.getText());
-        source.setParameter("objectClasses", objectClassesText.getText());
-
-        TableItem[] items = fieldTable.getItems();
-        source.getFieldConfigs().clear();
-
-        for (int i=0; i<items.length; i++) {
-            TableItem item = items[i];
-            FieldConfig field = (FieldConfig)item.getData();
-            field.setName("".equals(item.getText(1)) ? item.getText(0) : item.getText(1));
-            field.setOriginalName(item.getText(0));
-            field.setType(item.getText(2));
-            field.setPrimaryKey(items[i].getChecked()+"");
-            source.addFieldConfig(field);
-        }
-
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
-
-        checkDirty();
-    }
-
     public void refresh() {
         fieldTable.removeAll();
 
-        Collection fields = source.getFieldConfigs();
+        Collection fields = sourceConfig.getFieldConfigs();
         for (Iterator i=fields.iterator(); i.hasNext(); ) {
             FieldConfig fieldDefinition = (FieldConfig)i.next();
 

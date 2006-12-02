@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.source;
+package org.safehaus.penrose.studio.source.editor;
 
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;

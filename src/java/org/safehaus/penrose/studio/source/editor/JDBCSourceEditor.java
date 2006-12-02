@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.source;
+package org.safehaus.penrose.studio.source.editor;
 
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
@@ -23,7 +23,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.studio.source.JDBCSourceCachePage;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.SourceConfig;
 import org.safehaus.penrose.mapping.EntryMapping;

@@ -15,25 +15,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.connection;
+package org.safehaus.penrose.studio.source.editor;
 
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.SourceConfig;
 
 /**
  * @author Endi S. Dewata
  */
-public class JNDIConnectionEditorInput implements IEditorInput {
+public class JNDISourceEditorInput implements IEditorInput {
 
     private Partition partition;
-    private ConnectionConfig connectionConfig;
+    private SourceConfig sourceConfig;
 
-    public JNDIConnectionEditorInput(Partition partition, ConnectionConfig connectionConfig) {
+    public JNDISourceEditorInput(Partition partition, SourceConfig sourceConfig) {
         this.partition = partition;
-        this.connectionConfig = connectionConfig;
+        this.sourceConfig = sourceConfig;
     }
 
     public boolean exists() {
@@ -45,7 +45,7 @@ public class JNDIConnectionEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return connectionConfig.getName();
+        return sourceConfig.getName();
     }
 
     public IPersistableElement getPersistable() {
@@ -53,7 +53,7 @@ public class JNDIConnectionEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return connectionConfig.getName();
+        return sourceConfig.getName();
     }
 
     public Object getAdapter(Class aClass) {
@@ -62,18 +62,18 @@ public class JNDIConnectionEditorInput implements IEditorInput {
 
     public boolean equals(Object o) {
         if (o == null) return false;
-        if (!(o instanceof JNDIConnectionEditorInput)) return false;
+        if (!(o instanceof JNDISourceEditorInput)) return false;
 
-        JNDIConnectionEditorInput cei = (JNDIConnectionEditorInput)o;
-        return connectionConfig.equals(cei.connectionConfig);
+        JNDISourceEditorInput cei = (JNDISourceEditorInput)o;
+        return sourceConfig.equals(cei.sourceConfig);
     }
 
-    public ConnectionConfig getConnectionConfig() {
-        return connectionConfig;
+    public SourceConfig getSourceConfig() {
+        return sourceConfig;
     }
 
-    public void setConnectionConfig(ConnectionConfig connectionConfig) {
-        this.connectionConfig = connectionConfig;
+    public void setSourceConfig(SourceConfig sourceConfig) {
+        this.sourceConfig = sourceConfig;
     }
 
     public Partition getPartition() {

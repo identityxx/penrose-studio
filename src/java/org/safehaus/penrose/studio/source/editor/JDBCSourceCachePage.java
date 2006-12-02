@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.source;
+package org.safehaus.penrose.studio.source.editor;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
@@ -28,6 +28,7 @@ import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.partition.SourceConfig;
+import org.safehaus.penrose.studio.source.editor.JDBCSourceEditor;
 
 /**
  * @author Endi S. Dewata
@@ -46,7 +47,7 @@ public class JDBCSourceCachePage extends FormPage {
     Combo loadingMethodCombo;
 
     JDBCSourceEditor editor;
-	SourceConfig sourceConfig;
+    SourceConfig sourceConfig;
 
     public JDBCSourceCachePage(JDBCSourceEditor editor) {
         super(editor, "CACHE", "  Cache  ");
@@ -84,25 +85,25 @@ public class JDBCSourceCachePage extends FormPage {
 
         Control dataLoadingSection = createDataLoadingSection(section);
         section.setClient(dataLoadingSection);
-	}
+    }
 
-	public Composite createFilterCacheSection(Composite parent) {
+    public Composite createFilterCacheSection(Composite parent) {
 
-		Composite composite = toolkit.createComposite(parent);
-		composite.setLayout(new GridLayout(2, false));
+        Composite composite = toolkit.createComposite(parent);
+        composite.setLayout(new GridLayout(2, false));
 
-		Label filterCacheSizeLabel = toolkit.createLabel(composite, "Size (entries):");
+        Label filterCacheSizeLabel = toolkit.createLabel(composite, "Size (entries):");
         GridData gd = new GridData(GridData.FILL);
         gd.widthHint = 100;
         filterCacheSizeLabel.setLayoutData(gd);
 
         String value = sourceConfig.getParameter(SourceConfig.QUERY_CACHE_SIZE);
         value = value == null ? ""+SourceConfig.DEFAULT_QUERY_CACHE_SIZE : value;
-		filterCacheSizeText = toolkit.createText(composite, value, SWT.BORDER);
+        filterCacheSizeText = toolkit.createText(composite, value, SWT.BORDER);
 
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
-		filterCacheSizeText.setLayoutData(gd);
+        filterCacheSizeText.setLayoutData(gd);
 
         filterCacheSizeText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
@@ -139,8 +140,8 @@ public class JDBCSourceCachePage extends FormPage {
             }
         });
 
-		return composite;
-	}
+        return composite;
+    }
 
     public Composite createDataCacheSection(Composite parent) {
 
