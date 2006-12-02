@@ -21,6 +21,7 @@ import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.action.PenroseStudioActions;
 import org.safehaus.penrose.studio.module.action.NewModuleAction;
 import org.safehaus.penrose.studio.module.action.NewPollingConnectorModuleAction;
@@ -45,6 +46,7 @@ public class ModulesNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
+    private Server server;
     private Partition partition;
 
     public ModulesNode(String name, Image image, Object object, Node parent) {
@@ -113,6 +115,7 @@ public class ModulesNode extends Node {
                     this
             );
 
+            moduleNode.setServer(server);
             moduleNode.setPartition(partition);
             moduleNode.setModuleConfig(moduleConfig);
 
@@ -128,5 +131,13 @@ public class ModulesNode extends Node {
 
     public void setPartition(Partition partition) {
         this.partition = partition;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

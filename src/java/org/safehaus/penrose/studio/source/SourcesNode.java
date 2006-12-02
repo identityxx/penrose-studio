@@ -43,19 +43,17 @@ public class SourcesNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    Server server;
+    private Server server;
 
     private Partition partition;
 
     public SourcesNode(
-            Server server,
             String name,
             Image image,
             Object object,
             Node parent
     ) {
         super(name, image, object, parent);
-        this.server = server;
     }
 
     public void showMenu(IMenuManager manager) {
@@ -124,5 +122,13 @@ public class SourcesNode extends Node {
 
     public void setPartition(Partition partition) {
         this.partition = partition;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

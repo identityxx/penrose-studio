@@ -22,19 +22,16 @@ import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
  */
 public class ModuleEditorInput implements IEditorInput {
 
+    private Server server;
     private Partition partition;
     private ModuleConfig moduleConfig;
-
-    public ModuleEditorInput(Partition partition, ModuleConfig moduleConfig) {
-        this.partition = partition;
-        this.moduleConfig = moduleConfig;
-    }
 
     public boolean exists() {
         return true;
@@ -60,12 +57,27 @@ public class ModuleEditorInput implements IEditorInput {
         return null;
     }
 
+    public int hashCode() {
+        return (partition == null ? 0 : partition.hashCode()) +
+                (moduleConfig == null ? 0 : moduleConfig.hashCode());
+    }
+
+    boolean equals(Object o1, Object o2) {
+        if (o1 == null && o2 == null) return true;
+        if (o1 != null) return o1.equals(o2);
+        return o2.equals(o1);
+    }
+
     public boolean equals(Object o) {
         if (o == null) return false;
         if (!(o instanceof ModuleEditorInput)) return false;
 
         ModuleEditorInput cei = (ModuleEditorInput)o;
-        return moduleConfig.equals(cei.moduleConfig);
+
+        if (!equals(partition, cei.partition)) return false;
+        if (!equals(moduleConfig, cei.moduleConfig)) return false;
+
+        return true;
     }
 
     public ModuleConfig getModuleConfig() {
@@ -82,5 +94,13 @@ public class ModuleEditorInput implements IEditorInput {
 
     public void setPartition(Partition partition) {
         this.partition = partition;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

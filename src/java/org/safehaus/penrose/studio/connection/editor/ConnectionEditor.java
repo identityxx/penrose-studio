@@ -114,18 +114,6 @@ public class ConnectionEditor extends FormEditor {
         this.connectionConfig = connectionConfig;
     }
 
-    public ConnectionConfig getOriginalConnectionConfig() {
-        return originalConnectionConfig;
-    }
-
-    public void setOriginalConnectionConfig(ConnectionConfig originalConnectionConfig) {
-        this.originalConnectionConfig = originalConnectionConfig;
-    }
-
-    public void setDirty(boolean dirty) {
-        this.dirty = dirty;
-    }
-
     public void doSave(IProgressMonitor iProgressMonitor) {
         try {
             store();

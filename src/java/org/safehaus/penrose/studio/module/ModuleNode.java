@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.module;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.module.editor.ModuleEditor;
 import org.safehaus.penrose.studio.module.editor.ModuleEditorInput;
 import org.safehaus.penrose.studio.action.PenroseStudioActions;
@@ -40,6 +41,7 @@ public class ModuleNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
+    private Server server;
     private Partition partition;
     private ModuleConfig moduleConfig;
 
@@ -63,11 +65,14 @@ public class ModuleNode extends Node {
 
     public void open() throws Exception {
 
-        ModuleEditorInput mei = new ModuleEditorInput(partition, moduleConfig);
+        ModuleEditorInput ei = new ModuleEditorInput();
+        ei.setServer(server);
+        ei.setPartition(partition);
+        ei.setModuleConfig(moduleConfig);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
-        page.openEditor(mei, ModuleEditor.class.getName());
+        page.openEditor(ei, ModuleEditor.class.getName());
     }
 
     public void delete() {
@@ -101,5 +106,13 @@ public class ModuleNode extends Node {
 
     public void setModuleConfig(ModuleConfig moduleConfig) {
         this.moduleConfig = moduleConfig;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

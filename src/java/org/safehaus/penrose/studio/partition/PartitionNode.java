@@ -145,13 +145,13 @@ public class PartitionNode extends Node {
         children.add(connectionsNode);
 
         SourcesNode sourcesNode = new SourcesNode(
-                server,
                 ObjectsView.SOURCES,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
                 ObjectsView.SOURCES,
                 this
         );
 
+        sourcesNode.setServer(server);
         sourcesNode.setPartition(partition);
 
         children.add(sourcesNode);
@@ -163,6 +163,7 @@ public class PartitionNode extends Node {
                 this
         );
 
+        modulesNode.setServer(server);
         modulesNode.setPartition(partition);
 
         children.add(modulesNode);
