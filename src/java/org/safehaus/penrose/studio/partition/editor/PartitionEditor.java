@@ -38,7 +38,7 @@ public class PartitionEditor extends FormEditor {
         originalPartitionConfig = ei.getPartitionConfig();
         partitionConfig = (PartitionConfig)originalPartitionConfig.clone();
 
-        setPartName(partitionConfig.getName());
+        setPartName("["+server.getName()+"] "+partitionConfig.getName());
     }
 
     public void addPages() {
@@ -46,6 +46,7 @@ public class PartitionEditor extends FormEditor {
             addPage(new PartitionPropertiesPage(this));
             addPage(new PartitionCachePage(this, "ENTRY_CACHE", "  Entry Cache  ", partitionConfig.getEntryCacheConfig()));
             addPage(new PartitionCachePage(this, "SOURCE_CACHE", "  Source Cache  ", partitionConfig.getSourceCacheConfig()));
+            addPage(new PartitionStatusPage(this));
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
@@ -80,14 +81,6 @@ public class PartitionEditor extends FormEditor {
         }
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
-    }
-
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
-    }
-
     public void setDirty(boolean dirty) {
         this.dirty = dirty;
     }
@@ -107,7 +100,7 @@ public class PartitionEditor extends FormEditor {
 
         originalPartitionConfig.copy(partitionConfig);
 
-        setPartName(partitionConfig.getName());
+        setPartName("["+server.getName()+"] "+partitionConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.fireChangeEvent();
@@ -125,5 +118,13 @@ public class PartitionEditor extends FormEditor {
 
     public void setServer(Server server) {
         this.server = server;
+    }
+
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
+    }
+
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

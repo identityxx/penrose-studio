@@ -293,15 +293,19 @@ public class PreviewEditor extends EditorPart {
 
         table.removeAll();
 
-        String parentDn = (String)treeItem.getData();
-        if (parentDn == null) return;
+        String dn = (String)treeItem.getData();
+        if (dn == null) return;
 
         PenroseSearchResults results = new PenroseSearchResults();
 
         PenroseSearchControls sc = new PenroseSearchControls();
         sc.setScope(PenroseSearchControls.SCOPE_BASE);
 
-        session.search(parentDn, "(objectClass=*)", sc, results);
+        if ("".equals(dn)) {
+            sc.setAttributes(new String[] { "*", "+" });
+        }
+
+        session.search(dn, "(objectClass=*)", sc, results);
         if (!results.hasNext()) return;
 
         SearchResult entry = (SearchResult)results.next();

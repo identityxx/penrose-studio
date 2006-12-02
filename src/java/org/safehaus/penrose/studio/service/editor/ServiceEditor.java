@@ -18,66 +18,87 @@
 package org.safehaus.penrose.studio.service.editor;
 
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.service.editor.ServiceEditorInput;
-import org.safehaus.penrose.studio.service.editor.ServicePropertyPage;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.apache.log4j.Logger;
+
+import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
  */
-public class ServiceEditor extends MultiPageEditorPart {
+public class ServiceEditor extends FormEditor {
 
     Logger log = Logger.getLogger(getClass());
 
-    ServiceConfig origServiceConfig;
-    ServiceConfig serviceConfig;
+    private Server server;
+    private ServiceConfig origServiceConfig;
+    private ServiceConfig serviceConfig;
 
     boolean dirty;
 
-    ServicePropertyPage propertyPage;
-
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        ServiceEditorInput ei = (ServiceEditorInput)input;
+        setSite(site);
+        setInput(input);
+    }
 
+    public void setInput(IEditorInput input) {
+        super.setInput(input);
+
+        ServiceEditorInput ei = (ServiceEditorInput)input;
+        server = ei.getServer();
         origServiceConfig = ei.getServiceConfig();
         serviceConfig = (ServiceConfig)origServiceConfig.clone();
 
-        setSite(site);
-        setInput(input);
-        setPartName(serviceConfig.getName());
+        setPartName("["+server.getName()+"] "+serviceConfig.getName());
     }
 
-    protected void createPages() {
+    public void addPages() {
         try {
-            propertyPage = new ServicePropertyPage(this);
-            addPage(propertyPage.createControl());
-            setPageText(0, "  Properties  ");
-
-            load();
+            addPage(new ServicePropertyPage(this));
+            addPage(new ServiceStatusPage(this));
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
         }
     }
 
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    public void checkDirty() {
+        try {
+            dirty = false;
+
+            if (!origServiceConfig.equals(serviceConfig)) {
+                dirty = true;
+                return;
+            }
+
+        } catch (Exception e) {
+            log.debug(e.getMessage(), e);
+
+        } finally {
+            firePropertyChange(PROP_DIRTY);
+        }
+    }
+
+    public void refresh() {
+        for (Iterator i=pages.iterator(); i.hasNext(); ) {
+            ServiceEditorPage page = (ServiceEditorPage)i.next();
+            page.refresh();
+        }
+    }
+
     public Composite getParent() {
         return getContainer();
-    }
-
-    public void dispose() {
-        propertyPage.dispose();
-        super.dispose();
-    }
-
-    public void load() throws Exception {
-        propertyPage.load();
     }
 
     public void doSave(IProgressMonitor iProgressMonitor) {
@@ -96,7 +117,7 @@ public class ServiceEditor extends MultiPageEditorPart {
 
         origServiceConfig.copy(serviceConfig);
 
-        setPartName(serviceConfig.getName());
+        setPartName("["+server.getName()+"] "+serviceConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.fireChangeEvent();
@@ -104,28 +125,23 @@ public class ServiceEditor extends MultiPageEditorPart {
         checkDirty();
     }
 
-    public boolean isDirty() {
-        return dirty;
-    }
-
     public boolean isSaveAsAllowed() {
         return false;
     }
 
-    public void checkDirty() {
-        try {
-            dirty = false;
+    public Server getServer() {
+        return server;
+    }
 
-            if (!origServiceConfig.equals(serviceConfig)) {
-                dirty = true;
-                return;
-            }
+    public void setServer(Server server) {
+        this.server = server;
+    }
 
-        } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+    public ServiceConfig getServiceConfig() {
+        return serviceConfig;
+    }
 
-        } finally {
-            firePropertyChange(PROP_DIRTY);
-        }
+    public void setServiceConfig(ServiceConfig serviceConfig) {
+        this.serviceConfig = serviceConfig;
     }
 }

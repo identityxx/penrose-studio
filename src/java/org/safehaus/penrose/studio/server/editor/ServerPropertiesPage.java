@@ -27,11 +27,11 @@ public class ServerPropertiesPage extends FormPage {
 
     FormToolkit toolkit;
 
-    Label typeLabel;
-    Label hostnameLabel;
-    Label portLabel;
-    Label usernameLabel;
-    Label passwordLabel;
+    Text typeText;
+    Text hostnameText;
+    Text portText;
+    Text usernameText;
+    Text passwordText;
 
     ServerEditor editor;
     Server server;
@@ -75,42 +75,47 @@ public class ServerPropertiesPage extends FormPage {
         gd.widthHint = 100;
         typeLabel.setLayoutData(gd);
 
-        this.typeLabel = toolkit.createLabel(composite, "", SWT.NONE);
-        this.typeLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        typeText = toolkit.createText(composite, "", SWT.READ_ONLY);
+        typeText.setEnabled(false);
+        typeText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         String s = serverConfig.getType();
-        if (s != null) this.typeLabel.setText(s);
+        if (s != null) this.typeText.setText(s);
 
         toolkit.createLabel(composite, "Hostname:");
 
-        hostnameLabel = toolkit.createLabel(composite, "", SWT.NONE);
-        hostnameLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        hostnameText = toolkit.createText(composite, "", SWT.READ_ONLY);
+        hostnameText.setEnabled(false);
+        hostnameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         s = serverConfig.getHostname();
-        if (s != null) hostnameLabel.setText(s);
+        if (s != null) hostnameText.setText(s);
 
         toolkit.createLabel(composite, "Port:");
 
-        portLabel = toolkit.createLabel(composite, "", SWT.NONE);
-        portLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        portText = toolkit.createText(composite, "", SWT.READ_ONLY);
+        portText.setEnabled(false);
+        portText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         int port = serverConfig.getPort();
-        portLabel.setText(port+"");
+        portText.setText(port+"");
 
         toolkit.createLabel(composite, "Username:");
 
-        usernameLabel = toolkit.createLabel(composite, "", SWT.NONE);
-        usernameLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        usernameText = toolkit.createText(composite, "", SWT.READ_ONLY);
+        usernameText.setEnabled(false);
+        usernameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         s = serverConfig.getUsername();
-        if (s != null) usernameLabel.setText(s);
+        if (s != null) usernameText.setText(s);
 
         toolkit.createLabel(composite, "Password:");
 
-        passwordLabel = toolkit.createLabel(composite, "", SWT.PASSWORD);
-        passwordLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        passwordText = toolkit.createText(composite, "", SWT.PASSWORD | SWT.READ_ONLY);
+        passwordText.setEnabled(false);
+        passwordText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        passwordLabel.setText("********");
+        passwordText.setText("********");
 
         return section;
     }
@@ -187,9 +192,5 @@ public class ServerPropertiesPage extends FormPage {
         });
 
         return section;
-    }
-
-    public void checkDirty() {
-        editor.checkDirty();
     }
 }

@@ -21,7 +21,6 @@ import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.service.editor.ServiceParameterPage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.apache.log4j.Logger;

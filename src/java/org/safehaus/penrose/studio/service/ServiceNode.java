@@ -65,7 +65,9 @@ public class ServiceNode extends Node {
 
     public void open() throws Exception {
 
-        ServiceEditorInput ei = new ServiceEditorInput(serviceConfig);
+        ServiceEditorInput ei = new ServiceEditorInput();
+        ei.setServer(server);
+        ei.setServiceConfig(serviceConfig);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();

@@ -25,20 +25,15 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.*;
-import org.safehaus.penrose.service.ServiceConfig;
+import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
-import org.apache.log4j.Logger;
 
 import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
  */
-public class ServicePropertyPage {
-
-    Logger log = Logger.getLogger(getClass());
-
-    FormToolkit toolkit;
+public class ServicePropertyPage extends ServiceEditorPage {
 
     Text dnText;
 	Text classText;
@@ -51,43 +46,44 @@ public class ServicePropertyPage {
     Button editButton;
     Button removeButton;
 
-    ServiceEditor editor;
-    ServiceConfig serviceConfig;
-
     public ServicePropertyPage(ServiceEditor editor) {
-        this.editor = editor;
-        this.serviceConfig = editor.serviceConfig;
+        super(editor, "STATUS", "  Status  ");
     }
 
-    public Control createControl() {
-        toolkit = new FormToolkit(editor.getParent().getDisplay());
+    public void createFormContent(IManagedForm managedForm) {
+        super.createFormContent(managedForm);
 
-        Form form = toolkit.createForm(editor.getParent());
-        form.setText("Service Editor");
-
+        ScrolledForm form = managedForm.getForm();
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-        Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Properties");
-        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Control propertiesSection = createPropertiesSection(body);
+        propertiesSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Control propertiesSection = createPropertiesSection(section);
-        section.setClient(propertiesSection);
-
-        section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Parameters");
-        section.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-        Control parametersSection = createParametersSection(section);
-        section.setClient(parametersSection);
-
-        return form;
+        Control parametersSection = createParametersSection(body);
+        parametersSection.setLayoutData(new GridData(GridData.FILL_BOTH));
 	}
 
-	public Composite createPropertiesSection(Composite parent) {
+    public void refresh() {
+        parametersTable.removeAll();
 
-		Composite composite = toolkit.createComposite(parent);
+        for (Iterator i=getServiceConfig().getParameterNames().iterator(); i.hasNext(); ) {
+            String name = (String)i.next();
+            String value = getServiceConfig().getParameter(name);
+
+            TableItem item = new TableItem(parametersTable, SWT.CHECK);
+            item.setText(0, name);
+            item.setText(1, value);
+        }
+    }
+
+	public Section createPropertiesSection(Composite parent) {
+
+        Section section = toolkit.createSection(parent, Section.TITLE_BAR | Section.EXPANDED);
+        section.setText("Properties");
+
+		Composite composite = toolkit.createComposite(section);
+        section.setClient(composite);
 		composite.setLayout(new GridLayout(2, false));
 
 		Label dnLabel = toolkit.createLabel(composite, "Name:");
@@ -95,13 +91,13 @@ public class ServicePropertyPage {
         gd.widthHint = 100;
         dnLabel.setLayoutData(gd);
 
-		dnText = toolkit.createText(composite, serviceConfig.getName(), SWT.BORDER);
+		dnText = toolkit.createText(composite, getServiceConfig().getName(), SWT.BORDER);
         gd = new GridData(GridData.FILL_HORIZONTAL);
 		dnText.setLayoutData(gd);
 
         dnText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                serviceConfig.setName(dnText.getText());
+                getServiceConfig().setName(dnText.getText());
                 checkDirty();
             }
         });
@@ -111,13 +107,13 @@ public class ServicePropertyPage {
         gd.widthHint = 100;
         passwordLabel.setLayoutData(gd);
 
-        classText = toolkit.createText(composite, serviceConfig.getServiceClass(), SWT.BORDER);
+        classText = toolkit.createText(composite, getServiceConfig().getServiceClass(), SWT.BORDER);
         gd = new GridData(GridData.FILL_HORIZONTAL);
         classText.setLayoutData(gd);
 
         classText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                serviceConfig.setServiceClass(classText.getText());
+                getServiceConfig().setServiceClass(classText.getText());
                 checkDirty();
             }
         });
@@ -127,13 +123,13 @@ public class ServicePropertyPage {
         gd.widthHint = 100;
         descriptionLabel.setLayoutData(gd);
 
-        descriptionText = toolkit.createText(composite, serviceConfig.getDescription(), SWT.BORDER);
+        descriptionText = toolkit.createText(composite, getServiceConfig().getDescription(), SWT.BORDER);
         gd = new GridData(GridData.FILL_HORIZONTAL);
         descriptionText.setLayoutData(gd);
 
         descriptionText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                serviceConfig.setDescription(descriptionText.getText());
+                getServiceConfig().setDescription("".equals(descriptionText.getText()) ? null : descriptionText.getText());
                 checkDirty();
             }
         });
@@ -144,25 +140,30 @@ public class ServicePropertyPage {
         enabledLabel.setLayoutData(gd);
 
         enabledCheckbox = toolkit.createButton(composite, "", SWT.CHECK);
-        enabledCheckbox.setSelection(serviceConfig.isEnabled());
+        enabledCheckbox.setSelection(getServiceConfig().isEnabled());
         gd = new GridData(GridData.FILL_HORIZONTAL);
         enabledCheckbox.setLayoutData(gd);
 
         enabledCheckbox.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                serviceConfig.setEnabled(enabledCheckbox.getSelection());
+                getServiceConfig().setEnabled(enabledCheckbox.getSelection());
                 checkDirty();
             }
 
             public void widgetDefaultSelected(SelectionEvent event) {
             }
         });
-		return composite;
+
+        return section;
 	}
 	
     public Composite createParametersSection(final Composite parent) {
 
-        Composite composite = toolkit.createComposite(parent);
+        Section section = toolkit.createSection(parent, Section.TITLE_BAR | Section.EXPANDED);
+        section.setText("Parameters");
+
+        Composite composite = toolkit.createComposite(section);
+        section.setClient(composite);
         composite.setLayout(new GridLayout(2, false));
 
 		parametersTable = toolkit.createTable(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
@@ -194,10 +195,10 @@ public class ServicePropertyPage {
                     String newValue = dialog.getValue();
 
                     if (!oldName.equals(newName)) {
-                        serviceConfig.removeParameter(oldName);
+                        getServiceConfig().removeParameter(oldName);
                     }
 
-                    serviceConfig.setParameter(newName, newValue);
+                    getServiceConfig().setParameter(newName, newValue);
 
                     refresh();
                     parametersTable.setSelection(index);
@@ -233,7 +234,7 @@ public class ServicePropertyPage {
 
                     if (dialog.getAction() == ParameterDialog.CANCEL) return;
 
-                    serviceConfig.setParameter(dialog.getName(), dialog.getValue());
+                    getServiceConfig().setParameter(dialog.getName(), dialog.getValue());
 
                     refresh();
                     checkDirty();
@@ -270,10 +271,10 @@ public class ServicePropertyPage {
                     String newValue = dialog.getValue();
 
                     if (!oldName.equals(newName)) {
-                        serviceConfig.removeParameter(oldName);
+                        getServiceConfig().removeParameter(oldName);
                     }
 
-                    serviceConfig.setParameter(newName, newValue);
+                    getServiceConfig().setParameter(newName, newValue);
 
                     refresh();
                     parametersTable.setSelection(index);
@@ -296,7 +297,7 @@ public class ServicePropertyPage {
                     TableItem items[] = parametersTable.getSelection();
                     for (int i=0; i<items.length; i++) {
                         String name = items[i].getText(0);
-                        serviceConfig.removeParameter(name);
+                        getServiceConfig().removeParameter(name);
                     }
 
                     refresh();
@@ -308,33 +309,6 @@ public class ServicePropertyPage {
             }
         });
 
-        refresh();
-
-		return composite;
+		return section;
 	}
-
-    public void refresh() {
-        parametersTable.removeAll();
-
-        for (Iterator i=serviceConfig.getParameterNames().iterator(); i.hasNext(); ) {
-            String name = (String)i.next();
-            String value = serviceConfig.getParameter(name);
-
-            TableItem item = new TableItem(parametersTable, SWT.CHECK);
-            item.setText(0, name);
-            item.setText(1, value);
-        }
-    }
-
-    public void load() {
-        refresh();
-    }
-
-    public void checkDirty() {
-        editor.checkDirty();
-    }
-
-    public void dispose() {
-        toolkit.dispose();
-    }
 }

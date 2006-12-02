@@ -64,10 +64,9 @@ public class BrowserAction extends Action implements ChangeListener, SelectionLi
         
         try {
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            Node node = penroseStudio.getSelectedNode();
-            if (node == null) return;
+            ServerNode serverNode = penroseStudio.getSelectedServerNode();
+            if (serverNode == null) return;
 
-            ServerNode serverNode = (ServerNode)node;
             Server server = serverNode.getServer();
 
             ServerConfig serverConfig = server.getServerConfig();

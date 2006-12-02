@@ -53,7 +53,6 @@ public class PartitionEditorInput implements IEditorInput {
         if (!(o instanceof PartitionEditorInput)) return false;
 
         PartitionEditorInput cei = (PartitionEditorInput)o;
-
         if (!equals(partitionConfig, cei.partitionConfig)) return false;
 
         return true;

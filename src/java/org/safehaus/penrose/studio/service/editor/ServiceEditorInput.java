@@ -21,17 +21,15 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.service.ServiceConfig;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
  */
 public class ServiceEditorInput implements IEditorInput {
 
+    private Server server;
     private ServiceConfig serviceConfig;
-
-    public ServiceEditorInput(ServiceConfig userConfig) {
-        this.serviceConfig = userConfig;
-    }
 
     public boolean exists() {
         return true;
@@ -78,5 +76,13 @@ public class ServiceEditorInput implements IEditorInput {
 
     public void setServiceConfig(ServiceConfig serviceConfig) {
         this.serviceConfig = serviceConfig;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }
