@@ -25,7 +25,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.studio.mapping.EntrySelectionDialog;
+import org.safehaus.penrose.studio.mapping.editor.EntrySelectionDialog;
 import org.ietf.ldap.LDAPDN;
 
 /**

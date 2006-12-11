@@ -25,7 +25,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.studio.mapping.SourceDialog;
+import org.safehaus.penrose.studio.mapping.editor.SourceDialog;
 
 import java.util.Collection;
 import java.util.ArrayList;

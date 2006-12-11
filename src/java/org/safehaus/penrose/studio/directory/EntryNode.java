@@ -21,6 +21,8 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -29,7 +31,9 @@ import org.safehaus.penrose.studio.*;
 import org.safehaus.penrose.studio.action.PenroseStudioActions;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.mapping.*;
+import org.safehaus.penrose.studio.mapping.editor.MappingEditor;
+import org.safehaus.penrose.studio.mapping.editor.MappingEditorInput;
+import org.safehaus.penrose.studio.mapping.editor.MappingDialog;
 import org.safehaus.penrose.studio.directory.action.NewStaticEntryAction;
 import org.safehaus.penrose.studio.directory.action.NewDynamicEntryAction;
 import org.safehaus.penrose.studio.directory.action.MapLDAPTreeAction;
@@ -73,7 +77,9 @@ public class EntryNode extends Node {
 
         manager.add(actions.getOpenAction());
 
-        manager.add(new Action("Edit sources") {
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(new Action("Edit Sources") {
             public void run() {
                 try {
                     editSources();
@@ -105,6 +111,18 @@ public class EntryNode extends Node {
         manager.add(actions.getCopyAction());
         manager.add(actions.getPasteAction());
         manager.add(actions.getDeleteAction());
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(new Action("Properties") {
+            public void run() {
+                try {
+                    editProperties();
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                }
+            }
+        });
     }
 
     public void showCommercialMenu(IMenuManager manager) throws Exception {
@@ -163,6 +181,18 @@ public class EntryNode extends Node {
         editor.showACLPage();
     }
 
+    public void editProperties() throws Exception {
+
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        Shell shell = window.getShell();
+
+        MappingDialog dialog = new MappingDialog(shell, SWT.NONE);
+        dialog.setServer(server);
+        dialog.setPartition(partition);
+        dialog.setEntryMapping(entryMapping);
+        dialog.open();
+    }
+
     public Object copy() throws Exception {
         return null;
         //return entryMapping;
@@ -207,7 +237,7 @@ public class EntryNode extends Node {
             EntryNode entryNode = new EntryNode(
                     server,
                     childMapping.getRdn(),
-                    PenrosePlugin.getImage(PenroseImage.NODE),
+                    PenrosePlugin.getImage(PenroseImage.ENTRY),
                     childMapping,
                     this
             );

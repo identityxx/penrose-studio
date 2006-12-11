@@ -228,6 +228,49 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                 }
             });
 
+            treeViewer.addTreeListener(new ITreeViewerListener() {
+                public void treeCollapsed(TreeExpansionEvent event) {
+                    try {
+                        /*
+                        ISelection selection = treeViewer.getSelection();
+                        Object object = ((IStructuredSelection)selection).getFirstElement();
+
+                        Node node = (Node)object;
+                        node.collapse();
+
+                        treeViewer.refresh();
+                        */
+
+                    } catch (Exception e) {
+                        log.error(e.getMessage(), e);
+
+                        MessageDialog.openError(
+                                parent.getShell(),
+                                "ERROR",
+                                e.getMessage()
+                        );
+                    }
+                }
+
+                public void treeExpanded(TreeExpansionEvent event) {
+                    try {
+                        Node node = (Node)event.getElement();
+                        node.expand();
+
+                        //treeViewer.refresh();
+
+                    } catch (Exception e) {
+                        log.error(e.getMessage(), e);
+
+                        MessageDialog.openError(
+                                parent.getShell(),
+                                "ERROR",
+                                e.getMessage()
+                        );
+                    }
+                }
+            });
+
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.addChangeListener(this);
 

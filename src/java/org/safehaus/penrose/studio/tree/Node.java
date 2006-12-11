@@ -128,4 +128,10 @@ public class Node {
 
     public void delete() throws Exception {
     }
+
+    public void expand() throws Exception {
+    }
+
+    public void collapse() throws Exception {
+    }
 }

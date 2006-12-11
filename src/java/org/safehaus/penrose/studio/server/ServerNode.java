@@ -98,6 +98,11 @@ public class ServerNode extends Node {
         page.openEditor(ei, ServerEditor.class.getName());
     }
 
+    public void expand() throws Exception {
+        if (isConnected()) return;
+        connect();
+    }
+    
     public void connect() throws Exception {
         Server server = getServer();
 
@@ -169,7 +174,7 @@ public class ServerNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        return isConnected();
+        return true;
     }
 
     public Collection getChildren() throws Exception {

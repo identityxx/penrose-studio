@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.mapping;
+package org.safehaus.penrose.studio.mapping.editor;
 
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
@@ -28,6 +28,9 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.mapping.editor.AttributeTypeSelectionDialog;
+import org.safehaus.penrose.studio.mapping.editor.EntrySelectionDialog;
+import org.safehaus.penrose.studio.mapping.editor.ExpressionDialog;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.schema.ObjectClass;
@@ -54,13 +57,13 @@ public class LDAPPage extends FormPage {
     Table attributeTable;
 
     MappingEditor editor;
-    EntryMapping entry;
+    EntryMapping entryMapping;
 
     public LDAPPage(MappingEditor editor) {
         super(editor, "LDAP", "  LDAP  ");
 
         this.editor = editor;
-        this.entry = editor.entry;
+        this.entryMapping = editor.entry;
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -107,13 +110,13 @@ public class LDAPPage extends FormPage {
         parentDnLabel.setLayoutData(gd);
 
         parentDnText = toolkit.createText(composite, "", SWT.BORDER);
-        parentDnText.setText(entry.getParentDn() == null ? "" : entry.getParentDn());
+        parentDnText.setText(entryMapping.getParentDn() == null ? "" : entryMapping.getParentDn());
         gd = new GridData(GridData.FILL_HORIZONTAL);
         parentDnText.setLayoutData(gd);
 
         parentDnText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                entry.setParentDn("".equals(parentDnText.getText()) ? null : parentDnText.getText());
+                entryMapping.setParentDn("".equals(parentDnText.getText()) ? null : parentDnText.getText());
                 checkDirty();
             }
         });
@@ -140,7 +143,7 @@ public class LDAPPage extends FormPage {
         toolkit.createLabel(composite, "RDN:");
 
         rdnText = toolkit.createText(composite, "", SWT.BORDER);
-        rdnText.setText(entry.getRdn());
+        rdnText.setText(entryMapping.getRdn());
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
         rdnText.setLayoutData(gd);
@@ -154,9 +157,7 @@ public class LDAPPage extends FormPage {
     public Composite createObjectClassesSection(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
-        GridLayout layout = new GridLayout();
-        layout.numColumns = 2;
-        composite.setLayout(layout);
+        composite.setLayout(new GridLayout(2, false));
 
         objectClassTable = toolkit.createTable(composite, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
         GridData gd = new GridData(GridData.FILL_BOTH);
@@ -191,7 +192,7 @@ public class LDAPPage extends FormPage {
 
                     for (Iterator i=dialog.getSelections().iterator(); i.hasNext(); ) {
                         String objectClass = (String)i.next();
-                        entry.addObjectClass(objectClass);
+                        entryMapping.addObjectClass(objectClass);
                     }
 
                     refresh();
@@ -213,7 +214,7 @@ public class LDAPPage extends FormPage {
                 TableItem items[] = objectClassTable.getSelection();
                 for (int i=0; i<items.length; i++) {
                     String objectClass = (String)items[i].getData();
-                    entry.removeObjectClass(objectClass);
+                    entryMapping.removeObjectClass(objectClass);
                 }
 
                 refresh();
@@ -333,7 +334,7 @@ public class LDAPPage extends FormPage {
                         String name = (String)i.next();
                         AttributeMapping ad = new AttributeMapping();
                         ad.setName(name);
-                        entry.addAttributeMapping(ad);
+                        entryMapping.addAttributeMapping(ad);
                     }
 
                     refresh();
@@ -369,7 +370,7 @@ public class LDAPPage extends FormPage {
                 TableItem items[] = attributeTable.getSelection();
                 for (int i=0; i<items.length; i++) {
                     AttributeMapping ad = (AttributeMapping)items[i].getData();
-                    entry.removeAttributeMapping(ad);
+                    entryMapping.removeAttributeMapping(ad);
                 }
 
                 refresh();
@@ -389,7 +390,7 @@ public class LDAPPage extends FormPage {
         ExpressionDialog dialog = new ExpressionDialog(editor.getParent().getShell(), SWT.NONE);
         dialog.setText("Edit attribute value/expression...");
 
-        Collection sources = entry.getSourceMappings();
+        Collection sources = entryMapping.getSourceMappings();
         for (Iterator i=sources.iterator(); i.hasNext(); ) {
             SourceMapping source = (SourceMapping)i.next();
             SourceConfig sourceConfig = editor.getPartition().getSourceConfig(source.getSourceName());
@@ -425,16 +426,16 @@ public class LDAPPage extends FormPage {
             attributes.put(ad.getName(), ad);
         }
 */
-        Map objectClasses = getObjectClasses(entry.getObjectClasses());
+        Map objectClasses = getObjectClasses(entryMapping.getObjectClasses());
         //completeAttributeTypes(objectClasses, attributes);
 
         for (Iterator i=objectClasses.values().iterator(); i.hasNext(); ) {
             ObjectClass objectClass = (ObjectClass)i.next();
             String ocName = objectClass.getName();
-            entry.addObjectClass(ocName);
+            entryMapping.addObjectClass(ocName);
         }
 
-        for (Iterator i=entry.getObjectClasses().iterator(); i.hasNext(); ) {
+        for (Iterator i=entryMapping.getObjectClasses().iterator(); i.hasNext(); ) {
             String ocName = (String)i.next();
         
             TableItem item = new TableItem(objectClassTable, SWT.CHECK);
@@ -442,7 +443,7 @@ public class LDAPPage extends FormPage {
             item.setData(ocName);
         }
 
-        for (Iterator i=entry.getAttributeMappings().iterator(); i.hasNext(); ) {
+        for (Iterator i=entryMapping.getAttributeMappings().iterator(); i.hasNext(); ) {
             AttributeMapping ad = (AttributeMapping)i.next();
 
             String value;
@@ -524,7 +525,7 @@ public class LDAPPage extends FormPage {
 
         //log.debug("Rdn:");
 
-        for (Iterator i=entry.getAttributeMappings().iterator(); i.hasNext(); ) {
+        for (Iterator i=entryMapping.getAttributeMappings().iterator(); i.hasNext(); ) {
             AttributeMapping ad = (AttributeMapping)i.next();
             if (!"true".equals(ad.getRdn())) continue;
             String name = ad.getName();
@@ -547,7 +548,7 @@ public class LDAPPage extends FormPage {
             continue;
         }
 
-        entry.setRdn(rdn.toString());
+        entryMapping.setRdn(rdn.toString());
         rdnText.setText(rdn.toString());
     }
 

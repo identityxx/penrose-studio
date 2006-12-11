@@ -69,10 +69,10 @@
             icon="images/source.gif"
             class="org.safehaus.penrose.studio.source.editor.SourceEditor"/>
        <editor
-            id="org.safehaus.penrose.studio.mapping.MappingEditor"
+            id="org.safehaus.penrose.studio.mapping.editor.MappingEditor"
             name="Mapping"
             icon="images/penrose16.ico"
-            class="org.safehaus.penrose.studio.mapping.MappingEditor"/>
+            class="org.safehaus.penrose.studio.mapping.editor.MappingEditor"/>
        <editor
            id="org.safehaus.penrose.studio.browser.BrowserEditor"
            name="Browser"

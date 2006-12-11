@@ -24,7 +24,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.jface.action.Action;
 import org.safehaus.penrose.studio.directory.EntryNode;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.mapping.SourceDialog;
+import org.safehaus.penrose.studio.mapping.editor.SourceDialog;
 import org.safehaus.penrose.mapping.SourceMapping;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.AttributeMapping;

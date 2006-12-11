@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.mapping;
+package org.safehaus.penrose.studio.mapping.editor;
 
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
@@ -26,6 +26,9 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.mapping.editor.ACLPage;
+import org.safehaus.penrose.studio.mapping.editor.EntryCachePage;
+import org.safehaus.penrose.studio.mapping.editor.LDAPPage;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
