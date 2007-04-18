@@ -137,7 +137,7 @@ public class ModuleMappingDialog extends Dialog {
     public void setMapping(ModuleMapping mapping) {
         this.mapping = mapping;
 
-        baseDnText.setText(mapping.getBaseDn() == null ? "" : mapping.getBaseDn());
+        baseDnText.setText(mapping.getBaseDn().toString());
         filterText.setText(mapping.getFilter() == null ? "" : mapping.getFilter());
 
         for (int i=0; i<scopes.length; i++) {

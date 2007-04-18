@@ -40,6 +40,7 @@ import org.safehaus.penrose.studio.connection.wizard.JNDISourceWizard;
 import org.safehaus.penrose.studio.connection.editor.JNDIConnectionEditor;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.ldap.DN;
 import org.apache.log4j.Logger;
 
 import javax.naming.directory.SearchResult;
@@ -246,8 +247,8 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
 
                     TreeItem treeItem = tree.getSelection()[0];
                     SearchResult entry = (SearchResult)treeItem.getData();
-                    String baseDn = entry.getName();
-                    String parentDn = EntryUtil.getParentDn(baseDn);
+                    DN baseDn = new DN(entry.getName());
+                    DN parentDn = baseDn.getParentDn();
 
                     Attribute oc = entry.getAttributes().get("objectClass");
                     int counter = 0;
@@ -274,7 +275,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
                             client,
                             partition,
                             connectionConfig,
-                            parentDn,
+                            parentDn.toString(),
                             filter,
                             "ONELEVEL",
                             attributeNames
@@ -444,8 +445,8 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
 
             for (Iterator i=results.iterator(); i.hasNext(); ) {
                 SearchResult en = (SearchResult)i.next();
-                String dn = en.getName();
-                String rdn = EntryUtil.getRdn(dn).toString();
+                DN dn = new DN(en.getName());
+                String rdn = dn.getRdn().toString();
 
                 TreeItem it = new TreeItem(item, SWT.NONE);
                 it.setText(rdn);

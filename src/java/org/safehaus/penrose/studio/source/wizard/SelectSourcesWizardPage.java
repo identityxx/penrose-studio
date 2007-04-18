@@ -77,7 +77,7 @@ public class SelectSourcesWizardPage extends WizardPage implements SelectionList
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
 
-                Collection sources = partition.getSourceConfigs();
+                Collection sources = partition.getSources().getSourceConfigs();
                 if (sources.size() == 0) {
                     System.out.println("There is no sources defined.");
                     return;

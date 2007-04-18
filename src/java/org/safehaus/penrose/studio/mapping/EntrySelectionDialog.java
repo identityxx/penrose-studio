@@ -96,7 +96,7 @@ public class EntrySelectionDialog extends Dialog {
                     EntryMapping child = (EntryMapping)i.next();
 
                     TreeItem it = new TreeItem(item, SWT.NONE);
-                    it.setText(child.getRdn());
+                    it.setText(child.getRdn().toString());
                     it.setData(child);
 
                     new TreeItem(it, SWT.NONE);
@@ -156,7 +156,7 @@ public class EntrySelectionDialog extends Dialog {
         Collection rootEntries = partition.getRootEntryMappings();
         for (Iterator i=rootEntries.iterator(); i.hasNext(); ) {
             EntryMapping entry = (EntryMapping)i.next();
-            String dn = "".equals(entry.getDn()) ? "Root DSE" : entry.getDn();
+            String dn = entry.getDn().isEmpty() ? "Root DSE" : entry.getDn().toString();
 
             TreeItem item = new TreeItem(tree, SWT.NONE);
             item.setText(dn);

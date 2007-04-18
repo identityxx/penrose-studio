@@ -20,10 +20,11 @@ package org.safehaus.penrose.studio.connection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.connector.JDBCAdapter;
+import org.safehaus.penrose.adapter.jdbc.JDBCAdapter;
 import org.safehaus.penrose.studio.source.wizard.SourceWizardPage;
 import org.safehaus.penrose.studio.source.wizard.JDBCPrimaryKeyWizardPage;
 import org.safehaus.penrose.studio.source.wizard.*;
+import org.safehaus.penrose.jdbc.JDBCClient;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -74,13 +75,13 @@ public class JDBCSourceWizard extends Wizard {
             String schema = tableConfig.getSchema();
             String tableName = tableConfig.getName();
 
-            sourceConfig.setParameter(JDBCAdapter.CATALOG, catalog);
-            sourceConfig.setParameter(JDBCAdapter.SCHEMA, schema);
-            sourceConfig.setParameter(JDBCAdapter.TABLE, tableName);
+            sourceConfig.setParameter(JDBCClient.CATALOG, catalog);
+            sourceConfig.setParameter(JDBCClient.SCHEMA, schema);
+            sourceConfig.setParameter(JDBCClient.TABLE, tableName);
 
             String filter = fieldsPage.getFilter();
             if (filter != null) {
-                sourceConfig.setParameter(JDBCAdapter.FILTER, filter);
+                sourceConfig.setParameter(JDBCClient.FILTER, filter);
             }
 
             System.out.println("Saving fields :");
@@ -91,11 +92,11 @@ public class JDBCSourceWizard extends Wizard {
 
             for (Iterator i=fields.iterator(); i.hasNext(); ) {
                 FieldConfig field = (FieldConfig)i.next();
-                System.out.println(" - "+field.getName()+" "+field.isPK());
+                System.out.println(" - "+field.getName()+" "+field.isPrimaryKey());
                 sourceConfig.addFieldConfig(field);
             }
 
-            partition.addSourceConfig(sourceConfig);
+            partition.getSources().addSourceConfig(sourceConfig);
 
             return true;
 

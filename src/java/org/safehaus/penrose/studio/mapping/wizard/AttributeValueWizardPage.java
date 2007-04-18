@@ -35,6 +35,7 @@ import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.SourceConfig;
 import org.safehaus.penrose.partition.FieldConfig;
+import org.safehaus.penrose.ldap.RDN;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -102,7 +103,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                         if (sourceMappings != null) {
                             for (Iterator i=sourceMappings.iterator(); i.hasNext(); ) {
                                 SourceMapping sourceMapping = (SourceMapping)i.next();
-                                SourceConfig sourceConfig = partition.getSourceConfig(sourceMapping.getSourceName());
+                                SourceConfig sourceConfig = partition.getSources().getSourceConfig(sourceMapping.getSourceName());
                                 dialog.addVariable(sourceMapping.getName());
 
                                 Collection fields = sourceConfig.getFieldConfigs();
@@ -223,7 +224,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
         list.remove(attributeMapping);
     }
 
-    public void setRdn(Row rdn) {
+    public void setRdn(RDN rdn) {
 
         needRdn = !rdn.isEmpty();
 
@@ -235,7 +236,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
             AttributeMapping ad = new AttributeMapping();
             ad.setName(name);
-            ad.setRdn(true+"");
+            ad.setRdn(true);
 
             if (!"...".equals(value)) ad.setConstant(value);
 
@@ -347,10 +348,10 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                 //System.out.println(" - "+ad.getName());
 
                 TableItem it = new TableItem(attributeTable, SWT.CHECK);
-                it.setImage(PenrosePlugin.getImage("true".equals(ad.getRdn()) ? PenroseImage.KEY : PenroseImage.NOKEY));
+                it.setImage(PenrosePlugin.getImage(ad.isRdn() ? PenroseImage.KEY : PenroseImage.NOKEY));
                 it.setText(0, ad.getName());
                 it.setText(1, value == null ? "" : value);
-                it.setChecked("true".equals(ad.getRdn()));
+                it.setChecked(ad.isRdn());
                 it.setData(ad);
             }
         }
@@ -364,7 +365,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
             for (Iterator j=list.iterator(); j.hasNext(); ) {
                 AttributeMapping ad = (AttributeMapping)j.next();
-                if ("true".equals(ad.getRdn())) return true;
+                if (ad.isRdn()) return true;
             }
         }
 
@@ -376,7 +377,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
         for (int i=0; i<items.length; i++) {
             TableItem item = items[i];
             AttributeMapping ad = (AttributeMapping)item.getData();
-            ad.setRdn(item.getChecked()+"");
+            ad.setRdn(item.getChecked());
             item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
         }
     }

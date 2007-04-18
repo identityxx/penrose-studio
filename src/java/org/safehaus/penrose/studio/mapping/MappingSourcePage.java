@@ -113,7 +113,7 @@ public class MappingSourcePage extends FormPage implements ModifyListener {
 
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                Collection sources = editor.getPartition().getSourceConfigs();
+                Collection sources = editor.getPartition().getSources().getSourceConfigs();
                 if (sources.size() == 0) {
                     System.out.println("There is no sources defined.");
                     return;
@@ -146,7 +146,7 @@ public class MappingSourcePage extends FormPage implements ModifyListener {
                 CTabItem item = tabFolder.getSelection();
                 if (item == null) return;
 
-                Collection sources = editor.getPartition().getSourceConfigs();
+                Collection sources = editor.getPartition().getSources().getSourceConfigs();
                 if (sources.size() == 0) {
                     System.out.println("There is no sources defined.");
                     return;
@@ -330,7 +330,7 @@ public class MappingSourcePage extends FormPage implements ModifyListener {
                 dialog.setText("Add field...");
 
                 Partition partition = editor.getPartition();
-                SourceConfig sourceConfig = partition.getSourceConfig(sourceMapping.getSourceName());
+                SourceConfig sourceConfig = partition.getSources().getSourceConfig(sourceMapping.getSourceName());
                 Collection fieldNames = new ArrayList();
                 for (Iterator i=sourceConfig.getFieldConfigs().iterator(); i.hasNext(); ) {
                     FieldConfig fieldConfig = (FieldConfig)i.next();
@@ -377,7 +377,7 @@ public class MappingSourcePage extends FormPage implements ModifyListener {
     public void refreshFields(SourceMapping sourceMapping, Table table) {
         table.removeAll();
 
-        SourceConfig sourceConfig = editor.getPartition().getSourceConfig(sourceMapping.getSourceName());
+        SourceConfig sourceConfig = editor.getPartition().getSources().getSourceConfig(sourceMapping.getSourceName());
 
         for (Iterator i=sourceConfig.getFieldConfigs().iterator(); i.hasNext(); ) {
             FieldConfig fieldConfig = (FieldConfig)i.next();
@@ -408,8 +408,8 @@ public class MappingSourcePage extends FormPage implements ModifyListener {
                 }
 
                 TableItem item = new TableItem(table, SWT.CHECK);
-                item.setChecked(fieldConfig.isPK());
-                item.setImage(PenrosePlugin.getImage(fieldConfig.isPK() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                item.setChecked(fieldConfig.isPrimaryKey());
+                item.setImage(PenrosePlugin.getImage(fieldConfig.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
                 item.setText(0, fieldConfig.getName());
                 item.setText(1, value == null ? "" : value);
                 item.setData(fieldMapping);
@@ -450,12 +450,12 @@ public class MappingSourcePage extends FormPage implements ModifyListener {
                 for (Iterator i=dataSources.iterator(); i.hasNext(); ) {
                     SourceMapping source = (SourceMapping)i.next();
 
-                    SourceConfig sourceDefinition = partition.getSourceConfig(source.getSourceName());
+                    SourceConfig sourceDefinition = partition.getSources().getSourceConfig(source.getSourceName());
 
                     Collection fields = sourceDefinition.getFieldConfigs();
                     for (Iterator j=fields.iterator(); j.hasNext(); ) {
                         FieldConfig field = (FieldConfig)j.next();
-                        dialog.addField(source.getName()+"."+field.getName(), field.isPK());
+                        dialog.addField(source.getName()+"."+field.getName(), field.isPrimaryKey());
                     }
                 }
 /*
@@ -511,12 +511,12 @@ public class MappingSourcePage extends FormPage implements ModifyListener {
                     for (Iterator i=dataSources.iterator(); i.hasNext(); ) {
                         SourceMapping source = (SourceMapping)i.next();
 
-                        SourceConfig sourceDefinition = partition.getSourceConfig(source.getSourceName());
+                        SourceConfig sourceDefinition = partition.getSources().getSourceConfig(source.getSourceName());
 
                         Collection fields = sourceDefinition.getFieldConfigs();
                         for (Iterator j=fields.iterator(); j.hasNext(); ) {
                             FieldConfig field = (FieldConfig)j.next();
-                            dialog.addField(source.getName()+"."+field.getName(), field.isPK());
+                            dialog.addField(source.getName()+"."+field.getName(), field.isPrimaryKey());
                         }
                     }
 /*

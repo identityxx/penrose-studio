@@ -163,7 +163,7 @@ public class SelectSourceWizardPage extends WizardPage {
 
                 if (!confirm) return;
 
-                partition.removeSourceConfig(sourceConfig.getName());
+                partition.getSources().removeSourceConfig(sourceConfig.getName());
 
                 refresh();
 
@@ -179,7 +179,7 @@ public class SelectSourceWizardPage extends WizardPage {
         sourceTable.removeAll();
         infoTable.removeAll();
 
-        Collection sourceConfigs = partition.getSourceConfigs();
+        Collection sourceConfigs = partition.getSources().getSourceConfigs();
         for (Iterator i=sourceConfigs.iterator(); i.hasNext(); ) {
             SourceConfig sourceConfig = (SourceConfig)i.next();
             ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());

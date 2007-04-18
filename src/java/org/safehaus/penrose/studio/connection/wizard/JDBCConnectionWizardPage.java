@@ -33,8 +33,8 @@ import org.eclipse.swt.layout.RowLayout;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.driver.Parameter;
 import org.safehaus.penrose.studio.driver.Driver;
-import org.safehaus.penrose.studio.connection.wizard.ConnectionDriverPage;
-import org.safehaus.penrose.connector.JDBCAdapter;
+import org.safehaus.penrose.adapter.jdbc.JDBCAdapter;
+import org.safehaus.penrose.jdbc.JDBCClient;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -88,10 +88,10 @@ public class JDBCConnectionWizardPage extends WizardPage implements ModifyListen
                     Driver type = page.getDriver();
                     if (type == null) return;
 
-                    String driver = getParameter(JDBCAdapter.DRIVER);
-                    String url = getParameter(JDBCAdapter.URL);
-                    String username = getParameter(JDBCAdapter.USER);
-                    String password = getParameter(JDBCAdapter.PASSWORD);
+                    String driver = getParameter(JDBCClient.DRIVER);
+                    String url = getParameter(JDBCClient.URL);
+                    String username = getParameter(JDBCClient.USER);
+                    String password = getParameter(JDBCClient.PASSWORD);
 
                     url = Helper.replace(url, getParameters());
                     System.out.println("Connecting to "+url);

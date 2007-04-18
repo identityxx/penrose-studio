@@ -18,9 +18,6 @@
 package org.safehaus.penrose.studio.preview;
 
 import javax.naming.NamingEnumeration;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.SearchResult;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -40,14 +37,17 @@ import org.eclipse.ui.part.*;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.Penrose;
 import org.safehaus.penrose.PenroseFactory;
+import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.user.UserConfig;
 import org.safehaus.penrose.config.PenroseConfig;
-import org.safehaus.penrose.session.PenroseSession;
-import org.safehaus.penrose.session.PenroseSearchControls;
-import org.safehaus.penrose.session.PenroseSearchResults;
+import org.safehaus.penrose.session.Session;
+import org.safehaus.penrose.session.SessionManager;
+import org.safehaus.penrose.session.SessionContext;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.ietf.ldap.LDAPException;
+
+import java.util.Iterator;
 
 public class PreviewEditor extends EditorPart {
 
@@ -60,7 +60,7 @@ public class PreviewEditor extends EditorPart {
     Table table;
 
     Penrose penrose;
-    PenroseSession session;
+    Session session;
     String password;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -182,7 +182,7 @@ public class PreviewEditor extends EditorPart {
 
             UserConfig rootUserConfig = penroseConfig.getRootUserConfig();
 
-            open("", rootUserConfig.getDn(), rootUserConfig.getPassword());
+            open("", rootUserConfig.getDn().toString(), rootUserConfig.getPassword());
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
@@ -210,7 +210,9 @@ public class PreviewEditor extends EditorPart {
         penrose = penroseFactory.createPenrose(penroseApplication.getWorkDir());
         penrose.start();
 
-        session = penrose.newSession();
+        SessionContext sessionContext = penrose.getSessionContext();
+        SessionManager sessionManager = sessionContext.getSessionManager();
+        session = sessionManager.newSession();
         session.bind(bindDn, password);
 
         baseDn = baseDn == null ? "" : baseDn;
@@ -218,7 +220,7 @@ public class PreviewEditor extends EditorPart {
 
         TreeItem treeItem = new TreeItem(tree, SWT.NONE);
         treeItem.setText(name);
-        treeItem.setData(baseDn);
+        treeItem.setData(new DN(baseDn));
 
         showChildren(treeItem);
         showEntry(treeItem);
@@ -233,43 +235,43 @@ public class PreviewEditor extends EditorPart {
         TreeItem items[] = parentItem.getItems();
         for (int i=0; i<items.length; i++) items[i].dispose();
 
-        String parentDn = (String)parentItem.getData();
+        DN parentDn = (DN)parentItem.getData();
 
-        if ("".equals(parentDn)) {
-            PenroseSearchResults results = new PenroseSearchResults();
+        if (parentDn.isEmpty()) {
 
-            PenroseSearchControls sc = new PenroseSearchControls();
-            sc.setScope(PenroseSearchControls.SCOPE_BASE);
+            SearchResponse<SearchResult> results = session.search(
+                    "",
+                    "(objectClass=*)",
+                    SearchRequest.SCOPE_BASE
+            );
 
-            session.search("", "(objectClass=*)", sc, results);
             SearchResult parentEntry = (SearchResult)results.next();
 
             Attribute namingContexts = parentEntry.getAttributes().get("namingContexts");
 
-            for (NamingEnumeration e = namingContexts.getAll(); e.hasMore(); ) {
-                String namingContext = (String)e.next();
+            for (Iterator i = namingContexts.getValues().iterator(); i.hasNext(); ) {
+                String namingContext = i.next().toString();
 
                 TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
                 treeItem.setText(namingContext);
-                treeItem.setData(namingContext);
+                treeItem.setData(new DN(namingContext));
 
                 new TreeItem(treeItem, SWT.NONE);
             }
 
         } else {
 
-            PenroseSearchResults results = new PenroseSearchResults();
-
-            PenroseSearchControls sc = new PenroseSearchControls();
-            sc.setScope(PenroseSearchControls.SCOPE_ONE);
-
-            session.search(parentDn, "(objectClass=*)", sc, results);
+            SearchResponse<SearchResult> results = session.search(
+                    parentDn.toString(),
+                    "(objectClass=*)",
+                    SearchRequest.SCOPE_ONE
+            );
 
             while (results.hasNext()) {
                 try {
                     SearchResult entry = (SearchResult)results.next();
-                    String dn = entry.getName();
-                    String rdn = EntryUtil.getRdn(dn).toString();
+                    DN dn = entry.getDn();
+                    String rdn = dn.getRdn().toString();
 
                     TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
                     treeItem.setText(rdn);
@@ -294,30 +296,30 @@ public class PreviewEditor extends EditorPart {
 
         table.removeAll();
 
-        String dn = (String)treeItem.getData();
-        if (dn == null) return;
+        DN dn = (DN)treeItem.getData();
 
-        PenroseSearchResults results = new PenroseSearchResults();
-
-        PenroseSearchControls sc = new PenroseSearchControls();
-        sc.setScope(PenroseSearchControls.SCOPE_BASE);
+        SearchRequest sc = new SearchRequest();
+        sc.setDn(dn);
+        sc.setScope(SearchRequest.SCOPE_BASE);
 
         if ("".equals(dn)) {
             sc.setAttributes(new String[] { "*", "+" });
         }
 
-        session.search(dn, "(objectClass=*)", sc, results);
+        SearchResponse<SearchResult> results = new SearchResponse<SearchResult>();
+
+        session.search(sc, results);
         if (!results.hasNext()) return;
 
         SearchResult entry = (SearchResult)results.next();
 
         Attributes attributes = entry.getAttributes();
 
-        for (NamingEnumeration i = attributes.getAll(); i.hasMore(); ) {
+        for (Iterator i = attributes.getAll().iterator(); i.hasNext(); ) {
             Attribute attribute = (Attribute)i.next();
-            String name = attribute.getID();
+            String name = attribute.getName();
 
-            for (NamingEnumeration e = attribute.getAll(); e.hasMore(); ) {
+            for (Iterator e = attribute.getValues().iterator(); e.hasNext(); ) {
                 Object object = e.next();
                 String value = object instanceof byte[] ? "(binary)" : object.toString();
 

@@ -80,6 +80,8 @@ public class ACLPage extends FormPage implements ModifyListener {
 
         aclSection = createInheritedACLSection(section);
         section.setClient(aclSection);
+
+        refresh();
 	}
 
     public Composite createACLSection(Composite parent) {
@@ -121,8 +123,6 @@ public class ACLPage extends FormPage implements ModifyListener {
         tc.setText("Permission");
         tc.setWidth(75);
 
-        refreshACL();
-
         GridData gd = new GridData(GridData.FILL_BOTH);
         gd.heightHint = 100;
         aclTable.setLayoutData(gd);
@@ -140,7 +140,7 @@ public class ACLPage extends FormPage implements ModifyListener {
                     dialog.setText("Edit ACL...");
 
                     dialog.setSubject(aci.getSubject());
-                    dialog.setDn(aci.getDn());
+                    dialog.setDn(aci.getDn().toString());
                     dialog.setTarget(aci.getTarget());
                     dialog.setAttributes(aci.getAttributes());
                     dialog.setScope(aci.getScope());
@@ -158,7 +158,7 @@ public class ACLPage extends FormPage implements ModifyListener {
                     aci.setAction(dialog.getAction());
                     aci.setPermission(dialog.getPermission());
 
-                    refreshACL();
+                    refresh();
                     checkDirty();
 
                 } catch (Exception e) {
@@ -194,7 +194,7 @@ public class ACLPage extends FormPage implements ModifyListener {
 
                     entry.addACI(aci);
 
-                    refreshACL();
+                    refresh();
                     checkDirty();
 
                 } catch (Exception e) {
@@ -218,7 +218,7 @@ public class ACLPage extends FormPage implements ModifyListener {
                     dialog.setText("Edit ACL...");
 
                     dialog.setSubject(aci.getSubject());
-                    dialog.setDn(aci.getDn());
+                    dialog.setDn(aci.getDn().toString());
                     dialog.setTarget(aci.getTarget());
                     dialog.setAttributes(aci.getAttributes());
                     dialog.setScope(aci.getScope());
@@ -236,7 +236,7 @@ public class ACLPage extends FormPage implements ModifyListener {
                     aci.setAction(dialog.getAction());
                     aci.setPermission(dialog.getPermission());
 
-                    refreshACL();
+                    refresh();
                     checkDirty();
 
                 } catch (Exception e) {
@@ -290,7 +290,7 @@ public class ACLPage extends FormPage implements ModifyListener {
                     entry.addACI(acl[i]);
                 }
 
-                refreshACL();
+                refresh();
                 aclTable.setSelection(index-1);
 
                 checkDirty();
@@ -325,7 +325,7 @@ public class ACLPage extends FormPage implements ModifyListener {
                     entry.addACI(acl[i]);
                 }
 
-                refreshACL();
+                refresh();
                 aclTable.setSelection(index+1);
 
                 checkDirty();
@@ -335,22 +335,26 @@ public class ACLPage extends FormPage implements ModifyListener {
         return composite;
     }
 
-    public void refreshACL() {
-        aclTable.removeAll();
+    public void refresh() {
+        try {
+            aclTable.removeAll();
 
-        Collection acl = entry.getACL();
-        for (Iterator i=acl.iterator(); i.hasNext(); ) {
-            ACI aci = (ACI)i.next();
+            Collection acl = entry.getACL();
+            for (Iterator i=acl.iterator(); i.hasNext(); ) {
+                ACI aci = (ACI)i.next();
 
-            TableItem item = new TableItem(aclTable, SWT.NONE);
-            item.setText(0, aci.getSubject());
-            item.setText(1, aci.getDn() == null ? "" : aci.getDn());
-            item.setText(2, aci.getTarget());
-            item.setText(3, aci.getAttributes() == null ? "" : aci.getAttributes());
-            item.setText(4, aci.getScope());
-            item.setText(5, aci.getAction());
-            item.setText(6, aci.getPermission());
-            item.setData(aci);
+                TableItem item = new TableItem(aclTable, SWT.NONE);
+                item.setText(0, aci.getSubject());
+                item.setText(1, aci.getDn() == null ? "" : aci.getDn().toString());
+                item.setText(2, aci.getTarget());
+                item.setText(3, aci.getAttributes() == null ? "" : aci.getAttributes());
+                item.setText(4, aci.getScope());
+                item.setText(5, aci.getAction());
+                item.setText(6, aci.getPermission());
+                item.setData(aci);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -407,13 +411,13 @@ public class ACLPage extends FormPage implements ModifyListener {
 
                 TableItem item = new TableItem(inheritedAclTable, SWT.NONE);
                 item.setText(0, aci.getSubject());
-                item.setText(1, aci.getDn() == null ? "" : aci.getDn());
+                item.setText(1, aci.getDn().toString());
                 item.setText(2, aci.getTarget());
                 item.setText(3, aci.getAttributes() == null ? "" : aci.getAttributes());
                 item.setText(4, aci.getScope());
                 item.setText(5, aci.getAction());
                 item.setText(6, aci.getPermission());
-                item.setText(7, parentEntry.getDn());
+                item.setText(7, parentEntry.getDn().toString());
                 item.setData(aci);
             }
             parentEntry = partition.getParent(parentEntry);

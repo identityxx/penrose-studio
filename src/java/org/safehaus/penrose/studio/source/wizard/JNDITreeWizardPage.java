@@ -27,6 +27,7 @@ import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.ldap.DN;
 import org.apache.log4j.Logger;
 
 import javax.naming.directory.SearchResult;
@@ -190,7 +191,7 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
             for (Iterator i=results.iterator(); i.hasNext(); ) {
                 SearchResult entry = (SearchResult)i.next();
                 String dn = entry.getName();
-                String rdn = EntryUtil.getRdn(dn).toString();
+                String rdn = new DN(dn).getRdn().toString();
 
                 TreeItem it = new TreeItem(item, SWT.NONE);
                 it.setText(rdn);

@@ -21,7 +21,9 @@ import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.source.wizard.SelectSourceWizardPage;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.mapping.*;
-import org.safehaus.penrose.util.EntryUtil;
+import org.safehaus.penrose.ldap.RDN;
+import org.safehaus.penrose.ldap.DN;
+import org.safehaus.penrose.ldap.DNBuilder;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;
@@ -71,8 +73,12 @@ public class CreateLDAPProxyWizard extends Wizard {
                 suffix = url.substring(index+1);
             }
 
-            String baseDn = sourceConfig.getParameter("baseDn");
-            String dn = EntryUtil.append(baseDn, suffix);
+            DN baseDn = new DN(sourceConfig.getParameter("baseDn"));
+
+            DNBuilder db = new DNBuilder();
+            db.append(baseDn);
+            db.append(suffix);
+            DN dn = db.toDn();
 
             log.debug("DN: "+dn);
 
@@ -81,14 +87,20 @@ public class CreateLDAPProxyWizard extends Wizard {
                 entryMapping.setDn(dn);
 
             } else {
-                Row rdn = EntryUtil.getRdn(dn);
-                entryMapping.setRdn(rdn.toString());
-                entryMapping.setParentDn(parentMapping.getDn());
+                RDN rdn = dn.getRdn();
+
+                db.clear();
+                db.append(rdn);
+                db.append(parentMapping.getDn());
+
+                entryMapping.setDn(db.toDn());
             }
 
             SourceMapping sourceMapping = new SourceMapping("DEFAULT", sourceConfig.getName());
-            sourceMapping.setProxy(true);
             entryMapping.addSourceMapping(sourceMapping);
+
+            HandlerMapping handlerMapping = new HandlerMapping("DEFAULT", "PROXY");
+            entryMapping.setHandlerMapping(handlerMapping);
 
             partition.addEntryMapping(entryMapping);
 

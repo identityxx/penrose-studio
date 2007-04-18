@@ -25,10 +25,10 @@ import org.eclipse.swt.events.*;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
-import org.safehaus.penrose.connector.JDBCAdapter;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.jdbc.JDBCClient;
 import org.apache.log4j.Logger;
 
 /**
@@ -118,12 +118,12 @@ public class JDBCConnectionPropertiesPage extends FormPage {
         driverText = toolkit.createText(composite, "", SWT.BORDER);
 		driverText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        String s = connection.getParameter(JDBCAdapter.DRIVER);
+        String s = connection.getParameter(JDBCClient.DRIVER);
         if (s != null) driverText.setText(s);
 
         driverText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                connection.setParameter(JDBCAdapter.DRIVER, driverText.getText());
+                connection.setParameter(JDBCClient.DRIVER, driverText.getText());
                 checkDirty();
             }
         });
@@ -133,12 +133,12 @@ public class JDBCConnectionPropertiesPage extends FormPage {
         urlText = toolkit.createText(composite, "", SWT.BORDER);
         urlText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        s = connection.getParameter(JDBCAdapter.URL);
+        s = connection.getParameter(JDBCClient.URL);
         if (s != null) urlText.setText(s);
 
         urlText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                connection.setParameter(JDBCAdapter.URL, urlText.getText());
+                connection.setParameter(JDBCClient.URL, urlText.getText());
                 checkDirty();
             }
         });
@@ -148,12 +148,12 @@ public class JDBCConnectionPropertiesPage extends FormPage {
         usernameText = toolkit.createText(composite, "", SWT.BORDER);
         usernameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        s = connection.getParameter(JDBCAdapter.USER);
+        s = connection.getParameter(JDBCClient.USER);
         if (s != null) usernameText.setText(s);
 
         usernameText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                connection.setParameter(JDBCAdapter.USER, usernameText.getText());
+                connection.setParameter(JDBCClient.USER, usernameText.getText());
                 checkDirty();
             }
         });
@@ -163,12 +163,12 @@ public class JDBCConnectionPropertiesPage extends FormPage {
         passwordText = toolkit.createText(composite, "", SWT.BORDER | SWT.PASSWORD);
         passwordText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        s = connection.getParameter(JDBCAdapter.PASSWORD);
+        s = connection.getParameter(JDBCClient.PASSWORD);
         if (s != null) passwordText.setText(s);
 
         passwordText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                connection.setParameter(JDBCAdapter.PASSWORD, passwordText.getText());
+                connection.setParameter(JDBCClient.PASSWORD, passwordText.getText());
                 checkDirty();
             }
         });

@@ -29,6 +29,7 @@ import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.SourceConfig;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.SourceMapping;
+import org.safehaus.penrose.source.Sources;
 import org.apache.log4j.Logger;
 
 import java.util.Iterator;
@@ -78,8 +79,9 @@ public class JNDISourceEditor extends FormEditor {
 
 	public void store() throws Exception {
 
+        Sources sources = partition.getSources();
         if (!origSourceConfig.getName().equals(sourceConfig.getName())) {
-            partition.renameSourceConfig(origSourceConfig, sourceConfig.getName());
+            sources.renameSourceConfig(origSourceConfig, sourceConfig.getName());
 
             for (Iterator i=partition.getEntryMappings().iterator(); i.hasNext(); ) {
                 EntryMapping entryMapping = (EntryMapping)i.next();
@@ -91,7 +93,7 @@ public class JNDISourceEditor extends FormEditor {
             }
         }
 
-        partition.modifySourceConfig(sourceConfig.getName(), sourceConfig);
+        sources.modifySourceConfig(sourceConfig.getName(), sourceConfig);
 
         setPartName(partition.getName()+"/"+sourceConfig.getName());
 

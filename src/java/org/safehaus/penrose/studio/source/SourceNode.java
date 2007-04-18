@@ -32,10 +32,9 @@ import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
-import org.safehaus.penrose.studio.source.editor.JDBCSourceEditor;
-import org.safehaus.penrose.studio.source.editor.JDBCSourceEditorInput;
-import org.safehaus.penrose.studio.source.editor.JNDISourceEditor;
-import org.safehaus.penrose.studio.source.editor.JNDISourceEditorInput;
+import org.safehaus.penrose.studio.plugin.PluginManager;
+import org.safehaus.penrose.studio.plugin.Plugin;
+import org.safehaus.penrose.studio.source.editor.*;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
@@ -115,12 +114,17 @@ public class SourceNode extends Node {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
 
-        if ("JDBC".equals(con.getAdapterName())) {
-            page.openEditor(new JDBCSourceEditorInput(partition, sourceConfig), JDBCSourceEditor.class.getName());
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PluginManager pluginManager = penroseApplication.getPluginManager();
+        Plugin plugin = pluginManager.getPlugin(con.getAdapterName());
 
-        } else if ("LDAP".equals(con.getAdapterName())) {
-            page.openEditor(new JNDISourceEditorInput(partition, sourceConfig), JNDISourceEditor.class.getName());
-        }
+        SourceEditorInput sei = plugin.createSourceEditorInput();
+        sei.setPartition(partition);
+        sei.setSourceConfig(sourceConfig);
+
+        String sourceEditorClassName = plugin.getSourceEditorClass();
+
+        page.openEditor(sei, sourceEditorClassName);
     }
 
     public void remove() throws Exception {
@@ -141,7 +145,7 @@ public class SourceNode extends Node {
 
             SourceNode sourceNode = (SourceNode)node;
             SourceConfig sourceConfig = sourceNode.getSourceConfig();
-            partition.removeSourceConfig(sourceConfig.getName());
+            partition.getSources().removeSourceConfig(sourceConfig.getName());
         }
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
@@ -162,13 +166,13 @@ public class SourceNode extends Node {
 
         int counter = 1;
         String name = newSourceDefinition.getName();
-        while (partition.getSourceConfig(name) != null) {
+        while (partition.getSources().getSourceConfig(name) != null) {
             counter++;
             name = newSourceDefinition.getName()+" ("+counter+")";
         }
 
         newSourceDefinition.setName(name);
-        partition.addSourceConfig(newSourceDefinition);
+        partition.getSources().addSourceConfig(newSourceDefinition);
 
         view.setClipboard(null);
 

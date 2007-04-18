@@ -45,7 +45,7 @@ public class MappingEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return entryDefinition.getDn();
+        return entryDefinition.getDn().toString();
     }
 
     public IPersistableElement getPersistable() {
@@ -53,7 +53,7 @@ public class MappingEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return entryDefinition.getDn();
+        return entryDefinition.getDn().toString();
     }
 
     public Object getAdapter(Class aClass) {

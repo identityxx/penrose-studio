@@ -27,6 +27,7 @@ import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.acl.ACI;
+import org.safehaus.penrose.source.Sources;
 import org.apache.log4j.Logger;
 
 import javax.naming.InitialContext;
@@ -105,17 +106,21 @@ public class CreateLDAPProxyWizard extends Wizard {
 
             partition.addConnectionConfig(connectionConfig);
 
+            Sources sources = partition.getSources();
+
             SourceConfig sourceConfig = new SourceConfig(name, name);
             sourceConfig.setParameter("baseDn", connectionInfoPage.getSuffix());
             sourceConfig.setParameter("scope", "SUBTREE");
             sourceConfig.setParameter("filter", "(objectClass=*)");
-            partition.addSourceConfig(sourceConfig);
+            sources.addSourceConfig(sourceConfig);
 
             EntryMapping rootEntry = new EntryMapping(connectionInfoPage.getSuffix());
 
             SourceMapping sourceMapping = new SourceMapping("DEFAULT", name);
-            sourceMapping.setProxy(true);
             rootEntry.addSourceMapping(sourceMapping);
+
+            HandlerMapping rootHandlerMapping = new HandlerMapping("DEFAULT", "PROXY");
+            rootEntry.setHandlerMapping(rootHandlerMapping);
 
             rootEntry.addACI(new ACI("rs"));
 
@@ -129,13 +134,15 @@ public class CreateLDAPProxyWizard extends Wizard {
                 rootDseSourceConfig.setParameter("scope", "OBJECT");
                 rootDseSourceConfig.setParameter("filter", "objectClass=*");
 
-                partition.addSourceConfig(rootDseSourceConfig);
+                sources.addSourceConfig(rootDseSourceConfig);
 
                 EntryMapping rootDseEntryMapping = new EntryMapping();
 
                 SourceMapping rootDseSourceMapping = new SourceMapping("DEFAULT", rootDseSourceConfig.getName());
-                rootDseSourceMapping.setProxy(true);
                 rootDseEntryMapping.addSourceMapping(rootDseSourceMapping);
+
+                HandlerMapping rootDseHandlerMapping = new HandlerMapping("DEFAULT", "PROXY");
+                rootDseEntryMapping.setHandlerMapping(rootDseHandlerMapping);
 
                 rootDseEntryMapping.addACI(new ACI("rs"));
 

@@ -49,6 +49,7 @@ public class CachesNode extends Node {
         Collection children = new ArrayList();
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
+/*
         CacheConfig entryCacheConfig = penroseApplication.getPenroseConfig().getEntryCacheConfig();
         if (entryCacheConfig != null) {
             children.add(new CacheNode(
@@ -72,7 +73,7 @@ public class CachesNode extends Node {
                     this
             ));
         }
-
+*/
         return children;
     }
 }

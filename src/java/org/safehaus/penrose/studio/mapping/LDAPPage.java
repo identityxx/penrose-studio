@@ -34,6 +34,10 @@ import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.partition.SourceConfig;
 import org.safehaus.penrose.partition.FieldConfig;
+import org.safehaus.penrose.ldap.RDN;
+import org.safehaus.penrose.ldap.DN;
+import org.safehaus.penrose.ldap.DNBuilder;
+import org.safehaus.penrose.ldap.RDNBuilder;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -107,13 +111,13 @@ public class LDAPPage extends FormPage {
         parentDnLabel.setLayoutData(gd);
 
         parentDnText = toolkit.createText(composite, "", SWT.BORDER);
-        parentDnText.setText(entry.getParentDn() == null ? "" : entry.getParentDn());
+        parentDnText.setText(entry.getParentDn() == null ? "" : entry.getParentDn().toString());
         gd = new GridData(GridData.FILL_HORIZONTAL);
         parentDnText.setLayoutData(gd);
 
         parentDnText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                entry.setParentDn("".equals(parentDnText.getText()) ? null : parentDnText.getText());
+                entry.setDn(getDn());
                 checkDirty();
             }
         });
@@ -133,14 +137,14 @@ public class LDAPPage extends FormPage {
                 EntryMapping parentEntry = dialog.getEntryMapping();
                 if (parentEntry == null) return;
 
-                parentDnText.setText(parentEntry.getDn());
+                parentDnText.setText(parentEntry.getDn().toString());
             }
         });
 
         toolkit.createLabel(composite, "RDN:");
 
         rdnText = toolkit.createText(composite, "", SWT.BORDER);
-        rdnText.setText(entry.getRdn());
+        rdnText.setText(entry.getRdn().toString());
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
         rdnText.setLayoutData(gd);
@@ -255,7 +259,7 @@ public class LDAPPage extends FormPage {
                         AttributeMapping ad = (AttributeMapping)item.getData();
 
                         item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
-                        ad.setRdn(item.getChecked()+"");
+                        ad.setRdn(item.getChecked());
                     }
                     refreshRdn();
                     checkDirty();
@@ -275,7 +279,7 @@ public class LDAPPage extends FormPage {
                         AttributeMapping ad = (AttributeMapping)item.getData();
 
                         item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
-                        ad.setRdn(item.getChecked()+"");
+                        ad.setRdn(item.getChecked());
                     }
                     refreshRdn();
                     checkDirty();
@@ -392,7 +396,7 @@ public class LDAPPage extends FormPage {
         Collection sources = entry.getSourceMappings();
         for (Iterator i=sources.iterator(); i.hasNext(); ) {
             SourceMapping source = (SourceMapping)i.next();
-            SourceConfig sourceConfig = editor.getPartition().getSourceConfig(source.getSourceName());
+            SourceConfig sourceConfig = editor.getPartition().getSources().getSourceConfig(source.getSourceName());
             dialog.addVariable(source.getName());
 
             for (Iterator j=sourceConfig.getFieldConfigs().iterator(); j.hasNext(); ) {
@@ -465,7 +469,7 @@ public class LDAPPage extends FormPage {
             }
 
             TableItem item = new TableItem(attributeTable, SWT.CHECK);
-            item.setChecked("true".equals(ad.getRdn()));
+            item.setChecked(ad.isRdn());
             item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
             item.setText(0, ad.getName());
             item.setText(1, value == null ? "" : value);
@@ -520,44 +524,46 @@ public class LDAPPage extends FormPage {
     }
 
     public void refreshRdn() {
-        Row rdn = new Row();
 
         //log.debug("Rdn:");
 
+        RDNBuilder rb = new RDNBuilder();
         for (Iterator i=entry.getAttributeMappings().iterator(); i.hasNext(); ) {
             AttributeMapping ad = (AttributeMapping)i.next();
-            if (!"true".equals(ad.getRdn())) continue;
+            if (!ad.isRdn()) continue;
             String name = ad.getName();
             Object constant = ad.getConstant();
             if (constant != null) {
                 //log.debug(" - constant "+name+": "+constant);
-                rdn.set(name, constant);
+                rb.set(name, constant);
                 continue;
             }
 
             String variable = ad.getVariable();
             if (variable != null) {
                 //log.debug(" - variable "+name+": "+variable);
-                rdn.set(ad.getName(), "...");
+                rb.set(ad.getName(), "...");
                 continue;
             }
 
             //log.debug(" - expression "+name+": "+ad.getExpression());
-            rdn.set(name, "...");
+            rb.set(name, "...");
             continue;
         }
 
-        entry.setRdn(rdn.toString());
+        RDN rdn = rb.toRdn();
         rdnText.setText(rdn.toString());
+        entry.setDn(getDn());
     }
 
-    public String getDn() {
-        String dn = rdnText.getText();
+    public DN getDn() {
+        DNBuilder db = new DNBuilder();
+        db.append(rdnText.getText());
 
         if (!"".equals(parentDnText.getText())) {
-            dn = dn + "," + parentDnText.getText();
+            db.append(parentDnText.getText());
         }
 
-        return dn;
+        return db.toDn();
     }
 }

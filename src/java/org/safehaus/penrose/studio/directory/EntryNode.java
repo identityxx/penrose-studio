@@ -221,7 +221,7 @@ public class EntryNode extends Node {
 
             EntryNode entryNode = new EntryNode(
                     view,
-                    childMapping.getRdn(),
+                    childMapping.getRdn().toString(),
                     ObjectsView.ENTRY,
                     PenrosePlugin.getImage(PenroseImage.NODE),
                     childMapping,

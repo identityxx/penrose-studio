@@ -34,6 +34,7 @@ import javax.naming.Context;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.Hashtable;
 import java.io.StringWriter;
 import java.io.PrintWriter;
 
@@ -121,7 +122,7 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
         fetchButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 try {
-                    Properties env = new Properties();
+                    Hashtable env = new Hashtable();
                     env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
                     env.put(Context.PROVIDER_URL, getURL());
                     env.put(Context.SECURITY_PRINCIPAL, bindDnText.getText());
@@ -173,7 +174,7 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
             public void widgetSelected(SelectionEvent e) {
                 String url = getURL()+"/"+getSuffix();
 
-                Properties env = new Properties();
+                Hashtable env = new Hashtable();
                 env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
                 env.put(Context.PROVIDER_URL, url);
                 env.put(Context.SECURITY_PRINCIPAL, bindDnText.getText());

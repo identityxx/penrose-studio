@@ -25,6 +25,9 @@ import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.StaticEntryRDNWizardPage;
 import org.safehaus.penrose.util.EntryUtil;
+import org.safehaus.penrose.ldap.DNBuilder;
+import org.safehaus.penrose.ldap.DN;
+import org.safehaus.penrose.ldap.RDN;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -69,8 +72,8 @@ public class StaticEntryWizard extends Wizard {
 
     public IWizardPage getNextPage(IWizardPage page) {
         if (rdnPage == page) {
-            String rdn = rdnPage.getRdn();
-            attrPage.setRdn(EntryUtil.getRdn(rdn));
+            RDN rdn = new RDN(rdnPage.getRdn());
+            attrPage.setRdn(rdn);
 
         } else if (ocPage == page) {
             Collection objectClasses = ocPage.getSelectedObjectClasses();
@@ -83,8 +86,12 @@ public class StaticEntryWizard extends Wizard {
     public boolean performFinish() {
         try {
             entryMapping = new EntryMapping();
-            entryMapping.setRdn(rdnPage.getRdn());
-            entryMapping.setParentDn(rdnPage.getParentDn());
+
+            DNBuilder db = new DNBuilder();
+            db.append(rdnPage.getRdn());
+            db.append(rdnPage.getParentDn());
+            entryMapping.setDn(db.toDn());
+
             entryMapping.addObjectClasses(ocPage.getSelectedObjectClasses());
             entryMapping.addAttributeMappings(attrPage.getAttributeMappings());
 

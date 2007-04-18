@@ -27,7 +27,7 @@ import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.connector.JDBCAdapter;
+import org.safehaus.penrose.adapter.jdbc.JDBCAdapter;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.FieldConfig;
 import org.safehaus.penrose.partition.TableConfig;
@@ -203,8 +203,8 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
         try {
             showCatalogsAndSchemas();
 
-            String driver   = connectionConfig.getParameter(JDBCAdapter.DRIVER);
-            String username = connectionConfig.getParameter(JDBCAdapter.USER);
+            String driver   = connectionConfig.getParameter(JDBCClient.DRIVER);
+            String username = connectionConfig.getParameter(JDBCClient.USER);
 
             if ("oracle.jdbc.driver.OracleDriver".equals(driver)) {
                 schemaCombo.setText(username.toUpperCase());
@@ -286,7 +286,7 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
             FieldConfig field = (FieldConfig)i.next();
 
             TableItem it = new TableItem(fieldTable, SWT.NONE);
-            it.setImage(PenrosePlugin.getImage(field.isPK() ? PenroseImage.KEY : PenroseImage.NOKEY));
+            it.setImage(PenrosePlugin.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
             it.setText(0, field.getName());
             it.setText(1, field.getType());
         }

@@ -39,6 +39,10 @@ import org.safehaus.penrose.studio.validation.ValidationView;
 import org.safehaus.penrose.studio.logger.LoggerManager;
 import org.safehaus.penrose.studio.license.LicenseDialog;
 import org.safehaus.penrose.studio.welcome.action.EnterLicenseKeyAction;
+import org.safehaus.penrose.studio.plugin.PluginManager;
+import org.safehaus.penrose.studio.plugin.JDBCPlugin;
+import org.safehaus.penrose.studio.plugin.LDAPPlugin;
+import org.safehaus.penrose.studio.plugin.PluginConfig;
 import org.safehaus.penrose.schema.*;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.*;
@@ -49,6 +53,7 @@ import com.identyx.license.LicenseReader;
 import org.safehaus.penrose.log4j.Log4jConfigReader;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.safehaus.penrose.log4j.Log4jConfigWriter;
+import org.safehaus.penrose.naming.PenroseContext;
 
 import javax.crypto.Cipher;
 
@@ -73,9 +78,12 @@ public class PenroseApplication implements IPlatformRunnable {
     ApplicationConfig applicationConfig = new ApplicationConfig();
     PenroseConfig penroseConfig = new PenroseConfig();
     PenroseClient client;
-    SchemaManager schemaManager;
-    PartitionManager partitionManager;
+
+    PenroseContext penroseContext;
+    //SchemaManager schemaManager;
+    //PartitionManager partitionManager;
     LoggerManager loggerManager = new LoggerManager();
+    PluginManager pluginManager = new PluginManager();
 
     PenroseWorkbenchAdvisor workbenchAdvisor;
     ArrayList changeListeners = new ArrayList();
@@ -110,6 +118,16 @@ public class PenroseApplication implements IPlatformRunnable {
         workbenchAdvisor = new PenroseWorkbenchAdvisor();
 
         PenroseApplication.instance = this;
+
+        PluginConfig pluginConfig = new PluginConfig();
+        pluginConfig.setName("JDBC");
+        pluginConfig.setClassName(JDBCPlugin.class.getName());
+        pluginManager.init(pluginConfig);
+
+        pluginConfig = new PluginConfig();
+        pluginConfig.setName("JNDI");
+        pluginConfig.setClassName(LDAPPlugin.class.getName());
+        pluginManager.init(pluginConfig);
     }
 
     public static PenroseApplication getInstance() {
@@ -192,10 +210,15 @@ public class PenroseApplication implements IPlatformRunnable {
         PenroseConfigReader penroseConfigReader = new PenroseConfigReader(dir+"/conf/server.xml");
         penroseConfig = penroseConfigReader.read();
 
-        initSystemProperties();
-        initSchemaManager(dir);
-        loadPartitions(dir);
-        validatePartitions();
+        penroseContext = new PenroseContext();
+        penroseContext.init(penroseConfig);
+        penroseContext.load(dir);
+        penroseContext.start();
+
+        //initSystemProperties();
+        //initSchemaManager(dir);
+        //loadPartitions(dir);
+        //validatePartitions();
 
         loadLoggingConfig(dir);
         //loadLoggers();
@@ -222,25 +245,29 @@ public class PenroseApplication implements IPlatformRunnable {
             System.setProperty(name, value);
         }
     }
-
+/*
     public void initSchemaManager(String dir) throws Exception {
 
-        schemaManager = new SchemaManager();
+        schemaManager = penroseContext.getSchemaManager();
 
         for (Iterator i=penroseConfig.getSchemaConfigs().iterator(); i.hasNext(); ) {
             SchemaConfig schemaConfig = (SchemaConfig)i.next();
-            schemaManager.load(dir, schemaConfig);
+            schemaManager.init(dir, schemaConfig);
         }
+
     }
 
     public void loadPartitions(String dir) throws Exception {
 
-        partitionManager = new PartitionManager();
-        partitionManager.setSchemaManager(schemaManager);
+        partitionManager = penroseContext.getPartitionManager();
 
-        partitionManager.load(dir, penroseConfig.getPartitionConfigs());
+        for (Iterator i=penroseConfig.getPartitionConfigs().iterator(); i.hasNext(); ) {
+            PartitionConfig partitionConfig = (PartitionConfig)i.next();
+            partitionManager.load(dir, partitionConfig);
+        }
+
     }
-
+*/
     public void loadLoggingConfig(String dir) throws Exception {
         try {
             Log4jConfigReader reader = new Log4jConfigReader(new File(dir+"/conf/log4j.xml"));
@@ -253,9 +280,8 @@ public class PenroseApplication implements IPlatformRunnable {
 
     public void validatePartitions() throws Exception {
 
-        PartitionValidator partitionValidator = new PartitionValidator();
-        partitionValidator.setPenroseConfig(penroseConfig);
-        partitionValidator.setSchemaManager(schemaManager);
+        PartitionManager partitionManager = penroseContext.getPartitionManager();
+        PartitionValidator partitionValidator = partitionManager.getPartitionValidator();
 
         Collection results = new ArrayList();
 
@@ -326,6 +352,7 @@ public class PenroseApplication implements IPlatformRunnable {
 
         saveLoggingConfig(dir);
 
+        PartitionManager partitionManager = penroseContext.getPartitionManager();
         partitionManager.store(dir, penroseConfig.getPartitionConfigs());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
@@ -414,15 +441,11 @@ public class PenroseApplication implements IPlatformRunnable {
 	}
 
     public PartitionManager getPartitionManager() throws Exception {
-        return partitionManager;
+        return penroseContext == null ? null : penroseContext.getPartitionManager();
     }
 
     public SchemaManager getSchemaManager() {
-        return schemaManager;
-    }
-
-    public void setSchemaManager(SchemaManager schemaManager) {
-        this.schemaManager = schemaManager;
+        return penroseContext == null ? null : penroseContext.getSchemaManager();
     }
 
     public String getWorkDir() {
@@ -567,5 +590,21 @@ public class PenroseApplication implements IPlatformRunnable {
 
     public void setLoggingConfig(Log4jConfig loggingConfig) {
         this.loggingConfig = loggingConfig;
+    }
+
+    public PenroseContext getPenroseContext() {
+        return penroseContext;
+    }
+
+    public void setPenroseContext(PenroseContext penroseContext) {
+        this.penroseContext = penroseContext;
+    }
+
+    public PluginManager getPluginManager() {
+        return pluginManager;
+    }
+
+    public void setPluginManager(PluginManager pluginManager) {
+        this.pluginManager = pluginManager;
     }
 }

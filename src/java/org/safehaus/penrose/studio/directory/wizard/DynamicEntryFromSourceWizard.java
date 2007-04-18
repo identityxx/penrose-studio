@@ -27,6 +27,8 @@ import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.source.wizard.SelectSourcesWizardPage;
+import org.safehaus.penrose.ldap.DNBuilder;
+import org.safehaus.penrose.ldap.RDNBuilder;
 import org.apache.log4j.Logger;
 
 import java.util.Iterator;
@@ -91,8 +93,6 @@ public class DynamicEntryFromSourceWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            entryMapping.setParentDn(parentMapping.getDn());
-
             Collection sourceMappings = sourcesPage.getSourceMappings();
             for (Iterator i=sourceMappings.iterator(); i.hasNext(); ) {
                 SourceMapping sourceMapping = (SourceMapping)i.next();
@@ -104,18 +104,19 @@ public class DynamicEntryFromSourceWizard extends Wizard {
             Collection attributeMappings = attrPage.getAttributeMappings();
             entryMapping.addAttributeMappings(attributeMappings);
 
-            StringBuffer sb = new StringBuffer();
+            RDNBuilder rb = new RDNBuilder();
             for (Iterator i=attributeMappings.iterator(); i.hasNext(); ) {
                 AttributeMapping attributeMapping = (AttributeMapping)i.next();
-                if (!"true".equals(attributeMapping.getRdn())) continue;
+                if (!attributeMapping.isRdn()) continue;
 
-                if (sb.length() > 0) sb.append("+");
-
-                sb.append(attributeMapping.getName());
-                sb.append("=...");
+                rb.set(attributeMapping.getName(), "...");
             }
 
-            entryMapping.setRdn(sb.toString());
+            DNBuilder db = new DNBuilder();
+            db.append(rb.toRdn());
+            db.append(parentMapping.getDn());
+
+            entryMapping.setDn(db.toDn());
 
             // add reverse mappings
             for (Iterator i=entryMapping.getAttributeMappings().iterator(); i.hasNext(); ) {

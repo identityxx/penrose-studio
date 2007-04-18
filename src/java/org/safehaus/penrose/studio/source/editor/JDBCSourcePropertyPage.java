@@ -30,11 +30,10 @@ import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.studio.source.editor.JDBCSourceEditor;
 import org.safehaus.penrose.studio.source.JDBCFieldDialog;
 import org.safehaus.penrose.studio.source.FieldDialog;
 import org.safehaus.penrose.jdbc.JDBCClient;
-import org.safehaus.penrose.connector.JDBCAdapter;
+import org.safehaus.penrose.adapter.jdbc.JDBCAdapter;
 import org.apache.log4j.Logger;
 
 public class JDBCSourcePropertyPage extends FormPage {
@@ -157,7 +156,7 @@ public class JDBCSourcePropertyPage extends FormPage {
         gd.widthHint = 100;
         catalogLabel.setLayoutData(gd);
 
-        catalogText = toolkit.createText(composite, sourceConfig.getParameter(JDBCAdapter.CATALOG), SWT.BORDER);
+        catalogText = toolkit.createText(composite, sourceConfig.getParameter(JDBCClient.CATALOG), SWT.BORDER);
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
         catalogText.setLayoutData(gd);
@@ -165,9 +164,9 @@ public class JDBCSourcePropertyPage extends FormPage {
         catalogText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(catalogText.getText())) {
-                    sourceConfig.removeParameter(JDBCAdapter.CATALOG);
+                    sourceConfig.removeParameter(JDBCClient.CATALOG);
                 } else {
-                    sourceConfig.setParameter(JDBCAdapter.CATALOG, catalogText.getText());
+                    sourceConfig.setParameter(JDBCClient.CATALOG, catalogText.getText());
                 }
                 checkDirty();
             }
@@ -178,7 +177,7 @@ public class JDBCSourcePropertyPage extends FormPage {
         gd.widthHint = 100;
         schemaLabel.setLayoutData(gd);
 
-        schemaText = toolkit.createText(composite, sourceConfig.getParameter(JDBCAdapter.SCHEMA), SWT.BORDER);
+        schemaText = toolkit.createText(composite, sourceConfig.getParameter(JDBCClient.SCHEMA), SWT.BORDER);
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
         schemaText.setLayoutData(gd);
@@ -186,9 +185,9 @@ public class JDBCSourcePropertyPage extends FormPage {
         schemaText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(schemaText.getText())) {
-                    sourceConfig.removeParameter(JDBCAdapter.SCHEMA);
+                    sourceConfig.removeParameter(JDBCClient.SCHEMA);
                 } else {
-                    sourceConfig.setParameter(JDBCAdapter.SCHEMA, schemaText.getText());
+                    sourceConfig.setParameter(JDBCClient.SCHEMA, schemaText.getText());
                 }
                 checkDirty();
             }
@@ -199,8 +198,8 @@ public class JDBCSourcePropertyPage extends FormPage {
         gd.widthHint = 100;
         tableLabel.setLayoutData(gd);
 
-        String tableName = sourceConfig.getParameter(JDBCAdapter.TABLE);
-        if (tableName == null) tableName = sourceConfig.getParameter(JDBCAdapter.TABLE_NAME);
+        String tableName = sourceConfig.getParameter(JDBCClient.TABLE);
+        if (tableName == null) tableName = sourceConfig.getParameter(JDBCClient.TABLE_NAME);
 
 		tableText = toolkit.createText(composite, tableName, SWT.BORDER);
         gd = new GridData(GridData.FILL);
@@ -210,11 +209,11 @@ public class JDBCSourcePropertyPage extends FormPage {
         tableText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(tableText.getText())) {
-                    sourceConfig.removeParameter(JDBCAdapter.TABLE);
-                    sourceConfig.removeParameter(JDBCAdapter.TABLE_NAME);
+                    sourceConfig.removeParameter(JDBCClient.TABLE);
+                    sourceConfig.removeParameter(JDBCClient.TABLE_NAME);
                 } else {
-                    sourceConfig.setParameter(JDBCAdapter.TABLE, tableText.getText());
-                    sourceConfig.removeParameter(JDBCAdapter.TABLE_NAME);
+                    sourceConfig.setParameter(JDBCClient.TABLE, tableText.getText());
+                    sourceConfig.removeParameter(JDBCClient.TABLE_NAME);
                 }
                 checkDirty();
             }
@@ -271,10 +270,10 @@ public class JDBCSourcePropertyPage extends FormPage {
 
                     ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
 
-                    String catalog = sourceConfig.getParameter(JDBCAdapter.CATALOG);
-                    String schema = sourceConfig.getParameter(JDBCAdapter.SCHEMA);
-                    String tableName = sourceConfig.getParameter(JDBCAdapter.TABLE);
-                    if (tableName == null) tableName = sourceConfig.getParameter(JDBCAdapter.TABLE_NAME);
+                    String catalog = sourceConfig.getParameter(JDBCClient.CATALOG);
+                    String schema = sourceConfig.getParameter(JDBCClient.SCHEMA);
+                    String tableName = sourceConfig.getParameter(JDBCClient.TABLE);
+                    if (tableName == null) tableName = sourceConfig.getParameter(JDBCClient.TABLE_NAME);
                     if (catalog != null) tableName = catalog +"."+tableName;
                     if (schema != null) tableName = schema +"."+tableName;
 
@@ -310,7 +309,7 @@ public class JDBCSourcePropertyPage extends FormPage {
                 for (int i=0; i<fieldTable.getItemCount(); i++) {
                     TableItem item = fieldTable.getItem(i);
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
-                    fieldDefinition.setPrimaryKey(item.getChecked()+"");
+                    fieldDefinition.setPrimaryKey(item.getChecked());
                     item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
                 }
 
@@ -323,7 +322,7 @@ public class JDBCSourcePropertyPage extends FormPage {
                 for (int i=0; i<fieldTable.getItemCount(); i++) {
                     TableItem item = fieldTable.getItem(i);
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
-                    fieldDefinition.setPrimaryKey(item.getChecked()+"");
+                    fieldDefinition.setPrimaryKey(item.getChecked());
                     item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
                 }
 
@@ -361,18 +360,18 @@ public class JDBCSourcePropertyPage extends FormPage {
 
                     ConnectionConfig connection = partition.getConnectionConfig(sourceConfig.getConnectionName());
 
-                    String catalogName = sourceConfig.getParameter(JDBCAdapter.CATALOG);
-                    String schemaName = sourceConfig.getParameter(JDBCAdapter.SCHEMA);
-                    String tableName = sourceConfig.getParameter(JDBCAdapter.TABLE);
-                    if (tableName == null) tableName = sourceConfig.getParameter(JDBCAdapter.TABLE_NAME);
+                    String catalogName = sourceConfig.getParameter(JDBCClient.CATALOG);
+                    String schemaName = sourceConfig.getParameter(JDBCClient.SCHEMA);
+                    String tableName = sourceConfig.getParameter(JDBCClient.TABLE);
+                    if (tableName == null) tableName = sourceConfig.getParameter(JDBCClient.TABLE_NAME);
                     if (catalogName != null) tableName = catalogName+"."+tableName;
                     if (schemaName != null) tableName = schemaName+"."+tableName;
 
                     JDBCClient helper = new JDBCClient(
-                            connection.getParameter(JDBCAdapter.DRIVER),
-                            connection.getParameter(JDBCAdapter.URL),
-                            connection.getParameter(JDBCAdapter.USER),
-                            connection.getParameter(JDBCAdapter.PASSWORD)
+                            connection.getParameter(JDBCClient.DRIVER),
+                            connection.getParameter(JDBCClient.URL),
+                            connection.getParameter(JDBCClient.USER),
+                            connection.getParameter(JDBCClient.PASSWORD)
                     );
 
                     helper.connect();
@@ -416,18 +415,18 @@ public class JDBCSourcePropertyPage extends FormPage {
 
                     ConnectionConfig connection = partition.getConnectionConfig(sourceConfig.getConnectionName());
 
-                    String catalogName = sourceConfig.getParameter(JDBCAdapter.CATALOG);
-                    String schemaName = sourceConfig.getParameter(JDBCAdapter.SCHEMA);
-                    String tableName = sourceConfig.getParameter(JDBCAdapter.TABLE);
-                    if (tableName == null) tableName = sourceConfig.getParameter(JDBCAdapter.TABLE_NAME);
+                    String catalogName = sourceConfig.getParameter(JDBCClient.CATALOG);
+                    String schemaName = sourceConfig.getParameter(JDBCClient.SCHEMA);
+                    String tableName = sourceConfig.getParameter(JDBCClient.TABLE);
+                    if (tableName == null) tableName = sourceConfig.getParameter(JDBCClient.TABLE_NAME);
                     if (catalogName != null) tableName = catalogName+"."+tableName;
                     if (schemaName != null) tableName = schemaName+"."+tableName;
 
                     JDBCClient helper = new JDBCClient(
-                            connection.getParameter(JDBCAdapter.DRIVER),
-                            connection.getParameter(JDBCAdapter.URL),
-                            connection.getParameter(JDBCAdapter.USER),
-                            connection.getParameter(JDBCAdapter.PASSWORD)
+                            connection.getParameter(JDBCClient.DRIVER),
+                            connection.getParameter(JDBCClient.URL),
+                            connection.getParameter(JDBCClient.USER),
+                            connection.getParameter(JDBCClient.PASSWORD)
                     );
 
                     helper.connect();
@@ -493,8 +492,8 @@ public class JDBCSourcePropertyPage extends FormPage {
             FieldConfig fieldDefinition = (FieldConfig)i.next();
 
             TableItem item = new TableItem(fieldTable, SWT.CHECK);
-            item.setChecked(fieldDefinition.isPK());
-            item.setImage(PenrosePlugin.getImage(fieldDefinition.isPK() ? PenroseImage.KEY : PenroseImage.NOKEY));
+            item.setChecked(fieldDefinition.isPrimaryKey());
+            item.setImage(PenrosePlugin.getImage(fieldDefinition.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
             item.setText(0, fieldDefinition.getName().equals(fieldDefinition.getOriginalName()) ? fieldDefinition.getName() : fieldDefinition.getOriginalName());
             item.setText(1, fieldDefinition.getName().equals(fieldDefinition.getOriginalName()) ? "" : fieldDefinition.getName());
             item.setText(2, fieldDefinition.getType());

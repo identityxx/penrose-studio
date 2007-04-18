@@ -25,6 +25,7 @@ import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.SourceConfig;
+import org.safehaus.penrose.source.Sources;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
@@ -79,13 +80,14 @@ public class SourcesNode extends Node {
 
         int counter = 1;
         String name = newSourceDefinition.getName();
-        while (partition.getSourceConfig(name) != null) {
+        Sources sources = partition.getSources();
+        while (sources.getSourceConfig(name) != null) {
             counter++;
             name = newSourceDefinition.getName()+" ("+counter+")";
         }
 
         newSourceDefinition.setName(name);
-        partition.addSourceConfig(newSourceDefinition);
+        sources.addSourceConfig(newSourceDefinition);
 
         view.setClipboard(null);
 
@@ -94,14 +96,14 @@ public class SourcesNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        return !partition.getSourceConfigs().isEmpty();
+        return !partition.getSources().getSourceConfigs().isEmpty();
     }
 
     public Collection getChildren() throws Exception {
 
         Collection children = new ArrayList();
 
-        Collection sourceConfigs = partition.getSourceConfigs();
+        Collection sourceConfigs = partition.getSources().getSourceConfigs();
         for (Iterator i=sourceConfigs.iterator(); i.hasNext(); ) {
             SourceConfig sourceConfig = (SourceConfig)i.next();
 

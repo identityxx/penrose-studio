@@ -14,13 +14,17 @@ import org.eclipse.swt.events.*;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.studio.source.editor.JDBCSourceEditor;
-import org.safehaus.penrose.connector.AdapterConfig;
-import org.safehaus.penrose.connector.Connection;
+import org.safehaus.penrose.adapter.AdapterConfig;
+import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.config.PenroseConfig;
-import org.safehaus.penrose.session.PenroseSearchControls;
-import org.safehaus.penrose.session.PenroseSearchResults;
-import org.safehaus.penrose.mapping.AttributeValues;
+import org.safehaus.penrose.ldap.SearchResponse;
+import org.safehaus.penrose.ldap.SearchRequest;
+import org.safehaus.penrose.ldap.Attributes;
+import org.safehaus.penrose.ldap.Attribute;
+import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.source.SourceManager;
+import org.safehaus.penrose.source.Source;
+import org.safehaus.penrose.entry.Entry;
 
 import java.util.Iterator;
 import java.util.Collection;
@@ -128,31 +132,39 @@ public class JDBCSourceBrowsePage extends FormPage {
 
             AdapterConfig adapterConfig = penroseConfig.getAdapterConfig(connectionConfig.getAdapterName());
 
-            Connection connection = new Connection(connectionConfig, adapterConfig);
+            Connection connection = new Connection(partition, connectionConfig, adapterConfig);
             connection.init();
+            connection.start();
 
-            PenroseSearchResults sr = new PenroseSearchResults();
-            PenroseSearchControls sc = new PenroseSearchControls();
+            SearchResponse<Entry> sr = new SearchResponse<Entry>();
+            SearchRequest sc = new SearchRequest();
 
             int size = Integer.parseInt(maxSizeText.getText());
             sc.setSizeLimit(size);
 
-            connection.load(sourceConfig, null, null, sc, sr);
+            PenroseContext penroseContext = penroseApplication.getPenroseContext();
+            SourceManager sourceManager = penroseContext.getSourceManager();
+            Source source = sourceManager.getSource(partition, sourceConfig.getName());
 
-            sr.close();
+            source.search(sc, sr);
 
             Collection fields = sourceConfig.getFieldConfigs();
 
             //log.debug("Results:");
             while (sr.hasNext()) {
-                AttributeValues av = (AttributeValues)sr.next();
+                Entry entry = (Entry)sr.next();
+                Attributes attributes = entry.getAttributes();
                 //log.debug(" - "+av);
 
                 TableItem item = new TableItem(table, SWT.NONE);
                 int counter = 0;
                 for (Iterator i=fields.iterator(); i.hasNext(); counter++) {
-                    FieldConfig fieldDefinition = (FieldConfig)i.next();
-                    Collection values = av.get(fieldDefinition.getName());
+                    FieldConfig fieldConfig = (FieldConfig)i.next();
+
+                    Attribute attribute = attributes.get(fieldConfig.getName());
+                    if (attribute == null) continue;
+
+                    Collection values = attribute.getValues();
 
                     String value;
                     if (values == null) {
@@ -167,7 +179,7 @@ public class JDBCSourceBrowsePage extends FormPage {
                 }
             }
 
-            connection.close();
+            connection.stop();
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

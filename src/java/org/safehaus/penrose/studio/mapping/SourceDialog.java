@@ -204,7 +204,6 @@ public class SourceDialog extends Dialog {
                 source.setIncludeOnModify(modifyCheckbox.getSelection());
                 source.setIncludeOnModRdn(modrdnCheckbox.getSelection());
                 source.setIncludeOnDelete(deleteCheckbox.getSelection());
-                source.setProxy(proxyCheckbox.getSelection());
 
                 saved = true;
                 shell.close();
@@ -286,7 +285,6 @@ public class SourceDialog extends Dialog {
         modifyCheckbox.setSelection(source.isIncludeOnAdd());
         modrdnCheckbox.setSelection(source.isIncludeOnModRdn());
         deleteCheckbox.setSelection(source.isIncludeOnDelete());
-        proxyCheckbox.setSelection(source.isProxy());
 
         aliasText.setEnabled(canEnterAlias());
         saveButton.setEnabled(canSave());

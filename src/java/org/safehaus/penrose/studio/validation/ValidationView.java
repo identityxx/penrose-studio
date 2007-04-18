@@ -44,11 +44,10 @@ import org.safehaus.penrose.studio.mapping.MappingEditor;
 import org.safehaus.penrose.studio.connection.editor.JNDIConnectionEditor;
 import org.safehaus.penrose.studio.connection.editor.JDBCConnectionEditor;
 import org.safehaus.penrose.studio.connection.editor.*;
-import org.safehaus.penrose.studio.source.editor.JDBCSourceEditorInput;
-import org.safehaus.penrose.studio.source.editor.JNDISourceEditorInput;
-import org.safehaus.penrose.studio.source.editor.JDBCSourceEditor;
-import org.safehaus.penrose.studio.source.editor.JNDISourceEditor;
+import org.safehaus.penrose.studio.source.editor.*;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.plugin.PluginManager;
+import org.safehaus.penrose.studio.plugin.Plugin;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.partition.*;
 
@@ -128,7 +127,7 @@ public class ValidationView extends ViewPart {
             TableItem item = new TableItem(table, SWT.NONE);
             item.setText(0, result.getType());
             item.setText(1, result.getMessage());
-            item.setText(2, result.getSource());
+            item.setText(2, result.getSource().toString());
 
             if (PartitionValidationResult.ERROR.equals(result.getType())) {
                 item.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_RED));
@@ -148,8 +147,9 @@ public class ValidationView extends ViewPart {
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         PartitionManager partitionManager = penroseApplication.getPartitionManager();
+        PluginManager pluginManager = penroseApplication.getPluginManager();
 
-		if (object instanceof ConnectionConfig) {
+        if (object instanceof ConnectionConfig) {
             ConnectionConfig connectionConfig = (ConnectionConfig)object;
             Partition partition = partitionManager.getPartition(connectionConfig);
 
@@ -171,12 +171,13 @@ public class ValidationView extends ViewPart {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
 
-            if ("JDBC".equals(connection.getAdapterName())) {
-                page.openEditor(new JDBCSourceEditorInput(partition, sourceConfig), JDBCSourceEditor.class.getName());
+            Plugin plugin = pluginManager.getPlugin(connection.getAdapterName());
+            SourceEditorInput sei = plugin.createSourceEditorInput();
+            sei.setPartition(partition);
+            sei.setSourceConfig(sourceConfig);
 
-            } else if ("LDAP".equals(connection.getAdapterName())) {
-                page.openEditor(new JNDISourceEditorInput(partition, sourceConfig), JNDISourceEditor.class.getName());
-            }
+            String sourceEditorClass = plugin.getSourceEditorClass();
+            page.openEditor(sei, sourceEditorClass);
 
 		} else if (object instanceof EntryMapping) {
             EntryMapping entryDefinition = (EntryMapping)object;

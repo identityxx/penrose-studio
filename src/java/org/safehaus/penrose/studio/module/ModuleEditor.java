@@ -365,7 +365,7 @@ public class ModuleEditor extends EditorPart {
 	            ModuleMapping mapping = (ModuleMapping)i.next();
 	
 	            TableItem tableItem = new TableItem(mappingsTable, SWT.NONE);
-	            tableItem.setText(0, mapping.getBaseDn());
+	            tableItem.setText(0, mapping.getBaseDn().toString());
 	            tableItem.setText(1, mapping.getScope());
 	            tableItem.setText(2, mapping.getFilter());
 	            tableItem.setData(mapping);
@@ -395,7 +395,7 @@ public class ModuleEditor extends EditorPart {
                 if (dialog.getAction() == ModuleMappingDialog.CANCEL) return;
 
                 TableItem item = new TableItem(mappingsTable, SWT.NONE);
-                item.setText(0, mapping.getBaseDn());
+                item.setText(0, mapping.getBaseDn().toString());
                 item.setText(1, mapping.getScope());
                 item.setText(2, mapping.getFilter());
                 item.setData(mapping);

@@ -17,70 +17,8 @@
  */
 package org.safehaus.penrose.studio.source.editor;
 
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IPersistableElement;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.SourceConfig;
-
 /**
  * @author Endi S. Dewata
  */
-public class JDBCSourceEditorInput implements IEditorInput {
-
-    private Partition partition;
-    private SourceConfig sourceConfig;
-
-    public JDBCSourceEditorInput(Partition partition, SourceConfig sourceDefinition) {
-        this.partition = partition;
-        this.sourceConfig = sourceDefinition;
-    }
-
-    public boolean exists() {
-        return true;
-    }
-
-    public ImageDescriptor getImageDescriptor() {
-        return null;
-    }
-
-    public String getName() {
-        return sourceConfig.getName();
-    }
-
-    public IPersistableElement getPersistable() {
-        return null;
-    }
-
-    public String getToolTipText() {
-        return sourceConfig.getName();
-    }
-
-    public Object getAdapter(Class aClass) {
-        return null;
-    }
-
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (!(o instanceof JDBCSourceEditorInput)) return false;
-
-        JDBCSourceEditorInput cei = (JDBCSourceEditorInput)o;
-        return sourceConfig.equals(cei.sourceConfig);
-    }
-
-    public SourceConfig getSourceConfig() {
-        return sourceConfig;
-    }
-
-    public void setSourceConfig(SourceConfig sourceConfig) {
-        this.sourceConfig = sourceConfig;
-    }
-
-    public Partition getPartition() {
-        return partition;
-    }
-
-    public void setPartition(Partition partition) {
-        this.partition = partition;
-    }
+public class JDBCSourceEditorInput extends SourceEditorInput {
 }

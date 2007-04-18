@@ -23,6 +23,7 @@ import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.ldap.DN;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
@@ -79,8 +80,12 @@ public class DirectoryNode extends Node {
         for (Iterator i=rootEntryMappings.iterator(); i.hasNext(); ) {
             EntryMapping entryMapping = (EntryMapping)i.next();
 
-            String dn = entryMapping.getDn();
-            if ("".equals(dn)) dn = "Root DSE";
+            String dn;
+            if (entryMapping.getDn().isEmpty()) {
+                dn = "Root DSE";
+            } else {
+                dn = entryMapping.getDn().toString();
+            }
 
             EntryNode entryNode = new EntryNode(
                     view,

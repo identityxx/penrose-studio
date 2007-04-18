@@ -65,13 +65,15 @@ public class CreateRootDSEProxyWizard extends Wizard {
             sourceConfig.setParameter("scope", "OBJECT");
             sourceConfig.setParameter("filter", "objectClass=*");
 
-            partition.addSourceConfig(sourceConfig);
+            partition.getSources().addSourceConfig(sourceConfig);
 
             EntryMapping entryMapping = new EntryMapping();
 
             SourceMapping sourceMapping = new SourceMapping("DEFAULT", sourceConfig.getName());
-            sourceMapping.setProxy(true);
             entryMapping.addSourceMapping(sourceMapping);
+
+            HandlerMapping handlerMapping = new HandlerMapping("DEFAULT", "PROXY");
+            entryMapping.setHandlerMapping(handlerMapping);
 
             entryMapping.addACI(new ACI("rs"));
 

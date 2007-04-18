@@ -81,12 +81,12 @@ public class RelationshipWizardPage extends WizardPage implements SelectionListe
                 for (Iterator i=sourceMappings.iterator(); i.hasNext(); ) {
                     SourceMapping source = (SourceMapping)i.next();
 
-                    SourceConfig sourceDefinition = partition.getSourceConfig(source.getSourceName());
+                    SourceConfig sourceDefinition = partition.getSources().getSourceConfig(source.getSourceName());
 
                     Collection fields = sourceDefinition.getFieldConfigs();
                     for (Iterator j=fields.iterator(); j.hasNext(); ) {
                         FieldConfig field = (FieldConfig)j.next();
-                        dialog.addField(source.getName()+"."+field.getName(), field.isPK());
+                        dialog.addField(source.getName()+"."+field.getName(), field.isPrimaryKey());
                     }
                 }
 

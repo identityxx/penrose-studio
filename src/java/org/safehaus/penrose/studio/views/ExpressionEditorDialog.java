@@ -366,7 +366,7 @@ public class ExpressionEditorDialog extends BaseDialog {
 			Collection sources = entry.getSourceMappings();
 			for (Iterator i=sources.iterator(); i.hasNext(); ) {
 				SourceMapping source = (SourceMapping)i.next();
-				SourceConfig sourceConfig = partition.getSourceConfig(source.getSourceName());
+				SourceConfig sourceConfig = partition.getSources().getSourceConfig(source.getSourceName());
 				Object[] fields = sourceConfig.getFieldConfigs().toArray();
 				Image icon = PenrosePlugin.getImage(PenroseImage.SOURCE);
 

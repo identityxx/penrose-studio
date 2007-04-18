@@ -94,7 +94,7 @@ public class ModuleMappingWizardPage extends WizardPage implements SelectionList
                     if (dialog.getAction() == ModuleMappingDialog.CANCEL) return;
 
                     TableItem item = new TableItem(mappingsTable, SWT.NONE);
-                    item.setText(0, mapping.getBaseDn());
+                    item.setText(0, mapping.getBaseDn().toString());
                     item.setText(1, mapping.getScope());
                     item.setText(2, mapping.getFilter());
                     item.setData(mapping);
@@ -123,7 +123,7 @@ public class ModuleMappingWizardPage extends WizardPage implements SelectionList
 
                     if (dialog.getAction() == ModuleMappingDialog.CANCEL) return;
 
-                    item.setText(0, mapping.getBaseDn());
+                    item.setText(0, mapping.getBaseDn().toString());
                     item.setText(1, mapping.getScope());
                     item.setText(2, mapping.getFilter());
                     mappingsTable.redraw();

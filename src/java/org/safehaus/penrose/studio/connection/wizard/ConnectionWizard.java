@@ -19,11 +19,12 @@ package org.safehaus.penrose.studio.connection.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.safehaus.penrose.connector.JDBCAdapter;
+import org.safehaus.penrose.adapter.jdbc.JDBCAdapter;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.studio.driver.Driver;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.jdbc.JDBCClient;
 import org.apache.log4j.Logger;
 
 import javax.naming.InitialContext;
@@ -136,18 +137,18 @@ public class ConnectionWizard extends Wizard {
 
             if ("JDBC".equals(adapterName)) {
 
-                String driver = jdbcPage.getParameter(JDBCAdapter.DRIVER);
-                connectionConfig.setParameter(JDBCAdapter.DRIVER, driver);
+                String driver = jdbcPage.getParameter(JDBCClient.DRIVER);
+                connectionConfig.setParameter(JDBCClient.DRIVER, driver);
 
-                String url = jdbcPage.getParameter(JDBCAdapter.URL);
+                String url = jdbcPage.getParameter(JDBCClient.URL);
                 url = Helper.replace(url, jdbcPage.getParameters());
-                connectionConfig.setParameter(JDBCAdapter.URL, url);
+                connectionConfig.setParameter(JDBCClient.URL, url);
 
-                String user = jdbcPage.getParameter(JDBCAdapter.USER);
-                if (user != null) connectionConfig.setParameter(JDBCAdapter.USER, user);
+                String user = jdbcPage.getParameter(JDBCClient.USER);
+                if (user != null) connectionConfig.setParameter(JDBCClient.USER, user);
 
-                String password = jdbcPage.getParameter(JDBCAdapter.PASSWORD);
-                if (password != null) connectionConfig.setParameter(JDBCAdapter.PASSWORD, password);
+                String password = jdbcPage.getParameter(JDBCClient.PASSWORD);
+                if (password != null) connectionConfig.setParameter(JDBCClient.PASSWORD, password);
 
             } else if ("LDAP".equals(adapterName)) {
                 connectionConfig.setParameter(InitialContext.PROVIDER_URL, jndiInfoPage.getURL()+"/"+jndiInfoPage.getSuffix());

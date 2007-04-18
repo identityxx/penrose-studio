@@ -49,8 +49,12 @@ public class MappingEditor extends FormEditor implements ModifyListener {
         setSite(site);
         setInput(input);
 
-        String dn = entry.getDn();
-        if ("".equals(dn)) dn = "Root DSE";
+        String dn;
+        if (entry.getDn().isEmpty()) {
+            dn = "Root DSE";
+        } else {
+            dn = entry.getDn().toString();
+        }
         setPartName(dn);
     }
 
@@ -97,8 +101,12 @@ public class MappingEditor extends FormEditor implements ModifyListener {
 
         partition.modifyEntryMapping(origEntry, entry);
 
-        String dn = entry.getDn();
-        if ("".equals(dn)) dn = "Root DSE";
+        String dn;
+        if (entry.getDn().isEmpty()) {
+            dn = "Root DSE";
+        } else {
+            dn = entry.getDn().toString();
+        }
         setPartName(dn);
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();

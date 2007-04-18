@@ -75,7 +75,7 @@ public class UserPropertyPage {
         dnLabel.setLayoutData(gd);
 
 
-		dnText = toolkit.createText(composite, userConfig.getDn(), SWT.BORDER);
+		dnText = toolkit.createText(composite, userConfig.getDn().toString(), SWT.BORDER);
         gd = new GridData(GridData.FILL_HORIZONTAL);
 		dnText.setLayoutData(gd);
 

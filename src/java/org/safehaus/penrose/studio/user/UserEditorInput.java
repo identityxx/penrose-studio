@@ -42,7 +42,7 @@ public class UserEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return userConfig.getDn();
+        return userConfig.getDn().toString();
     }
 
     public IPersistableElement getPersistable() {
@@ -50,7 +50,7 @@ public class UserEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return userConfig.getDn();
+        return userConfig.getDn().toString();
     }
 
     public Object getAdapter(Class aClass) {

@@ -95,7 +95,7 @@ public class JDBCConnectionEditor extends FormEditor {
         if (!origConnectionConfig.getName().equals(connectionConfig.getName())) {
             partition.renameConnectionConfig(origConnectionConfig, connectionConfig.getName());
 
-            for (Iterator i=partition.getSourceConfigs().iterator(); i.hasNext(); ) {
+            for (Iterator i=partition.getSources().getSourceConfigs().iterator(); i.hasNext(); ) {
                 SourceConfig sourceConfig = (SourceConfig)i.next();
                 if (!sourceConfig.getConnectionName().equals(origConnectionConfig.getName())) continue;
                 sourceConfig.setConnectionName(connectionConfig.getName());

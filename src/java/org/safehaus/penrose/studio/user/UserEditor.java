@@ -49,7 +49,7 @@ public class UserEditor extends MultiPageEditorPart {
 
         setSite(site);
         setInput(input);
-        setPartName(userConfig.getDn());
+        setPartName(userConfig.getDn().toString());
     }
 
     protected void createPages() {
@@ -94,7 +94,7 @@ public class UserEditor extends MultiPageEditorPart {
 
         origUserConfig.copy(userConfig);
 
-        setPartName(userConfig.getDn());
+        setPartName(userConfig.getDn().toString());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         penroseApplication.notifyChangeListeners();

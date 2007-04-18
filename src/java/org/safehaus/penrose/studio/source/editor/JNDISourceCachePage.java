@@ -234,11 +234,11 @@ public class JNDISourceCachePage extends FormPage {
 
         loadingMethodCombo = new Combo(composite, SWT.READ_ONLY);
         loadingMethodCombo.add("");
-        loadingMethodCombo.add(SourceConfig.LOAD_ALL);
-        loadingMethodCombo.add(SourceConfig.SEARCH_AND_LOAD);
+        //loadingMethodCombo.add(SourceConfig.LOAD_ALL);
+        //loadingMethodCombo.add(SourceConfig.SEARCH_AND_LOAD);
 
-        value = sourceConfig.getParameter(SourceConfig.LOADING_METHOD);
-        value = value == null ? SourceConfig.DEFAULT_LOADING_METHOD : value;
+        //value = sourceConfig.getParameter(SourceConfig.LOADING_METHOD);
+        //value = value == null ? SourceConfig.DEFAULT_LOADING_METHOD : value;
         loadingMethodCombo.setText(value);
 
         gd = new GridData(GridData.FILL);
@@ -248,9 +248,9 @@ public class JNDISourceCachePage extends FormPage {
         loadingMethodCombo.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(loadingMethodCombo.getText())) {
-                    sourceConfig.removeParameter(SourceConfig.LOADING_METHOD);
+                    //sourceConfig.removeParameter(SourceConfig.LOADING_METHOD);
                 } else {
-                    sourceConfig.setParameter(SourceConfig.LOADING_METHOD, loadingMethodCombo.getText());
+                    //sourceConfig.setParameter(SourceConfig.LOADING_METHOD, loadingMethodCombo.getText());
                 }
                 checkDirty();
             }

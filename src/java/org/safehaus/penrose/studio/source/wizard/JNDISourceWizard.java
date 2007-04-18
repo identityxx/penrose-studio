@@ -107,7 +107,7 @@ public class JNDISourceWizard extends Wizard {
                 sourceConfig.addFieldConfig(field);
             }
 
-            partition.addSourceConfig(sourceConfig);
+            partition.getSources().addSourceConfig(sourceConfig);
 
             return true;
 

@@ -35,6 +35,8 @@ import org.safehaus.penrose.partition.SourceConfig;
 import org.safehaus.penrose.partition.FieldConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.filter.*;
+import org.safehaus.penrose.ldap.DNBuilder;
+import org.safehaus.penrose.ldap.RDNBuilder;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -68,7 +70,7 @@ public class NewEntryFromSourceAction extends Action {
             Partition partition = node.getPartition();
             EntryMapping entryMapping = node.getEntryMapping();
 
-            Collection sourceConfigs = partition.getSourceConfigs();
+            Collection sourceConfigs = partition.getSources().getSourceConfigs();
             if (sourceConfigs.size() == 0) {
                 System.out.println("There is no sources defined.");
                 return;
@@ -84,22 +86,23 @@ public class NewEntryFromSourceAction extends Action {
 
             if (!dialog.isSaved()) return;
 
-            SourceConfig sourceConfig = partition.getSourceConfig(sourceMapping.getSourceName());
+            SourceConfig sourceConfig = partition.getSources().getSourceConfig(sourceMapping.getSourceName());
 
             final EntryMapping entry = new EntryMapping();
 
-            StringBuffer rdn = new StringBuffer();
+            DNBuilder db = new DNBuilder();
+            RDNBuilder rb = new RDNBuilder();
+
             Collection pkNames = sourceConfig.getPrimaryKeyNames();
             for (Iterator i=pkNames.iterator(); i.hasNext(); ) {
                 String pkName = (String)i.next();
-                if (rdn.length() > 0) rdn.append("+");
-                rdn.append(pkName);
-                rdn.append("=...");
+                rb.set(pkName, "...");
             }
 
-            entry.setRdn(rdn.toString());
-            entry.setParentDn(entryMapping.getDn());
+            db.append(rb.toRdn());
+            db.append(entryMapping.getDn());
 
+            entry.setDn(db.toDn());
             entry.addObjectClass("top");
 
             String s = sourceConfig.getParameter("filter");
@@ -119,10 +122,10 @@ public class NewEntryFromSourceAction extends Action {
                         String attribute = sf.getAttribute();
                         if (!attribute.equalsIgnoreCase("objectClass")) return;
 
-                        String value = sf.getValue();
+                        Object value = sf.getValue();
                         if (value.equals("*")) return;
 
-                        entry.addObjectClass(value);
+                        entry.addObjectClass(value.toString());
                     }
                 });
                 fi.run();

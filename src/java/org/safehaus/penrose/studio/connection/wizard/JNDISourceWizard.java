@@ -25,9 +25,10 @@ import org.safehaus.penrose.partition.FieldConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.studio.source.wizard.JNDIFieldWizardPage;
 import org.safehaus.penrose.studio.source.wizard.JNDIAttributeWizardPage;
-import org.safehaus.penrose.mapping.Row;
+import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.ldap.DN;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -75,11 +76,11 @@ public class JNDISourceWizard extends Wizard {
         this.scope = scope;
         this.attributeNames = attributeNames;
 
-        Row rdn;
+        RDN rdn;
         if (baseDn == null || "".equals(baseDn)) {
-            rdn = EntryUtil.getRdn(client.getSuffix());
+            rdn = new DN(client.getSuffix()).getRdn();
         } else {
-            rdn = EntryUtil.getRdn(baseDn);
+            rdn = new DN(baseDn).getRdn();
         }
         String rdnAttr = (String)rdn.getNames().iterator().next();
         String rdnValue = (String)rdn.get(rdnAttr);
@@ -117,7 +118,7 @@ public class JNDISourceWizard extends Wizard {
                 sourceConfig.addFieldConfig(field);
             }
 
-            partition.addSourceConfig(sourceConfig);
+            partition.getSources().addSourceConfig(sourceConfig);
 
             return true;
 
@@ -143,7 +144,7 @@ public class JNDISourceWizard extends Wizard {
 
     public IWizardPage getNextPage(IWizardPage page) {
         if (attributesPage == page) {
-            Row rdn = EntryUtil.getRdn(baseDn);
+            RDN rdn = new DN(baseDn).getRdn();
             Collection names = new ArrayList();
             for (Iterator i=rdn.getNames().iterator(); i.hasNext(); ) {
                 String name = (String)i.next();

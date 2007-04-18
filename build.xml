@@ -14,7 +14,7 @@
     <property name="prefix" value=""/>
     <property name="penrose.studio.home" value="${prefix}/usr/local/${project.name}-${product.version}"/>
 
-    <property name="penrose.version" value="1.1.3"/>
+    <property name="penrose.version" value="1.2_beta"/>
 
     <property name="rcp.prefix" value="eclipse-RCP-3.1"/>
     <property name="iscc.path" value="ISCC.exe"/>
@@ -43,8 +43,8 @@
     </target>
 
     <target name="import" depends="init">
-        <copy todir="lib" file="../penrose-pro-1.1/lib/penrose-${penrose.version}.jar"/>
-        <copy todir="lib" file="../penrose-pro-1.1/target/penrose-pro-${penrose.version}.jar"/>
+        <copy todir="lib" file="../penrose-pro-1.2/lib/penrose-${penrose.version}.jar"/>
+        <copy todir="lib" file="../penrose-pro-1.2/target/penrose-pro-${penrose.version}.jar"/>
     </target>
 
     <target name="clean" depends="init">
@@ -57,8 +57,8 @@
         <javac
             srcdir="src/tools"
             destdir="target/tools"
-            source="1.4"
-            target="1.4"
+            source="1.5"
+            target="1.5"
         />
         <jar destfile="target/penrose-studio-tools-${product.version}.jar" basedir="target/tools"/>
     </target>
@@ -84,8 +84,8 @@
             srcdir="src/java"
             destdir="target/classes"
             classpathref="lib.path"
-            source="1.4"
-            target="1.4"
+            source="1.5"
+            target="1.5"
         />
         <copy todir="target/classes">
             <fileset dir="src/java">
