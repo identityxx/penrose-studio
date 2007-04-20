@@ -87,6 +87,16 @@ public class JDBCSearchResultDialog extends Dialog {
 
             valueText.setText(value == null ? "" : value.toString());
         }
+
+        for (Iterator i=rdn.getNames().iterator(); i.hasNext(); ) {
+            String name = (String)i.next();
+            Object value = rdn.get(name);
+
+            Text valueText = (Text) texts.get(name);
+            if (valueText == null) continue;
+
+            valueText.setText(value == null ? "" : value.toString());
+        }
     }
 
     public void createControl(final Shell parent) {

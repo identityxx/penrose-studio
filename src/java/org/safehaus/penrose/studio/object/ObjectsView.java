@@ -28,6 +28,7 @@ import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.nis.NISNode;
 import org.safehaus.penrose.studio.logging.LoggingNode;
 import org.safehaus.penrose.studio.properties.SystemPropertiesNode;
 import org.safehaus.penrose.studio.user.AdministratorNode;
@@ -84,6 +85,7 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
     public final static String APPENDER          = "Appender";
     public final static String LOGGERS           = "Loggers";
     public final static String LOGGER            = "Logger";
+    public final static String NIS               = "NIS";
 
 	private TreeViewer treeViewer;
 
@@ -94,7 +96,7 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
     private PartitionsNode partitionsNode;
     private SchemasNode schemasNode;
     private ServicesNode servicesNode;
-    private CachesNode cachesNode;
+    //private CachesNode cachesNode;
     private LoggingNode loggingNode;
 
     public ObjectsView() {
@@ -124,7 +126,7 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                 SERVICES,
                 null);
         nodes.add(servicesNode);
-
+/*
         cachesNode = new CachesNode(
                 this,
                 CACHES,
@@ -133,7 +135,7 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                 CACHES,
                 null);
         nodes.add(cachesNode);
-
+*/
         loggingNode = new LoggingNode(
                 this,
                 LOGGING,
@@ -176,6 +178,15 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                 SYSTEM_PROPERTIES,
                 PenrosePlugin.getImage(PenroseImage.SYSTEM_PROPERTIES),
                 SYSTEM_PROPERTIES,
+                null
+        ));
+
+        nodes.add(new NISNode(
+                this,
+                NIS,
+                NIS,
+                PenrosePlugin.getImage(PenroseImage.MODULE),
+                NIS,
                 null
         ));
 	}
@@ -289,7 +300,7 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
     public void setServicesNode(ServicesNode servicesNode) {
         this.servicesNode = servicesNode;
     }
-
+/*
     public CachesNode getCachesNode() {
         return cachesNode;
     }
@@ -297,4 +308,5 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
     public void setCachesNode(CachesNode cachesNode) {
         this.cachesNode = cachesNode;
     }
+*/
 }

@@ -148,6 +148,11 @@
            name="Service"
            icon="images/service.png"
            class="org.safehaus.penrose.studio.service.ServiceEditor"/>
+       <editor
+           id="org.safehaus.penrose.studio.nis.NISEditor"
+           name="NIS"
+           icon="images/service.png"
+           class="org.safehaus.penrose.studio.nis.NISEditor"/>
    </extension>
    <extension
          id="application"
