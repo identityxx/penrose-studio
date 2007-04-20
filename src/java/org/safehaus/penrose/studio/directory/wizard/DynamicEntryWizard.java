@@ -99,7 +99,20 @@ public class DynamicEntryWizard extends Wizard {
             Collection relationships = relationshipPage.getRelationships();
             for (Iterator i=relationships.iterator(); i.hasNext(); ) {
                 Relationship relationship = (Relationship)i.next();
-                entryMapping.addRelationship(relationship);
+
+                String lfield = relationship.getLeftField();
+                SourceMapping lsource = entryMapping.getSourceMapping(relationship.getLeftSource());
+                int lindex = entryMapping.getSourceMappingIndex(lsource);
+
+                String rfield = relationship.getRightField();
+                SourceMapping rsource = entryMapping.getSourceMapping(relationship.getRightSource());
+                int rindex = entryMapping.getSourceMappingIndex(rsource);
+
+                if (lindex < rindex) { // rhs is dependent on lhs
+                    rsource.addFieldMapping(new FieldMapping(rfield, FieldMapping.VARIABLE, relationship.getLhs()));
+                } else {
+                    lsource.addFieldMapping(new FieldMapping(lfield, FieldMapping.VARIABLE, relationship.getRhs()));
+                }
             }
 
             entryMapping.addObjectClasses(ocPage.getSelectedObjectClasses());
@@ -131,9 +144,11 @@ public class DynamicEntryWizard extends Wizard {
                 String sourceName = variable.substring(0, j);
                 String fieldName = variable.substring(j+1);
 
-                FieldMapping fieldMapping = new FieldMapping(fieldName, FieldMapping.VARIABLE, attributeMapping.getName());
-
                 SourceMapping sourceMapping = entryMapping.getSourceMapping(sourceName);
+                Collection fieldMappings = sourceMapping.getFieldMappings(fieldName);
+                if (fieldMappings != null && !fieldMappings.isEmpty()) continue;
+
+                FieldMapping fieldMapping = new FieldMapping(fieldName, FieldMapping.VARIABLE, attributeMapping.getName());
                 sourceMapping.addFieldMapping(fieldMapping);
             }
 
