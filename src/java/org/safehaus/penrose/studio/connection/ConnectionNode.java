@@ -30,12 +30,11 @@ import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.plugin.PluginManager;
+import org.safehaus.penrose.studio.plugin.Plugin;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.connection.action.NewSourceAction;
-import org.safehaus.penrose.studio.connection.editor.JNDIConnectionEditorInput;
-import org.safehaus.penrose.studio.connection.editor.JNDIConnectionEditor;
-import org.safehaus.penrose.studio.connection.editor.JDBCConnectionEditorInput;
-import org.safehaus.penrose.studio.connection.editor.JDBCConnectionEditor;
+import org.safehaus.penrose.studio.connection.editor.*;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.ConnectionConfig;
@@ -115,12 +114,18 @@ public class ConnectionNode extends Node {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
 
-        if ("JDBC".equals(connectionConfig.getAdapterName())) {
-            page.openEditor(new JDBCConnectionEditorInput(partition, connectionConfig), JDBCConnectionEditor.class.getName());
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PluginManager pluginManager = penroseApplication.getPluginManager();
+        Plugin plugin = pluginManager.getPlugin(connectionConfig.getAdapterName());
 
-        } else if ("LDAP".equals(connectionConfig.getAdapterName())) {
-            page.openEditor(new JNDIConnectionEditorInput(partition, connectionConfig), JNDIConnectionEditor.class.getName());
-        }
+        ConnectionEditorInput cei = plugin.createConnectionEditorInput();
+        cei.setPartition(partition);
+        cei.setConnectionConfig(connectionConfig);
+
+        String connectionEditorClass = plugin.getConnectionEditorClass();
+
+        log.debug("Opening "+connectionEditorClass);
+        page.openEditor(cei, connectionEditorClass);
     }
 
     public void remove() throws Exception {

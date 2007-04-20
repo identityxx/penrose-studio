@@ -14,20 +14,15 @@ import org.eclipse.swt.events.*;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.adapter.AdapterConfig;
-import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.config.PenroseConfig;
-import org.safehaus.penrose.ldap.SearchResponse;
-import org.safehaus.penrose.ldap.SearchRequest;
-import org.safehaus.penrose.ldap.Attributes;
-import org.safehaus.penrose.ldap.Attribute;
+import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
-import org.safehaus.penrose.entry.Entry;
+import org.safehaus.penrose.util.LDAPUtil;
 
 import java.util.Iterator;
 import java.util.Collection;
+import java.util.ArrayList;
 
 public class JDBCSourceBrowsePage extends FormPage {
 
@@ -35,7 +30,6 @@ public class JDBCSourceBrowsePage extends FormPage {
 
     FormToolkit toolkit;
 
-    Button refreshButton;
     Text maxSizeText;
 
     Table table;
@@ -43,6 +37,7 @@ public class JDBCSourceBrowsePage extends FormPage {
     JDBCSourceEditor editor;
     Partition partition;
     SourceConfig sourceConfig;
+    Source source;
 
     public JDBCSourceBrowsePage(JDBCSourceEditor editor) {
         super(editor, "BROWSE", "  Browse  ");
@@ -50,6 +45,11 @@ public class JDBCSourceBrowsePage extends FormPage {
         this.editor = editor;
         this.partition = editor.partition;
         this.sourceConfig = editor.sourceConfig;
+
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseContext penroseContext = penroseApplication.getPenroseContext();
+        SourceManager sourceManager = penroseContext.getSourceManager();
+        source = sourceManager.getSource(partition, sourceConfig.getName());
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -71,35 +71,24 @@ public class JDBCSourceBrowsePage extends FormPage {
         refresh();
     }
 
-    public Composite createFieldsSection(Composite parent) {
+    public Composite createFieldsSection(final Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
-        composite.setLayout(new GridLayout());
+        composite.setLayout(new GridLayout(2, false));
 
-        Composite buttons = toolkit.createComposite(composite);
-        buttons.setLayout(new GridLayout(3, false));
-        buttons.setLayoutData(new GridData());
+        Composite options = toolkit.createComposite(composite);
+        options.setLayout(new GridLayout(2, false));
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        options.setLayoutData(gd);
 
-        Label label = toolkit.createLabel(buttons, "Max:");
+        Label label = toolkit.createLabel(options, "Max:");
         label.setLayoutData(new GridData());
 
-        maxSizeText = toolkit.createText(buttons, "100", SWT.BORDER);
-        GridData gd = new GridData();
+        maxSizeText = toolkit.createText(options, "100", SWT.BORDER);
+        gd = new GridData();
         gd.widthHint = 50;
         maxSizeText.setLayoutData(gd);
-
-        refreshButton = new Button(buttons, SWT.PUSH);
-        refreshButton.setText("Refresh");
-        gd = new GridData();
-        gd.horizontalIndent = 5;
-        gd.widthHint = 80;
-        refreshButton.setLayoutData(gd);
-
-        refreshButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                refresh();
-            }
-        });
 
         table = toolkit.createTable(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
         table.setHeaderVisible(true);
@@ -116,6 +105,133 @@ public class JDBCSourceBrowsePage extends FormPage {
             tc.setWidth(100);
         }
 
+        Composite buttons = toolkit.createComposite(composite);
+        buttons.setLayout(new GridLayout());
+        buttons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
+
+        Button addButton = new Button(buttons, SWT.PUSH);
+        addButton.setText("Add");
+        gd = new GridData();
+        gd.widthHint = 80;
+        addButton.setLayoutData(gd);
+
+        addButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                try {
+                    SearchResultDialog dialog = new SearchResultDialog(parent.getShell(), SWT.NONE);
+                    dialog.setSourceConfig(sourceConfig);
+                    dialog.open();
+
+                    if (dialog.getAction() == SearchResultDialog.CANCEL) return;
+
+                    RDN rdn = dialog.getRdn();
+                    DN dn = new DN(rdn);
+                    Attributes attributes = dialog.getAttributes();
+
+                    source.add(dn, attributes);
+
+                    refresh();
+
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                    String message = e.toString();
+                    if (message.length() > 500) {
+                        message = message.substring(0, 500) + "...";
+                    }
+                    MessageDialog.openError(editor.getSite().getShell(), "Browse Failed", message);
+                }
+            }
+        });
+
+        Button editButton = new Button(buttons, SWT.PUSH);
+        editButton.setText("Edit");
+        gd = new GridData();
+        gd.widthHint = 80;
+        editButton.setLayoutData(gd);
+
+        editButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                try {
+                    if (table.getSelectionCount() == 0) return;
+
+                    int index = table.getSelectionIndex();
+                    TableItem item = table.getSelection()[0];
+                    SearchResult searchResult = (SearchResult)item.getData();
+
+                    SearchResultDialog dialog = new SearchResultDialog(parent.getShell(), SWT.NONE);
+                    dialog.setSourceConfig(sourceConfig);
+                    dialog.setRdn(searchResult.getDn().getRdn());
+                    dialog.setAttributes(searchResult.getAttributes());
+                    dialog.open();
+
+                    if (dialog.getAction() == SearchResultDialog.CANCEL) return;
+
+                    DN dn = searchResult.getDn();
+                    Collection<Modification> modifications = LDAPUtil.createModifications(
+                            searchResult.getAttributes(),
+                            dialog.getAttributes()
+                    );
+
+                    source.modify(dn, modifications);
+
+                    refresh();
+
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                    String message = e.toString();
+                    if (message.length() > 500) {
+                        message = message.substring(0, 500) + "...";
+                    }
+                    MessageDialog.openError(editor.getSite().getShell(), "Browse Failed", message);
+                }
+            }
+        });
+
+        Button deleteButton = new Button(buttons, SWT.PUSH);
+        deleteButton.setText("Delete");
+        gd = new GridData();
+        gd.widthHint = 80;
+        deleteButton.setLayoutData(gd);
+
+        deleteButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                try {
+                    if (table.getSelectionCount() == 0) return;
+
+                    int index = table.getSelectionIndex();
+                    TableItem item = table.getSelection()[0];
+                    SearchResult searchResult = (SearchResult)item.getData();
+
+                    DN dn = searchResult.getDn();
+                    source.delete(dn);
+
+                    refresh();
+
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                    String message = e.toString();
+                    if (message.length() > 500) {
+                        message = message.substring(0, 500) + "...";
+                    }
+                    MessageDialog.openError(editor.getSite().getShell(), "Browse Failed", message);
+                }
+            }
+        });
+
+        new Label(buttons, SWT.NONE);
+        
+        Button refreshButton = new Button(buttons, SWT.PUSH);
+        refreshButton.setText("Refresh");
+        gd = new GridData();
+        gd.widthHint = 80;
+        refreshButton.setLayoutData(gd);
+
+        refreshButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                refresh();
+            }
+        });
+
         return composite;
     }
 
@@ -123,28 +239,11 @@ public class JDBCSourceBrowsePage extends FormPage {
         table.removeAll();
 
         try {
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
-
-            PartitionManager partitionManager = penroseApplication.getPartitionManager();
-            Partition partition = partitionManager.getPartition(sourceConfig);
-            ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
-
-            AdapterConfig adapterConfig = penroseConfig.getAdapterConfig(connectionConfig.getAdapterName());
-
-            Connection connection = new Connection(partition, connectionConfig, adapterConfig);
-            connection.init();
-            connection.start();
-
-            SearchResponse<Entry> sr = new SearchResponse<Entry>();
+            SearchResponse<SearchResult> sr = new SearchResponse<SearchResult>();
             SearchRequest sc = new SearchRequest();
 
             int size = Integer.parseInt(maxSizeText.getText());
             sc.setSizeLimit(size);
-
-            PenroseContext penroseContext = penroseApplication.getPenroseContext();
-            SourceManager sourceManager = penroseContext.getSourceManager();
-            Source source = sourceManager.getSource(partition, sourceConfig.getName());
 
             source.search(sc, sr);
 
@@ -152,7 +251,7 @@ public class JDBCSourceBrowsePage extends FormPage {
 
             //log.debug("Results:");
             while (sr.hasNext()) {
-                Entry entry = (Entry)sr.next();
+                SearchResult entry = (SearchResult)sr.next();
                 Attributes attributes = entry.getAttributes();
                 //log.debug(" - "+av);
 
@@ -177,9 +276,8 @@ public class JDBCSourceBrowsePage extends FormPage {
 
                     item.setText(counter, value == null ? "" : value);
                 }
+                item.setData(entry);
             }
-
-            connection.stop();
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

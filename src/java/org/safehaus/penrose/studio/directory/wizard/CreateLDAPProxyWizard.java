@@ -99,8 +99,7 @@ public class CreateLDAPProxyWizard extends Wizard {
             SourceMapping sourceMapping = new SourceMapping("DEFAULT", sourceConfig.getName());
             entryMapping.addSourceMapping(sourceMapping);
 
-            HandlerMapping handlerMapping = new HandlerMapping("DEFAULT", "PROXY");
-            entryMapping.setHandlerMapping(handlerMapping);
+            entryMapping.setHandlerName("PROXY");
 
             partition.addEntryMapping(entryMapping);
 

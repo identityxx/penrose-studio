@@ -60,7 +60,7 @@ public class JDBCSourceEditor extends FormEditor {
         try {
             addPage(new JDBCSourcePropertyPage(this));
             addPage(new JDBCSourceBrowsePage(this));
-            addPage(new JDBCSourceCachePage(this));
+            //addPage(new JDBCSourceCachePage(this));
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

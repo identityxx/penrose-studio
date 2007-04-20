@@ -72,8 +72,7 @@ public class CreateRootDSEProxyWizard extends Wizard {
             SourceMapping sourceMapping = new SourceMapping("DEFAULT", sourceConfig.getName());
             entryMapping.addSourceMapping(sourceMapping);
 
-            HandlerMapping handlerMapping = new HandlerMapping("DEFAULT", "PROXY");
-            entryMapping.setHandlerMapping(handlerMapping);
+            entryMapping.setHandlerName("PROXY");
 
             entryMapping.addACI(new ACI("rs"));
 

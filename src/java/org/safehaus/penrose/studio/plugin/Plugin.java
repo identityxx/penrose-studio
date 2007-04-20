@@ -1,8 +1,8 @@
 package org.safehaus.penrose.studio.plugin;
 
-import org.safehaus.penrose.studio.source.editor.JDBCSourceEditorInput;
 import org.safehaus.penrose.studio.source.editor.JDBCSourceEditor;
 import org.safehaus.penrose.studio.source.editor.SourceEditorInput;
+import org.safehaus.penrose.studio.connection.editor.ConnectionEditorInput;
 
 /**
  * @author Endi S. Dewata
@@ -15,12 +15,20 @@ public class Plugin {
         return pluginConfig.getName();
     }
     
+    public ConnectionEditorInput createConnectionEditorInput() {
+        return new ConnectionEditorInput();
+    }
+
+    public String getConnectionEditorClass() {
+        return null;
+    }
+
     public SourceEditorInput createSourceEditorInput() {
-        return new JDBCSourceEditorInput();
+        return new SourceEditorInput();
     }
 
     public String getSourceEditorClass() {
-        return JDBCSourceEditor.class.getName();
+        return null;
     }
 
     public PluginConfig getPluginConfig() {

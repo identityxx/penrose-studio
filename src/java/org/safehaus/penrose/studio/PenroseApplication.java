@@ -39,10 +39,7 @@ import org.safehaus.penrose.studio.validation.ValidationView;
 import org.safehaus.penrose.studio.logger.LoggerManager;
 import org.safehaus.penrose.studio.license.LicenseDialog;
 import org.safehaus.penrose.studio.welcome.action.EnterLicenseKeyAction;
-import org.safehaus.penrose.studio.plugin.PluginManager;
-import org.safehaus.penrose.studio.plugin.JDBCPlugin;
-import org.safehaus.penrose.studio.plugin.LDAPPlugin;
-import org.safehaus.penrose.studio.plugin.PluginConfig;
+import org.safehaus.penrose.studio.plugin.*;
 import org.safehaus.penrose.schema.*;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.*;
@@ -80,8 +77,6 @@ public class PenroseApplication implements IPlatformRunnable {
     PenroseClient client;
 
     PenroseContext penroseContext;
-    //SchemaManager schemaManager;
-    //PartitionManager partitionManager;
     LoggerManager loggerManager = new LoggerManager();
     PluginManager pluginManager = new PluginManager();
 
@@ -125,8 +120,13 @@ public class PenroseApplication implements IPlatformRunnable {
         pluginManager.init(pluginConfig);
 
         pluginConfig = new PluginConfig();
-        pluginConfig.setName("JNDI");
+        pluginConfig.setName("LDAP");
         pluginConfig.setClassName(LDAPPlugin.class.getName());
+        pluginManager.init(pluginConfig);
+
+        pluginConfig = new PluginConfig();
+        pluginConfig.setName("NIS");
+        pluginConfig.setClassName(NISPlugin.class.getName());
         pluginManager.init(pluginConfig);
     }
 

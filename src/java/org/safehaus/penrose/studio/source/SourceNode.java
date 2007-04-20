@@ -124,6 +124,7 @@ public class SourceNode extends Node {
 
         String sourceEditorClassName = plugin.getSourceEditorClass();
 
+        log.debug("Opening "+sourceEditorClassName);
         page.openEditor(sei, sourceEditorClassName);
     }
 

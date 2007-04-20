@@ -119,8 +119,7 @@ public class CreateLDAPProxyWizard extends Wizard {
             SourceMapping sourceMapping = new SourceMapping("DEFAULT", name);
             rootEntry.addSourceMapping(sourceMapping);
 
-            HandlerMapping rootHandlerMapping = new HandlerMapping("DEFAULT", "PROXY");
-            rootEntry.setHandlerMapping(rootHandlerMapping);
+            rootEntry.setHandlerName("PROXY");
 
             rootEntry.addACI(new ACI("rs"));
 
@@ -141,8 +140,7 @@ public class CreateLDAPProxyWizard extends Wizard {
                 SourceMapping rootDseSourceMapping = new SourceMapping("DEFAULT", rootDseSourceConfig.getName());
                 rootDseEntryMapping.addSourceMapping(rootDseSourceMapping);
 
-                HandlerMapping rootDseHandlerMapping = new HandlerMapping("DEFAULT", "PROXY");
-                rootDseEntryMapping.setHandlerMapping(rootDseHandlerMapping);
+                rootDseEntryMapping.setHandlerName("PROXY");
 
                 rootDseEntryMapping.addACI(new ACI("rs"));
 

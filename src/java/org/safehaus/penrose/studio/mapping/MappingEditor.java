@@ -61,9 +61,10 @@ public class MappingEditor extends FormEditor implements ModifyListener {
     protected void addPages() {
         try {
             addPage(new LDAPPage(this));
-            addPage(new MappingSourcePage(this));
+            addPage(new SourcesPage(this));
             addPage(new ACLPage(this));
-            addPage(new EntryCachePage(this));
+            addPage(new MiscPage(this));
+            //addPage(new EntryCachePage(this));
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

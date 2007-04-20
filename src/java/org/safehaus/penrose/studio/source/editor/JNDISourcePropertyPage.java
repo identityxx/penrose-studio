@@ -242,7 +242,7 @@ public class JNDISourcePropertyPage extends FormPage {
 
         objectClassesText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                if ("".equals(filterText.getText())) {
+                if ("".equals(objectClassesText.getText())) {
                     source.removeParameter("objectClasses");
                 } else {
                     source.setParameter("objectClasses", objectClassesText.getText());

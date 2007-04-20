@@ -411,7 +411,7 @@ public class ACLPage extends FormPage implements ModifyListener {
 
                 TableItem item = new TableItem(inheritedAclTable, SWT.NONE);
                 item.setText(0, aci.getSubject());
-                item.setText(1, aci.getDn().toString());
+                item.setText(1, aci.getDn() == null ? "" : aci.getDn().toString());
                 item.setText(2, aci.getTarget());
                 item.setText(3, aci.getAttributes() == null ? "" : aci.getAttributes());
                 item.setText(4, aci.getScope());

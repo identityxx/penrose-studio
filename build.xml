@@ -184,6 +184,21 @@
         <antcall target="build-win32"/>
     </target>
 
+    <target name="build-linux-gtk-x86_64" depends="init" if="isLinux">
+        <property name="platform" value="linux-gtk-x86_64"/>
+        <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>
+        <!-- uncompress rpc -->
+        <untar src="rcp/${rcp.prefix}-${platform}.tar.gz" dest="target" compression="gzip"/>
+        <move todir="target/${dist.name}">
+            <fileset dir="target/eclipse"/>
+        </move>
+        <move file="target/${dist.name}/eclipse" tofile="target/${dist.name}/${project.name}"/>
+        <chmod file="target/${dist.name}/${project.name}" perm="a+rx"/>
+        <antcall target="build">
+            <param name="platform" value="${platform}"/>
+        </antcall>
+    </target>
+
     <target name="build-linux" depends="init" if="isLinux">
         <property name="platform" value="linux-gtk"/>
         <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>

@@ -23,8 +23,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.studio.source.editor.JNDISourceBrowsePage;
-import org.safehaus.penrose.studio.source.editor.JNDISourceCachePage;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.SourceConfig;
 import org.safehaus.penrose.mapping.EntryMapping;
@@ -59,7 +57,7 @@ public class JNDISourceEditor extends FormEditor {
         try {
             addPage(new JNDISourcePropertyPage(this));
             addPage(new JNDISourceBrowsePage(this));
-            addPage(new JNDISourceCachePage(this));
+            //addPage(new JNDISourceCachePage(this));
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

@@ -64,6 +64,11 @@
             icon="images/server.png"
             class="org.safehaus.penrose.studio.connection.editor.JNDIConnectionEditor"/>
        <editor
+            id="org.safehaus.penrose.studio.connection.editor.NISConnectionEditor"
+            name="NIS Connection"
+            icon="images/server.png"
+            class="org.safehaus.penrose.studio.connection.editor.NISConnectionEditor"/>
+       <editor
             id="org.safehaus.penrose.studio.source.editor.JDBCSourceEditor"
             name="Source"
             icon="images/source.gif"
@@ -73,6 +78,11 @@
             name="Source"
             icon="images/source.gif"
             class="org.safehaus.penrose.studio.source.editor.JNDISourceEditor"/>
+       <editor
+            id="org.safehaus.penrose.studio.source.editor.NISSourceEditor"
+            name="Source"
+            icon="images/source.gif"
+            class="org.safehaus.penrose.studio.source.editor.NISSourceEditor"/>
        <editor
             id="org.safehaus.penrose.studio.mapping.MappingEditor"
             name="Mapping"

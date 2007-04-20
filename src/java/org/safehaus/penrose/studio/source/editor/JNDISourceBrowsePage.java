@@ -18,11 +18,7 @@ import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.adapter.AdapterConfig;
 import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.entry.Entry;
-import org.safehaus.penrose.ldap.SearchResponse;
-import org.safehaus.penrose.ldap.SearchRequest;
-import org.safehaus.penrose.ldap.Attributes;
-import org.safehaus.penrose.ldap.Attribute;
+import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
@@ -137,7 +133,7 @@ public class JNDISourceBrowsePage extends FormPage {
             connection.init();
             connection.start();
 
-            SearchResponse<Entry> sr = new SearchResponse<Entry>();
+            SearchResponse<SearchResult> sr = new SearchResponse<SearchResult>();
             SearchRequest sc = new SearchRequest();
 
             int size = Integer.parseInt(maxSizeText.getText());
@@ -153,7 +149,7 @@ public class JNDISourceBrowsePage extends FormPage {
 
             //log.debug("Results:");
             while (sr.hasNext()) {
-                Entry entry = (Entry)sr.next();
+                SearchResult entry = (SearchResult)sr.next();
                 Attributes attributes = entry.getAttributes();
                 //log.debug(" - "+av);
 

@@ -5,8 +5,6 @@ import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.SourceMapping;
-import org.safehaus.penrose.mapping.HandlerMapping;
-import org.safehaus.penrose.handler.HandlerManager;
 
 /**
  * @author Endi S. Dewata
@@ -36,8 +34,7 @@ public class SchemaUtil {
         SourceMapping sourceMapping = new SourceMapping("DEFAULT", sourceConfig.getName());
         entryMapping.addSourceMapping(sourceMapping);
 
-        HandlerMapping handlerMapping = new HandlerMapping("DEFAULT", "PROXY");
-        entryMapping.setHandlerMapping(handlerMapping);
+        entryMapping.setHandlerName("PROXY");
 
         partition.addEntryMapping(entryMapping);
 

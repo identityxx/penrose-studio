@@ -156,12 +156,13 @@ public class ValidationView extends ViewPart {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
 
-            if ("LDAP".equals(connectionConfig.getAdapterName())) {
-                page.openEditor(new JNDIConnectionEditorInput(partition, connectionConfig), JNDIConnectionEditor.class.getName());
-                
-            } else if ("JDBC".equals(connectionConfig.getAdapterName())) {
-                page.openEditor(new JDBCConnectionEditorInput(partition, connectionConfig), JDBCConnectionEditor.class.getName());
-            }
+            Plugin plugin = pluginManager.getPlugin(connectionConfig.getAdapterName());
+            ConnectionEditorInput cei = plugin.createConnectionEditorInput();
+            cei.setPartition(partition);
+            cei.setConnectionConfig(connectionConfig);
+
+            String connectionEditorClass = plugin.getConnectionEditorClass();
+            page.openEditor(cei, connectionEditorClass);
 
 		} else if (object instanceof SourceConfig) {
 			SourceConfig sourceConfig = (SourceConfig)object;
