@@ -276,6 +276,15 @@
         <antcall target="dist-win32"/>
     </target>
 
+    <target name="dist-linux-gtk-x86_64" depends="build-linux-gtk-x86_64" if="isLinux">
+        <antcall target="rpm">
+            <param name="rpm.prefix" value=""/>
+            <param name="rpm.home" value="/usr/src/redhat"/>
+            <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
+            <param name="rpm.name" value="${project.name}-${product.version}-1.i386.rpm"/>
+        </antcall>
+    </target>
+
     <target name="dist-linux" depends="build-linux" if="isLinux">
         <antcall target="rpm">
             <param name="rpm.prefix" value=""/>
@@ -404,6 +413,13 @@
         <antcall target="install-linux"/>
         <antcall target="install-macosx"/>
         <antcall target="install-win32"/>
+    </target>
+
+    <target name="install-linux-gtk-x86_64" if="isLinux">
+        <antcall target="install-dist">
+            <param name="platform" value="linux-gtk-x86_64"/>
+        </antcall>
+        <chmod dir="${penrose.studio.home}" includes="penrose-studio" perm="a+rx" />
     </target>
 
     <target name="install-linux" if="isLinux">
