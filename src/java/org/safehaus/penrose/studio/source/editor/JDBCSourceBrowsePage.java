@@ -22,7 +22,6 @@ import org.safehaus.penrose.util.LDAPUtil;
 
 import java.util.Iterator;
 import java.util.Collection;
-import java.util.ArrayList;
 
 public class JDBCSourceBrowsePage extends FormPage {
 
@@ -105,6 +104,12 @@ public class JDBCSourceBrowsePage extends FormPage {
             tc.setWidth(100);
         }
 
+        table.addMouseListener(new MouseAdapter() {
+            public void mouseDoubleClick(MouseEvent mouseEvent) {
+                edit(parent.getShell());
+            }
+        });
+
         Composite buttons = toolkit.createComposite(composite);
         buttons.setLayout(new GridLayout());
         buttons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
@@ -117,29 +122,7 @@ public class JDBCSourceBrowsePage extends FormPage {
 
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                try {
-                    SearchResultDialog dialog = new SearchResultDialog(parent.getShell(), SWT.NONE);
-                    dialog.setSourceConfig(sourceConfig);
-                    dialog.open();
-
-                    if (dialog.getAction() == SearchResultDialog.CANCEL) return;
-
-                    RDN rdn = dialog.getRdn();
-                    DN dn = new DN(rdn);
-                    Attributes attributes = dialog.getAttributes();
-
-                    source.add(dn, attributes);
-
-                    refresh();
-
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                    String message = e.toString();
-                    if (message.length() > 500) {
-                        message = message.substring(0, 500) + "...";
-                    }
-                    MessageDialog.openError(editor.getSite().getShell(), "Browse Failed", message);
-                }
+                add(parent.getShell());
             }
         });
 
@@ -151,39 +134,7 @@ public class JDBCSourceBrowsePage extends FormPage {
 
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                try {
-                    if (table.getSelectionCount() == 0) return;
-
-                    int index = table.getSelectionIndex();
-                    TableItem item = table.getSelection()[0];
-                    SearchResult searchResult = (SearchResult)item.getData();
-
-                    SearchResultDialog dialog = new SearchResultDialog(parent.getShell(), SWT.NONE);
-                    dialog.setSourceConfig(sourceConfig);
-                    dialog.setRdn(searchResult.getDn().getRdn());
-                    dialog.setAttributes(searchResult.getAttributes());
-                    dialog.open();
-
-                    if (dialog.getAction() == SearchResultDialog.CANCEL) return;
-
-                    DN dn = searchResult.getDn();
-                    Collection<Modification> modifications = LDAPUtil.createModifications(
-                            searchResult.getAttributes(),
-                            dialog.getAttributes()
-                    );
-
-                    source.modify(dn, modifications);
-
-                    refresh();
-
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                    String message = e.toString();
-                    if (message.length() > 500) {
-                        message = message.substring(0, 500) + "...";
-                    }
-                    MessageDialog.openError(editor.getSite().getShell(), "Browse Failed", message);
-                }
+                edit(parent.getShell());
             }
         });
 
@@ -195,26 +146,7 @@ public class JDBCSourceBrowsePage extends FormPage {
 
         deleteButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                try {
-                    if (table.getSelectionCount() == 0) return;
-
-                    int index = table.getSelectionIndex();
-                    TableItem item = table.getSelection()[0];
-                    SearchResult searchResult = (SearchResult)item.getData();
-
-                    DN dn = searchResult.getDn();
-                    source.delete(dn);
-
-                    refresh();
-
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                    String message = e.toString();
-                    if (message.length() > 500) {
-                        message = message.substring(0, 500) + "...";
-                    }
-                    MessageDialog.openError(editor.getSite().getShell(), "Browse Failed", message);
-                }
+                delete(parent.getShell());
             }
         });
 
@@ -235,24 +167,116 @@ public class JDBCSourceBrowsePage extends FormPage {
         return composite;
     }
 
+    public void add(final Shell parent) {
+        try {
+            JDBCSearchResultDialog dialog = new JDBCSearchResultDialog(parent.getShell(), SWT.NONE);
+            dialog.setSourceConfig(sourceConfig);
+            dialog.open();
+
+            if (dialog.getAction() == JDBCSearchResultDialog.CANCEL) return;
+
+            RDN rdn = dialog.getRdn();
+            DN dn = new DN(rdn);
+            Attributes attributes = dialog.getAttributes();
+
+            source.add(dn, attributes);
+
+            refresh();
+
+        } catch (Exception e) {
+            log.debug(e.getMessage(), e);
+            String message = e.toString();
+            if (message.length() > 500) {
+                message = message.substring(0, 500) + "...";
+            }
+            MessageDialog.openError(editor.getSite().getShell(), "Browse Failed", message);
+        }
+    }
+
+    public void edit(final Shell parent) {
+        try {
+            if (table.getSelectionCount() == 0) return;
+
+            TableItem item = table.getSelection()[0];
+            SearchResult searchResult = (SearchResult)item.getData();
+
+            DN dn = searchResult.getDn();
+            RDN rdn = dn.getRdn();
+
+            JDBCSearchResultDialog dialog = new JDBCSearchResultDialog(parent, SWT.NONE);
+            dialog.setSourceConfig(sourceConfig);
+            dialog.setRdn(rdn);
+            dialog.setAttributes(searchResult.getAttributes());
+            dialog.open();
+
+            if (dialog.getAction() == JDBCSearchResultDialog.CANCEL) return;
+
+            RDN newRdn = dialog.getRdn();
+
+            Collection<Modification> modifications = LDAPUtil.createModifications(
+                    searchResult.getAttributes(),
+                    dialog.getAttributes()
+            );
+
+            if (!rdn.equals(newRdn)) {
+                source.modrdn(dn, newRdn, true);
+
+                DNBuilder db = new DNBuilder();
+                db.append(newRdn);
+                db.append(dn.getParentDn());
+                dn = db.toDn();
+            }
+
+            source.modify(dn, modifications);
+
+            refresh();
+
+        } catch (Exception e) {
+            log.debug(e.getMessage(), e);
+            String message = e.toString();
+            if (message.length() > 500) {
+                message = message.substring(0, 500) + "...";
+            }
+            MessageDialog.openError(editor.getSite().getShell(), "Browse Failed", message);
+        }
+    }
+
+    public void delete(final Shell parent) {
+        try {
+            if (table.getSelectionCount() == 0) return;
+
+            int index = table.getSelectionIndex();
+            TableItem item = table.getSelection()[0];
+            SearchResult searchResult = (SearchResult)item.getData();
+
+            DN dn = searchResult.getDn();
+            source.delete(dn);
+
+            refresh();
+
+        } catch (Exception e) {
+            log.debug(e.getMessage(), e);
+            String message = e.toString();
+            if (message.length() > 500) {
+                message = message.substring(0, 500) + "...";
+            }
+            MessageDialog.openError(editor.getSite().getShell(), "Browse Failed", message);
+        }
+    }
+
     public void refresh() {
+        final Collection fields = sourceConfig.getFieldConfigs();
+
         table.removeAll();
 
-        try {
-            SearchResponse<SearchResult> sr = new SearchResponse<SearchResult>();
-            SearchRequest sc = new SearchRequest();
+        SearchRequest sc = new SearchRequest();
 
-            int size = Integer.parseInt(maxSizeText.getText());
-            sc.setSizeLimit(size);
+        int size = Integer.parseInt(maxSizeText.getText());
+        sc.setSizeLimit(size);
 
-            source.search(sc, sr);
-
-            Collection fields = sourceConfig.getFieldConfigs();
-
-            //log.debug("Results:");
-            while (sr.hasNext()) {
-                SearchResult entry = (SearchResult)sr.next();
-                Attributes attributes = entry.getAttributes();
+        SearchResponse<SearchResult> sr = new SearchResponse<SearchResult>() {
+            public void add(SearchResult searchResult) {
+                Attributes attributes = searchResult.getAttributes();
                 //log.debug(" - "+av);
 
                 TableItem item = new TableItem(table, SWT.NONE);
@@ -276,8 +300,13 @@ public class JDBCSourceBrowsePage extends FormPage {
 
                     item.setText(counter, value == null ? "" : value);
                 }
-                item.setData(entry);
+                
+                item.setData(searchResult);
             }
+        };
+
+        try {
+            source.search(sc, sr);
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

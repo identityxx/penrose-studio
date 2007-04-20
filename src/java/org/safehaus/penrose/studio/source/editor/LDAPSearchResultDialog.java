@@ -9,21 +9,24 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.graphics.Point;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.PenrosePlugin;
-import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.partition.SourceConfig;
 import org.safehaus.penrose.partition.FieldConfig;
+import org.safehaus.penrose.ldap.RDN;
+import org.safehaus.penrose.ldap.Attributes;
+import org.safehaus.penrose.ldap.Attribute;
+import org.safehaus.penrose.ldap.RDNBuilder;
+import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseImage;
 
-import java.util.Iterator;
-import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
  */
-public class SearchResultDialog extends Dialog {
+public class LDAPSearchResultDialog extends Dialog {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -42,7 +45,7 @@ public class SearchResultDialog extends Dialog {
 
     int action;
 
-	public SearchResultDialog(Shell parent, int style) {
+	public LDAPSearchResultDialog(Shell parent, int style) {
 		super(parent, style);
     }
 
@@ -98,7 +101,7 @@ public class SearchResultDialog extends Dialog {
                 valueText.setText(value.toString());
             }
         }
-        
+
         for (Iterator i=attributes.getAll().iterator(); i.hasNext(); ) {
             Attribute attribute = (Attribute)i.next();
             String name = attribute.getName();

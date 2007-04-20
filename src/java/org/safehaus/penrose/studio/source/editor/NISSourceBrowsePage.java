@@ -41,12 +41,19 @@ public class NISSourceBrowsePage extends FormPage {
     Partition partition;
     SourceConfig sourceConfig;
 
-    public NISSourceBrowsePage(NISSourceEditor editor) {
+    Source source;
+
+    public NISSourceBrowsePage(NISSourceEditor editor) throws Exception {
         super(editor, "BROWSE", "  Browse  ");
 
         this.editor = editor;
         this.partition = editor.partition;
         this.sourceConfig = editor.sourceConfig;
+
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseContext penroseContext = penroseApplication.getPenroseContext();
+        SourceManager sourceManager = penroseContext.getSourceManager();
+        source = sourceManager.getSource(partition, sourceConfig.getName());
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -117,40 +124,19 @@ public class NISSourceBrowsePage extends FormPage {
     }
 
     public void refresh() {
+
+        final Collection fields = sourceConfig.getFieldConfigs();
+
         table.removeAll();
 
-        try {
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+        SearchRequest sc = new SearchRequest();
 
-            PartitionManager partitionManager = penroseApplication.getPartitionManager();
-            Partition partition = partitionManager.getPartition(sourceConfig);
-            ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
+        int size = Integer.parseInt(maxSizeText.getText());
+        sc.setSizeLimit(size);
 
-            AdapterConfig adapterConfig = penroseConfig.getAdapterConfig(connectionConfig.getAdapterName());
-
-            Connection connection = new Connection(partition, connectionConfig, adapterConfig);
-            connection.init();
-            connection.start();
-
-            SearchResponse<SearchResult> sr = new SearchResponse<SearchResult>();
-            SearchRequest sc = new SearchRequest();
-
-            int size = Integer.parseInt(maxSizeText.getText());
-            sc.setSizeLimit(size);
-
-            PenroseContext penroseContext = penroseApplication.getPenroseContext();
-            SourceManager sourceManager = penroseContext.getSourceManager();
-            Source source = sourceManager.getSource(partition, sourceConfig.getName());
-
-            source.search(sc, sr);
-
-            Collection fields = sourceConfig.getFieldConfigs();
-
-            //log.debug("Results:");
-            while (sr.hasNext()) {
-                SearchResult entry = (SearchResult)sr.next();
-                Attributes attributes = entry.getAttributes();
+        SearchResponse<SearchResult> sr = new SearchResponse<SearchResult>() {
+            public void add(SearchResult searchResult) {
+                Attributes attributes = searchResult.getAttributes();
                 //log.debug(" - "+av);
 
                 TableItem item = new TableItem(table, SWT.NONE);
@@ -175,8 +161,10 @@ public class NISSourceBrowsePage extends FormPage {
                     item.setText(counter, value == null ? "" : value);
                 }
             }
+        };
 
-            connection.stop();
+        try {
+            source.search(sc, sr);
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
