@@ -15,21 +15,18 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.nis.action.*;
 import org.safehaus.penrose.studio.source.editor.JDBCSearchResultDialog;
 import org.safehaus.penrose.partition.PartitionManager;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.adapter.jdbc.JDBCAdapter;
-import org.safehaus.penrose.jdbc.JDBCClient;
-import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.util.LDAPUtil;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.sql.ResultSet;
+import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
@@ -40,17 +37,21 @@ public class NISUsersPage extends FormPage {
 
     FormToolkit toolkit;
 
-    Combo domain1Combo;
-    Combo domain2Combo;
     Combo actionCombo;
+    List domainsList;
     Table table;
 
     NISEditor editor;
+
+    Collection actions = new ArrayList();
 
     public NISUsersPage(NISEditor editor) {
         super(editor, "USERS", "  Users  ");
 
         this.editor = editor;
+
+        actions.add(new ConflictingUIDFinderAction());
+        actions.add(new InconsistentUIDFinderAction());
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -63,10 +64,10 @@ public class NISUsersPage extends FormPage {
         body.setLayout(new GridLayout());
 
         Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Domains");
-        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        section.setText("Action");
+        section.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Control sourcesSection = createDomainsSection(section);
+        Control sourcesSection = createActionSection(section);
         section.setClient(sourcesSection);
 
         section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
@@ -81,8 +82,7 @@ public class NISUsersPage extends FormPage {
 
     public void init() {
        try {
-           domain1Combo.removeAll();
-           domain2Combo.removeAll();
+           domainsList.removeAll();
 
            PenroseApplication penroseApplication = PenroseApplication.getInstance();
            PenroseContext penroseContext = penroseApplication.getPenroseContext();
@@ -91,9 +91,9 @@ public class NISUsersPage extends FormPage {
            Collection partitions = partitionManager.getPartitions();
            for (Iterator i=partitions.iterator(); i.hasNext(); ) {
                Partition partition = (Partition)i.next();
-
-               domain1Combo.add(partition.getName());
-               domain2Combo.add(partition.getName());
+               String partitionName = partition.getName();
+               if ("DEFAULT".equals(partitionName)) continue;
+               domainsList.add(partitionName);
            }
 
        } catch (Exception e) {
@@ -102,11 +102,11 @@ public class NISUsersPage extends FormPage {
            if (message.length() > 500) {
                message = message.substring(0, 500) + "...";
            }
-           MessageDialog.openError(editor.getSite().getShell(), "Browse Failed", message);
+           MessageDialog.openError(editor.getSite().getShell(), "Init Failed", message);
        }
    }
 
-    public Composite createDomainsSection(Composite parent) {
+    public Composite createActionSection(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
@@ -118,29 +118,28 @@ public class NISUsersPage extends FormPage {
 
         actionCombo = new Combo(composite, SWT.READ_ONLY);
         actionCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        actionCombo.add("Find users from different domains with conflicting UIDs");
-        actionCombo.add("Find users with inconsistent UID numbers across domains");
 
-        Label source1Label = toolkit.createLabel(composite, "Domain 1:");
+        for (Iterator i=actions.iterator(); i.hasNext(); ) {
+            NISAction action = (NISAction)i.next();
+            actionCombo.add(action.getName());
+            actionCombo.setData(action.getName(), action);
+        }
+
+        actionCombo.select(0);
+
+        Label domainLabel = toolkit.createLabel(composite, "Domain:");
         gd = new GridData();
+        gd.verticalAlignment = GridData.BEGINNING;
         gd.widthHint = 100;
-        source1Label.setLayoutData(gd);
+        domainLabel.setLayoutData(gd);
 
-        domain1Combo = new Combo(composite, SWT.READ_ONLY);
-        domain1Combo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        Label source2Label = toolkit.createLabel(composite, "Domain 2:");
-        gd = new GridData();
-        gd.widthHint = 100;
-        source2Label.setLayoutData(gd);
-
-        domain2Combo = new Combo(composite, SWT.READ_ONLY);
-        domain2Combo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        domainsList = new List(composite, SWT.BORDER | SWT.MULTI);
+        domainsList.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         new Label(composite, SWT.NONE);
-
+        
         Button button = new Button(composite, SWT.PUSH);
-        button.setText("Find");
+        button.setText("Run");
         gd = new GridData();
         gd.widthHint = 80;
         button.setLayoutData(gd);
@@ -155,7 +154,7 @@ public class NISUsersPage extends FormPage {
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";
                     }
-                    MessageDialog.openError(editor.getSite().getShell(), "Browse Failed", message);
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", message);
                 }
             }
         });
@@ -177,19 +176,19 @@ public class NISUsersPage extends FormPage {
         table.setLinesVisible(true);
 
         TableColumn tc = new TableColumn(table, SWT.NONE);
-        tc.setText("Domain 1 uid");
+        tc.setText("Domain 1");
         tc.setWidth(150);
 
         tc = new TableColumn(table, SWT.NONE);
-        tc.setText("Domain 1 uidNumber");
+        tc.setText("User");
         tc.setWidth(150);
 
         tc = new TableColumn(table, SWT.NONE);
-        tc.setText("Domain 2 uid");
+        tc.setText("Domain 2");
         tc.setWidth(150);
 
         tc = new TableColumn(table, SWT.NONE);
-        tc.setText("Domain 2 uidNumber");
+        tc.setText("User");
         tc.setWidth(150);
 
         Composite buttons = toolkit.createComposite(composite);
@@ -216,7 +215,7 @@ public class NISUsersPage extends FormPage {
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";
                     }
-                    MessageDialog.openError(editor.getSite().getShell(), "Browse Failed", message);
+                    MessageDialog.openError(editor.getSite().getShell(), "Edit Failed", message);
                 }
             }
         });
@@ -241,7 +240,7 @@ public class NISUsersPage extends FormPage {
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";
                     }
-                    MessageDialog.openError(editor.getSite().getShell(), "Browse Failed", message);
+                    MessageDialog.openError(editor.getSite().getShell(), "Edit Failed", message);
                 }
             }
         });
@@ -253,53 +252,40 @@ public class NISUsersPage extends FormPage {
 
         table.removeAll();
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
-        PartitionManager partitionManager = penroseContext.getPartitionManager();
-        SourceManager sourceManager = penroseContext.getSourceManager();
+        String actionName = actionCombo.getText();
+        NISAction action = (NISAction)actionCombo.getData(actionName);
+        
+        NISActionRequest request = new NISActionRequest();
 
-        String partition1Name = domain1Combo.getText();
-        final Partition partition1 = partitionManager.getPartition(partition1Name);
-        final Source source1 = sourceManager.getSource(partition1, "users_cache");
-
-        String partition2Name = domain2Combo.getText();
-        final Partition partition2 = partitionManager.getPartition(partition2Name);
-        final Source source2 = sourceManager.getSource(partition2, "users_cache");
-
-        JDBCAdapter adapter1 = (JDBCAdapter)source1.getConnection().getAdapter();
-        JDBCClient client1 = adapter1.getClient();
-        String catalog1 = client1.getConnection().getCatalog();
-        String table1Name = catalog1+"."+source1.getParameter(JDBCClient.TABLE);
-
-        JDBCAdapter adapter2 = (JDBCAdapter)source2.getConnection().getAdapter();
-        JDBCClient client2 = adapter2.getClient();
-        String catalog2 = client2.getConnection().getCatalog();
-        String table2Name = catalog2+"."+source2.getParameter(JDBCClient.TABLE);
-
-        String sql = "select a.uid, a.uidNumber, b.uid, b.uidNumber" +
-            " from "+table1Name+" a, "+table2Name+" b where ";
-
-        if (actionCombo.getSelectionIndex() == 0) {
-            sql += "a.uid <> b.uid and a.uidNumber = b.uidNumber";
-        } else {
-            sql += "a.uid = b.uid and a.uidNumber <> b.uidNumber";
+        String[] domains = domainsList.getSelection();
+        for (int i=0; i<domains.length; i++) {
+            request.addDomain(domains[i]);
         }
 
-        QueryResponse response = new QueryResponse() {
-            public void add(Object object) throws Exception {
-                ResultSet rs = (ResultSet)object;
+        NISActionResponse response = new NISActionResponse() {
 
-                Object uid1 = rs.getObject(1);
-                Object uidNumber1 = rs.getObject(2);
+            int counter = 1;
 
-                Object uid2 = rs.getObject(3);
-                Object uidNumber2 = rs.getObject(4);
+            public void add(Object object) {
+                Attributes attributes = (Attributes)object;
+
+                log.debug("Displaying result #"+counter);
+
+                Partition partition1 = (Partition)attributes.getValue("partition1");
+                Source source1 = (Source)attributes.getValue("source1");
+                Object uid1 = attributes.getValue("uid1");
+                Object uidNumber1 = attributes.getValue("uidNumber1");
+
+                Partition partition2 = (Partition)attributes.getValue("partition2");
+                Source source2 = (Source)attributes.getValue("source2");
+                Object uid2 = attributes.getValue("uid2");
+                Object uidNumber2 = attributes.getValue("uidNumber2");
 
                 TableItem ti = new TableItem(table, SWT.NONE);
-                ti.setText(0, uid1.toString());
-                ti.setText(1, uidNumber1.toString());
-                ti.setText(2, uid2.toString());
-                ti.setText(3, uidNumber2.toString());
+                ti.setText(0, partition1.getName());
+                ti.setText(1, uid1+" ("+uidNumber1+")");
+                ti.setText(2, partition2.getName());
+                ti.setText(3, uid2+" ("+uidNumber2+")");
 
                 ti.setData("partition1", partition1);
                 ti.setData("source1", source1);
@@ -308,10 +294,12 @@ public class NISUsersPage extends FormPage {
                 ti.setData("partition2", partition2);
                 ti.setData("source2", source2);
                 ti.setData("uid2", uid2);
+
+                counter++;
             }
         };
 
-        client1.executeQuery(sql, response);
+        action.execute(request, response);
     }
 
     public void edit(Partition partition, Source source, Object uid) throws Exception {
@@ -327,6 +315,7 @@ public class NISUsersPage extends FormPage {
         DN dn = new DN(rdn);
 
         JDBCSearchResultDialog dialog = new JDBCSearchResultDialog(getSite().getShell(), SWT.NONE);
+        dialog.setPartition(partition);
         dialog.setSourceConfig(sourceUidNumber.getSourceConfig());
         dialog.setRdn(rdn);
         dialog.open();
@@ -335,13 +324,5 @@ public class NISUsersPage extends FormPage {
 
         Attributes attributes = dialog.getAttributes();
         sourceUidNumber.add(dn, attributes);
-    }
-
-    public String getCatalog() {
-        return "".equals(domain1Combo.getText()) ? null : domain1Combo.getText();
-    }
-
-    public String getSchema() {
-        return "".equals(domain2Combo.getText()) ? null : domain2Combo.getText();
     }
 }

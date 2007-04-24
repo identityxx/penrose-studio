@@ -170,6 +170,7 @@ public class JDBCSourceBrowsePage extends FormPage {
     public void add(final Shell parent) {
         try {
             JDBCSearchResultDialog dialog = new JDBCSearchResultDialog(parent.getShell(), SWT.NONE);
+            dialog.setPartition(partition);
             dialog.setSourceConfig(sourceConfig);
             dialog.open();
 
@@ -204,6 +205,7 @@ public class JDBCSourceBrowsePage extends FormPage {
             RDN rdn = dn.getRdn();
 
             JDBCSearchResultDialog dialog = new JDBCSearchResultDialog(parent, SWT.NONE);
+            dialog.setPartition(partition);
             dialog.setSourceConfig(sourceConfig);
             dialog.setRdn(rdn);
             dialog.setAttributes(searchResult.getAttributes());

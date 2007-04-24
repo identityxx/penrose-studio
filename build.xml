@@ -14,7 +14,7 @@
     <property name="prefix" value=""/>
     <property name="penrose.studio.home" value="${prefix}/usr/local/${project.name}-${product.version}"/>
 
-    <property name="penrose.version" value="1.2_beta"/>
+    <property name="penrose.version" value="1.2"/>
 
     <property name="rcp.prefix" value="eclipse-RCP-3.1"/>
     <property name="iscc.path" value="ISCC.exe"/>
