@@ -33,9 +33,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.apache.log4j.Logger;
 
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * @author Endi S. Dewata
@@ -44,9 +42,12 @@ public class SourcesNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
+    public final static char SEPARATOR = '.';
+
     ObjectsView view;
 
     private Partition partition;
+    private String path;
 
     public SourcesNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
@@ -96,33 +97,64 @@ public class SourcesNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        return !partition.getSources().getSourceConfigs().isEmpty();
+        return !getChildren().isEmpty();
     }
 
     public Collection getChildren() throws Exception {
 
-        Collection children = new ArrayList();
+        Map children = new LinkedHashMap();
 
         Collection sourceConfigs = partition.getSources().getSourceConfigs();
         for (Iterator i=sourceConfigs.iterator(); i.hasNext(); ) {
             SourceConfig sourceConfig = (SourceConfig)i.next();
+            String sourceName = sourceConfig.getName();
 
-            SourceNode sourceNode = new SourceNode(
-                    view,
-                    sourceConfig.getName(),
-                    ObjectsView.SOURCE,
-                    PenrosePlugin.getImage(PenroseImage.SOURCE),
-                    sourceConfig,
-                    this
-            );
+            // log.debug("Checking "+ path +" with "+sourceName);
+            if (path != null && !sourceName.startsWith(path +SEPARATOR)) continue;
 
-            sourceNode.setPartition(partition);
-            sourceNode.setSourceConfig(sourceConfig);
+            int p = sourceName.indexOf(SEPARATOR, path == null ? 0 : path.length()+1);
 
-            children.add(sourceNode);
+            if (p >= 0) { // intermediate node
+                String label = sourceName.substring(path == null ? 0 : path.length()+1, p);
+
+                if (!children.containsKey(label)) {
+                    // log.debug("Creating sources node "+label);
+                    SourcesNode sourcesNode = new SourcesNode(
+                            view,
+                            label,
+                            ObjectsView.SOURCES,
+                            PenrosePlugin.getImage(PenroseImage.FOLDER),
+                            ObjectsView.SOURCES,
+                            this
+                    );
+
+                    sourcesNode.setPartition(partition);
+                    sourcesNode.setPath(sourceName.substring(0, p));
+
+                    children.put(label, sourcesNode);
+                }
+
+            } else { // leaf node
+                String label = sourceName.substring(path == null ? 0 : path.length()+1);
+
+                // log.debug("Creating source node "+label);
+                SourceNode sourceNode = new SourceNode(
+                        view,
+                        label,
+                        ObjectsView.SOURCE,
+                        PenrosePlugin.getImage(PenroseImage.SOURCE),
+                        sourceConfig,
+                        this
+                );
+
+                sourceNode.setPartition(partition);
+                sourceNode.setSourceConfig(sourceConfig);
+
+                children.put(label, sourceNode);
+            }
         }
 
-        return children;
+        return children.values();
     }
 
     public Partition getPartition() {
@@ -131,5 +163,13 @@ public class SourcesNode extends Node {
 
     public void setPartition(Partition partition) {
         this.partition = partition;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }
