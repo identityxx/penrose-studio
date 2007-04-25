@@ -56,10 +56,10 @@ public class ConflictingUIDFinderAction extends NISAction {
         SourceManager sourceManager = penroseContext.getSourceManager();
 
         final Partition partition1 = partitionManager.getPartition(partition1Name);
-        final Source source1 = sourceManager.getSource(partition1, "users_cache");
+        final Source source1 = sourceManager.getSource(partition1, "cache.users");
 
         final Partition partition2 = partitionManager.getPartition(partition2Name);
-        final Source source2 = sourceManager.getSource(partition2, "users_cache");
+        final Source source2 = sourceManager.getSource(partition2, "cache.users");
 
         JDBCAdapter adapter1 = (JDBCAdapter)source1.getConnection().getAdapter();
         JDBCClient client1 = adapter1.getClient();
