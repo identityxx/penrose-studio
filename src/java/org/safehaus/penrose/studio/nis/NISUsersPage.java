@@ -24,6 +24,10 @@ import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.ldap.*;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.HashMap;
+
 /**
  * @author Endi S. Dewata
  */
@@ -402,14 +406,128 @@ public class NISUsersPage extends FormPage {
             SearchResult result = (SearchResult)response.next();
             Attributes attrs = result.getAttributes();
             Object un = attrs.getValue("uidNumber");
-            dialog.addUidNumber(un);
+            dialog.addNewUidNumber(un);
         }
 
         dialog.open();
 
-        if (dialog.getAction() == NISUserDialog.CANCEL) return;
+        int action = dialog.getAction();
 
-        //Attributes attributes = dialog.getAttributes();
-        //sourceUidNumber.add(dn, attributes);
+        if (action == NISUserDialog.CANCEL) return;
+
+        Object un = dialog.getUidNumber();
+        String message = dialog.getMessage();
+
+        RDNBuilder rb = new RDNBuilder();
+        rb.set("uid", uid);
+        rb.set("uidNumber", un);
+        DN dn = new DN(rb.toRdn());
+
+        String changes;
+
+        if (action == NISUserDialog.ADD) {
+
+            checkUidNumber(un);
+
+            if (dialog.getNewUidNumbers().size() == 0) {
+                addOriginalUidNumber(sourceUidNumber, uid, uidNumber);
+            }
+
+            Attributes attrs = new Attributes();
+            attrs.setValue("uid", uid);
+            attrs.setValue("uidNumber", un);
+
+            sourceUidNumber.add(dn, attrs);
+
+            changes = "add uidNumber "+un;
+
+        } else { // if (action == NISUserDialog.REMOVE) {
+
+            sourceUidNumber.delete(dn);
+
+            Collection uidNumbers = dialog.getNewUidNumbers();
+            if (uidNumbers.size() == 2 && uidNumbers.contains(uidNumber) && !uidNumber.equals(un)) {
+                removeOriginalUidNumber(sourceUidNumber, uid, uidNumber);
+            }
+
+            changes = "delete uidNumber "+un;
+        }
+
+        Source changeLog = sourceManager.getSource("DEFAULT", "changelog");
+
+        Attributes attrs = new Attributes();
+        attrs.setValue("domain", domainName);
+        attrs.setValue("target", "uid="+uid);
+        attrs.setValue("type", "users");
+        attrs.setValue("changes", changes);
+        attrs.setValue("message", message);
+
+        changeLog.add(new DN(), attrs);
+    }
+
+    public void checkUidNumber(Object uidNumber) throws Exception {
+
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseContext penroseContext = penroseApplication.getPenroseContext();
+        SourceManager sourceManager = penroseContext.getSourceManager();
+
+        String domainNames[] = domainsList.getItems();
+        for (int i=0; i<domainNames.length; i++) {
+            String domainName = domainNames[i];
+            String partitionName = (String)domainsList.getData(domainName);
+
+            SearchRequest request = new SearchRequest();
+            request.setFilter("(uidNumber="+uidNumber+")");
+
+            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
+
+            Source users = sourceManager.getSource(partitionName, "cache.users");
+            users.search(request, response);
+
+            if (response.hasNext()) {
+                throw new Exception("uidNumber "+uidNumber+" already exists in domain "+domainName);
+            }
+
+            response = new SearchResponse<SearchResult>();
+
+            Source uidNumbers = sourceManager.getSource(partitionName, "users_uidNumber");
+            uidNumbers.search(request, response);
+
+            if (response.hasNext()) {
+                throw new Exception("uidNumber "+uidNumber+" already exists in domain "+domainName);
+            }
+        }
+    }
+
+    public void addOriginalUidNumber(
+            Source sourceUidNumber,
+            Object uid,
+            Object uidNumber
+    ) throws Exception {
+        
+        RDNBuilder rb = new RDNBuilder();
+        rb.set("uid", uid);
+        rb.set("uidNumber", uidNumber);
+        DN dn = new DN(rb.toRdn());
+
+        Attributes attrs = new Attributes();
+        attrs.setValue("uid", uid);
+        attrs.setValue("uidNumber", uidNumber);
+
+        sourceUidNumber.add(dn, attrs);
+    }
+
+    public void removeOriginalUidNumber(
+            Source sourceUidNumber,
+            Object uid,
+            Object uidNumber
+    ) throws Exception {
+
+        RDNBuilder rb = new RDNBuilder();
+        rb.set("uid", uid);
+        rb.set("uidNumber", uidNumber);
+        DN dn = new DN(rb.toRdn());
+
+        sourceUidNumber.delete(dn);
     }
 }

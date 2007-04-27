@@ -1,10 +1,11 @@
 package org.safehaus.penrose.studio.nis;
 
 import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
@@ -25,22 +26,32 @@ public class NISUserDialog extends Dialog {
     Logger log = Logger.getLogger(getClass());
 
     public final static int CANCEL = 0;
-    public final static int OK     = 1;
+    public final static int ADD    = 1;
+    public final static int REMOVE = 2;
 
     Shell shell;
 
     SourceConfig sourceConfig;
 
     private Attributes attributes = new Attributes();
-    private Collection uidNumbers = new ArrayList();
+    private Collection newUidNumbers = new ArrayList();
 
     Label domainText;
     Label uidText;
-    Label uidNumberText;
+    Label origUidNumberText;
+    Label newUidNumbersText;
+
+    Button addButton;
+    Text newUidNumberText;
+    Button removeButton;
+    Combo newUidNumbersCombo;
+    Text messageText;
 
     int action;
+    Object uidNumber;
+    String message;
 
-	public NISUserDialog(Shell parent, int style) {
+    public NISUserDialog(Shell parent, int style) {
 		super(parent, style);
     }
 
@@ -52,7 +63,7 @@ public class NISUserDialog extends Dialog {
         init();
         reset();
 
-        Point size = new Point(500, 400);
+        Point size = new Point(600, 400);
         shell.setSize(size);
 
         Point l = getParent().getLocation();
@@ -82,7 +93,26 @@ public class NISUserDialog extends Dialog {
         uidText.setText(uid == null ? "" : uid.toString());
 
         Object uidNumber = attributes.getValue("uidNumber");
-        uidNumberText.setText(uidNumber == null ? "" : uidNumber.toString());
+        origUidNumberText.setText(uidNumber == null ? "" : uidNumber.toString());
+
+        if (newUidNumbers.isEmpty()) {
+
+            removeButton.setEnabled(false);
+            newUidNumbersCombo.setEnabled(false);
+
+        } else {
+            StringBuilder sb = new StringBuilder();
+            for (Iterator i = newUidNumbers.iterator(); i.hasNext(); ) {
+                Object newUidNumber = i.next();
+                if (sb.length() > 0) sb.append(", ");
+                sb.append(newUidNumber);
+
+                newUidNumbersCombo.add(newUidNumber.toString());
+                newUidNumbersCombo.setData(newUidNumber.toString(), newUidNumber);
+            }
+
+            newUidNumbersText.setText(sb.toString());
+        }
     }
 
     public void createControl(Shell parent) {
@@ -91,8 +121,17 @@ public class NISUserDialog extends Dialog {
         Composite composite = createInfoPanel(parent);
         composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        composite = createUIDPanel(parent);
+        new Label(composite, SWT.NONE);
+
+        composite = createActionPanel(parent);
+        composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        new Label(composite, SWT.NONE);
+
+        composite = createMessagePanel(parent);
         composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        new Label(composite, SWT.NONE);
 
         composite = createButtonsPanel(parent);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -108,7 +147,7 @@ public class NISUserDialog extends Dialog {
         Label domainLabel = new Label(composite, SWT.NONE);
         domainLabel.setText("Domain:");
         GridData gd = new GridData();
-        gd.widthHint = 100;
+        gd.widthHint = 150;
         domainLabel.setLayoutData(gd);
 
         domainText = new Label(composite, SWT.NONE);
@@ -121,39 +160,78 @@ public class NISUserDialog extends Dialog {
         uidText = new Label(composite, SWT.NONE);
         uidText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Label uidNumberLabel = new Label(composite, SWT.NONE);
-        uidNumberLabel.setText("UID Number:");
-        uidNumberLabel.setLayoutData(new GridData());
+        Label origUidNumberLabel = new Label(composite, SWT.NONE);
+        origUidNumberLabel.setText("Orig. UID Number:");
+        origUidNumberLabel.setLayoutData(new GridData());
 
-        uidNumberText = new Label(composite, SWT.NONE);
-        uidNumberText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        origUidNumberText = new Label(composite, SWT.NONE);
+        origUidNumberText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label newUidNumbersLabel = new Label(composite, SWT.NONE);
+        newUidNumbersLabel.setText("New UID Numbers:");
+        newUidNumbersLabel.setLayoutData(new GridData());
+
+        newUidNumbersText = new Label(composite, SWT.NONE);
+        newUidNumbersText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         return composite;
     }
 
-    public Composite createUIDPanel(Composite parent) {
+    public Composite createActionPanel(Composite parent) {
 
         Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(new GridLayout(2, false));
 
-        List newUidList = new List(composite, SWT.BORDER);
-        newUidList.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Label actionLabel = new Label(composite, SWT.NONE);
+        actionLabel.setText("Action:");
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        actionLabel.setLayoutData(gd);
 
-        Composite buttons = new Composite(composite, SWT.NONE);
-        buttons.setLayout(new GridLayout());
-        buttons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
+        addButton = new Button(composite, SWT.RADIO);
+        addButton.setLayoutData(new GridData());
+        addButton.setText("Add new UID number:");
+        addButton.setSelection(true);
 
-        Button addButton = new Button(buttons, SWT.PUSH);
-        addButton.setText("Add");
-        addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        newUidNumberText = new Text(composite, SWT.BORDER);
+        newUidNumberText.setLayoutData(new GridData());
 
-        Button editButton = new Button(buttons, SWT.PUSH);
-        editButton.setText("Edit");
-        editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        newUidNumberText.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent focusEvent) {
+                addButton.setSelection(true);
+                removeButton.setSelection(false);
+            }
+        });
 
-        Button removeButton = new Button(buttons, SWT.PUSH);
-        removeButton.setText("Remove");
-        removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        removeButton = new Button(composite, SWT.RADIO);
+        removeButton.setText("Remove UID number:");
+        removeButton.setLayoutData(new GridData());
+
+        newUidNumbersCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
+        newUidNumbersCombo.setLayoutData(new GridData());
+
+        newUidNumbersCombo.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent focusEvent) {
+                addButton.setSelection(false);
+                removeButton.setSelection(true);
+            }
+        });
+
+
+        return composite;
+    }
+
+    public Composite createMessagePanel(Composite parent) {
+
+        Composite composite = new Composite(parent, SWT.NONE);
+        composite.setLayout(new GridLayout());
+
+        Label messageLabel = new Label(composite, SWT.NONE);
+        messageLabel.setText("Message:");
+        messageLabel.setLayoutData(new GridData());
+
+        messageText = new Text(composite, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+        messageText.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         return composite;
     }
@@ -163,12 +241,32 @@ public class NISUserDialog extends Dialog {
         Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(new RowLayout());
 
-        Button closeButton = new Button(composite, SWT.PUSH);
-        closeButton.setText("Close");
+        Button cancelButton = new Button(composite, SWT.PUSH);
+        cancelButton.setText("  Cancel  ");
 
-        closeButton.addSelectionListener(new SelectionAdapter() {
+        cancelButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                action = OK;
+                action = CANCEL;
+                shell.close();
+            }
+        });
+
+        Button okButton = new Button(composite, SWT.PUSH);
+        okButton.setText("  OK  ");
+
+        okButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+                if (addButton.getSelection()) {
+                    action = ADD;
+                    uidNumber = newUidNumberText.getText();
+                } else {
+                    action = REMOVE;
+                    String s = newUidNumbersCombo.getText();
+                    uidNumber = newUidNumbersCombo.getData(s);
+                }
+
+                message = messageText.getText();
+
                 shell.close();
             }
         });
@@ -200,17 +298,33 @@ public class NISUserDialog extends Dialog {
         this.attributes.set(attributes);
     }
 
-    public Collection getUidNumbers() {
-        return uidNumbers;
+    public Collection getNewUidNumbers() {
+        return newUidNumbers;
     }
 
-    public void addUidNumber(Object uidNumber) {
-        uidNumbers.add(uidNumber);
+    public void addNewUidNumber(Object uidNumber) {
+        newUidNumbers.add(uidNumber);
     }
 
-    public void setUidNumbers(Collection uidNumbers) {
-        if (this.uidNumbers == uidNumbers) return;
-        this.uidNumbers.clear();
-        this.uidNumbers.addAll(uidNumbers);
+    public void setNewUidNumbers(Collection newUidNumbers) {
+        if (this.newUidNumbers == newUidNumbers) return;
+        this.newUidNumbers.clear();
+        this.newUidNumbers.addAll(newUidNumbers);
+    }
+
+    public Object getUidNumber() {
+        return uidNumber;
+    }
+
+    public void setUidNumber(Object uidNumber) {
+        this.uidNumber = uidNumber;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

@@ -22,7 +22,6 @@ import org.safehaus.penrose.studio.nis.action.NISAction;
 import org.safehaus.penrose.studio.nis.action.NISActionRequest;
 import org.safehaus.penrose.studio.nis.action.NISActionResponse;
 import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
@@ -398,7 +397,7 @@ public class NISGroupsPage extends FormPage {
             SearchResult result = (SearchResult)response.next();
             Attributes attributes = result.getAttributes();
             Object uidNumber = attributes.getValue("gidNumber");
-            dialog.addUidNumber(uidNumber);
+            dialog.addNewUidNumber(uidNumber);
         }
 
         dialog.open();
