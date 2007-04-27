@@ -1,38 +1,38 @@
 package org.safehaus.penrose.studio.nis.action;
 
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.source.Source;
-import org.safehaus.penrose.source.SourceManager;
-import org.safehaus.penrose.adapter.jdbc.JDBCAdapter;
+import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.partition.PartitionManager;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.jdbc.JDBCClient;
-import org.safehaus.penrose.jdbc.QueryResponse;
-import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.ldap.Attributes;
+import org.safehaus.penrose.source.SourceManager;
+import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.SearchRequest;
 import org.safehaus.penrose.ldap.SearchResult;
 import org.safehaus.penrose.ldap.SearchResponse;
+import org.safehaus.penrose.ldap.Attributes;
+import org.safehaus.penrose.adapter.jdbc.JDBCAdapter;
+import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.jdbc.QueryResponse;
 
-import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.sql.ResultSet;
+import java.util.List;
 import java.sql.Connection;
+import java.sql.ResultSet;
 
 /**
  * @author Endi S. Dewata
  */
-public class ConflictingUIDFinderAction extends NISAction {
+public class ConflictingGIDFinderAction extends NISAction {
 
-    public String sourceName = "cache.users";
+    public String sourceName = "cache.groups";
 
     Map partitions = new HashMap();
 
-    public ConflictingUIDFinderAction() throws Exception {
+    public ConflictingGIDFinderAction() throws Exception {
 
-        setName("Conflicting UID Finder");
-        setDescription("Finds users from different domains with conflicting UIDs");
+        setName("Conflicting GID Finder");
+        setDescription("Finds groups from different domains with conflicting GIDs");
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
@@ -112,34 +112,34 @@ public class ConflictingUIDFinderAction extends NISAction {
         connection2.close();
         String table2Name = catalog2+"."+source2.getParameter(JDBCClient.TABLE);
 
-        String sql = "select a.uid, a.uidNumber, b.uid, b.uidNumber" +
+        String sql = "select a.cn, a.gidNumber, b.cn, b.gidNumber" +
                 " from "+table1Name+" a, "+table2Name+" b" +
-                " where a.uid <> b.uid and a.uidNumber = b.uidNumber" +
-                " order by a.uid";
+                " where a.cn <> b.cn and a.gidNumber = b.gidNumber" +
+                " order by a.cn";
 
         QueryResponse queryResponse = new QueryResponse() {
             public void add(Object object) throws Exception {
                 ResultSet rs = (ResultSet)object;
 
-                Object uid1 = rs.getObject(1);
-                Object uidNumber1 = rs.getObject(2);
+                Object group1 = rs.getObject(1);
+                Object gidNumber1 = rs.getObject(2);
 
-                Object uid2 = rs.getObject(3);
-                Object uidNumber2 = rs.getObject(4);
+                Object group2 = rs.getObject(3);
+                Object gidNumber2 = rs.getObject(4);
 
                 Attributes attributes = new Attributes();
 
                 attributes.setValue("domain1", domain1Name);
                 attributes.setValue("partition1", partition1.getName());
                 attributes.setValue("source1", source1);
-                attributes.setValue("uid1", uid1);
-                attributes.setValue("uidNumber1", uidNumber1);
+                attributes.setValue("group1", group1);
+                attributes.setValue("gidNumber1", gidNumber1);
 
                 attributes.setValue("domain2", domain2Name);
                 attributes.setValue("partition2", partition2.getName());
                 attributes.setValue("source2", source2);
-                attributes.setValue("uid2", uid2);
-                attributes.setValue("uidNumber2", uidNumber2);
+                attributes.setValue("group2", group2);
+                attributes.setValue("gidNumber2", gidNumber2);
 
                 response.add(attributes);
             }

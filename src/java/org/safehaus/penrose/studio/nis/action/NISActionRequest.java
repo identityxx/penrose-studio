@@ -14,7 +14,7 @@ public class NISActionRequest {
         return domains;
     }
 
-    public void addDomain(String domain) {
+    public void addPartition(String domain) {
         domains.add(domain);
     }
     

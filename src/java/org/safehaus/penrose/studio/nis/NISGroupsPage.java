@@ -18,16 +18,19 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.studio.nis.action.*;
+import org.safehaus.penrose.studio.nis.action.NISAction;
+import org.safehaus.penrose.studio.nis.action.NISActionRequest;
+import org.safehaus.penrose.studio.nis.action.NISActionResponse;
+import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
-import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.ldap.*;
 
 /**
  * @author Endi S. Dewata
  */
-public class NISUsersPage extends FormPage {
+public class NISGroupsPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -41,8 +44,8 @@ public class NISUsersPage extends FormPage {
 
     NISEditor editor;
 
-    public NISUsersPage(NISEditor editor) {
-        super(editor, "USERS", "  Users  ");
+    public NISGroupsPage(NISEditor editor) {
+        super(editor, "GROUPS", "  Groups  ");
 
         this.editor = editor;
     }
@@ -51,7 +54,7 @@ public class NISUsersPage extends FormPage {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("NIS Users");
+        form.setText("NIS Groups");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
@@ -85,7 +88,7 @@ public class NISUsersPage extends FormPage {
            Source actionsSource = sourceManager.getSource("DEFAULT", "actions");
 
            SearchRequest request = new SearchRequest();
-           request.setFilter("(type=users)");
+           request.setFilter("(type=groups)");
 
            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
                public void add(SearchResult result) throws Exception {
@@ -221,11 +224,11 @@ public class NISUsersPage extends FormPage {
         tc.setWidth(100);
 
         tc = new TableColumn(table, SWT.NONE);
-        tc.setText("User");
+        tc.setText("Group");
         tc.setWidth(100);
 
         tc = new TableColumn(table, SWT.NONE);
-        tc.setText("UID");
+        tc.setText("GID");
         tc.setWidth(100);
 
         tc = new TableColumn(table, SWT.NONE);
@@ -233,11 +236,11 @@ public class NISUsersPage extends FormPage {
         tc.setWidth(100);
 
         tc = new TableColumn(table, SWT.NONE);
-        tc.setText("User");
+        tc.setText("Group");
         tc.setWidth(100);
 
         tc = new TableColumn(table, SWT.NONE);
-        tc.setText("UID");
+        tc.setText("GID");
         tc.setWidth(100);
 
         Composite buttons = toolkit.createComposite(composite);
@@ -245,7 +248,7 @@ public class NISUsersPage extends FormPage {
         buttons.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Button edit1Button = new Button(buttons, SWT.PUSH);
-        edit1Button.setText("Edit user from domain 1");
+        edit1Button.setText("Edit group from domain 1");
 
         edit1Button.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
@@ -256,9 +259,9 @@ public class NISUsersPage extends FormPage {
                     String domainName = (String)item.getData("domain1");
                     String partitionName = (String)item.getData("partition1");
                     Source source = (Source)item.getData("source1");
-                    Object uid = item.getData("uid1");
-                    Object uidNumber = item.getData("uidNumber1");
-                    edit(domainName, partitionName, source, uid, uidNumber);
+                    String cn = (String)item.getData("group1");
+                    Object gidNumber = item.getData("gidNumber1");
+                    edit(partitionName, source, cn);
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
@@ -272,7 +275,7 @@ public class NISUsersPage extends FormPage {
         });
 
         Button edit2Button = new Button(buttons, SWT.PUSH);
-        edit2Button.setText("Edit user from domain 2");
+        edit2Button.setText("Edit group from domain 2");
 
         edit2Button.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
@@ -283,9 +286,9 @@ public class NISUsersPage extends FormPage {
                     String domainName = (String)item.getData("domain2");
                     String partitionName = (String)item.getData("partition2");
                     Source source = (Source)item.getData("source2");
-                    Object uid = item.getData("uid2");
-                    Object uidNumber = item.getData("uidNumber2");
-                    edit(domainName, partitionName, source, uid, uidNumber);
+                    String cn = (String)item.getData("group2");
+                    Object gidNumber = item.getData("gidNumber2");
+                    edit(partitionName, source, cn);
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
@@ -330,34 +333,34 @@ public class NISUsersPage extends FormPage {
                 String domain1Name = (String)attributes.getValue("domain1");
                 String partition1Name = (String)attributes.getValue("partition1");
                 Source source1 = (Source)attributes.getValue("source1");
-                Object uid1 = attributes.getValue("uid1");
-                Object uidNumber1 = attributes.getValue("uidNumber1");
+                Object group1 = attributes.getValue("group1");
+                Object gidNumber1 = attributes.getValue("gidNumber1");
 
                 String domain2Name = (String)attributes.getValue("domain2");
                 String partition2Name = (String)attributes.getValue("partition2");
                 Source source2 = (Source)attributes.getValue("source2");
-                Object uid2 = attributes.getValue("uid2");
-                Object uidNumber2 = attributes.getValue("uidNumber2");
+                Object group2 = attributes.getValue("group2");
+                Object gidNumber2 = attributes.getValue("gidNumber2");
 
                 TableItem ti = new TableItem(table, SWT.NONE);
                 ti.setText(0, domain1Name);
-                ti.setText(1, ""+uid1);
-                ti.setText(2, ""+uidNumber1);
+                ti.setText(1, ""+ group1);
+                ti.setText(2, ""+ gidNumber1);
                 ti.setText(3, domain2Name);
-                ti.setText(4, ""+uid2);
-                ti.setText(5, ""+uidNumber2);
+                ti.setText(4, ""+ group2);
+                ti.setText(5, ""+ gidNumber2);
 
                 ti.setData("domain1", domain1Name);
                 ti.setData("partition1", partition1Name);
                 ti.setData("source1", source1);
-                ti.setData("uid1", uid1);
-                ti.setData("uidNumber1", uidNumber1);
+                ti.setData("group1", group1);
+                ti.setData("gidNumber1", gidNumber1);
 
                 ti.setData("domain2", domain2Name);
                 ti.setData("partition2", partition2Name);
                 ti.setData("source2", source2);
-                ti.setData("uid2", uid2);
-                ti.setData("uidNumber2", uidNumber2);
+                ti.setData("group2", group2);
+                ti.setData("gidNumber2", gidNumber2);
 
                 counter++;
             }
@@ -370,46 +373,39 @@ public class NISUsersPage extends FormPage {
         action.execute(request, response);
     }
 
-    public void edit(
-            String domainName,
-            String partitionName,
-            Source source,
-            Object uid,
-            Object uidNumber
-    ) throws Exception {
+    public void edit(String partitionName, Source source, String cn) throws Exception {
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
         SourceManager sourceManager = penroseContext.getSourceManager();
 
-        Attributes attributes = new Attributes();
-        attributes.setValue("domain", domainName);
-        attributes.setValue("uid", uid);
-        attributes.setValue("uidNumber", uidNumber);
+        RDNBuilder rb = new RDNBuilder();
+        rb.set("cn", cn);
+        RDN rdn = rb.toRdn();
+        DN dn = new DN(rdn);
 
         NISUserDialog dialog = new NISUserDialog(getSite().getShell(), SWT.NONE);
-        dialog.setAttributes(attributes);
 
-        Source sourceUidNumber = sourceManager.getSource(partitionName, "users_uidNumber");
+        Source sourceUidNumber = sourceManager.getSource(partitionName, "groups_gidNumber");
         dialog.setSourceConfig(sourceUidNumber.getSourceConfig());
 
         SearchRequest request = new SearchRequest();
-        request.setFilter("(uid="+uid+")");
+        request.setFilter("(cn="+cn+")");
         SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
         sourceUidNumber.search(request, response);
         while (response.hasNext()) {
             SearchResult result = (SearchResult)response.next();
-            Attributes attrs = result.getAttributes();
-            Object un = attrs.getValue("uidNumber");
-            dialog.addUidNumber(un);
+            Attributes attributes = result.getAttributes();
+            Object uidNumber = attributes.getValue("gidNumber");
+            dialog.addUidNumber(uidNumber);
         }
 
         dialog.open();
 
         if (dialog.getAction() == NISUserDialog.CANCEL) return;
 
-        //Attributes attributes = dialog.getAttributes();
-        //sourceUidNumber.add(dn, attributes);
+        Attributes attributes = dialog.getAttributes();
+        sourceUidNumber.add(dn, attributes);
     }
 }

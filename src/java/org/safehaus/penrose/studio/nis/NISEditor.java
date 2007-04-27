@@ -12,10 +12,6 @@ public class NISEditor extends FormEditor {
     Logger log = Logger.getLogger(getClass());
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        NISEditorInput ei = (NISEditorInput)input;
-        //partition = ei.getPartition();
-        //origSourceConfig = ei.getSourceConfig();
-        //sourceConfig = (SourceConfig)origSourceConfig.clone();
 
         setSite(site);
         setInput(input);
@@ -24,9 +20,9 @@ public class NISEditor extends FormEditor {
 
     public void addPages() {
         try {
+            addPage(new NISDomainsPage(this));
             addPage(new NISUsersPage(this));
-            //addPage(new JDBCSourceBrowsePage(this));
-            //addPage(new JDBCSourceCachePage(this));
+            addPage(new NISGroupsPage(this));
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
