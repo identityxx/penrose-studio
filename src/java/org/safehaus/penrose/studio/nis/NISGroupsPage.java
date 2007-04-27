@@ -26,6 +26,8 @@ import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
 
+import java.util.Collection;
+
 /**
  * @author Endi S. Dewata
  */
@@ -260,7 +262,7 @@ public class NISGroupsPage extends FormPage {
                     Source source = (Source)item.getData("source1");
                     String cn = (String)item.getData("group1");
                     Object gidNumber = item.getData("gidNumber1");
-                    edit(partitionName, source, cn);
+                    edit(domainName, partitionName, source, cn, gidNumber);
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
@@ -287,7 +289,7 @@ public class NISGroupsPage extends FormPage {
                     Source source = (Source)item.getData("source2");
                     String cn = (String)item.getData("group2");
                     Object gidNumber = item.getData("gidNumber2");
-                    edit(partitionName, source, cn);
+                    edit(domainName, partitionName, source, cn, gidNumber);
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
@@ -372,39 +374,160 @@ public class NISGroupsPage extends FormPage {
         action.execute(request, response);
     }
 
-    public void edit(String partitionName, Source source, String cn) throws Exception {
+    public void edit(
+            String domainName,
+            String partitionName,
+            Source source,
+            Object cn,
+            Object gidNumber
+    ) throws Exception {
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
         SourceManager sourceManager = penroseContext.getSourceManager();
 
-        RDNBuilder rb = new RDNBuilder();
-        rb.set("cn", cn);
-        RDN rdn = rb.toRdn();
-        DN dn = new DN(rdn);
+        Attributes attributes = new Attributes();
+        attributes.setValue("domain", domainName);
+        attributes.setValue("cn", cn);
+        attributes.setValue("gidNumber", gidNumber);
 
-        NISUserDialog dialog = new NISUserDialog(getSite().getShell(), SWT.NONE);
+        NISGroupDialog dialog = new NISGroupDialog(getSite().getShell(), SWT.NONE);
+        dialog.setAttributes(attributes);
 
-        Source sourceUidNumber = sourceManager.getSource(partitionName, "groups_gidNumber");
-        dialog.setSourceConfig(sourceUidNumber.getSourceConfig());
+        Source sourceGidNumber = sourceManager.getSource(partitionName, "groups_gidNumber");
+        dialog.setSourceConfig(sourceGidNumber.getSourceConfig());
 
         SearchRequest request = new SearchRequest();
-        request.setFilter("(cn="+cn+")");
+        request.setFilter("(cn="+ cn +")");
         SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
-        sourceUidNumber.search(request, response);
+        sourceGidNumber.search(request, response);
         while (response.hasNext()) {
             SearchResult result = (SearchResult)response.next();
-            Attributes attributes = result.getAttributes();
-            Object uidNumber = attributes.getValue("gidNumber");
-            dialog.addNewUidNumber(uidNumber);
+            Attributes attrs = result.getAttributes();
+            Object gn = attrs.getValue("gidNumber");
+            dialog.addNewGidNumber(gn);
         }
 
         dialog.open();
 
-        if (dialog.getAction() == NISUserDialog.CANCEL) return;
+        int action = dialog.getAction();
 
-        Attributes attributes = dialog.getAttributes();
-        sourceUidNumber.add(dn, attributes);
+        if (action == NISUserDialog.CANCEL) return;
+
+        Object gn = dialog.getGidNumber();
+        String message = dialog.getMessage();
+
+        RDNBuilder rb = new RDNBuilder();
+        rb.set("cn", cn);
+        rb.set("gidNumber", gn);
+        DN dn = new DN(rb.toRdn());
+
+        String changes;
+
+        if (action == NISUserDialog.ADD) {
+
+            if (!gidNumber.equals(gn)) checkGidNumber(gn);
+
+            if (dialog.getNewGidNumbers().size() == 0) {
+                addOriginalGidNumber(sourceGidNumber, cn, gidNumber);
+            }
+
+            Attributes attrs = new Attributes();
+            attrs.setValue("cn", cn);
+            attrs.setValue("gidNumber", gn);
+
+            sourceGidNumber.add(dn, attrs);
+
+            changes = "add gidNumber "+gn;
+
+        } else { // if (action == NISUserDialog.REMOVE) {
+
+            sourceGidNumber.delete(dn);
+
+            Collection gidNumbers = dialog.getNewGidNumbers();
+            if (gidNumbers.size() == 2 && gidNumbers.contains(gidNumber) && !gidNumber.equals(gn)) {
+                removeOriginalGidNumber(sourceGidNumber, cn, gidNumber);
+            }
+
+            changes = "delete gidNumber "+gn;
+        }
+
+        Source changeLog = sourceManager.getSource("DEFAULT", "changelog");
+
+        Attributes attrs = new Attributes();
+        attrs.setValue("domain", domainName);
+        attrs.setValue("target", "cn="+ cn);
+        attrs.setValue("type", "groups");
+        attrs.setValue("changes", changes);
+        attrs.setValue("message", message);
+
+        changeLog.add(new DN(), attrs);
+    }
+
+    public void checkGidNumber(Object gidNumber) throws Exception {
+
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseContext penroseContext = penroseApplication.getPenroseContext();
+        SourceManager sourceManager = penroseContext.getSourceManager();
+
+        String domainNames[] = domainsList.getItems();
+        for (int i=0; i<domainNames.length; i++) {
+            String domainName = domainNames[i];
+            String partitionName = (String)domainsList.getData(domainName);
+
+            SearchRequest request = new SearchRequest();
+            request.setFilter("(gidNumber="+ gidNumber +")");
+
+            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
+
+            Source groups = sourceManager.getSource(partitionName, "cache.groups");
+            groups.search(request, response);
+
+            if (response.hasNext()) {
+                throw new Exception("gidNumber "+ gidNumber +" already exists in domain "+domainName);
+            }
+
+            response = new SearchResponse<SearchResult>();
+
+            Source gidNumbers = sourceManager.getSource(partitionName, "groups_gidNumber");
+            gidNumbers.search(request, response);
+
+            if (response.hasNext()) {
+                throw new Exception("gidNumber "+ gidNumber +" already exists in domain "+domainName);
+            }
+        }
+    }
+
+    public void addOriginalGidNumber(
+            Source sourceGidNumber,
+            Object cn,
+            Object gidNumber
+    ) throws Exception {
+
+        RDNBuilder rb = new RDNBuilder();
+        rb.set("cn", cn);
+        rb.set("gidNumber", gidNumber);
+        DN dn = new DN(rb.toRdn());
+
+        Attributes attrs = new Attributes();
+        attrs.setValue("cn", cn);
+        attrs.setValue("gidNumber", gidNumber);
+
+        sourceGidNumber.add(dn, attrs);
+    }
+
+    public void removeOriginalGidNumber(
+            Source sourceGidNumber,
+            Object cn,
+            Object gidNumber
+    ) throws Exception {
+
+        RDNBuilder rb = new RDNBuilder();
+        rb.set("cn", cn);
+        rb.set("gidNumber", gidNumber);
+        DN dn = new DN(rb.toRdn());
+
+        sourceGidNumber.delete(dn);
     }
 }

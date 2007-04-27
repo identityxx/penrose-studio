@@ -427,7 +427,7 @@ public class NISUsersPage extends FormPage {
 
         if (action == NISUserDialog.ADD) {
 
-            checkUidNumber(un);
+            if (!uidNumber.equals(un)) checkUidNumber(un);
 
             if (dialog.getNewUidNumbers().size() == 0) {
                 addOriginalUidNumber(sourceUidNumber, uid, uidNumber);
