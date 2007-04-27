@@ -128,8 +128,6 @@ public class NISGroupDialog extends Dialog {
         composite = createActionPanel(parent);
         composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        new Label(composite, SWT.NONE);
-
         composite = createMessagePanel(parent);
         composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
@@ -196,7 +194,9 @@ public class NISGroupDialog extends Dialog {
         addButton.setSelection(true);
 
         newGidNumberText = new Text(composite, SWT.BORDER);
-        newGidNumberText.setLayoutData(new GridData());
+        gd = new GridData();
+        gd.widthHint = 100;
+        newGidNumberText.setLayoutData(gd);
 
         newGidNumberText.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent focusEvent) {
@@ -210,7 +210,9 @@ public class NISGroupDialog extends Dialog {
         removeButton.setLayoutData(new GridData());
 
         newGidNumbersCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
-        newGidNumbersCombo.setLayoutData(new GridData());
+        gd = new GridData();
+        gd.widthHint = 100;
+        newGidNumbersCombo.setLayoutData(gd);
 
         newGidNumbersCombo.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent focusEvent) {

@@ -126,8 +126,6 @@ public class NISUserDialog extends Dialog {
         composite = createActionPanel(parent);
         composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        new Label(composite, SWT.NONE);
-
         composite = createMessagePanel(parent);
         composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
@@ -194,7 +192,9 @@ public class NISUserDialog extends Dialog {
         addButton.setSelection(true);
 
         newUidNumberText = new Text(composite, SWT.BORDER);
-        newUidNumberText.setLayoutData(new GridData());
+        gd = new GridData();
+        gd.widthHint = 100;
+        newUidNumberText.setLayoutData(gd);
 
         newUidNumberText.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent focusEvent) {
@@ -208,7 +208,9 @@ public class NISUserDialog extends Dialog {
         removeButton.setLayoutData(new GridData());
 
         newUidNumbersCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
-        newUidNumbersCombo.setLayoutData(new GridData());
+        gd = new GridData();
+        gd.widthHint = 100;
+        newUidNumbersCombo.setLayoutData(gd);
 
         newUidNumbersCombo.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent focusEvent) {
