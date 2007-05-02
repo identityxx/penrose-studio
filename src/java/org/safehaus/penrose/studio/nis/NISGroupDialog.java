@@ -16,10 +16,6 @@ import org.safehaus.penrose.ldap.Attributes;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.Iterator;
-
 /**
  * @author Endi S. Dewata
  */
@@ -28,25 +24,25 @@ public class NISGroupDialog extends Dialog {
     Logger log = Logger.getLogger(getClass());
 
     public final static int CANCEL = 0;
-    public final static int ADD    = 1;
-    public final static int REMOVE = 2;
+    public final static int SET    = 1;
+    public final static int CHANGE = 2;
+    public final static int REMOVE = 3;
 
     Shell shell;
 
     SourceConfig sourceConfig;
 
-    private Attributes attributes = new Attributes();
-    private Collection newGidNumbers = new ArrayList();
+    Attributes attributes = new Attributes();
+    Object newGidNumber;
 
     Label domainText;
     Label cnText;
     Label origGidNumberText;
-    Label newGidNumbersText;
+    Label newGidNumberText;
 
-    Button addButton;
-    Text newGidNumberText;
-    Button removeButton;
-    Combo newGidNumbersCombo;
+    Button setButton;
+    Text gidNumberText;
+    Button revertButton;
     Text messageText;
 
     int action;
@@ -97,23 +93,11 @@ public class NISGroupDialog extends Dialog {
         Object gidNumber = attributes.getValue("gidNumber");
         origGidNumberText.setText(gidNumber == null ? "" : gidNumber.toString());
 
-        if (newGidNumbers.isEmpty()) {
-
-            removeButton.setEnabled(false);
-            newGidNumbersCombo.setEnabled(false);
+        if (newGidNumber == null) {
+            revertButton.setEnabled(false);
 
         } else {
-            StringBuilder sb = new StringBuilder();
-            for (Iterator i = newGidNumbers.iterator(); i.hasNext(); ) {
-                Object newUidNumber = i.next();
-                if (sb.length() > 0) sb.append(", ");
-                sb.append(newUidNumber);
-
-                newGidNumbersCombo.add(newUidNumber.toString());
-                newGidNumbersCombo.setData(newUidNumber.toString(), newUidNumber);
-            }
-
-            newGidNumbersText.setText(sb.toString());
+            newGidNumberText.setText(newGidNumber.toString());
         }
     }
 
@@ -161,18 +145,18 @@ public class NISGroupDialog extends Dialog {
         cnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label origUidNumberLabel = new Label(composite, SWT.NONE);
-        origUidNumberLabel.setText("Orig. GID Number:");
+        origUidNumberLabel.setText("Original GID Number:");
         origUidNumberLabel.setLayoutData(new GridData());
 
         origGidNumberText = new Label(composite, SWT.NONE);
         origGidNumberText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Label newUidNumbersLabel = new Label(composite, SWT.NONE);
-        newUidNumbersLabel.setText("New GID Numbers:");
-        newUidNumbersLabel.setLayoutData(new GridData());
+        Label newUidNumberLabel = new Label(composite, SWT.NONE);
+        newUidNumberLabel.setText("New GID Number:");
+        newUidNumberLabel.setLayoutData(new GridData());
 
-        newGidNumbersText = new Label(composite, SWT.NONE);
-        newGidNumbersText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        newGidNumberText = new Label(composite, SWT.NONE);
+        newGidNumberText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         return composite;
     }
@@ -188,39 +172,26 @@ public class NISGroupDialog extends Dialog {
         gd.horizontalSpan = 2;
         actionLabel.setLayoutData(gd);
 
-        addButton = new Button(composite, SWT.RADIO);
-        addButton.setLayoutData(new GridData());
-        addButton.setText("Add new GID number:");
-        addButton.setSelection(true);
+        setButton = new Button(composite, SWT.RADIO);
+        setButton.setLayoutData(new GridData());
+        setButton.setText("Set new GID number:");
+        setButton.setSelection(true);
 
-        newGidNumberText = new Text(composite, SWT.BORDER);
+        gidNumberText = new Text(composite, SWT.BORDER);
         gd = new GridData();
         gd.widthHint = 100;
-        newGidNumberText.setLayoutData(gd);
+        gidNumberText.setLayoutData(gd);
 
-        newGidNumberText.addFocusListener(new FocusAdapter() {
+        gidNumberText.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent focusEvent) {
-                addButton.setSelection(true);
-                removeButton.setSelection(false);
+                setButton.setSelection(true);
+                revertButton.setSelection(false);
             }
         });
 
-        removeButton = new Button(composite, SWT.RADIO);
-        removeButton.setText("Remove GID number:");
-        removeButton.setLayoutData(new GridData());
-
-        newGidNumbersCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
-        gd = new GridData();
-        gd.widthHint = 100;
-        newGidNumbersCombo.setLayoutData(gd);
-
-        newGidNumbersCombo.addFocusListener(new FocusAdapter() {
-            public void focusGained(FocusEvent focusEvent) {
-                addButton.setSelection(false);
-                removeButton.setSelection(true);
-            }
-        });
-
+        revertButton = new Button(composite, SWT.RADIO);
+        revertButton.setText("Revert to the original GID number.");
+        revertButton.setLayoutData(new GridData());
 
         return composite;
     }
@@ -260,13 +231,16 @@ public class NISGroupDialog extends Dialog {
 
         okButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                if (addButton.getSelection()) {
-                    action = ADD;
-                    gidNumber = newGidNumberText.getText();
+                if (setButton.getSelection()) {
+                    if (newGidNumber == null) {
+                        action = SET;
+                    } else {
+                        action = CHANGE;
+                    }
+                    gidNumber = gidNumberText.getText();
                 } else {
                     action = REMOVE;
-                    String s = newGidNumbersCombo.getText();
-                    gidNumber = newGidNumbersCombo.getData(s);
+                    gidNumber = attributes.getValue("gidNumber");
                 }
 
                 message = messageText.getText();
@@ -302,18 +276,12 @@ public class NISGroupDialog extends Dialog {
         this.attributes.set(attributes);
     }
 
-    public Collection getNewGidNumbers() {
-        return newGidNumbers;
+    public Object getNewGidNumber() {
+        return newGidNumber;
     }
 
-    public void addNewGidNumber(Object uidNumber) {
-        newGidNumbers.add(uidNumber);
-    }
-
-    public void setNewGidNumbers(Collection newGidNumbers) {
-        if (this.newGidNumbers == newGidNumbers) return;
-        this.newGidNumbers.clear();
-        this.newGidNumbers.addAll(newGidNumbers);
+    public void setNewGidNumber(Object newGidNumber) {
+        this.newGidNumber = newGidNumber;
     }
 
     public Object getGidNumber() {

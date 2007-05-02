@@ -15,6 +15,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.safehaus.penrose.mapping.EntryMapping;
+import org.safehaus.penrose.mapping.Link;
 
 /**
  * @author Endi S. Dewata
@@ -64,9 +65,12 @@ public class MiscPage extends FormPage {
         gd.widthHint = 100;
         partitionLabel.setLayoutData(gd);
 
-        String value = entryMapping.getPartitionName();
-        value = value == null ? "" : value;
-		partitionText = toolkit.createText(composite, value, SWT.BORDER);
+        Link link = entryMapping.getLink();
+        
+        partitionText = toolkit.createText(composite, "", SWT.BORDER);
+        if (link != null) {
+            partitionText.setText(link.getPartitionName() == null ? "" : link.getPartitionName());
+        }
 
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
@@ -75,9 +79,11 @@ public class MiscPage extends FormPage {
         partitionText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(partitionText.getText())) {
-                    entryMapping.setPartitionName(null);
+                    entryMapping.setLink(null);
                 } else {
-                    entryMapping.setPartitionName(partitionText.getText());
+                    Link link = new Link();
+                    link.setPartitionName(partitionText.getText());
+                    entryMapping.setLink(link);
                 }
                 checkDirty();
             }
@@ -88,7 +94,7 @@ public class MiscPage extends FormPage {
         gd.widthHint = 100;
         handlerLabel.setLayoutData(gd);
 
-        value = entryMapping.getHandlerName();
+        String value = entryMapping.getHandlerName();
         value = value == null ? "" : value;
         handlerText = toolkit.createText(composite, value, SWT.BORDER);
 

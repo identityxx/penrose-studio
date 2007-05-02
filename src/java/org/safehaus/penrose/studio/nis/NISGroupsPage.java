@@ -27,6 +27,7 @@ import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
 
 import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
@@ -386,6 +387,10 @@ public class NISGroupsPage extends FormPage {
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
         SourceManager sourceManager = penroseContext.getSourceManager();
 
+        RDNBuilder rb = new RDNBuilder();
+        rb.set("cn", cn);
+        DN dn = new DN(rb.toRdn());
+
         Attributes attributes = new Attributes();
         attributes.setValue("domain", domainName);
         attributes.setValue("cn", cn);
@@ -398,15 +403,15 @@ public class NISGroupsPage extends FormPage {
         dialog.setSourceConfig(sourceGidNumber.getSourceConfig());
 
         SearchRequest request = new SearchRequest();
-        request.setFilter("(cn="+ cn +")");
+        request.setDn(dn);
         SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
         sourceGidNumber.search(request, response);
-        while (response.hasNext()) {
+        if (response.hasNext()) {
             SearchResult result = (SearchResult)response.next();
             Attributes attrs = result.getAttributes();
             Object gn = attrs.getValue("gidNumber");
-            dialog.addNewGidNumber(gn);
+            dialog.setNewGidNumber(gn);
         }
 
         dialog.open();
@@ -418,46 +423,38 @@ public class NISGroupsPage extends FormPage {
         Object gn = dialog.getGidNumber();
         String message = dialog.getMessage();
 
-        RDNBuilder rb = new RDNBuilder();
-        rb.set("cn", cn);
-        rb.set("gidNumber", gn);
-        DN dn = new DN(rb.toRdn());
-
         String changes;
 
-        if (action == NISUserDialog.ADD) {
+        if (action == NISGroupDialog.SET) {
 
             if (!gidNumber.equals(gn)) checkGidNumber(gn);
 
-            if (dialog.getNewGidNumbers().size() == 0) {
-                addOriginalGidNumber(sourceGidNumber, cn, gidNumber);
-            }
-
             Attributes attrs = new Attributes();
-            attrs.setValue("cn", cn);
             attrs.setValue("gidNumber", gn);
 
             sourceGidNumber.add(dn, attrs);
 
-            changes = "add gidNumber "+gn;
+        } else if (action == NISGroupDialog.CHANGE) {
 
-        } else { // if (action == NISUserDialog.REMOVE) {
+            if (!gidNumber.equals(gn)) checkGidNumber(gn);
+
+            Collection modifications = new ArrayList();
+            modifications.add(new Modification(Modification.REPLACE, new Attribute("gidNumber", gn)));
+
+            sourceGidNumber.modify(dn, modifications);
+
+        } else { // if (action == NISGroupDialog.REMOVE) {
 
             sourceGidNumber.delete(dn);
-
-            Collection gidNumbers = dialog.getNewGidNumbers();
-            if (gidNumbers.size() == 2 && gidNumbers.contains(gidNumber) && !gidNumber.equals(gn)) {
-                removeOriginalGidNumber(sourceGidNumber, cn, gidNumber);
-            }
-
-            changes = "delete gidNumber "+gn;
         }
+
+        changes = "set gidNumber "+gn;
 
         Source changeLog = sourceManager.getSource("DEFAULT", "changelog");
 
         Attributes attrs = new Attributes();
         attrs.setValue("domain", domainName);
-        attrs.setValue("target", "cn="+ cn);
+        attrs.setValue("target", dn.toString());
         attrs.setValue("type", "groups");
         attrs.setValue("changes", changes);
         attrs.setValue("message", message);
@@ -497,37 +494,5 @@ public class NISGroupsPage extends FormPage {
                 throw new Exception("gidNumber "+ gidNumber +" already exists in domain "+domainName);
             }
         }
-    }
-
-    public void addOriginalGidNumber(
-            Source sourceGidNumber,
-            Object cn,
-            Object gidNumber
-    ) throws Exception {
-
-        RDNBuilder rb = new RDNBuilder();
-        rb.set("cn", cn);
-        rb.set("gidNumber", gidNumber);
-        DN dn = new DN(rb.toRdn());
-
-        Attributes attrs = new Attributes();
-        attrs.setValue("cn", cn);
-        attrs.setValue("gidNumber", gidNumber);
-
-        sourceGidNumber.add(dn, attrs);
-    }
-
-    public void removeOriginalGidNumber(
-            Source sourceGidNumber,
-            Object cn,
-            Object gidNumber
-    ) throws Exception {
-
-        RDNBuilder rb = new RDNBuilder();
-        rb.set("cn", cn);
-        rb.set("gidNumber", gidNumber);
-        DN dn = new DN(rb.toRdn());
-
-        sourceGidNumber.delete(dn);
     }
 }

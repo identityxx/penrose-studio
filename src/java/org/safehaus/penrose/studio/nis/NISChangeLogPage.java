@@ -36,11 +36,20 @@ public class NISChangeLogPage extends FormPage {
     NISEditor editor;
 
     Table logsTable;
+    Text messageText;
 
-    public NISChangeLogPage(NISEditor editor) {
+    Source source;
+
+    public NISChangeLogPage(NISEditor editor) throws Exception {
         super(editor, "CHANGELOG", "  Change Log ");
 
         this.editor = editor;
+
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseContext penroseContext = penroseApplication.getPenroseContext();
+        SourceManager sourceManager = penroseContext.getSourceManager();
+
+        source = sourceManager.getSource("DEFAULT", "changelog");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -71,14 +80,6 @@ public class NISChangeLogPage extends FormPage {
        try {
            logsTable.removeAll();
 
-           PenroseApplication penroseApplication = PenroseApplication.getInstance();
-           PenroseContext penroseContext = penroseApplication.getPenroseContext();
-           PartitionManager partitionManager = penroseContext.getPartitionManager();
-           SourceManager sourceManager = penroseContext.getSourceManager();
-
-           Partition partition = partitionManager.getPartition("DEFAULT");
-           Source source = sourceManager.getSource(partition, "changelog");
-
            SearchRequest request = new SearchRequest();
            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
                public void add(SearchResult result) throws Exception {
@@ -89,7 +90,7 @@ public class NISChangeLogPage extends FormPage {
                    String type = (String)attributes.getValue("type");
                    String target = (String)attributes.getValue("target");
                    String changes = (String)attributes.getValue("changes");
-                   String message = (String)attributes.getValue("message");
+                   String active = (String)attributes.getValue("active");
 
                    TableItem ti = new TableItem(logsTable, SWT.NONE);
                    ti.setText(0, changeNumber.toString());
@@ -97,7 +98,7 @@ public class NISChangeLogPage extends FormPage {
                    ti.setText(2, type);
                    ti.setText(3, target);
                    ti.setText(4, changes);
-                   ti.setText(5, message);
+                   ti.setText(5, active != null && "1".equals(active) ? "Active" : "");
                    ti.setData(attributes);
                }
            };
@@ -117,19 +118,13 @@ public class NISChangeLogPage extends FormPage {
     public Composite createChangeLogSection(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
-        composite.setLayout(new GridLayout());
+        composite.setLayout(new GridLayout(2, false));
 
-        Button refreshButton = new Button(composite, SWT.PUSH);
-        refreshButton.setText("Refresh");
-        refreshButton.setLayoutData(new GridData());
+        Composite leftPanel = toolkit.createComposite(composite);
+        leftPanel.setLayout(new GridLayout());
+        leftPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        refreshButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                refresh();
-            }
-        });
-
-        logsTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
+        logsTable = new Table(leftPanel, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
         logsTable.setLayoutData(new GridData(GridData.FILL_BOTH));
         logsTable.setHeaderVisible(true);
         logsTable.setLinesVisible(true);
@@ -151,12 +146,116 @@ public class NISChangeLogPage extends FormPage {
         tc.setText("Target");
 
         tc = new TableColumn(logsTable, SWT.NONE);
-        tc.setWidth(200);
+        tc.setWidth(150);
         tc.setText("Changes");
 
         tc = new TableColumn(logsTable, SWT.NONE);
-        tc.setWidth(150);
-        tc.setText("Message");
+        tc.setWidth(50);
+        tc.setText("Active");
+
+        logsTable.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+
+                if (logsTable.getSelectionCount() == 0) return;
+
+                TableItem ti = logsTable.getSelection()[0];
+                Attributes attributes = (Attributes)ti.getData();
+                String message = (String)attributes.getValue("message");
+                messageText.setText(message == null ? "" : message);
+            }
+        });
+
+        toolkit.createLabel(leftPanel, "Message:", SWT.NONE);
+
+        messageText = toolkit.createText(leftPanel, "", SWT.BORDER | SWT.READ_ONLY);
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.heightHint = 100;
+        messageText.setLayoutData(gd);
+
+        Composite rightPanel = toolkit.createComposite(composite);
+        rightPanel.setLayout(new GridLayout());
+        gd = new GridData(GridData.FILL_VERTICAL);
+        gd.verticalSpan = 2;
+        rightPanel.setLayoutData(gd);
+
+        Button editButton = new Button(rightPanel, SWT.PUSH);
+        editButton.setText("Edit");
+        editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        editButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    if (logsTable.getSelectionCount() == 0) return;
+
+                    TableItem item = logsTable.getSelection()[0];
+
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                    String message = e.toString();
+                    if (message.length() > 500) {
+                        message = message.substring(0, 500) + "...";
+                    }
+                    MessageDialog.openError(editor.getSite().getShell(), "Edit Failed", message);
+                }
+            }
+        });
+
+        Button deleteButton = new Button(rightPanel, SWT.PUSH);
+        deleteButton.setText("Delete");
+        deleteButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        deleteButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    if (logsTable.getSelectionCount() == 0) return;
+
+                    int index = logsTable.getSelectionIndex();
+                    
+                    TableItem[] items = logsTable.getSelection();
+                    for (int i=0; i<items.length; i++) {
+                        TableItem ti = items[i];
+                        Attributes attributes = (Attributes)ti.getData();
+
+                        Object changeNumber = attributes.getValue("changeNumber");
+                        source.delete("changeNumber="+changeNumber);
+                        ti.dispose();
+                    }
+
+                    logsTable.select(index);
+
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                    String message = e.toString();
+                    if (message.length() > 500) {
+                        message = message.substring(0, 500) + "...";
+                    }
+                    MessageDialog.openError(editor.getSite().getShell(), "Delete Failed", message);
+                }
+            }
+        });
+
+        new Label(rightPanel, SWT.NONE);
+
+        Button refreshButton = new Button(rightPanel, SWT.PUSH);
+        refreshButton.setText("Refresh");
+        refreshButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        refreshButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                refresh();
+            }
+        });
+
+        new Label(rightPanel, SWT.NONE);
+
+        Button activateButton = new Button(rightPanel, SWT.PUSH);
+        activateButton.setText("Activate/Deactivate");
+        activateButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        activateButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+            }
+        });
 
         return composite;
     }

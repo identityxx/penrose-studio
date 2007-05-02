@@ -27,6 +27,7 @@ import org.safehaus.penrose.ldap.*;
 import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
@@ -386,6 +387,10 @@ public class NISUsersPage extends FormPage {
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
         SourceManager sourceManager = penroseContext.getSourceManager();
 
+        RDNBuilder rb = new RDNBuilder();
+        rb.set("uid", uid);
+        DN dn = new DN(rb.toRdn());
+
         Attributes attributes = new Attributes();
         attributes.setValue("domain", domainName);
         attributes.setValue("uid", uid);
@@ -398,15 +403,15 @@ public class NISUsersPage extends FormPage {
         dialog.setSourceConfig(sourceUidNumber.getSourceConfig());
 
         SearchRequest request = new SearchRequest();
-        request.setFilter("(uid="+uid+")");
+        request.setDn(dn);
         SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
         sourceUidNumber.search(request, response);
-        while (response.hasNext()) {
+        if (response.hasNext()) {
             SearchResult result = (SearchResult)response.next();
             Attributes attrs = result.getAttributes();
             Object un = attrs.getValue("uidNumber");
-            dialog.addNewUidNumber(un);
+            dialog.setNewUidNumber(un);
         }
 
         dialog.open();
@@ -418,46 +423,38 @@ public class NISUsersPage extends FormPage {
         Object un = dialog.getUidNumber();
         String message = dialog.getMessage();
 
-        RDNBuilder rb = new RDNBuilder();
-        rb.set("uid", uid);
-        rb.set("uidNumber", un);
-        DN dn = new DN(rb.toRdn());
-
         String changes;
 
-        if (action == NISUserDialog.ADD) {
+        if (action == NISUserDialog.SET) {
 
             if (!uidNumber.equals(un)) checkUidNumber(un);
 
-            if (dialog.getNewUidNumbers().size() == 0) {
-                addOriginalUidNumber(sourceUidNumber, uid, uidNumber);
-            }
-
             Attributes attrs = new Attributes();
-            attrs.setValue("uid", uid);
             attrs.setValue("uidNumber", un);
 
             sourceUidNumber.add(dn, attrs);
 
-            changes = "add uidNumber "+un;
+        } else if (action == NISUserDialog.CHANGE) {
+
+            if (!uidNumber.equals(un)) checkUidNumber(un);
+
+            Collection<Modification> modifications = new ArrayList<Modification>();
+            modifications.add(new Modification(Modification.REPLACE, new Attribute("uidNumber", un)));
+
+            sourceUidNumber.modify(dn, modifications);
 
         } else { // if (action == NISUserDialog.REMOVE) {
 
             sourceUidNumber.delete(dn);
-
-            Collection uidNumbers = dialog.getNewUidNumbers();
-            if (uidNumbers.size() == 2 && uidNumbers.contains(uidNumber) && !uidNumber.equals(un)) {
-                removeOriginalUidNumber(sourceUidNumber, uid, uidNumber);
-            }
-
-            changes = "delete uidNumber "+un;
         }
+
+        changes = "set uidNumber "+un;
 
         Source changeLog = sourceManager.getSource("DEFAULT", "changelog");
 
         Attributes attrs = new Attributes();
         attrs.setValue("domain", domainName);
-        attrs.setValue("target", "uid="+uid);
+        attrs.setValue("target", dn.toString());
         attrs.setValue("type", "users");
         attrs.setValue("changes", changes);
         attrs.setValue("message", message);
@@ -497,37 +494,5 @@ public class NISUsersPage extends FormPage {
                 throw new Exception("uidNumber "+uidNumber+" already exists in domain "+domainName);
             }
         }
-    }
-
-    public void addOriginalUidNumber(
-            Source sourceUidNumber,
-            Object uid,
-            Object uidNumber
-    ) throws Exception {
-        
-        RDNBuilder rb = new RDNBuilder();
-        rb.set("uid", uid);
-        rb.set("uidNumber", uidNumber);
-        DN dn = new DN(rb.toRdn());
-
-        Attributes attrs = new Attributes();
-        attrs.setValue("uid", uid);
-        attrs.setValue("uidNumber", uidNumber);
-
-        sourceUidNumber.add(dn, attrs);
-    }
-
-    public void removeOriginalUidNumber(
-            Source sourceUidNumber,
-            Object uid,
-            Object uidNumber
-    ) throws Exception {
-
-        RDNBuilder rb = new RDNBuilder();
-        rb.set("uid", uid);
-        rb.set("uidNumber", uidNumber);
-        DN dn = new DN(rb.toRdn());
-
-        sourceUidNumber.delete(dn);
     }
 }

@@ -26,25 +26,25 @@ public class NISUserDialog extends Dialog {
     Logger log = Logger.getLogger(getClass());
 
     public final static int CANCEL = 0;
-    public final static int ADD    = 1;
-    public final static int REMOVE = 2;
+    public final static int SET    = 1;
+    public final static int CHANGE = 2;
+    public final static int REMOVE = 3;
 
     Shell shell;
 
     SourceConfig sourceConfig;
 
     private Attributes attributes = new Attributes();
-    private Collection newUidNumbers = new ArrayList();
+    private Object newUidNumber;
 
     Label domainText;
     Label uidText;
     Label origUidNumberText;
     Label newUidNumbersText;
 
-    Button addButton;
+    Button setButton;
     Text newUidNumberText;
-    Button removeButton;
-    Combo newUidNumbersCombo;
+    Button revertButton;
     Text messageText;
 
     int action;
@@ -95,23 +95,11 @@ public class NISUserDialog extends Dialog {
         Object uidNumber = attributes.getValue("uidNumber");
         origUidNumberText.setText(uidNumber == null ? "" : uidNumber.toString());
 
-        if (newUidNumbers.isEmpty()) {
-
-            removeButton.setEnabled(false);
-            newUidNumbersCombo.setEnabled(false);
+        if (newUidNumber == null) {
+            revertButton.setEnabled(false);
 
         } else {
-            StringBuilder sb = new StringBuilder();
-            for (Iterator i = newUidNumbers.iterator(); i.hasNext(); ) {
-                Object newUidNumber = i.next();
-                if (sb.length() > 0) sb.append(", ");
-                sb.append(newUidNumber);
-
-                newUidNumbersCombo.add(newUidNumber.toString());
-                newUidNumbersCombo.setData(newUidNumber.toString(), newUidNumber);
-            }
-
-            newUidNumbersText.setText(sb.toString());
+            newUidNumbersText.setText(newUidNumber.toString());
         }
     }
 
@@ -159,14 +147,14 @@ public class NISUserDialog extends Dialog {
         uidText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label origUidNumberLabel = new Label(composite, SWT.NONE);
-        origUidNumberLabel.setText("Orig. UID Number:");
+        origUidNumberLabel.setText("Original UID Number:");
         origUidNumberLabel.setLayoutData(new GridData());
 
         origUidNumberText = new Label(composite, SWT.NONE);
         origUidNumberText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label newUidNumbersLabel = new Label(composite, SWT.NONE);
-        newUidNumbersLabel.setText("New UID Numbers:");
+        newUidNumbersLabel.setText("New UID Number:");
         newUidNumbersLabel.setLayoutData(new GridData());
 
         newUidNumbersText = new Label(composite, SWT.NONE);
@@ -186,10 +174,10 @@ public class NISUserDialog extends Dialog {
         gd.horizontalSpan = 2;
         actionLabel.setLayoutData(gd);
 
-        addButton = new Button(composite, SWT.RADIO);
-        addButton.setLayoutData(new GridData());
-        addButton.setText("Add new UID number:");
-        addButton.setSelection(true);
+        setButton = new Button(composite, SWT.RADIO);
+        setButton.setLayoutData(new GridData());
+        setButton.setText("Set new UID number:");
+        setButton.setSelection(true);
 
         newUidNumberText = new Text(composite, SWT.BORDER);
         gd = new GridData();
@@ -198,27 +186,14 @@ public class NISUserDialog extends Dialog {
 
         newUidNumberText.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent focusEvent) {
-                addButton.setSelection(true);
-                removeButton.setSelection(false);
+                setButton.setSelection(true);
+                revertButton.setSelection(false);
             }
         });
 
-        removeButton = new Button(composite, SWT.RADIO);
-        removeButton.setText("Remove UID number:");
-        removeButton.setLayoutData(new GridData());
-
-        newUidNumbersCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
-        gd = new GridData();
-        gd.widthHint = 100;
-        newUidNumbersCombo.setLayoutData(gd);
-
-        newUidNumbersCombo.addFocusListener(new FocusAdapter() {
-            public void focusGained(FocusEvent focusEvent) {
-                addButton.setSelection(false);
-                removeButton.setSelection(true);
-            }
-        });
-
+        revertButton = new Button(composite, SWT.RADIO);
+        revertButton.setText("Revert to the original UID number.");
+        revertButton.setLayoutData(new GridData());
 
         return composite;
     }
@@ -258,13 +233,16 @@ public class NISUserDialog extends Dialog {
 
         okButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                if (addButton.getSelection()) {
-                    action = ADD;
+                if (setButton.getSelection()) {
+                    if (newUidNumber == null) {
+                        action = SET;
+                    } else {
+                        action = CHANGE;
+                    }
                     uidNumber = newUidNumberText.getText();
                 } else {
                     action = REMOVE;
-                    String s = newUidNumbersCombo.getText();
-                    uidNumber = newUidNumbersCombo.getData(s);
+                    uidNumber = attributes.getValue("uidNumber");
                 }
 
                 message = messageText.getText();
@@ -300,18 +278,12 @@ public class NISUserDialog extends Dialog {
         this.attributes.set(attributes);
     }
 
-    public Collection getNewUidNumbers() {
-        return newUidNumbers;
+    public Object getNewUidNumber() {
+        return newUidNumber;
     }
 
-    public void addNewUidNumber(Object uidNumber) {
-        newUidNumbers.add(uidNumber);
-    }
-
-    public void setNewUidNumbers(Collection newUidNumbers) {
-        if (this.newUidNumbers == newUidNumbers) return;
-        this.newUidNumbers.clear();
-        this.newUidNumbers.addAll(newUidNumbers);
+    public void setNewUidNumber(Object newUidNumber) {
+        this.newUidNumber = newUidNumber;
     }
 
     public Object getUidNumber() {
