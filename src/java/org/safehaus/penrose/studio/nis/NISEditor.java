@@ -23,6 +23,7 @@ public class NISEditor extends FormEditor {
             addPage(new NISDomainsPage(this));
             addPage(new NISUsersPage(this));
             addPage(new NISGroupsPage(this));
+            addPage(new NISHostsPage(this));
             addPage(new NISChangeLogPage(this));
 
         } catch (Exception e) {

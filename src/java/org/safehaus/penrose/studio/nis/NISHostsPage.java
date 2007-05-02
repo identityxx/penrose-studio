@@ -1,10 +1,9 @@
 package org.safehaus.penrose.studio.nis;
 
-import org.apache.log4j.Logger;
+import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
@@ -13,10 +12,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.partition.PartitionManager;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.SearchRequest;
@@ -27,7 +25,7 @@ import org.safehaus.penrose.ldap.Attributes;
 /**
  * @author Endi S. Dewata
  */
-public class NISDomainsPage extends FormPage {
+public class NISHostsPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -35,10 +33,10 @@ public class NISDomainsPage extends FormPage {
 
     NISEditor editor;
 
-    Table domainsTable;
+    Table hostsTable;
 
-    public NISDomainsPage(NISEditor editor) {
-        super(editor, "DOMAINS", "  Domains ");
+    public NISHostsPage(NISEditor editor) {
+        super(editor, "HOSTS", "  Hosts ");
 
         this.editor = editor;
     }
@@ -47,16 +45,16 @@ public class NISDomainsPage extends FormPage {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("NIS Domains");
+        form.setText("NIS Hosts");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
         Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Domains");
+        section.setText("Hosts");
         section.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Control sourcesSection = createDomainsSection(section);
+        Control sourcesSection = createHostsSection(section);
         section.setClient(sourcesSection);
 
         init();
@@ -64,29 +62,45 @@ public class NISDomainsPage extends FormPage {
 
     public void init() {
        try {
-           domainsTable.removeAll();
+           hostsTable.removeAll();
 
            PenroseApplication penroseApplication = PenroseApplication.getInstance();
            PenroseContext penroseContext = penroseApplication.getPenroseContext();
-           SourceManager sourceManager = penroseContext.getSourceManager();
 
-           Source source = sourceManager.getSource("DEFAULT", "domains");
+           final SourceManager sourceManager = penroseContext.getSourceManager();
+
+           Source domains = sourceManager.getSource("DEFAULT", "domains");
 
            SearchRequest request = new SearchRequest();
-           SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
-               public void add(SearchResult result) throws Exception {
-                   Attributes attributes = result.getAttributes();
-                   String domainName = (String)attributes.getValue("name");
-                   String partitionName = (String)attributes.getValue("partition");
+           SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
-                   TableItem ti = new TableItem(domainsTable, SWT.NONE);
-                   ti.setText(0, domainName);
-                   ti.setText(1, partitionName);
-                   ti.setData(attributes);
-               }
-           };
+           domains.search(request, response);
 
-           source.search(request, response);
+           while (response.hasNext()) {
+               SearchResult result = response.next();
+               Attributes attributes = result.getAttributes();
+               final String domainName = (String)attributes.getValue("name");
+               String partitionName = (String)attributes.getValue("partition");
+
+               Source hosts = sourceManager.getSource(partitionName, "cache.hosts");
+
+               SearchRequest hostsRequest = new SearchRequest();
+               SearchResponse<SearchResult> hostsResponse = new SearchResponse<SearchResult>() {
+                   public void add(SearchResult result) throws Exception {
+                       Attributes attributes = result.getAttributes();
+                       String hostName = (String)attributes.getValue("cn");
+                       String address = (String)attributes.getValue("ipHostNumber");
+
+                       TableItem ti = new TableItem(hostsTable, SWT.NONE);
+                       ti.setText(0, domainName);
+                       ti.setText(1, hostName);
+                       ti.setText(2, address);
+                       ti.setData(attributes);
+                   }
+               };
+
+               hosts.search(hostsRequest, hostsResponse);
+           }
 
        } catch (Exception e) {
            log.debug(e.getMessage(), e);
@@ -98,23 +112,27 @@ public class NISDomainsPage extends FormPage {
        }
    }
 
-    public Composite createDomainsSection(Composite parent) {
+    public Composite createHostsSection(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
 
-        domainsTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
-        domainsTable.setLayoutData(new GridData(GridData.FILL_BOTH));
-        domainsTable.setHeaderVisible(true);
-        domainsTable.setLinesVisible(true);
+        hostsTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
+        hostsTable.setLayoutData(new GridData(GridData.FILL_BOTH));
+        hostsTable.setHeaderVisible(true);
+        hostsTable.setLinesVisible(true);
 
-        TableColumn tc = new TableColumn(domainsTable, SWT.NONE);
-        tc.setWidth(200);
+        TableColumn tc = new TableColumn(hostsTable, SWT.NONE);
+        tc.setWidth(150);
         tc.setText("Domain");
 
-        tc = new TableColumn(domainsTable, SWT.NONE);
-        tc.setWidth(200);
-        tc.setText("Partition");
+        tc = new TableColumn(hostsTable, SWT.NONE);
+        tc.setWidth(150);
+        tc.setText("Hostname");
+
+        tc = new TableColumn(hostsTable, SWT.NONE);
+        tc.setWidth(150);
+        tc.setText("IP Address");
 
         Composite buttons = toolkit.createComposite(composite);
         buttons.setLayout(new GridLayout());
