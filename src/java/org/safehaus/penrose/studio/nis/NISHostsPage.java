@@ -17,10 +17,7 @@ import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
-import org.safehaus.penrose.ldap.SearchRequest;
-import org.safehaus.penrose.ldap.SearchResult;
-import org.safehaus.penrose.ldap.SearchResponse;
-import org.safehaus.penrose.ldap.Attributes;
+import org.safehaus.penrose.ldap.*;
 
 /**
  * @author Endi S. Dewata
@@ -35,10 +32,19 @@ public class NISHostsPage extends FormPage {
 
     Table hostsTable;
 
+    Source hosts;
+
     public NISHostsPage(NISEditor editor) {
         super(editor, "HOSTS", "  Hosts ");
 
         this.editor = editor;
+
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseContext penroseContext = penroseApplication.getPenroseContext();
+
+        final SourceManager sourceManager = penroseContext.getSourceManager();
+
+        hosts = sourceManager.getSource("DEFAULT", "hosts");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -57,49 +63,30 @@ public class NISHostsPage extends FormPage {
         Control sourcesSection = createHostsSection(section);
         section.setClient(sourcesSection);
 
-        init();
+        refresh();
     }
 
-    public void init() {
+    public void refresh() {
        try {
            hostsTable.removeAll();
-
-           PenroseApplication penroseApplication = PenroseApplication.getInstance();
-           PenroseContext penroseContext = penroseApplication.getPenroseContext();
-
-           final SourceManager sourceManager = penroseContext.getSourceManager();
-
-           Source domains = sourceManager.getSource("DEFAULT", "domains");
 
            SearchRequest request = new SearchRequest();
            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
-           domains.search(request, response);
+           hosts.search(request, response);
 
            while (response.hasNext()) {
                SearchResult result = response.next();
                Attributes attributes = result.getAttributes();
-               final String domainName = (String)attributes.getValue("name");
-               String partitionName = (String)attributes.getValue("partition");
+               String name = (String)attributes.getValue("name");
+               String domain = (String)attributes.getValue("domain");
+               String address = (String)attributes.getValue("address");
 
-               Source hosts = sourceManager.getSource(partitionName, "cache.hosts");
-
-               SearchRequest hostsRequest = new SearchRequest();
-               SearchResponse<SearchResult> hostsResponse = new SearchResponse<SearchResult>() {
-                   public void add(SearchResult result) throws Exception {
-                       Attributes attributes = result.getAttributes();
-                       String hostName = (String)attributes.getValue("cn");
-                       String address = (String)attributes.getValue("ipHostNumber");
-
-                       TableItem ti = new TableItem(hostsTable, SWT.NONE);
-                       ti.setText(0, domainName);
-                       ti.setText(1, hostName);
-                       ti.setText(2, address);
-                       ti.setData(attributes);
-                   }
-               };
-
-               hosts.search(hostsRequest, hostsResponse);
+               TableItem ti = new TableItem(hostsTable, SWT.NONE);
+               ti.setText(0, domain);
+               ti.setText(1, name);
+               ti.setText(2, address);
+               ti.setData(result);
            }
 
        } catch (Exception e) {
@@ -147,6 +134,25 @@ public class NISHostsPage extends FormPage {
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
+                    NISHostDialog dialog = new NISHostDialog(getSite().getShell(), SWT.NONE);
+
+                    dialog.open();
+
+                    int action = dialog.getAction();
+                    if (action == NISUserDialog.CANCEL) return;
+
+                    RDNBuilder rb = new RDNBuilder();
+                    rb.set("name", dialog.getName());
+                    rb.set("domain", dialog.getDomain());
+                    DN dn = new DN(rb.toRdn());
+
+                    Attributes attributes = new Attributes();
+                    attributes.setValue("domain", dialog.getDomain());
+                    attributes.setValue("name", dialog.getName());
+                    attributes.setValue("address", dialog.getAddress());
+
+                    hosts.add(dn, attributes);
+
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
                     String message = e.toString();
@@ -155,24 +161,8 @@ public class NISHostsPage extends FormPage {
                     }
                     MessageDialog.openError(editor.getSite().getShell(), "Action Failed", message);
                 }
-            }
-        });
 
-        Button editButton = new Button(buttons, SWT.PUSH);
-        editButton.setText("Edit");
-        editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        editButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                try {
-                } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
-                    String message = e.toString();
-                    if (message.length() > 500) {
-                        message = message.substring(0, 500) + "...";
-                    }
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", message);
-                }
+                refresh();
             }
         });
 
@@ -183,14 +173,36 @@ public class NISHostsPage extends FormPage {
         removeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
+                    if (hostsTable.getSelectionCount() == 0) return;
+                    
+                    TableItem items[] = hostsTable.getSelection();
+                    for (TableItem ti : items) {
+                        SearchResult result = (SearchResult)ti.getData();
+                        DN dn = result.getDn();
+                        hosts.delete(dn);
+                        ti.dispose();
+                    }
+
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
                     String message = e.toString();
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";
                     }
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", message);
+                    MessageDialog.openError(editor.getSite().getShell(), "Remove Failed", message);
                 }
+            }
+        });
+
+        new Label(buttons, SWT.NONE);
+
+        Button refreshButton = new Button(buttons, SWT.PUSH);
+        refreshButton.setText("Refresh");
+        refreshButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        refreshButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                refresh();
             }
         });
 

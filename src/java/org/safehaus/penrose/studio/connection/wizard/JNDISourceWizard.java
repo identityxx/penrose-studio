@@ -78,7 +78,7 @@ public class JNDISourceWizard extends Wizard {
 
         RDN rdn;
         if (baseDn == null || "".equals(baseDn)) {
-            rdn = new DN(client.getSuffix()).getRdn();
+            rdn = client.getSuffix().getRdn();
         } else {
             rdn = new DN(baseDn).getRdn();
         }

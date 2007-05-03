@@ -50,7 +50,7 @@ public class SnapshotUtil {
 
         Schema schema = client.getSchema();
 
-        DN dn = new DN(entry.getName().equals("") ? client.getSuffix() : entry.getName()+","+client.getSuffix());
+        DN dn = entry.getName().equals("") ? client.getSuffix() : new DN(entry.getName()+","+client.getSuffix());
         RDN rdn = dn.getRdn();
 
         //log.debug("Creating mapping:");

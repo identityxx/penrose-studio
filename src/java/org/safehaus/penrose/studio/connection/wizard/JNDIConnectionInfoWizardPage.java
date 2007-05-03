@@ -31,10 +31,7 @@ import org.safehaus.penrose.ldap.LDAPClient;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Properties;
-import java.util.Hashtable;
+import java.util.*;
 import java.io.StringWriter;
 import java.io.PrintWriter;
 
@@ -122,13 +119,13 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
         fetchButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 try {
-                    Hashtable env = new Hashtable();
-                    env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-                    env.put(Context.PROVIDER_URL, getURL());
-                    env.put(Context.SECURITY_PRINCIPAL, bindDnText.getText());
-                    env.put(Context.SECURITY_CREDENTIALS, passwordText.getText());
+                    Map<String,String> properties = new HashMap<String,String>();
+                    properties.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+                    properties.put(Context.PROVIDER_URL, getURL());
+                    properties.put(Context.SECURITY_PRINCIPAL, bindDnText.getText());
+                    properties.put(Context.SECURITY_CREDENTIALS, passwordText.getText());
 
-                    LDAPClient client = new LDAPClient(env);
+                    LDAPClient client = new LDAPClient(properties);
                     Collection baseDns = client.getNamingContexts();
 
                     suffixCombo.removeAll();
@@ -174,15 +171,15 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
             public void widgetSelected(SelectionEvent e) {
                 String url = getURL()+"/"+getSuffix();
 
-                Hashtable env = new Hashtable();
-                env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-                env.put(Context.PROVIDER_URL, url);
-                env.put(Context.SECURITY_PRINCIPAL, bindDnText.getText());
-                env.put(Context.SECURITY_CREDENTIALS, passwordText.getText());
+                Map<String,String> properties = new HashMap<String,String>();
+                properties.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+                properties.put(Context.PROVIDER_URL, url);
+                properties.put(Context.SECURITY_PRINCIPAL, bindDnText.getText());
+                properties.put(Context.SECURITY_CREDENTIALS, passwordText.getText());
 
                 try {
-                    LDAPClient client = new LDAPClient(env);
-                    client.getContext().close();
+                    LDAPClient client = new LDAPClient(properties);
+                    client.open().close();
                     MessageDialog.openInformation(parent.getShell(), "Test Connection Result", "Connection successful!");
 
                 } catch (Exception ex) {

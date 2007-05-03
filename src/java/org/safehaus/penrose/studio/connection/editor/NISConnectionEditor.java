@@ -34,7 +34,12 @@ public class NISConnectionEditor extends FormEditor {
 
         partition = cei.getPartition();
         origConnectionConfig = cei.getConnectionConfig();
-        connectionConfig = (ConnectionConfig)origConnectionConfig.clone();
+
+        try {
+            connectionConfig = (ConnectionConfig)origConnectionConfig.clone();
+        } catch (Exception e) {
+            throw new PartInitException(e.getMessage(), e);
+        }
 
         setSite(site);
         setInput(input);

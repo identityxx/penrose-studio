@@ -387,9 +387,12 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
 
             TreeItem item = new TreeItem(tree, SWT.NONE);
 
-            String suffix = client.getSuffix();
-            if ("".equals(suffix)) suffix = "Root DSE";
-            item.setText(suffix);
+            DN suffix = client.getSuffix();
+            if (suffix.isEmpty()) {
+                item.setText("Root DSE");
+            } else {
+                item.setText(suffix.toString());
+            }
             item.setData(root);
 
             Collection results = client.getChildren("");
