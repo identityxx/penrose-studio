@@ -19,6 +19,9 @@ import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
 
+import java.util.Collection;
+import java.util.ArrayList;
+
 /**
  * @author Endi S. Dewata
  */
@@ -81,11 +84,13 @@ public class NISHostsPage extends FormPage {
                String name = (String)attributes.getValue("name");
                String domain = (String)attributes.getValue("domain");
                String address = (String)attributes.getValue("address");
+               String path = (String)attributes.getValue("path");
 
                TableItem ti = new TableItem(hostsTable, SWT.NONE);
                ti.setText(0, domain);
                ti.setText(1, name);
-               ti.setText(2, address);
+               ti.setText(2, address == null ? "" : address);
+               ti.setText(3, path == null ? "" : path);
                ti.setData(result);
            }
 
@@ -118,8 +123,12 @@ public class NISHostsPage extends FormPage {
         tc.setText("Hostname");
 
         tc = new TableColumn(hostsTable, SWT.NONE);
-        tc.setWidth(150);
+        tc.setWidth(100);
         tc.setText("IP Address");
+
+        tc = new TableColumn(hostsTable, SWT.NONE);
+        tc.setWidth(100);
+        tc.setText("Path");
 
         Composite buttons = toolkit.createComposite(composite);
         buttons.setLayout(new GridLayout());
@@ -150,6 +159,7 @@ public class NISHostsPage extends FormPage {
                     attributes.setValue("domain", dialog.getDomain());
                     attributes.setValue("name", dialog.getName());
                     attributes.setValue("address", dialog.getAddress());
+                    attributes.setValue("path", dialog.getPath());
 
                     hosts.add(dn, attributes);
 
@@ -159,7 +169,70 @@ public class NISHostsPage extends FormPage {
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";
                     }
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", message);
+                    MessageDialog.openError(editor.getSite().getShell(), "Add Failed", message);
+                }
+
+                refresh();
+            }
+        });
+
+        Button editButton = new Button(buttons, SWT.PUSH);
+        editButton.setText("Edit");
+        editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        editButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                try {
+                    if (hostsTable.getSelectionCount() == 0) return;
+
+                    TableItem ti = hostsTable.getSelection()[0];
+                    SearchResult result = (SearchResult)ti.getData();
+                    DN dn = result.getDn();
+                    Attributes attributes = result.getAttributes();
+
+                    NISHostDialog dialog = new NISHostDialog(getSite().getShell(), SWT.NONE);
+                    dialog.setDomain((String)attributes.getValue("domain"));
+                    dialog.setName((String)attributes.getValue("name"));
+                    dialog.setAddress((String)attributes.getValue("address"));
+                    dialog.setPath((String)attributes.getValue("path"));
+                    dialog.open();
+
+                    int action = dialog.getAction();
+                    if (action == NISUserDialog.CANCEL) return;
+
+                    RDNBuilder rb = new RDNBuilder();
+                    rb.set("name", dialog.getName());
+                    rb.set("domain", dialog.getDomain());
+                    RDN newRdn = rb.toRdn();
+
+                    if (!dn.getRdn().equals(newRdn)) {
+                        hosts.modrdn(dn, newRdn, true);
+                    }
+
+                    DNBuilder db = new DNBuilder();
+                    db.append(newRdn);
+                    db.append(dn.getParentDn());
+                    DN newDn = db.toDn();
+
+                    Collection<Modification> modifications = new ArrayList<Modification>();
+                    modifications.add(new Modification(
+                            Modification.REPLACE,
+                            new Attribute("address", dialog.getAddress())
+                    ));
+                    modifications.add(new Modification(
+                            Modification.REPLACE,
+                            new Attribute("path", dialog.getPath())
+                    ));
+
+                    hosts.modify(newDn, modifications);
+
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                    String message = e.toString();
+                    if (message.length() > 500) {
+                        message = message.substring(0, 500) + "...";
+                    }
+                    MessageDialog.openError(editor.getSite().getShell(), "Edit Failed", message);
                 }
 
                 refresh();

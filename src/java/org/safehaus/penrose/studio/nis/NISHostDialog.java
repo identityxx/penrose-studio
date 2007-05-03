@@ -27,12 +27,14 @@ public class NISHostDialog extends Dialog {
     Text domainText;
     Text nameText;
     Text addressText;
+    Text pathText;
 
     int action;
 
     private String domain;
     private String name;
     private String address;
+    private String path;
 
     public NISHostDialog(Shell parent, int style) {
 		super(parent, style);
@@ -72,6 +74,7 @@ public class NISHostDialog extends Dialog {
         domainText.setText(domain == null ? "" : domain);
         nameText.setText(name == null ? "" : name);
         addressText.setText(address == null ? "" : address);
+        pathText.setText(path == null ? "" : path);
     }
 
     public void createControl(Shell parent) {
@@ -100,19 +103,26 @@ public class NISHostDialog extends Dialog {
         domainText = new Text(composite, SWT.BORDER);
         domainText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Label uidLabel = new Label(composite, SWT.NONE);
-        uidLabel.setText("Name:");
-        uidLabel.setLayoutData(new GridData());
+        Label nameLabel = new Label(composite, SWT.NONE);
+        nameLabel.setText("Name:");
+        nameLabel.setLayoutData(new GridData());
 
         nameText = new Text(composite, SWT.BORDER);
         nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Label origUidNumberLabel = new Label(composite, SWT.NONE);
-        origUidNumberLabel.setText("Address:");
-        origUidNumberLabel.setLayoutData(new GridData());
+        Label addressLabel = new Label(composite, SWT.NONE);
+        addressLabel.setText("Address:");
+        addressLabel.setLayoutData(new GridData());
 
         addressText = new Text(composite, SWT.BORDER);
         addressText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label pathLabel = new Label(composite, SWT.NONE);
+        pathLabel.setText("Path:");
+        pathLabel.setLayoutData(new GridData());
+
+        pathText = new Text(composite, SWT.BORDER);
+        pathText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         return composite;
     }
@@ -140,6 +150,7 @@ public class NISHostDialog extends Dialog {
                 domain = domainText.getText().equals("") ? null : domainText.getText();
                 name = nameText.getText().equals("") ? null : nameText.getText();
                 address = addressText.getText().equals("") ? null : addressText.getText();
+                path = pathText.getText().equals("") ? null : pathText.getText();
                 action = OK;
                 shell.close();
             }
@@ -178,5 +189,13 @@ public class NISHostDialog extends Dialog {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }
