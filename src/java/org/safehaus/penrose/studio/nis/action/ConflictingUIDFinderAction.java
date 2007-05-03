@@ -121,10 +121,10 @@ public class ConflictingUIDFinderAction extends NISAction {
             public void add(Object object) throws Exception {
                 ResultSet rs = (ResultSet)object;
 
-                Object uid1 = rs.getObject(1);
+                String uid1 = rs.getString(1);
                 Object uidNumber1 = rs.getObject(2);
 
-                Object uid2 = rs.getObject(3);
+                String uid2 = rs.getString(3);
                 Object uidNumber2 = rs.getObject(4);
 
                 Attributes attributes = new Attributes();

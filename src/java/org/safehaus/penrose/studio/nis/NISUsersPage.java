@@ -261,7 +261,7 @@ public class NISUsersPage extends FormPage {
                     String domainName = (String)item.getData("domain1");
                     String partitionName = (String)item.getData("partition1");
                     Source source = (Source)item.getData("source1");
-                    Object uid = item.getData("uid1");
+                    String uid = (String)item.getData("uid1");
                     Object uidNumber = item.getData("uidNumber1");
                     edit(domainName, partitionName, source, uid, uidNumber);
 
@@ -288,7 +288,7 @@ public class NISUsersPage extends FormPage {
                     String domainName = (String)item.getData("domain2");
                     String partitionName = (String)item.getData("partition2");
                     Source source = (Source)item.getData("source2");
-                    Object uid = item.getData("uid2");
+                    String uid = (String)item.getData("uid2");
                     Object uidNumber = item.getData("uidNumber2");
                     edit(domainName, partitionName, source, uid, uidNumber);
 
@@ -319,8 +319,8 @@ public class NISUsersPage extends FormPage {
         NISActionRequest request = new NISActionRequest();
 
         String[] domains = domainsList.getSelection();
-        for (int i=0; i<domains.length; i++) {
-            request.addPartition(domains[i]);
+        for (String domain : domains) {
+            request.addPartition(domain);
         }
 
         NISActionResponse response = new NISActionResponse() {
@@ -335,13 +335,13 @@ public class NISUsersPage extends FormPage {
                 String domain1Name = (String)attributes.getValue("domain1");
                 String partition1Name = (String)attributes.getValue("partition1");
                 Source source1 = (Source)attributes.getValue("source1");
-                Object uid1 = attributes.getValue("uid1");
+                String uid1 = (String)attributes.getValue("uid1");
                 Object uidNumber1 = attributes.getValue("uidNumber1");
 
                 String domain2Name = (String)attributes.getValue("domain2");
                 String partition2Name = (String)attributes.getValue("partition2");
                 Source source2 = (Source)attributes.getValue("source2");
-                Object uid2 = attributes.getValue("uid2");
+                String uid2 = (String)attributes.getValue("uid2");
                 Object uidNumber2 = attributes.getValue("uidNumber2");
 
                 TableItem ti = new TableItem(table, SWT.NONE);
@@ -376,10 +376,10 @@ public class NISUsersPage extends FormPage {
     }
 
     public void edit(
-            String domainName,
+            String domain,
             String partitionName,
             Source source,
-            Object uid,
+            String uid,
             Object uidNumber
     ) throws Exception {
 
@@ -391,13 +391,10 @@ public class NISUsersPage extends FormPage {
         rb.set("uid", uid);
         DN dn = new DN(rb.toRdn());
 
-        Attributes attributes = new Attributes();
-        attributes.setValue("domain", domainName);
-        attributes.setValue("uid", uid);
-        attributes.setValue("uidNumber", uidNumber);
-
         NISUserDialog dialog = new NISUserDialog(getSite().getShell(), SWT.NONE);
-        dialog.setAttributes(attributes);
+        dialog.setDomain(domain);
+        dialog.setUid(uid);
+        dialog.setOrigUidNumber(uidNumber);
 
         Source sourceUidNumber = sourceManager.getSource(partitionName, "users_uidNumber");
         dialog.setSourceConfig(sourceUidNumber.getSourceConfig());
@@ -452,14 +449,14 @@ public class NISUsersPage extends FormPage {
 
         Source changeLog = sourceManager.getSource("DEFAULT", "changelog");
 
-        Attributes attrs = new Attributes();
-        attrs.setValue("domain", domainName);
-        attrs.setValue("target", dn.toString());
-        attrs.setValue("type", "users");
-        attrs.setValue("changes", changes);
-        attrs.setValue("message", message);
+        Attributes attributes = new Attributes();
+        attributes.setValue("domain", domain);
+        attributes.setValue("target", dn.toString());
+        attributes.setValue("type", "users");
+        attributes.setValue("changes", changes);
+        attributes.setValue("message", message);
 
-        changeLog.add(new DN(), attrs);
+        changeLog.add(new DN(), attributes);
     }
 
     public void checkUidNumber(Object uidNumber) throws Exception {

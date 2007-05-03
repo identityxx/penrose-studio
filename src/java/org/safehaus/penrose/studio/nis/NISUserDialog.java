@@ -34,9 +34,6 @@ public class NISUserDialog extends Dialog {
 
     SourceConfig sourceConfig;
 
-    private Attributes attributes = new Attributes();
-    private Object newUidNumber;
-
     Label domainText;
     Label uidText;
     Label origUidNumberText;
@@ -48,6 +45,12 @@ public class NISUserDialog extends Dialog {
     Text messageText;
 
     int action;
+
+    private String domain;
+    private String uid;
+    private Object origUidNumber;
+    private Object newUidNumber;
+
     Object uidNumber;
     String message;
 
@@ -86,14 +89,9 @@ public class NISUserDialog extends Dialog {
     }
 
     public void reset() {
-        String domainName = (String)attributes.getValue("domain");
-        domainText.setText(domainName == null ? "" : domainName.toString());
-
-        Object uid = attributes.getValue("uid");
-        uidText.setText(uid == null ? "" : uid.toString());
-
-        Object uidNumber = attributes.getValue("uidNumber");
-        origUidNumberText.setText(uidNumber == null ? "" : uidNumber.toString());
+        domainText.setText(domain == null ? "" : domain);
+        uidText.setText(uid == null ? "" : uid);
+        origUidNumberText.setText(origUidNumber == null ? "" : origUidNumber.toString());
 
         if (newUidNumber == null) {
             revertButton.setEnabled(false);
@@ -242,7 +240,7 @@ public class NISUserDialog extends Dialog {
                     uidNumber = newUidNumberText.getText();
                 } else {
                     action = REMOVE;
-                    uidNumber = attributes.getValue("uidNumber");
+                    uidNumber = origUidNumber;
                 }
 
                 message = messageText.getText();
@@ -270,14 +268,6 @@ public class NISUserDialog extends Dialog {
         this.sourceConfig = sourceConfig;
     }
 
-    public Attributes getAttributes() {
-        return attributes;
-    }
-
-    public void setAttributes(Attributes attributes) {
-        this.attributes.set(attributes);
-    }
-
     public Object getNewUidNumber() {
         return newUidNumber;
     }
@@ -300,5 +290,29 @@ public class NISUserDialog extends Dialog {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public Object getOrigUidNumber() {
+        return origUidNumber;
+    }
+
+    public void setOrigUidNumber(Object origUidNumber) {
+        this.origUidNumber = origUidNumber;
     }
 }

@@ -74,25 +74,24 @@ public class NISHostsPage extends FormPage {
            hostsTable.removeAll();
 
            SearchRequest request = new SearchRequest();
-           SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
+           SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
+               public void add(SearchResult result) {
+                   Attributes attributes = result.getAttributes();
+                   String name = (String)attributes.getValue("name");
+                   String domain = (String)attributes.getValue("domain");
+                   String address = (String)attributes.getValue("address");
+                   String path = (String)attributes.getValue("path");
+
+                   TableItem ti = new TableItem(hostsTable, SWT.NONE);
+                   ti.setText(0, domain);
+                   ti.setText(1, name);
+                   ti.setText(2, address == null ? "" : address);
+                   ti.setText(3, path == null ? "" : path);
+                   ti.setData(result);
+               }
+           };
 
            hosts.search(request, response);
-
-           while (response.hasNext()) {
-               SearchResult result = response.next();
-               Attributes attributes = result.getAttributes();
-               String name = (String)attributes.getValue("name");
-               String domain = (String)attributes.getValue("domain");
-               String address = (String)attributes.getValue("address");
-               String path = (String)attributes.getValue("path");
-
-               TableItem ti = new TableItem(hostsTable, SWT.NONE);
-               ti.setText(0, domain);
-               ti.setText(1, name);
-               ti.setText(2, address == null ? "" : address);
-               ti.setText(3, path == null ? "" : path);
-               ti.setData(result);
-           }
 
        } catch (Exception e) {
            log.debug(e.getMessage(), e);

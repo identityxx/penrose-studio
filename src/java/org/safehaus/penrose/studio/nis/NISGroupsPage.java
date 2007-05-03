@@ -379,7 +379,7 @@ public class NISGroupsPage extends FormPage {
             String domainName,
             String partitionName,
             Source source,
-            Object cn,
+            String cn,
             Object gidNumber
     ) throws Exception {
 
@@ -391,13 +391,10 @@ public class NISGroupsPage extends FormPage {
         rb.set("cn", cn);
         DN dn = new DN(rb.toRdn());
 
-        Attributes attributes = new Attributes();
-        attributes.setValue("domain", domainName);
-        attributes.setValue("cn", cn);
-        attributes.setValue("gidNumber", gidNumber);
-
         NISGroupDialog dialog = new NISGroupDialog(getSite().getShell(), SWT.NONE);
-        dialog.setAttributes(attributes);
+        dialog.setDomain(domainName);
+        dialog.setName(cn);
+        dialog.setOrigGidNumber(gidNumber);
 
         Source sourceGidNumber = sourceManager.getSource(partitionName, "groups_gidNumber");
         dialog.setSourceConfig(sourceGidNumber.getSourceConfig());
@@ -452,14 +449,14 @@ public class NISGroupsPage extends FormPage {
 
         Source changeLog = sourceManager.getSource("DEFAULT", "changelog");
 
-        Attributes attrs = new Attributes();
-        attrs.setValue("domain", domainName);
-        attrs.setValue("target", dn.toString());
-        attrs.setValue("type", "groups");
-        attrs.setValue("changes", changes);
-        attrs.setValue("message", message);
+        Attributes attributes = new Attributes();
+        attributes.setValue("domain", domainName);
+        attributes.setValue("target", dn.toString());
+        attributes.setValue("type", "groups");
+        attributes.setValue("changes", changes);
+        attributes.setValue("message", message);
 
-        changeLog.add(new DN(), attrs);
+        changeLog.add(new DN(), attributes);
     }
 
     public void checkGidNumber(Object gidNumber) throws Exception {

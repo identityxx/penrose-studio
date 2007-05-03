@@ -121,10 +121,10 @@ public class InconsistentGIDFinderAction extends NISAction {
             public void add(Object object) throws Exception {
                 ResultSet rs = (ResultSet)object;
 
-                Object group1 = rs.getObject(1);
+                String group1 = rs.getString(1);
                 Object gidNumber1 = rs.getObject(2);
 
-                Object group2 = rs.getObject(3);
+                String group2 = rs.getString(3);
                 Object gidNumber2 = rs.getObject(4);
 
                 Attributes attributes = new Attributes();

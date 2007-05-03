@@ -12,7 +12,6 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.graphics.Point;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.partition.SourceConfig;
-import org.safehaus.penrose.ldap.Attributes;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 
@@ -32,11 +31,8 @@ public class NISGroupDialog extends Dialog {
 
     SourceConfig sourceConfig;
 
-    Attributes attributes = new Attributes();
-    Object newGidNumber;
-
     Label domainText;
-    Label cnText;
+    Label nameText;
     Label origGidNumberText;
     Label newGidNumberText;
 
@@ -46,6 +42,12 @@ public class NISGroupDialog extends Dialog {
     Text messageText;
 
     int action;
+
+    private String domain;
+    private String name;
+    private Object origGidNumber;
+    private Object newGidNumber;
+
     Object gidNumber;
     String message;
 
@@ -84,14 +86,9 @@ public class NISGroupDialog extends Dialog {
     }
 
     public void reset() {
-        String domainName = (String)attributes.getValue("domain");
-        domainText.setText(domainName == null ? "" : domainName.toString());
-
-        Object cn = attributes.getValue("cn");
-        cnText.setText(cn == null ? "" : cn.toString());
-
-        Object gidNumber = attributes.getValue("gidNumber");
-        origGidNumberText.setText(gidNumber == null ? "" : gidNumber.toString());
+        domainText.setText(getDomain() == null ? "" : getDomain());
+        nameText.setText(getName() == null ? "" : getName());
+        origGidNumberText.setText(getOrigGidNumber() == null ? "" : getOrigGidNumber().toString());
 
         if (newGidNumber == null) {
             revertButton.setEnabled(false);
@@ -141,8 +138,8 @@ public class NISGroupDialog extends Dialog {
         uidLabel.setText("Group:");
         uidLabel.setLayoutData(new GridData());
 
-        cnText = new Label(composite, SWT.NONE);
-        cnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        nameText = new Label(composite, SWT.NONE);
+        nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label origUidNumberLabel = new Label(composite, SWT.NONE);
         origUidNumberLabel.setText("Original GID Number:");
@@ -240,7 +237,7 @@ public class NISGroupDialog extends Dialog {
                     gidNumber = gidNumberText.getText();
                 } else {
                     action = REMOVE;
-                    gidNumber = attributes.getValue("gidNumber");
+                    gidNumber = getOrigGidNumber();
                 }
 
                 message = messageText.getText();
@@ -268,14 +265,6 @@ public class NISGroupDialog extends Dialog {
         this.sourceConfig = sourceConfig;
     }
 
-    public Attributes getAttributes() {
-        return attributes;
-    }
-
-    public void setAttributes(Attributes attributes) {
-        this.attributes.set(attributes);
-    }
-
     public Object getNewGidNumber() {
         return newGidNumber;
     }
@@ -298,5 +287,29 @@ public class NISGroupDialog extends Dialog {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Object getOrigGidNumber() {
+        return origGidNumber;
+    }
+
+    public void setOrigGidNumber(Object origGidNumber) {
+        this.origGidNumber = origGidNumber;
     }
 }
