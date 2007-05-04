@@ -9,9 +9,9 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -24,10 +24,7 @@ import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.nis.agent.NISAgentClient;
 
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.LinkedHashMap;
+import java.util.*;
 
 /**
  * @author Endi S. Dewata
@@ -60,8 +57,8 @@ public class NISFilesPage extends FormPage {
 
         actions.put("Find files by UID number", "findByUid");
         actions.put("Find files by GID number", "findByGid");
-        actions.put("Change file UID number", "changeFileUid");
-        actions.put("Change file GID number", "changeFileGid");
+        actions.put("Change file UID number", "changeUid");
+        actions.put("Change file GID number", "changeGid");
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
@@ -302,25 +299,44 @@ public class NISFilesPage extends FormPage {
 
             NISAgentClient client = new NISAgentClient(hostname);
 
-            Collection<String> list;
             if ("findByUid".equals(action)) {
-                list = client.findByUid(path, new Integer(parameters));
+                Collection<String> list = client.findByUid(path, new Integer(parameters));
+
+                for (String file : list) {
+                    TableItem ti = new TableItem(table, SWT.NONE);
+                    ti.setText(0, hostname);
+                    ti.setText(1, file);
+
+                    counter++;
+                }
+
+                messageLabel.setText("Found "+counter+" file(s).");
 
             } else if ("findByGid".equals(action)) {
-                list = client.findByGid(path, new Integer(parameters));
-            } else {
-                list = new ArrayList<String>();
-            }
+                Collection<String> list = client.findByGid(path, new Integer(parameters));
 
-            for (String file : list) {
-                TableItem ti = new TableItem(table, SWT.NONE);
-                ti.setText(0, hostname);
-                ti.setText(1, file);
+                for (String file : list) {
+                    TableItem ti = new TableItem(table, SWT.NONE);
+                    ti.setText(0, hostname);
+                    ti.setText(1, file);
 
-                counter++;
+                    counter++;
+                }
+
+                messageLabel.setText("Found "+counter+" file(s).");
+
+            } else if ("changeUid".equals(action)) {
+                StringTokenizer st = new StringTokenizer(parameters);
+                int rc = client.changeUid(path, new Integer(st.nextToken()), new Integer(st.nextToken()));
+
+                messageLabel.setText("RC: "+rc);
+
+            } else if ("changeGid".equals(action)) {
+                StringTokenizer st = new StringTokenizer(parameters);
+                int rc = client.changeGid(path, new Integer(st.nextToken()), new Integer(st.nextToken()));
+
+                messageLabel.setText("RC: "+rc);
             }
         }
-
-        messageLabel.setText("Found "+counter+" file(s).");
     }
 }
