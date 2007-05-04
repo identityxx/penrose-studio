@@ -24,7 +24,8 @@ public class NISEditor extends FormEditor {
             addPage(new NISUsersPage(this));
             addPage(new NISGroupsPage(this));
             addPage(new NISHostsPage(this));
-            addPage(new NISChangeLogPage(this));
+            addPage(new NISChangesPage(this));
+            addPage(new NISFilesPage(this));
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

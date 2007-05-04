@@ -15,8 +15,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.partition.PartitionManager;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.SearchRequest;
@@ -27,7 +25,7 @@ import org.safehaus.penrose.ldap.Attributes;
 /**
  * @author Endi S. Dewata
  */
-public class NISChangeLogPage extends FormPage {
+public class NISChangesPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -40,8 +38,8 @@ public class NISChangeLogPage extends FormPage {
 
     Source source;
 
-    public NISChangeLogPage(NISEditor editor) throws Exception {
-        super(editor, "CHANGELOG", "  Change Log ");
+    public NISChangesPage(NISEditor editor) throws Exception {
+        super(editor, "CHANGES", "  Changes ");
 
         this.editor = editor;
 
@@ -49,23 +47,23 @@ public class NISChangeLogPage extends FormPage {
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
         SourceManager sourceManager = penroseContext.getSourceManager();
 
-        source = sourceManager.getSource("DEFAULT", "changelog");
+        source = sourceManager.getSource("DEFAULT", "changes");
     }
 
     public void createFormContent(IManagedForm managedForm) {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Change Log");
+        form.setText("Changes");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
         Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Change Log");
+        section.setText("Changes");
         section.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Control sourcesSection = createChangeLogSection(section);
+        Control sourcesSection = createChangesSection(section);
         section.setClient(sourcesSection);
 
         refresh();
@@ -115,7 +113,7 @@ public class NISChangeLogPage extends FormPage {
        }
    }
 
-    public Composite createChangeLogSection(Composite parent) {
+    public Composite createChangesSection(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));

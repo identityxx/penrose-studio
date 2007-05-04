@@ -41,7 +41,7 @@ public class NISGroupsPage extends FormPage {
     Combo actionCombo;
     List domainsList;
 
-    Label message;
+    Label messageLabel;
     Table table;
 
     NISEditor editor;
@@ -212,8 +212,8 @@ public class NISGroupsPage extends FormPage {
         composite.setLayoutData(new GridData(GridData.FILL_BOTH));
         composite.setLayout(new GridLayout());
 
-        message = toolkit.createLabel(composite, "");
-        message.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        messageLabel = toolkit.createLabel(composite, "");
+        messageLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         table = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
         table.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -368,7 +368,7 @@ public class NISGroupsPage extends FormPage {
             }
 
             public void close() {
-                message.setText("Found "+counter+" result(s).");
+                messageLabel.setText("Found "+counter+" result(s).");
             }
         };
 
@@ -420,7 +420,7 @@ public class NISGroupsPage extends FormPage {
         Object gn = dialog.getGidNumber();
         String message = dialog.getMessage();
 
-        String changes;
+        String s;
 
         if (action == NISGroupDialog.SET) {
 
@@ -445,18 +445,18 @@ public class NISGroupsPage extends FormPage {
             sourceGidNumber.delete(dn);
         }
 
-        changes = "set gidNumber "+gn;
+        s = "set gidNumber "+gn;
 
-        Source changeLog = sourceManager.getSource("DEFAULT", "changelog");
+        Source changes = sourceManager.getSource("DEFAULT", "changes");
 
         Attributes attributes = new Attributes();
         attributes.setValue("domain", domainName);
         attributes.setValue("target", dn.toString());
         attributes.setValue("type", "groups");
-        attributes.setValue("changes", changes);
+        attributes.setValue("changes", s);
         attributes.setValue("message", message);
 
-        changeLog.add(new DN(), attributes);
+        changes.add(new DN(), attributes);
     }
 
     public void checkGidNumber(Object gidNumber) throws Exception {

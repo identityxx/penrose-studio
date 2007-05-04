@@ -25,8 +25,6 @@ import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.ldap.*;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.ArrayList;
 
 /**
@@ -41,7 +39,7 @@ public class NISUsersPage extends FormPage {
     Combo actionCombo;
     List domainsList;
 
-    Label message;
+    Label messageLabel;
     Table table;
 
     NISEditor editor;
@@ -212,8 +210,8 @@ public class NISUsersPage extends FormPage {
         composite.setLayoutData(new GridData(GridData.FILL_BOTH));
         composite.setLayout(new GridLayout());
 
-        message = toolkit.createLabel(composite, "");
-        message.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        messageLabel = toolkit.createLabel(composite, "");
+        messageLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         table = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
         table.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -368,7 +366,7 @@ public class NISUsersPage extends FormPage {
             }
 
             public void close() {
-                message.setText("Found "+counter+" result(s).");
+                messageLabel.setText("Found "+counter+" result(s).");
             }
         };
 
@@ -420,7 +418,7 @@ public class NISUsersPage extends FormPage {
         Object un = dialog.getUidNumber();
         String message = dialog.getMessage();
 
-        String changes;
+        String s;
 
         if (action == NISUserDialog.SET) {
 
@@ -445,18 +443,18 @@ public class NISUsersPage extends FormPage {
             sourceUidNumber.delete(dn);
         }
 
-        changes = "set uidNumber "+un;
+        s = "set uidNumber "+un;
 
-        Source changeLog = sourceManager.getSource("DEFAULT", "changelog");
+        Source changes = sourceManager.getSource("DEFAULT", "changes");
 
         Attributes attributes = new Attributes();
         attributes.setValue("domain", domain);
         attributes.setValue("target", dn.toString());
         attributes.setValue("type", "users");
-        attributes.setValue("changes", changes);
+        attributes.setValue("changes", s);
         attributes.setValue("message", message);
 
-        changeLog.add(new DN(), attributes);
+        changes.add(new DN(), attributes);
     }
 
     public void checkUidNumber(Object uidNumber) throws Exception {

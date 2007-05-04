@@ -79,14 +79,12 @@ public class NISHostsPage extends FormPage {
                    Attributes attributes = result.getAttributes();
                    String name = (String)attributes.getValue("name");
                    String domain = (String)attributes.getValue("domain");
-                   String address = (String)attributes.getValue("address");
                    String path = (String)attributes.getValue("path");
 
                    TableItem ti = new TableItem(hostsTable, SWT.NONE);
                    ti.setText(0, domain);
                    ti.setText(1, name);
-                   ti.setText(2, address == null ? "" : address);
-                   ti.setText(3, path == null ? "" : path);
+                   ti.setText(2, path == null ? "" : path);
                    ti.setData(result);
                }
            };
@@ -157,7 +155,6 @@ public class NISHostsPage extends FormPage {
                     Attributes attributes = new Attributes();
                     attributes.setValue("domain", dialog.getDomain());
                     attributes.setValue("name", dialog.getName());
-                    attributes.setValue("address", dialog.getAddress());
                     attributes.setValue("path", dialog.getPath());
 
                     hosts.add(dn, attributes);
@@ -192,7 +189,6 @@ public class NISHostsPage extends FormPage {
                     NISHostDialog dialog = new NISHostDialog(getSite().getShell(), SWT.NONE);
                     dialog.setDomain((String)attributes.getValue("domain"));
                     dialog.setName((String)attributes.getValue("name"));
-                    dialog.setAddress((String)attributes.getValue("address"));
                     dialog.setPath((String)attributes.getValue("path"));
                     dialog.open();
 
@@ -214,10 +210,6 @@ public class NISHostsPage extends FormPage {
                     DN newDn = db.toDn();
 
                     Collection<Modification> modifications = new ArrayList<Modification>();
-                    modifications.add(new Modification(
-                            Modification.REPLACE,
-                            new Attribute("address", dialog.getAddress())
-                    ));
                     modifications.add(new Modification(
                             Modification.REPLACE,
                             new Attribute("path", dialog.getPath())

@@ -26,14 +26,12 @@ public class NISHostDialog extends Dialog {
 
     Text domainText;
     Text nameText;
-    Text addressText;
     Text pathText;
 
     int action;
 
     private String domain;
     private String name;
-    private String address;
     private String path;
 
     public NISHostDialog(Shell parent, int style) {
@@ -73,7 +71,6 @@ public class NISHostDialog extends Dialog {
     public void reset() {
         domainText.setText(domain == null ? "" : domain);
         nameText.setText(name == null ? "" : name);
-        addressText.setText(address == null ? "" : address);
         pathText.setText(path == null ? "" : path);
     }
 
@@ -110,13 +107,6 @@ public class NISHostDialog extends Dialog {
         nameText = new Text(composite, SWT.BORDER);
         nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Label addressLabel = new Label(composite, SWT.NONE);
-        addressLabel.setText("Address:");
-        addressLabel.setLayoutData(new GridData());
-
-        addressText = new Text(composite, SWT.BORDER);
-        addressText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
         Label pathLabel = new Label(composite, SWT.NONE);
         pathLabel.setText("Path:");
         pathLabel.setLayoutData(new GridData());
@@ -149,7 +139,6 @@ public class NISHostDialog extends Dialog {
             public void widgetSelected(SelectionEvent e) {
                 domain = domainText.getText().equals("") ? null : domainText.getText();
                 name = nameText.getText().equals("") ? null : nameText.getText();
-                address = addressText.getText().equals("") ? null : addressText.getText();
                 path = pathText.getText().equals("") ? null : pathText.getText();
                 action = OK;
                 shell.close();
@@ -181,14 +170,6 @@ public class NISHostDialog extends Dialog {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 
     public String getPath() {
