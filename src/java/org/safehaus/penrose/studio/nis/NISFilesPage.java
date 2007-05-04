@@ -133,15 +133,10 @@ public class NISFilesPage extends FormPage {
         hostsCombo.setLayoutData(gd);
 
         Label actionLabel = toolkit.createLabel(composite, "Action:");
-        gd = new GridData();
-        gd.verticalAlignment = GridData.BEGINNING;
-        gd.widthHint = 100;
-        actionLabel.setLayoutData(gd);
+        actionLabel.setLayoutData(new GridData());
 
         actionsCombo = new Combo(composite, SWT.READ_ONLY);
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.heightHint = 100;
-        actionsCombo.setLayoutData(gd);
+        actionsCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         for (String title : actions.keySet()) {
             String value = actions.get(title);
@@ -152,14 +147,10 @@ public class NISFilesPage extends FormPage {
         actionsCombo.select(0);
         
         Label parametersLabel = toolkit.createLabel(composite, "Parameters:");
-        gd = new GridData();
-        gd.verticalAlignment = GridData.BEGINNING;
-        gd.widthHint = 100;
-        parametersLabel.setLayoutData(gd);
+        parametersLabel.setLayoutData(new GridData());
 
         parametersText = toolkit.createText(composite, "", SWT.BORDER);
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        parametersText.setLayoutData(gd);
+        parametersText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Button runButton = new Button(composite, SWT.PUSH);
         runButton.setText("  Run  ");
