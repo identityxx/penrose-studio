@@ -17,10 +17,10 @@ import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
-import org.safehaus.penrose.ldap.SearchRequest;
-import org.safehaus.penrose.ldap.SearchResult;
-import org.safehaus.penrose.ldap.SearchResponse;
-import org.safehaus.penrose.ldap.Attributes;
+import org.safehaus.penrose.ldap.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
@@ -33,11 +33,11 @@ public class NISChangesPage extends FormPage {
 
     NISEditor editor;
 
-    Table logsTable;
+    Table changesTable;
     Text messageText;
     Button activateButton;
 
-    Source source;
+    Source changes;
 
     public NISChangesPage(NISEditor editor) throws Exception {
         super(editor, "CHANGES", "  Changes ");
@@ -48,7 +48,7 @@ public class NISChangesPage extends FormPage {
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
         SourceManager sourceManager = penroseContext.getSourceManager();
 
-        source = sourceManager.getSource("DEFAULT", "changes");
+        changes = sourceManager.getSource("DEFAULT", "changes");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -76,46 +76,83 @@ public class NISChangesPage extends FormPage {
     }
 
     public void refresh() {
-       try {
-           logsTable.removeAll();
+        try {
+            int indices[] = changesTable.getSelectionIndices();
+            changesTable.removeAll();
 
-           SearchRequest request = new SearchRequest();
-           SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
-               public void add(SearchResult result) throws Exception {
-                   Attributes attributes = result.getAttributes();
+            SearchRequest request = new SearchRequest();
+            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
+                public void add(SearchResult result) throws Exception {
+                    Attributes attributes = result.getAttributes();
                    
-                   Object changeNumber = attributes.getValue("changeNumber");
-                   String domain = (String)attributes.getValue("domain");
-                   String type = (String)attributes.getValue("type");
-                   String target = (String)attributes.getValue("target");
-                   String field = (String)attributes.getValue("field");
-                   String oldValue = (String)attributes.getValue("oldValue");
-                   String newValue = (String)attributes.getValue("newValue");
-                   String active = (String)attributes.getValue("active");
+                    Object changeNumber = attributes.getValue("changeNumber");
+                    String domain = (String)attributes.getValue("domain");
+                    String type = (String)attributes.getValue("type");
+                    String target = (String)attributes.getValue("target");
+                    String oldValue = (String)attributes.getValue("oldValue");
+                    String newValue = (String)attributes.getValue("newValue");
+                    String active = (String)attributes.getValue("active");
 
-                   TableItem ti = new TableItem(logsTable, SWT.NONE);
-                   ti.setText(0, changeNumber.toString());
-                   ti.setText(1, domain);
-                   ti.setText(2, field);
-                   ti.setText(3, oldValue);
-                   ti.setText(4, newValue);
-                   ti.setText(5, target);
-                   ti.setText(6, active != null && "1".equals(active) ? "Yes" : "");
-                   ti.setData(attributes);
-               }
-           };
+                    TableItem ti = new TableItem(changesTable, SWT.NONE);
+                    ti.setText(0, changeNumber.toString());
+                    ti.setText(1, domain);
+                    ti.setText(2, type);
+                    ti.setText(3, target);
+                    ti.setText(4, oldValue);
+                    ti.setText(5, newValue);
+                    ti.setText(6, active != null && "1".equals(active) ? "Yes" : "");
+                    ti.setData(result);
+                }
+            };
 
-           source.search(request, response);
+            changes.search(request, response);
 
-       } catch (Exception e) {
-           log.debug(e.getMessage(), e);
-           String message = e.toString();
-           if (message.length() > 500) {
-               message = message.substring(0, 500) + "...";
-           }
-           MessageDialog.openError(editor.getSite().getShell(), "Refresh Failed", message);
-       }
-   }
+            changesTable.select(indices);
+
+        } catch (Exception e) {
+            log.debug(e.getMessage(), e);
+            String message = e.toString();
+            if (message.length() > 500) {
+                message = message.substring(0, 500) + "...";
+            }
+            MessageDialog.openError(editor.getSite().getShell(), "Refresh Failed", message);
+        }
+
+        update();
+    }
+
+    public void update() {
+        try {
+            if (changesTable.getSelectionCount() == 0) {
+                messageText.setText("");
+                activateButton.setText("Activate");
+                return;
+            }
+
+            TableItem ti = changesTable.getSelection()[0];
+            SearchResult result = (SearchResult)ti.getData();
+            Attributes attributes = result.getAttributes();
+
+            String message = (String)attributes.getValue("message");
+            String active = (String)attributes.getValue("active");
+
+            messageText.setText(message == null ? "" : message);
+
+            if ("1".equals(active)) {
+                activateButton.setText("Deactivate");
+            } else {
+                activateButton.setText("Activate");
+            }
+
+        } catch (Exception e) {
+            log.debug(e.getMessage(), e);
+            String message = e.toString();
+            if (message.length() > 500) {
+                message = message.substring(0, 500) + "...";
+            }
+            MessageDialog.openError(editor.getSite().getShell(), "Update Failed", message);
+        }
+    }
 
     public Composite createChangesSection(Composite parent) {
 
@@ -126,56 +163,42 @@ public class NISChangesPage extends FormPage {
         leftPanel.setLayout(new GridLayout());
         leftPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        logsTable = new Table(leftPanel, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
-        logsTable.setLayoutData(new GridData(GridData.FILL_BOTH));
-        logsTable.setHeaderVisible(true);
-        logsTable.setLinesVisible(true);
+        changesTable = new Table(leftPanel, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+        changesTable.setLayoutData(new GridData(GridData.FILL_BOTH));
+        changesTable.setHeaderVisible(true);
+        changesTable.setLinesVisible(true);
 
-        TableColumn tc = new TableColumn(logsTable, SWT.NONE);
+        TableColumn tc = new TableColumn(changesTable, SWT.NONE);
         tc.setWidth(30);
         tc.setText("#");
 
-        tc = new TableColumn(logsTable, SWT.NONE);
+        tc = new TableColumn(changesTable, SWT.NONE);
         tc.setWidth(100);
         tc.setText("Domain");
 
-        tc = new TableColumn(logsTable, SWT.NONE);
+        tc = new TableColumn(changesTable, SWT.NONE);
         tc.setWidth(80);
-        tc.setText("Field");
+        tc.setText("Type");
 
-        tc = new TableColumn(logsTable, SWT.NONE);
+        tc = new TableColumn(changesTable, SWT.NONE);
+        tc.setWidth(80);
+        tc.setText("Target");
+
+        tc = new TableColumn(changesTable, SWT.NONE);
         tc.setWidth(80);
         tc.setText("Old Value");
 
-        tc = new TableColumn(logsTable, SWT.NONE);
+        tc = new TableColumn(changesTable, SWT.NONE);
         tc.setWidth(80);
         tc.setText("New Value");
 
-        tc = new TableColumn(logsTable, SWT.NONE);
-        tc.setWidth(80);
-        tc.setText("Owner");
-
-        tc = new TableColumn(logsTable, SWT.NONE);
+        tc = new TableColumn(changesTable, SWT.NONE);
         tc.setWidth(50);
         tc.setText("Active");
 
-        logsTable.addSelectionListener(new SelectionAdapter() {
+        changesTable.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
-
-                if (logsTable.getSelectionCount() == 0) return;
-
-                TableItem ti = logsTable.getSelection()[0];
-                Attributes attributes = (Attributes)ti.getData();
-                String message = (String)attributes.getValue("message");
-                String active = (String)attributes.getValue("active");
-
-                messageText.setText(message == null ? "" : message);
-
-                if ("1".equals(active)) {
-                    activateButton.setText("Deactivate");
-                } else {
-                    activateButton.setText("Activate");
-                }
+                update();
             }
         });
 
@@ -190,7 +213,7 @@ public class NISChangesPage extends FormPage {
         buttons.setLayout(new GridLayout());
         gd = new GridData(GridData.FILL_VERTICAL);
         gd.verticalSpan = 2;
-        gd.widthHint = 100;
+        gd.widthHint = 120;
         buttons.setLayoutData(gd);
 
         Button addButton = new Button(buttons, SWT.PUSH);
@@ -200,9 +223,24 @@ public class NISChangesPage extends FormPage {
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
-                    if (logsTable.getSelectionCount() == 0) return;
+                    NISChangeDialog dialog = new NISChangeDialog(getSite().getShell(), SWT.NONE);
 
-                    TableItem item = logsTable.getSelection()[0];
+                    dialog.open();
+
+                    int action = dialog.getAction();
+                    if (action == NISUserDialog.CANCEL) return;
+
+                    DN dn = new DN();
+
+                    Attributes attributes = new Attributes();
+                    attributes.setValue("domain", dialog.getDomain());
+                    attributes.setValue("type", dialog.getType());
+                    attributes.setValue("target", dialog.getTarget());
+                    attributes.setValue("oldValue", dialog.getOldValue());
+                    attributes.setValue("newValue", dialog.getNewValue());
+                    attributes.setValue("message", dialog.getMessage());
+
+                    changes.add(dn, attributes);
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
@@ -212,6 +250,8 @@ public class NISChangesPage extends FormPage {
                     }
                     MessageDialog.openError(editor.getSite().getShell(), "Edit Failed", message);
                 }
+
+                refresh();
             }
         });
 
@@ -222,9 +262,47 @@ public class NISChangesPage extends FormPage {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
-                    if (logsTable.getSelectionCount() == 0) return;
+                    if (changesTable.getSelectionCount() == 0) return;
 
-                    TableItem item = logsTable.getSelection()[0];
+                    TableItem item = changesTable.getSelection()[0];
+                    SearchResult result = (SearchResult)item.getData();
+                    Attributes attributes = result.getAttributes();
+
+                    String domain = (String)attributes.getValue("domain");
+                    String type = (String)attributes.getValue("type");
+                    String target = (String)attributes.getValue("target");
+                    String oldValue = (String)attributes.getValue("oldValue");
+                    String newValue = (String)attributes.getValue("newValue");
+                    String message = (String)attributes.getValue("message");
+
+                    NISChangeDialog dialog = new NISChangeDialog(getSite().getShell(), SWT.NONE);
+                    dialog.setDomain(domain);
+                    dialog.setType(type);
+                    dialog.setTarget(target);
+                    dialog.setOldValue(oldValue);
+                    dialog.setNewValue(newValue);
+                    dialog.setMessage(message);
+                    dialog.open();
+
+                    int action = dialog.getAction();
+                    if (action == NISUserDialog.CANCEL) return;
+
+                    domain = dialog.getDomain();
+                    type = dialog.getType();
+                    target = dialog.getTarget();
+                    oldValue = dialog.getOldValue();
+                    newValue = dialog.getNewValue();
+                    message = dialog.getMessage();
+
+                    Collection<Modification> modifications = new ArrayList<Modification>();
+                    modifications.add(new Modification(Modification.REPLACE, new Attribute("domain", domain)));
+                    modifications.add(new Modification(Modification.REPLACE, new Attribute("type", type)));
+                    modifications.add(new Modification(Modification.REPLACE, new Attribute("target", target)));
+                    modifications.add(new Modification(Modification.REPLACE, new Attribute("oldValue", oldValue)));
+                    modifications.add(new Modification(Modification.REPLACE, new Attribute("newValue", newValue)));
+                    modifications.add(new Modification(Modification.REPLACE, new Attribute("message", message)));
+
+                    changes.modify(result.getDn(), modifications);
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
@@ -234,6 +312,8 @@ public class NISChangesPage extends FormPage {
                     }
                     MessageDialog.openError(editor.getSite().getShell(), "Edit Failed", message);
                 }
+
+                refresh();
             }
         });
 
@@ -244,20 +324,18 @@ public class NISChangesPage extends FormPage {
         removeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
-                    if (logsTable.getSelectionCount() == 0) return;
+                    if (changesTable.getSelectionCount() == 0) return;
 
-                    int index = logsTable.getSelectionIndex();
+                    int index = changesTable.getSelectionIndex();
                     
-                    TableItem[] items = logsTable.getSelection();
+                    TableItem[] items = changesTable.getSelection();
                     for (TableItem ti : items) {
-                        Attributes attributes = (Attributes) ti.getData();
+                        SearchResult result = (SearchResult)ti.getData();
 
-                        Object changeNumber = attributes.getValue("changeNumber");
-                        source.delete("changeNumber=" + changeNumber);
-                        ti.dispose();
+                        changes.delete(result.getDn());
                     }
 
-                    logsTable.select(index);
+                    changesTable.select(index);
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
@@ -267,6 +345,8 @@ public class NISChangesPage extends FormPage {
                     }
                     MessageDialog.openError(editor.getSite().getShell(), "Delete Failed", message);
                 }
+
+                refresh();
             }
         });
 
@@ -279,14 +359,15 @@ public class NISChangesPage extends FormPage {
         showFilesButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
-                    if (logsTable.getSelectionCount() == 0) return;
+                    if (changesTable.getSelectionCount() == 0) return;
 
-                    TableItem ti = logsTable.getSelection()[0];
-                    Attributes attributes = (Attributes) ti.getData();
+                    TableItem ti = changesTable.getSelection()[0];
+                    SearchResult result = (SearchResult)ti.getData();
+                    Attributes attributes = result.getAttributes();
+
                     String type = (String)attributes.getValue("type");
                     String domain = (String)attributes.getValue("domain");
                     String oldValue = (String)attributes.getValue("oldValue");
-                    String newValue = (String)attributes.getValue("newValue");
 
                     NISFilesPage page = (NISFilesPage)editor.setActivePage("FILES");
 
@@ -320,10 +401,12 @@ public class NISChangesPage extends FormPage {
         changeFilesButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
-                    if (logsTable.getSelectionCount() == 0) return;
+                    if (changesTable.getSelectionCount() == 0) return;
 
-                    TableItem ti = logsTable.getSelection()[0];
-                    Attributes attributes = (Attributes) ti.getData();
+                    TableItem ti = changesTable.getSelection()[0];
+                    SearchResult result = (SearchResult)ti.getData();
+                    Attributes attributes = result.getAttributes();
+
                     String type = (String)attributes.getValue("type");
                     String domain = (String)attributes.getValue("domain");
                     String oldValue = (String)attributes.getValue("oldValue");
@@ -361,10 +444,12 @@ public class NISChangesPage extends FormPage {
         revertFilesButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
-                    if (logsTable.getSelectionCount() == 0) return;
+                    if (changesTable.getSelectionCount() == 0) return;
 
-                    TableItem ti = logsTable.getSelection()[0];
-                    Attributes attributes = (Attributes) ti.getData();
+                    TableItem ti = changesTable.getSelection()[0];
+                    SearchResult result = (SearchResult)ti.getData();
+                    Attributes attributes = result.getAttributes();
+
                     String type = (String)attributes.getValue("type");
                     String domain = (String)attributes.getValue("domain");
                     String oldValue = (String)attributes.getValue("oldValue");
@@ -401,6 +486,35 @@ public class NISChangesPage extends FormPage {
 
         activateButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    if (changesTable.getSelectionCount() == 0) return;
+
+                    TableItem ti = changesTable.getSelection()[0];
+                    SearchResult result = (SearchResult)ti.getData();
+                    Attributes attributes = result.getAttributes();
+
+                    String active = (String)attributes.getValue("active");
+
+                    Collection<Modification> modifications = new ArrayList<Modification>();
+
+                    if ("1".equals(active)) {
+                        modifications.add(new Modification(Modification.DELETE, new Attribute("active")));
+                    } else {
+                        modifications.add(new Modification(Modification.REPLACE, new Attribute("active", "1")));
+                    }
+                    
+                    changes.modify(result.getDn(), modifications);
+
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                    String message = e.toString();
+                    if (message.length() > 500) {
+                        message = message.substring(0, 500) + "...";
+                    }
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", message);
+                }
+
+                refresh();
             }
         });
 

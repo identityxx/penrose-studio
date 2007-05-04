@@ -88,52 +88,52 @@ public class NISUsersPage extends FormPage {
     }
 
     public void init() {
-       try {
-           actionCombo.removeAll();
-           domainsList.removeAll();
+        try {
+            actionCombo.removeAll();
+            domainsList.removeAll();
 
-           SearchRequest request = new SearchRequest();
-           request.setFilter("(type=users)");
+            SearchRequest request = new SearchRequest();
+            request.setFilter("(type=users)");
 
-           SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
-               public void add(SearchResult result) throws Exception {
-                   Attributes attributes = result.getAttributes();
-                   String actionName = (String)attributes.getValue("name");
-                   String className = (String)attributes.getValue("className");
+            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
+                public void add(SearchResult result) throws Exception {
+                    Attributes attributes = result.getAttributes();
+                    String actionName = (String) attributes.getValue("name");
+                    String className = (String) attributes.getValue("className");
 
-                   actionCombo.add(actionName);
-                   actionCombo.setData(actionName, className);
-               }
-           };
+                    actionCombo.add(actionName);
+                    actionCombo.setData(actionName, className);
+                }
+            };
 
-           actions.search(request, response);
+            actions.search(request, response);
 
-           actionCombo.select(0);
+            actionCombo.select(0);
 
-           request = new SearchRequest();
-           response = new SearchResponse<SearchResult>() {
-               public void add(SearchResult result) throws Exception {
-                   Attributes attributes = result.getAttributes();
-                   String domain = (String)attributes.getValue("name");
-                   String partition = (String)attributes.getValue("partition");
-                   domainsList.add(domain);
-                   domainsList.setData(domain, partition);
-               }
-           };
+            request = new SearchRequest();
+            response = new SearchResponse<SearchResult>() {
+                public void add(SearchResult result) throws Exception {
+                    Attributes attributes = result.getAttributes();
+                    String domain = (String) attributes.getValue("name");
+                    String partition = (String) attributes.getValue("partition");
+                    domainsList.add(domain);
+                    domainsList.setData(domain, partition);
+                }
+            };
 
-           domains.search(request, response);
+            domains.search(request, response);
 
-           domainsList.selectAll();
+            domainsList.selectAll();
 
-       } catch (Exception e) {
-           log.debug(e.getMessage(), e);
-           String message = e.toString();
-           if (message.length() > 500) {
-               message = message.substring(0, 500) + "...";
-           }
-           MessageDialog.openError(editor.getSite().getShell(), "Init Failed", message);
-       }
-   }
+        } catch (Exception e) {
+            log.debug(e.getMessage(), e);
+            String message = e.toString();
+            if (message.length() > 500) {
+                message = message.substring(0, 500) + "...";
+            }
+            MessageDialog.openError(editor.getSite().getShell(), "Init Failed", message);
+        }
+    }
 
     public Composite createActionSection(Composite parent) {
 
@@ -261,10 +261,10 @@ public class NISUsersPage extends FormPage {
                     if (table.getSelectionCount() == 0) return;
 
                     TableItem item = table.getSelection()[0];
-                    String domain = (String)item.getData("domain1");
-                    String partition = (String)item.getData("partition1");
-                    Source source = (Source)item.getData("source1");
-                    String uid = (String)item.getData("uid1");
+                    String domain = (String) item.getData("domain1");
+                    String partition = (String) item.getData("partition1");
+                    Source source = (Source) item.getData("source1");
+                    String uid = (String) item.getData("uid1");
                     Object uidNumber = item.getData("uidNumber1");
                     edit(domain, partition, source, uid, uidNumber);
 
@@ -288,10 +288,10 @@ public class NISUsersPage extends FormPage {
                     if (table.getSelectionCount() == 0) return;
 
                     TableItem item = table.getSelection()[0];
-                    String domain = (String)item.getData("domain2");
-                    String partition = (String)item.getData("partition2");
-                    Source source = (Source)item.getData("source2");
-                    String uid = (String)item.getData("uid2");
+                    String domain = (String) item.getData("domain2");
+                    String partition = (String) item.getData("partition2");
+                    Source source = (Source) item.getData("source2");
+                    String uid = (String) item.getData("uid2");
                     Object uidNumber = item.getData("uidNumber2");
                     edit(domain, partition, source, uid, uidNumber);
 
@@ -314,10 +314,10 @@ public class NISUsersPage extends FormPage {
         table.removeAll();
 
         String actionName = actionCombo.getText();
-        String className = (String)actionCombo.getData(actionName);
+        String className = (String) actionCombo.getData(actionName);
 
         Class clazz = Class.forName(className);
-        NISAction action = (NISAction)clazz.newInstance();
+        NISAction action = (NISAction) clazz.newInstance();
 
         NISActionRequest request = new NISActionRequest();
 
@@ -331,29 +331,29 @@ public class NISUsersPage extends FormPage {
             int counter = 0;
 
             public void add(Object object) {
-                Attributes attributes = (Attributes)object;
+                Attributes attributes = (Attributes) object;
 
-                log.debug("Displaying result #"+counter);
+                log.debug("Displaying result #" + counter);
 
-                String domain1 = (String)attributes.getValue("domain1");
-                String partition1 = (String)attributes.getValue("partition1");
-                Source source1 = (Source)attributes.getValue("source1");
-                String uid1 = (String)attributes.getValue("uid1");
+                String domain1 = (String) attributes.getValue("domain1");
+                String partition1 = (String) attributes.getValue("partition1");
+                Source source1 = (Source) attributes.getValue("source1");
+                String uid1 = (String) attributes.getValue("uid1");
                 Object uidNumber1 = attributes.getValue("uidNumber1");
 
-                String domain2 = (String)attributes.getValue("domain2");
-                String partition2 = (String)attributes.getValue("partition2");
-                Source source2 = (Source)attributes.getValue("source2");
-                String uid2 = (String)attributes.getValue("uid2");
+                String domain2 = (String) attributes.getValue("domain2");
+                String partition2 = (String) attributes.getValue("partition2");
+                Source source2 = (Source) attributes.getValue("source2");
+                String uid2 = (String) attributes.getValue("uid2");
                 Object uidNumber2 = attributes.getValue("uidNumber2");
 
                 TableItem ti = new TableItem(table, SWT.NONE);
                 ti.setText(0, domain1);
-                ti.setText(1, ""+uid1);
-                ti.setText(2, ""+uidNumber1);
+                ti.setText(1, "" + uid1);
+                ti.setText(2, "" + uidNumber1);
                 ti.setText(3, domain2);
-                ti.setText(4, ""+uid2);
-                ti.setText(5, ""+uidNumber2);
+                ti.setText(4, "" + uid2);
+                ti.setText(5, "" + uidNumber2);
 
                 ti.setData("domain1", domain1);
                 ti.setData("partition1", partition1);
@@ -371,7 +371,7 @@ public class NISUsersPage extends FormPage {
             }
 
             public void close() {
-                messageLabel.setText("Found "+counter+" result(s).");
+                messageLabel.setText("Found " + counter + " result(s).");
             }
         };
 
@@ -459,7 +459,6 @@ public class NISUsersPage extends FormPage {
         attributes.setValue("domain", domain);
         attributes.setValue("type", "user");
         attributes.setValue("target", uid);
-        attributes.setValue("field", "uid");
         attributes.setValue("oldValue", currentUidNumber.toString());
         attributes.setValue("newValue", newUidNumber.toString());
         attributes.setValue("message", message);

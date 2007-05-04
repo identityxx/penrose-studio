@@ -329,13 +329,13 @@ public class NISFilesPage extends FormPage {
                 StringTokenizer st = new StringTokenizer(parameters);
                 int rc = client.changeUid(path, new Integer(st.nextToken()), new Integer(st.nextToken()));
 
-                messageLabel.setText("RC: "+rc);
+                messageLabel.setText(rc == 0 ? "Operation succeeded." : "Operation failed. RC: "+rc);
 
             } else if ("changeGid".equals(action)) {
                 StringTokenizer st = new StringTokenizer(parameters);
                 int rc = client.changeGid(path, new Integer(st.nextToken()), new Integer(st.nextToken()));
 
-                messageLabel.setText("RC: "+rc);
+                messageLabel.setText(rc == 0 ? "Operation succeeded." : "Operation failed. RC: "+rc);
             }
         }
     }

@@ -89,52 +89,52 @@ public class NISGroupsPage extends FormPage {
     }
 
     public void init() {
-       try {
-           actionCombo.removeAll();
-           domainsList.removeAll();
+        try {
+            actionCombo.removeAll();
+            domainsList.removeAll();
 
-           SearchRequest request = new SearchRequest();
-           request.setFilter("(type=groups)");
+            SearchRequest request = new SearchRequest();
+            request.setFilter("(type=groups)");
 
-           SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
-               public void add(SearchResult result) throws Exception {
-                   Attributes attributes = result.getAttributes();
-                   String actionName = (String)attributes.getValue("name");
-                   String className = (String)attributes.getValue("className");
+            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
+                public void add(SearchResult result) throws Exception {
+                    Attributes attributes = result.getAttributes();
+                    String actionName = (String) attributes.getValue("name");
+                    String className = (String) attributes.getValue("className");
 
-                   actionCombo.add(actionName);
-                   actionCombo.setData(actionName, className);
-               }
-           };
+                    actionCombo.add(actionName);
+                    actionCombo.setData(actionName, className);
+                }
+            };
 
-           actions.search(request, response);
+            actions.search(request, response);
 
-           actionCombo.select(0);
+            actionCombo.select(0);
 
-           request = new SearchRequest();
-           response = new SearchResponse<SearchResult>() {
-               public void add(SearchResult result) throws Exception {
-                   Attributes attributes = result.getAttributes();
-                   String domain = (String)attributes.getValue("name");
-                   String partition = (String)attributes.getValue("partition");
-                   domainsList.add(domain);
-                   domainsList.setData(domain, partition);
-               }
-           };
+            request = new SearchRequest();
+            response = new SearchResponse<SearchResult>() {
+                public void add(SearchResult result) throws Exception {
+                    Attributes attributes = result.getAttributes();
+                    String domain = (String) attributes.getValue("name");
+                    String partition = (String) attributes.getValue("partition");
+                    domainsList.add(domain);
+                    domainsList.setData(domain, partition);
+                }
+            };
 
-           domains.search(request, response);
+            domains.search(request, response);
 
-           domainsList.selectAll();
+            domainsList.selectAll();
 
-       } catch (Exception e) {
-           log.debug(e.getMessage(), e);
-           String message = e.toString();
-           if (message.length() > 500) {
-               message = message.substring(0, 500) + "...";
-           }
-           MessageDialog.openError(editor.getSite().getShell(), "Init Failed", message);
-       }
-   }
+        } catch (Exception e) {
+            log.debug(e.getMessage(), e);
+            String message = e.toString();
+            if (message.length() > 500) {
+                message = message.substring(0, 500) + "...";
+            }
+            MessageDialog.openError(editor.getSite().getShell(), "Init Failed", message);
+        }
+    }
 
     public Composite createActionSection(Composite parent) {
 
@@ -262,10 +262,10 @@ public class NISGroupsPage extends FormPage {
                     if (table.getSelectionCount() == 0) return;
 
                     TableItem item = table.getSelection()[0];
-                    String domain = (String)item.getData("domain1");
-                    String partition = (String)item.getData("partition1");
-                    Source source = (Source)item.getData("source1");
-                    String cn = (String)item.getData("group1");
+                    String domain = (String) item.getData("domain1");
+                    String partition = (String) item.getData("partition1");
+                    Source source = (Source) item.getData("source1");
+                    String cn = (String) item.getData("group1");
                     Object gidNumber = item.getData("gidNumber1");
                     edit(domain, partition, source, cn, gidNumber);
 
@@ -289,10 +289,10 @@ public class NISGroupsPage extends FormPage {
                     if (table.getSelectionCount() == 0) return;
 
                     TableItem item = table.getSelection()[0];
-                    String domain = (String)item.getData("domain2");
-                    String partition = (String)item.getData("partition2");
-                    Source source = (Source)item.getData("source2");
-                    String cn = (String)item.getData("group2");
+                    String domain = (String) item.getData("domain2");
+                    String partition = (String) item.getData("partition2");
+                    Source source = (Source) item.getData("source2");
+                    String cn = (String) item.getData("group2");
                     Object gidNumber = item.getData("gidNumber2");
                     edit(domain, partition, source, cn, gidNumber);
 
@@ -315,10 +315,10 @@ public class NISGroupsPage extends FormPage {
         table.removeAll();
 
         String actionName = actionCombo.getText();
-        String className = (String)actionCombo.getData(actionName);
+        String className = (String) actionCombo.getData(actionName);
 
         Class clazz = Class.forName(className);
-        NISAction action = (NISAction)clazz.newInstance();
+        NISAction action = (NISAction) clazz.newInstance();
 
         NISActionRequest request = new NISActionRequest();
 
@@ -331,29 +331,29 @@ public class NISGroupsPage extends FormPage {
             int counter = 0;
 
             public void add(Object object) {
-                Attributes attributes = (Attributes)object;
+                Attributes attributes = (Attributes) object;
 
-                log.debug("Displaying result #"+counter);
+                log.debug("Displaying result #" + counter);
 
-                String domain1 = (String)attributes.getValue("domain1");
-                String partition1 = (String)attributes.getValue("partition1");
-                Source source1 = (Source)attributes.getValue("source1");
+                String domain1 = (String) attributes.getValue("domain1");
+                String partition1 = (String) attributes.getValue("partition1");
+                Source source1 = (Source) attributes.getValue("source1");
                 Object group1 = attributes.getValue("group1");
                 Object gidNumber1 = attributes.getValue("gidNumber1");
 
-                String domain2 = (String)attributes.getValue("domain2");
-                String partition2 = (String)attributes.getValue("partition2");
-                Source source2 = (Source)attributes.getValue("source2");
+                String domain2 = (String) attributes.getValue("domain2");
+                String partition2 = (String) attributes.getValue("partition2");
+                Source source2 = (Source) attributes.getValue("source2");
                 Object group2 = attributes.getValue("group2");
                 Object gidNumber2 = attributes.getValue("gidNumber2");
 
                 TableItem ti = new TableItem(table, SWT.NONE);
                 ti.setText(0, domain1);
-                ti.setText(1, ""+ group1);
-                ti.setText(2, ""+ gidNumber1);
+                ti.setText(1, "" + group1);
+                ti.setText(2, "" + gidNumber1);
                 ti.setText(3, domain2);
-                ti.setText(4, ""+ group2);
-                ti.setText(5, ""+ gidNumber2);
+                ti.setText(4, "" + group2);
+                ti.setText(5, "" + gidNumber2);
 
                 ti.setData("domain1", domain1);
                 ti.setData("partition1", partition1);
@@ -371,7 +371,7 @@ public class NISGroupsPage extends FormPage {
             }
 
             public void close() {
-                messageLabel.setText("Found "+counter+" result(s).");
+                messageLabel.setText("Found " + counter + " result(s).");
             }
         };
 
@@ -415,7 +415,7 @@ public class NISGroupsPage extends FormPage {
             Attributes attributes = result.getAttributes();
             currentGidNumber = attributes.getValue("gidNumber");
             dialog.setNewGidNumber(currentGidNumber);
-            
+
         } else {
             currentGidNumber = origGidNumber;
         }
@@ -432,7 +432,7 @@ public class NISGroupsPage extends FormPage {
         while (response.hasNext()) {
             SearchResult result = response.next();
             Attributes attributes = result.getAttributes();
-            String memberUid = (String)attributes.getValue("memberUid");
+            String memberUid = (String) attributes.getValue("memberUid");
             dialog.addMember(memberUid);
         }
 
@@ -475,7 +475,6 @@ public class NISGroupsPage extends FormPage {
         attributes.setValue("domain", domain);
         attributes.setValue("type", "group");
         attributes.setValue("target", cn);
-        attributes.setValue("field", "gid");
         attributes.setValue("oldValue", currentGidNumber.toString());
         attributes.setValue("newValue", newGidNumber.toString());
         attributes.setValue("message", message);

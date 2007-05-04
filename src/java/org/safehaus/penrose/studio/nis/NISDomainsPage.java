@@ -69,34 +69,37 @@ public class NISDomainsPage extends FormPage {
     }
 
     public void refresh() {
-       try {
-           domainsTable.removeAll();
+        try {
+            int indices[] = domainsTable.getSelectionIndices();
+            domainsTable.removeAll();
 
-           SearchRequest request = new SearchRequest();
-           SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
-               public void add(SearchResult result) throws Exception {
-                   Attributes attributes = result.getAttributes();
-                   String domain = (String)attributes.getValue("name");
-                   String partition = (String)attributes.getValue("partition");
+            SearchRequest request = new SearchRequest();
+            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
+                public void add(SearchResult result) throws Exception {
+                    Attributes attributes = result.getAttributes();
+                    String domain = (String)attributes.getValue("name");
+                    String partition = (String)attributes.getValue("partition");
 
-                   TableItem ti = new TableItem(domainsTable, SWT.NONE);
-                   ti.setText(0, domain);
-                   ti.setText(1, partition);
-                   ti.setData(result);
-               }
-           };
+                    TableItem ti = new TableItem(domainsTable, SWT.NONE);
+                    ti.setText(0, domain);
+                    ti.setText(1, partition);
+                    ti.setData(result);
+                }
+            };
 
-           domains.search(request, response);
+            domains.search(request, response);
 
-       } catch (Exception e) {
-           log.debug(e.getMessage(), e);
-           String message = e.toString();
-           if (message.length() > 500) {
-               message = message.substring(0, 500) + "...";
-           }
+            domainsTable.select(indices);
+
+        } catch (Exception e) {
+            log.debug(e.getMessage(), e);
+            String message = e.toString();
+            if (message.length() > 500) {
+                message = message.substring(0, 500) + "...";
+            }
            MessageDialog.openError(editor.getSite().getShell(), "Init Failed", message);
-       }
-   }
+        }
+    }
 
     public Composite createDomainsSection(Composite parent) {
 
@@ -229,7 +232,6 @@ public class NISDomainsPage extends FormPage {
                         SearchResult result = (SearchResult)ti.getData();
                         DN dn = result.getDn();
                         domains.delete(dn);
-                        ti.dispose();
                     }
 
                 } catch (Exception e) {
@@ -240,6 +242,8 @@ public class NISDomainsPage extends FormPage {
                     }
                     MessageDialog.openError(editor.getSite().getShell(), "Action Failed", message);
                 }
+
+                refresh();
             }
         });
 

@@ -70,36 +70,39 @@ public class NISHostsPage extends FormPage {
     }
 
     public void refresh() {
-       try {
-           hostsTable.removeAll();
+        try {
+            int indices[] = hostsTable.getSelectionIndices();
+            hostsTable.removeAll();
 
-           SearchRequest request = new SearchRequest();
-           SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
-               public void add(SearchResult result) {
-                   Attributes attributes = result.getAttributes();
-                   String name = (String)attributes.getValue("name");
-                   String domain = (String)attributes.getValue("domain");
-                   String path = (String)attributes.getValue("path");
+            SearchRequest request = new SearchRequest();
+            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
+                public void add(SearchResult result) {
+                    Attributes attributes = result.getAttributes();
+                    String name = (String) attributes.getValue("name");
+                    String domain = (String) attributes.getValue("domain");
+                    String path = (String) attributes.getValue("path");
 
-                   TableItem ti = new TableItem(hostsTable, SWT.NONE);
-                   ti.setText(0, domain);
-                   ti.setText(1, name);
-                   ti.setText(2, path == null ? "" : path);
-                   ti.setData(result);
-               }
-           };
+                    TableItem ti = new TableItem(hostsTable, SWT.NONE);
+                    ti.setText(0, domain);
+                    ti.setText(1, name);
+                    ti.setText(2, path == null ? "" : path);
+                    ti.setData(result);
+                }
+            };
 
-           hosts.search(request, response);
+            hosts.search(request, response);
 
-       } catch (Exception e) {
-           log.debug(e.getMessage(), e);
-           String message = e.toString();
-           if (message.length() > 500) {
-               message = message.substring(0, 500) + "...";
-           }
-           MessageDialog.openError(editor.getSite().getShell(), "Init Failed", message);
-       }
-   }
+            hostsTable.select(indices);
+
+        } catch (Exception e) {
+            log.debug(e.getMessage(), e);
+            String message = e.toString();
+            if (message.length() > 500) {
+                message = message.substring(0, 500) + "...";
+            }
+            MessageDialog.openError(editor.getSite().getShell(), "Init Failed", message);
+        }
+    }
 
     public Composite createHostsSection(Composite parent) {
 
@@ -178,14 +181,14 @@ public class NISHostsPage extends FormPage {
                     if (hostsTable.getSelectionCount() == 0) return;
 
                     TableItem ti = hostsTable.getSelection()[0];
-                    SearchResult result = (SearchResult)ti.getData();
+                    SearchResult result = (SearchResult) ti.getData();
                     DN dn = result.getDn();
                     Attributes attributes = result.getAttributes();
 
                     NISHostDialog dialog = new NISHostDialog(getSite().getShell(), SWT.NONE);
-                    dialog.setDomain((String)attributes.getValue("domain"));
-                    dialog.setName((String)attributes.getValue("name"));
-                    dialog.setPath((String)attributes.getValue("path"));
+                    dialog.setDomain((String) attributes.getValue("domain"));
+                    dialog.setName((String) attributes.getValue("name"));
+                    dialog.setPath((String) attributes.getValue("path"));
                     dialog.open();
 
                     int action = dialog.getAction();
@@ -234,13 +237,12 @@ public class NISHostsPage extends FormPage {
             public void widgetSelected(SelectionEvent event) {
                 try {
                     if (hostsTable.getSelectionCount() == 0) return;
-                    
+
                     TableItem items[] = hostsTable.getSelection();
                     for (TableItem ti : items) {
-                        SearchResult result = (SearchResult)ti.getData();
+                        SearchResult result = (SearchResult) ti.getData();
                         DN dn = result.getDn();
                         hosts.delete(dn);
-                        ti.dispose();
                     }
 
                 } catch (Exception e) {
@@ -251,6 +253,8 @@ public class NISHostsPage extends FormPage {
                     }
                     MessageDialog.openError(editor.getSite().getShell(), "Remove Failed", message);
                 }
+
+                refresh();
             }
         });
 
