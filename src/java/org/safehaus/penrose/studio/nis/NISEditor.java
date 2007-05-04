@@ -21,10 +21,10 @@ public class NISEditor extends FormEditor {
     public void addPages() {
         try {
             addPage(new NISDomainsPage(this));
+            addPage(new NISHostsPage(this));
             addPage(new NISUsersPage(this));
             addPage(new NISGroupsPage(this));
             addPage(new NISChangesPage(this));
-            addPage(new NISHostsPage(this));
             addPage(new NISFilesPage(this));
 
         } catch (Exception e) {

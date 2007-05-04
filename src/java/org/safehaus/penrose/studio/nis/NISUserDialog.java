@@ -12,11 +12,8 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.graphics.Point;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.partition.SourceConfig;
-import org.safehaus.penrose.ldap.Attributes;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-
-import java.util.*;
 
 /**
  * @author Endi S. Dewata
@@ -64,7 +61,6 @@ public class NISUserDialog extends Dialog {
         shell = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
 
         init();
-        reset();
 
         Point size = new Point(600, 400);
         shell.setSize(size);
@@ -78,6 +74,8 @@ public class NISUserDialog extends Dialog {
         shell.setImage(PenrosePlugin.getImage(PenroseImage.LOGO16));
         shell.open();
 
+        refresh();
+
         Display display = getParent().getDisplay();
         while (!shell.isDisposed()) {
             if (!display.readAndDispatch()) display.sleep();
@@ -88,7 +86,7 @@ public class NISUserDialog extends Dialog {
         createControl(shell);
     }
 
-    public void reset() {
+    public void refresh() {
         domainText.setText(domain == null ? "" : domain);
         uidText.setText(uid == null ? "" : uid);
         origUidNumberText.setText(origUidNumber == null ? "" : origUidNumber.toString());
@@ -114,8 +112,6 @@ public class NISUserDialog extends Dialog {
 
         composite = createMessagePanel(parent);
         composite.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-        new Label(composite, SWT.NONE);
 
         composite = createButtonsPanel(parent);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -191,7 +187,9 @@ public class NISUserDialog extends Dialog {
 
         revertButton = new Button(composite, SWT.RADIO);
         revertButton.setText("Revert to the original UID number.");
-        revertButton.setLayoutData(new GridData());
+        gd = new GridData();
+        gd.horizontalSpan = 2;
+        revertButton.setLayoutData(gd);
 
         return composite;
     }

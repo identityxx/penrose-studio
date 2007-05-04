@@ -103,7 +103,7 @@ public class NISDomainsPage extends FormPage {
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
 
-        domainsTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
+        domainsTable = new Table(composite, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
         domainsTable.setLayoutData(new GridData(GridData.FILL_BOTH));
         domainsTable.setHeaderVisible(true);
         domainsTable.setLinesVisible(true);

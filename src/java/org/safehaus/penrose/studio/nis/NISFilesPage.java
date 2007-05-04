@@ -177,7 +177,7 @@ public class NISFilesPage extends FormPage {
         gd.widthHint = 100;
         hostLabel.setLayoutData(gd);
 
-        hostsList = new List(composite, SWT.BORDER | SWT.MULTI);
+        hostsList = new List(composite, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 80;
         hostsList.setLayoutData(gd);

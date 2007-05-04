@@ -106,7 +106,7 @@ public class NISHostsPage extends FormPage {
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
 
-        hostsTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
+        hostsTable = new Table(composite, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
         hostsTable.setLayoutData(new GridData(GridData.FILL_BOTH));
         hostsTable.setHeaderVisible(true);
         hostsTable.setLinesVisible(true);
@@ -118,10 +118,6 @@ public class NISHostsPage extends FormPage {
         tc = new TableColumn(hostsTable, SWT.NONE);
         tc.setWidth(150);
         tc.setText("Hostname");
-
-        tc = new TableColumn(hostsTable, SWT.NONE);
-        tc.setWidth(100);
-        tc.setText("IP Address");
 
         tc = new TableColumn(hostsTable, SWT.NONE);
         tc.setWidth(100);

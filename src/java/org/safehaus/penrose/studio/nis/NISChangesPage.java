@@ -96,12 +96,11 @@ public class NISChangesPage extends FormPage {
                    TableItem ti = new TableItem(logsTable, SWT.NONE);
                    ti.setText(0, changeNumber.toString());
                    ti.setText(1, domain);
-                   ti.setText(2, type);
-                   ti.setText(3, target);
-                   ti.setText(4, field);
-                   ti.setText(5, oldValue);
-                   ti.setText(6, newValue);
-                   ti.setText(7, active != null && "1".equals(active) ? "Yes" : "");
+                   ti.setText(2, field);
+                   ti.setText(3, oldValue);
+                   ti.setText(4, newValue);
+                   ti.setText(5, target);
+                   ti.setText(6, active != null && "1".equals(active) ? "Yes" : "");
                    ti.setData(attributes);
                }
            };
@@ -142,23 +141,19 @@ public class NISChangesPage extends FormPage {
 
         tc = new TableColumn(logsTable, SWT.NONE);
         tc.setWidth(80);
-        tc.setText("Type");
-
-        tc = new TableColumn(logsTable, SWT.NONE);
-        tc.setWidth(80);
-        tc.setText("Target");
-
-        tc = new TableColumn(logsTable, SWT.NONE);
-        tc.setWidth(80);
         tc.setText("Field");
 
         tc = new TableColumn(logsTable, SWT.NONE);
         tc.setWidth(80);
-        tc.setText("Old");
+        tc.setText("Old Value");
 
         tc = new TableColumn(logsTable, SWT.NONE);
         tc.setWidth(80);
-        tc.setText("New");
+        tc.setText("New Value");
+
+        tc = new TableColumn(logsTable, SWT.NONE);
+        tc.setWidth(80);
+        tc.setText("Owner");
 
         tc = new TableColumn(logsTable, SWT.NONE);
         tc.setWidth(50);
@@ -191,14 +186,14 @@ public class NISChangesPage extends FormPage {
         gd.heightHint = 100;
         messageText.setLayoutData(gd);
 
-        Composite rightPanel = toolkit.createComposite(composite);
-        rightPanel.setLayout(new GridLayout());
+        Composite buttons = toolkit.createComposite(composite);
+        buttons.setLayout(new GridLayout());
         gd = new GridData(GridData.FILL_VERTICAL);
         gd.verticalSpan = 2;
-        gd.widthHint = 80;
-        rightPanel.setLayoutData(gd);
+        gd.widthHint = 100;
+        buttons.setLayoutData(gd);
 
-        Button addButton = new Button(rightPanel, SWT.PUSH);
+        Button addButton = new Button(buttons, SWT.PUSH);
         addButton.setText("Add");
         addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -220,7 +215,7 @@ public class NISChangesPage extends FormPage {
             }
         });
 
-        Button editButton = new Button(rightPanel, SWT.PUSH);
+        Button editButton = new Button(buttons, SWT.PUSH);
         editButton.setText("Edit");
         editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -242,7 +237,7 @@ public class NISChangesPage extends FormPage {
             }
         });
 
-        Button removeButton = new Button(rightPanel, SWT.PUSH);
+        Button removeButton = new Button(buttons, SWT.PUSH);
         removeButton.setText("Remove");
         removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -275,26 +270,149 @@ public class NISChangesPage extends FormPage {
             }
         });
 
-        new Label(rightPanel, SWT.NONE);
+        new Label(buttons, SWT.NONE);
 
-        Button refreshButton = new Button(rightPanel, SWT.PUSH);
+        Button showFilesButton = new Button(buttons, SWT.PUSH);
+        showFilesButton.setText("Show Files");
+        showFilesButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        showFilesButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    if (logsTable.getSelectionCount() == 0) return;
+
+                    TableItem ti = logsTable.getSelection()[0];
+                    Attributes attributes = (Attributes) ti.getData();
+                    String type = (String)attributes.getValue("type");
+                    String domain = (String)attributes.getValue("domain");
+                    String oldValue = (String)attributes.getValue("oldValue");
+                    String newValue = (String)attributes.getValue("newValue");
+
+                    NISFilesPage page = (NISFilesPage)editor.setActivePage("FILES");
+
+                    if ("user".equals(type)) {
+                        page.actionsCombo.setText("Find files by UID number");
+                        
+                    } else if ("group".equals(type)) {
+                        page.actionsCombo.setText("Find files by GID number");
+                    }
+
+                    page.domainsCombo.setText(domain);
+                    page.updateHosts();
+                    page.hostsList.selectAll();
+                    page.parametersText.setText(oldValue);
+
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                    String message = e.toString();
+                    if (message.length() > 500) {
+                        message = message.substring(0, 500) + "...";
+                    }
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", message);
+                }
+            }
+        });
+
+        Button changeFilesButton = new Button(buttons, SWT.PUSH);
+        changeFilesButton.setText("Change Files");
+        changeFilesButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        changeFilesButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    if (logsTable.getSelectionCount() == 0) return;
+
+                    TableItem ti = logsTable.getSelection()[0];
+                    Attributes attributes = (Attributes) ti.getData();
+                    String type = (String)attributes.getValue("type");
+                    String domain = (String)attributes.getValue("domain");
+                    String oldValue = (String)attributes.getValue("oldValue");
+                    String newValue = (String)attributes.getValue("newValue");
+
+                    NISFilesPage page = (NISFilesPage)editor.setActivePage("FILES");
+
+                    if ("user".equals(type)) {
+                        page.actionsCombo.setText("Change file UID number");
+
+                    } else if ("group".equals(type)) {
+                        page.actionsCombo.setText("Change file GID number");
+                    }
+
+                    page.domainsCombo.setText(domain);
+                    page.updateHosts();
+                    page.hostsList.selectAll();
+                    page.parametersText.setText(oldValue+" "+newValue);
+
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                    String message = e.toString();
+                    if (message.length() > 500) {
+                        message = message.substring(0, 500) + "...";
+                    }
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", message);
+                }
+            }
+        });
+
+        Button revertFilesButton = new Button(buttons, SWT.PUSH);
+        revertFilesButton.setText("Revert Files");
+        revertFilesButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        revertFilesButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    if (logsTable.getSelectionCount() == 0) return;
+
+                    TableItem ti = logsTable.getSelection()[0];
+                    Attributes attributes = (Attributes) ti.getData();
+                    String type = (String)attributes.getValue("type");
+                    String domain = (String)attributes.getValue("domain");
+                    String oldValue = (String)attributes.getValue("oldValue");
+                    String newValue = (String)attributes.getValue("newValue");
+
+                    NISFilesPage page = (NISFilesPage)editor.setActivePage("FILES");
+
+                    if ("user".equals(type)) {
+                        page.actionsCombo.setText("Change file UID number");
+
+                    } else if ("group".equals(type)) {
+                        page.actionsCombo.setText("Change file GID number");
+                    }
+
+                    page.domainsCombo.setText(domain);
+                    page.updateHosts();
+                    page.hostsList.selectAll();
+                    page.parametersText.setText(newValue+" "+oldValue);
+
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                    String message = e.toString();
+                    if (message.length() > 500) {
+                        message = message.substring(0, 500) + "...";
+                    }
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", message);
+                }
+            }
+        });
+
+        activateButton = new Button(buttons, SWT.PUSH);
+        activateButton.setText("Activate");
+        activateButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        activateButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+            }
+        });
+
+        new Label(buttons, SWT.NONE);
+
+        Button refreshButton = new Button(buttons, SWT.PUSH);
         refreshButton.setText("Refresh");
         refreshButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         refreshButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 refresh();
-            }
-        });
-
-        new Label(rightPanel, SWT.NONE);
-
-        activateButton = new Button(rightPanel, SWT.PUSH);
-        activateButton.setText("Activate");
-        activateButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        activateButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
             }
         });
 

@@ -15,6 +15,9 @@ import org.safehaus.penrose.partition.SourceConfig;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 
+import java.util.Collection;
+import java.util.ArrayList;
+
 /**
  * @author Endi S. Dewata
  */
@@ -35,6 +38,7 @@ public class NISGroupDialog extends Dialog {
     Label nameText;
     Label origGidNumberText;
     Label newGidNumberText;
+    List membersList;
 
     Button setButton;
     Text gidNumberText;
@@ -47,6 +51,7 @@ public class NISGroupDialog extends Dialog {
     private String name;
     private Object origGidNumber;
     private Object newGidNumber;
+    private Collection<String> members = new ArrayList<String>();
 
     Object gidNumber;
     String message;
@@ -61,7 +66,6 @@ public class NISGroupDialog extends Dialog {
         shell = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
 
         init();
-        reset();
 
         Point size = new Point(600, 400);
         shell.setSize(size);
@@ -75,6 +79,8 @@ public class NISGroupDialog extends Dialog {
         shell.setImage(PenrosePlugin.getImage(PenroseImage.LOGO16));
         shell.open();
 
+        refresh();
+
         Display display = getParent().getDisplay();
         while (!shell.isDisposed()) {
             if (!display.readAndDispatch()) display.sleep();
@@ -85,10 +91,14 @@ public class NISGroupDialog extends Dialog {
         createControl(shell);
     }
 
-    public void reset() {
+    public void refresh() {
         domainText.setText(getDomain() == null ? "" : getDomain());
         nameText.setText(getName() == null ? "" : getName());
         origGidNumberText.setText(getOrigGidNumber() == null ? "" : getOrigGidNumber().toString());
+
+        for (String member : members) {
+            membersList.add(member);
+        }
 
         if (newGidNumber == null) {
             revertButton.setEnabled(false);
@@ -104,15 +114,11 @@ public class NISGroupDialog extends Dialog {
         Composite composite = createInfoPanel(parent);
         composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        new Label(composite, SWT.NONE);
-
         composite = createActionPanel(parent);
         composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         composite = createMessagePanel(parent);
         composite.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-        new Label(composite, SWT.NONE);
 
         composite = createButtonsPanel(parent);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -125,35 +131,52 @@ public class NISGroupDialog extends Dialog {
         Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(new GridLayout(2, false));
 
-        Label domainLabel = new Label(composite, SWT.NONE);
+        Composite leftPanel = new Composite(composite, SWT.NONE);
+        leftPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
+        leftPanel.setLayout(new GridLayout(2, false));
+
+        Label domainLabel = new Label(leftPanel, SWT.NONE);
         domainLabel.setText("Domain:");
         GridData gd = new GridData();
         gd.widthHint = 150;
         domainLabel.setLayoutData(gd);
 
-        domainText = new Label(composite, SWT.NONE);
+        domainText = new Label(leftPanel, SWT.NONE);
         domainText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Label uidLabel = new Label(composite, SWT.NONE);
+        Label uidLabel = new Label(leftPanel, SWT.NONE);
         uidLabel.setText("Group:");
         uidLabel.setLayoutData(new GridData());
 
-        nameText = new Label(composite, SWT.NONE);
+        nameText = new Label(leftPanel, SWT.NONE);
         nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Label origUidNumberLabel = new Label(composite, SWT.NONE);
+        Label origUidNumberLabel = new Label(leftPanel, SWT.NONE);
         origUidNumberLabel.setText("Original GID Number:");
         origUidNumberLabel.setLayoutData(new GridData());
 
-        origGidNumberText = new Label(composite, SWT.NONE);
+        origGidNumberText = new Label(leftPanel, SWT.NONE);
         origGidNumberText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Label newUidNumberLabel = new Label(composite, SWT.NONE);
+        Label newUidNumberLabel = new Label(leftPanel, SWT.NONE);
         newUidNumberLabel.setText("New GID Number:");
         newUidNumberLabel.setLayoutData(new GridData());
 
-        newGidNumberText = new Label(composite, SWT.NONE);
+        newGidNumberText = new Label(leftPanel, SWT.NONE);
         newGidNumberText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Composite rightPanel = new Composite(composite, SWT.NONE);
+        gd = new GridData(GridData.FILL_VERTICAL);
+        gd.widthHint = 200;
+        rightPanel.setLayoutData(gd);
+        rightPanel.setLayout(new GridLayout());
+
+        Label membersLabel = new Label(rightPanel, SWT.NONE);
+        membersLabel.setText("Members:");
+        membersLabel.setLayoutData(new GridData());
+
+        membersList = new List(rightPanel, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+        membersList.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         return composite;
     }
@@ -188,7 +211,9 @@ public class NISGroupDialog extends Dialog {
 
         revertButton = new Button(composite, SWT.RADIO);
         revertButton.setText("Revert to the original GID number.");
-        revertButton.setLayoutData(new GridData());
+        gd = new GridData();
+        gd.horizontalSpan = 2;
+        revertButton.setLayoutData(gd);
 
         return composite;
     }
@@ -311,5 +336,19 @@ public class NISGroupDialog extends Dialog {
 
     public void setOrigGidNumber(Object origGidNumber) {
         this.origGidNumber = origGidNumber;
+    }
+
+    public Collection<String> getMembers() {
+        return members;
+    }
+
+    public void addMember(String member) {
+        members.add(member);
+    }
+
+    public void setMembers(Collection<String> members) {
+        if (this.members == members) return;
+        this.members.clear();
+        this.members.addAll(members);
     }
 }
