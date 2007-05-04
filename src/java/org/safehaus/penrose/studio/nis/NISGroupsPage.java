@@ -156,7 +156,7 @@ public class NISGroupsPage extends FormPage {
         domainsList = new List(composite, SWT.BORDER | SWT.MULTI);
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
-        gd.heightHint = 100;
+        gd.heightHint = 80;
         domainsList.setLayoutData(gd);
 
         new Label(composite, SWT.NONE);
@@ -318,9 +318,8 @@ public class NISGroupsPage extends FormPage {
 
         NISActionRequest request = new NISActionRequest();
 
-        String[] domains = domainsList.getSelection();
-        for (int i=0; i<domains.length; i++) {
-            request.addPartition(domains[i]);
+        for (String domain : domainsList.getSelection()) {
+            request.addPartition(domain);
         }
 
         NISActionResponse response = new NISActionResponse() {
@@ -380,7 +379,7 @@ public class NISGroupsPage extends FormPage {
             String partitionName,
             Source source,
             String cn,
-            Object gidNumber
+            Object origGidNumber
     ) throws Exception {
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
@@ -394,7 +393,7 @@ public class NISGroupsPage extends FormPage {
         NISGroupDialog dialog = new NISGroupDialog(getSite().getShell(), SWT.NONE);
         dialog.setDomain(domainName);
         dialog.setName(cn);
-        dialog.setOrigGidNumber(gidNumber);
+        dialog.setOrigGidNumber(origGidNumber);
 
         Source sourceGidNumber = sourceManager.getSource(partitionName, "groups_gidNumber");
         dialog.setSourceConfig(sourceGidNumber.getSourceConfig());
@@ -404,11 +403,16 @@ public class NISGroupsPage extends FormPage {
         SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
         sourceGidNumber.search(request, response);
+
+        Object currentGidNumber;
         if (response.hasNext()) {
-            SearchResult result = (SearchResult)response.next();
+            SearchResult result = response.next();
             Attributes attrs = result.getAttributes();
-            Object gn = attrs.getValue("gidNumber");
-            dialog.setNewGidNumber(gn);
+            currentGidNumber = attrs.getValue("gidNumber");
+            dialog.setNewGidNumber(currentGidNumber);
+            
+        } else {
+            currentGidNumber = origGidNumber;
         }
 
         dialog.open();
@@ -417,43 +421,42 @@ public class NISGroupsPage extends FormPage {
 
         if (action == NISUserDialog.CANCEL) return;
 
-        Object gn = dialog.getGidNumber();
+        Object newGidNumber = dialog.getGidNumber();
         String message = dialog.getMessage();
-
-        String s;
 
         if (action == NISGroupDialog.SET) {
 
-            if (!gidNumber.equals(gn)) checkGidNumber(gn);
+            if (!origGidNumber.equals(newGidNumber)) checkGidNumber(newGidNumber);
 
             Attributes attrs = new Attributes();
-            attrs.setValue("gidNumber", gn);
+            attrs.setValue("gidNumber", newGidNumber);
 
             sourceGidNumber.add(dn, attrs);
 
         } else if (action == NISGroupDialog.CHANGE) {
 
-            if (!gidNumber.equals(gn)) checkGidNumber(gn);
+            if (!origGidNumber.equals(newGidNumber)) checkGidNumber(newGidNumber);
 
-            Collection modifications = new ArrayList();
-            modifications.add(new Modification(Modification.REPLACE, new Attribute("gidNumber", gn)));
+            Collection<Modification> modifications = new ArrayList<Modification>();
+            modifications.add(new Modification(Modification.REPLACE, new Attribute("gidNumber", newGidNumber)));
 
             sourceGidNumber.modify(dn, modifications);
 
         } else { // if (action == NISGroupDialog.REMOVE) {
 
             sourceGidNumber.delete(dn);
+            newGidNumber = origGidNumber;
         }
-
-        s = "set gidNumber "+gn;
 
         Source changes = sourceManager.getSource("DEFAULT", "changes");
 
         Attributes attributes = new Attributes();
         attributes.setValue("domain", domainName);
-        attributes.setValue("target", dn.toString());
-        attributes.setValue("type", "groups");
-        attributes.setValue("changes", s);
+        attributes.setValue("type", "group");
+        attributes.setValue("target", cn);
+        attributes.setValue("field", "gidNumber");
+        attributes.setValue("oldValue", currentGidNumber.toString());
+        attributes.setValue("newValue", newGidNumber.toString());
         attributes.setValue("message", message);
 
         changes.add(new DN(), attributes);
@@ -465,13 +468,11 @@ public class NISGroupsPage extends FormPage {
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
         SourceManager sourceManager = penroseContext.getSourceManager();
 
-        String domainNames[] = domainsList.getItems();
-        for (int i=0; i<domainNames.length; i++) {
-            String domainName = domainNames[i];
-            String partitionName = (String)domainsList.getData(domainName);
+        for (String domainName : domainsList.getItems()) {
+            String partitionName = (String) domainsList.getData(domainName);
 
             SearchRequest request = new SearchRequest();
-            request.setFilter("(gidNumber="+ gidNumber +")");
+            request.setFilter("(gidNumber=" + gidNumber + ")");
 
             SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
@@ -479,7 +480,7 @@ public class NISGroupsPage extends FormPage {
             groups.search(request, response);
 
             if (response.hasNext()) {
-                throw new Exception("gidNumber "+ gidNumber +" already exists in domain "+domainName);
+                throw new Exception("gidNumber " + gidNumber + " already exists in domain " + domainName);
             }
 
             response = new SearchResponse<SearchResult>();
@@ -488,7 +489,7 @@ public class NISGroupsPage extends FormPage {
             gidNumbers.search(request, response);
 
             if (response.hasNext()) {
-                throw new Exception("gidNumber "+ gidNumber +" already exists in domain "+domainName);
+                throw new Exception("gidNumber " + gidNumber + " already exists in domain " + domainName);
             }
         }
     }

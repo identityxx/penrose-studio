@@ -4,10 +4,14 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.forms.events.HyperlinkAdapter;
+import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -34,8 +38,9 @@ public class NISFilesPage extends FormPage {
 
     FormToolkit toolkit;
 
-    Combo hostsCombo;
     Combo actionsCombo;
+    Combo domainsCombo;
+    List hostsList;
     Text parametersText;
 
     Label messageLabel;
@@ -45,6 +50,9 @@ public class NISFilesPage extends FormPage {
 
     Map<String,String> actions = new LinkedHashMap<String,String>();
 
+    Source domains;
+    Source hosts;
+
     public NISFilesPage(NISEditor editor) {
         super(editor, "FILES", "  Files  ");
 
@@ -52,6 +60,15 @@ public class NISFilesPage extends FormPage {
 
         actions.put("Find files by UID number", "findByUid");
         actions.put("Find files by GID number", "findByGid");
+        actions.put("Change file UID number", "changeFileUid");
+        actions.put("Change file GID number", "changeFileGid");
+
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseContext penroseContext = penroseApplication.getPenroseContext();
+        SourceManager sourceManager = penroseContext.getSourceManager();
+
+        domains = sourceManager.getSource("DEFAULT", "domains");
+        hosts = sourceManager.getSource("DEFAULT", "hosts");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -82,31 +99,22 @@ public class NISFilesPage extends FormPage {
 
     public void init() {
        try {
-           hostsCombo.removeAll();
-
-           PenroseApplication penroseApplication = PenroseApplication.getInstance();
-           PenroseContext penroseContext = penroseApplication.getPenroseContext();
-           SourceManager sourceManager = penroseContext.getSourceManager();
-
-           Source hosts = sourceManager.getSource("DEFAULT", "hosts");
+           domainsCombo.removeAll();
 
            SearchRequest request = new SearchRequest();
            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
                public void add(SearchResult result) throws Exception {
                    Attributes attributes = result.getAttributes();
-                   String domain = (String)attributes.getValue("domain");
-                   String name = (String)attributes.getValue("name");
-                   String path = (String)attributes.getValue("path");
-
-                   String host = domain+" "+name+" "+path;
-                   hostsCombo.add(host);
-                   hostsCombo.setData(host, result);
+                   String domain = (String)attributes.getValue("name");
+                   domainsCombo.add(domain);
                }
            };
 
-           hosts.search(request, response);
+           domains.search(request, response);
 
-           hostsCombo.select(0);
+           domainsCombo.select(0);
+
+           updateHosts();
 
        } catch (Exception e) {
            log.debug(e.getMessage(), e);
@@ -121,22 +129,15 @@ public class NISFilesPage extends FormPage {
     public Composite createActionSection(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
-        composite.setLayout(new GridLayout(2, false));
-
-        Label hostLabel = toolkit.createLabel(composite, "Host:");
-        GridData gd = new GridData();
-        gd.widthHint = 100;
-        hostLabel.setLayoutData(gd);
-
-        hostsCombo = new Combo(composite, SWT.READ_ONLY);
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        hostsCombo.setLayoutData(gd);
+        composite.setLayout(new GridLayout(3, false));
 
         Label actionLabel = toolkit.createLabel(composite, "Action:");
         actionLabel.setLayoutData(new GridData());
 
         actionsCombo = new Combo(composite, SWT.READ_ONLY);
-        actionsCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.horizontalSpan = 2;
+        actionsCombo.setLayoutData(gd);
 
         for (String title : actions.keySet()) {
             String value = actions.get(title);
@@ -145,7 +146,62 @@ public class NISFilesPage extends FormPage {
         }
 
         actionsCombo.select(0);
-        
+
+        Label domainsLabel = toolkit.createLabel(composite, "Domain:");
+        domainsLabel.setLayoutData(new GridData());
+
+        domainsCombo = new Combo(composite, SWT.READ_ONLY);
+        gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.horizontalSpan = 2;
+        domainsCombo.setLayoutData(gd);
+
+        domainsCombo.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                try {
+                    updateHosts();
+
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                    String message = e.toString();
+                    if (message.length() > 500) {
+                        message = message.substring(0, 500) + "...";
+                    }
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", message);
+                }
+            }
+        });
+
+        Label hostLabel = toolkit.createLabel(composite, "Hosts:");
+        gd = new GridData();
+        gd.verticalAlignment = GridData.BEGINNING;
+        gd.widthHint = 100;
+        hostLabel.setLayoutData(gd);
+
+        hostsList = new List(composite, SWT.BORDER | SWT.MULTI);
+        gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.heightHint = 80;
+        hostsList.setLayoutData(gd);
+
+        Composite links = toolkit.createComposite(composite);
+        links.setLayout(new GridLayout());
+        links.setLayoutData(new GridData(GridData.FILL_VERTICAL));
+
+        Hyperlink selectAllLink = toolkit.createHyperlink(links, "Select All", SWT.NONE);
+
+        selectAllLink.addHyperlinkListener(new HyperlinkAdapter() {
+            public void linkActivated(HyperlinkEvent event) {
+                hostsList.selectAll();
+            }
+        });
+
+        Hyperlink selectNoneLink = toolkit.createHyperlink(links, "Select None", SWT.NONE);
+
+        selectNoneLink.addHyperlinkListener(new HyperlinkAdapter() {
+            public void linkActivated(HyperlinkEvent event) {
+                hostsList.deselectAll();
+            }
+        });
+
         Label parametersLabel = toolkit.createLabel(composite, "Parameters:");
         parametersLabel.setLayoutData(new GridData());
 
@@ -155,7 +211,6 @@ public class NISFilesPage extends FormPage {
         Button runButton = new Button(composite, SWT.PUSH);
         runButton.setText("  Run  ");
         gd = new GridData();
-        gd.horizontalSpan = 2;
         gd.horizontalAlignment = GridData.END;
         runButton.setLayoutData(gd);
 
@@ -189,40 +244,83 @@ public class NISFilesPage extends FormPage {
         table = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
         table.setLayoutData(new GridData(GridData.FILL_BOTH));
 
+        table.setHeaderVisible(true);
+        table.setLinesVisible(true);
+
+        TableColumn tc = new TableColumn(table, SWT.NONE);
+        tc.setText("Hostname");
+        tc.setWidth(150);
+
+        tc = new TableColumn(table, SWT.NONE);
+        tc.setText("File");
+        tc.setWidth(500);
+
         return composite;
+    }
+
+    public void updateHosts() throws Exception {
+        hostsList.removeAll();
+
+        String domain = domainsCombo.getText();
+
+        SearchRequest request = new SearchRequest();
+        request.setFilter("(domain="+domain+")");
+
+        SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
+            public void add(SearchResult result) throws Exception {
+                Attributes attributes = result.getAttributes();
+                String name = (String)attributes.getValue("name");
+                String path = (String)attributes.getValue("path");
+
+                String host = name+":"+path;
+                hostsList.add(host);
+                hostsList.setData(host, result);
+            }
+        };
+
+        hosts.search(request, response);
     }
 
     public void run() throws Exception {
 
+        messageLabel.setText("Running...");
+        
         table.removeAll();
 
-        String host = hostsCombo.getText();
-        SearchResult result = (SearchResult)hostsCombo.getData(host);
-        Attributes attributes = result.getAttributes();
-        String hostname = (String)attributes.getValue("name");
-        String path = (String)attributes.getValue("path");
+        int counter = 0;
 
         String title = actionsCombo.getText();
         String action = (String)actionsCombo.getData(title);
         String parameters = parametersText.getText();
 
-        NISAgentClient client = new NISAgentClient(hostname);
+        for (String host : hostsList.getSelection()) {
+            SearchResult result = (SearchResult) hostsList.getData(host);
+            Attributes attributes = result.getAttributes();
 
-        Collection<String> list;
-        if ("findByUid".equals(action)) {
-            list = client.findByUid(path, new Integer(parameters));
+            String hostname = (String)attributes.getValue("name");
+            String path = (String)attributes.getValue("path");
 
-        } else if ("findByGid".equals(action)) {
-            list = client.findByGid(path, new Integer(parameters));
-        } else {
-            list = new ArrayList<String>();
+            NISAgentClient client = new NISAgentClient(hostname);
+
+            Collection<String> list;
+            if ("findByUid".equals(action)) {
+                list = client.findByUid(path, new Integer(parameters));
+
+            } else if ("findByGid".equals(action)) {
+                list = client.findByGid(path, new Integer(parameters));
+            } else {
+                list = new ArrayList<String>();
+            }
+
+            for (String file : list) {
+                TableItem ti = new TableItem(table, SWT.NONE);
+                ti.setText(0, hostname);
+                ti.setText(1, file);
+
+                counter++;
+            }
         }
 
-        for (String file : list) {
-            TableItem ti = new TableItem(table, SWT.NONE);
-            ti.setText(file);
-        }
-
-        messageLabel.setText("Found "+list.size()+" file(s).");
+        messageLabel.setText("Found "+counter+" file(s).");
     }
 }

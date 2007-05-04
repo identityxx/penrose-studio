@@ -154,7 +154,7 @@ public class NISUsersPage extends FormPage {
         domainsList = new List(composite, SWT.BORDER | SWT.MULTI);
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
-        gd.heightHint = 100;
+        gd.heightHint = 80;
         domainsList.setLayoutData(gd);
 
         new Label(composite, SWT.NONE);
@@ -378,7 +378,7 @@ public class NISUsersPage extends FormPage {
             String partitionName,
             Source source,
             String uid,
-            Object uidNumber
+            Object origUidNumber
     ) throws Exception {
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
@@ -392,7 +392,7 @@ public class NISUsersPage extends FormPage {
         NISUserDialog dialog = new NISUserDialog(getSite().getShell(), SWT.NONE);
         dialog.setDomain(domain);
         dialog.setUid(uid);
-        dialog.setOrigUidNumber(uidNumber);
+        dialog.setOrigUidNumber(origUidNumber);
 
         Source sourceUidNumber = sourceManager.getSource(partitionName, "users_uidNumber");
         dialog.setSourceConfig(sourceUidNumber.getSourceConfig());
@@ -402,11 +402,17 @@ public class NISUsersPage extends FormPage {
         SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
         sourceUidNumber.search(request, response);
+
+        Object currentUidNumber;
+
         if (response.hasNext()) {
-            SearchResult result = (SearchResult)response.next();
+            SearchResult result = response.next();
             Attributes attrs = result.getAttributes();
-            Object un = attrs.getValue("uidNumber");
-            dialog.setNewUidNumber(un);
+            currentUidNumber = attrs.getValue("uidNumber");
+            dialog.setNewUidNumber(currentUidNumber);
+
+        } else {
+            currentUidNumber = origUidNumber;
         }
 
         dialog.open();
@@ -415,43 +421,42 @@ public class NISUsersPage extends FormPage {
 
         if (action == NISUserDialog.CANCEL) return;
 
-        Object un = dialog.getUidNumber();
+        Object newUidNumber = dialog.getUidNumber();
         String message = dialog.getMessage();
-
-        String s;
 
         if (action == NISUserDialog.SET) {
 
-            if (!uidNumber.equals(un)) checkUidNumber(un);
+            if (!origUidNumber.equals(newUidNumber)) checkUidNumber(newUidNumber);
 
             Attributes attrs = new Attributes();
-            attrs.setValue("uidNumber", un);
+            attrs.setValue("uidNumber", newUidNumber);
 
             sourceUidNumber.add(dn, attrs);
 
         } else if (action == NISUserDialog.CHANGE) {
 
-            if (!uidNumber.equals(un)) checkUidNumber(un);
+            if (!origUidNumber.equals(newUidNumber)) checkUidNumber(newUidNumber);
 
             Collection<Modification> modifications = new ArrayList<Modification>();
-            modifications.add(new Modification(Modification.REPLACE, new Attribute("uidNumber", un)));
+            modifications.add(new Modification(Modification.REPLACE, new Attribute("uidNumber", newUidNumber)));
 
             sourceUidNumber.modify(dn, modifications);
 
         } else { // if (action == NISUserDialog.REMOVE) {
 
             sourceUidNumber.delete(dn);
+            newUidNumber = origUidNumber;
         }
-
-        s = "set uidNumber "+un;
 
         Source changes = sourceManager.getSource("DEFAULT", "changes");
 
         Attributes attributes = new Attributes();
         attributes.setValue("domain", domain);
-        attributes.setValue("target", dn.toString());
-        attributes.setValue("type", "users");
-        attributes.setValue("changes", s);
+        attributes.setValue("type", "user");
+        attributes.setValue("target", uid);
+        attributes.setValue("field", "uidNumber");
+        attributes.setValue("oldValue", currentUidNumber.toString());
+        attributes.setValue("newValue", newUidNumber.toString());
         attributes.setValue("message", message);
 
         changes.add(new DN(), attributes);
@@ -463,13 +468,11 @@ public class NISUsersPage extends FormPage {
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
         SourceManager sourceManager = penroseContext.getSourceManager();
 
-        String domainNames[] = domainsList.getItems();
-        for (int i=0; i<domainNames.length; i++) {
-            String domainName = domainNames[i];
-            String partitionName = (String)domainsList.getData(domainName);
+        for (String domainName : domainsList.getItems()) {
+            String partitionName = (String) domainsList.getData(domainName);
 
             SearchRequest request = new SearchRequest();
-            request.setFilter("(uidNumber="+uidNumber+")");
+            request.setFilter("(uidNumber=" + uidNumber + ")");
 
             SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
@@ -477,7 +480,7 @@ public class NISUsersPage extends FormPage {
             users.search(request, response);
 
             if (response.hasNext()) {
-                throw new Exception("uidNumber "+uidNumber+" already exists in domain "+domainName);
+                throw new Exception("uidNumber " + uidNumber + " already exists in domain " + domainName);
             }
 
             response = new SearchResponse<SearchResult>();
@@ -486,7 +489,7 @@ public class NISUsersPage extends FormPage {
             uidNumbers.search(request, response);
 
             if (response.hasNext()) {
-                throw new Exception("uidNumber "+uidNumber+" already exists in domain "+domainName);
+                throw new Exception("uidNumber " + uidNumber + " already exists in domain " + domainName);
             }
         }
     }

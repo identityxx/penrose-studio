@@ -35,6 +35,7 @@ public class NISChangesPage extends FormPage {
 
     Table logsTable;
     Text messageText;
+    Button activateButton;
 
     Source source;
 
@@ -87,7 +88,9 @@ public class NISChangesPage extends FormPage {
                    String domain = (String)attributes.getValue("domain");
                    String type = (String)attributes.getValue("type");
                    String target = (String)attributes.getValue("target");
-                   String changes = (String)attributes.getValue("changes");
+                   String field = (String)attributes.getValue("field");
+                   String oldValue = (String)attributes.getValue("oldValue");
+                   String newValue = (String)attributes.getValue("newValue");
                    String active = (String)attributes.getValue("active");
 
                    TableItem ti = new TableItem(logsTable, SWT.NONE);
@@ -95,8 +98,10 @@ public class NISChangesPage extends FormPage {
                    ti.setText(1, domain);
                    ti.setText(2, type);
                    ti.setText(3, target);
-                   ti.setText(4, changes);
-                   ti.setText(5, active != null && "1".equals(active) ? "Active" : "");
+                   ti.setText(4, field);
+                   ti.setText(5, oldValue);
+                   ti.setText(6, newValue);
+                   ti.setText(7, active != null && "1".equals(active) ? "Yes" : "");
                    ti.setData(attributes);
                }
            };
@@ -128,7 +133,7 @@ public class NISChangesPage extends FormPage {
         logsTable.setLinesVisible(true);
 
         TableColumn tc = new TableColumn(logsTable, SWT.NONE);
-        tc.setWidth(50);
+        tc.setWidth(30);
         tc.setText("#");
 
         tc = new TableColumn(logsTable, SWT.NONE);
@@ -140,12 +145,20 @@ public class NISChangesPage extends FormPage {
         tc.setText("Type");
 
         tc = new TableColumn(logsTable, SWT.NONE);
-        tc.setWidth(100);
+        tc.setWidth(80);
         tc.setText("Target");
 
         tc = new TableColumn(logsTable, SWT.NONE);
-        tc.setWidth(150);
-        tc.setText("Changes");
+        tc.setWidth(80);
+        tc.setText("Field");
+
+        tc = new TableColumn(logsTable, SWT.NONE);
+        tc.setWidth(80);
+        tc.setText("Old");
+
+        tc = new TableColumn(logsTable, SWT.NONE);
+        tc.setWidth(80);
+        tc.setText("New");
 
         tc = new TableColumn(logsTable, SWT.NONE);
         tc.setWidth(50);
@@ -159,13 +172,21 @@ public class NISChangesPage extends FormPage {
                 TableItem ti = logsTable.getSelection()[0];
                 Attributes attributes = (Attributes)ti.getData();
                 String message = (String)attributes.getValue("message");
+                String active = (String)attributes.getValue("active");
+
                 messageText.setText(message == null ? "" : message);
+
+                if ("1".equals(active)) {
+                    activateButton.setText("Deactivate");
+                } else {
+                    activateButton.setText("Activate");
+                }
             }
         });
 
         toolkit.createLabel(leftPanel, "Message:", SWT.NONE);
 
-        messageText = toolkit.createText(leftPanel, "", SWT.BORDER | SWT.READ_ONLY);
+        messageText = toolkit.createText(leftPanel, "", SWT.BORDER | SWT.READ_ONLY  | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 100;
         messageText.setLayoutData(gd);
@@ -174,7 +195,30 @@ public class NISChangesPage extends FormPage {
         rightPanel.setLayout(new GridLayout());
         gd = new GridData(GridData.FILL_VERTICAL);
         gd.verticalSpan = 2;
+        gd.widthHint = 80;
         rightPanel.setLayoutData(gd);
+
+        Button addButton = new Button(rightPanel, SWT.PUSH);
+        addButton.setText("Add");
+        addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        addButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    if (logsTable.getSelectionCount() == 0) return;
+
+                    TableItem item = logsTable.getSelection()[0];
+
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                    String message = e.toString();
+                    if (message.length() > 500) {
+                        message = message.substring(0, 500) + "...";
+                    }
+                    MessageDialog.openError(editor.getSite().getShell(), "Edit Failed", message);
+                }
+            }
+        });
 
         Button editButton = new Button(rightPanel, SWT.PUSH);
         editButton.setText("Edit");
@@ -198,11 +242,11 @@ public class NISChangesPage extends FormPage {
             }
         });
 
-        Button deleteButton = new Button(rightPanel, SWT.PUSH);
-        deleteButton.setText("Delete");
-        deleteButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Button removeButton = new Button(rightPanel, SWT.PUSH);
+        removeButton.setText("Remove");
+        removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        deleteButton.addSelectionListener(new SelectionAdapter() {
+        removeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
                     if (logsTable.getSelectionCount() == 0) return;
@@ -210,12 +254,11 @@ public class NISChangesPage extends FormPage {
                     int index = logsTable.getSelectionIndex();
                     
                     TableItem[] items = logsTable.getSelection();
-                    for (int i=0; i<items.length; i++) {
-                        TableItem ti = items[i];
-                        Attributes attributes = (Attributes)ti.getData();
+                    for (TableItem ti : items) {
+                        Attributes attributes = (Attributes) ti.getData();
 
                         Object changeNumber = attributes.getValue("changeNumber");
-                        source.delete("changeNumber="+changeNumber);
+                        source.delete("changeNumber=" + changeNumber);
                         ti.dispose();
                     }
 
@@ -246,8 +289,8 @@ public class NISChangesPage extends FormPage {
 
         new Label(rightPanel, SWT.NONE);
 
-        Button activateButton = new Button(rightPanel, SWT.PUSH);
-        activateButton.setText("Activate/Deactivate");
+        activateButton = new Button(rightPanel, SWT.PUSH);
+        activateButton.setText("Activate");
         activateButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         activateButton.addSelectionListener(new SelectionAdapter() {
