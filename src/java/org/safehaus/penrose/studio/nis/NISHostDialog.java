@@ -12,6 +12,8 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 
+import java.rmi.registry.Registry;
+
 /**
  * @author Endi S. Dewata
  */
@@ -24,15 +26,15 @@ public class NISHostDialog extends Dialog {
 
     Shell shell;
 
-    Text domainText;
     Text nameText;
     Text pathText;
+    Text portText;
 
     int action;
 
-    private String domain;
     private String name;
     private String path;
+    private Integer port;
 
     public NISHostDialog(Shell parent, int style) {
 		super(parent, style);
@@ -69,9 +71,9 @@ public class NISHostDialog extends Dialog {
     }
 
     public void reset() {
-        domainText.setText(domain == null ? "" : domain);
         nameText.setText(name == null ? "" : name);
         pathText.setText(path == null ? "" : path);
+        portText.setText(port == null ? ""+ Registry.REGISTRY_PORT : ""+port);
     }
 
     public void createControl(Shell parent) {
@@ -91,18 +93,11 @@ public class NISHostDialog extends Dialog {
         Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(new GridLayout(2, false));
 
-        Label domainLabel = new Label(composite, SWT.NONE);
-        domainLabel.setText("Domain:");
-        GridData gd = new GridData();
-        gd.widthHint = 100;
-        domainLabel.setLayoutData(gd);
-
-        domainText = new Text(composite, SWT.BORDER);
-        domainText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
         Label nameLabel = new Label(composite, SWT.NONE);
         nameLabel.setText("Name:");
-        nameLabel.setLayoutData(new GridData());
+        GridData gd = new GridData();
+        gd.widthHint = 100;
+        nameLabel.setLayoutData(gd);
 
         nameText = new Text(composite, SWT.BORDER);
         nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -113,6 +108,13 @@ public class NISHostDialog extends Dialog {
 
         pathText = new Text(composite, SWT.BORDER);
         pathText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label portLabel = new Label(composite, SWT.NONE);
+        portLabel.setText("Port:");
+        portLabel.setLayoutData(new GridData());
+
+        portText = new Text(composite, SWT.BORDER);
+        portText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         return composite;
     }
@@ -137,9 +139,9 @@ public class NISHostDialog extends Dialog {
 
         okButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                domain = domainText.getText().equals("") ? null : domainText.getText();
                 name = nameText.getText().equals("") ? null : nameText.getText();
                 path = pathText.getText().equals("") ? null : pathText.getText();
+                port = portText.getText().equals("") ? Registry.REGISTRY_PORT : new Integer(portText.getText());
                 action = OK;
                 shell.close();
             }
@@ -156,14 +158,6 @@ public class NISHostDialog extends Dialog {
         this.action = action;
     }
 
-    public String getDomain() {
-        return domain;
-    }
-
-    public void setDomain(String domain) {
-        this.domain = domain;
-    }
-
     public String getName() {
         return name;
     }
@@ -178,5 +172,13 @@ public class NISHostDialog extends Dialog {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public Integer getPort() {
+        return port;
+    }
+
+    public void setPort(Integer port) {
+        this.port = port;
     }
 }

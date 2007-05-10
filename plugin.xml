@@ -151,7 +151,7 @@
        <editor
            id="org.safehaus.penrose.studio.nis.NISEditor"
            name="NIS"
-           icon="images/service.png"
+           icon="images/object.gif"
            class="org.safehaus.penrose.studio.nis.NISEditor"/>
    </extension>
    <extension

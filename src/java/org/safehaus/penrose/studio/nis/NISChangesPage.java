@@ -18,6 +18,7 @@ import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
+import org.safehaus.penrose.nis.NISDomain;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,11 +32,12 @@ public class NISChangesPage extends FormPage {
 
     FormToolkit toolkit;
 
-    NISEditor editor;
-
     Table changesTable;
     Text messageText;
     Button activateButton;
+
+    NISEditor editor;
+    NISDomain domain;
 
     Source changes;
 
@@ -43,6 +45,7 @@ public class NISChangesPage extends FormPage {
         super(editor, "CHANGES", "  Changes ");
 
         this.editor = editor;
+        this.domain = editor.getDomain();
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
@@ -81,12 +84,13 @@ public class NISChangesPage extends FormPage {
             changesTable.removeAll();
 
             SearchRequest request = new SearchRequest();
+            request.setFilter("(domain="+domain.getName()+")");
+
             SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
                 public void add(SearchResult result) throws Exception {
                     Attributes attributes = result.getAttributes();
                    
                     Object changeNumber = attributes.getValue("changeNumber");
-                    String domain = (String)attributes.getValue("domain");
                     String type = (String)attributes.getValue("type");
                     String target = (String)attributes.getValue("target");
                     String oldValue = (String)attributes.getValue("oldValue");
@@ -95,12 +99,11 @@ public class NISChangesPage extends FormPage {
 
                     TableItem ti = new TableItem(changesTable, SWT.NONE);
                     ti.setText(0, changeNumber.toString());
-                    ti.setText(1, domain);
-                    ti.setText(2, type);
-                    ti.setText(3, target);
-                    ti.setText(4, oldValue);
-                    ti.setText(5, newValue);
-                    ti.setText(6, active != null && "1".equals(active) ? "Yes" : "");
+                    ti.setText(1, type);
+                    ti.setText(2, target);
+                    ti.setText(3, oldValue);
+                    ti.setText(4, newValue);
+                    ti.setText(5, active != null && "1".equals(active) ? "Yes" : "");
                     ti.setData(result);
                 }
             };
@@ -173,10 +176,6 @@ public class NISChangesPage extends FormPage {
         tc.setText("#");
 
         tc = new TableColumn(changesTable, SWT.NONE);
-        tc.setWidth(100);
-        tc.setText("Domain");
-
-        tc = new TableColumn(changesTable, SWT.NONE);
         tc.setWidth(80);
         tc.setText("Type");
 
@@ -233,7 +232,7 @@ public class NISChangesPage extends FormPage {
                     DN dn = new DN();
 
                     Attributes attributes = new Attributes();
-                    attributes.setValue("domain", dialog.getDomain());
+                    attributes.setValue("domain", domain.getName());
                     attributes.setValue("type", dialog.getType());
                     attributes.setValue("target", dialog.getTarget());
                     attributes.setValue("oldValue", dialog.getOldValue());
@@ -268,7 +267,6 @@ public class NISChangesPage extends FormPage {
                     SearchResult result = (SearchResult)item.getData();
                     Attributes attributes = result.getAttributes();
 
-                    String domain = (String)attributes.getValue("domain");
                     String type = (String)attributes.getValue("type");
                     String target = (String)attributes.getValue("target");
                     String oldValue = (String)attributes.getValue("oldValue");
@@ -276,7 +274,6 @@ public class NISChangesPage extends FormPage {
                     String message = (String)attributes.getValue("message");
 
                     NISChangeDialog dialog = new NISChangeDialog(getSite().getShell(), SWT.NONE);
-                    dialog.setDomain(domain);
                     dialog.setType(type);
                     dialog.setTarget(target);
                     dialog.setOldValue(oldValue);
@@ -287,7 +284,6 @@ public class NISChangesPage extends FormPage {
                     int action = dialog.getAction();
                     if (action == NISUserDialog.CANCEL) return;
 
-                    domain = dialog.getDomain();
                     type = dialog.getType();
                     target = dialog.getTarget();
                     oldValue = dialog.getOldValue();
@@ -295,7 +291,6 @@ public class NISChangesPage extends FormPage {
                     message = dialog.getMessage();
 
                     Collection<Modification> modifications = new ArrayList<Modification>();
-                    modifications.add(new Modification(Modification.REPLACE, new Attribute("domain", domain)));
                     modifications.add(new Modification(Modification.REPLACE, new Attribute("type", type)));
                     modifications.add(new Modification(Modification.REPLACE, new Attribute("target", target)));
                     modifications.add(new Modification(Modification.REPLACE, new Attribute("oldValue", oldValue)));
@@ -366,10 +361,9 @@ public class NISChangesPage extends FormPage {
                     Attributes attributes = result.getAttributes();
 
                     String type = (String)attributes.getValue("type");
-                    String domain = (String)attributes.getValue("domain");
                     String oldValue = (String)attributes.getValue("oldValue");
 
-                    NISFilesPage page = (NISFilesPage)editor.setActivePage("FILES");
+                    NISToolsPage page = (NISToolsPage)editor.setActivePage("TOOLS");
 
                     if ("user".equals(type)) {
                         page.actionsCombo.setText("Find files by UID number");
@@ -378,7 +372,6 @@ public class NISChangesPage extends FormPage {
                         page.actionsCombo.setText("Find files by GID number");
                     }
 
-                    page.domainsCombo.setText(domain);
                     page.updateHosts();
                     page.hostsList.selectAll();
                     page.parametersText.setText(oldValue);
@@ -408,11 +401,10 @@ public class NISChangesPage extends FormPage {
                     Attributes attributes = result.getAttributes();
 
                     String type = (String)attributes.getValue("type");
-                    String domain = (String)attributes.getValue("domain");
                     String oldValue = (String)attributes.getValue("oldValue");
                     String newValue = (String)attributes.getValue("newValue");
 
-                    NISFilesPage page = (NISFilesPage)editor.setActivePage("FILES");
+                    NISToolsPage page = (NISToolsPage)editor.setActivePage("TOOLS");
 
                     if ("user".equals(type)) {
                         page.actionsCombo.setText("Change file UID number");
@@ -421,7 +413,6 @@ public class NISChangesPage extends FormPage {
                         page.actionsCombo.setText("Change file GID number");
                     }
 
-                    page.domainsCombo.setText(domain);
                     page.updateHosts();
                     page.hostsList.selectAll();
                     page.parametersText.setText(oldValue+" "+newValue);
@@ -451,11 +442,10 @@ public class NISChangesPage extends FormPage {
                     Attributes attributes = result.getAttributes();
 
                     String type = (String)attributes.getValue("type");
-                    String domain = (String)attributes.getValue("domain");
                     String oldValue = (String)attributes.getValue("oldValue");
                     String newValue = (String)attributes.getValue("newValue");
 
-                    NISFilesPage page = (NISFilesPage)editor.setActivePage("FILES");
+                    NISToolsPage page = (NISToolsPage)editor.setActivePage("TOOLS");
 
                     if ("user".equals(type)) {
                         page.actionsCombo.setText("Change file UID number");
@@ -464,7 +454,6 @@ public class NISChangesPage extends FormPage {
                         page.actionsCombo.setText("Change file GID number");
                     }
 
-                    page.domainsCombo.setText(domain);
                     page.updateHosts();
                     page.hostsList.selectAll();
                     page.parametersText.setText(newValue+" "+oldValue);

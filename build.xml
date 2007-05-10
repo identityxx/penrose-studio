@@ -43,6 +43,8 @@
     </target>
 
     <target name="import" depends="init">
+        <copy todir="lib" file="../penrose-pro-1.2/agent/target/agent-${penrose.version}.jar"/>
+        <copy todir="lib" file="../penrose-pro-1.2/agent/target/agent-client-${penrose.version}.jar"/>
         <copy todir="lib" file="../penrose-pro-1.2/lib/penrose-${penrose.version}.jar"/>
         <copy todir="lib" file="../penrose-pro-1.2/target/penrose-pro-${penrose.version}.jar"/>
     </target>
@@ -57,6 +59,8 @@
         <javac
             srcdir="src/tools"
             destdir="target/tools"
+            debug="on"
+            debuglevel="lines,vars,source"
             source="1.5"
             target="1.5"
         />
@@ -84,6 +88,8 @@
             srcdir="src/java"
             destdir="target/classes"
             classpathref="lib.path"
+            debug="on"
+            debuglevel="lines,vars,source"
             source="1.5"
             target="1.5"
         />

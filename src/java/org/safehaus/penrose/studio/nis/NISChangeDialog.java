@@ -24,7 +24,6 @@ public class NISChangeDialog extends Dialog {
 
     Shell shell;
 
-    Text domainText;
     Text typeText;
     Text targetText;
     Text oldValueText;
@@ -33,7 +32,6 @@ public class NISChangeDialog extends Dialog {
 
     int action;
 
-    private String domain;
     private String type;
     private String target;
     private String oldValue;
@@ -75,7 +73,6 @@ public class NISChangeDialog extends Dialog {
     }
 
     public void reset() {
-        domainText.setText(domain == null ? "" : domain);
         typeText.setText(type == null ? "" : type);
         targetText.setText(target == null ? "" : target);
         oldValueText.setText(oldValue == null ? "" : oldValue);
@@ -103,18 +100,11 @@ public class NISChangeDialog extends Dialog {
         Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(new GridLayout(2, false));
 
-        Label domainLabel = new Label(composite, SWT.NONE);
-        domainLabel.setText("Domain:");
-        GridData gd = new GridData();
-        gd.widthHint = 100;
-        domainLabel.setLayoutData(gd);
-
-        domainText = new Text(composite, SWT.BORDER);
-        domainText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
         Label typeLabel = new Label(composite, SWT.NONE);
         typeLabel.setText("Type:");
-        typeLabel.setLayoutData(new GridData());
+        GridData gd = new GridData();
+        gd.widthHint = 100;
+        typeLabel.setLayoutData(gd);
 
         typeText = new Text(composite, SWT.BORDER);
         typeText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -178,7 +168,6 @@ public class NISChangeDialog extends Dialog {
 
         okButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                domain = domainText.getText().equals("") ? null : domainText.getText();
                 type = typeText.getText().equals("") ? null : typeText.getText();
                 target = targetText.getText().equals("") ? null : targetText.getText();
                 oldValue = oldValueText.getText().equals("") ? null : oldValueText.getText();
@@ -198,14 +187,6 @@ public class NISChangeDialog extends Dialog {
 
     public void setAction(int action) {
         this.action = action;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public void setDomain(String domain) {
-        this.domain = domain;
     }
 
     public String getType() {

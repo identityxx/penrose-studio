@@ -2,18 +2,33 @@ package org.safehaus.penrose.studio.nis;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.ldap.*;
+import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.source.SourceManager;
+import org.safehaus.penrose.source.Source;
+import org.safehaus.penrose.nis.NISDomain;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.IEditorInput;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchActionConstants;
+import org.apache.log4j.Logger;
 
 import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
  */
 public class NISNode extends Node {
+
+    Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
 
@@ -22,20 +37,121 @@ public class NISNode extends Node {
         this.view = view;
     }
 
+    public void showMenu(IMenuManager manager) throws Exception {
+
+        manager.add(new Action("New Domain...") {
+            public void run() {
+                try {
+                    newDomain();
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(new Action("Refresh") {
+            public void run() {
+                try {
+                    refresh();
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                }
+            }
+        });
+    }
+
     public boolean hasChildren() throws Exception {
-        return false;
+
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseContext penroseContext = penroseApplication.getPenroseContext();
+        SourceManager sourceManager = penroseContext.getSourceManager();
+
+        Source domains = sourceManager.getSource("DEFAULT", "domains");
+        if (domains == null) return false;
+
+        SearchRequest request = new SearchRequest();
+        SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
+
+        domains.search(request, response);
+
+        return response.getTotalCount() > 0;
     }
 
     public Collection getChildren() throws Exception {
-        return null;
+
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseContext penroseContext = penroseApplication.getPenroseContext();
+        SourceManager sourceManager = penroseContext.getSourceManager();
+
+        Source domains = sourceManager.getSource("DEFAULT", "domains");
+        if (domains == null) return null;
+
+        SearchRequest request = new SearchRequest();
+        SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
+
+        domains.search(request, response);
+
+        Collection children = new ArrayList();
+
+        while (response.hasNext()) {
+            SearchResult result = response.next();
+            Attributes attributes = result.getAttributes();
+            
+            String name = (String)attributes.getValue("name");
+            String partition = (String)attributes.getValue("partition");
+
+            NISDomain domain = new NISDomain();
+            domain.setName(name);
+            domain.setPartition(partition);
+
+            NISDomainNode node = new NISDomainNode(
+                    view,
+                    partition,
+                    ObjectsView.ENTRY,
+                    PenrosePlugin.getImage(PenroseImage.NODE),
+                    domain,
+                    this
+            );
+
+            children.add(node);
+        }
+
+        return children;
     }
 
-    public void open() throws Exception {
+    public void newDomain() throws Exception {
 
-        NISEditorInput ei = new NISEditorInput();
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseContext penroseContext = penroseApplication.getPenroseContext();
+        SourceManager sourceManager = penroseContext.getSourceManager();
 
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        IWorkbenchPage page = window.getActivePage();
-        page.openEditor(ei, NISEditor.class.getName());
+        Source domains = sourceManager.getSource("DEFAULT", "domains");
+
+        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+        NISDomainDialog dialog = new NISDomainDialog(shell, SWT.NONE);
+
+        dialog.open();
+
+        int action = dialog.getAction();
+        if (action == NISUserDialog.CANCEL) return;
+
+        RDNBuilder rb = new RDNBuilder();
+        rb.set("name", dialog.getName());
+        DN dn = new DN(rb.toRdn());
+
+        Attributes attributes = new Attributes();
+        attributes.setValue("name", dialog.getName());
+        attributes.setValue("partition", dialog.getPartition());
+
+        domains.add(dn, attributes);
+
+        penroseApplication.notifyChangeListeners();
+    }
+
+    public void refresh() throws Exception {
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        penroseApplication.notifyChangeListeners();
     }
 }
