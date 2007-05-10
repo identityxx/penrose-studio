@@ -210,9 +210,9 @@ public class NISFilesPage extends FormPage {
             public void add(SearchResult result) throws Exception {
                 Attributes attributes = result.getAttributes();
                 String name = (String)attributes.getValue("name");
-                String path = (String)attributes.getValue("path");
+                String paths = (String)attributes.getValue("paths");
 
-                String host = name+":"+path;
+                String host = name+":"+ paths;
                 hostsList.add(host);
                 hostsList.setData(host, result);
             }
@@ -234,7 +234,11 @@ public class NISFilesPage extends FormPage {
             Attributes attributes = result.getAttributes();
 
             final String hostname = (String)attributes.getValue("name");
-            String path = (String)attributes.getValue("path");
+            String s = (String)attributes.getValue("paths");
+
+            Collection<String> paths = new ArrayList<String>();
+            StringTokenizer st = new StringTokenizer(s, ",");
+            while (st.hasMoreTokens()) paths.add(st.nextToken());
 
             FindClient client = new FindClient(hostname);
 
@@ -249,7 +253,7 @@ public class NISFilesPage extends FormPage {
                 }
             };
 
-            client.find(path, results);
+            client.find(paths, results);
 
             counter += results.getTotalCount();
 

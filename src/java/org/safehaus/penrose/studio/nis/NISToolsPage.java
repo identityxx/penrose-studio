@@ -9,6 +9,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.SWT;
@@ -29,9 +30,7 @@ import org.safehaus.penrose.agent.client.FindResult;
 import org.safehaus.penrose.agent.AgentResults;
 import org.safehaus.penrose.nis.NISDomain;
 
-import java.util.Map;
-import java.util.LinkedHashMap;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * @author Endi S. Dewata
@@ -260,8 +259,12 @@ public class NISToolsPage extends FormPage {
             Attributes attributes = result.getAttributes();
 
             final String hostname = (String)attributes.getValue("name");
-            String path = (String)attributes.getValue("path");
+            String s = (String)attributes.getValue("paths");
             Integer port = (Integer) attributes.getValue("port");
+
+            Collection<String> paths = new ArrayList<String>();
+            StringTokenizer st = new StringTokenizer(s, ",");
+            while (st.hasMoreTokens()) paths.add(st.nextToken());
 
             FindClient client = new FindClient(hostname, port);
 
@@ -276,7 +279,7 @@ public class NISToolsPage extends FormPage {
                     }
                 };
 
-                client.findByUid(path, new Integer(parameters), results);
+                client.findByUid(paths, new Integer(parameters), results);
 
                 counter += results.getTotalCount();
 
@@ -293,21 +296,21 @@ public class NISToolsPage extends FormPage {
                     }
                 };
 
-                client.findByGid(path, new Integer(parameters), results);
+                client.findByGid(paths, new Integer(parameters), results);
 
                 counter += results.getTotalCount();
 
                 messageLabel.setText("Found "+counter+" file(s).");
 
             } else if ("changeUid".equals(action)) {
-                StringTokenizer st = new StringTokenizer(parameters);
-                int rc = client.changeUid(path, new Integer(st.nextToken()), new Integer(st.nextToken()));
+                st = new StringTokenizer(parameters);
+                int rc = client.changeUid(paths, new Integer(st.nextToken()), new Integer(st.nextToken()));
 
                 messageLabel.setText(rc == 0 ? "Operation succeeded." : "Operation failed. RC: "+rc);
 
             } else if ("changeGid".equals(action)) {
-                StringTokenizer st = new StringTokenizer(parameters);
-                int rc = client.changeGid(path, new Integer(st.nextToken()), new Integer(st.nextToken()));
+                st = new StringTokenizer(parameters);
+                int rc = client.changeGid(paths, new Integer(st.nextToken()), new Integer(st.nextToken()));
 
                 messageLabel.setText(rc == 0 ? "Operation succeeded." : "Operation failed. RC: "+rc);
             }

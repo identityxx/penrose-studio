@@ -27,13 +27,13 @@ public class NISHostDialog extends Dialog {
     Shell shell;
 
     Text nameText;
-    Text pathText;
+    Text pathsText;
     Text portText;
 
     int action;
 
     private String name;
-    private String path;
+    private String paths;
     private Integer port;
 
     public NISHostDialog(Shell parent, int style) {
@@ -72,7 +72,7 @@ public class NISHostDialog extends Dialog {
 
     public void reset() {
         nameText.setText(name == null ? "" : name);
-        pathText.setText(path == null ? "" : path);
+        pathsText.setText(paths == null ? "" : paths);
         portText.setText(port == null ? ""+ Registry.REGISTRY_PORT : ""+port);
     }
 
@@ -102,19 +102,19 @@ public class NISHostDialog extends Dialog {
         nameText = new Text(composite, SWT.BORDER);
         nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Label pathLabel = new Label(composite, SWT.NONE);
-        pathLabel.setText("Path:");
-        pathLabel.setLayoutData(new GridData());
-
-        pathText = new Text(composite, SWT.BORDER);
-        pathText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
         Label portLabel = new Label(composite, SWT.NONE);
         portLabel.setText("Port:");
         portLabel.setLayoutData(new GridData());
 
         portText = new Text(composite, SWT.BORDER);
         portText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label pathsLabel = new Label(composite, SWT.NONE);
+        pathsLabel.setText("Paths:");
+        pathsLabel.setLayoutData(new GridData());
+
+        pathsText = new Text(composite, SWT.BORDER);
+        pathsText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         return composite;
     }
@@ -140,7 +140,7 @@ public class NISHostDialog extends Dialog {
         okButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 name = nameText.getText().equals("") ? null : nameText.getText();
-                path = pathText.getText().equals("") ? null : pathText.getText();
+                paths = pathsText.getText().equals("") ? null : pathsText.getText();
                 port = portText.getText().equals("") ? Registry.REGISTRY_PORT : new Integer(portText.getText());
                 action = OK;
                 shell.close();
@@ -166,12 +166,12 @@ public class NISHostDialog extends Dialog {
         this.name = name;
     }
 
-    public String getPath() {
-        return path;
+    public String getPaths() {
+        return paths;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setPaths(String paths) {
+        this.paths = paths;
     }
 
     public Integer getPort() {
