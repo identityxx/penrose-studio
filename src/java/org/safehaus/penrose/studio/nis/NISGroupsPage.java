@@ -576,8 +576,6 @@ public class NISGroupsPage extends FormPage {
             String domainName = (String) attributes.getValue("name");
             String partition = (String) attributes.getValue("partition");
 
-            if (domain.getName().equals(domainName)) continue;
-
             response = new SearchResponse<SearchResult>();
 
             groups = sourceManager.getSource(partition, "cache.groups");

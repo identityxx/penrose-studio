@@ -76,7 +76,7 @@ public class NISFilesPage extends FormPage implements Runnable {
         body.setLayout(new GridLayout());
 
         Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Action");
+        section.setText("Search");
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Control sourcesSection = createActionSection(section);
@@ -136,6 +136,7 @@ public class NISFilesPage extends FormPage implements Runnable {
         uidText = toolkit.createText(composite, "", SWT.BORDER);
         gd = new GridData();
         gd.horizontalSpan = 2;
+        gd.widthHint = 100;
         uidText.setLayoutData(gd);
 
         Label gidLabel = toolkit.createLabel(composite, "GID:");
@@ -144,6 +145,7 @@ public class NISFilesPage extends FormPage implements Runnable {
         gidText = toolkit.createText(composite, "", SWT.BORDER);
         gd = new GridData();
         gd.horizontalSpan = 2;
+        gd.widthHint = 100;
         gidText.setLayoutData(gd);
 
         Label hostLabel = toolkit.createLabel(composite, "Hosts:");
@@ -180,7 +182,8 @@ public class NISFilesPage extends FormPage implements Runnable {
         });
 
         Button runButton = new Button(composite, SWT.PUSH);
-        runButton.setText("  Run  ");
+        runButton.setText("  Search  ");
+        runButton.setEnabled(false);
         gd = new GridData();
         gd.horizontalAlignment = GridData.END;
         gd.widthHint = 80;

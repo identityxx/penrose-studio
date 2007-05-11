@@ -348,12 +348,10 @@ public class NISUserChangesPage extends FormPage {
 
                     Integer origUidNumber = (Integer)attributes.getValue("origUidNumber");
 
-                    NISToolsPage page = (NISToolsPage)editor.setActivePage("TOOLS");
-                    page.actionsCombo.setText("Find files by UID number");
-
-                    page.updateHosts();
+                    NISFilesPage page = (NISFilesPage)editor.setActivePage("FILES");
                     page.hostsList.selectAll();
-                    page.parametersText.setText(""+origUidNumber);
+                    page.uidText.setText(""+origUidNumber);
+                    page.gidText.setText("");
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
@@ -385,9 +383,9 @@ public class NISUserChangesPage extends FormPage {
                     NISToolsPage page = (NISToolsPage)editor.setActivePage("TOOLS");
                     page.actionsCombo.setText("Change file UID number");
 
-                    page.updateHosts();
                     page.hostsList.selectAll();
-                    page.parametersText.setText(origUidNumber+" "+uidNumber);
+                    page.fromText.setText(""+origUidNumber);
+                    page.toText.setText(""+uidNumber);
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
@@ -419,9 +417,9 @@ public class NISUserChangesPage extends FormPage {
                     NISToolsPage page = (NISToolsPage)editor.setActivePage("TOOLS");
                     page.actionsCombo.setText("Change file UID number");
 
-                    page.updateHosts();
                     page.hostsList.selectAll();
-                    page.parametersText.setText(uidNumber+" "+origUidNumber);
+                    page.fromText.setText(""+uidNumber);
+                    page.toText.setText(""+origUidNumber);
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
