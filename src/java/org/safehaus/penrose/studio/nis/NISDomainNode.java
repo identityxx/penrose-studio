@@ -49,7 +49,7 @@ public class NISDomainNode extends Node {
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
         SourceManager sourceManager = penroseContext.getSourceManager();
 
-        domains = sourceManager.getSource("DEFAULT", "domains");
+        domains = sourceManager.getSource("DEFAULT", "penrose.domains");
     }
 
     public void showMenu(IMenuManager manager) throws Exception {

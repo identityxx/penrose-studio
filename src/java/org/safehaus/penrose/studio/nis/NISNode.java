@@ -68,7 +68,7 @@ public class NISNode extends Node {
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
         SourceManager sourceManager = penroseContext.getSourceManager();
 
-        Source domains = sourceManager.getSource("DEFAULT", "domains");
+        Source domains = sourceManager.getSource("DEFAULT", "penrose.domains");
         if (domains == null) return false;
 
         SearchRequest request = new SearchRequest();
@@ -85,7 +85,7 @@ public class NISNode extends Node {
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
         SourceManager sourceManager = penroseContext.getSourceManager();
 
-        Source domains = sourceManager.getSource("DEFAULT", "domains");
+        Source domains = sourceManager.getSource("DEFAULT", "penrose.domains");
         if (domains == null) return null;
 
         SearchRequest request = new SearchRequest();
@@ -127,7 +127,7 @@ public class NISNode extends Node {
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
         SourceManager sourceManager = penroseContext.getSourceManager();
 
-        Source domains = sourceManager.getSource("DEFAULT", "domains");
+        Source domains = sourceManager.getSource("DEFAULT", "penrose.domains");
 
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
         NISDomainDialog dialog = new NISDomainDialog(shell, SWT.NONE);

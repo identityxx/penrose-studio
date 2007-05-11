@@ -27,10 +27,10 @@ public class NISEditor extends FormEditor {
         try {
             addPage(new NISDomainPage(this));
             addPage(new NISHostsPage(this));
-            addPage(new NISFilesPage(this));
             addPage(new NISUsersPage(this));
             addPage(new NISGroupsPage(this));
             addPage(new NISChangesPage(this));
+            addPage(new NISFilesPage(this));
             addPage(new NISToolsPage(this));
 
         } catch (Exception e) {

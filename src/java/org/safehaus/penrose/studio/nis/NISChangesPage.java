@@ -51,7 +51,7 @@ public class NISChangesPage extends FormPage {
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
         SourceManager sourceManager = penroseContext.getSourceManager();
 
-        changes = sourceManager.getSource("DEFAULT", "changes");
+        changes = sourceManager.getSource("DEFAULT", "penrose.changes");
     }
 
     public void createFormContent(IManagedForm managedForm) {

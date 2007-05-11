@@ -7,10 +7,7 @@ import org.safehaus.penrose.agent.AgentResults;
 import org.safehaus.penrose.source.Source;
 import org.apache.log4j.Logger;
 
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * @author Endi Sukma Dewata
@@ -54,9 +51,13 @@ public class UpdateFilesRunnable implements Runnable {
         RDNBuilder rb = new RDNBuilder();
         rb.set("hostname", hostname);
 
-        files.delete(new DN(rb.toRdn()));
+        Map<String,String> parameters = files.getConnection().getParameters();
 
         FindClient client = new FindClient(hostname, port);
+
+        client.find(paths, parameters);
+/*
+        // files.delete(new DN(rb.toRdn()));
 
         AgentResults<FindResult> results = new AgentResults<FindResult>() {
             public void add(FindResult result) throws Exception {
@@ -106,5 +107,6 @@ public class UpdateFilesRunnable implements Runnable {
         ));
 
         hosts.modify(host.getDn(), modifications);
+*/
     }
 }

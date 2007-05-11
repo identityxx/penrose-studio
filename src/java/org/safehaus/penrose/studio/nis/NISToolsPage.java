@@ -70,7 +70,7 @@ public class NISToolsPage extends FormPage {
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
         SourceManager sourceManager = penroseContext.getSourceManager();
 
-        hosts = sourceManager.getSource("DEFAULT", "hosts");
+        hosts = sourceManager.getSource("DEFAULT", "penrose.hosts");
     }
 
     public void createFormContent(IManagedForm managedForm) {

@@ -46,14 +46,20 @@ public class JDBCSourceEditor extends FormEditor {
     JDBCSourceCachePage cachePage;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        JDBCSourceEditorInput ei = (JDBCSourceEditorInput)input;
-        partition = ei.getPartition();
-        origSourceConfig = ei.getSourceConfig();
-        sourceConfig = (SourceConfig)origSourceConfig.clone();
 
-        setSite(site);
-        setInput(input);
-        setPartName(partition.getName()+"/"+sourceConfig.getName());
+        try {
+            JDBCSourceEditorInput ei = (JDBCSourceEditorInput)input;
+            partition = ei.getPartition();
+            origSourceConfig = ei.getSourceConfig();
+            sourceConfig = (SourceConfig)origSourceConfig.clone();
+
+            setSite(site);
+            setInput(input);
+            setPartName(partition.getName()+"/"+sourceConfig.getName());
+
+        } catch (Exception e) {
+            throw new PartInitException(e.getMessage(), e);
+        }
     }
 
     public void addPages() {

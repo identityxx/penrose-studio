@@ -8,19 +8,28 @@ import java.util.List;
  */
 public class NISActionRequest {
 
-    private List domains = new ArrayList();
+    private String domain;
+    private List<String> domains = new ArrayList<String>();
 
-    public List getDomains() {
+    public List<String> getDomains() {
         return domains;
     }
 
-    public void addPartition(String domain) {
+    public void addDomain(String domain) {
         domains.add(domain);
     }
     
-    public void setDomains(List domains) {
+    public void setDomains(List<String> domains) {
         if (this.domains == domains) return;
         this.domains.clear();
         this.domains.addAll(domains);
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 }

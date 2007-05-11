@@ -25,6 +25,7 @@ import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
+import org.safehaus.penrose.nis.NISDomain;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ public class NISGroupsPage extends FormPage {
     Table table;
 
     NISEditor editor;
+    NISDomain domain;
 
     Source actions;
     Source domains;
@@ -53,13 +55,14 @@ public class NISGroupsPage extends FormPage {
         super(editor, "GROUPS", "  Groups  ");
 
         this.editor = editor;
+        this.domain = editor.getDomain();
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
         SourceManager sourceManager = penroseContext.getSourceManager();
 
-        actions = sourceManager.getSource("DEFAULT", "actions");
-        domains = sourceManager.getSource("DEFAULT", "domains");
+        actions = sourceManager.getSource("DEFAULT", "penrose.actions");
+        domains = sourceManager.getSource("DEFAULT", "penrose.domains");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -321,9 +324,10 @@ public class NISGroupsPage extends FormPage {
         NISAction action = (NISAction) clazz.newInstance();
 
         NISActionRequest request = new NISActionRequest();
+        request.setDomain(domain.getName());
 
-        for (String domain : domainsList.getSelection()) {
-            request.addPartition(domain);
+        for (String d : domainsList.getSelection()) {
+            request.addDomain(d);
         }
 
         NISActionResponse response = new NISActionResponse() {
@@ -371,7 +375,7 @@ public class NISGroupsPage extends FormPage {
             }
 
             public void close() {
-                messageLabel.setText("Found " + counter + " result(s).");
+                messageLabel.setText("Found " + counter + " conflict(s).");
             }
         };
 
@@ -469,7 +473,7 @@ public class NISGroupsPage extends FormPage {
             newGidNumber = origGidNumber;
         }
 
-        Source changes = sourceManager.getSource("DEFAULT", "changes");
+        Source changes = sourceManager.getSource("DEFAULT", "penrose.changes");
 
         Attributes attributes = new Attributes();
         attributes.setValue("domain", domain);

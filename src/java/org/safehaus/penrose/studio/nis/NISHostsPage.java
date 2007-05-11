@@ -53,8 +53,8 @@ public class NISHostsPage extends FormPage {
 
         final SourceManager sourceManager = penroseContext.getSourceManager();
 
-        hosts = sourceManager.getSource("DEFAULT", "hosts");
-        files = sourceManager.getSource("DEFAULT", "files");
+        hosts = sourceManager.getSource("DEFAULT", "penrose.hosts");
+        files = sourceManager.getSource("DEFAULT", "penrose.files");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -76,6 +76,11 @@ public class NISHostsPage extends FormPage {
         refresh();
     }
 
+    public void setActive(boolean b) {
+        super.setActive(b);
+        if (b) refresh();
+    }
+    
     public void refresh() {
         try {
             int indices[] = hostsTable.getSelectionIndices();
@@ -363,7 +368,9 @@ public class NISHostsPage extends FormPage {
             hosts.modify(result.getDn(), modifications);
 
             Runnable runnable = new UpdateFilesRunnable(result, hosts, files);
-            new Thread(runnable).start();
+            runnable.run();
+
+            //new Thread(runnable).start();
             
             //Display display = getSite().getShell().getDisplay();
             //display.asyncExec(runnable);

@@ -10,8 +10,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.graphics.Point;
+
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.partition.SourceConfig;
+
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 
@@ -28,8 +29,6 @@ public class NISUserDialog extends Dialog {
     public final static int REMOVE = 3;
 
     Shell shell;
-
-    SourceConfig sourceConfig;
 
     Label domainText;
     Label uidText;
@@ -241,7 +240,7 @@ public class NISUserDialog extends Dialog {
                     uidNumber = origUidNumber;
                 }
 
-                message = messageText.getText();
+                message = "".equals(messageText.getText()) ? null : messageText.getText();
 
                 shell.close();
             }
@@ -256,14 +255,6 @@ public class NISUserDialog extends Dialog {
 
     public void setAction(int action) {
         this.action = action;
-    }
-
-    public SourceConfig getSourceConfig() {
-        return sourceConfig;
-    }
-
-    public void setSourceConfig(SourceConfig sourceConfig) {
-        this.sourceConfig = sourceConfig;
     }
 
     public Object getNewUidNumber() {

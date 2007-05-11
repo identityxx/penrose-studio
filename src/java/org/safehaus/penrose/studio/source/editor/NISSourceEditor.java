@@ -26,14 +26,20 @@ public class NISSourceEditor extends FormEditor {
     boolean dirty;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        SourceEditorInput ei = (SourceEditorInput)input;
-        partition = ei.getPartition();
-        origSourceConfig = ei.getSourceConfig();
-        sourceConfig = (SourceConfig)origSourceConfig.clone();
 
-        setSite(site);
-        setInput(input);
-        setPartName(partition.getName()+"/"+sourceConfig.getName());
+        try {
+            SourceEditorInput ei = (SourceEditorInput)input;
+            partition = ei.getPartition();
+            origSourceConfig = ei.getSourceConfig();
+            sourceConfig = (SourceConfig)origSourceConfig.clone();
+    
+            setSite(site);
+            setInput(input);
+            setPartName(partition.getName()+"/"+sourceConfig.getName());
+
+        } catch (Exception e) {
+            throw new PartInitException(e.getMessage(), e);
+        }
     }
 
     public void addPages() {

@@ -4,14 +4,10 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.forms.events.HyperlinkAdapter;
-import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -23,9 +19,9 @@ import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.ldap.*;
+import org.safehaus.penrose.nis.NISDomain;
 
-import java.util.Collection;
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * @author Endi S. Dewata
@@ -37,27 +33,32 @@ public class NISUsersPage extends FormPage {
     FormToolkit toolkit;
 
     Combo actionCombo;
-    List domainsList;
 
     Label messageLabel;
-    Table table;
+    Table usersTable;
+    Table conflictsTable;
+    Table matchesTable;
 
     NISEditor editor;
+    NISDomain domain;
 
     Source actions;
     Source domains;
+
+    Map<String,Collection<Conflict>> conflicts = new TreeMap<String,Collection<Conflict>>();
 
     public NISUsersPage(NISEditor editor) {
         super(editor, "USERS", "  Users  ");
 
         this.editor = editor;
+        this.domain = editor.getDomain();
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
         SourceManager sourceManager = penroseContext.getSourceManager();
 
-        actions = sourceManager.getSource("DEFAULT", "actions");
-        domains = sourceManager.getSource("DEFAULT", "domains");
+        actions = sourceManager.getSource("DEFAULT", "penrose.actions");
+        domains = sourceManager.getSource("DEFAULT", "penrose.domains");
 
     }
 
@@ -90,7 +91,6 @@ public class NISUsersPage extends FormPage {
     public void init() {
         try {
             actionCombo.removeAll();
-            domainsList.removeAll();
 
             SearchRequest request = new SearchRequest();
             request.setFilter("(type=users)");
@@ -109,21 +109,6 @@ public class NISUsersPage extends FormPage {
             actions.search(request, response);
 
             actionCombo.select(0);
-
-            request = new SearchRequest();
-            response = new SearchResponse<SearchResult>() {
-                public void add(SearchResult result) throws Exception {
-                    Attributes attributes = result.getAttributes();
-                    String domain = (String) attributes.getValue("name");
-                    String partition = (String) attributes.getValue("partition");
-                    domainsList.add(domain);
-                    domainsList.setData(domain, partition);
-                }
-            };
-
-            domains.search(request, response);
-
-            domainsList.selectAll();
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
@@ -147,42 +132,7 @@ public class NISUsersPage extends FormPage {
 
         actionCombo = new Combo(composite, SWT.READ_ONLY);
         gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalSpan = 2;
         actionCombo.setLayoutData(gd);
-
-        Label domainLabel = toolkit.createLabel(composite, "Domain:");
-        gd = new GridData();
-        gd.verticalAlignment = GridData.BEGINNING;
-        gd.widthHint = 100;
-        domainLabel.setLayoutData(gd);
-
-        domainsList = new List(composite, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalSpan = 2;
-        gd.heightHint = 80;
-        domainsList.setLayoutData(gd);
-
-        new Label(composite, SWT.NONE);
-
-        Composite links = toolkit.createComposite(composite);
-        links.setLayout(new RowLayout());
-        links.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        Hyperlink selectAllLink = toolkit.createHyperlink(links, "Select All", SWT.NONE);
-
-        selectAllLink.addHyperlinkListener(new HyperlinkAdapter() {
-            public void linkActivated(HyperlinkEvent event) {
-                domainsList.selectAll();
-            }
-        });
-
-        Hyperlink selectNoneLink = toolkit.createHyperlink(links, "Select None", SWT.NONE);
-
-        selectNoneLink.addHyperlinkListener(new HyperlinkAdapter() {
-            public void linkActivated(HyperlinkEvent event) {
-                domainsList.deselectAll();
-            }
-        });
 
         Button runButton = new Button(composite, SWT.PUSH);
         runButton.setText("Run");
@@ -213,60 +163,42 @@ public class NISUsersPage extends FormPage {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayoutData(new GridData(GridData.FILL_BOTH));
-        composite.setLayout(new GridLayout());
+        composite.setLayout(new GridLayout(2, false));
 
         messageLabel = toolkit.createLabel(composite, "");
-        messageLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+        messageLabel.setLayoutData(gd);
 
-        table = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
-        table.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Label conflictsLabel = toolkit.createLabel(composite, "Conflicts:");
+        conflictsLabel.setLayoutData(new GridData());
 
-        table.setHeaderVisible(true);
-        table.setLinesVisible(true);
+        usersTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
+        gd = new GridData(GridData.FILL_BOTH);
+        gd.verticalSpan = 3;
+        usersTable.setLayoutData(gd);
 
-        TableColumn tc = new TableColumn(table, SWT.NONE);
-        tc.setText("Domain 1");
-        tc.setWidth(120);
+        usersTable.setHeaderVisible(true);
+        usersTable.setLinesVisible(true);
 
-        tc = new TableColumn(table, SWT.NONE);
+        TableColumn tc = new TableColumn(usersTable, SWT.NONE);
         tc.setText("User");
         tc.setWidth(100);
 
-        tc = new TableColumn(table, SWT.NONE);
+        tc = new TableColumn(usersTable, SWT.NONE);
         tc.setText("UID");
         tc.setWidth(80);
 
-        tc = new TableColumn(table, SWT.NONE);
-        tc.setText("Domain 2");
-        tc.setWidth(120);
-
-        tc = new TableColumn(table, SWT.NONE);
-        tc.setText("User");
-        tc.setWidth(100);
-
-        tc = new TableColumn(table, SWT.NONE);
-        tc.setText("UID");
-        tc.setWidth(80);
-
-        Composite buttons = toolkit.createComposite(composite);
-        buttons.setLayout(new RowLayout());
-        buttons.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        Button edit1Button = new Button(buttons, SWT.PUSH);
-        edit1Button.setText("Edit user from domain 1");
-
-        edit1Button.addSelectionListener(new SelectionAdapter() {
+        usersTable.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    if (table.getSelectionCount() == 0) return;
+                    if (usersTable.getSelectionCount() == 0) return;
 
-                    TableItem item = table.getSelection()[0];
-                    String domain = (String) item.getData("domain1");
-                    String partition = (String) item.getData("partition1");
-                    Source source = (Source) item.getData("source1");
-                    String uid = (String) item.getData("uid1");
-                    Object uidNumber = item.getData("uidNumber1");
-                    edit(domain, partition, source, uid, uidNumber);
+                    TableItem item = usersTable.getSelection()[0];
+
+                    Attributes attributes = (Attributes)item.getData();
+
+                    showConflicts(attributes);
+                    showMatches(attributes);
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
@@ -279,21 +211,66 @@ public class NISUsersPage extends FormPage {
             }
         });
 
-        Button edit2Button = new Button(buttons, SWT.PUSH);
-        edit2Button.setText("Edit user from domain 2");
+        conflictsTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
+        conflictsTable.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        edit2Button.addSelectionListener(new SelectionAdapter() {
+        conflictsTable.setHeaderVisible(true);
+        conflictsTable.setLinesVisible(true);
+
+        tc = new TableColumn(conflictsTable, SWT.NONE);
+        tc.setText("Domain");
+        tc.setWidth(120);
+
+        tc = new TableColumn(conflictsTable, SWT.NONE);
+        tc.setText("User");
+        tc.setWidth(100);
+
+        tc = new TableColumn(conflictsTable, SWT.NONE);
+        tc.setText("UID");
+        tc.setWidth(80);
+
+        Label matchesLabel = toolkit.createLabel(composite, "Matches:");
+        matchesLabel.setLayoutData(new GridData());
+
+        matchesTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
+        matchesTable.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        matchesTable.setHeaderVisible(true);
+        matchesTable.setLinesVisible(true);
+
+        tc = new TableColumn(matchesTable, SWT.NONE);
+        tc.setText("Domain");
+        tc.setWidth(120);
+
+        tc = new TableColumn(matchesTable, SWT.NONE);
+        tc.setText("User");
+        tc.setWidth(100);
+
+        tc = new TableColumn(matchesTable, SWT.NONE);
+        tc.setText("UID");
+        tc.setWidth(80);
+
+        Button editButton = new Button(composite, SWT.PUSH);
+        editButton.setText("Edit");
+        gd = new GridData();
+        gd.widthHint = 80;
+        editButton.setLayoutData(gd);
+
+        editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    if (table.getSelectionCount() == 0) return;
+                    if (usersTable.getSelectionCount() == 0) return;
 
-                    TableItem item = table.getSelection()[0];
-                    String domain = (String) item.getData("domain2");
-                    String partition = (String) item.getData("partition2");
-                    Source source = (Source) item.getData("source2");
-                    String uid = (String) item.getData("uid2");
-                    Object uidNumber = item.getData("uidNumber2");
-                    edit(domain, partition, source, uid, uidNumber);
+                    TableItem item = usersTable.getSelection()[0];
+
+                    Attributes attributes = (Attributes)item.getData();
+                    String domain = (String)attributes.getValue("domain");
+                    String partition = (String)attributes.getValue("partition");
+                    Source source = (Source)attributes.getValue("source");
+                    String uid = (String)attributes.getValue("uid");
+                    Object origUidNumber = attributes.getValue("origUidNumber");
+
+                    edit(domain, partition, source, uid, origUidNumber);
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
@@ -309,9 +286,88 @@ public class NISUsersPage extends FormPage {
         return composite;
     }
 
+    public void showConflicts(Attributes attributes) throws Exception {
+
+        conflictsTable.removeAll();
+
+        String uid1 = (String) attributes.getValue("uid");
+        Collection<Conflict> list = conflicts.get(uid1);
+
+        if (list == null) return;
+
+        for (Conflict conflict : list) {
+
+            Attributes attributes2 = conflict.getAttributes2();
+
+            String domain2 = (String) attributes2.getValue("domain");
+            String uid2 = (String) attributes2.getValue("uid");
+            Integer uidNumber2 = (Integer) attributes2.getValue("uidNumber");
+            if (uidNumber2 == null) uidNumber2 = (Integer) attributes2.getValue("origUidNumber");
+
+            TableItem ti = new TableItem(conflictsTable, SWT.NONE);
+            ti.setText(0, domain2);
+            ti.setText(1, "" + uid2);
+            ti.setText(2, "" + uidNumber2);
+            ti.setData(attributes2);
+        }
+    }
+
+    public void showMatches(Attributes attributes) throws Exception {
+
+        matchesTable.removeAll();
+
+        String uid = (String) attributes.getValue("uid");
+        Integer uidNumber = (Integer) attributes.getValue("uidNumber");
+        if (uidNumber == null) uidNumber = (Integer) attributes.getValue("origUidNumber");
+
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseContext penroseContext = penroseApplication.getPenroseContext();
+        SourceManager sourceManager = penroseContext.getSourceManager();
+
+        SearchRequest searchRequest = new SearchRequest();
+        SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
+
+        domains.search(searchRequest, searchResponse);
+
+        while (searchResponse.hasNext()) {
+            SearchResult searchResults = searchResponse.next();
+            Attributes attrs = searchResults.getAttributes();
+
+            String domainName = (String) attrs.getValue("name");
+            String partition = (String) attrs.getValue("partition");
+
+            if (domain.getName().equals(domainName)) continue;
+            
+            SearchRequest request = new SearchRequest();
+            request.setFilter("(&(uid="+uid+")(uidNumber="+uidNumber+"))");
+
+            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
+
+            Source users = sourceManager.getSource(partition, "cache.users");
+            users.search(request, response);
+
+            while (response.hasNext()) {
+                SearchResult result = response.next();
+                Attributes attributes2 = result.getAttributes();
+
+                String uid2 = (String) attributes2.getValue("uid");
+                Integer uidNumber2 = (Integer)attributes2.getValue("uidNumber");
+
+                TableItem ti = new TableItem(matchesTable, SWT.NONE);
+                ti.setText(0, domainName);
+                ti.setText(1, "" + uid2);
+                ti.setText(2, "" + uidNumber2);
+                ti.setData(attributes2);
+            }
+        }
+    }
+
     public void run() throws Exception {
 
-        table.removeAll();
+        usersTable.removeAll();
+        conflictsTable.removeAll();
+        matchesTable.removeAll();
+        conflicts.clear();
 
         String actionName = actionCombo.getText();
         String className = (String) actionCombo.getData(actionName);
@@ -320,62 +376,56 @@ public class NISUsersPage extends FormPage {
         NISAction action = (NISAction) clazz.newInstance();
 
         NISActionRequest request = new NISActionRequest();
+        request.setDomain(domain.getName());
 
-        String[] domains = domainsList.getSelection();
-        for (String domain : domains) {
-            request.addPartition(domain);
+        SearchRequest searchRequest = new SearchRequest();
+        SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
+
+        domains.search(searchRequest, searchResponse);
+
+        while (searchResponse.hasNext()) {
+            SearchResult result = searchResponse.next();
+            Attributes attributes = result.getAttributes();
+            String domain = (String) attributes.getValue("name");
+            request.addDomain(domain);
         }
 
         NISActionResponse response = new NISActionResponse() {
-
-            int counter = 0;
-
             public void add(Object object) {
-                Attributes attributes = (Attributes) object;
+                Conflict conflict = (Conflict)object;
 
-                log.debug("Displaying result #" + counter);
+                Attributes attributes1 = conflict.getAttributes1();
+                String uid = (String) attributes1.getValue("uid");
 
-                String domain1 = (String) attributes.getValue("domain1");
-                String partition1 = (String) attributes.getValue("partition1");
-                Source source1 = (Source) attributes.getValue("source1");
-                String uid1 = (String) attributes.getValue("uid1");
-                Object uidNumber1 = attributes.getValue("uidNumber1");
+                Collection<Conflict> list = conflicts.get(uid);
+                if (list == null) {
+                    list = new ArrayList<Conflict>();
+                    conflicts.put(uid, list);
+                }
 
-                String domain2 = (String) attributes.getValue("domain2");
-                String partition2 = (String) attributes.getValue("partition2");
-                Source source2 = (Source) attributes.getValue("source2");
-                String uid2 = (String) attributes.getValue("uid2");
-                Object uidNumber2 = attributes.getValue("uidNumber2");
-
-                TableItem ti = new TableItem(table, SWT.NONE);
-                ti.setText(0, domain1);
-                ti.setText(1, "" + uid1);
-                ti.setText(2, "" + uidNumber1);
-                ti.setText(3, domain2);
-                ti.setText(4, "" + uid2);
-                ti.setText(5, "" + uidNumber2);
-
-                ti.setData("domain1", domain1);
-                ti.setData("partition1", partition1);
-                ti.setData("source1", source1);
-                ti.setData("uid1", uid1);
-                ti.setData("uidNumber1", uidNumber1);
-
-                ti.setData("domain2", domain2);
-                ti.setData("partition2", partition2);
-                ti.setData("source2", source2);
-                ti.setData("uid2", uid2);
-                ti.setData("uidNumber2", uidNumber2);
-
-                counter++;
-            }
-
-            public void close() {
-                messageLabel.setText("Found " + counter + " result(s).");
+                list.add(conflict);
             }
         };
 
         action.execute(request, response);
+
+        for (Collection<Conflict> list : conflicts.values()) {
+            
+            Conflict conflict = list.iterator().next();
+
+            Attributes attributes1 = conflict.getAttributes1();
+            String uid = (String) attributes1.getValue("uid");
+            Integer uidNumber = (Integer)attributes1.getValue("uidNumber");
+            if (uidNumber == null) uidNumber = (Integer)attributes1.getValue("origUidNumber");
+
+            TableItem ti = new TableItem(usersTable, SWT.NONE);
+            ti.setText(0, uid);
+            ti.setText(1, "" + uidNumber);
+
+            ti.setData(attributes1);
+        }
+
+        messageLabel.setText("Found " + conflicts.size() + " user(s).");
     }
 
     public void edit(
@@ -391,6 +441,7 @@ public class NISUsersPage extends FormPage {
         SourceManager sourceManager = penroseContext.getSourceManager();
 
         RDNBuilder rb = new RDNBuilder();
+        rb.set("domain", domain);
         rb.set("uid", uid);
         DN dn = new DN(rb.toRdn());
 
@@ -399,14 +450,13 @@ public class NISUsersPage extends FormPage {
         dialog.setUid(uid);
         dialog.setOrigUidNumber(origUidNumber);
 
-        Source sourceUidNumber = sourceManager.getSource(partition, "users_uidNumber");
-        dialog.setSourceConfig(sourceUidNumber.getSourceConfig());
+        Source penroseUsers = sourceManager.getSource(partition, "penrose.users");
 
         SearchRequest request = new SearchRequest();
         request.setDn(dn);
         SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
-        sourceUidNumber.search(request, response);
+        penroseUsers.search(request, response);
 
         Object currentUidNumber;
 
@@ -426,74 +476,103 @@ public class NISUsersPage extends FormPage {
 
         if (action == NISUserDialog.CANCEL) return;
 
-        Object newUidNumber = dialog.getUidNumber();
+        Object uidNumber = dialog.getUidNumber();
         String message = dialog.getMessage();
 
         if (action == NISUserDialog.SET) {
 
-            if (!origUidNumber.equals(newUidNumber)) checkUidNumber(newUidNumber);
+            if (!origUidNumber.equals(uidNumber)) checkUidNumber(uid, uidNumber);
 
             Attributes attrs = new Attributes();
-            attrs.setValue("uidNumber", newUidNumber);
+            attrs.setValue("domain", domain);
+            attrs.setValue("uid", uid);
+            attrs.setValue("oldUidNumber", origUidNumber);
+            attrs.setValue("uidNumber", uidNumber);
+            attrs.setValue("message", message);
 
-            sourceUidNumber.add(dn, attrs);
+            penroseUsers.add(dn, attrs);
 
         } else if (action == NISUserDialog.CHANGE) {
 
-            if (!origUidNumber.equals(newUidNumber)) checkUidNumber(newUidNumber);
+            if (!origUidNumber.equals(uidNumber)) checkUidNumber(uid, uidNumber);
 
             Collection<Modification> modifications = new ArrayList<Modification>();
-            modifications.add(new Modification(Modification.REPLACE, new Attribute("uidNumber", newUidNumber)));
+            modifications.add(new Modification(Modification.REPLACE, new Attribute("uidNumber", uidNumber)));
+            modifications.add(new Modification(Modification.REPLACE, new Attribute("message", message)));
 
-            sourceUidNumber.modify(dn, modifications);
+            penroseUsers.modify(dn, modifications);
 
         } else { // if (action == NISUserDialog.REMOVE) {
 
-            sourceUidNumber.delete(dn);
-            newUidNumber = origUidNumber;
+            penroseUsers.delete(dn);
+            uidNumber = origUidNumber;
         }
 
-        Source changes = sourceManager.getSource("DEFAULT", "changes");
+        Source changes = sourceManager.getSource("DEFAULT", "penrose.changes");
 
         Attributes attributes = new Attributes();
         attributes.setValue("domain", domain);
         attributes.setValue("type", "user");
         attributes.setValue("target", uid);
         attributes.setValue("oldValue", currentUidNumber.toString());
-        attributes.setValue("newValue", newUidNumber.toString());
+        attributes.setValue("newValue", uidNumber.toString());
         attributes.setValue("message", message);
 
         changes.add(new DN(), attributes);
     }
 
-    public void checkUidNumber(Object uidNumber) throws Exception {
+    public void checkUidNumber(String uid, Object uidNumber) throws Exception {
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
         SourceManager sourceManager = penroseContext.getSourceManager();
 
-        for (String domainName : domainsList.getItems()) {
-            String partitionName = (String) domainsList.getData(domainName);
+        SearchRequest request = new SearchRequest();
+        request.setFilter("(uidNumber=" + uidNumber + ")");
 
-            SearchRequest request = new SearchRequest();
-            request.setFilter("(uidNumber=" + uidNumber + ")");
+        SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
-            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
+        Source uidNumbers = sourceManager.getSource("DEFAULT", "penrose.users");
+        uidNumbers.search(request, response);
 
-            Source users = sourceManager.getSource(partitionName, "cache.users");
-            users.search(request, response);
+        while (response.hasNext()) {
+            SearchResult result = response.next();
+            Attributes attributes = result.getAttributes();
 
-            if (response.hasNext()) {
-                throw new Exception("uidNumber " + uidNumber + " already exists in domain " + domainName);
-            }
+            String domainName = (String)attributes.getValue("domain");
+            String uid2 = (String)attributes.getValue("uid");
+            if (uid.equals(uid2)) continue;
+
+            throw new Exception("UID number "+uidNumber+" is already allocated for user "+uid2+" in domain "+domainName);
+        }
+
+        SearchRequest searchRequest = new SearchRequest();
+        SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
+
+        domains.search(searchRequest, searchResponse);
+
+        while (searchResponse.hasNext()) {
+            SearchResult searchResults = searchResponse.next();
+            Attributes attributes = searchResults.getAttributes();
+
+            String domainName = (String) attributes.getValue("name");
+            String partition = (String) attributes.getValue("partition");
+
+            if (domain.getName().equals(domainName)) continue;
 
             response = new SearchResponse<SearchResult>();
 
-            Source uidNumbers = sourceManager.getSource(partitionName, "users_uidNumber");
-            uidNumbers.search(request, response);
+            Source users = sourceManager.getSource(partition, "cache.users");
+            users.search(request, response);
 
-            if (response.hasNext()) {
-                throw new Exception("uidNumber " + uidNumber + " already exists in domain " + domainName);
+            while (response.hasNext()) {
+                SearchResult result = response.next();
+                Attributes attrs = result.getAttributes();
+
+                String uid2 = (String)attrs.getValue("uid");
+                if (uid.equals(uid2)) continue;
+
+                throw new Exception("UID number "+uidNumber+" is used by user "+uid2+" in domain "+domainName);
             }
         }
     }
