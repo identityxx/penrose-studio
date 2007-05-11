@@ -24,7 +24,6 @@ public class NISChangeDialog extends Dialog {
 
     Shell shell;
 
-    Text typeText;
     Text targetText;
     Text oldValueText;
     Text newValueText;
@@ -32,7 +31,6 @@ public class NISChangeDialog extends Dialog {
 
     int action;
 
-    private String type;
     private String target;
     private String oldValue;
     private String newValue;
@@ -73,7 +71,6 @@ public class NISChangeDialog extends Dialog {
     }
 
     public void reset() {
-        typeText.setText(type == null ? "" : type);
         targetText.setText(target == null ? "" : target);
         oldValueText.setText(oldValue == null ? "" : oldValue);
         newValueText.setText(newValue == null ? "" : newValue);
@@ -100,18 +97,11 @@ public class NISChangeDialog extends Dialog {
         Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(new GridLayout(2, false));
 
-        Label typeLabel = new Label(composite, SWT.NONE);
-        typeLabel.setText("Type:");
-        GridData gd = new GridData();
-        gd.widthHint = 100;
-        typeLabel.setLayoutData(gd);
-
-        typeText = new Text(composite, SWT.BORDER);
-        typeText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
         Label targetLabel = new Label(composite, SWT.NONE);
         targetLabel.setText("Target:");
-        targetLabel.setLayoutData(new GridData());
+        GridData gd = new GridData();
+        gd.widthHint = 100;
+        targetLabel.setLayoutData(gd);
 
         targetText = new Text(composite, SWT.BORDER);
         targetText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -168,7 +158,6 @@ public class NISChangeDialog extends Dialog {
 
         okButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                type = typeText.getText().equals("") ? null : typeText.getText();
                 target = targetText.getText().equals("") ? null : targetText.getText();
                 oldValue = oldValueText.getText().equals("") ? null : oldValueText.getText();
                 newValue = newValueText.getText().equals("") ? null : newValueText.getText();
@@ -187,14 +176,6 @@ public class NISChangeDialog extends Dialog {
 
     public void setAction(int action) {
         this.action = action;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getTarget() {

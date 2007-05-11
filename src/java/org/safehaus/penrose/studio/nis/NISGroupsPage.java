@@ -4,14 +4,10 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.forms.events.HyperlinkAdapter;
-import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -21,14 +17,22 @@ import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.nis.action.NISAction;
 import org.safehaus.penrose.studio.nis.action.NISActionRequest;
 import org.safehaus.penrose.studio.nis.action.NISActionResponse;
+import org.safehaus.penrose.studio.nis.action.Conflict;
 import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.nis.NISDomain;
+import org.safehaus.penrose.adapter.jdbc.JDBCAdapter;
+import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.jdbc.Assignment;
+import org.safehaus.penrose.jdbc.QueryResponse;
 
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
+import java.sql.ResultSet;
 
 /**
  * @author Endi S. Dewata
@@ -40,16 +44,19 @@ public class NISGroupsPage extends FormPage {
     FormToolkit toolkit;
 
     Combo actionCombo;
-    List domainsList;
 
     Label messageLabel;
-    Table table;
+    Table groupsTable;
+    Table conflictsTable;
+    Table matchesTable;
 
     NISEditor editor;
     NISDomain domain;
 
     Source actions;
     Source domains;
+
+    Map<String,Collection<Conflict>> conflicts = new TreeMap<String,Collection<Conflict>>();
 
     public NISGroupsPage(NISEditor editor) {
         super(editor, "GROUPS", "  Groups  ");
@@ -94,7 +101,6 @@ public class NISGroupsPage extends FormPage {
     public void init() {
         try {
             actionCombo.removeAll();
-            domainsList.removeAll();
 
             SearchRequest request = new SearchRequest();
             request.setFilter("(type=groups)");
@@ -113,21 +119,6 @@ public class NISGroupsPage extends FormPage {
             actions.search(request, response);
 
             actionCombo.select(0);
-
-            request = new SearchRequest();
-            response = new SearchResponse<SearchResult>() {
-                public void add(SearchResult result) throws Exception {
-                    Attributes attributes = result.getAttributes();
-                    String domain = (String) attributes.getValue("name");
-                    String partition = (String) attributes.getValue("partition");
-                    domainsList.add(domain);
-                    domainsList.setData(domain, partition);
-                }
-            };
-
-            domains.search(request, response);
-
-            domainsList.selectAll();
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
@@ -150,43 +141,7 @@ public class NISGroupsPage extends FormPage {
         actionLabel.setLayoutData(gd);
 
         actionCombo = new Combo(composite, SWT.READ_ONLY);
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalSpan = 2;
-        actionCombo.setLayoutData(gd);
-
-        Label domainLabel = toolkit.createLabel(composite, "Domain:");
-        gd = new GridData();
-        gd.verticalAlignment = GridData.BEGINNING;
-        gd.widthHint = 100;
-        domainLabel.setLayoutData(gd);
-
-        domainsList = new List(composite, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalSpan = 2;
-        gd.heightHint = 80;
-        domainsList.setLayoutData(gd);
-
-        new Label(composite, SWT.NONE);
-
-        Composite links = toolkit.createComposite(composite);
-        links.setLayout(new RowLayout());
-        links.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        Hyperlink selectAllLink = toolkit.createHyperlink(links, "Select All", SWT.NONE);
-
-        selectAllLink.addHyperlinkListener(new HyperlinkAdapter() {
-            public void linkActivated(HyperlinkEvent event) {
-                domainsList.selectAll();
-            }
-        });
-
-        Hyperlink selectNoneLink = toolkit.createHyperlink(links, "Select None", SWT.NONE);
-
-        selectNoneLink.addHyperlinkListener(new HyperlinkAdapter() {
-            public void linkActivated(HyperlinkEvent event) {
-                domainsList.deselectAll();
-            }
-        });
+        actionCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Button runButton = new Button(composite, SWT.PUSH);
         runButton.setText("Run");
@@ -217,60 +172,41 @@ public class NISGroupsPage extends FormPage {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayoutData(new GridData(GridData.FILL_BOTH));
-        composite.setLayout(new GridLayout());
+        composite.setLayout(new GridLayout(2, false));
 
         messageLabel = toolkit.createLabel(composite, "");
         messageLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        table = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
-        table.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Label conflictsLabel = toolkit.createLabel(composite, "Conflicts:");
+        conflictsLabel.setLayoutData(new GridData());
 
-        table.setHeaderVisible(true);
-        table.setLinesVisible(true);
+        groupsTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
+        GridData gd = new GridData(GridData.FILL_BOTH);
+        gd.verticalSpan = 3;
+        groupsTable.setLayoutData(gd);
 
-        TableColumn tc = new TableColumn(table, SWT.NONE);
-        tc.setText("Domain 1");
-        tc.setWidth(120);
+        groupsTable.setHeaderVisible(true);
+        groupsTable.setLinesVisible(true);
 
-        tc = new TableColumn(table, SWT.NONE);
+        TableColumn tc = new TableColumn(groupsTable, SWT.NONE);
         tc.setText("Group");
         tc.setWidth(100);
 
-        tc = new TableColumn(table, SWT.NONE);
+        tc = new TableColumn(groupsTable, SWT.NONE);
         tc.setText("GID");
         tc.setWidth(80);
 
-        tc = new TableColumn(table, SWT.NONE);
-        tc.setText("Domain 2");
-        tc.setWidth(120);
-
-        tc = new TableColumn(table, SWT.NONE);
-        tc.setText("Group");
-        tc.setWidth(100);
-
-        tc = new TableColumn(table, SWT.NONE);
-        tc.setText("GID");
-        tc.setWidth(80);
-
-        Composite buttons = toolkit.createComposite(composite);
-        buttons.setLayout(new RowLayout());
-        buttons.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        Button edit1Button = new Button(buttons, SWT.PUSH);
-        edit1Button.setText("Edit group from domain 1");
-
-        edit1Button.addSelectionListener(new SelectionAdapter() {
+        groupsTable.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    if (table.getSelectionCount() == 0) return;
+                    if (groupsTable.getSelectionCount() == 0) return;
 
-                    TableItem item = table.getSelection()[0];
-                    String domain = (String) item.getData("domain1");
-                    String partition = (String) item.getData("partition1");
-                    Source source = (Source) item.getData("source1");
-                    String cn = (String) item.getData("group1");
-                    Object gidNumber = item.getData("gidNumber1");
-                    edit(domain, partition, source, cn, gidNumber);
+                    TableItem item = groupsTable.getSelection()[0];
+
+                    Attributes attributes = (Attributes)item.getData();
+
+                    showConflicts(attributes);
+                    showMatches(attributes);
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
@@ -283,21 +219,65 @@ public class NISGroupsPage extends FormPage {
             }
         });
 
-        Button edit2Button = new Button(buttons, SWT.PUSH);
-        edit2Button.setText("Edit group from domain 2");
+        conflictsTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
+        conflictsTable.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        edit2Button.addSelectionListener(new SelectionAdapter() {
+        conflictsTable.setHeaderVisible(true);
+        conflictsTable.setLinesVisible(true);
+
+        tc = new TableColumn(conflictsTable, SWT.NONE);
+        tc.setText("Domain");
+        tc.setWidth(120);
+
+        tc = new TableColumn(conflictsTable, SWT.NONE);
+        tc.setText("Group");
+        tc.setWidth(100);
+
+        tc = new TableColumn(conflictsTable, SWT.NONE);
+        tc.setText("GID");
+        tc.setWidth(80);
+
+        Label matchesLabel = toolkit.createLabel(composite, "Matches:");
+        matchesLabel.setLayoutData(new GridData());
+
+        matchesTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
+        matchesTable.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        matchesTable.setHeaderVisible(true);
+        matchesTable.setLinesVisible(true);
+
+        tc = new TableColumn(matchesTable, SWT.NONE);
+        tc.setText("Domain");
+        tc.setWidth(120);
+
+        tc = new TableColumn(matchesTable, SWT.NONE);
+        tc.setText("Group");
+        tc.setWidth(100);
+
+        tc = new TableColumn(matchesTable, SWT.NONE);
+        tc.setText("GID");
+        tc.setWidth(80);
+
+        Button editButton = new Button(composite, SWT.PUSH);
+        editButton.setText("Edit");
+        gd = new GridData();
+        gd.widthHint = 80;
+        editButton.setLayoutData(gd);
+
+        editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    if (table.getSelectionCount() == 0) return;
+                    if (groupsTable.getSelectionCount() == 0) return;
 
-                    TableItem item = table.getSelection()[0];
-                    String domain = (String) item.getData("domain2");
-                    String partition = (String) item.getData("partition2");
-                    Source source = (Source) item.getData("source2");
-                    String cn = (String) item.getData("group2");
-                    Object gidNumber = item.getData("gidNumber2");
-                    edit(domain, partition, source, cn, gidNumber);
+                    TableItem item = groupsTable.getSelection()[0];
+
+                    Attributes attributes = (Attributes)item.getData();
+                    String domain = (String)attributes.getValue("domain");
+                    String partition = (String)attributes.getValue("partition");
+                    String cn = (String)attributes.getValue("cn");
+                    Integer origGidNumber = (Integer)attributes.getValue("origGidNumber");
+
+                    edit(domain, partition, cn, origGidNumber);
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
@@ -313,9 +293,102 @@ public class NISGroupsPage extends FormPage {
         return composite;
     }
 
+    public void showConflicts(Attributes attributes) throws Exception {
+
+        conflictsTable.removeAll();
+
+        String cn = (String) attributes.getValue("cn");
+        Collection<Conflict> list = conflicts.get(cn);
+
+        if (list == null) return;
+
+        for (Conflict conflict : list) {
+
+            Attributes attributes2 = conflict.getAttributes2();
+
+            String domain2 = (String) attributes2.getValue("domain");
+            String cn2 = (String) attributes2.getValue("cn");
+            Integer gidNumber2 = (Integer) attributes2.getValue("gidNumber");
+            if (gidNumber2 == null) gidNumber2 = (Integer) attributes2.getValue("origGidNumber");
+
+            TableItem ti = new TableItem(conflictsTable, SWT.NONE);
+            ti.setText(0, domain2);
+            ti.setText(1, "" + cn2);
+            ti.setText(2, "" + gidNumber2);
+        }
+    }
+
+    public void showMatches(Attributes attributes) throws Exception {
+
+        matchesTable.removeAll();
+
+        String cn = (String) attributes.getValue("cn");
+        Integer gidNumber = (Integer) attributes.getValue("gidNumber");
+        if (gidNumber == null) gidNumber = (Integer) attributes.getValue("origGidNumber");
+
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseContext penroseContext = penroseApplication.getPenroseContext();
+        SourceManager sourceManager = penroseContext.getSourceManager();
+
+        SearchRequest searchRequest = new SearchRequest();
+        SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
+
+        domains.search(searchRequest, searchResponse);
+
+        while (searchResponse.hasNext()) {
+            SearchResult searchResults = searchResponse.next();
+            Attributes attrs = searchResults.getAttributes();
+
+            final String domainName = (String) attrs.getValue("name");
+            String partition = (String) attrs.getValue("partition");
+
+            if (domain.getName().equals(domainName)) continue;
+
+            Source users = sourceManager.getSource(partition, "cache.groups");
+
+            JDBCAdapter adapter = (JDBCAdapter)users.getConnection().getAdapter();
+            JDBCClient client = adapter.getClient();
+
+            String catalog = users.getParameter(JDBCClient.CATALOG);
+            String table = catalog+"."+users.getParameter(JDBCClient.TABLE);
+
+            String sql = "select a.cn, a.gidNumber, b.gidNumber" +
+                    " from "+table+" a"+
+                    " left join nis.groups b on b.domain=? and a.cn=b.cn"+
+                    " where a.cn = ? and (b.gidNumber is null and a.gidNumber = ? or b.gidNumber = ?)"+
+                    " order by a.cn";
+
+            Collection<Assignment> assignments = new ArrayList<Assignment>();
+            assignments.add(new Assignment(domainName));
+            assignments.add(new Assignment(cn));
+            assignments.add(new Assignment(gidNumber));
+            assignments.add(new Assignment(gidNumber));
+
+            QueryResponse queryResponse = new QueryResponse() {
+                public void add(Object object) throws Exception {
+                    ResultSet rs = (ResultSet)object;
+
+                    String cn2 = rs.getString(1);
+                    Integer gidNumber2 = (Integer)rs.getObject(3);
+                    if (gidNumber2 == null) gidNumber2 = (Integer)rs.getObject(2);
+
+                    TableItem ti = new TableItem(matchesTable, SWT.NONE);
+                    ti.setText(0, domainName);
+                    ti.setText(1, "" + cn2);
+                    ti.setText(2, "" + gidNumber2);
+                }
+            };
+
+            client.executeQuery(sql, assignments, queryResponse);
+        }
+    }
+
     public void run() throws Exception {
 
-        table.removeAll();
+        groupsTable.removeAll();
+        conflictsTable.removeAll();
+        matchesTable.removeAll();
+        conflicts.clear();
 
         String actionName = actionCombo.getText();
         String className = (String) actionCombo.getData(actionName);
@@ -326,68 +399,61 @@ public class NISGroupsPage extends FormPage {
         NISActionRequest request = new NISActionRequest();
         request.setDomain(domain.getName());
 
-        for (String d : domainsList.getSelection()) {
-            request.addDomain(d);
+        SearchRequest searchRequest = new SearchRequest();
+        SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
+
+        domains.search(searchRequest, searchResponse);
+
+        while (searchResponse.hasNext()) {
+            SearchResult result = searchResponse.next();
+            Attributes attributes = result.getAttributes();
+            String domain = (String) attributes.getValue("name");
+            request.addDomain(domain);
         }
 
         NISActionResponse response = new NISActionResponse() {
-
-            int counter = 0;
-
             public void add(Object object) {
-                Attributes attributes = (Attributes) object;
+                Conflict conflict = (Conflict)object;
 
-                log.debug("Displaying result #" + counter);
+                Attributes attributes1 = conflict.getAttributes1();
+                String cn = (String) attributes1.getValue("cn");
 
-                String domain1 = (String) attributes.getValue("domain1");
-                String partition1 = (String) attributes.getValue("partition1");
-                Source source1 = (Source) attributes.getValue("source1");
-                Object group1 = attributes.getValue("group1");
-                Object gidNumber1 = attributes.getValue("gidNumber1");
+                Collection<Conflict> list = conflicts.get(cn);
+                if (list == null) {
+                    list = new ArrayList<Conflict>();
+                    conflicts.put(cn, list);
+                }
 
-                String domain2 = (String) attributes.getValue("domain2");
-                String partition2 = (String) attributes.getValue("partition2");
-                Source source2 = (Source) attributes.getValue("source2");
-                Object group2 = attributes.getValue("group2");
-                Object gidNumber2 = attributes.getValue("gidNumber2");
-
-                TableItem ti = new TableItem(table, SWT.NONE);
-                ti.setText(0, domain1);
-                ti.setText(1, "" + group1);
-                ti.setText(2, "" + gidNumber1);
-                ti.setText(3, domain2);
-                ti.setText(4, "" + group2);
-                ti.setText(5, "" + gidNumber2);
-
-                ti.setData("domain1", domain1);
-                ti.setData("partition1", partition1);
-                ti.setData("source1", source1);
-                ti.setData("group1", group1);
-                ti.setData("gidNumber1", gidNumber1);
-
-                ti.setData("domain2", domain2);
-                ti.setData("partition2", partition2);
-                ti.setData("source2", source2);
-                ti.setData("group2", group2);
-                ti.setData("gidNumber2", gidNumber2);
-
-                counter++;
-            }
-
-            public void close() {
-                messageLabel.setText("Found " + counter + " conflict(s).");
+                list.add(conflict);
             }
         };
 
         action.execute(request, response);
+
+        for (Collection<Conflict> list : conflicts.values()) {
+
+            Conflict conflict = list.iterator().next();
+
+            Attributes attributes1 = conflict.getAttributes1();
+            String cn = (String) attributes1.getValue("cn");
+            Integer gidNumber = (Integer)attributes1.getValue("gidNumber");
+            if (gidNumber == null) gidNumber = (Integer)attributes1.getValue("origGidNumber");
+
+            TableItem ti = new TableItem(groupsTable, SWT.NONE);
+            ti.setText(0, cn);
+            ti.setText(1, "" + gidNumber);
+
+            ti.setData(attributes1);
+        }
+
+        messageLabel.setText("Found " + conflicts.size() + " groups(s).");
     }
 
     public void edit(
             String domain,
             String partition,
-            Source source,
             String cn,
-            Object origGidNumber
+            Integer origGidNumber
     ) throws Exception {
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
@@ -395,6 +461,7 @@ public class NISGroupsPage extends FormPage {
         SourceManager sourceManager = penroseContext.getSourceManager();
 
         RDNBuilder rb = new RDNBuilder();
+        rb.set("domain", domain);
         rb.set("cn", cn);
         DN dn = new DN(rb.toRdn());
 
@@ -403,31 +470,25 @@ public class NISGroupsPage extends FormPage {
         dialog.setName(cn);
         dialog.setOrigGidNumber(origGidNumber);
 
-        Source sourceGidNumber = sourceManager.getSource(partition, "groups_gidNumber");
-        dialog.setSourceConfig(sourceGidNumber.getSourceConfig());
+        Source penroseGroups = sourceManager.getSource(partition, "penrose.groups");
 
         SearchRequest request = new SearchRequest();
         request.setDn(dn);
 
         SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
-        sourceGidNumber.search(request, response);
+        penroseGroups.search(request, response);
 
-        Object currentGidNumber;
         if (response.hasNext()) {
             SearchResult result = response.next();
             Attributes attributes = result.getAttributes();
-            currentGidNumber = attributes.getValue("gidNumber");
-            dialog.setNewGidNumber(currentGidNumber);
-
-        } else {
-            currentGidNumber = origGidNumber;
+            dialog.setNewGidNumber((Integer)attributes.getValue("gidNumber"));
         }
 
         Source members = sourceManager.getSource(partition, "cache.groups_memberUid");
 
         request = new SearchRequest();
-        request.setDn(dn);
+        request.setFilter("(cn="+cn+")");
 
         response = new SearchResponse<SearchResult>();
 
@@ -446,74 +507,90 @@ public class NISGroupsPage extends FormPage {
 
         if (action == NISUserDialog.CANCEL) return;
 
-        Object newGidNumber = dialog.getGidNumber();
+        Integer newGidNumber = dialog.getGidNumber();
         String message = dialog.getMessage();
 
         if (action == NISGroupDialog.SET) {
 
-            if (!origGidNumber.equals(newGidNumber)) checkGidNumber(newGidNumber);
+            if (!origGidNumber.equals(newGidNumber)) checkGidNumber(cn, newGidNumber);
 
             Attributes attrs = new Attributes();
+            attrs.setValue("domain", domain);
+            attrs.setValue("cn", cn);
+            attrs.setValue("origGidNumber", origGidNumber);
             attrs.setValue("gidNumber", newGidNumber);
+            attrs.setValue("message", message);
 
-            sourceGidNumber.add(dn, attrs);
+            penroseGroups.add(dn, attrs);
 
         } else if (action == NISGroupDialog.CHANGE) {
 
-            if (!origGidNumber.equals(newGidNumber)) checkGidNumber(newGidNumber);
+            if (!origGidNumber.equals(newGidNumber)) checkGidNumber(cn, newGidNumber);
 
             Collection<Modification> modifications = new ArrayList<Modification>();
             modifications.add(new Modification(Modification.REPLACE, new Attribute("gidNumber", newGidNumber)));
+            modifications.add(new Modification(Modification.REPLACE, new Attribute("message", message)));
 
-            sourceGidNumber.modify(dn, modifications);
+            penroseGroups.modify(dn, modifications);
 
         } else { // if (action == NISGroupDialog.REMOVE) {
 
-            sourceGidNumber.delete(dn);
-            newGidNumber = origGidNumber;
+            penroseGroups.delete(dn);
         }
-
-        Source changes = sourceManager.getSource("DEFAULT", "penrose.changes");
-
-        Attributes attributes = new Attributes();
-        attributes.setValue("domain", domain);
-        attributes.setValue("type", "group");
-        attributes.setValue("target", cn);
-        attributes.setValue("oldValue", currentGidNumber.toString());
-        attributes.setValue("newValue", newGidNumber.toString());
-        attributes.setValue("message", message);
-
-        changes.add(new DN(), attributes);
     }
 
-    public void checkGidNumber(Object gidNumber) throws Exception {
+    public void checkGidNumber(String cn, Integer gidNumber) throws Exception {
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
         SourceManager sourceManager = penroseContext.getSourceManager();
 
-        for (String domainName : domainsList.getItems()) {
-            String partitionName = (String) domainsList.getData(domainName);
+        SearchRequest request = new SearchRequest();
+        request.setFilter("(gidNumber=" + gidNumber + ")");
 
-            SearchRequest request = new SearchRequest();
-            request.setFilter("(gidNumber=" + gidNumber + ")");
+        SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
-            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
+        Source groups = sourceManager.getSource("DEFAULT", "penrose.groups");
+        groups.search(request, response);
 
-            Source groups = sourceManager.getSource(partitionName, "cache.groups");
-            groups.search(request, response);
+        while (response.hasNext()) {
+            SearchResult result = response.next();
+            Attributes attributes = result.getAttributes();
 
-            if (response.hasNext()) {
-                throw new Exception("gidNumber " + gidNumber + " already exists in domain " + domainName);
-            }
+            String domainName = (String)attributes.getValue("domain");
+            String cn2 = (String)attributes.getValue("cn");
+            if (cn.equals(cn2)) continue;
+
+            throw new Exception("GID number "+gidNumber+" is already allocated for user "+cn2+" in domain "+domainName);
+        }
+
+        SearchRequest searchRequest = new SearchRequest();
+        SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
+
+        domains.search(searchRequest, searchResponse);
+
+        while (searchResponse.hasNext()) {
+            SearchResult searchResults = searchResponse.next();
+            Attributes attributes = searchResults.getAttributes();
+
+            String domainName = (String) attributes.getValue("name");
+            String partition = (String) attributes.getValue("partition");
+
+            if (domain.getName().equals(domainName)) continue;
 
             response = new SearchResponse<SearchResult>();
 
-            Source gidNumbers = sourceManager.getSource(partitionName, "groups_gidNumber");
-            gidNumbers.search(request, response);
+            groups = sourceManager.getSource(partition, "cache.groups");
+            groups.search(request, response);
 
-            if (response.hasNext()) {
-                throw new Exception("gidNumber " + gidNumber + " already exists in domain " + domainName);
+            while (response.hasNext()) {
+                SearchResult result = response.next();
+                Attributes attrs = result.getAttributes();
+
+                String cn2 = (String)attrs.getValue("cn");
+                if (cn.equals(cn2)) continue;
+
+                throw new Exception("GID number "+gidNumber+" is used by user "+cn2+" in domain "+domainName);
             }
         }
     }

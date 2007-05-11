@@ -136,8 +136,7 @@ public class NISUsersPage extends FormPage {
         actionLabel.setLayoutData(gd);
 
         actionCombo = new Combo(composite, SWT.READ_ONLY);
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        actionCombo.setLayoutData(gd);
+        actionCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Button runButton = new Button(composite, SWT.PUSH);
         runButton.setText("Run");
@@ -171,14 +170,13 @@ public class NISUsersPage extends FormPage {
         composite.setLayout(new GridLayout(2, false));
 
         messageLabel = toolkit.createLabel(composite, "");
-        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-        messageLabel.setLayoutData(gd);
+        messageLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label conflictsLabel = toolkit.createLabel(composite, "Conflicts:");
         conflictsLabel.setLayoutData(new GridData());
 
         usersTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
-        gd = new GridData(GridData.FILL_BOTH);
+        GridData gd = new GridData(GridData.FILL_BOTH);
         gd.verticalSpan = 3;
         usersTable.setLayoutData(gd);
 
@@ -271,11 +269,10 @@ public class NISUsersPage extends FormPage {
                     Attributes attributes = (Attributes)item.getData();
                     String domain = (String)attributes.getValue("domain");
                     String partition = (String)attributes.getValue("partition");
-                    Source source = (Source)attributes.getValue("source");
                     String uid = (String)attributes.getValue("uid");
-                    Object origUidNumber = attributes.getValue("origUidNumber");
+                    Integer origUidNumber = (Integer)attributes.getValue("origUidNumber");
 
-                    edit(domain, partition, source, uid, origUidNumber);
+                    edit(domain, partition, uid, origUidNumber);
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
@@ -450,9 +447,8 @@ public class NISUsersPage extends FormPage {
     public void edit(
             String domain,
             String partition,
-            Source source,
             String uid,
-            Object origUidNumber
+            Integer origUidNumber
     ) throws Exception {
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
@@ -473,20 +469,15 @@ public class NISUsersPage extends FormPage {
 
         SearchRequest request = new SearchRequest();
         request.setDn(dn);
+
         SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
         penroseUsers.search(request, response);
 
-        Object currentUidNumber;
-
         if (response.hasNext()) {
             SearchResult result = response.next();
             Attributes attributes = result.getAttributes();
-            currentUidNumber = attributes.getValue("uidNumber");
-            dialog.setNewUidNumber(currentUidNumber);
-
-        } else {
-            currentUidNumber = origUidNumber;
+            dialog.setNewUidNumber((Integer)attributes.getValue("uidNumber"));
         }
 
         dialog.open();
@@ -495,7 +486,7 @@ public class NISUsersPage extends FormPage {
 
         if (action == NISUserDialog.CANCEL) return;
 
-        Object uidNumber = dialog.getUidNumber();
+        Integer uidNumber = dialog.getUidNumber();
         String message = dialog.getMessage();
 
         if (action == NISUserDialog.SET) {
@@ -524,23 +515,10 @@ public class NISUsersPage extends FormPage {
         } else { // if (action == NISUserDialog.REMOVE) {
 
             penroseUsers.delete(dn);
-            uidNumber = origUidNumber;
         }
-
-        Source changes = sourceManager.getSource("DEFAULT", "penrose.changes");
-
-        Attributes attributes = new Attributes();
-        attributes.setValue("domain", domain);
-        attributes.setValue("type", "user");
-        attributes.setValue("target", uid);
-        attributes.setValue("oldValue", currentUidNumber.toString());
-        attributes.setValue("newValue", uidNumber.toString());
-        attributes.setValue("message", message);
-
-        changes.add(new DN(), attributes);
     }
 
-    public void checkUidNumber(String uid, Object uidNumber) throws Exception {
+    public void checkUidNumber(String uid, Integer uidNumber) throws Exception {
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         PenroseContext penroseContext = penroseApplication.getPenroseContext();
@@ -551,8 +529,8 @@ public class NISUsersPage extends FormPage {
 
         SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
-        Source uidNumbers = sourceManager.getSource("DEFAULT", "penrose.users");
-        uidNumbers.search(request, response);
+        Source users = sourceManager.getSource("DEFAULT", "penrose.users");
+        users.search(request, response);
 
         while (response.hasNext()) {
             SearchResult result = response.next();
@@ -581,7 +559,7 @@ public class NISUsersPage extends FormPage {
 
             response = new SearchResponse<SearchResult>();
 
-            Source users = sourceManager.getSource(partition, "cache.users");
+            users = sourceManager.getSource(partition, "cache.users");
             users.search(request, response);
 
             while (response.hasNext()) {

@@ -85,15 +85,15 @@ public class InconsistentUIDFinderAction extends NISAction {
         JDBCClient client1 = adapter1.getClient();
 
         String catalog1 = source1.getParameter(JDBCClient.CATALOG);
-        String table1Name = catalog1+"."+source1.getParameter(JDBCClient.TABLE);
+        String table1 = catalog1+"."+source1.getParameter(JDBCClient.TABLE);
 
         String catalog2 = source2.getParameter(JDBCClient.CATALOG);
-        String table2Name = catalog2+"."+source2.getParameter(JDBCClient.TABLE);
+        String table2 = catalog2+"."+source2.getParameter(JDBCClient.TABLE);
 
         String sql = "select a.uid, a.uidNumber, b.uidNumber, c.uid, c.uidNumber, d.uidNumber" +
-                " from "+table1Name+" a"+
+                " from "+table1+" a"+
                 " left join nis.users b on b.domain=? and a.uid=b.uid"+
-                " join "+table2Name+" c on a.uid = c.uid "+
+                " join "+table2+" c on a.uid = c.uid "+
                 " left join nis.users d on d.domain=? and c.uid=d.uid"+
                 " where b.uidNumber is null and d.uidNumber is null and a.uidNumber <> c.uidNumber"+
                     " or b.uidNumber is null and a.uidNumber <> d.uidNumber"+
@@ -120,7 +120,6 @@ public class InconsistentUIDFinderAction extends NISAction {
                 Attributes attributes1 = new Attributes();
                 attributes1.setValue("domain", domain1);
                 attributes1.setValue("partition", partition1);
-                attributes1.setValue("source", source1);
                 attributes1.setValue("uid", uid1);
                 attributes1.setValue("origUidNumber", origUidNumber1);
                 attributes1.setValue("uidNumber", uidNumber1);
@@ -128,7 +127,6 @@ public class InconsistentUIDFinderAction extends NISAction {
                 Attributes attributes2 = new Attributes();
                 attributes2.setValue("domain", domain2);
                 attributes2.setValue("partition", partition2);
-                attributes2.setValue("source", source2);
                 attributes2.setValue("uid", uid2);
                 attributes2.setValue("origUidNumber", origUidNumber2);
                 attributes2.setValue("uidNumber", uidNumber2);

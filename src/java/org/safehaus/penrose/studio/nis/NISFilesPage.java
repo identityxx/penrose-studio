@@ -101,9 +101,11 @@ public class NISFilesPage extends FormPage implements Runnable {
                public void add(SearchResult result) throws Exception {
                    Attributes attributes = result.getAttributes();
                    String name = (String)attributes.getValue("name");
+                   String paths = (String)attributes.getValue("paths");
 
-                   hostsList.add(name);
-                   hostsList.setData(name, result);
+                   String host = name+":"+paths;
+                   hostsList.add(host);
+                   hostsList.setData(host, result);
                }
            };
 

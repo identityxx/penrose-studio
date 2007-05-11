@@ -49,11 +49,11 @@ public class NISGroupDialog extends Dialog {
 
     private String domain;
     private String name;
-    private Object origGidNumber;
-    private Object newGidNumber;
+    private Integer origGidNumber;
+    private Integer newGidNumber;
     private Collection<String> members = new ArrayList<String>();
 
-    Object gidNumber;
+    Integer gidNumber;
     String message;
 
     public NISGroupDialog(Shell parent, int style) {
@@ -259,10 +259,10 @@ public class NISGroupDialog extends Dialog {
                     } else {
                         action = CHANGE;
                     }
-                    gidNumber = gidNumberText.getText();
+                    gidNumber = new Integer(gidNumberText.getText());
                 } else {
                     action = REMOVE;
-                    gidNumber = getOrigGidNumber();
+                    gidNumber = origGidNumber;
                 }
 
                 message = messageText.getText();
@@ -290,19 +290,19 @@ public class NISGroupDialog extends Dialog {
         this.sourceConfig = sourceConfig;
     }
 
-    public Object getNewGidNumber() {
+    public Integer getNewGidNumber() {
         return newGidNumber;
     }
 
-    public void setNewGidNumber(Object newGidNumber) {
+    public void setNewGidNumber(Integer newGidNumber) {
         this.newGidNumber = newGidNumber;
     }
 
-    public Object getGidNumber() {
+    public Integer getGidNumber() {
         return gidNumber;
     }
 
-    public void setGidNumber(Object gidNumber) {
+    public void setGidNumber(Integer gidNumber) {
         this.gidNumber = gidNumber;
     }
 
@@ -330,11 +330,11 @@ public class NISGroupDialog extends Dialog {
         this.name = name;
     }
 
-    public Object getOrigGidNumber() {
+    public Integer getOrigGidNumber() {
         return origGidNumber;
     }
 
-    public void setOrigGidNumber(Object origGidNumber) {
+    public void setOrigGidNumber(Integer origGidNumber) {
         this.origGidNumber = origGidNumber;
     }
 

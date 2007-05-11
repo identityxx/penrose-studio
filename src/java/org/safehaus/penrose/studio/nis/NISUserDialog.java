@@ -44,10 +44,10 @@ public class NISUserDialog extends Dialog {
 
     private String domain;
     private String uid;
-    private Object origUidNumber;
-    private Object newUidNumber;
+    private Integer origUidNumber;
+    private Integer newUidNumber;
 
-    Object uidNumber;
+    Integer uidNumber;
     String message;
 
     public NISUserDialog(Shell parent, int style) {
@@ -234,7 +234,7 @@ public class NISUserDialog extends Dialog {
                     } else {
                         action = CHANGE;
                     }
-                    uidNumber = newUidNumberText.getText();
+                    uidNumber = new Integer(newUidNumberText.getText());
                 } else {
                     action = REMOVE;
                     uidNumber = origUidNumber;
@@ -257,19 +257,19 @@ public class NISUserDialog extends Dialog {
         this.action = action;
     }
 
-    public Object getNewUidNumber() {
+    public Integer getNewUidNumber() {
         return newUidNumber;
     }
 
-    public void setNewUidNumber(Object newUidNumber) {
+    public void setNewUidNumber(Integer newUidNumber) {
         this.newUidNumber = newUidNumber;
     }
 
-    public Object getUidNumber() {
+    public Integer getUidNumber() {
         return uidNumber;
     }
 
-    public void setUidNumber(Object uidNumber) {
+    public void setUidNumber(Integer uidNumber) {
         this.uidNumber = uidNumber;
     }
 
@@ -297,11 +297,11 @@ public class NISUserDialog extends Dialog {
         this.uid = uid;
     }
 
-    public Object getOrigUidNumber() {
+    public Integer getOrigUidNumber() {
         return origUidNumber;
     }
 
-    public void setOrigUidNumber(Object origUidNumber) {
+    public void setOrigUidNumber(Integer origUidNumber) {
         this.origUidNumber = origUidNumber;
     }
 }

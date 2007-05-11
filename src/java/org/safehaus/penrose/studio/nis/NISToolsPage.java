@@ -173,6 +173,7 @@ public class NISToolsPage extends FormPage {
 
         Button runButton = new Button(composite, SWT.PUSH);
         runButton.setText("  Run  ");
+        runButton.setEnabled(false);
         gd = new GridData();
         gd.horizontalAlignment = GridData.END;
         runButton.setLayoutData(gd);
@@ -231,9 +232,9 @@ public class NISToolsPage extends FormPage {
             public void add(SearchResult result) throws Exception {
                 Attributes attributes = result.getAttributes();
                 String name = (String)attributes.getValue("name");
-                String path = (String)attributes.getValue("path");
+                String paths = (String)attributes.getValue("paths");
 
-                String host = name+":"+path;
+                String host = name+":"+paths;
                 hostsList.add(host);
                 hostsList.setData(host, result);
             }
