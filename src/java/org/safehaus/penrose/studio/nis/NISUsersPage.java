@@ -20,8 +20,13 @@ import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.nis.NISDomain;
+import org.safehaus.penrose.adapter.jdbc.JDBCAdapter;
+import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.jdbc.Assignment;
+import org.safehaus.penrose.jdbc.QueryResponse;
 
 import java.util.*;
+import java.sql.ResultSet;
 
 /**
  * @author Endi S. Dewata
@@ -308,7 +313,6 @@ public class NISUsersPage extends FormPage {
             ti.setText(0, domain2);
             ti.setText(1, "" + uid2);
             ti.setText(2, "" + uidNumber2);
-            ti.setData(attributes2);
         }
     }
 
@@ -333,32 +337,47 @@ public class NISUsersPage extends FormPage {
             SearchResult searchResults = searchResponse.next();
             Attributes attrs = searchResults.getAttributes();
 
-            String domainName = (String) attrs.getValue("name");
+            final String domainName = (String) attrs.getValue("name");
             String partition = (String) attrs.getValue("partition");
 
             if (domain.getName().equals(domainName)) continue;
             
-            SearchRequest request = new SearchRequest();
-            request.setFilter("(&(uid="+uid+")(uidNumber="+uidNumber+"))");
-
-            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
-
             Source users = sourceManager.getSource(partition, "cache.users");
-            users.search(request, response);
 
-            while (response.hasNext()) {
-                SearchResult result = response.next();
-                Attributes attributes2 = result.getAttributes();
+            JDBCAdapter adapter = (JDBCAdapter)users.getConnection().getAdapter();
+            JDBCClient client = adapter.getClient();
 
-                String uid2 = (String) attributes2.getValue("uid");
-                Integer uidNumber2 = (Integer)attributes2.getValue("uidNumber");
+            String catalog = users.getParameter(JDBCClient.CATALOG);
+            String table = catalog+"."+users.getParameter(JDBCClient.TABLE);
 
-                TableItem ti = new TableItem(matchesTable, SWT.NONE);
-                ti.setText(0, domainName);
-                ti.setText(1, "" + uid2);
-                ti.setText(2, "" + uidNumber2);
-                ti.setData(attributes2);
-            }
+            String sql = "select a.uid, a.uidNumber, b.uidNumber" +
+                    " from "+table+" a"+
+                    " left join nis.users b on b.domain=? and a.uid=b.uid"+
+                    " where a.uid = ? and (b.uidNumber is null and a.uidNumber = ? or b.uidNumber = ?)"+
+                    " order by a.uid";
+
+            Collection<Assignment> assignments = new ArrayList<Assignment>();
+            assignments.add(new Assignment(domainName));
+            assignments.add(new Assignment(uid));
+            assignments.add(new Assignment(uidNumber));
+            assignments.add(new Assignment(uidNumber));
+
+            QueryResponse queryResponse = new QueryResponse() {
+                public void add(Object object) throws Exception {
+                    ResultSet rs = (ResultSet)object;
+
+                    String uid2 = rs.getString(1);
+                    Integer uidNumber2 = (Integer)rs.getObject(3);
+                    if (uidNumber2 == null) uidNumber2 = (Integer)rs.getObject(2);
+
+                    TableItem ti = new TableItem(matchesTable, SWT.NONE);
+                    ti.setText(0, domainName);
+                    ti.setText(1, "" + uid2);
+                    ti.setText(2, "" + uidNumber2);
+                }
+            };
+
+            client.executeQuery(sql, assignments, queryResponse);
         }
     }
 
@@ -486,7 +505,7 @@ public class NISUsersPage extends FormPage {
             Attributes attrs = new Attributes();
             attrs.setValue("domain", domain);
             attrs.setValue("uid", uid);
-            attrs.setValue("oldUidNumber", origUidNumber);
+            attrs.setValue("origUidNumber", origUidNumber);
             attrs.setValue("uidNumber", uidNumber);
             attrs.setValue("message", message);
 

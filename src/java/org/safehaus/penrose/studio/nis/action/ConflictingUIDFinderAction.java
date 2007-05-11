@@ -92,9 +92,9 @@ public class ConflictingUIDFinderAction extends NISAction {
                 " left join nis.users b on b.domain=? and a.uid=b.uid"+
                 " join "+table2Name+" c on a.uid <> c.uid "+
                 " left join nis.users d on d.domain=? and c.uid=d.uid"+
-                " where b.uidNumber is null and d.uidNumber is null and a.uidNumber = c.uidNumber "+
-                    " or b.uidNumber is null and a.uidNumber = d.uidNumber "+
-                    " or d.uidNumber is null and b.uidNumber = c.uidNumber "+
+                " where b.uidNumber is null and d.uidNumber is null and a.uidNumber = c.uidNumber"+
+                    " or b.uidNumber is null and a.uidNumber = d.uidNumber"+
+                    " or d.uidNumber is null and b.uidNumber = c.uidNumber"+
                     " or b.uidNumber = d.uidNumber" +
                 " order by a.uid";
 

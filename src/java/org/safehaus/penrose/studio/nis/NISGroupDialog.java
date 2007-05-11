@@ -152,14 +152,14 @@ public class NISGroupDialog extends Dialog {
         nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label origUidNumberLabel = new Label(leftPanel, SWT.NONE);
-        origUidNumberLabel.setText("Original GID Number:");
+        origUidNumberLabel.setText("Original GID number:");
         origUidNumberLabel.setLayoutData(new GridData());
 
         origGidNumberText = new Label(leftPanel, SWT.NONE);
         origGidNumberText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label newUidNumberLabel = new Label(leftPanel, SWT.NONE);
-        newUidNumberLabel.setText("New GID Number:");
+        newUidNumberLabel.setText("New GID number:");
         newUidNumberLabel.setLayoutData(new GridData());
 
         newGidNumberText = new Label(leftPanel, SWT.NONE);

@@ -140,14 +140,14 @@ public class NISUserDialog extends Dialog {
         uidText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label origUidNumberLabel = new Label(composite, SWT.NONE);
-        origUidNumberLabel.setText("Original UID Number:");
+        origUidNumberLabel.setText("Original UID number:");
         origUidNumberLabel.setLayoutData(new GridData());
 
         origUidNumberText = new Label(composite, SWT.NONE);
         origUidNumberText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label newUidNumbersLabel = new Label(composite, SWT.NONE);
-        newUidNumbersLabel.setText("New UID Number:");
+        newUidNumbersLabel.setText("New UID number:");
         newUidNumbersLabel.setLayoutData(new GridData());
 
         newUidNumbersText = new Label(composite, SWT.NONE);
