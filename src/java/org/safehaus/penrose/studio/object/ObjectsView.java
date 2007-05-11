@@ -181,15 +181,18 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                 null
         ));
 
-        nodes.add(new NISNode(
-                this,
-                NIS,
-                NIS,
-                PenrosePlugin.getImage(PenroseImage.MODULE),
-                NIS,
-                null
-        ));
-	}
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        if (penroseApplication.isCommercial()) {
+            nodes.add(new NISNode(
+                    this,
+                    NIS,
+                    NIS,
+                    PenrosePlugin.getImage(PenroseImage.MODULE),
+                    NIS,
+                    null
+            ));
+        }
+    }
 	
 	/**
 	 * This is a callback that will allow us to create the viewer and initialize

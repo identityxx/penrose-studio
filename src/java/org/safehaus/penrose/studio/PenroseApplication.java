@@ -464,7 +464,7 @@ public class PenroseApplication implements IPlatformRunnable {
         this.client = client;
     }
 
-    public boolean checkCommercial() {
+    public boolean isCommercial() {
         if (license != null) return true;
 
         Shell shell = new Shell(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);

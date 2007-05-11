@@ -31,14 +31,20 @@
     </path>
 
     <target name="init">
-        <condition property="isLinux">
-            <os name="Linux"/>
+        <echo message="Operating System: ${os.name} ${os.version}" />
+        <condition property="isWindows">
+            <os family="windows"/>
+        </condition>
+        <condition property="isUnix">
+            <and>
+                <os family="unix"/>
+                <not>
+                    <os family="mac"/>
+                </not>
+            </and>
         </condition>
         <condition property="isMac">
             <os family="mac"/>
-        </condition>
-        <condition property="isWindows">
-            <os family="windows"/>
         </condition>
     </target>
 
@@ -274,7 +280,8 @@
     </target>
 
     <target name="dist-all" depends="compile">
-        <copy todir="${project.dist}"
+        <copy
+            todir="${project.dist}"
             file="target/${project.name}-${product.version}.jar">
         </copy>
         <antcall target="dist-linux"/>
@@ -359,7 +366,7 @@
                 <expandproperties/>
             </filterchain>
         </copy>
-        <exec executable="${iscc.path}" os="Windows NT,Windows 2000,Windows XP,Windows 2003">
+        <exec executable="${iscc.path}">
             <arg line="/Q target/penrose-studio.iss"/>
         </exec>
         <antcall target="rpm">

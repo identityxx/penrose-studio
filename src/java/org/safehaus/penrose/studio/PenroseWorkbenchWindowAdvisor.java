@@ -117,10 +117,6 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         ApplicationConfig applicationConfig = penroseApplication.getApplicationConfig();
 
         try {
-            penroseApplication.connect();
-            penroseApplication.open(penroseApplication.getWorkDir());
-            penroseApplication.disconnect();
-
             IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 
             Project project = penroseApplication.getApplicationConfig().getCurrentProject();
@@ -132,6 +128,25 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             //IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
             page.openEditor(new WelcomeEditorInput(), WelcomeEditor.class.getName());
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+
+            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            Shell shell = window.getShell();
+
+            MessageDialog.openError(
+                    shell,
+                    "ERROR",
+                    "Failed opening "+applicationConfig.getCurrentProject().getName()+" configuration.\n"+
+                            "See penrose-studio-log.txt for details."
+            );
+        }
+
+        try {
+            penroseApplication.connect();
+            penroseApplication.open(penroseApplication.getWorkDir());
+            penroseApplication.disconnect();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

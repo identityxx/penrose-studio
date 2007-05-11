@@ -52,7 +52,7 @@ public class MapLDAPTreeAction extends Action {
             Shell shell = window.getShell();
 
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            //if (!penroseApplication.checkCommercial()) return;
+            //if (!penroseApplication.isCommercial()) return;
 
             Wizard wizard = new CreateLDAPProxyWizard(node.getPartition(), node.getEntryMapping());
 
