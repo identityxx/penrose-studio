@@ -66,6 +66,18 @@ public class NISDomainPage extends FormPage {
         Label partitionText = toolkit.createLabel(composite, domain.getPartition());
         partitionText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+        Label serverLabel = toolkit.createLabel(composite, "Server:");
+        serverLabel.setLayoutData(new GridData());
+
+        Label serverText = toolkit.createLabel(composite, domain.getServer());
+        serverText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label suffixLabel = toolkit.createLabel(composite, "Suffix:");
+        suffixLabel.setLayoutData(new GridData());
+
+        Label suffixText = toolkit.createLabel(composite, domain.getSuffix());
+        suffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
         return composite;
     }
 

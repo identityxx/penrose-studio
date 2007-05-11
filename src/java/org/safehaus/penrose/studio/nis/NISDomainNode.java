@@ -128,6 +128,8 @@ public class NISDomainNode extends Node {
         NISDomainDialog dialog = new NISDomainDialog(shell, SWT.NONE);
         dialog.setName(domain.getName());
         dialog.setPartition(domain.getPartition());
+        dialog.setServer(domain.getServer());
+        dialog.setSuffix(domain.getSuffix());
         dialog.open();
 
         int action = dialog.getAction();
@@ -146,9 +148,20 @@ public class NISDomainNode extends Node {
         DN newDn = db.toDn();
 
         Collection<Modification> modifications = new ArrayList<Modification>();
+
         modifications.add(new Modification(
                 Modification.REPLACE,
                 new Attribute("partition", dialog.getPartition())
+        ));
+
+        modifications.add(new Modification(
+                Modification.REPLACE,
+                new Attribute("server", dialog.getServer())
+        ));
+
+        modifications.add(new Modification(
+                Modification.REPLACE,
+                new Attribute("suffix", dialog.getSuffix())
         ));
 
         domains.modify(newDn, modifications);

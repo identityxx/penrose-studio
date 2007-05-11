@@ -26,11 +26,15 @@ public class NISDomainDialog extends Dialog {
 
     Text nameText;
     Text partitionText;
+    Text serverText;
+    Text suffixText;
 
     int action;
 
     private String name;
     private String partition;
+    private String server;
+    private String suffix;
 
     public NISDomainDialog(Shell parent, int style) {
 		super(parent, style);
@@ -69,6 +73,8 @@ public class NISDomainDialog extends Dialog {
     public void reset() {
         nameText.setText(name == null ? "" : name);
         partitionText.setText(partition == null ? "" : partition);
+        serverText.setText(server == null ? "" : server);
+        suffixText.setText(suffix == null ? "" : suffix);
     }
 
     public void createControl(Shell parent) {
@@ -104,6 +110,20 @@ public class NISDomainDialog extends Dialog {
         partitionText = new Text(composite, SWT.BORDER);
         partitionText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+        Label serverLabel = new Label(composite, SWT.NONE);
+        serverLabel.setText("Server:");
+        serverLabel.setLayoutData(new GridData());
+
+        serverText = new Text(composite, SWT.BORDER);
+        serverText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label suffixLabel = new Label(composite, SWT.NONE);
+        suffixLabel.setText("Suffix:");
+        suffixLabel.setLayoutData(new GridData());
+
+        suffixText = new Text(composite, SWT.BORDER);
+        suffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
         return composite;
     }
 
@@ -129,6 +149,8 @@ public class NISDomainDialog extends Dialog {
             public void widgetSelected(SelectionEvent e) {
                 name = nameText.getText().equals("") ? null : nameText.getText();
                 partition = partitionText.getText().equals("") ? null : partitionText.getText();
+                server = serverText.getText().equals("") ? null : serverText.getText();
+                suffix = suffixText.getText().equals("") ? null : suffixText.getText();
                 action = OK;
                 shell.close();
             }
@@ -159,5 +181,21 @@ public class NISDomainDialog extends Dialog {
 
     public void setPartition(String partition) {
         this.partition = partition;
+    }
+
+    public String getServer() {
+        return server;
+    }
+
+    public void setServer(String server) {
+        this.server = server;
+    }
+
+    public String getSuffix() {
+        return suffix;
+    }
+
+    public void setSuffix(String suffix) {
+        this.suffix = suffix;
     }
 }

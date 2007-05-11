@@ -118,6 +118,8 @@ public class NISToolsPage extends FormPage {
 
            hosts.search(request, response);
 
+           hostsList.selectAll();
+
        } catch (Exception e) {
            log.debug(e.getMessage(), e);
            String message = e.toString();

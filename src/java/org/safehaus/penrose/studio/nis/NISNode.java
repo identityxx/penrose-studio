@@ -101,10 +101,14 @@ public class NISNode extends Node {
             
             String name = (String)attributes.getValue("name");
             String partition = (String)attributes.getValue("partition");
+            String server = (String)attributes.getValue("server");
+            String suffix = (String)attributes.getValue("suffix");
 
             NISDomain domain = new NISDomain();
             domain.setName(name);
             domain.setPartition(partition);
+            domain.setServer(server);
+            domain.setSuffix(suffix);
 
             NISDomainNode node = new NISDomainNode(
                     view,
@@ -144,6 +148,8 @@ public class NISNode extends Node {
         Attributes attributes = new Attributes();
         attributes.setValue("name", dialog.getName());
         attributes.setValue("partition", dialog.getPartition());
+        attributes.setValue("server", dialog.getServer());
+        attributes.setValue("suffix", dialog.getSuffix());
 
         domains.add(dn, attributes);
 
