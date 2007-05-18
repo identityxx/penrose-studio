@@ -22,9 +22,11 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.source.Sources;
+import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.SourceMapping;
 import org.safehaus.penrose.nis.*;
+import org.safehaus.penrose.naming.PenroseContext;
 
 import java.util.Iterator;
 import java.util.Collection;
@@ -418,6 +420,11 @@ public class NISSourcePropertyPage extends FormPage {
             sources.removeSourceConfig(oldName);
             source.setName(newName);
             sources.addSourceConfig(source);
+
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseContext penroseContext = penroseApplication.getPenroseContext();
+            SourceManager sourceManager = penroseContext.getSourceManager();
+            sourceManager.init(partition, source);
         }
 
         source.setParameter("base", baseText.getText());

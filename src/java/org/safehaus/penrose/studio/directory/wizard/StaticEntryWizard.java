@@ -24,9 +24,7 @@ import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.StaticEntryRDNWizardPage;
-import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.ldap.DNBuilder;
-import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.RDN;
 import org.apache.log4j.Logger;
 

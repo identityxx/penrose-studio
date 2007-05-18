@@ -22,6 +22,9 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.adapter.jdbc.JDBCAdapter;
 import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.source.SourceManager;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -121,6 +124,11 @@ public class JDBCSourceWizard extends Wizard {
             }
 
             partition.getSources().addSourceConfig(sourceConfig);
+
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseContext penroseContext = penroseApplication.getPenroseContext();
+            SourceManager sourceManager = penroseContext.getSourceManager();
+            sourceManager.init(partition, sourceConfig);
 
             return true;
 

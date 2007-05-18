@@ -195,12 +195,23 @@ public class ProjectEditorDialog extends Dialog {
     }
 
 	public void store() {
-		project.setName("".equals(nameText.getText()) ? null : nameText.getText());
-        project.setType(typeCombo.getText());
-        project.setHost("".equals(hostText.getText()) ? null : hostText.getText());
-        project.setPort("".equals(portText.getText()) ? 0 : Integer.parseInt(portText.getText()));
-        project.setUsername("".equals(usernameText.getText()) ? null : usernameText.getText());
-        project.setPassword("".equals(passwordText.getText()) ? null : passwordText.getText());
+        String s = nameText.getText().trim();
+        project.setName("".equals(s) ? null : s);
+
+        s = typeCombo.getText().trim();
+        project.setType(s);
+
+        s = hostText.getText().trim();
+        project.setHost("".equals(s) ? null : s);
+
+        s = portText.getText().trim();
+        project.setPort("".equals(s) ? 0 : Integer.parseInt(s));
+
+        s = usernameText.getText().trim();
+        project.setUsername("".equals(s) ? null : s);
+
+        s = passwordText.getText().trim();
+        project.setPassword("".equals(s) ? null : s);
 	}
 
     public Project getProject() {

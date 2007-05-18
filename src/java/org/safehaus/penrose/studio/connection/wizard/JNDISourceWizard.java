@@ -26,7 +26,6 @@ import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.studio.source.wizard.JNDIFieldWizardPage;
 import org.safehaus.penrose.studio.source.wizard.JNDIAttributeWizardPage;
 import org.safehaus.penrose.ldap.RDN;
-import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.ldap.DN;
 import org.apache.log4j.Logger;

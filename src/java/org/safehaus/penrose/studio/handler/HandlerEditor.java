@@ -1,65 +1,47 @@
-/**
- * Copyright (c) 2000-2006, Identyx Corporation.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- */
-package org.safehaus.penrose.studio.user;
+package org.safehaus.penrose.studio.handler;
 
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.user.UserConfig;
 import org.apache.log4j.Logger;
+import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.handler.HandlerConfig;
 
 /**
  * @author Endi S. Dewata
  */
-public class UserEditor extends MultiPageEditorPart {
+public class HandlerEditor extends MultiPageEditorPart {
 
     Logger log = Logger.getLogger(getClass());
 
-    UserConfig origUserConfig;
-    UserConfig userConfig;
+	HandlerConfig handlerConfig;
+    HandlerConfig origHandlerConfig;
 
     boolean dirty;
 
-    UserPropertyPage propertyPage;
+    HandlerPropertyPage propertyPage;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        UserEditorInput ei = (UserEditorInput)input;
-
-        origUserConfig = ei.getUserConfig();
+        HandlerEditorInput ei = (HandlerEditorInput)input;
+        origHandlerConfig = ei.getHandlerConfig();
 
         try {
-            userConfig = (UserConfig)origUserConfig.clone();
+            handlerConfig = (HandlerConfig)origHandlerConfig.clone();
         } catch (Exception e) {
             throw new PartInitException(e.getMessage(), e);
         }
 
         setSite(site);
         setInput(input);
-        setPartName(userConfig.getDn().toString());
+        setPartName("Handler - "+handlerConfig.getName());
     }
 
     protected void createPages() {
         try {
-            propertyPage = new UserPropertyPage(this);
+            propertyPage = new HandlerPropertyPage(this);
             addPage(propertyPage.createControl());
             setPageText(0, "  Properties  ");
 
@@ -97,9 +79,9 @@ public class UserEditor extends MultiPageEditorPart {
 
     public void store() throws Exception {
 
-        origUserConfig.copy(userConfig);
+        origHandlerConfig.copy(handlerConfig);
 
-        setPartName(userConfig.getDn().toString());
+        setPartName("Handler - "+handlerConfig.getName());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         penroseApplication.notifyChangeListeners();
@@ -119,7 +101,7 @@ public class UserEditor extends MultiPageEditorPart {
         try {
             dirty = false;
 
-            if (!origUserConfig.equals(userConfig)) {
+            if (!origHandlerConfig.equals(handlerConfig)) {
                 dirty = true;
                 return;
             }

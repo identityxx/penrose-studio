@@ -44,7 +44,12 @@ public class MappingEditor extends FormEditor implements ModifyListener {
 
         partition = mei.getPartition();
         origEntry = mei.getEntryDefinition();
-        entry = (EntryMapping)origEntry.clone();
+
+        try {
+            entry = (EntryMapping)origEntry.clone();
+        } catch (Exception e) {
+            throw new PartInitException(e.getMessage(), e);
+        }
 
         setSite(site);
         setInput(input);

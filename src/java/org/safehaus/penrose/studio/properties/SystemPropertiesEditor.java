@@ -39,8 +39,8 @@ public class SystemPropertiesEditor extends MultiPageEditorPart {
 
     boolean dirty;
 
-    Map origProperties;
-    Map properties = new TreeMap();
+    Map<String,String> origProperties;
+    Map<String,String> properties = new TreeMap<String,String>();
 
     SystemPropertiesPage propertyPage;
 

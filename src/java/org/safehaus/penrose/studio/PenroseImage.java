@@ -38,6 +38,7 @@ public class PenroseImage {
 	public final static String HOME_NODE         = "images/home.gif";
 	public final static String DYNAMIC_NODE      = "images/folder-mapped.gif";
 	public final static String NODE              = "images/folder.gif";
+    public final static String HANDLER           = "images/engine.png";
     public final static String ENGINE            = "images/engine.png";
     public final static String CONNECTOR         = "images/connector.png";
     public final static String CACHE             = "images/cache.png";

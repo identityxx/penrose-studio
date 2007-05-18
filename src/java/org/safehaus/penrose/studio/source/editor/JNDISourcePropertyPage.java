@@ -39,6 +39,8 @@ import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.source.Sources;
+import org.safehaus.penrose.source.SourceManager;
+import org.safehaus.penrose.naming.PenroseContext;
 import org.apache.log4j.Logger;
 
 public class JNDISourcePropertyPage extends FormPage {
@@ -468,6 +470,11 @@ public class JNDISourcePropertyPage extends FormPage {
             sources.removeSourceConfig(oldName);
             source.setName(newName);
             sources.addSourceConfig(source);
+
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseContext penroseContext = penroseApplication.getPenroseContext();
+            SourceManager sourceManager = penroseContext.getSourceManager();
+            sourceManager.init(partition, source);
         }
 
         source.setParameter("baseDn", baseDnText.getText());

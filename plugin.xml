@@ -104,10 +104,10 @@
            icon="images/properties.png"
            class="org.safehaus.penrose.studio.properties.SystemPropertiesEditor"/>
        <editor
-           id="org.safehaus.penrose.studio.cache.CacheEditor"
-           name="Cache"
-           icon="images/cache.png"
-           class="org.safehaus.penrose.studio.cache.CacheEditor"/>
+           id="org.safehaus.penrose.studio.handler.HandlerEditor"
+           name="Handler"
+           icon="images/engine.png"
+           class="org.safehaus.penrose.studio.handler.HandlerEditor"/>
        <editor
            id="org.safehaus.penrose.studio.engine.EngineEditor"
            name="Engine"

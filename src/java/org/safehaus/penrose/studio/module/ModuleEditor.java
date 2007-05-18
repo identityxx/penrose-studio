@@ -61,7 +61,12 @@ public class ModuleEditor extends EditorPart {
 
         partition = ei.getPartition();
         origModuleConfig = ei.getModuleConfig();
-        moduleConfig = (ModuleConfig)origModuleConfig.clone();
+
+        try {
+            moduleConfig = (ModuleConfig)origModuleConfig.clone();
+        } catch (Exception e) {
+            throw new PartInitException(e.getMessage(), e);
+        }
 
         setSite(site);
         setInput(input);

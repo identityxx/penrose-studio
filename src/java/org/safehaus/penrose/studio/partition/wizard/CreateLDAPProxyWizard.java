@@ -28,6 +28,8 @@ import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.source.Sources;
+import org.safehaus.penrose.source.SourceManager;
+import org.safehaus.penrose.naming.PenroseContext;
 import org.apache.log4j.Logger;
 
 import javax.naming.InitialContext;
@@ -114,6 +116,10 @@ public class CreateLDAPProxyWizard extends Wizard {
             sourceConfig.setParameter("filter", "(objectClass=*)");
             sources.addSourceConfig(sourceConfig);
 
+            PenroseContext penroseContext = penroseApplication.getPenroseContext();
+            SourceManager sourceManager = penroseContext.getSourceManager();
+            sourceManager.init(partition, sourceConfig);
+
             EntryMapping rootEntry = new EntryMapping(connectionInfoPage.getSuffix());
 
             SourceMapping sourceMapping = new SourceMapping("DEFAULT", name);
@@ -134,6 +140,8 @@ public class CreateLDAPProxyWizard extends Wizard {
                 rootDseSourceConfig.setParameter("filter", "objectClass=*");
 
                 sources.addSourceConfig(rootDseSourceConfig);
+
+                sourceManager.init(partition, rootDseSourceConfig);
 
                 EntryMapping rootDseEntryMapping = new EntryMapping();
 

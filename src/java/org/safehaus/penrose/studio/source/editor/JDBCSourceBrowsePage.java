@@ -271,13 +271,15 @@ public class JDBCSourceBrowsePage extends FormPage {
 
         table.removeAll();
 
-        SearchRequest sc = new SearchRequest();
+        SearchRequest request = new SearchRequest();
 
         int size = Integer.parseInt(maxSizeText.getText());
-        sc.setSizeLimit(size);
+        request.setSizeLimit(size);
 
-        SearchResponse<SearchResult> sr = new SearchResponse<SearchResult>() {
-            public void add(SearchResult searchResult) {
+        SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
+            public void add(SearchResult searchResult) throws Exception {
+                super.add(searchResult);
+
                 Attributes attributes = searchResult.getAttributes();
                 //log.debug(" - "+av);
 
@@ -302,13 +304,13 @@ public class JDBCSourceBrowsePage extends FormPage {
 
                     item.setText(counter, value == null ? "" : value);
                 }
-                
+
                 item.setData(searchResult);
             }
         };
 
         try {
-            source.search(sc, sr);
+            source.search(request, response);
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
@@ -316,7 +318,7 @@ public class JDBCSourceBrowsePage extends FormPage {
             if (message.length() > 500) {
                 message = message.substring(0, 500) + "...";
             }
-            MessageDialog.openError(editor.getSite().getShell(), "Browse Failed", message);
+            MessageDialog.openError(editor.getSite().getShell(), "Error", message);
         }
     }
 

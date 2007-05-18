@@ -184,7 +184,7 @@ public class LDAPPage extends FormPage {
                     PenroseApplication penroseApplication = PenroseApplication.getInstance();
                     SchemaManager schemaManager = penroseApplication.getSchemaManager();
 
-                    Collection ocNames = new ArrayList();
+                    Collection<String> ocNames = new TreeSet<String>();
                     for (Iterator i=schemaManager.getObjectClasses().iterator(); i.hasNext(); ) {
                         ObjectClass objectClass = (ObjectClass)i.next();
                         ocNames.add(objectClass.getName());

@@ -91,7 +91,7 @@ public class UserPropertyPage {
         gd.widthHint = 100;
         passwordLabel.setLayoutData(gd);
 
-        passwordText = toolkit.createText(composite, userConfig.getPassword(), SWT.BORDER);
+        passwordText = toolkit.createText(composite, new String(userConfig.getPassword()), SWT.BORDER);
         gd = new GridData(GridData.FILL_HORIZONTAL);
         passwordText.setLayoutData(gd);
 

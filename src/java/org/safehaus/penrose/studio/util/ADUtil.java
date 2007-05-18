@@ -8,6 +8,9 @@ import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.AttributeMapping;
 import org.safehaus.penrose.mapping.Expression;
 import org.safehaus.penrose.mapping.SourceMapping;
+import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.source.SourceManager;
 
 /**
  * @author Endi S. Dewata
@@ -42,6 +45,11 @@ public class ADUtil {
         sourceConfig.setParameter("filter", "(objectClass=*)");
 
         partition.getSources().addSourceConfig(sourceConfig);
+
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseContext penroseContext = penroseApplication.getPenroseContext();
+        SourceManager sourceManager = penroseContext.getSourceManager();
+        sourceManager.init(partition, sourceConfig);
 
         EntryMapping entryMapping = new EntryMapping();
         entryMapping.setDn(destSchemaDn);

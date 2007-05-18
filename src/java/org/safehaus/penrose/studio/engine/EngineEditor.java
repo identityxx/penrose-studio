@@ -40,12 +40,16 @@ public class EngineEditor extends MultiPageEditorPart {
     boolean dirty;
 
     EnginePropertyPage propertyPage;
-    //EngineCachePage cachePage;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         EngineEditorInput ei = (EngineEditorInput)input;
         origEngineConfig = ei.getEngineConfig();
-        engineConfig = (EngineConfig)origEngineConfig.clone();
+
+        try {
+            engineConfig = (EngineConfig)origEngineConfig.clone();
+        } catch (Exception e) {
+            throw new PartInitException(e.getMessage(), e);
+        }
 
         setSite(site);
         setInput(input);

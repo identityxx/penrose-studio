@@ -27,7 +27,11 @@ public class SchemaEditor extends FormEditor {
         SchemaEditorInput sei = (SchemaEditorInput)input;
 
         origSchema = sei.getSchema();
-        schema = (Schema)origSchema.clone();
+        try {
+            schema = (Schema)origSchema.clone();
+        } catch (Exception e) {
+            throw new PartInitException(e.getMessage(), e);
+        }
 
         setSite(site);
         setInput(input);

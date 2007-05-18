@@ -45,7 +45,12 @@ public class ConnectorEditor extends MultiPageEditorPart {
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         ConnectorEditorInput ei = (ConnectorEditorInput)input;
         origConnectorConfig = ei.getConnectorConfig();
-        connectorConfig = (ConnectorConfig)origConnectorConfig.clone();
+
+        try {
+            connectorConfig = (ConnectorConfig)origConnectorConfig.clone();
+        } catch (Exception e) {
+            throw new PartInitException(e.getMessage(), e);
+        }
 
         setSite(site);
         setInput(input);

@@ -26,6 +26,8 @@ import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.SourceConfig;
 import org.safehaus.penrose.source.Sources;
+import org.safehaus.penrose.source.SourceManager;
+import org.safehaus.penrose.naming.PenroseContext;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
@@ -90,9 +92,13 @@ public class SourcesNode extends Node {
         newSourceDefinition.setName(name);
         sources.addSourceConfig(newSourceDefinition);
 
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseContext penroseContext = penroseApplication.getPenroseContext();
+        SourceManager sourceManager = penroseContext.getSourceManager();
+        sourceManager.init(partition, newSourceDefinition);
+
         view.setClipboard(null);
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
         penroseApplication.notifyChangeListeners();
     }
 

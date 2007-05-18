@@ -127,14 +127,27 @@ public class JNDIConnectionSchemaPage extends FormPage {
 
         exportSchema.addHyperlinkListener(new HyperlinkAdapter() {
             public void linkActivated(HyperlinkEvent event) {
-                Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+                try {
+                    Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 
-                Schema newSchema = (Schema)schema.clone();
+                    Schema newSchema = (Schema)schema.clone();
 
-                SchemaExportWizard wizard = new SchemaExportWizard(newSchema);
-                WizardDialog dialog = new WizardDialog(shell, wizard);
-                dialog.setPageSize(600, 300);
-                dialog.open();
+                    SchemaExportWizard wizard = new SchemaExportWizard(newSchema);
+                    WizardDialog dialog = new WizardDialog(shell, wizard);
+                    dialog.setPageSize(600, 300);
+                    dialog.open();
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    e.printStackTrace(pw);
+                    String message = sw.toString();
+                    if (message.length() > 500) {
+                        message = message.substring(0, 500) + "...";
+                    }
+                    MessageDialog.openError(getEditorSite().getShell(), "Error", "Error: "+message);
+                }
             }
         });
 

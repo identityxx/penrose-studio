@@ -37,7 +37,6 @@ import org.eclipse.ui.part.*;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.ietf.ldap.*;
-import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.util.ApplicationConfig;
@@ -62,7 +61,7 @@ public class BrowserEditor extends EditorPart {
     LDAPConnection connection = new LDAPConnection();
 
     String bindDn;
-    String password;
+    byte[] password;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         setSite(site);
@@ -109,7 +108,7 @@ public class BrowserEditor extends EditorPart {
                     dialog.setPort(url.getPort());
                     dialog.setBaseDn(url.getDN());
                     dialog.setBindDn(bindDn);
-                    dialog.setBindPassword(password);
+                    dialog.setBindPassword(new String(password));
                     dialog.open();
 
                     if (dialog.getAction() == BrowserDialog.CANCEL) return;
@@ -119,7 +118,7 @@ public class BrowserEditor extends EditorPart {
                     String baseDn = dialog.getBaseDn();
 
                     bindDn = dialog.getBindDn();
-                    password = dialog.getBindPassword();
+                    password = dialog.getBindPassword().getBytes();
 
                     open(hostname, port, baseDn);
 
@@ -189,9 +188,8 @@ public class BrowserEditor extends EditorPart {
             String s = serviceConfig.getParameter(LDAP_PORT);
             int port = s == null ? DEFAULT_LDAP_PORT : Integer.parseInt(s);
 
-            UserConfig rootUserConfig = penroseConfig.getRootUserConfig();
-            bindDn = rootUserConfig.getDn().toString();
-            password = rootUserConfig.getPassword();
+            bindDn = penroseConfig.getRootDn().toString();
+            password = penroseConfig.getRootPassword();
 
             open(hostname, port, "");
 
@@ -215,7 +213,7 @@ public class BrowserEditor extends EditorPart {
         bindDnText.setText(bindDn == null ? "" : bindDn);
 
         connection.connect(hostname, port);
-        connection.bind(3, bindDn, password == null ? null : password.getBytes());
+        connection.bind(3, bindDn, password);
 
         baseDn = baseDn == null ? "" : baseDn;
         String name = "".equals(baseDn) ? "Root DSE" : baseDn;

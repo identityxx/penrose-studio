@@ -270,9 +270,14 @@ public class SourcesPage extends FormPage implements ModifyListener {
                     ExpressionDialog dialog = new ExpressionDialog(editor.getParent().getShell(), SWT.NONE);
                     dialog.setText("Edit field value/expression...");
 
-                    for (Iterator i=entry.getAttributeMappings().iterator(); i.hasNext(); ) {
-                        AttributeMapping ad = (AttributeMapping)i.next();
-                        dialog.addVariable(ad.getName());
+                    for (AttributeMapping attributeMapping : entry.getAttributeMappings()) {
+                        dialog.addVariable(attributeMapping.getName());
+                    }
+
+                    for (SourceMapping sourceMapping : entry.getSourceMappings()) {
+                        for (FieldMapping fieldMapping : sourceMapping.getFieldMappings()) {
+                            dialog.addVariable(sourceMapping.getName()+"."+fieldMapping.getName());
+                        }
                     }
 
                     dialog.setFieldMapping(field);

@@ -28,6 +28,7 @@ import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.handler.HandlersNode;
 import org.safehaus.penrose.studio.nis.NISNode;
 import org.safehaus.penrose.studio.logging.LoggingNode;
 import org.safehaus.penrose.studio.properties.SystemPropertiesNode;
@@ -36,10 +37,8 @@ import org.safehaus.penrose.studio.service.ServicesNode;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.connector.ConnectorNode;
-import org.safehaus.penrose.studio.engine.EngineNode;
 import org.safehaus.penrose.studio.engine.EnginesNode;
 import org.safehaus.penrose.studio.schema.SchemasNode;
-import org.safehaus.penrose.studio.cache.CachesNode;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
 
 import java.util.ArrayList;
@@ -61,6 +60,8 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
     public final static String CACHES            = "Caches";
     public final static String ENTRY_CACHE       = "Entry Cache";
     public final static String SOURCE_CACHE      = "Source Cache";
+    public final static String HANDLERS          = "Handlers";
+    public final static String HANDLER           = "Handler";
     public final static String ENGINES           = "Engines";
     public final static String ENGINE            = "Engine";
     public final static String ENGINE_CACHE      = "Engine Cache";
@@ -96,7 +97,6 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
     private PartitionsNode partitionsNode;
     private SchemasNode schemasNode;
     private ServicesNode servicesNode;
-    //private CachesNode cachesNode;
     private LoggingNode loggingNode;
 
     public ObjectsView() {
@@ -126,16 +126,7 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                 SERVICES,
                 null);
         nodes.add(servicesNode);
-/*
-        cachesNode = new CachesNode(
-                this,
-                CACHES,
-                CACHES,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
-                CACHES,
-                null);
-        nodes.add(cachesNode);
-*/
+
         loggingNode = new LoggingNode(
                 this,
                 LOGGING,
@@ -144,6 +135,15 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                 LOGGING,
                 null);
         nodes.add(loggingNode);
+
+        nodes.add(new HandlersNode(
+                this,
+                HANDLERS,
+                HANDLERS,
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                HANDLERS,
+                this
+        ));
 
         nodes.add(new EnginesNode(
                 this,
@@ -182,7 +182,7 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
         ));
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        if (penroseApplication.isCommercial()) {
+        if (penroseApplication.getLicense() != null) {
             nodes.add(new NISNode(
                     this,
                     NIS,
@@ -303,13 +303,4 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
     public void setServicesNode(ServicesNode servicesNode) {
         this.servicesNode = servicesNode;
     }
-/*
-    public CachesNode getCachesNode() {
-        return cachesNode;
-    }
-
-    public void setCachesNode(CachesNode cachesNode) {
-        this.cachesNode = cachesNode;
-    }
-*/
 }

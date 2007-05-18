@@ -135,7 +135,9 @@ public class JNDISourceBrowsePage extends FormPage {
         sc.setSizeLimit(size);
 
         SearchResponse<SearchResult> sr = new SearchResponse<SearchResult>() {
-            public void add(SearchResult searchResult) {
+            public void add(SearchResult searchResult) throws Exception {
+                super.add(searchResult);
+
                 Attributes attributes = searchResult.getAttributes();
                 //log.debug(" - "+av);
 

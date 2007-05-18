@@ -45,7 +45,11 @@ public class ServiceEditor extends MultiPageEditorPart {
         ServiceEditorInput ei = (ServiceEditorInput)input;
 
         origServiceConfig = ei.getServiceConfig();
-        serviceConfig = (ServiceConfig)origServiceConfig.clone();
+        try {
+            serviceConfig = (ServiceConfig)origServiceConfig.clone();
+        } catch (Exception e) {
+            throw new PartInitException(e.getMessage(), e);
+        }
 
         setSite(site);
         setInput(input);

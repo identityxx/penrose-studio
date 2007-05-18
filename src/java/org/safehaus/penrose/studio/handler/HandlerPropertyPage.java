@@ -1,72 +1,51 @@
-/**
- * Copyright (c) 2000-2006, Identyx Corporation.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- */
-package org.safehaus.penrose.studio.engine;
+package org.safehaus.penrose.studio.handler;
 
-import java.util.*;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.*;
+import org.apache.log4j.Logger;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.Form;
+import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.forms.widgets.*;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.*;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
-import org.safehaus.penrose.cache.CacheConfig;
-import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.config.PenroseConfig;
-import org.apache.log4j.Logger;
+import org.safehaus.penrose.handler.HandlerConfig;
+
+import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
  */
-public class EngineCachePage {
+public class HandlerPropertyPage {
 
     Logger log = Logger.getLogger(getClass());
 
     FormToolkit toolkit;
 
-    Text connectorNameText;
-	Text connectorClassText;
+    Text handlerNameText;
+	Text handlerClassText;
 	Text descriptionText;
 
-    Table parametersTable;
+    Table parameterTable;
 
     Button addButton;
     Button editButton;
     Button removeButton;
 
-    EngineEditor editor;
-	CacheConfig cacheConfig;
+    HandlerEditor editor;
+	HandlerConfig handlerConfig;
 
-    public EngineCachePage(EngineEditor editor) {
+    public HandlerPropertyPage(HandlerEditor editor) {
         this.editor = editor;
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseConfig serverConfig = penroseApplication.getPenroseConfig();
-        this.cacheConfig = serverConfig.getEntryCacheConfig();
+        this.handlerConfig = editor.handlerConfig;
     }
 
     public Control createControl() {
         toolkit = new FormToolkit(editor.getParent().getDisplay());
 
         Form form = toolkit.createForm(editor.getParent());
-        form.setText("Engine Editor");
+        form.setText("Handler Editor");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
@@ -98,13 +77,13 @@ public class EngineCachePage {
         gd.widthHint = 100;
         connectorNameLabel.setLayoutData(gd);
 
-		connectorNameText = toolkit.createText(composite, cacheConfig.getName(), SWT.BORDER);
+		handlerNameText = toolkit.createText(composite, handlerConfig.getName(), SWT.BORDER);
         gd = new GridData(GridData.FILL_HORIZONTAL);
-		connectorNameText.setLayoutData(gd);
+		handlerNameText.setLayoutData(gd);
 
-        connectorNameText.addModifyListener(new ModifyListener() {
+        handlerNameText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                cacheConfig.setName(connectorNameText.getText());
+                handlerConfig.setName(handlerNameText.getText());
                 checkDirty();
             }
         });
@@ -114,13 +93,13 @@ public class EngineCachePage {
         gd.widthHint = 100;
         connectorClassLabel.setLayoutData(gd);
 
-        connectorClassText = toolkit.createText(composite, cacheConfig.getCacheClass(), SWT.BORDER);
+        handlerClassText = toolkit.createText(composite, handlerConfig.getHandlerClass(), SWT.BORDER);
         gd = new GridData(GridData.FILL_HORIZONTAL);
-        connectorClassText.setLayoutData(gd);
+        handlerClassText.setLayoutData(gd);
 
-        connectorClassText.addModifyListener(new ModifyListener() {
+        handlerClassText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                cacheConfig.setCacheClass(connectorClassText.getText());
+                handlerConfig.setHandlerClass(handlerClassText.getText());
                 checkDirty();
             }
         });
@@ -130,38 +109,38 @@ public class EngineCachePage {
         gd.widthHint = 100;
         descriptionLabel.setLayoutData(gd);
 
-        descriptionText = toolkit.createText(composite, cacheConfig.getDescription(), SWT.BORDER);
+        descriptionText = toolkit.createText(composite, handlerConfig.getDescription(), SWT.BORDER);
         gd = new GridData(GridData.FILL_HORIZONTAL);
         descriptionText.setLayoutData(gd);
 
         descriptionText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                cacheConfig.setDescription(descriptionText.getText());
+                handlerConfig.setDescription(descriptionText.getText());
                 checkDirty();
             }
         });
 
 		return composite;
 	}
-	
+
     public Composite createParametersSection(final Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
 
-		parametersTable = toolkit.createTable(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
-        parametersTable.setHeaderVisible(true);
-        parametersTable.setLinesVisible(true);
+		parameterTable = toolkit.createTable(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+        parameterTable.setHeaderVisible(true);
+        parameterTable.setLinesVisible(true);
 
-        parametersTable.setLayoutData(new GridData(GridData.FILL_BOTH));
+        parameterTable.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        parametersTable.addMouseListener(new MouseAdapter() {
+        parameterTable.addMouseListener(new MouseAdapter() {
             public void mouseDoubleClick(MouseEvent event) {
                 try {
-                    if (parametersTable.getSelectionCount() == 0) return;
+                    if (parameterTable.getSelectionCount() == 0) return;
 
-                    int index = parametersTable.getSelectionIndex();
-                    TableItem item = parametersTable.getSelection()[0];
+                    int index = parameterTable.getSelectionIndex();
+                    TableItem item = parameterTable.getSelection()[0];
 
                     String oldName = item.getText(0);
                     String oldValue = item.getText(1);
@@ -178,13 +157,13 @@ public class EngineCachePage {
                     String newValue = dialog.getValue();
 
                     if (!oldName.equals(newName)) {
-                        cacheConfig.removeParameter(oldName);
+                        handlerConfig.removeParameter(oldName);
                     }
 
-                    cacheConfig.setParameter(newName, newValue);
+                    handlerConfig.setParameter(newName, newValue);
 
                     refresh();
-                    parametersTable.setSelection(index);
+                    parameterTable.setSelection(index);
                     checkDirty();
 
                 } catch (Exception e) {
@@ -193,11 +172,11 @@ public class EngineCachePage {
             }
         });
 
-        TableColumn tc = new TableColumn(parametersTable, SWT.NONE);
+        TableColumn tc = new TableColumn(parameterTable, SWT.NONE);
         tc.setText("Name");
         tc.setWidth(250);
 
-        tc = new TableColumn(parametersTable, SWT.NONE);
+        tc = new TableColumn(parameterTable, SWT.NONE);
         tc.setText("Value");
         tc.setWidth(250);
 
@@ -217,7 +196,7 @@ public class EngineCachePage {
 
                     if (dialog.getAction() == ParameterDialog.CANCEL) return;
 
-                    cacheConfig.setParameter(dialog.getName(), dialog.getValue());
+                    handlerConfig.setParameter(dialog.getName(), dialog.getValue());
 
                     refresh();
                     checkDirty();
@@ -234,10 +213,10 @@ public class EngineCachePage {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    if (parametersTable.getSelectionCount() == 0) return;
+                    if (parameterTable.getSelectionCount() == 0) return;
 
-                    int index = parametersTable.getSelectionIndex();
-                    TableItem item = parametersTable.getSelection()[0];
+                    int index = parameterTable.getSelectionIndex();
+                    TableItem item = parameterTable.getSelection()[0];
 
                     String oldName = item.getText(0);
                     String oldValue = item.getText(1);
@@ -254,13 +233,13 @@ public class EngineCachePage {
                     String newValue = dialog.getValue();
 
                     if (!oldName.equals(newName)) {
-                        cacheConfig.removeParameter(oldName);
+                        handlerConfig.removeParameter(oldName);
                     }
 
-                    cacheConfig.setParameter(newName, newValue);
+                    handlerConfig.setParameter(newName, newValue);
 
                     refresh();
-                    parametersTable.setSelection(index);
+                    parameterTable.setSelection(index);
                     checkDirty();
 
                 } catch (Exception e) {
@@ -275,12 +254,12 @@ public class EngineCachePage {
         removeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    if (parametersTable.getSelectionCount() == 0) return;
+                    if (parameterTable.getSelectionCount() == 0) return;
 
-                    TableItem items[] = parametersTable.getSelection();
+                    TableItem items[] = parameterTable.getSelection();
                     for (int i=0; i<items.length; i++) {
                         String name = items[i].getText(0);
-                        cacheConfig.removeParameter(name);
+                        handlerConfig.removeParameter(name);
                     }
 
                     refresh();
@@ -298,13 +277,13 @@ public class EngineCachePage {
 	}
 
     public void refresh() {
-        parametersTable.removeAll();
+        parameterTable.removeAll();
 
-        for (Iterator i=cacheConfig.getParameterNames().iterator(); i.hasNext(); ) {
+        for (Iterator i=handlerConfig.getParameterNames().iterator(); i.hasNext(); ) {
             String name = (String)i.next();
-            String value = cacheConfig.getParameter(name);
+            String value = handlerConfig.getParameter(name);
 
-            TableItem item = new TableItem(parametersTable, SWT.CHECK);
+            TableItem item = new TableItem(parameterTable, SWT.CHECK);
             item.setText(0, name);
             item.setText(1, value);
         }

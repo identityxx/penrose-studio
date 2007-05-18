@@ -26,7 +26,6 @@ import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.StaticEntryDNWizardPage;
-import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.acl.ACI;
 import org.apache.log4j.Logger;
 

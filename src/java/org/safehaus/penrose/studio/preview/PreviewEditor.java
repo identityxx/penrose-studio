@@ -17,8 +17,6 @@
  */
 package org.safehaus.penrose.studio.preview;
 
-import javax.naming.NamingEnumeration;
-
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
@@ -38,7 +36,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.Penrose;
 import org.safehaus.penrose.PenroseFactory;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.user.UserConfig;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.session.Session;
@@ -61,7 +58,7 @@ public class PreviewEditor extends EditorPart {
 
     Penrose penrose;
     Session session;
-    String password;
+    byte[] password;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         setSite(site);
@@ -111,14 +108,14 @@ public class PreviewEditor extends EditorPart {
                     PreviewDialog dialog = new PreviewDialog(parent.getShell(), SWT.NONE);
                     dialog.setBaseDn(baseDnText.getText());
                     dialog.setBindDn(bindDnText.getText());
-                    dialog.setBindPassword(password);
+                    dialog.setBindPassword(new String(password));
                     dialog.open();
 
                     if (dialog.getAction() == PreviewDialog.CANCEL) return;
 
                     String baseDn = dialog.getBaseDn();
                     String bindDn = dialog.getBindDn();
-                    String password = dialog.getBindPassword();
+                    byte[] password = dialog.getBindPassword().getBytes();
 
                     open(baseDn, bindDn, password);
 
@@ -180,9 +177,7 @@ public class PreviewEditor extends EditorPart {
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
             PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
 
-            UserConfig rootUserConfig = penroseConfig.getRootUserConfig();
-
-            open("", rootUserConfig.getDn().toString(), rootUserConfig.getPassword());
+            open("", penroseConfig.getRootDn().toString(), penroseConfig.getRootPassword());
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
@@ -193,7 +188,7 @@ public class PreviewEditor extends EditorPart {
     public void setFocus() {
     }
 
-    public void open(String baseDn, String bindDn, String password) throws Exception {
+    public void open(String baseDn, String bindDn, byte[] password) throws Exception {
 
         tree.removeAll();
 
