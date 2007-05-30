@@ -391,7 +391,6 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="penrose" />
-    <orderEntry type="module" module-name="license" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
