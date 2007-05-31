@@ -30,6 +30,7 @@ import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.source.Sources;
 import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.handler.HandlerManager;
 import org.apache.log4j.Logger;
 
 import javax.naming.InitialContext;
@@ -159,7 +160,7 @@ public class CreateLDAPProxyWizard extends Wizard {
             if (infoPage.getMapADSchema()) {
                 String schemaFormat = infoPage.getSchemaFormat();
                 String sourceSchemaDn = "CN=Schema,CN=Configuration,"+connectionInfoPage.getSuffix();
-                String destSchemaDn = "cn=schema,ou=system";
+                String destSchemaDn = HandlerManager.SCHEMA_DN.toString();
 
                 EntryMapping schemaMapping;
 

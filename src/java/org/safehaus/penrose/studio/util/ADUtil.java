@@ -11,6 +11,8 @@ import org.safehaus.penrose.mapping.SourceMapping;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.source.SourceManager;
+import org.safehaus.penrose.ldap.DN;
+import org.safehaus.penrose.ldap.RDN;
 
 /**
  * @author Endi S. Dewata
@@ -51,15 +53,20 @@ public class ADUtil {
         SourceManager sourceManager = penroseContext.getSourceManager();
         sourceManager.init(partition, sourceConfig);
 
+        DN dn = new DN(destSchemaDn);
+
         EntryMapping entryMapping = new EntryMapping();
-        entryMapping.setDn(destSchemaDn);
+        entryMapping.setDn(dn);
         entryMapping.addObjectClass("top");
         entryMapping.addObjectClass("subschema");
 
-        entryMapping.addAttributeMapping(new AttributeMapping("cn", AttributeMapping.CONSTANT, "schema", true));
+        RDN rdn = dn.getRdn();
+        for (String name : rdn.getNames()) {
+            String value = rdn.get(name).toString();
+            entryMapping.addAttributeMapping(new AttributeMapping(name, AttributeMapping.CONSTANT, value, true));
+        }
 
         Expression atExpression = new Expression(
-                "schema", "s",
                 "import org.safehaus.penrose.schema.*;\n" +
                 "\n" +
                 "if (!s.objectClass.contains(\"attributeSchema\")) return null;\n" +
@@ -82,7 +89,6 @@ public class ADUtil {
         );
 
         Expression ocExpression = new Expression(
-                "schema", "s",
                 "import java.util.*;\n" +
                 "import org.safehaus.penrose.schema.*;\n" +
                 "\n" +
@@ -131,7 +137,7 @@ public class ADUtil {
                 )
         );
 
-        SourceMapping sourceMapping = new SourceMapping("schema", sourceConfig.getName());
+        SourceMapping sourceMapping = new SourceMapping("s", sourceConfig.getName());
         entryMapping.addSourceMapping(sourceMapping);
 
         partition.addEntryMapping(entryMapping);

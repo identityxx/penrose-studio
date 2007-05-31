@@ -238,7 +238,7 @@ public class BrowserEditor extends EditorPart {
         DN parentDn = (DN)parentItem.getData();
 
         if (parentDn.isEmpty()) {
-            LDAPSearchResults sr = connection.search("", LDAPConnection.SCOPE_BASE, "(objectClass=*)", new String[0], false);
+            LDAPSearchResults sr = connection.search("", LDAPConnection.SCOPE_BASE, "(objectClass=*)", new String[] { "*", "+" }, false);
             LDAPEntry parentEntry = sr.next();
 
             LDAPAttribute namingContexts = parentEntry.getAttribute("namingContexts");
@@ -255,7 +255,7 @@ public class BrowserEditor extends EditorPart {
 
         } else {
 
-            LDAPSearchResults sr = connection.search(parentDn.toString(), LDAPConnection.SCOPE_ONE, "(objectClass=*)", new String[0], true);
+            LDAPSearchResults sr = connection.search(parentDn.toString(), LDAPConnection.SCOPE_ONE, "(objectClass=*)", new String[] { "*", "+" }, true);
 
             while (sr.hasMore()) {
                 try {
@@ -283,12 +283,13 @@ public class BrowserEditor extends EditorPart {
 
         DN dn = (DN)treeItem.getData();
 
-        LDAPSearchResults sr;
-        if (dn.isEmpty()) {
-            sr = connection.search(dn.toString(), LDAPConnection.SCOPE_BASE, "(objectClass=*)", new String[] { "*", "+" }, false);
-        } else {
-            sr = connection.search(dn.toString(), LDAPConnection.SCOPE_BASE, "(objectClass=*)", new String[0], false);
-        }
+        LDAPSearchResults sr = connection.search(
+                dn.toString(),
+                LDAPConnection.SCOPE_BASE,
+                "(objectClass=*)",
+                new String[] { "*", "+" },
+                false
+        );
 
         if (!sr.hasMore()) return;
 

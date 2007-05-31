@@ -225,22 +225,25 @@ public class PreviewEditor extends EditorPart {
         tree.setSelection(new TreeItem[] { treeItem });
     }
 
-    public void showChildren(TreeItem parentItem) throws Exception {
+    public void showChildren(final TreeItem parentItem) throws Exception {
 
         TreeItem items[] = parentItem.getItems();
-        for (int i=0; i<items.length; i++) items[i].dispose();
+        for (TreeItem item : items) item.dispose();
 
         DN parentDn = (DN)parentItem.getData();
 
         if (parentDn.isEmpty()) {
 
-            SearchResponse<SearchResult> results = session.search(
-                    "",
-                    "(objectClass=*)",
-                    SearchRequest.SCOPE_BASE
-            );
+            SearchRequest request = new SearchRequest();
+            request.setDn("");
+            request.setScope(SearchRequest.SCOPE_BASE);
+            request.setAttributes(new String[] { "*", "+" });
 
-            SearchResult parentEntry = (SearchResult)results.next();
+            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
+
+            session.search(request, response);
+
+            SearchResult parentEntry = response.next();
 
             Attribute namingContexts = parentEntry.getAttributes().get("namingContexts");
 
@@ -256,33 +259,30 @@ public class PreviewEditor extends EditorPart {
 
         } else {
 
-            SearchResponse<SearchResult> results = session.search(
-                    parentDn.toString(),
-                    "(objectClass=*)",
-                    SearchRequest.SCOPE_ONE
-            );
+            SearchRequest request = new SearchRequest();
+            request.setDn(parentDn.toString());
+            request.setScope(SearchRequest.SCOPE_ONE);
+            request.setAttributes(new String[] { "*", "+" });
 
-            while (results.hasNext()) {
-                try {
-                    SearchResult entry = (SearchResult)results.next();
-                    DN dn = entry.getDn();
-                    String rdn = dn.getRdn().toString();
+            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
-                    TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
-                    treeItem.setText(rdn);
-                    treeItem.setData(dn);
+            session.search(request, response);
 
-                    new TreeItem(treeItem, SWT.NONE);
+            while (response.hasNext()) {
+                SearchResult entry = response.next();
+                DN dn = entry.getDn();
+                String rdn = dn.getRdn().toString();
 
-                } catch (Exception e) {
-                    TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
-                    treeItem.setText(e.getMessage());
-                }
+                TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
+                treeItem.setText(rdn);
+                treeItem.setData(dn);
+
+                new TreeItem(treeItem, SWT.NONE);
             }
 
-            if (results.getReturnCode() != LDAPException.SUCCESS) {
+            if (response.getReturnCode() != LDAPException.SUCCESS) {
                 TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
-                treeItem.setText(LDAPException.resultCodeToString(results.getReturnCode()));
+                treeItem.setText(LDAPException.resultCodeToString(response.getReturnCode()));
             }
         }
     }
@@ -293,20 +293,18 @@ public class PreviewEditor extends EditorPart {
 
         DN dn = (DN)treeItem.getData();
 
-        SearchRequest sc = new SearchRequest();
-        sc.setDn(dn);
-        sc.setScope(SearchRequest.SCOPE_BASE);
+        SearchRequest request = new SearchRequest();
+        request.setDn(dn);
+        request.setScope(SearchRequest.SCOPE_BASE);
+        request.setAttributes(new String[] { "*", "+" });
 
-        if ("".equals(dn)) {
-            sc.setAttributes(new String[] { "*", "+" });
-        }
+        SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
-        SearchResponse<SearchResult> results = new SearchResponse<SearchResult>();
+        session.search(request, response);
 
-        session.search(sc, results);
-        if (!results.hasNext()) return;
+        if (!response.hasNext()) return;
 
-        SearchResult entry = (SearchResult)results.next();
+        SearchResult entry = response.next();
 
         Attributes attributes = entry.getAttributes();
 
