@@ -25,9 +25,12 @@ import org.safehaus.penrose.partition.FieldConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.studio.source.wizard.JNDIFieldWizardPage;
 import org.safehaus.penrose.studio.source.wizard.JNDIAttributeWizardPage;
+import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.ldap.DN;
+import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.source.SourceManager;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -118,6 +121,11 @@ public class JNDISourceWizard extends Wizard {
             }
 
             partition.getSources().addSourceConfig(sourceConfig);
+
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseContext penroseContext = penroseApplication.getPenroseContext();
+            SourceManager sourceManager = penroseContext.getSourceManager();
+            sourceManager.init(partition, sourceConfig);
 
             return true;
 

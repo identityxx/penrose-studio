@@ -144,7 +144,7 @@ public class LDAPPage extends FormPage {
         toolkit.createLabel(composite, "RDN:");
 
         rdnText = toolkit.createText(composite, "", SWT.BORDER);
-        rdnText.setText(entry.getRdn().toString());
+        rdnText.setText(entry.getRdn() == null ? "" : entry.getRdn().toString());
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
         rdnText.setLayoutData(gd);

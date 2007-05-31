@@ -144,6 +144,7 @@ public class CreateLDAPProxyWizard extends Wizard {
                 sourceManager.init(partition, rootDseSourceConfig);
 
                 EntryMapping rootDseEntryMapping = new EntryMapping();
+                rootDseEntryMapping.setDn("");
 
                 SourceMapping rootDseSourceMapping = new SourceMapping("DEFAULT", rootDseSourceConfig.getName());
                 rootDseEntryMapping.addSourceMapping(rootDseSourceMapping);
