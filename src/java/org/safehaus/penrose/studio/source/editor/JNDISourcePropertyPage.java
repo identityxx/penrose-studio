@@ -30,13 +30,13 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.source.editor.JNDISourceEditor;
 import org.safehaus.penrose.studio.source.JNDIFieldDialog;
 import org.safehaus.penrose.studio.source.FieldDialog;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.schema.Schema;
+import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.source.Sources;
 import org.safehaus.penrose.source.SourceManager;
@@ -358,7 +358,7 @@ public class JNDISourcePropertyPage extends FormPage {
 
                     PenroseApplication penroseApplication = PenroseApplication.getInstance();
                     SchemaManager schemaManager = penroseApplication.getSchemaManager();
-                    Collection attributeTypes = schemaManager.getAttributeTypes();
+                    Collection<AttributeType> attributeTypes = schemaManager.getAttributeTypes();
 
                     JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setAttributeTypes(attributeTypes);

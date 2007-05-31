@@ -1,20 +1,21 @@
 <?xml version="1.0"?>
-<!-- ====================================================================== 
-         Copyright (c) 2000-2006, Identyx Corporation.
-         All rights reserved.
-     ====================================================================== -->
+<!--
+ Copyright (c) 2000-2006, Identyx Corporation.
+ All rights reserved.
+-->
 <project name="penrose-studio" default="compile">
 
     <description>Penrose Studio</description>
 
     <property file="build.properties"/>
+
     <property name="project.name" value="penrose-studio"/>
     <property name="project.dist" value="dist"/>
 
+    <property name="penrose.version" value="1.2.1"/>
+
     <property name="prefix" value=""/>
     <property name="penrose.studio.home" value="${prefix}/usr/local/${project.name}-${product.version}"/>
-
-    <property name="penrose.version" value="1.2"/>
 
     <property name="rcp.prefix" value="eclipse-RCP-3.1"/>
     <property name="iscc.path" value="ISCC.exe"/>
@@ -49,10 +50,10 @@
     </target>
 
     <target name="import" depends="init">
-        <copy todir="lib" file="../penrose-pro-1.2/agent/target/agent-${penrose.version}.jar"/>
-        <copy todir="lib" file="../penrose-pro-1.2/agent/target/agent-client-${penrose.version}.jar"/>
-        <copy todir="lib" file="../penrose-pro-1.2/lib/penrose-${penrose.version}.jar"/>
-        <copy todir="lib" file="../penrose-pro-1.2/target/penrose-pro-${penrose.version}.jar"/>
+        <copy todir="lib" file="../penrose-pro-${product.specification}/agent/target/agent-${penrose.version}.jar"/>
+        <copy todir="lib" file="../penrose-pro-${product.specification}/agent/target/agent-client-${penrose.version}.jar"/>
+        <copy todir="lib" file="../penrose-pro-${product.specification}/lib/penrose-${penrose.version}.jar"/>
+        <copy todir="lib" file="../penrose-pro-${product.specification}/target/penrose-pro-${penrose.version}.jar"/>
     </target>
 
     <target name="clean" depends="init">
@@ -118,7 +119,7 @@
                 <exclude name="**/.svn"/>
             </patternset>
             <manifest>
-                <attribute name="Specification-Version"  value="1.0"/>
+                <attribute name="Specification-Version"  value="${product.specification}"/>
                 <attribute name="Implementation-Title"   value="Penrose Studio"/>
                 <attribute name="Implementation-Version" value="${product.version}"/>
                 <attribute name="Implementation-Vendor"  value="Identyx Corporation"/>

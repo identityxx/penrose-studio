@@ -136,11 +136,11 @@ public class JNDIFieldDialog extends FieldDialog {
         return composite;
     }
 
-    public void setAttributeTypes(Collection fields) {
+    public void setAttributeTypes(Collection<AttributeType> attributeTypes) {
         attributeTypeTable.removeAll();
         items.clear();
 
-        for (Iterator i=fields.iterator(); i.hasNext(); ) {
+        for (Iterator i=attributeTypes.iterator(); i.hasNext(); ) {
             AttributeType attributeType = (AttributeType)i.next();
             TableItem ti = new TableItem(attributeTypeTable, SWT.NONE);
             ti.setText(attributeType.getName());
