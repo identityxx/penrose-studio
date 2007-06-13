@@ -470,11 +470,6 @@ public class JNDISourcePropertyPage extends FormPage {
             sources.removeSourceConfig(oldName);
             source.setName(newName);
             sources.addSourceConfig(source);
-
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseContext penroseContext = penroseApplication.getPenroseContext();
-            SourceManager sourceManager = penroseContext.getSourceManager();
-            sourceManager.init(partition, source);
         }
 
         source.setParameter("baseDn", baseDnText.getText());

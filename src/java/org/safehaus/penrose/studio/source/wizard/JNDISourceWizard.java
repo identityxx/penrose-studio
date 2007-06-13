@@ -112,11 +112,6 @@ public class JNDISourceWizard extends Wizard {
 
             partition.getSources().addSourceConfig(sourceConfig);
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseContext penroseContext = penroseApplication.getPenroseContext();
-            SourceManager sourceManager = penroseContext.getSourceManager();
-            sourceManager.init(partition, sourceConfig);
-
             return true;
 
         } catch (Exception e) {

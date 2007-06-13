@@ -55,7 +55,7 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
     Table tableTable;
     Table fieldTable;
 
-    private Collection fields;
+    Collection fields;
     ConnectionConfig connectionConfig;
 
     public JDBCTableWizardPage() {
@@ -319,8 +319,7 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
     }
 
     public boolean validatePage() {
-        if (getTableName() == null) return false;
-        return true;
+        return getTableName() != null;
     }
 
     public void widgetSelected(SelectionEvent event) {

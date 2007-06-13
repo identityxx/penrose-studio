@@ -18,6 +18,7 @@ import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.adapter.AdapterConfig;
 import org.safehaus.penrose.connection.Connection;
+import org.safehaus.penrose.connection.ConnectionManager;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.source.SourceManager;
@@ -41,19 +42,12 @@ public class JNDISourceBrowsePage extends FormPage {
     Partition partition;
     SourceConfig sourceConfig;
 
-    Source source;
-
     public JNDISourceBrowsePage(JNDISourceEditor editor) throws Exception {
         super(editor, "BROWSE", "  Browse  ");
 
         this.editor = editor;
         this.partition = editor.partition;
         this.sourceConfig = editor.sourceConfig;
-
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
-        SourceManager sourceManager = penroseContext.getSourceManager();
-        source = sourceManager.getSource(partition, sourceConfig.getName());
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -166,7 +160,21 @@ public class JNDISourceBrowsePage extends FormPage {
         };
 
         try {
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseContext penroseContext = penroseApplication.getPenroseContext();
+
+            ConnectionManager connectionManager = penroseContext.getConnectionManager();
+            ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
+            Connection connection = connectionManager.createConnection(partition, connectionConfig);
+
+            connection.start();
+
+            SourceManager sourceManager = penroseContext.getSourceManager();
+            Source source = sourceManager.createSource(partition, sourceConfig, connection);
+
             source.search(sc, sr);
+
+            connection.stop();
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

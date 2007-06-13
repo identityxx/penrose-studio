@@ -177,13 +177,9 @@ public class SourceNode extends Node {
         newSourceDefinition.setName(name);
         partition.getSources().addSourceConfig(newSourceDefinition);
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
-        SourceManager sourceManager = penroseContext.getSourceManager();
-        sourceManager.init(partition, newSourceDefinition);
-
         view.setClipboard(null);
 
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
         penroseApplication.notifyChangeListeners();
     }
 

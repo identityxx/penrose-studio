@@ -274,13 +274,11 @@ public class JDBCSourcePropertyPage extends FormPage {
                     String schema = sourceConfig.getParameter(JDBCClient.SCHEMA);
                     String tableName = sourceConfig.getParameter(JDBCClient.TABLE);
                     if (tableName == null) tableName = sourceConfig.getParameter(JDBCClient.TABLE_NAME);
-                    if (catalog != null) tableName = catalog +"."+tableName;
-                    if (schema != null) tableName = schema +"."+tableName;
 
                     JDBCClient client = new JDBCClient(connectionConfig.getParameters());
                     
                     client.connect();
-                    Collection fields = client.getColumns(tableName);
+                    Collection fields = client.getColumns(catalog, schema, tableName);
                     client.close();
 
                     JDBCFieldDialog dialog = new JDBCFieldDialog(parent.getShell(), SWT.NONE);

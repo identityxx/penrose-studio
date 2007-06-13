@@ -75,7 +75,7 @@ public class Helper {
 			}
 			MessageDialog.openError(shell, "Test Connection Result", "Error: "+ex.getSQLState()+"\n"+message);
 		} finally {
-			try { con.close(); } catch (Exception ex) {}
+			try { if (con != null) con.close(); } catch (Exception ex) {}
 		}
 	}
 	
@@ -100,7 +100,7 @@ public class Helper {
 			}
 			MessageDialog.openError(shell, "Test Connection Result", "Error: "+message);
 		} finally {
-			try { ic.close(); } catch (Exception ex) {} 
+			try { if (ic != null) ic.close(); } catch (Exception ex) {}
 		}
 	}
 

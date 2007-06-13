@@ -22,8 +22,12 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.studio.driver.Driver;
 import org.safehaus.penrose.studio.util.Helper;
+import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.connection.ConnectionManager;
+import org.safehaus.penrose.connection.Connection;
 import org.apache.log4j.Logger;
 
 import javax.naming.InitialContext;
@@ -136,18 +140,13 @@ public class ConnectionWizard extends Wizard {
 
             if ("JDBC".equals(adapterName)) {
 
-                String driver = jdbcPage.getParameter(JDBCClient.DRIVER);
-                connectionConfig.setParameter(JDBCClient.DRIVER, driver);
+                Map<String,String> parameters = jdbcPage.getParameters();
+                connectionConfig.setParameters(parameters);
 
-                String url = jdbcPage.getParameter(JDBCClient.URL);
-                url = Helper.replace(url, jdbcPage.getParameters());
+                Map<String,String> allParameters = jdbcPage.getAllParameters();
+                String url = allParameters.get(JDBCClient.URL);
+                url = Helper.replace(url, allParameters);
                 connectionConfig.setParameter(JDBCClient.URL, url);
-
-                String user = jdbcPage.getParameter(JDBCClient.USER);
-                if (user != null) connectionConfig.setParameter(JDBCClient.USER, user);
-
-                String password = jdbcPage.getParameter(JDBCClient.PASSWORD);
-                if (password != null) connectionConfig.setParameter(JDBCClient.PASSWORD, password);
 
             } else if ("LDAP".equals(adapterName)) {
                 connectionConfig.setParameter(InitialContext.PROVIDER_URL, jndiInfoPage.getURL()+"/"+jndiInfoPage.getSuffix());

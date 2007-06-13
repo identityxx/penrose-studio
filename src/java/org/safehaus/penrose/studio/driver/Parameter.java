@@ -24,8 +24,10 @@ public class Parameter {
 
     public final static int TYPE_NORMAL   = 0;
     public final static int TYPE_REQUIRED = 1;
-    public final static int TYPE_HIDDEN   = 2;
-    public final static int TYPE_PASSWORD = 3;
+    public final static int TYPE_READ_ONLY = 2;
+    public final static int TYPE_HIDDEN   = 3;
+    public final static int TYPE_PASSWORD = 4;
+    public final static int TYPE_TEMP     = 5;
 
     private String name;
     private String displayName;
@@ -93,11 +95,17 @@ public class Parameter {
             case TYPE_REQUIRED:
                 return "REQUIRED";
 
+            case TYPE_READ_ONLY:
+                return "READ_ONLY";
+
             case TYPE_HIDDEN:
                 return "HIDDEN";
 
             case TYPE_PASSWORD:
                 return "PASSWORD";
+
+            case TYPE_TEMP:
+                return "TEMP";
 
             default:
                 return null;
@@ -111,11 +119,17 @@ public class Parameter {
         } else if ("REQUIRED".equals(s)) {
             type = TYPE_REQUIRED;
 
+        } else if ("READ_ONLY".equals(s)) {
+            type = TYPE_READ_ONLY;
+
         } else if ("HIDDEN".equals(s)) {
             type = TYPE_HIDDEN;
 
         } else if ("PASSWORD".equals(s)) {
             type = TYPE_PASSWORD;
+
+        } else if ("TEMP".equals(s)) {
+            type = TYPE_TEMP;
         }
     }
 

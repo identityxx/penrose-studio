@@ -70,11 +70,6 @@ public class CreateRootDSEProxyWizard extends Wizard {
 
             partition.getSources().addSourceConfig(sourceConfig);
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseContext penroseContext = penroseApplication.getPenroseContext();
-            SourceManager sourceManager = penroseContext.getSourceManager();
-            sourceManager.init(partition, sourceConfig);
-
             EntryMapping entryMapping = new EntryMapping();
 
             SourceMapping sourceMapping = new SourceMapping("DEFAULT", sourceConfig.getName());

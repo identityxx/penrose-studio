@@ -24,12 +24,6 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.studio.PenroseWorkbenchAdvisor;
-import org.safehaus.penrose.studio.PenroseWorkbenchWindowAdvisor;
-import org.safehaus.penrose.studio.PenroseActionBarAdvisor;
-import org.safehaus.penrose.studio.connection.editor.JDBCConnectionTablesPage;
-import org.safehaus.penrose.studio.connection.editor.JDBCConnectionPropertiesPage;
-import org.safehaus.penrose.studio.connection.editor.JDBCConnectionEditorInput;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.SourceConfig;
 import org.apache.log4j.Logger;
@@ -46,10 +40,18 @@ public class JDBCConnectionEditor extends FormEditor {
     boolean dirty;
 
     private Partition partition;
+
     ConnectionConfig origConnectionConfig;
     private ConnectionConfig connectionConfig;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+        setSite(site);
+        setInput(input);
+    }
+
+    public void setInput(IEditorInput input) {
+        super.setInput(input);
+
         JDBCConnectionEditorInput cei = (JDBCConnectionEditorInput)input;
 
         partition = cei.getPartition();
@@ -58,26 +60,17 @@ public class JDBCConnectionEditor extends FormEditor {
         try {
             connectionConfig = (ConnectionConfig)origConnectionConfig.clone();
         } catch (Exception e) {
-            throw new PartInitException(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
 
-        setSite(site);
-        setInput(input);
         setPartName(partition.getName()+"/"+connectionConfig.getName());
     }
 
     public void addPages() {
         try {
             addPage(new JDBCConnectionPropertiesPage(this));
-
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseWorkbenchAdvisor workbenchAdvisor = penroseApplication.getWorkbenchAdvisor();
-            PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
-            PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
-
-            //if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
-                addPage(new JDBCConnectionTablesPage(this));
-            //}
+            addPage(new JDBCConnectionTablesPage(this));
+            addPage(new JDBCConnectionAdvancedPage(this));
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

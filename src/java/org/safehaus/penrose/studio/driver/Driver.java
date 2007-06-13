@@ -17,8 +17,6 @@
  */
 package org.safehaus.penrose.studio.driver;
 
-import org.safehaus.penrose.studio.driver.Parameter;
-
 import java.util.Map;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -31,7 +29,7 @@ public class Driver {
     private String name;
     private String adapterName;
 
-    private Map parameters = new LinkedHashMap();
+    private Map<String,Parameter> parameters = new LinkedHashMap<String,Parameter>();
 
     public Driver() {
     }
@@ -57,10 +55,10 @@ public class Driver {
     }
 
     public Parameter getParameter(String name) {
-        return (Parameter)parameters.get(name);
+        return parameters.get(name);
     }
     
-    public Collection getParameters() {
+    public Collection<Parameter> getParameters() {
         return parameters.values();
     }
 

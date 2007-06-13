@@ -19,6 +19,8 @@ import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.util.LDAPUtil;
+import org.safehaus.penrose.connection.ConnectionManager;
+import org.safehaus.penrose.connection.Connection;
 
 import java.util.Iterator;
 import java.util.Collection;
@@ -36,7 +38,6 @@ public class JDBCSourceBrowsePage extends FormPage {
     JDBCSourceEditor editor;
     Partition partition;
     SourceConfig sourceConfig;
-    Source source;
 
     public JDBCSourceBrowsePage(JDBCSourceEditor editor) {
         super(editor, "BROWSE", "  Browse  ");
@@ -44,11 +45,6 @@ public class JDBCSourceBrowsePage extends FormPage {
         this.editor = editor;
         this.partition = editor.partition;
         this.sourceConfig = editor.sourceConfig;
-
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
-        SourceManager sourceManager = penroseContext.getSourceManager();
-        source = sourceManager.getSource(partition, sourceConfig.getName());
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -180,7 +176,22 @@ public class JDBCSourceBrowsePage extends FormPage {
             DN dn = new DN(rdn);
             Attributes attributes = dialog.getAttributes();
 
+
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseContext penroseContext = penroseApplication.getPenroseContext();
+
+            ConnectionManager connectionManager = penroseContext.getConnectionManager();
+            ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
+            Connection connection = connectionManager.createConnection(partition, connectionConfig);
+
+            connection.start();
+
+            SourceManager sourceManager = penroseContext.getSourceManager();
+            Source source = sourceManager.createSource(partition, sourceConfig, connection);
+
             source.add(dn, attributes);
+
+            connection.stop();
 
             refresh();
 
@@ -220,6 +231,18 @@ public class JDBCSourceBrowsePage extends FormPage {
                     dialog.getAttributes()
             );
 
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseContext penroseContext = penroseApplication.getPenroseContext();
+
+            ConnectionManager connectionManager = penroseContext.getConnectionManager();
+            ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
+            Connection connection = connectionManager.createConnection(partition, connectionConfig);
+
+            connection.start();
+
+            SourceManager sourceManager = penroseContext.getSourceManager();
+            Source source = sourceManager.createSource(partition, sourceConfig, connection);
+
             if (!rdn.equals(newRdn)) {
                 source.modrdn(dn, newRdn, true);
 
@@ -230,6 +253,8 @@ public class JDBCSourceBrowsePage extends FormPage {
             }
 
             source.modify(dn, modifications);
+
+            connection.stop();
 
             refresh();
 
@@ -252,7 +277,22 @@ public class JDBCSourceBrowsePage extends FormPage {
             SearchResult searchResult = (SearchResult)item.getData();
 
             DN dn = searchResult.getDn();
+
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseContext penroseContext = penroseApplication.getPenroseContext();
+
+            ConnectionManager connectionManager = penroseContext.getConnectionManager();
+            ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
+            Connection connection = connectionManager.createConnection(partition, connectionConfig);
+
+            connection.start();
+
+            SourceManager sourceManager = penroseContext.getSourceManager();
+            Source source = sourceManager.createSource(partition, sourceConfig, connection);
+
             source.delete(dn);
+
+            connection.stop();
 
             refresh();
 
@@ -310,7 +350,21 @@ public class JDBCSourceBrowsePage extends FormPage {
         };
 
         try {
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseContext penroseContext = penroseApplication.getPenroseContext();
+
+            ConnectionManager connectionManager = penroseContext.getConnectionManager();
+            ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
+            Connection connection = connectionManager.createConnection(partition, connectionConfig);
+
+            connection.start();
+
+            SourceManager sourceManager = penroseContext.getSourceManager();
+            Source source = sourceManager.createSource(partition, sourceConfig, connection);
+
             source.search(request, response);
+
+            connection.stop();
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

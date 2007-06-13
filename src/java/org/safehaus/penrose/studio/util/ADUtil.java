@@ -48,11 +48,6 @@ public class ADUtil {
 
         partition.getSources().addSourceConfig(sourceConfig);
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
-        SourceManager sourceManager = penroseContext.getSourceManager();
-        sourceManager.init(partition, sourceConfig);
-
         DN dn = new DN(destSchemaDn);
 
         EntryMapping entryMapping = new EntryMapping();

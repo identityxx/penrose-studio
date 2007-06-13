@@ -33,12 +33,10 @@ import org.eclipse.swt.layout.RowLayout;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.driver.Parameter;
 import org.safehaus.penrose.studio.driver.Driver;
-import org.safehaus.penrose.adapter.jdbc.JDBCAdapter;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,7 +52,7 @@ public class JDBCConnectionWizardPage extends WizardPage implements ModifyListen
     //Font boldFont;
     Composite fieldComposite;
 
-    Map fieldMap = new HashMap();
+    Map<String,Text> fieldMap = new HashMap<String,Text>();
 
     public JDBCConnectionWizardPage() {
         super(NAME);
@@ -88,12 +86,14 @@ public class JDBCConnectionWizardPage extends WizardPage implements ModifyListen
                     Driver type = page.getDriver();
                     if (type == null) return;
 
-                    String driver = getParameter(JDBCClient.DRIVER);
-                    String url = getParameter(JDBCClient.URL);
-                    String username = getParameter(JDBCClient.USER);
-                    String password = getParameter(JDBCClient.PASSWORD);
+                    Map<String,String> allParameters = getAllParameters();
 
-                    url = Helper.replace(url, getParameters());
+                    String driver = allParameters.get(JDBCClient.DRIVER);
+                    String url = allParameters.get(JDBCClient.URL);
+                    String username = allParameters.get(JDBCClient.USER);
+                    String password = allParameters.get(JDBCClient.PASSWORD);
+
+                    url = Helper.replace(url, allParameters);
                     System.out.println("Connecting to "+url);
 
                     Helper.testJdbcConnection(
@@ -126,14 +126,14 @@ public class JDBCConnectionWizardPage extends WizardPage implements ModifyListen
     public void init() {
         try {
             ConnectionDriverPage page = (ConnectionDriverPage)getWizard().getPage(ConnectionDriverPage.NAME);
-            Driver type = page.getDriver();
-            if (type == null) return;
+            Driver driver = page.getDriver();
+            if (driver == null) return;
 
-            setDescription("Enter "+type.getName()+" connection properties.");
+            setDescription("Enter "+driver.getName()+" connection properties.");
 
             Control child[] = fieldComposite.getChildren();
-            for (int i=0; i<child.length; i++) {
-                child[i].dispose();
+            for (Control control : child) {
+                control.dispose();
             }
 
             fieldMap.clear();
@@ -142,28 +142,40 @@ public class JDBCConnectionWizardPage extends WizardPage implements ModifyListen
             layout.numColumns = 2;
             fieldComposite.setLayout(layout);
 
-            Collection fields = type.getParameters();
-            for (Iterator i=fields.iterator(); i.hasNext(); ) {
-                Parameter parameter = (Parameter)i.next();
+            Collection<Parameter> parameters = driver.getParameters();
+            for (Parameter parameter : parameters) {
+                int type = parameter.getType();
 
-                Label label = new Label(fieldComposite, SWT.NONE);
-                if (parameter.getType() == Parameter.TYPE_REQUIRED) {
-                    label.setText(parameter.getDisplayName()+"*:");
+                if (type == Parameter.TYPE_REQUIRED) {
+                    Label label = new Label(fieldComposite, SWT.NONE);
+                    label.setText(parameter.getDisplayName() + "*:");
+
+                    GridData gd = new GridData(GridData.FILL);
+                    gd.widthHint = 100;
+                    label.setLayoutData(gd);
+                    
+                } else if (type == Parameter.TYPE_HIDDEN) {
+
                 } else {
-                    label.setText(parameter.getDisplayName()+":");
+                    Label label = new Label(fieldComposite, SWT.NONE);
+                    label.setText(parameter.getDisplayName() + ":");
+
+                    GridData gd = new GridData(GridData.FILL);
+                    gd.widthHint = 100;
+                    label.setLayoutData(gd);
                 }
-                GridData gd = new GridData(GridData.FILL);
-                gd.widthHint = 100;
-                label.setLayoutData(gd);
 
                 int style = SWT.BORDER;
-                if (parameter.getType() == Parameter.TYPE_HIDDEN) style |= SWT.READ_ONLY;
-                if (parameter.getType() == Parameter.TYPE_PASSWORD) style |= SWT.PASSWORD;
+                if (type == Parameter.TYPE_READ_ONLY) style |= SWT.READ_ONLY;
+                if (type == Parameter.TYPE_PASSWORD) style |= SWT.PASSWORD;
 
-                if (parameter.getType() == Parameter.TYPE_HIDDEN) {
+                if (type == Parameter.TYPE_READ_ONLY) {
                     Label l = new Label(fieldComposite, SWT.NONE);
                     l.setText(parameter.getDefaultValue() == null ? "" : parameter.getDefaultValue());
                     l.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+                } else if (type == Parameter.TYPE_HIDDEN) {
+
                 } else {
                     Text text = new Text(fieldComposite, style);
                     text.setText(parameter.getDefaultValue() == null ? "" : parameter.getDefaultValue());
@@ -183,16 +195,17 @@ public class JDBCConnectionWizardPage extends WizardPage implements ModifyListen
 
     public String getParameter(String name) {
         ConnectionDriverPage page = (ConnectionDriverPage)getWizard().getPage(ConnectionDriverPage.NAME);
-        Driver type = page.getDriver();
-        if (type == null) return null;
+        Driver driver = page.getDriver();
+        if (driver == null) return null;
 
-        Parameter parameter = type.getParameter(name);
-        if (parameter.getType() == Parameter.TYPE_HIDDEN) {
+        Parameter parameter = driver.getParameter(name);
+        int type = parameter.getType();
+        if (type == Parameter.TYPE_READ_ONLY || type == Parameter.TYPE_HIDDEN) {
             //System.out.println("hidden "+name+": "+parameter.getDefaultValue());
             return parameter.getDefaultValue();
         }
 
-        Text text = (Text)fieldMap.get(name);
+        Text text = fieldMap.get(name);
         if (text == null) return null;
 
         String s = text.getText();
@@ -202,16 +215,36 @@ public class JDBCConnectionWizardPage extends WizardPage implements ModifyListen
         return s;
     }
 
-    public Map getParameters() {
-        Map map = new HashMap();
+    public Map<String,String> getParameters() {
+        Map<String,String> map = new HashMap<String,String>();
 
         ConnectionDriverPage page = (ConnectionDriverPage)getWizard().getPage(ConnectionDriverPage.NAME);
-        Driver type = page.getDriver();
-        if (type == null) return map;
+        Driver driver = page.getDriver();
+        if (driver == null) return map;
 
-        Collection parameters = type.getParameters();
-        for (Iterator i=parameters.iterator(); i.hasNext(); ) {
-            Parameter parameter = (Parameter)i.next();
+        Collection<Parameter> parameters = driver.getParameters();
+        for (Parameter parameter : parameters) {
+            if (parameter.getType() == Parameter.TYPE_TEMP) continue;
+
+            String name = parameter.getName();
+            String value = getParameter(name);
+            if (value == null) continue;
+
+            map.put(name, value);
+        }
+
+        return map;
+    }
+
+    public Map<String,String> getAllParameters() {
+        Map<String,String> map = new HashMap<String,String>();
+
+        ConnectionDriverPage page = (ConnectionDriverPage)getWizard().getPage(ConnectionDriverPage.NAME);
+        Driver driver = page.getDriver();
+        if (driver == null) return map;
+
+        Collection<Parameter> parameters = driver.getParameters();
+        for (Parameter parameter : parameters) {
             String name = parameter.getName();
             String value = getParameter(name);
             if (value == null) continue;
@@ -224,12 +257,11 @@ public class JDBCConnectionWizardPage extends WizardPage implements ModifyListen
 
     public boolean validatePage() {
         ConnectionDriverPage page = (ConnectionDriverPage)getWizard().getPage(ConnectionDriverPage.NAME);
-        Driver type = page.getDriver();
-        if (type == null) return false;
+        Driver driver = page.getDriver();
+        if (driver == null) return false;
 
-        Collection parameters = type.getParameters();
-        for (Iterator i=parameters.iterator(); i.hasNext(); ) {
-            Parameter parameter = (Parameter)i.next();
+        Collection<Parameter> parameters = driver.getParameters();
+        for (Parameter parameter : parameters) {
             String name = parameter.getName();
             String value = getParameter(name);
 
