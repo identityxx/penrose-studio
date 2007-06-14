@@ -46,14 +46,15 @@ public class SourceDialog extends Dialog {
 
     Map items = new HashMap();
 
-    private SourceMapping source;
+    SourceMapping sourceMapping;
 
-    Button requiredCheckbox;
-    Button addCheckbox;
-    Button modifyCheckbox;
-    Button modrdnCheckbox;
-    Button deleteCheckbox;
-    Button proxyCheckbox;
+    Combo searchCombo;
+    Combo bindCombo;
+
+    Combo addCombo;
+    Combo deleteCombo;
+    Combo modifyCombo;
+    Combo modrdnCombo;
 
     Button saveButton;
 
@@ -130,29 +131,74 @@ public class SourceDialog extends Dialog {
     public Composite createPropertiesPage(Composite parent) {
 
         Composite composite = new Composite(parent, SWT.NONE);
-        composite.setLayout(new RowLayout(SWT.VERTICAL));
+        composite.setLayout(new GridLayout(2, false));
 
-        requiredCheckbox = new Button(composite, SWT.CHECK);
-        requiredCheckbox.setText("Required on search");
+        Label bindLabel = new Label(composite, SWT.NONE);
+        bindLabel.setText("Bind:");
+        bindLabel.setLayoutData(new GridData());
+
+        bindCombo = new Combo(composite, SWT.BORDER);
+        bindCombo.add("");
+        bindCombo.add(SourceMapping.REQUIRED);
+        bindCombo.add(SourceMapping.REQUISITE);
+        bindCombo.add(SourceMapping.SUFFICIENT);
+        bindCombo.add(SourceMapping.IGNORE);
+        bindCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label requiredLabel = new Label(composite, SWT.NONE);
+        requiredLabel.setText("Search:");
+        requiredLabel.setLayoutData(new GridData());
+
+        searchCombo = new Combo(composite, SWT.BORDER);
+        searchCombo.add("");
+        searchCombo.add(SourceMapping.REQUIRED);
+        searchCombo.add(SourceMapping.REQUISITE);
+        searchCombo.add(SourceMapping.SUFFICIENT);
+        searchCombo.add(SourceMapping.IGNORE);
+        searchCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         new Label(composite, SWT.NONE);
-
-        addCheckbox = new Button(composite, SWT.CHECK);
-        addCheckbox.setText("Include on add");
-
-        modifyCheckbox = new Button(composite, SWT.CHECK);
-        modifyCheckbox.setText("Include on modify");
-
-        modrdnCheckbox = new Button(composite, SWT.CHECK);
-        modrdnCheckbox.setText("Include on modrdn");
-
-        deleteCheckbox = new Button(composite, SWT.CHECK);
-        deleteCheckbox.setText("Include on delete");
-
         new Label(composite, SWT.NONE);
 
-        proxyCheckbox = new Button(composite, SWT.CHECK);
-        proxyCheckbox.setText("Proxy");
+        Label addLabel = new Label(composite, SWT.NONE);
+        addLabel.setText("Add:");
+        addLabel.setLayoutData(new GridData());
+
+        addCombo = new Combo(composite, SWT.BORDER);
+        addCombo.add("");
+        addCombo.add(SourceMapping.REQUIRED);
+        addCombo.add(SourceMapping.IGNORE);
+        addCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label deleteLabel = new Label(composite, SWT.NONE);
+        deleteLabel.setText("Delete:");
+        deleteLabel.setLayoutData(new GridData());
+
+        deleteCombo = new Combo(composite, SWT.BORDER);
+        deleteCombo.add("");
+        deleteCombo.add(SourceMapping.REQUIRED);
+        deleteCombo.add(SourceMapping.IGNORE);
+        deleteCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label modifyLabel = new Label(composite, SWT.NONE);
+        modifyLabel.setText("Modify:");
+        modifyLabel.setLayoutData(new GridData());
+
+        modifyCombo = new Combo(composite, SWT.BORDER);
+        modifyCombo.add("");
+        modifyCombo.add(SourceMapping.REQUIRED);
+        modifyCombo.add(SourceMapping.IGNORE);
+        modifyCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label modrdnLabel = new Label(composite, SWT.NONE);
+        modrdnLabel.setText("Modify RDN:");
+        modrdnLabel.setLayoutData(new GridData());
+
+        modrdnCombo = new Combo(composite, SWT.BORDER);
+        modrdnCombo.add("");
+        modrdnCombo.add(SourceMapping.REQUIRED);
+        modrdnCombo.add(SourceMapping.IGNORE);
+        modrdnCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         return composite;
     }
@@ -196,14 +242,16 @@ public class SourceDialog extends Dialog {
 
                 SourceConfig sourceConfig = (SourceConfig)item.getData();
 
-                source.setName(aliasText.getText());
-                source.setSourceName(sourceConfig.getName());
+                sourceMapping.setName(aliasText.getText());
+                sourceMapping.setSourceName(sourceConfig.getName());
 
-                source.setRequired(requiredCheckbox.getSelection());
-                source.setIncludeOnAdd(addCheckbox.getSelection());
-                source.setIncludeOnModify(modifyCheckbox.getSelection());
-                source.setIncludeOnModRdn(modrdnCheckbox.getSelection());
-                source.setIncludeOnDelete(deleteCheckbox.getSelection());
+                sourceMapping.setSearch("".equals(searchCombo.getText()) ? null : searchCombo.getText());
+                sourceMapping.setBind("".equals(bindCombo.getText()) ? null : bindCombo.getText());
+
+                sourceMapping.setAdd("".equals(addCombo.getText()) ? null : addCombo.getText());
+                sourceMapping.setDelete("".equals(deleteCombo.getText()) ? null : deleteCombo.getText());
+                sourceMapping.setModify("".equals(modifyCombo.getText()) ? null : modifyCombo.getText());
+                sourceMapping.setModrdn("".equals(modrdnCombo.getText()) ? null : modrdnCombo.getText());
 
                 saved = true;
                 shell.close();
@@ -268,11 +316,11 @@ public class SourceDialog extends Dialog {
     }
 
     public SourceMapping getSourceMapping() {
-        return source;
+        return sourceMapping;
     }
 
     public void setSourceMapping(SourceMapping source) {
-        this.source = source;
+        this.sourceMapping = source;
 
         TreeItem item = (TreeItem)items.get(source.getSourceName());
         if (item != null) {
@@ -280,11 +328,13 @@ public class SourceDialog extends Dialog {
         }
         aliasText.setText(source.getName() == null ? "" : source.getName());
 
-        requiredCheckbox.setSelection(source.isRequired());
-        addCheckbox.setSelection(source.isIncludeOnAdd());
-        modifyCheckbox.setSelection(source.isIncludeOnAdd());
-        modrdnCheckbox.setSelection(source.isIncludeOnModRdn());
-        deleteCheckbox.setSelection(source.isIncludeOnDelete());
+        searchCombo.setText(source.getSearch() == null ? "" : source.getSearch());
+        bindCombo.setText(source.getBind() == null ? "" : source.getBind());
+
+        addCombo.setText(source.getAdd() == null ? "" : source.getAdd());
+        deleteCombo.setText(source.getDelete() == null ? "" : source.getDelete());
+        modifyCombo.setText(source.getModify() == null ? "" : source.getModify());
+        modrdnCombo.setText(source.getModrdn() == null ? "" : source.getModrdn());
 
         aliasText.setEnabled(canEnterAlias());
         saveButton.setEnabled(canSave());

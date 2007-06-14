@@ -5,10 +5,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.SWT;
@@ -16,6 +13,11 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.Link;
+import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.config.PenroseConfig;
+import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.handler.HandlerConfig;
+import org.safehaus.penrose.engine.EngineConfig;
 
 /**
  * @author Endi S. Dewata
@@ -24,9 +26,9 @@ public class MiscPage extends FormPage {
 
     FormToolkit toolkit;
 
-    Text partitionText;
-    Text handlerText;
-    Text engineText;
+    Combo partitionCombo;
+    Combo handlerCombo;
+    Combo engineCombo;
 
     MappingEditor editor;
 	EntryMapping entryMapping;
@@ -57,7 +59,10 @@ public class MiscPage extends FormPage {
 
 	public Composite createMiscelleanousSection(Composite parent) {
 
-		Composite composite = toolkit.createComposite(parent);
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+
+        Composite composite = toolkit.createComposite(parent);
 		composite.setLayout(new GridLayout(2, false));
 
 		Label partitionLabel = toolkit.createLabel(composite, "Partition:");
@@ -67,22 +72,28 @@ public class MiscPage extends FormPage {
 
         Link link = entryMapping.getLink();
         
-        partitionText = toolkit.createText(composite, "", SWT.BORDER);
-        if (link != null) {
-            partitionText.setText(link.getPartitionName() == null ? "" : link.getPartitionName());
+        partitionCombo = new Combo(composite, SWT.BORDER);
+        partitionCombo.add("");
+
+        for (PartitionConfig partitionConfig : penroseConfig.getPartitionConfigs()) {
+            partitionCombo.add(partitionConfig.getName());
+        }
+
+        if (link != null && link.getPartitionName() != null) {
+            partitionCombo.setText(link.getPartitionName());
         }
 
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
-		partitionText.setLayoutData(gd);
+		partitionCombo.setLayoutData(gd);
 
-        partitionText.addModifyListener(new ModifyListener() {
+        partitionCombo.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                if ("".equals(partitionText.getText())) {
+                if ("".equals(partitionCombo.getText())) {
                     entryMapping.setLink(null);
                 } else {
                     Link link = new Link();
-                    link.setPartitionName(partitionText.getText());
+                    link.setPartitionName(partitionCombo.getText());
                     entryMapping.setLink(link);
                 }
                 checkDirty();
@@ -94,20 +105,28 @@ public class MiscPage extends FormPage {
         gd.widthHint = 100;
         handlerLabel.setLayoutData(gd);
 
+        handlerCombo = new Combo(composite, SWT.BORDER);
+        handlerCombo.add("");
+
+        for (HandlerConfig handlerConfig : penroseConfig.getHandlerConfigs()) {
+            handlerCombo.add(handlerConfig.getName());
+        }
+
         String value = entryMapping.getHandlerName();
-        value = value == null ? "" : value;
-        handlerText = toolkit.createText(composite, value, SWT.BORDER);
+        if (value != null) {
+            handlerCombo.setText(value);
+        }
 
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
-        handlerText.setLayoutData(gd);
+        handlerCombo.setLayoutData(gd);
 
-        handlerText.addModifyListener(new ModifyListener() {
+        handlerCombo.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                if ("".equals(handlerText.getText())) {
+                if ("".equals(handlerCombo.getText())) {
                     entryMapping.setHandlerName(null);
                 } else {
-                    entryMapping.setHandlerName(handlerText.getText());
+                    entryMapping.setHandlerName(handlerCombo.getText());
                 }
                 checkDirty();
             }
@@ -118,20 +137,28 @@ public class MiscPage extends FormPage {
         gd.widthHint = 100;
         engineLabel.setLayoutData(gd);
 
+        engineCombo = new Combo(composite, SWT.BORDER);
+        engineCombo.add("");
+
+        for (EngineConfig engineConfig : penroseConfig.getEngineConfigs()) {
+            engineCombo.add(engineConfig.getName());
+        }
+
         value = entryMapping.getEngineName();
-        value = value == null ? "" : value;
-        engineText = toolkit.createText(composite, value, SWT.BORDER);
+        if (value != null) {
+            engineCombo.setText(value);
+        }
 
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
-        engineText.setLayoutData(gd);
+        engineCombo.setLayoutData(gd);
 
-        engineText.addModifyListener(new ModifyListener() {
+        engineCombo.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                if ("".equals(engineText.getText())) {
+                if ("".equals(engineCombo.getText())) {
                     entryMapping.setEngineName(null);
                 } else {
-                    entryMapping.setEngineName(engineText.getText());
+                    entryMapping.setEngineName(engineCombo.getText());
                 }
                 checkDirty();
             }
