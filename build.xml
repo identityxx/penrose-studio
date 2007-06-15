@@ -199,7 +199,7 @@
         <antcall target="build-win32"/>
     </target>
 
-    <target name="build-linux-gtk-x86_64" depends="init" if="isLinux">
+    <target name="build-linux-gtk-x86_64" depends="init" if="isUnix">
         <property name="platform" value="linux-gtk-x86_64"/>
         <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>
         <!-- uncompress rpc -->
@@ -214,7 +214,7 @@
         </antcall>
     </target>
 
-    <target name="build-linux" depends="init" if="isLinux">
+    <target name="build-linux" depends="init" if="isUnix">
         <property name="platform" value="linux-gtk"/>
         <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>
         <!-- uncompress rpc -->
@@ -292,7 +292,7 @@
         <antcall target="dist-win32"/>
     </target>
 
-    <target name="dist-linux-gtk-x86_64" depends="build-linux-gtk-x86_64" if="isLinux">
+    <target name="dist-linux-gtk-x86_64" depends="build-linux-gtk-x86_64" if="isUnix">
         <antcall target="rpm">
             <param name="rpm.prefix" value=""/>
             <param name="rpm.home" value="/usr/src/redhat"/>
@@ -301,7 +301,7 @@
         </antcall>
     </target>
 
-    <target name="dist-linux" depends="build-linux" if="isLinux">
+    <target name="dist-linux" depends="build-linux" if="isUnix">
         <antcall target="rpm">
             <param name="rpm.prefix" value=""/>
             <param name="rpm.home" value="/usr/src/redhat"/>
@@ -431,14 +431,14 @@
         <antcall target="install-win32"/>
     </target>
 
-    <target name="install-linux-gtk-x86_64" if="isLinux">
+    <target name="install-linux-gtk-x86_64" if="isUnix">
         <antcall target="install-dist">
             <param name="platform" value="linux-gtk-x86_64"/>
         </antcall>
         <chmod dir="${penrose.studio.home}" includes="penrose-studio" perm="a+rx" />
     </target>
 
-    <target name="install-linux" if="isLinux">
+    <target name="install-linux" if="isUnix">
         <antcall target="install-dist">
             <param name="platform" value="linux-gtk"/>
         </antcall>
