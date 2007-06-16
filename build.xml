@@ -12,8 +12,6 @@
     <property name="project.name" value="penrose-studio"/>
     <property name="project.dist" value="dist"/>
 
-    <property name="penrose.version" value="1.2.1"/>
-
     <property name="prefix" value=""/>
     <property name="penrose.studio.home" value="${prefix}/usr/local/${project.name}-${product.version}"/>
 
