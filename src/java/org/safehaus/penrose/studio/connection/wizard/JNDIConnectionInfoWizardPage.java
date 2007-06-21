@@ -155,7 +155,8 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
         Label passwordLabel = new Label(composite, SWT.NONE);
         passwordLabel.setText("Password:");
 
-        passwordText = new Text(composite, SWT.BORDER | SWT.PASSWORD);
+        passwordText = new Text(composite, SWT.BORDER );
+		passwordText.setEchoChar('*');
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 3;
         passwordText.setLayoutData(gd);

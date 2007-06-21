@@ -168,7 +168,8 @@ public class JDBCConnectionPropertiesPage extends JDBCConnectionEditorPage {
 
         toolkit.createLabel(composite, "Password:");
 
-        passwordText = toolkit.createText(composite, "", SWT.BORDER | SWT.PASSWORD);
+        passwordText = toolkit.createText(composite, "", SWT.BORDER );
+		passwordText.setEchoChar('*');
         passwordText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         passwordText.addModifyListener(new ModifyListener() {
