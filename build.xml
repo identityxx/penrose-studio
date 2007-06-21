@@ -238,7 +238,7 @@
         <!-- apply universal binary patch -->
         <copy
             todir="target/${dist.name}/plugins"
-            file="rcp/org.eclipse.swt.carbon.macosx.ppc_3.1.0.jar"
+            file="rcp/org.eclipse.swt.carbon.macosx_3.2.1.v3235.jar"
             overwrite="true"
         />
         <chmod file="target/${dist.name}/eclipse" perm="a+rx"/>
