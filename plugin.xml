@@ -96,7 +96,7 @@
        <editor
            id="org.safehaus.penrose.studio.preview.PreviewEditor"
            name="Preview"
-           icon="images/xmag.gif"
+           icon="images/dirpreview.png"
            class="org.safehaus.penrose.studio.preview.PreviewEditor"/>
        <editor
            id="org.safehaus.penrose.studio.properties.SystemPropertiesEditor"
