@@ -228,12 +228,14 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
         try {
             IToolBarManager standardToolBar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
             coolBar.add(new ToolBarContributionItem(standardToolBar, "standard"));
-
-            ActionContributionItem connectCI = new ActionContributionItem(connectAction);
-            standardToolBar.add(connectCI);
-
+            
             ActionContributionItem saveCI = new ActionContributionItem(saveAction);
             standardToolBar.add(saveCI);
+            
+            standardToolBar.add(new Separator());
+            
+            ActionContributionItem connectCI = new ActionContributionItem(connectAction);
+            standardToolBar.add(connectCI);
 
             ActionContributionItem uploadCI = new ActionContributionItem(uploadAction);
             standardToolBar.add(uploadCI);

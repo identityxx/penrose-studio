@@ -25,15 +25,19 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.schema.wizard.NewSchemaWizard;
 import org.apache.log4j.Logger;
+
 
 public class NewSchemaAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
 	public NewSchemaAction() {
-        setText("New Schema...");
+        setText("New Schema...");        
+        setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.SCHEMA));
         setId(getClass().getName());
 	}
 	

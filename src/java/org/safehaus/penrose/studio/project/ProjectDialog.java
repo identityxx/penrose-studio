@@ -279,11 +279,11 @@ public class ProjectDialog extends Dialog {
         buttons.setLayout(new GridLayout());
 
         Button connectButton = new Button(buttons, SWT.PUSH);
-        //connectButton.setImage(connectImage);
+        connectButton.setImage(connectImage);
         connectButton.setText("Connect");
 
         GridData gc = new GridData(GridData.FILL_HORIZONTAL);
-        gc.widthHint = 80;
+        gc.widthHint = 100;
         connectButton.setLayoutData(gc);
 
         connectButton.addSelectionListener(new SelectionAdapter() {

@@ -22,11 +22,12 @@ public class PenroseImage {
     public final static String WELCOME           = "images/3steps.png";
 
     public final static String NEW               = "images/new.gif";
-    public final static String CONNECT           = "images/connect.gif";
-    public final static String SAVE              = "images/3floppy_unmount.png";
+    public final static String CONNECT           = "images/connect_to_penrose.png";
+    public final static String SAVE              = "images/save.png";
     public final static String UPLOAD            = "images/upload.png";
 
-	public final static String REFRESH           = "images/refresh.gif";
+    public final static String EXIT              = "images/exit.png";
+    public final static String REFRESH           = "images/refresh.png";
 	public final static String ADD               = "images/folder-add.gif";
 	public final static String DELETE            = "images/delete.gif";
 	public final static String KEY               = "images/key.gif";
@@ -47,7 +48,7 @@ public class PenroseImage {
     public final static String OBJECT_CLASS      = "images/schema.png";
     public final static String ATTRIBUTE_TYPE    = "images/schema.png";
     public final static String BROWSER           = "images/browser.png";
-    public final static String PREVIEW           = "images/xmag.gif";
+    public final static String PREVIEW           = "images/dirpreview.png";
     public final static String LOGO16            = "images/penrose16.png";
     public final static String ROOT_DSE          = "images/rootdse.png";
     public final static String ADMINISTRATOR     = "images/root.png";

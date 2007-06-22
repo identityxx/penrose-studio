@@ -23,17 +23,20 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenrosePlugin;
 
 public class ExitAction implements IWorkbenchWindowActionDelegate {
 
 	private IWorkbenchWindow window;
 
 	public ExitAction() {
+		
 	}
 
 	public void run(IAction action) {
 		boolean confirmed = true;
-
+		
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         if (penroseApplication.isDirty()) {
             confirmed = MessageDialog.openConfirm(
