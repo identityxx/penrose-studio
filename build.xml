@@ -15,7 +15,7 @@
     <property name="prefix" value=""/>
     <property name="penrose.studio.home" value="${prefix}/usr/local/${project.name}-${product.version}"/>
 
-    <property name="rcp.prefix" value="eclipse-RCP-3.1"/>
+    <property name="rcp.prefix" value="eclipse-RCP-3.2.2"/>
     <property name="iscc.path" value="ISCC.exe"/>
     <property name="cygwin.home" value="c:/cygwin"/>
 
@@ -149,8 +149,8 @@
         <mkdir dir="${plugin.path}"/>
         <copy todir="target/${dist.name}/plugins">
             <fileset dir="lib/plugins">
-                <include name="org.eclipse.core.runtime.compatibility_3.1.0.jar"/>
-                <include name="org.eclipse.ui.forms_3.1.0.jar"/>
+                <include name="org.eclipse.core.runtime.compatibility_3.1.1.jar"/>
+                <include name="org.eclipse.ui.forms_3.2.0.jar"/>
             </fileset>
         </copy>
         <copy todir="${plugin.path}">
@@ -235,12 +235,14 @@
         <move todir="target/${dist.name}">
             <fileset dir="target/eclipse"/>
         </move>
-        <!-- apply universal binary patch -->
+        <!-- apply universal binary patch 
+        doesnt need anymore since the RCP is 3.2
         <copy
             todir="target/${dist.name}/plugins"
             file="rcp/org.eclipse.swt.carbon.macosx.ppc_3.1.0.jar"
             overwrite="true"
         />
+    	-->
         <chmod file="target/${dist.name}/eclipse" perm="a+rx"/>
         <antcall target="build">
             <param name="platform" value="${platform}"/>
@@ -300,13 +302,16 @@
     </target>
 
     <target name="dist-linux" depends="build-linux" if="isUnix">
-        <antcall target="rpm">
+
+    	<antcall target="rpm">
             <param name="rpm.prefix" value=""/>
             <param name="rpm.home" value="/usr/src/redhat"/>
             <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
             <param name="rpm.name" value="${project.name}-${product.version}-1.i386.rpm"/>
         </antcall>
-    </target>
+
+    	
+   </target>
 
     <target name="dist-macosx" depends="build-macosx" if="isMac">
         <property name="app.name" value="Penrose Studio.app"/>

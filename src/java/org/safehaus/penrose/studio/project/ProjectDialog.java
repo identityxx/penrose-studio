@@ -284,6 +284,7 @@ public class ProjectDialog extends Dialog {
 
         GridData gc = new GridData(GridData.FILL_HORIZONTAL);
         gc.widthHint = 100;
+        gc.heightHint = 55;
         connectButton.setLayoutData(gc);
 
         connectButton.addSelectionListener(new SelectionAdapter() {

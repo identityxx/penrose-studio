@@ -91,12 +91,12 @@
        <editor
            id="org.safehaus.penrose.studio.browser.BrowserEditor"
            name="Browser"
-           icon="images/browser.png"
+           icon="images/browser_22x22.png"
            class="org.safehaus.penrose.studio.browser.BrowserEditor"/>
        <editor
            id="org.safehaus.penrose.studio.preview.PreviewEditor"
            name="Preview"
-           icon="images/dirpreview.png"
+           icon="images/dirpreview_22x22.png"
            class="org.safehaus.penrose.studio.preview.PreviewEditor"/>
        <editor
            id="org.safehaus.penrose.studio.properties.SystemPropertiesEditor"
