@@ -120,6 +120,9 @@ public class ProjectDialog extends Dialog {
             for (Iterator i=list.iterator(); i.hasNext(); ) {
 				Project project = (Project)i.next();
 
+				
+				
+				//TODO: solve SWT exception here, the project are boing retrieved null
                 TableItem item = new TableItem(projectTable, SWT.NONE);
 				item.setText(project.getName());
                 item.setImage(penroseImage);
@@ -127,7 +130,8 @@ public class ProjectDialog extends Dialog {
 			}
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+           e.printStackTrace();
+        	log.debug(e.getMessage(), e);
         }
 	}
 
@@ -283,7 +287,7 @@ public class ProjectDialog extends Dialog {
         connectButton.setText("Connect");
 
         GridData gc = new GridData(GridData.FILL_HORIZONTAL);
-        gc.widthHint = 100;
+        gc.widthHint = 140;
         gc.heightHint = 55;
         connectButton.setLayoutData(gc);
 

@@ -136,8 +136,7 @@ public class BrowserDialog extends Dialog {
 		Label passwordLabel = new Label(composite, SWT.NONE);
         passwordLabel.setText("Password:");
 
-		bindPasswordText = new Text(composite, SWT.BORDER);
-		bindPasswordText.setEchoChar('*');
+		bindPasswordText = new Text(composite, SWT.BORDER | SWT.PASSWORD);
 		
         bindPasswordText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 

@@ -237,8 +237,8 @@ public class FieldEditorWindow {
 		jdbcUsername.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
 		// Password: (text)
 		toolkit.createLabel(sectionClient, "Password:");
-		jdbcPassword = toolkit.createText(sectionClient, "", SWT.BORDER);
-		jdbcPassword.setEchoChar('*');
+		jdbcPassword = toolkit.createText(sectionClient, "", SWT.BORDER | SWT.PASSWORD);
+		
 		jdbcPassword.setLayoutData(new TableWrapData(TableWrapData.LEFT));
 		// end
 		section.setClient(sectionClient);

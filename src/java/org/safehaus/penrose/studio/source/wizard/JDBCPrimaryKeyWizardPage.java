@@ -120,7 +120,9 @@ public class JDBCPrimaryKeyWizardPage extends WizardPage implements SelectionLis
             FieldConfig field = (FieldConfig)item.getData();
             field.setPrimaryKey(item.getChecked());
             item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
+           
         }
+        
     }
 
     public void widgetSelected(SelectionEvent event) {

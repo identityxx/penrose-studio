@@ -134,11 +134,8 @@ public class ProjectEditorDialog extends Dialog {
 		Label passwordLabel = new Label(composite, SWT.NONE);
         passwordLabel.setText("Password:");
 
-		passwordText = new Text(composite, SWT.BORDER );
-		//passwordText.setEchoChar('*');
-		char cbit = (char) (('*' << 8) + '*');
-		passwordText.setEchoChar(cbit);
-        passwordText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		passwordText = new Text(composite, SWT.BORDER | SWT.PASSWORD);
+		passwordText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		new Label(composite, SWT.NONE);
 
