@@ -350,7 +350,6 @@ public class JDBCConnectionTablesPage extends JDBCConnectionEditorPage {
             TableConfig tableConfig = (TableConfig)ti.getData();
 
             JDBCClient client = new JDBCClient(connectionConfig.getParameters());
-            client.connect();
 
             Collection fields = client.getColumns(getCatalog(), getSchema(), tableConfig.getName());
 

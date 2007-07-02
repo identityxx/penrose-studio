@@ -277,7 +277,6 @@ public class JDBCSourcePropertyPage extends FormPage {
 
                     JDBCClient client = new JDBCClient(connectionConfig.getParameters());
                     
-                    client.connect();
                     Collection fields = client.getColumns(catalog, schema, tableName);
                     client.close();
 
@@ -372,7 +371,6 @@ public class JDBCSourcePropertyPage extends FormPage {
                             connection.getParameter(JDBCClient.PASSWORD)
                     );
 
-                    helper.connect();
                     Collection fields = helper.getColumns(tableName);
                     helper.close();
 
@@ -427,7 +425,6 @@ public class JDBCSourcePropertyPage extends FormPage {
                             connection.getParameter(JDBCClient.PASSWORD)
                     );
 
-                    helper.connect();
                     Collection fields = helper.getColumns(tableName);
                     helper.close();
 

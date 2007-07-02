@@ -232,7 +232,6 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
         schemaCombo.removeAll();
 
         JDBCClient client = new JDBCClient(connectionConfig.getParameters());
-        client.connect();
 
         Collection catalogs = client.getCatalogs();
         Collection schemas = client.getSchemas();
@@ -255,8 +254,6 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
 
         JDBCClient client = new JDBCClient(connectionConfig.getParameters());
 
-        client.connect();
-
         Collection tables = client.getTables(getCatalog(), getSchema());
 
         for (Iterator i=tables.iterator(); i.hasNext(); ) {
@@ -277,8 +274,6 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
         if (getTableName() == null) return;
 
         JDBCClient client = new JDBCClient(connectionConfig.getParameters());
-
-        client.connect();
 
         fields = client.getColumns(getCatalog(), getSchema(), getTableName());
 

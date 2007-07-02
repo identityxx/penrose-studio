@@ -248,7 +248,6 @@ public class JDBCFieldWizardPage extends WizardPage {
 
             JDBCClient client = new JDBCClient(connectionConfig.getParameters());
 
-            client.connect();
             Collection fields = client.getColumns(catalog, schema, tableName);
             client.close();
 

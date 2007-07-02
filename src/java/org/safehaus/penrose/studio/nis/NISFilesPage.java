@@ -254,7 +254,7 @@ public class NISFilesPage extends FormPage implements Runnable {
 
         if (hostsList.getSelectionCount() == 0) return;
         
-        int counter = 0;
+        long counter = 0;
 
         AndFilter filter = new AndFilter();
 
