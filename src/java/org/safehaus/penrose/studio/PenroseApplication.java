@@ -103,12 +103,12 @@ public class PenroseApplication implements IPlatformRunnable {
 
     public PenroseApplication() throws Exception {
 
-        String userHome = System.getProperties().getProperty("user.home", "/tmp");
+        String userHome = System.getProperty("user.home");
+
         homeDir = new File(userHome, ".penrose");
         homeDir.mkdirs();
 
-        String dir = System.getProperty("user.dir");
-        workDir = dir+File.separator+"work";
+        workDir = userHome+File.separator+".penrose"+File.separator+"work";
 
         workbenchAdvisor = new PenroseWorkbenchAdvisor();
 
