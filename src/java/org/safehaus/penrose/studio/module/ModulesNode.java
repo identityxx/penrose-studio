@@ -17,19 +17,17 @@
  */
 package org.safehaus.penrose.studio.module;
 
+import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.action.PenroseStudioActions;
 import org.safehaus.penrose.studio.module.action.NewModuleAction;
-import org.safehaus.penrose.studio.module.action.NewPollingConnectorModuleAction;
-import org.safehaus.penrose.studio.module.action.NewLDAPSyncModuleAction;
 import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
 import org.safehaus.penrose.partition.Partition;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.swt.graphics.Image;
@@ -46,33 +44,39 @@ public class ModulesNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Server server;
+    ObjectsView view;
+
     private Partition partition;
 
-    public ModulesNode(String name, Image image, Object object, Node parent) {
-        super(name, image, object, parent);
+    public ModulesNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+        super(name, type, image, object, parent);
+        this.view = view;
     }
 
     public void showMenu(IMenuManager manager) {
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseStudioActions actions = penroseStudio.getActions();
-
         manager.add(new NewModuleAction(this));
-        manager.add(new NewPollingConnectorModuleAction(this));
-        manager.add(new NewLDAPSyncModuleAction(this));
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        manager.add(actions.getPasteAction());
+        manager.add(new Action("Paste") {
+            public void run() {
+                try {
+                    paste();
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                }
+            }
+        });
     }
 
-    public boolean canPaste(Object object) throws Exception {
-        return object instanceof ModuleConfig;
-    }
+    public void paste() throws Exception {
 
-    public void paste(Object object) throws Exception {
-        ModuleConfig newModuleConfig = (ModuleConfig)object;
+        Object newObject = view.getClipboard();
+
+        if (!(newObject instanceof ModuleConfig)) return;
+
+        ModuleConfig newModuleConfig = (ModuleConfig)((ModuleConfig)newObject).clone();
         String oldName = newModuleConfig.getName();
 
         int counter = 1;
@@ -94,6 +98,11 @@ public class ModulesNode extends Node {
                 partition.addModuleMapping(mapping);
             }
         }
+
+        view.setClipboard(null);
+
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        penroseApplication.notifyChangeListeners();
     }
 
     public boolean hasChildren() throws Exception {
@@ -109,13 +118,14 @@ public class ModulesNode extends Node {
             ModuleConfig moduleConfig = (ModuleConfig)i.next();
 
             ModuleNode moduleNode = new ModuleNode(
+                    view,
                     moduleConfig.getName(),
+                    ObjectsView.MODULE,
                     PenrosePlugin.getImage(PenroseImage.MODULE),
                     moduleConfig,
                     this
             );
 
-            moduleNode.setServer(server);
             moduleNode.setPartition(partition);
             moduleNode.setModuleConfig(moduleConfig);
 
@@ -131,13 +141,5 @@ public class ModulesNode extends Node {
 
     public void setPartition(Partition partition) {
         this.partition = partition;
-    }
-
-    public Server getServer() {
-        return server;
-    }
-
-    public void setServer(Server server) {
-        this.server = server;
     }
 }

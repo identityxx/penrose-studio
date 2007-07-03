@@ -23,7 +23,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.apache.log4j.Logger;
 
@@ -39,22 +39,21 @@ public class SystemPropertiesEditor extends MultiPageEditorPart {
 
     boolean dirty;
 
-    Map origProperties;
-    Map properties = new TreeMap();
+    Map<String,String> origProperties;
+    Map<String,String> properties = new TreeMap<String,String>();
 
     SystemPropertiesPage propertyPage;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         setSite(site);
         setInput(input);
+        setPartName("System Properties");
 
-        SystemPropertiesEditorInput ei = (SystemPropertiesEditorInput)input;
-        PenroseConfig penroseConfig = ei.getPenroseConfig();
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
 
         origProperties = penroseConfig.getSystemProperties();
         properties.putAll(origProperties);
-
-        setPartName(input.getName());
     }
 
     protected void createPages() {
@@ -100,8 +99,8 @@ public class SystemPropertiesEditor extends MultiPageEditorPart {
         origProperties.clear();
         origProperties.putAll(properties);
         
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.fireChangeEvent();
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        penroseApplication.notifyChangeListeners();
 
         checkDirty();
     }

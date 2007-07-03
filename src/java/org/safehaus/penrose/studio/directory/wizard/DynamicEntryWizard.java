@@ -25,6 +25,8 @@ import org.safehaus.penrose.studio.source.wizard.SelectSourcesWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.RelationshipWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
+import org.safehaus.penrose.ldap.RDNBuilder;
+import org.safehaus.penrose.ldap.DNBuilder;
 import org.apache.log4j.Logger;
 
 import java.util.Iterator;
@@ -88,8 +90,6 @@ public class DynamicEntryWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            entryMapping.setParentDn(parentMapping.getDn());
-
             Collection sourceMappings = sourcesPage.getSourceMappings();
             for (Iterator i=sourceMappings.iterator(); i.hasNext(); ) {
                 SourceMapping sourceMapping = (SourceMapping)i.next();
@@ -99,7 +99,20 @@ public class DynamicEntryWizard extends Wizard {
             Collection relationships = relationshipPage.getRelationships();
             for (Iterator i=relationships.iterator(); i.hasNext(); ) {
                 Relationship relationship = (Relationship)i.next();
-                entryMapping.addRelationship(relationship);
+
+                String lfield = relationship.getLeftField();
+                SourceMapping lsource = entryMapping.getSourceMapping(relationship.getLeftSource());
+                int lindex = entryMapping.getSourceMappingIndex(lsource);
+
+                String rfield = relationship.getRightField();
+                SourceMapping rsource = entryMapping.getSourceMapping(relationship.getRightSource());
+                int rindex = entryMapping.getSourceMappingIndex(rsource);
+
+                if (lindex < rindex) { // rhs is dependent on lhs
+                    rsource.addFieldMapping(new FieldMapping(rfield, FieldMapping.VARIABLE, relationship.getLhs()));
+                } else {
+                    lsource.addFieldMapping(new FieldMapping(lfield, FieldMapping.VARIABLE, relationship.getRhs()));
+                }
             }
 
             entryMapping.addObjectClasses(ocPage.getSelectedObjectClasses());
@@ -107,18 +120,18 @@ public class DynamicEntryWizard extends Wizard {
             Collection attributeMappings = attrPage.getAttributeMappings();
             entryMapping.addAttributeMappings(attributeMappings);
 
-            StringBuffer sb = new StringBuffer();
+            RDNBuilder rb = new RDNBuilder();
             for (Iterator i=attributeMappings.iterator(); i.hasNext(); ) {
                 AttributeMapping attributeMapping = (AttributeMapping)i.next();
-                if (!"true".equals(attributeMapping.getRdn())) continue;
+                if (!attributeMapping.isRdn()) continue;
 
-                if (sb.length() > 0) sb.append("+");
-
-                sb.append(attributeMapping.getName());
-                sb.append("=...");
+                rb.set(attributeMapping.getName(), "...");
             }
 
-            entryMapping.setRdn(sb.toString());
+            DNBuilder db = new DNBuilder();
+            db.append(rb.toRdn());
+            db.append(parentMapping.getDn());
+            entryMapping.setDn(db.toDn());
 
             // add reverse mappings
             for (Iterator i=entryMapping.getAttributeMappings().iterator(); i.hasNext(); ) {
@@ -131,9 +144,11 @@ public class DynamicEntryWizard extends Wizard {
                 String sourceName = variable.substring(0, j);
                 String fieldName = variable.substring(j+1);
 
-                FieldMapping fieldMapping = new FieldMapping(fieldName, FieldMapping.VARIABLE, attributeMapping.getName());
-
                 SourceMapping sourceMapping = entryMapping.getSourceMapping(sourceName);
+                Collection fieldMappings = sourceMapping.getFieldMappings(fieldName);
+                if (fieldMappings != null && !fieldMappings.isEmpty()) continue;
+
+                FieldMapping fieldMapping = new FieldMapping(fieldName, FieldMapping.VARIABLE, attributeMapping.getName());
                 sourceMapping.addFieldMapping(fieldMapping);
             }
 

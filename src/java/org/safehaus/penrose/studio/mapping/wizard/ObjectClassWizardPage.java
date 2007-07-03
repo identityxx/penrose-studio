@@ -24,9 +24,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.FillLayout;
-import org.safehaus.penrose.studio.server.ServerNode;
-import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.SchemaManager;
@@ -79,33 +77,24 @@ public class ObjectClassWizardPage extends WizardPage {
         addButton.setText(">");
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                try {
-                    if (availableTable.getSelectionCount() == 0) return;
+                if (availableTable.getSelectionCount() == 0) return;
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    ServerNode serverNode = penroseStudio.getSelectedServerNode();
-                    if (serverNode == null) return;
+                PenroseApplication penroseApplication = PenroseApplication.getInstance();
+                SchemaManager schemaManager = penroseApplication.getSchemaManager();
 
-                    Server server = serverNode.getServer();
-                    SchemaManager schemaManager = server.getSchemaManager();
+                TableItem items[] = availableTable.getSelection();
+                for (int i=0; i<items.length; i++) {
+                    String objectClass = (String)items[i].getData();
 
-                    TableItem items[] = availableTable.getSelection();
-                    for (int i=0; i<items.length; i++) {
-                        String objectClass = (String)items[i].getData();
-
-                        Collection ocNames = schemaManager.getAllObjectClassNames(objectClass);
-                        for (Iterator j=ocNames.iterator(); j.hasNext(); ) {
-                            String ocName = (String)j.next();
-                            availableOCs.remove(ocName);
-                            selectedOCs.add(ocName);
-                        }
+                    Collection ocNames = schemaManager.getAllObjectClassNames(objectClass);
+                    for (Iterator j=ocNames.iterator(); j.hasNext(); ) {
+                        String ocName = (String)j.next();
+                        availableOCs.remove(ocName);
+                        selectedOCs.add(ocName);
                     }
-
-                    refresh();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
                 }
+
+                refresh();
             }
         });
 
@@ -113,52 +102,44 @@ public class ObjectClassWizardPage extends WizardPage {
         removeButton.setText("<");
         removeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                try {
-                    if (selectedTable.getSelectionCount() == 0) return;
+                if (selectedTable.getSelectionCount() == 0) return;
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    ServerNode serverNode = penroseStudio.getSelectedServerNode();
-                    if (serverNode == null) return;
+                PenroseApplication penroseApplication = PenroseApplication.getInstance();
+                SchemaManager schemaManager = penroseApplication.getSchemaManager();
 
-                    Server server = serverNode.getServer();
-                    SchemaManager schemaManager = server.getSchemaManager();
-
-                    TableItem items[] = selectedTable.getSelection();
-                    for (int i=0; i<items.length; i++) {
-                        String objectClass = (String)items[i].getData();
-                        selectedOCs.remove(objectClass);
-                        availableOCs.add(objectClass);
-                    }
-
-                    Collection list = new ArrayList();
-
-                    for (Iterator i=selectedOCs.iterator(); i.hasNext(); ) {
-                        String objectClass = (String)i.next();
-
-                        boolean missingSuperclass = false;
-                        Collection ocNames = schemaManager.getAllObjectClassNames(objectClass);
-                        for (Iterator j=ocNames.iterator(); j.hasNext(); ) {
-                            String ocName = (String)j.next();
-                            if (selectedOCs.contains(ocName)) continue;
-                            missingSuperclass = true;
-                            break;
-                        }
-
-                        if (!missingSuperclass) continue;
-
-                        list.add(objectClass);
-                    }
-
-                    for (Iterator i=list.iterator(); i.hasNext(); ) {
-                        String objectClass = (String)i.next();
-                        selectedOCs.remove(objectClass);
-                        availableOCs.add(objectClass);
-                    }
-
-                    refresh();
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
+                TableItem items[] = selectedTable.getSelection();
+                for (int i=0; i<items.length; i++) {
+                    String objectClass = (String)items[i].getData();
+                    selectedOCs.remove(objectClass);
+                    availableOCs.add(objectClass);
                 }
+
+                Collection list = new ArrayList();
+
+                for (Iterator i=selectedOCs.iterator(); i.hasNext(); ) {
+                    String objectClass = (String)i.next();
+
+                    boolean missingSuperclass = false;
+                    Collection ocNames = schemaManager.getAllObjectClassNames(objectClass);
+                    for (Iterator j=ocNames.iterator(); j.hasNext(); ) {
+                        String ocName = (String)j.next();
+                        if (selectedOCs.contains(ocName)) continue;
+                        missingSuperclass = true;
+                        break;
+                    }
+
+                    if (!missingSuperclass) continue;
+
+                    list.add(objectClass);
+                }
+
+                for (Iterator i=list.iterator(); i.hasNext(); ) {
+                    String objectClass = (String)i.next();
+                    selectedOCs.remove(objectClass);
+                    availableOCs.add(objectClass);
+                }
+
+                refresh();
             }
         });
 
@@ -203,12 +184,8 @@ public class ObjectClassWizardPage extends WizardPage {
 
     public void init() {
         try {
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            ServerNode serverNode = penroseStudio.getSelectedServerNode();
-            if (serverNode == null) return;
-
-            Server server = serverNode.getServer();
-            Schema schema = server.getSchemaManager().getAllSchema();
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            Schema schema = penroseApplication.getSchemaManager().getAllSchema();
 
             Collection ocNames = new ArrayList();
             for (Iterator i=schema.getObjectClasses().iterator(); i.hasNext(); ) {

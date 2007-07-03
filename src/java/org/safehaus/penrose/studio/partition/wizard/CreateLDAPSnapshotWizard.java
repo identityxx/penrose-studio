@@ -18,16 +18,13 @@
 package org.safehaus.penrose.studio.partition.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.server.ServerNode;
-import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.connection.wizard.LDAPConnectionInfoWizardPage;
-import org.safehaus.penrose.studio.connection.wizard.LDAPConnectionParametersWizardPage;
+import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionInfoWizardPage;
+import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionParametersWizardPage;
 import org.safehaus.penrose.studio.util.SnapshotUtil;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.ldap.LDAPClient;
-import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;
@@ -43,8 +40,8 @@ public class CreateLDAPSnapshotWizard extends Wizard {
     Logger log = Logger.getLogger(getClass());
 
     public PartitionNamePage namePage = new PartitionNamePage();
-    public LDAPConnectionInfoWizardPage connectionInfoPage = new LDAPConnectionInfoWizardPage();
-    public LDAPConnectionParametersWizardPage connectionParametersPage = new LDAPConnectionParametersWizardPage();
+    public JNDIConnectionInfoWizardPage connectionInfoPage = new JNDIConnectionInfoWizardPage();
+    public JNDIConnectionParametersWizardPage connectionParametersPage = new JNDIConnectionParametersWizardPage();
 
     public CreateLDAPSnapshotWizard() {
         Map parameters = new TreeMap();
@@ -77,16 +74,14 @@ public class CreateLDAPSnapshotWizard extends Wizard {
 
             PartitionConfig partitionConfig = new PartitionConfig();
             partitionConfig.setName(name);
+            partitionConfig.setPath(path);
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            ServerNode serverNode = penroseStudio.getSelectedServerNode();
-            if (serverNode == null) return false;
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+            penroseConfig.addPartitionConfig(partitionConfig);
 
-            Server server = serverNode.getServer();
-            PartitionManager partitionManager = server.getPartitionManager();
-
-            Partition partition = new Partition(partitionConfig);
-            partitionManager.addPartition(partition);
+            PartitionManager partitionManager = penroseApplication.getPartitionManager();
+            Partition partition = partitionManager.load(penroseApplication.getWorkDir(), partitionConfig);
 
             ConnectionConfig connectionConfig = new ConnectionConfig();
             connectionConfig.setName(name);
@@ -110,7 +105,7 @@ public class CreateLDAPSnapshotWizard extends Wizard {
             SnapshotUtil snapshotUtil = new SnapshotUtil();
             snapshotUtil.createSnapshot(partition, client);
 
-            penroseStudio.fireChangeEvent();
+            penroseApplication.notifyChangeListeners();
 
             return true;
 

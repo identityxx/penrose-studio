@@ -28,8 +28,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.partition.ConnectionConfig;
+import org.safehaus.penrose.studio.PenroseApplication;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;
@@ -153,8 +153,8 @@ public class SelectConnectionWizardPage extends WizardPage {
 
                 refresh();
 
-                PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                penroseStudio.fireChangeEvent();
+                PenroseApplication penroseApplication = PenroseApplication.getInstance();
+                penroseApplication.notifyChangeListeners();
             }
         });
 
@@ -179,8 +179,8 @@ public class SelectConnectionWizardPage extends WizardPage {
 
                 refresh();
 
-                PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                penroseStudio.fireChangeEvent();
+                PenroseApplication penroseApplication = PenroseApplication.getInstance();
+                penroseApplication.notifyChangeListeners();
             }
         });
 

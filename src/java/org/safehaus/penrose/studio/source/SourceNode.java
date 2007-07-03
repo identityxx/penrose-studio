@@ -18,22 +18,33 @@
 package org.safehaus.penrose.studio.source;
 
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.graphics.Image;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.source.editor.SourceEditorInput;
-import org.safehaus.penrose.studio.source.editor.SourceEditor;
-import org.safehaus.penrose.studio.action.PenroseStudioActions;
-import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.plugin.PluginManager;
+import org.safehaus.penrose.studio.plugin.Plugin;
+import org.safehaus.penrose.studio.source.editor.*;
+import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.partition.SourceConfig;
+import org.safehaus.penrose.partition.ConnectionConfig;
+import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.source.SourceManager;
 import org.apache.log4j.Logger;
+
+import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
@@ -42,65 +53,134 @@ public class SourceNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    Server server;
+    ObjectsView view;
 
     private Partition partition;
     private ConnectionConfig connectionConfig;
     private SourceConfig sourceConfig;
 
-    public SourceNode(
-            Server server,
-            String name,
-            Image image,
-            Object object,
-            Node parent
-    ) {
-        super(name, image, object, parent);
-        this.server = server;
+    public SourceNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+        super(name, type, image, object, parent);
+        this.view = view;
     }
 
     public void showMenu(IMenuManager manager) {
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseStudioActions actions = penroseStudio.getActions();
-
-        manager.add(actions.getOpenAction());
+        manager.add(new Action("Open") {
+            public void run() {
+                try {
+                    open();
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                }
+            }
+        });
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        manager.add(actions.getCopyAction());
-        manager.add(actions.getPasteAction());
-        manager.add(actions.getDeleteAction());
+        manager.add(new Action("Copy") {
+            public void run() {
+                try {
+                    copy();
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Action("Paste") {
+            public void run() {
+                try {
+                    paste();
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
+            public void run() {
+                try {
+                    remove();
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                }
+            }
+        });
     }
 
     public void open() throws Exception {
 
+        ConnectionConfig con = partition.getConnectionConfig(sourceConfig.getConnectionName());
+
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
 
-        SourceEditorInput ei = new SourceEditorInput();
-        ei.setProject(server);
-        ei.setPartition(partition);
-        ei.setSourceConfig(sourceConfig);
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PluginManager pluginManager = penroseApplication.getPluginManager();
+        Plugin plugin = pluginManager.getPlugin(con.getAdapterName());
 
-        page.openEditor(ei, SourceEditor.class.getName());
+        SourceEditorInput sei = plugin.createSourceEditorInput();
+        sei.setPartition(partition);
+        sei.setSourceConfig(sourceConfig);
+
+        String sourceEditorClassName = plugin.getSourceEditorClass();
+
+        log.debug("Opening "+sourceEditorClassName);
+        page.openEditor(sei, sourceEditorClassName);
     }
 
-    public void delete() throws Exception {
-        SourceConfig sourceConfig = getSourceConfig();
-        partition.removeSourceConfig(sourceConfig.getName());
+    public void remove() throws Exception {
+
+        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+
+        TreeViewer treeViewer = view.getTreeViewer();
+        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
+
+        boolean confirm = MessageDialog.openQuestion(shell,
+                "Confirmation", "Remove selected sources?");
+
+        if (!confirm) return;
+
+        for (Iterator i=selection.iterator(); i.hasNext(); ) {
+            Node node = (Node)i.next();
+            if (!(node instanceof SourceNode)) continue;
+
+            SourceNode sourceNode = (SourceNode)node;
+            SourceConfig sourceConfig = sourceNode.getSourceConfig();
+            partition.getSources().removeSourceConfig(sourceConfig.getName());
+        }
+
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        penroseApplication.notifyChangeListeners();
     }
 
-    public Object copy() throws Exception {
-        return sourceConfig;
+    public void copy() throws Exception {
+        view.setClipboard(getObject());
     }
 
-    public boolean canPaste(Object object) throws Exception {
-        return getParent().canPaste(object);
-    }
+    public void paste() throws Exception {
 
-    public void paste(Object object) throws Exception {
-        getParent().paste(object);
+        Object newObject = view.getClipboard();
+
+        if (!(newObject instanceof SourceConfig)) return;
+
+        SourceConfig newSourceDefinition = (SourceConfig)((SourceConfig)newObject).clone();
+
+        int counter = 1;
+        String name = newSourceDefinition.getName();
+        while (partition.getSources().getSourceConfig(name) != null) {
+            counter++;
+            name = newSourceDefinition.getName()+" ("+counter+")";
+        }
+
+        newSourceDefinition.setName(name);
+        partition.getSources().addSourceConfig(newSourceDefinition);
+
+        view.setClipboard(null);
+
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        penroseApplication.notifyChangeListeners();
     }
 
     public Partition getPartition() {

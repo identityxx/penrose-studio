@@ -22,23 +22,23 @@
   </driver>
   <driver name="LDAP">
     <adapter-name>LDAP</adapter-name>
-    <parameter name="java.naming.factory.initial" type="HIDDEN">
+    <parameter name="java.naming.factory.initial" type="READ_ONLY">
       <display-name>Driver</display-name>
       <default-value>com.sun.jndi.ldap.LdapCtxFactory</default-value>
     </parameter>
-    <parameter name="java.naming.provider.url" type="HIDDEN">
+    <parameter name="java.naming.provider.url" type="READ_ONLY">
       <display-name>URL</display-name>
       <default-value>ldap://${host}:${port}/${baseDn}</default-value>
     </parameter>
-    <parameter name="host" type="REQUIRED">
+    <parameter name="host" type="TEMP">
       <display-name>Host</display-name>
       <default-value>localhost</default-value>
     </parameter>
-    <parameter name="port" type="REQUIRED">
+    <parameter name="port" type="TEMP">
       <display-name>Port</display-name>
       <default-value>389</default-value>
     </parameter>
-    <parameter name="baseDn" type="REQUIRED">
+    <parameter name="baseDn" type="TEMP">
       <display-name>Base DN</display-name>
       <default-value></default-value>
     </parameter>
@@ -53,23 +53,23 @@
   </driver>
   <driver name="Microsoft SQL Server">
     <adapter-name>JDBC</adapter-name>
-    <parameter name="driver" type="HIDDEN">
+    <parameter name="driver" type="READ_ONLY">
       <display-name>Driver</display-name>
       <default-value>com.microsoft.jdbc.sqlserver.SQLServerDriver</default-value>
     </parameter>
-    <parameter name="url" type="HIDDEN">
+    <parameter name="url" type="READ_ONLY">
       <display-name>URL</display-name>
       <default-value>jdbc:microsoft:sqlserver://${host}:${port};databasename=${database}</default-value>
     </parameter>
-    <parameter name="host" type="REQUIRED">
+    <parameter name="host" type="TEMP">
       <display-name>Host</display-name>
       <default-value>localhost</default-value>
     </parameter>
-    <parameter name="port" type="REQUIRED">
+    <parameter name="port" type="TEMP">
       <display-name>Port</display-name>
       <default-value>1433</default-value>
     </parameter>
-    <parameter name="database" type="REQUIRED">
+    <parameter name="database" type="TEMP">
       <display-name>Database</display-name>
       <default-value></default-value>
     </parameter>
@@ -84,23 +84,23 @@
   </driver>
   <driver name="MySQL">
     <adapter-name>JDBC</adapter-name>
-    <parameter name="driver" type="HIDDEN">
+    <parameter name="driver" type="READ_ONLY">
       <display-name>Driver</display-name>
       <default-value>com.mysql.jdbc.Driver</default-value>
     </parameter>
-    <parameter name="url" type="HIDDEN">
+    <parameter name="url" type="READ_ONLY">
       <display-name>URL</display-name>
       <default-value>jdbc:mysql://${host}:${port}/${database}?autoReconnect=true</default-value>
     </parameter>
-    <parameter name="host" type="REQUIRED">
+    <parameter name="host" type="TEMP">
       <display-name>Host</display-name>
       <default-value>localhost</default-value>
     </parameter>
-    <parameter name="port" type="REQUIRED">
+    <parameter name="port" type="TEMP">
       <display-name>Port</display-name>
       <default-value>3306</default-value>
     </parameter>
-    <parameter name="database" type="REQUIRED">
+    <parameter name="database" type="TEMP">
       <display-name>Database</display-name>
       <default-value></default-value>
     </parameter>
@@ -115,15 +115,15 @@
   </driver>
   <driver name="ODBC">
     <adapter-name>JDBC</adapter-name>
-    <parameter name="driver" type="HIDDEN">
+    <parameter name="driver" type="READ_ONLY">
       <display-name>Driver</display-name>
       <default-value>sun.jdbc.odbc.JdbcOdbcDriver</default-value>
     </parameter>
-    <parameter name="url" type="HIDDEN">
+    <parameter name="url" type="READ_ONLY">
       <display-name>URL</display-name>
       <default-value>jdbc:odbc:${datasource}</default-value>
     </parameter>
-    <parameter name="datasource" type="REQUIRED">
+    <parameter name="datasource" type="TEMP">
       <display-name>Data Source</display-name>
       <default-value></default-value>
     </parameter>
@@ -138,23 +138,23 @@
   </driver>
   <driver name="Oracle">
     <adapter-name>JDBC</adapter-name>
-    <parameter name="driver" type="HIDDEN">
+    <parameter name="driver" type="READ_ONLY">
       <display-name>Driver</display-name>
       <default-value>oracle.jdbc.driver.OracleDriver</default-value>
     </parameter>
-    <parameter name="url" type="HIDDEN">
+    <parameter name="url" type="READ_ONLY">
       <display-name>URL</display-name>
       <default-value>jdbc:oracle:thin:@${host}:${port}:${sid}</default-value>
     </parameter>
-    <parameter name="host" type="REQUIRED">
+    <parameter name="host" type="TEMP">
       <display-name>Host</display-name>
       <default-value>localhost</default-value>
     </parameter>
-    <parameter name="port" type="REQUIRED">
+    <parameter name="port" type="TEMP">
       <display-name>Port</display-name>
       <default-value>1521</default-value>
     </parameter>
-    <parameter name="sid" type="REQUIRED">
+    <parameter name="sid" type="TEMP">
       <display-name>SID</display-name>
       <default-value></default-value>
     </parameter>
@@ -169,23 +169,27 @@
   </driver>
   <driver name="PostgreSQL">
     <adapter-name>JDBC</adapter-name>
-    <parameter name="driver" type="HIDDEN">
+    <parameter name="driver" type="READ_ONLY">
       <display-name>Driver</display-name>
       <default-value>org.postgresql.Driver</default-value>
     </parameter>
-    <parameter name="url" type="HIDDEN">
+    <parameter name="url" type="READ_ONLY">
       <display-name>URL</display-name>
       <default-value>jdbc:postgresql://${host}:${port}/${database}</default-value>
     </parameter>
-    <parameter name="host" type="REQUIRED">
+    <parameter name="quote" type="HIDDEN">
+      <display-name>Quote</display-name>
+      <default-value>"</default-value>
+    </parameter>
+    <parameter name="host" type="TEMP">
       <display-name>Host</display-name>
       <default-value>localhost</default-value>
     </parameter>
-    <parameter name="port" type="REQUIRED">
+    <parameter name="port" type="TEMP">
       <display-name>Port</display-name>
       <default-value>5432</default-value>
     </parameter>
-    <parameter name="database" type="REQUIRED">
+    <parameter name="database" type="TEMP">
       <display-name>Database</display-name>
       <default-value></default-value>
     </parameter>
@@ -200,23 +204,23 @@
   </driver>
   <driver name="Sybase">
     <adapter-name>JDBC</adapter-name>
-    <parameter name="driver" type="HIDDEN">
+    <parameter name="driver" type="READ_ONLY">
       <display-name>Driver</display-name>
       <default-value>com.sybase.jdbc2.jdbc.SybDriver</default-value>
     </parameter>
-    <parameter name="url" type="HIDDEN">
+    <parameter name="url" type="READ_ONLY">
       <display-name>URL</display-name>
       <default-value>jdbc:sybase:Tds:${host}:${port}/${database}</default-value>
     </parameter>
-    <parameter name="host" type="REQUIRED">
+    <parameter name="host" type="TEMP">
       <display-name>Host</display-name>
       <default-value>localhost</default-value>
     </parameter>
-    <parameter name="port" type="REQUIRED">
+    <parameter name="port" type="TEMP">
       <display-name>Port</display-name>
       <default-value>1403</default-value>
     </parameter>
-    <parameter name="database" type="REQUIRED">
+    <parameter name="database" type="TEMP">
       <display-name>Database</display-name>
       <default-value></default-value>
     </parameter>

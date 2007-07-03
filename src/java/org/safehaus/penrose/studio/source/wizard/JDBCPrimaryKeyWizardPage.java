@@ -23,7 +23,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.source.FieldConfig;
+import org.safehaus.penrose.partition.FieldConfig;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.apache.log4j.Logger;
@@ -87,10 +87,10 @@ public class JDBCPrimaryKeyWizardPage extends WizardPage implements SelectionLis
                 FieldConfig field = (FieldConfig)i.next();
 
                 TableItem it = new TableItem(fieldsTable, SWT.CHECK);
-                it.setImage(PenrosePlugin.getImage(field.isPK() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                it.setImage(PenrosePlugin.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
                 it.setText(0, field.getName());
                 it.setText(1, field.getType());
-                it.setChecked(field.isPK());
+                it.setChecked(field.isPrimaryKey());
                 it.setData(field);
             }
 
@@ -118,9 +118,11 @@ public class JDBCPrimaryKeyWizardPage extends WizardPage implements SelectionLis
         for (int i=0; i<items.length; i++) {
             TableItem item = items[i];
             FieldConfig field = (FieldConfig)item.getData();
-            field.setPrimaryKey(item.getChecked()+"");
+            field.setPrimaryKey(item.getChecked());
             item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
+           
         }
+        
     }
 
     public void widgetSelected(SelectionEvent event) {

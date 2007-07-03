@@ -25,9 +25,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.studio.mapping.editor.RelationshipDialog;
+import org.safehaus.penrose.partition.SourceConfig;
+import org.safehaus.penrose.partition.FieldConfig;
+import org.safehaus.penrose.studio.mapping.RelationshipDialog;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -81,12 +81,12 @@ public class RelationshipWizardPage extends WizardPage implements SelectionListe
                 for (Iterator i=sourceMappings.iterator(); i.hasNext(); ) {
                     SourceMapping source = (SourceMapping)i.next();
 
-                    SourceConfig sourceDefinition = partition.getSourceConfig(source.getSourceName());
+                    SourceConfig sourceDefinition = partition.getSources().getSourceConfig(source.getSourceName());
 
                     Collection fields = sourceDefinition.getFieldConfigs();
                     for (Iterator j=fields.iterator(); j.hasNext(); ) {
                         FieldConfig field = (FieldConfig)j.next();
-                        dialog.addField(source.getName()+"."+field.getName(), field.isPK());
+                        dialog.addField(source.getName()+"."+field.getName(), field.isPrimaryKey());
                     }
                 }
 

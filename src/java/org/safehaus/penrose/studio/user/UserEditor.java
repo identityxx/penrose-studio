@@ -23,7 +23,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.user.UserConfig;
 import org.apache.log4j.Logger;
 
@@ -42,15 +42,19 @@ public class UserEditor extends MultiPageEditorPart {
     UserPropertyPage propertyPage;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        setSite(site);
-        setInput(input);
-
         UserEditorInput ei = (UserEditorInput)input;
 
         origUserConfig = ei.getUserConfig();
-        userConfig = (UserConfig)origUserConfig.clone();
 
-        setPartName(input.getName());
+        try {
+            userConfig = (UserConfig)origUserConfig.clone();
+        } catch (Exception e) {
+            throw new PartInitException(e.getMessage(), e);
+        }
+
+        setSite(site);
+        setInput(input);
+        setPartName(userConfig.getDn().toString());
     }
 
     protected void createPages() {
@@ -95,10 +99,10 @@ public class UserEditor extends MultiPageEditorPart {
 
         origUserConfig.copy(userConfig);
 
-        setPartName(getEditorInput().getName());
+        setPartName(userConfig.getDn().toString());
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.fireChangeEvent();
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        penroseApplication.notifyChangeListeners();
 
         checkDirty();
     }

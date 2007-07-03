@@ -18,12 +18,12 @@
 package org.safehaus.penrose.studio.directory;
 
 import org.safehaus.penrose.studio.*;
-import org.safehaus.penrose.studio.action.PenroseStudioActions;
-import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.directory.action.*;
+import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.ldap.DN;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
@@ -41,49 +41,31 @@ public class DirectoryNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Server server;
+    ObjectsView view;
+
     private Partition partition;
 
-    public DirectoryNode(
-            String name,
-            Image image,
-            Object object,
-            Node parent
-    ) {
-        super(name, image, object, parent);
+    public DirectoryNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+        super(name, type, image, object, parent);
+        this.view = view;
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseStudioActions actions = penroseStudio.getActions();
-
         manager.add(new NewRootEntryAction(this));
 
-        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-        manager.add(new MapLDAPTreeFromTopAction(this));
-        manager.add(new MapRootDSEAction(this));
-        manager.add(new MapADSchemaAction(this));
-        manager.add(new CreateLDAPSnapshotEntryAction(this));
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseWorkbenchAdvisor workbenchAdvisor = penroseApplication.getWorkbenchAdvisor();
+        PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
+        PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
-        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-
-        manager.add(actions.getPasteAction());
-    }
-
-
-    public boolean canPaste(Object object) throws Exception {
-        return object instanceof EntryMapping;
-    }
-
-    public void paste(Object object) throws Exception {
-        EntryMapping newEntryMapping = (EntryMapping)object;
-        newEntryMapping.setParentDn(null);
-
-        partition.addEntryMapping(newEntryMapping);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.fireChangeEvent();
+        //if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
+            manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+            manager.add(new MapLDAPTreeFromTopAction(this));
+            manager.add(new MapRootDSEAction(this));
+            manager.add(new MapADSchemaAction(this));
+            manager.add(new CreateLDAPSnapshotEntryAction(this));
+        //}
     }
 
     public boolean hasChildren() throws Exception {
@@ -98,12 +80,17 @@ public class DirectoryNode extends Node {
         for (Iterator i=rootEntryMappings.iterator(); i.hasNext(); ) {
             EntryMapping entryMapping = (EntryMapping)i.next();
 
-            String dn = entryMapping.getDn();
-            if ("".equals(dn)) dn = "Root DSE";
+            String dn;
+            if (entryMapping.getDn().isEmpty()) {
+                dn = "Root DSE";
+            } else {
+                dn = entryMapping.getDn().toString();
+            }
 
             EntryNode entryNode = new EntryNode(
-                    server,
+                    view,
                     dn,
+                    ObjectsView.ENTRY,
                     PenrosePlugin.getImage(PenroseImage.HOME_NODE),
                     entryMapping,
                     this
@@ -124,13 +111,5 @@ public class DirectoryNode extends Node {
 
     public void setPartition(Partition partition) {
         this.partition = partition;
-    }
-
-    public Server getServer() {
-        return server;
-    }
-
-    public void setServer(Server server) {
-        this.server = server;
     }
 }

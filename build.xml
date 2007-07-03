@@ -1,26 +1,27 @@
 <?xml version="1.0"?>
-<!-- ====================================================================== 
-         Copyright (c) 2000-2006, Identyx Corporation.
-         All rights reserved.
-     ====================================================================== -->
+<!--
+ Copyright (c) 2000-2006, Identyx Corporation.
+ All rights reserved.
+-->
 <project name="penrose-studio" default="compile">
 
     <description>Penrose Studio</description>
 
     <property file="build.properties"/>
+
     <property name="project.name" value="penrose-studio"/>
     <property name="project.dist" value="dist"/>
 
     <property name="prefix" value=""/>
     <property name="penrose.studio.home" value="${prefix}/usr/local/${project.name}-${product.version}"/>
 
-    <property name="penrose.version" value="1.2"/>
-
-    <property name="rcp.prefix" value="eclipse-RCP-3.1"/>
+    <property name="rcp.prefix" value="eclipse-RCP-3.2.2"/>
     <property name="iscc.path" value="ISCC.exe"/>
     <property name="cygwin.home" value="c:/cygwin"/>
 
-    <tstamp/>
+    <tstamp>
+        <format property="TIMESTAMP" pattern="yyyyMMddHHmmss"/>
+    </tstamp>
 
     <path id="lib.path">
         <fileset dir="lib">
@@ -31,21 +32,28 @@
     </path>
 
     <target name="init">
-        <condition property="isLinux">
-            <os name="Linux"/>
+        <echo message="Operating System: ${os.name} ${os.version}" />
+        <condition property="isWindows">
+            <os family="windows"/>
+        </condition>
+        <condition property="isUnix">
+            <and>
+                <os family="unix"/>
+                <not>
+                    <os family="mac"/>
+                </not>
+            </and>
         </condition>
         <condition property="isMac">
             <os family="mac"/>
         </condition>
-        <condition property="isWindows">
-            <os family="windows"/>
-        </condition>
     </target>
 
     <target name="import" depends="init">
-        <copy todir="lib" file="../penrose-pro/lib/penrose-${penrose.version}.jar"/>
-        <copy todir="lib" file="../penrose-pro/lib/penrose-shared-${penrose.version}.jar"/>
-        <copy todir="lib" file="../penrose-pro/target/penrose-pro-${penrose.version}.jar"/>
+        <copy todir="lib" file="../penrose-pro-${product.specification}/agent/target/agent-${penrose.version}.jar"/>
+        <copy todir="lib" file="../penrose-pro-${product.specification}/agent/target/agent-client-${penrose.version}.jar"/>
+        <copy todir="lib" file="../penrose-pro-${product.specification}/lib/penrose-${penrose.version}.jar"/>
+        <copy todir="lib" file="../penrose-pro-${product.specification}/target/penrose-pro-${penrose.version}.jar"/>
     </target>
 
     <target name="clean" depends="init">
@@ -58,8 +66,10 @@
         <javac
             srcdir="src/tools"
             destdir="target/tools"
-            source="1.4"
-            target="1.4"
+            debug="on"
+            debuglevel="lines,vars,source"
+            source="1.5"
+            target="1.5"
         />
         <jar destfile="target/penrose-studio-tools-${product.version}.jar" basedir="target/tools"/>
     </target>
@@ -85,8 +95,10 @@
             srcdir="src/java"
             destdir="target/classes"
             classpathref="lib.path"
-            source="1.4"
-            target="1.4"
+            debug="on"
+            debuglevel="lines,vars,source"
+            source="1.5"
+            target="1.5"
         />
         <copy todir="target/classes">
             <fileset dir="src/java">
@@ -107,11 +119,11 @@
                 <exclude name="**/.svn"/>
             </patternset>
             <manifest>
-                <attribute name="Specification-Version"  value="1.0"/>
+                <attribute name="Specification-Version"  value="${product.specification}"/>
                 <attribute name="Implementation-Title"   value="Penrose Studio"/>
                 <attribute name="Implementation-Version" value="${product.version}"/>
                 <attribute name="Implementation-Vendor"  value="Identyx Corporation"/>
-                <attribute name="Built-Date" value="${DSTAMP}"/>
+                <attribute name="Built-Date" value="${TIMESTAMP}"/>
             </manifest>
         </jar>
     </target>
@@ -128,6 +140,7 @@
                 <exclude name=".svn/**"/>
             </fileset>
         </copy>
+    	<mkdir dir="target/${dist.name}/conf/lib"/>
         <copy todir="target/${dist.name}/configuration">
             <fileset dir="rcp/configuration">
                 <include name="*.*"/>
@@ -137,8 +150,8 @@
         <mkdir dir="${plugin.path}"/>
         <copy todir="target/${dist.name}/plugins">
             <fileset dir="lib/plugins">
-                <include name="org.eclipse.core.runtime.compatibility_3.1.0.jar"/>
-                <include name="org.eclipse.ui.forms_3.1.0.jar"/>
+                <include name="org.eclipse.core.runtime.compatibility_3.1.1.jar"/>
+                <include name="org.eclipse.ui.forms_3.2.0.jar"/>
             </fileset>
         </copy>
         <copy todir="${plugin.path}">
@@ -185,7 +198,22 @@
         <antcall target="build-win32"/>
     </target>
 
-    <target name="build-linux" depends="init" if="isLinux">
+    <target name="build-linux-gtk-x86_64" depends="init" if="isUnix">
+        <property name="platform" value="linux-gtk-x86_64"/>
+        <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>
+        <!-- uncompress rpc -->
+        <untar src="rcp/${rcp.prefix}-${platform}.tar.gz" dest="target" compression="gzip"/>
+        <move todir="target/${dist.name}">
+            <fileset dir="target/eclipse"/>
+        </move>
+        <move file="target/${dist.name}/eclipse" tofile="target/${dist.name}/${project.name}"/>
+        <chmod file="target/${dist.name}/${project.name}" perm="a+rx"/>
+        <antcall target="build">
+            <param name="platform" value="${platform}"/>
+        </antcall>
+    </target>
+
+    <target name="build-linux" depends="init" if="isUnix">
         <property name="platform" value="linux-gtk"/>
         <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>
         <!-- uncompress rpc -->
@@ -208,12 +236,14 @@
         <move todir="target/${dist.name}">
             <fileset dir="target/eclipse"/>
         </move>
-        <!-- apply universal binary patch -->
+        <!-- apply universal binary patch 
+        doesnt need anymore since the RCP is 3.2
         <copy
             todir="target/${dist.name}/plugins"
             file="rcp/org.eclipse.swt.carbon.macosx.ppc_3.1.0.jar"
             overwrite="true"
         />
+    	-->
         <chmod file="target/${dist.name}/eclipse" perm="a+rx"/>
         <antcall target="build">
             <param name="platform" value="${platform}"/>
@@ -254,7 +284,8 @@
     </target>
 
     <target name="dist-all" depends="compile">
-        <copy todir="${project.dist}"
+        <copy
+            todir="${project.dist}"
             file="target/${project.name}-${product.version}.jar">
         </copy>
         <antcall target="dist-linux"/>
@@ -262,7 +293,7 @@
         <antcall target="dist-win32"/>
     </target>
 
-    <target name="dist-linux" depends="build-linux" if="isLinux">
+    <target name="dist-linux-gtk-x86_64" depends="build-linux-gtk-x86_64" if="isUnix">
         <antcall target="rpm">
             <param name="rpm.prefix" value=""/>
             <param name="rpm.home" value="/usr/src/redhat"/>
@@ -270,6 +301,18 @@
             <param name="rpm.name" value="${project.name}-${product.version}-1.i386.rpm"/>
         </antcall>
     </target>
+
+    <target name="dist-linux" depends="build-linux" if="isUnix">
+
+    	<antcall target="rpm">
+            <param name="rpm.prefix" value=""/>
+            <param name="rpm.home" value="/usr/src/redhat"/>
+            <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
+            <param name="rpm.name" value="${project.name}-${product.version}-1.i386.rpm"/>
+        </antcall>
+
+    	
+   </target>
 
     <target name="dist-macosx" depends="build-macosx" if="isMac">
         <property name="app.name" value="Penrose Studio.app"/>
@@ -330,7 +373,7 @@
                 <expandproperties/>
             </filterchain>
         </copy>
-        <exec executable="${iscc.path}" os="Windows NT,Windows 2000,Windows XP,Windows 2003">
+        <exec executable="${iscc.path}">
             <arg line="/Q target/penrose-studio.iss"/>
         </exec>
         <antcall target="rpm">
@@ -392,7 +435,14 @@
         <antcall target="install-win32"/>
     </target>
 
-    <target name="install-linux" if="isLinux">
+    <target name="install-linux-gtk-x86_64" if="isUnix">
+        <antcall target="install-dist">
+            <param name="platform" value="linux-gtk-x86_64"/>
+        </antcall>
+        <chmod dir="${penrose.studio.home}" includes="penrose-studio" perm="a+rx" />
+    </target>
+
+    <target name="install-linux" if="isUnix">
         <antcall target="install-dist">
             <param name="platform" value="linux-gtk"/>
         </antcall>

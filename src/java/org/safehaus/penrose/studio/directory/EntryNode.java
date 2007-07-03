@@ -20,27 +20,25 @@ package org.safehaus.penrose.studio.directory;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.SWT;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.studio.*;
-import org.safehaus.penrose.studio.action.PenroseStudioActions;
-import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.mapping.editor.MappingEditor;
-import org.safehaus.penrose.studio.mapping.editor.MappingEditorInput;
-import org.safehaus.penrose.studio.mapping.editor.MappingDialog;
+import org.safehaus.penrose.studio.mapping.*;
 import org.safehaus.penrose.studio.directory.action.NewStaticEntryAction;
 import org.safehaus.penrose.studio.directory.action.NewDynamicEntryAction;
 import org.safehaus.penrose.studio.directory.action.MapLDAPTreeAction;
 import org.safehaus.penrose.studio.directory.action.NewEntryFromSourceAction;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.util.EntryUtil;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -54,32 +52,29 @@ public class EntryNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    Server server;
+    ObjectsView view;
 
     private Partition partition;
     private EntryMapping entryMapping;
 
-    public EntryNode(
-            Server server,
-            String name,
-            Image image,
-            Object object,
-            Node parent
-    ) {
-        super(name, image, object, parent);
-        this.server = server;
+    public EntryNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+        super(name, type, image, object, parent);
+        this.view = view;
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseStudioActions actions = penroseStudio.getActions();
+        manager.add(new Action("Open") {
+            public void run() {
+                try {
+                    open();
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                }
+            }
+        });
 
-        manager.add(actions.getOpenAction());
-
-        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-
-        manager.add(new Action("Edit Sources") {
+        manager.add(new Action("Edit sources") {
             public void run() {
                 try {
                     editSources();
@@ -108,16 +103,30 @@ public class EntryNode extends Node {
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        manager.add(actions.getCopyAction());
-        manager.add(actions.getPasteAction());
-        manager.add(actions.getDeleteAction());
-
-        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-
-        manager.add(new Action("Properties") {
+        manager.add(new Action("Copy") {
             public void run() {
                 try {
-                    editProperties();
+                    //copy(connection);
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Action("Paste") {
+            public void run() {
+                try {
+                    //paste(connection);
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
+            public void run() {
+                try {
+                    remove();
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
                 }
@@ -127,8 +136,8 @@ public class EntryNode extends Node {
 
     public void showCommercialMenu(IMenuManager manager) throws Exception {
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseWorkbenchAdvisor workbenchAdvisor = penroseApplication.getWorkbenchAdvisor();
         PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
         PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
@@ -142,10 +151,7 @@ public class EntryNode extends Node {
 
     public void open() throws Exception {
 
-        MappingEditorInput mei = new MappingEditorInput();
-        mei.setProject(server);
-        mei.setPartition(partition);
-        mei.setEntryDefinition(entryMapping);
+        MappingEditorInput mei = new MappingEditorInput(partition, entryMapping);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -155,10 +161,7 @@ public class EntryNode extends Node {
 
     public void editSources() throws Exception {
 
-        MappingEditorInput mei = new MappingEditorInput();
-        mei.setProject(server);
-        mei.setPartition(partition);
-        mei.setEntryDefinition(entryMapping);
+        MappingEditorInput mei = new MappingEditorInput(partition, entryMapping);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -169,10 +172,7 @@ public class EntryNode extends Node {
 
     public void editACL() throws Exception {
 
-        MappingEditorInput mei = new MappingEditorInput();
-        mei.setProject(server);
-        mei.setPartition(partition);
-        mei.setEntryDefinition(entryMapping);
+        MappingEditorInput mei = new MappingEditorInput(partition, entryMapping);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -181,45 +181,30 @@ public class EntryNode extends Node {
         editor.showACLPage();
     }
 
-    public void editProperties() throws Exception {
+    public void remove() throws Exception {
 
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        Shell shell = window.getShell();
+        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 
-        MappingDialog dialog = new MappingDialog(shell, SWT.NONE);
-        dialog.setServer(server);
-        dialog.setPartition(partition);
-        dialog.setEntryMapping(entryMapping);
-        dialog.open();
-    }
+        TreeViewer treeViewer = view.getTreeViewer();
+        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
 
-    public Object copy() throws Exception {
-        return null;
-        //return entryMapping;
-    }
+        boolean confirm = MessageDialog.openQuestion(shell,
+                "Confirmation", "Remove selected entries?");
 
-    public boolean canPaste(Object object) throws Exception {
-        return object instanceof EntryMapping;
-    }
+        if (!confirm) return;
 
-    public void paste(Object object) throws Exception {
-        EntryMapping newEntryMapping = (EntryMapping)object;
+        for (Iterator i=selection.iterator(); i.hasNext(); ) {
+            Node node = (Node)i.next();
+            if (!(node instanceof EntryNode)) continue;
 
-        String rdn = newEntryMapping.getRdn();
-        String dn = entryMapping.getDn();
-        String newDn = EntryUtil.append(rdn, dn);
+            EntryNode entryNode = (EntryNode)node;
 
-        newEntryMapping.setDn(newDn);
+            EntryMapping entryMapping = entryNode.getEntryMapping();
+            partition.removeEntryMapping(entryMapping);
+        }
 
-        partition.addEntryMapping(newEntryMapping);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.fireChangeEvent();
-    }
-
-    public void delete() throws Exception {
-        EntryMapping entryMapping = getEntryMapping();
-        partition.removeEntryMapping(entryMapping);
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        penroseApplication.notifyChangeListeners();
     }
 
     public boolean hasChildren() throws Exception {
@@ -235,9 +220,10 @@ public class EntryNode extends Node {
             EntryMapping childMapping = (EntryMapping)i.next();
 
             EntryNode entryNode = new EntryNode(
-                    server,
-                    childMapping.getRdn(),
-                    PenrosePlugin.getImage(PenroseImage.ENTRY),
+                    view,
+                    childMapping.getRdn().toString(),
+                    ObjectsView.ENTRY,
+                    PenrosePlugin.getImage(PenroseImage.NODE),
                     childMapping,
                     this
             );

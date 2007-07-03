@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.SWT;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
@@ -31,8 +32,11 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.safehaus.penrose.studio.project.ProjectDialog;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.welcome.WelcomeEditorInput;
 import org.safehaus.penrose.studio.welcome.WelcomeEditor;
+import org.safehaus.penrose.studio.util.ApplicationConfig;
 import org.apache.log4j.Logger;
 
 public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
@@ -57,13 +61,13 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     public void preWindowOpen() {
         // log.debug("preWindowOpen");
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
         try {
-            penroseStudio.loadLicense();
+            penroseApplication.loadLicense();
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-/*
+
         try {
             Shell shell = new Shell(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
 
@@ -73,20 +77,19 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             //configurer.setShowCoolBar(true);
             //configurer.setShowStatusLine(true);
 
-            ServerDialog dialog = new ServerDialog(shell);
+            ProjectDialog dialog = new ProjectDialog(shell);
             dialog.open();
 
-            if (dialog.getAction() == ServerDialog.CANCEL) System.exit(0);
+            if (dialog.getAction() == ProjectDialog.CANCEL) System.exit(0);
 
-            Server server = dialog.getProject();
+            Project project = dialog.getProject();
 
-            penroseStudio.getApplicationConfig().setCurrentProject(server);
+            penroseApplication.getApplicationConfig().setCurrentProject(project);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             System.exit(0);
         }
-*/
     }
 
     public void createWindowContents(Shell shell) {
@@ -110,14 +113,19 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     public void postWindowCreate() {
         // log.debug("postWindowCreate");
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        ApplicationConfig applicationConfig = penroseApplication.getApplicationConfig();
 
         try {
             IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 
-            configurer.setTitle("Penrose Studio");
+            Project project = penroseApplication.getApplicationConfig().getCurrentProject();
+            configurer.setTitle("Penrose Studio - "+project.getName());
 
+            //IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
             IWorkbenchWindow window = configurer.getWindow();
 
+            //IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
             page.openEditor(new WelcomeEditorInput(), WelcomeEditor.class.getName());
 
@@ -130,13 +138,48 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             MessageDialog.openError(
                     shell,
                     "ERROR",
-                    e.getMessage()
+                    "Failed opening "+applicationConfig.getCurrentProject().getName()+" configuration.\n"+
+                            "See penrose-studio-log.txt for details."
+            );
+        }
+
+        try {
+            penroseApplication.connect();
+            penroseApplication.open(penroseApplication.getWorkDir());
+            penroseApplication.disconnect();
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+
+            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            Shell shell = window.getShell();
+
+            MessageDialog.openError(
+                    shell,
+                    "ERROR",
+                    "Failed opening "+applicationConfig.getCurrentProject().getName()+" configuration.\n"+
+                            "See penrose-studio-log.txt for details."
             );
         }
 
     }
 
     public void postWindowOpen() {
+        // log.debug("postWindowOpen");
+        try {
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            penroseApplication.validatePartitions();
+        } catch (Exception e) {
+            log.debug(e.getMessage(), e);
+
+            String message = e.toString();
+            if (message.length() > 500) {
+                message = message.substring(0, 500) + "...";
+            }
+
+            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            MessageDialog.openError(window.getShell(), "Open Failed", message);
+        }
     }
 
     public PenroseActionBarAdvisor getActionBarAdvisor() {

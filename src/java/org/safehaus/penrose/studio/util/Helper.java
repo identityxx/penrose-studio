@@ -75,11 +75,11 @@ public class Helper {
 			}
 			MessageDialog.openError(shell, "Test Connection Result", "Error: "+ex.getSQLState()+"\n"+message);
 		} finally {
-			try { con.close(); } catch (Exception ex) {}
+			try { if (con != null) con.close(); } catch (Exception ex) {}
 		}
 	}
 	
-	public static void testLDAPConnection(Shell shell, String initialContext, String providerUrl, String principal, String credentials) {
+	public static void testJndiConnection(Shell shell, String initialContext, String providerUrl, String principal, String credentials) {
 		InitialDirContext ic = null;
 		try {
 			Properties env = new Properties();
@@ -100,8 +100,16 @@ public class Helper {
 			}
 			MessageDialog.openError(shell, "Test Connection Result", "Error: "+message);
 		} finally {
-			try { ic.close(); } catch (Exception ex) {} 
+			try { if (ic != null) ic.close(); } catch (Exception ex) {}
 		}
+	}
+
+	public static void hookContextMenu(Control control, IMenuListener menuListener) {
+		MenuManager menuMgr = new MenuManager("#PopupMenu");
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(menuListener);
+		Menu menu = menuMgr.createContextMenu(control);
+		control.setMenu(menu);
 	}
 
 }

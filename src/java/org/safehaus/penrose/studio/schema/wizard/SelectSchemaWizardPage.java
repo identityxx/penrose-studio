@@ -24,8 +24,9 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.handler.HandlerManager;
 import org.apache.log4j.Logger;
 
 import javax.naming.NamingEnumeration;
@@ -105,7 +106,7 @@ public class SelectSchemaWizardPage extends WizardPage {
         newDnButton = new Button(destinationSchemaComposite, SWT.RADIO);
 
         destSchemaText = new Text(destinationSchemaComposite, SWT.BORDER);
-        destSchemaText.setText("cn=schema,ou=system");
+        destSchemaText.setText(HandlerManager.SCHEMA_DN.toString());
         destSchemaText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         new Label(composite, SWT.NONE);

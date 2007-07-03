@@ -18,19 +18,19 @@
 package org.safehaus.penrose.studio.partition.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.server.ServerNode;
-import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.util.ADUtil;
 import org.safehaus.penrose.studio.util.SchemaUtil;
-import org.safehaus.penrose.studio.connection.wizard.LDAPConnectionInfoWizardPage;
-import org.safehaus.penrose.studio.connection.wizard.LDAPConnectionParametersWizardPage;
+import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionInfoWizardPage;
+import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionParametersWizardPage;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.acl.ACI;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.Sources;
+import org.safehaus.penrose.source.SourceManager;
+import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.handler.HandlerManager;
 import org.apache.log4j.Logger;
 
 import javax.naming.InitialContext;
@@ -47,8 +47,8 @@ public class CreateLDAPProxyWizard extends Wizard {
     Logger log = Logger.getLogger(getClass());
 
     public PartitionProxyPage infoPage = new PartitionProxyPage();
-    public LDAPConnectionInfoWizardPage connectionInfoPage = new LDAPConnectionInfoWizardPage();
-    public LDAPConnectionParametersWizardPage connectionParametersPage = new LDAPConnectionParametersWizardPage();
+    public JNDIConnectionInfoWizardPage connectionInfoPage = new JNDIConnectionInfoWizardPage();
+    public JNDIConnectionParametersWizardPage connectionParametersPage = new JNDIConnectionParametersWizardPage();
 
     public CreateLDAPProxyWizard() {
 
@@ -83,16 +83,14 @@ public class CreateLDAPProxyWizard extends Wizard {
 
             PartitionConfig partitionConfig = new PartitionConfig();
             partitionConfig.setName(name);
+            partitionConfig.setPath(path);
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            ServerNode serverNode = penroseStudio.getSelectedServerNode();
-            if (serverNode == null) return false;
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+            penroseConfig.addPartitionConfig(partitionConfig);
 
-            Server server = serverNode.getServer();
-            PartitionManager partitionManager = server.getPartitionManager();
-
-            Partition partition = new Partition(partitionConfig);
-            partitionManager.addPartition(partition);
+            PartitionManager partitionManager = penroseApplication.getPartitionManager();
+            Partition partition = partitionManager.load(penroseApplication.getWorkDir(), partitionConfig);
 
             ConnectionConfig connectionConfig = new ConnectionConfig();
             connectionConfig.setName(name);
@@ -111,17 +109,20 @@ public class CreateLDAPProxyWizard extends Wizard {
 
             partition.addConnectionConfig(connectionConfig);
 
+            Sources sources = partition.getSources();
+
             SourceConfig sourceConfig = new SourceConfig(name, name);
             sourceConfig.setParameter("baseDn", connectionInfoPage.getSuffix());
             sourceConfig.setParameter("scope", "SUBTREE");
             sourceConfig.setParameter("filter", "(objectClass=*)");
-            partition.addSourceConfig(sourceConfig);
+            sources.addSourceConfig(sourceConfig);
 
             EntryMapping rootEntry = new EntryMapping(connectionInfoPage.getSuffix());
 
             SourceMapping sourceMapping = new SourceMapping("DEFAULT", name);
-            sourceMapping.setProxy(true);
             rootEntry.addSourceMapping(sourceMapping);
+
+            rootEntry.setHandlerName("PROXY");
 
             rootEntry.addACI(new ACI("rs"));
 
@@ -135,13 +136,15 @@ public class CreateLDAPProxyWizard extends Wizard {
                 rootDseSourceConfig.setParameter("scope", "OBJECT");
                 rootDseSourceConfig.setParameter("filter", "objectClass=*");
 
-                partition.addSourceConfig(rootDseSourceConfig);
+                sources.addSourceConfig(rootDseSourceConfig);
 
                 EntryMapping rootDseEntryMapping = new EntryMapping();
+                rootDseEntryMapping.setDn("");
 
                 SourceMapping rootDseSourceMapping = new SourceMapping("DEFAULT", rootDseSourceConfig.getName());
-                rootDseSourceMapping.setProxy(true);
                 rootDseEntryMapping.addSourceMapping(rootDseSourceMapping);
+
+                rootDseEntryMapping.setHandlerName("PROXY");
 
                 rootDseEntryMapping.addACI(new ACI("rs"));
 
@@ -151,7 +154,7 @@ public class CreateLDAPProxyWizard extends Wizard {
             if (infoPage.getMapADSchema()) {
                 String schemaFormat = infoPage.getSchemaFormat();
                 String sourceSchemaDn = "CN=Schema,CN=Configuration,"+connectionInfoPage.getSuffix();
-                String destSchemaDn = "cn=schema,ou=system";
+                String destSchemaDn = HandlerManager.SCHEMA_DN.toString();
 
                 EntryMapping schemaMapping;
 
@@ -169,10 +172,10 @@ public class CreateLDAPProxyWizard extends Wizard {
 
             //AdapterConfig adapterConfig = penroseConfig.getAdapterConfig("LDAP");
 
-            //ConnectionManager connectionManager = penroseStudio.getConnectionManager();
+            //ConnectionManager connectionManager = penroseApplication.getConnectionManager();
             //connectionManager.init(partition, connectionConfig, adapterConfig);
 
-            penroseStudio.fireChangeEvent();
+            penroseApplication.notifyChangeListeners();
 
             return true;
 

@@ -37,103 +37,97 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.part.*;
 import org.safehaus.penrose.mapping.*;
+import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
-import org.safehaus.penrose.studio.mapping.editor.MappingEditorInput;
-import org.safehaus.penrose.studio.mapping.editor.MappingEditor;
-import org.safehaus.penrose.studio.connection.editor.ConnectionEditorInput;
-import org.safehaus.penrose.studio.connection.editor.ConnectionEditor;
-import org.safehaus.penrose.studio.source.editor.SourceEditorInput;
-import org.safehaus.penrose.studio.source.editor.SourceEditor;
+import org.safehaus.penrose.studio.mapping.MappingEditorInput;
+import org.safehaus.penrose.studio.mapping.MappingEditor;
+import org.safehaus.penrose.studio.connection.editor.JNDIConnectionEditor;
+import org.safehaus.penrose.studio.connection.editor.JDBCConnectionEditor;
+import org.safehaus.penrose.studio.connection.editor.*;
+import org.safehaus.penrose.studio.source.editor.*;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.server.ServerNode;
-import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.util.SWTUtil;
+import org.safehaus.penrose.studio.plugin.PluginManager;
+import org.safehaus.penrose.studio.plugin.Plugin;
+import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.source.SourceConfig;
 
 public class ValidationView extends ViewPart {
 
-    private Logger log = Logger.getLogger(getClass());
+	private Logger log = Logger.getLogger(getClass());
+	
+	Composite parent;
 
-    Composite parent;
-
-    Table table;
+	Table table;
     private Collection results = new ArrayList();
 
-    public void createPartControl(Composite parent) {
+	public void createPartControl(Composite parent) {
         log.debug("createPartControl");
 
-        this.parent = parent;
+		this.parent = parent;
+		
+		parent.setLayout(new FillLayout());
+		
+		table = new Table(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
 
-        parent.setLayout(new FillLayout());
-
-        table = new Table(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
-
-        SWTUtil.hookContextMenu(table, new IMenuListener() {
-            public void menuAboutToShow(IMenuManager manager) {
-                Action refreshAction = new Action("Refresh") {
-                    public void run() {
+		Helper.hookContextMenu(table, new IMenuListener() {
+			public void menuAboutToShow(IMenuManager manager) {
+				Action refreshAction = new Action("Refresh") {
+					public void run() {
                         try {
-                            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                            for (Iterator i=penroseStudio.getServers().iterator(); i.hasNext(); ) {
-                                Server server = (Server)i.next();
-                                server.validate();
-                            }
-
+                            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+                            penroseApplication.validatePartitions();
                         } catch (Exception e) {
                             log.debug(e.getMessage(), e);
                         }
-                    }
-                };
-                refreshAction.setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.REFRESH));
-                manager.add(refreshAction);
-                manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-            }
-        });
+					}
+				};
+				refreshAction.setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.REFRESH));
+				manager.add(refreshAction);
+				manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+			}
+		});
 
-        table.addMouseListener(new MouseAdapter() {
-            public void mouseDoubleClick(MouseEvent e) {
+		table.addMouseListener(new MouseAdapter() {
+			public void mouseDoubleClick(MouseEvent e) {
                 try {
-                    handleDoubleClick();
+				    handleDoubleClick();
                 } catch (Exception ex) {
                     log.debug(ex.getMessage(), ex);
                 }
-            }
-        });
+			}
+		});
 
-        TableColumn tc = new TableColumn(table, SWT.NONE);
-        tc.setText("Type");
-        tc.setWidth(100);
-
-        tc = new TableColumn(table, SWT.NONE);
-        tc.setText("Message");
-        tc.setWidth(400);
+		TableColumn tc = new TableColumn(table, SWT.NONE);
+		tc.setText("Type");
+		tc.setWidth(100);
 
         tc = new TableColumn(table, SWT.NONE);
-        tc.setText("Object");
-        tc.setWidth(200);
+		tc.setText("Message");
+		tc.setWidth(400);
 
-        table.setHeaderVisible(true);
-        table.setLinesVisible(true);
-
+        tc = new TableColumn(table, SWT.NONE);
+		tc.setText("Object");
+		tc.setWidth(200);
+		
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+		
         refresh();
-    }
-
-    public void setFocus() {
-        parent.setFocus();
-    }
-
+	}
+	
+	public void setFocus() {
+		parent.setFocus();
+	}
+	
     public void refresh() {
         table.removeAll();
         for (Iterator i=results.iterator(); i.hasNext(); ) {
-            PartitionValidationResult result = (PartitionValidationResult)i.next();
+        	PartitionValidationResult result = (PartitionValidationResult)i.next();
 
             TableItem item = new TableItem(table, SWT.NONE);
             item.setText(0, result.getType());
             item.setText(1, result.getMessage());
-            item.setText(2, result.getSource());
+            item.setText(2, result.getSource().toString());
 
             if (PartitionValidationResult.ERROR.equals(result.getType())) {
                 item.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_RED));
@@ -145,53 +139,59 @@ public class ValidationView extends ViewPart {
         }
     }
 
-    void handleDoubleClick() throws Exception {
+	void handleDoubleClick() throws Exception {
         if (table.getSelectionCount() == 0) return;
 
         TableItem item = table.getSelection()[0];
-        Object object = item.getData();
+		Object object = item.getData();
 
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        IWorkbenchPage page = window.getActivePage();
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        ServerNode serverNode = penroseStudio.getSelectedServerNode();
-        if (serverNode == null) return;
-
-        Server server = serverNode.getServer();
-        PartitionManager partitionManager = server.getPartitionManager();
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PartitionManager partitionManager = penroseApplication.getPartitionManager();
+        PluginManager pluginManager = penroseApplication.getPluginManager();
 
         if (object instanceof ConnectionConfig) {
             ConnectionConfig connectionConfig = (ConnectionConfig)object;
             Partition partition = partitionManager.getPartition(connectionConfig);
 
-            ConnectionEditorInput ei = new ConnectionEditorInput();
-            ei.setPartition(partition);
-            ei.setConnectionConfig(connectionConfig);
+            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            IWorkbenchPage page = window.getActivePage();
 
-            page.openEditor(ei, ConnectionEditor.class.getName());
+            Plugin plugin = pluginManager.getPlugin(connectionConfig.getAdapterName());
+            ConnectionEditorInput cei = plugin.createConnectionEditorInput();
+            cei.setPartition(partition);
+            cei.setConnectionConfig(connectionConfig);
 
-        } else if (object instanceof SourceConfig) {
-            SourceConfig sourceConfig = (SourceConfig)object;
+            String connectionEditorClass = plugin.getConnectionEditorClass();
+            page.openEditor(cei, connectionEditorClass);
+
+		} else if (object instanceof SourceConfig) {
+			SourceConfig sourceConfig = (SourceConfig)object;
             Partition partition = partitionManager.getPartition(sourceConfig);
+            ConnectionConfig connection = partition.getConnectionConfig(sourceConfig.getConnectionName());
 
-            SourceEditorInput ei = new SourceEditorInput();
-            ei.setPartition(partition);
-            ei.setSourceConfig(sourceConfig);
+            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            IWorkbenchPage page = window.getActivePage();
 
-            page.openEditor(ei, SourceEditor.class.getName());
+            Plugin plugin = pluginManager.getPlugin(connection.getAdapterName());
+            SourceEditorInput sei = plugin.createSourceEditorInput();
+            sei.setPartition(partition);
+            sei.setSourceConfig(sourceConfig);
 
-        } else if (object instanceof EntryMapping) {
-            EntryMapping entryMapping = (EntryMapping)object;
-            Partition partition = partitionManager.getPartition(entryMapping);
+            String sourceEditorClass = plugin.getSourceEditorClass();
+            page.openEditor(sei, sourceEditorClass);
 
-            MappingEditorInput mei = new MappingEditorInput();
-            mei.setPartition(partition);
-            mei.setEntryDefinition(entryMapping);
+		} else if (object instanceof EntryMapping) {
+            EntryMapping entryDefinition = (EntryMapping)object;
+            Partition partition = partitionManager.getPartition(entryDefinition);
+
+            MappingEditorInput mei = new MappingEditorInput(partition, entryDefinition);
+
+            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            IWorkbenchPage page = window.getActivePage();
 
             page.openEditor(mei, MappingEditor.class.getName());
-        }
-    }
+		}
+	}
 
     public Collection getResults() {
         return results;

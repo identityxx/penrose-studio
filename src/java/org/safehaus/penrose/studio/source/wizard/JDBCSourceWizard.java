@@ -17,11 +17,14 @@
  */
 package org.safehaus.penrose.studio.source.wizard;
 
+import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.safehaus.penrose.jdbc.JDBCAdapter;
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.jdbc.TableConfig;
+import org.safehaus.penrose.partition.*;
+import org.safehaus.penrose.adapter.jdbc.JDBCAdapter;
+import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.source.SourceManager;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -30,22 +33,29 @@ import java.util.Iterator;
 /**
  * @author Endi S. Dewata
  */
-public class JDBCSourceWizard extends SourceWizard {
+public class JDBCSourceWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
+
+    private Partition partition;
+    private ConnectionConfig connectionConfig;
+    private SourceConfig sourceConfig;
 
     public SourceWizardPage propertyPage;
     public JDBCTableWizardPage jdbcTablePage;
     public JDBCFieldWizardPage jdbcFieldsPage;
     public JDBCPrimaryKeyWizardPage jdbcPrimaryKeyPage;
 
-    public JDBCSourceWizard() {
+    public JDBCSourceWizard(Partition partition, ConnectionConfig connectionConfig) {
+        this.partition = partition;
+        this.connectionConfig = connectionConfig;
+
         propertyPage = new SourceWizardPage();
         jdbcTablePage = new JDBCTableWizardPage();
         jdbcFieldsPage = new JDBCFieldWizardPage();
         jdbcPrimaryKeyPage = new JDBCPrimaryKeyWizardPage();
 
-        setWindowTitle("New Source");
+        setWindowTitle(connectionConfig.getName()+" - New Source");
     }
 
     public boolean canFinish() {
@@ -92,13 +102,13 @@ public class JDBCSourceWizard extends SourceWizard {
             String schema = tableConfig.getSchema();
             String tableName = tableConfig.getName();
 
-            sourceConfig.setParameter(JDBCAdapter.CATALOG, catalog);
-            sourceConfig.setParameter(JDBCAdapter.SCHEMA, schema);
-            sourceConfig.setParameter(JDBCAdapter.TABLE, tableName);
+            sourceConfig.setParameter(JDBCClient.CATALOG, catalog);
+            sourceConfig.setParameter(JDBCClient.SCHEMA, schema);
+            sourceConfig.setParameter(JDBCClient.TABLE, tableName);
 
             String filter = jdbcFieldsPage.getFilter();
             if (filter != null) {
-                sourceConfig.setParameter(JDBCAdapter.FILTER, filter);
+                sourceConfig.setParameter(JDBCClient.FILTER, filter);
             }
 
             System.out.println("Saving fields :");
@@ -109,11 +119,11 @@ public class JDBCSourceWizard extends SourceWizard {
 
             for (Iterator i=fields.iterator(); i.hasNext(); ) {
                 FieldConfig field = (FieldConfig)i.next();
-                System.out.println(" - "+field.getName()+" "+field.isPK());
+                System.out.println(" - "+field.getName()+" "+field.isPrimaryKey());
                 sourceConfig.addFieldConfig(field);
             }
 
-            partition.addSourceConfig(sourceConfig);
+            partition.getSources().addSourceConfig(sourceConfig);
 
             return true;
 
@@ -123,7 +133,31 @@ public class JDBCSourceWizard extends SourceWizard {
         }
     }
 
+    public SourceConfig getSourceConfig() {
+        return sourceConfig;
+    }
+
+    public void setSourceConfig(SourceConfig connection) {
+        this.sourceConfig = connection;
+    }
+
     public boolean needsPreviousAndNextButtons() {
         return true;
+    }
+
+    public ConnectionConfig getConnectionConfig() {
+        return connectionConfig;
+    }
+
+    public void setConnectionConfig(ConnectionConfig connectionConfig) {
+        this.connectionConfig = connectionConfig;
+    }
+
+    public Partition getPartition() {
+        return partition;
+    }
+
+    public void setPartition(Partition partition) {
+        this.partition = partition;
     }
 }

@@ -1,31 +1,36 @@
 package org.safehaus.penrose.studio.util;
 
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.partition.SourceConfig;
+import org.safehaus.penrose.partition.FieldConfig;
+import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.AttributeMapping;
 import org.safehaus.penrose.mapping.Expression;
 import org.safehaus.penrose.mapping.SourceMapping;
+import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.source.SourceManager;
+import org.safehaus.penrose.ldap.DN;
+import org.safehaus.penrose.ldap.RDN;
 
 /**
  * @author Endi S. Dewata
  */
 public class ADUtil {
-
+    
     public EntryMapping createSchemaProxy(
             Partition partition,
             ConnectionConfig connectionConfig,
             String sourceSchemaDn,
             String destSchemaDn
             ) throws Exception {
-
+        
         SourceConfig sourceConfig = new SourceConfig();
         sourceConfig.setName(connectionConfig.getName()+" Schema");
         sourceConfig.setConnectionName(connectionConfig.getName());
 
-        sourceConfig.addFieldConfig(new FieldConfig("lDAPDisplayName", "true"));
+        sourceConfig.addFieldConfig(new FieldConfig("lDAPDisplayName", true));
         sourceConfig.addFieldConfig(new FieldConfig("objectClass"));
         sourceConfig.addFieldConfig(new FieldConfig("attributeID"));
         sourceConfig.addFieldConfig(new FieldConfig("adminDescription"));
@@ -41,17 +46,22 @@ public class ADUtil {
         sourceConfig.setParameter("scope", "ONELEVEL");
         sourceConfig.setParameter("filter", "(objectClass=*)");
 
-        partition.addSourceConfig(sourceConfig);
+        partition.getSources().addSourceConfig(sourceConfig);
+
+        DN dn = new DN(destSchemaDn);
 
         EntryMapping entryMapping = new EntryMapping();
-        entryMapping.setDn(destSchemaDn);
+        entryMapping.setDn(dn);
         entryMapping.addObjectClass("top");
         entryMapping.addObjectClass("subschema");
 
-        entryMapping.addAttributeMapping(new AttributeMapping("cn", AttributeMapping.CONSTANT, "schema", true));
+        RDN rdn = dn.getRdn();
+        for (String name : rdn.getNames()) {
+            String value = rdn.get(name).toString();
+            entryMapping.addAttributeMapping(new AttributeMapping(name, AttributeMapping.CONSTANT, value, true));
+        }
 
         Expression atExpression = new Expression(
-                "schema", "s",
                 "import org.safehaus.penrose.schema.*;\n" +
                 "\n" +
                 "if (!s.objectClass.contains(\"attributeSchema\")) return null;\n" +
@@ -74,7 +84,6 @@ public class ADUtil {
         );
 
         Expression ocExpression = new Expression(
-                "schema", "s",
                 "import java.util.*;\n" +
                 "import org.safehaus.penrose.schema.*;\n" +
                 "\n" +
@@ -123,7 +132,7 @@ public class ADUtil {
                 )
         );
 
-        SourceMapping sourceMapping = new SourceMapping("schema", sourceConfig.getName());
+        SourceMapping sourceMapping = new SourceMapping("s", sourceConfig.getName());
         entryMapping.addSourceMapping(sourceMapping);
 
         partition.addEntryMapping(entryMapping);

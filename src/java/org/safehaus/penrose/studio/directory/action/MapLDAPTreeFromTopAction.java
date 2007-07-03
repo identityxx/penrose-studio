@@ -19,13 +19,15 @@ package org.safehaus.penrose.studio.directory.action;
 
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.Wizard;
+import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.studio.directory.wizard.CreateLDAPProxyWizard;
-import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.PenroseApplication;
 import org.apache.log4j.Logger;
 
 public class MapLDAPTreeFromTopAction extends Action {
@@ -44,10 +46,13 @@ public class MapLDAPTreeFromTopAction extends Action {
 	public void run() {
         try {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            IWorkbenchPage page = window.getActivePage();
+            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+
             Shell shell = window.getShell();
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            //if (!penroseStudio.checkCommercial()) return;
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            //if (!penroseApplication.isCommercial()) return;
 
             Wizard wizard = new CreateLDAPProxyWizard(node.getPartition());
 
@@ -55,8 +60,9 @@ public class MapLDAPTreeFromTopAction extends Action {
             dialog.setPageSize(600, 300);
             dialog.open();
 
-            penroseStudio.show(node);
-            penroseStudio.fireChangeEvent();
+            penroseApplication.notifyChangeListeners();
+
+            objectsView.show(node);
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

@@ -25,7 +25,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.studio.mapping.editor.EntrySelectionDialog;
+import org.safehaus.penrose.studio.mapping.EntrySelectionDialog;
 import org.ietf.ldap.LDAPDN;
 
 /**
@@ -91,7 +91,7 @@ public class StaticEntryRDNWizardPage extends WizardPage implements ModifyListen
 
         parentDnText = new Text(composite, SWT.BORDER);
         if (parentMapping != null) {
-            parentDnText.setText(parentMapping.getDn());
+            parentDnText.setText(parentMapping.getDn().toString());
         }
 
         parentDnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -110,7 +110,7 @@ public class StaticEntryRDNWizardPage extends WizardPage implements ModifyListen
                 EntryMapping parentEntry = dialog.getEntryMapping();
                 if (parentEntry == null) return;
 
-                parentDnText.setText(parentEntry.getDn());
+                parentDnText.setText(parentEntry.getDn().toString());
             }
         });
 

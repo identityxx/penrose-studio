@@ -22,10 +22,10 @@ public class Pair {
 	private String name, value;
 	
 	public Pair(String name, String value) {
-		this.name=name;
-		this.value=value;
+		this.name = name;
+		this.value = value;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -37,7 +37,7 @@ public class Pair {
     public String getValue() {
 		return value;
 	}
-    
+
     public void setValue(String value) {
 		this.value = value;
 	}

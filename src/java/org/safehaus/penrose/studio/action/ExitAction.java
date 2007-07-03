@@ -17,32 +17,46 @@
  */
 package org.safehaus.penrose.studio.action;
 
-import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.SWT;
+import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenrosePlugin;
 
-public class ExitAction extends Action {
+public class ExitAction implements IWorkbenchWindowActionDelegate {
 
-    public ExitAction() {
-        setText("E&xit");
-        setToolTipText("Exit");
-        setAccelerator(SWT.ALT | SWT.F4);
-        setId(getClass().getName());
-    }
+	private IWorkbenchWindow window;
 
-    public void run() {
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        Shell shell = window.getShell();
+	public ExitAction() {
+		
+	}
 
-        boolean confirmed = MessageDialog.openConfirm(
-                shell,
-                "Confirm",
-                "Are you sure you want to exit?"
-        );
+	public void run(IAction action) {
+		boolean confirmed = true;
+		
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        if (penroseApplication.isDirty()) {
+            confirmed = MessageDialog.openConfirm(
+                    window.getShell(),
+                    "Confirm Exit",
+                    "Are you sure you want to exit?\nYou will lose unsaved works!");
+        }
 
-        if (confirmed) System.exit(0);
-    }
+		if (confirmed) {
+			System.exit(0);
+		}
+	}
+
+	public void selectionChanged(IAction action, ISelection selection) {
+	}
+
+	public void dispose() {
+	}
+
+	public void init(IWorkbenchWindow window) {
+        this.window = window;
+	}
 }

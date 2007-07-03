@@ -17,26 +17,39 @@
  */
 package org.safehaus.penrose.studio.connection.wizard;
 
-import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.studio.driver.DriverWizard;
-import org.safehaus.penrose.studio.driver.DriverReader;
-import org.safehaus.penrose.studio.driver.DriverWriter;
-import org.safehaus.penrose.studio.driver.Driver;
-import org.apache.log4j.Logger;
-
+import java.io.File;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Iterator;
-import java.util.Collection;
+
+import org.apache.log4j.Logger;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.packageadmin.PackageAdmin;
+import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.driver.Driver;
+import org.safehaus.penrose.studio.driver.DriverReader;
+import org.safehaus.penrose.studio.driver.DriverWizard;
+import org.safehaus.penrose.studio.driver.DriverWriter;
 
 /**
  * @author Endi S. Dewata
@@ -55,17 +68,26 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
         setDescription("Select the type of the connection.");
 
         try {
-            DriverReader reader = new DriverReader("conf/drivers.xml");
+            
+        	
+        	DriverReader reader = new DriverReader("conf/drivers.xml");
             Collection list = reader.getDrivers();
-
+            
+            //TODO: actually get the loaded bundles and put on the list as a driver
+            list.addAll(loadLibraries());
+            
             for (Iterator i=list.iterator(); i.hasNext(); ) {
                 Driver driver = (Driver)i.next();
                 addDriver(driver);
             }
+            
+           
+            
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
             MessageDialog.openError(getShell(), "Error", e.getMessage());
+            
         }
 /*
         Driver jndi = new Driver("LDAP");
@@ -153,6 +175,77 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
 */
     }
 
+    
+    private Collection loadLibraries() throws Exception {
+
+		// bundles will be children of the lib directory. eg: conf/lib/mysql
+		File f = new File("conf/lib");
+
+		log.debug("Dynamically Loading libraries on " + f.getAbsolutePath());
+
+	
+		
+		
+		String[] dirs = f.list();
+		for (int i = 0; i < dirs.length; i++) {
+			File dir = new File(f.getAbsolutePath()+File.separator+dirs[i]);
+	
+	
+			BundleContext context = PenrosePlugin.getDefault().getBundleContext();
+			
+			log.debug("Installing bundle for "+ dir.getAbsolutePath());
+			
+			try{
+			
+				this.installBundle("file://"+ dir.getAbsolutePath());
+			
+			}catch(BundleException e){
+				log.debug(e.getMessage(), e);	           
+			}catch(ClassCastException e){
+				log.debug(e.getMessage(), e);
+				MessageDialog.openError(getShell(), "Error", e.getMessage());
+			}
+			
+			
+			Driver d = new Driver();
+			
+			
+		}
+		// Class cl = Class.forName("com.mysql.jdbc.Driver");
+		// com.mysql.jdbc.Driver d = (com.mysql.jdbc.Driver)cl.newInstance();
+		return new ArrayList();
+	}
+    
+    private void installBundle(String dir) throws BundleException, ClassNotFoundException {
+    	BundleContext context = PenrosePlugin.getDefault().getBundleContext();
+    	
+    	Bundle bundle = context.installBundle(dir);
+		
+		/*
+		 * Enumeration e = bundle.getHeaders().elements();
+		 * while(e.hasMoreElements()){ System.out.println(e.nextElement()); }
+		 */
+
+		ServiceReference packageAdminRef = context.getServiceReference(PackageAdmin.class.getName());
+		PackageAdmin packageAdmin = null;
+		if (packageAdminRef != null) {
+			packageAdmin = (PackageAdmin) context.getService(packageAdminRef);
+
+			packageAdmin.refreshPackages(new Bundle[] { bundle });
+
+		}
+
+		Class c = bundle.loadClass("com.mysql.jdbc.Driver");
+
+		Method[] m = c.getMethods();
+		for (int j = 0; j < m.length; j++) {
+			Method method = m[j];
+			System.out.println(method.getName());
+
+		}
+    }
+    
+    
     public void createControl(final Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
         setControl(composite);
@@ -182,7 +275,8 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    DriverWizard wizard = new DriverWizard();
+                    
+                	DriverWizard wizard = new DriverWizard();
                     WizardDialog dialog = new WizardDialog(parent.getShell(), wizard);
                     dialog.setPageSize(600, 300);
                     dialog.open();
@@ -194,9 +288,11 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
                     saveDrivers();
 
                     refresh();
+                    
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
+                    e.printStackTrace();
                 }
             }
         });

@@ -20,12 +20,16 @@ package org.safehaus.penrose.studio;
 import org.eclipse.ui.plugin.*;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.packageadmin.PackageAdmin;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import java.util.*;
 import java.io.File;
+import java.lang.reflect.Method;
 
 public class PenrosePlugin extends AbstractUIPlugin {
 
@@ -33,6 +37,8 @@ public class PenrosePlugin extends AbstractUIPlugin {
 
 	private static PenrosePlugin plugin;
 	private ResourceBundle resourceBundle;
+	
+	private BundleContext bundleContext;
 	
 	public PenrosePlugin() {
 
@@ -50,13 +56,20 @@ public class PenrosePlugin extends AbstractUIPlugin {
 		}
 	}
 
+
+	
+	  public BundleContext getBundleContext(){
+		  return this.bundleContext;
+	  }
+	
 	/**
 	 * This method is called upon plug-in activation
 	 */
 	public void start(BundleContext context) throws Exception {
         //log.debug("Starting PenrosePlugin");
         super.start(context);
-
+        this.bundleContext = context;
+        
         try {
             //IWorkbench workbench = PlatformUI.getWorkbench();
             //IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();

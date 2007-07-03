@@ -1,16 +1,19 @@
 package org.safehaus.penrose.studio.util;
 
-import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.partition.SourceConfig;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.SourceMapping;
+import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.source.SourceManager;
 
 /**
  * @author Endi S. Dewata
  */
 public class SchemaUtil {
-
+    
     public EntryMapping createSchemaProxy(
             Partition partition,
             ConnectionConfig connectionConfig,
@@ -26,14 +29,15 @@ public class SchemaUtil {
         sourceConfig.setParameter("scope", "SUBTREE");
         sourceConfig.setParameter("filter", "(objectClass=*)");
 
-        partition.addSourceConfig(sourceConfig);
+        partition.getSources().addSourceConfig(sourceConfig);
 
         EntryMapping entryMapping = new EntryMapping();
         entryMapping.setDn(destSchemaDn);
 
         SourceMapping sourceMapping = new SourceMapping("DEFAULT", sourceConfig.getName());
-        sourceMapping.setProxy(true);
         entryMapping.addSourceMapping(sourceMapping);
+
+        entryMapping.setHandlerName("PROXY");
 
         partition.addEntryMapping(entryMapping);
 

@@ -19,12 +19,12 @@ package org.safehaus.penrose.studio.partition.action;
 
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.partition.wizard.ExportPartitionWizard;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
 
@@ -43,6 +43,9 @@ public class ExportPartitionAction extends Action {
 	public void run() {
         try {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            IWorkbenchPage page = window.getActivePage();
+            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+
             Shell shell = window.getShell();
 
             ExportPartitionWizard wizard = new ExportPartitionWizard(partition);
@@ -50,9 +53,7 @@ public class ExportPartitionAction extends Action {
             dialog.setPageSize(600, 300);
             dialog.open();
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            Node node = penroseStudio.getServerNode("Penrose Server");
-            penroseStudio.show(node);
+            objectsView.show(objectsView.getPartitionsNode());
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

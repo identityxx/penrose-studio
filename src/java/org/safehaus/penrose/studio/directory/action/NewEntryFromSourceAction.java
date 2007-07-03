@@ -19,20 +19,24 @@ package org.safehaus.penrose.studio.directory.action;
 
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
 import org.eclipse.jface.action.Action;
+import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.directory.EntryNode;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.mapping.editor.SourceDialog;
+import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.mapping.SourceDialog;
 import org.safehaus.penrose.mapping.SourceMapping;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.AttributeMapping;
 import org.safehaus.penrose.mapping.FieldMapping;
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.source.FieldConfig;
+import org.safehaus.penrose.partition.SourceConfig;
+import org.safehaus.penrose.partition.FieldConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.filter.*;
+import org.safehaus.penrose.ldap.DNBuilder;
+import org.safehaus.penrose.ldap.RDNBuilder;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -55,15 +59,18 @@ public class NewEntryFromSourceAction extends Action {
 	public void run() {
         try {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            IWorkbenchPage page = window.getActivePage();
+            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+
             Shell shell = window.getShell();
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            //if (!penroseStudio.checkCommercial()) return;
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            //if (!penroseApplication.isCommercial()) return;
 
             Partition partition = node.getPartition();
             EntryMapping entryMapping = node.getEntryMapping();
 
-            Collection sourceConfigs = partition.getSourceConfigs();
+            Collection sourceConfigs = partition.getSources().getSourceConfigs();
             if (sourceConfigs.size() == 0) {
                 System.out.println("There is no sources defined.");
                 return;
@@ -79,22 +86,23 @@ public class NewEntryFromSourceAction extends Action {
 
             if (!dialog.isSaved()) return;
 
-            SourceConfig sourceConfig = partition.getSourceConfig(sourceMapping.getSourceName());
+            SourceConfig sourceConfig = partition.getSources().getSourceConfig(sourceMapping.getSourceName());
 
             final EntryMapping entry = new EntryMapping();
 
-            StringBuffer rdn = new StringBuffer();
+            DNBuilder db = new DNBuilder();
+            RDNBuilder rb = new RDNBuilder();
+
             Collection pkNames = sourceConfig.getPrimaryKeyNames();
             for (Iterator i=pkNames.iterator(); i.hasNext(); ) {
                 String pkName = (String)i.next();
-                if (rdn.length() > 0) rdn.append("+");
-                rdn.append(pkName);
-                rdn.append("=...");
+                rb.set(pkName, "...");
             }
 
-            entry.setRdn(rdn.toString());
-            entry.setParentDn(entryMapping.getDn());
+            db.append(rb.toRdn());
+            db.append(entryMapping.getDn());
 
+            entry.setDn(db.toDn());
             entry.addObjectClass("top");
 
             String s = sourceConfig.getParameter("filter");
@@ -114,10 +122,10 @@ public class NewEntryFromSourceAction extends Action {
                         String attribute = sf.getAttribute();
                         if (!attribute.equalsIgnoreCase("objectClass")) return;
 
-                        String value = sf.getValue();
+                        Object value = sf.getValue();
                         if (value.equals("*")) return;
 
-                        entry.addObjectClass(value);
+                        entry.addObjectClass(value.toString());
                     }
                 });
                 fi.run();
@@ -150,8 +158,9 @@ public class NewEntryFromSourceAction extends Action {
 
             partition.addEntryMapping(entry);
 
-            penroseStudio.show(node);
-            penroseStudio.fireChangeEvent();
+            penroseApplication.notifyChangeListeners();
+
+            objectsView.show(node);
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

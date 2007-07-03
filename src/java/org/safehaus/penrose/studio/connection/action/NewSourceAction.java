@@ -19,14 +19,16 @@ package org.safehaus.penrose.studio.connection.action;
 
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.adapter.PenroseStudioAdapter;
-import org.safehaus.penrose.studio.source.wizard.SourceWizard;
+import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.source.wizard.JDBCSourceWizard;
+import org.safehaus.penrose.studio.source.wizard.JNDISourceWizard;
 import org.safehaus.penrose.studio.connection.ConnectionNode;
-import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
 
@@ -46,36 +48,32 @@ public class NewSourceAction extends Action {
 	public void run() {
         try {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            IWorkbenchPage page = window.getActivePage();
+            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+
             Shell shell = window.getShell();
 
             Partition partition = node.getPartition();
             ConnectionConfig connectionConfig = node.getConnectionConfig();
             String adapterName = connectionConfig.getAdapterName();
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            PenroseStudioAdapter adapter = penroseStudio.getAdapter(adapterName);
-
-            Class clazz = Class.forName(adapter.getSourceWizardClassName());
-            SourceWizard wizard = (SourceWizard)clazz.newInstance();
-            wizard.setPartition(partition);
-            wizard.setConnectionConfig(connectionConfig);
-
-            /*
-            Wizard wizard = null;
             if ("JDBC".equals(adapterName)) {
-                wizard = new JDBCSourceWizard(partition, connectionConfig);
+                JDBCSourceWizard wizard = new JDBCSourceWizard(partition, connectionConfig);
+                WizardDialog dialog = new WizardDialog(shell, wizard);
+                dialog.setPageSize(600, 300);
+                dialog.open();
 
             } else if ("LDAP".equals(adapterName)) {
-                wizard = new LDAPSourceWizard(partition, connectionConfig);
+                JNDISourceWizard wizard = new JNDISourceWizard(partition, connectionConfig);
+                WizardDialog dialog = new WizardDialog(shell, wizard);
+                dialog.setPageSize(600, 300);
+                dialog.open();
             }
-            */
-            
-            WizardDialog dialog = new WizardDialog(shell, wizard);
-            dialog.setPageSize(600, 300);
-            dialog.open();
 
-            penroseStudio.show(node);
-            penroseStudio.fireChangeEvent();
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            penroseApplication.notifyChangeListeners();
+
+            objectsView.show(node);
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

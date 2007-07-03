@@ -20,58 +20,56 @@ package org.safehaus.penrose.studio.object;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.part.*;
 import org.eclipse.jface.viewers.*;
 import org.eclipse.jface.action.*;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
-import org.safehaus.penrose.studio.event.ChangeListener;
-import org.safehaus.penrose.studio.event.ChangeEvent;
-import org.safehaus.penrose.studio.event.SelectionEvent;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.server.ServerNode;
-import org.safehaus.penrose.studio.server.ServersNode;
-import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.util.ChangeListener;
+import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.handler.HandlersNode;
+import org.safehaus.penrose.studio.nis.NISNode;
+import org.safehaus.penrose.studio.logging.LoggingNode;
+import org.safehaus.penrose.studio.properties.SystemPropertiesNode;
+import org.safehaus.penrose.studio.user.AdministratorNode;
+import org.safehaus.penrose.studio.service.ServicesNode;
+import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.tree.Node;
+import org.safehaus.penrose.studio.connector.ConnectorNode;
+import org.safehaus.penrose.studio.engine.EnginesNode;
+import org.safehaus.penrose.studio.schema.SchemasNode;
+import org.safehaus.penrose.studio.partition.PartitionsNode;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class ObjectsView extends ViewPart implements ChangeListener, ISelectionChangedListener {
 
     Logger log = Logger.getLogger(getClass());
 
-    public final static String SERVERS           = "Servers";
-    public final static String LOCAL_FILES       = "Local Files";
-    public final static String LIBRARIES         = "Libraries";
-
-    public final static String PROJECT           = "Project";
-
     public final static String PARTITIONS        = "Partitions";
     public final static String PARTITION         = "Partition";
-
     public final static String DIRECTORY         = "Directory";
     public final static String ENTRY             = "Entry";
-
+    public final static String DATA_SOURCES      = "Data Sources";
     public final static String CONNECTIONS       = "Connections";
     public final static String CONNECTION        = "Connection";
-
     public final static String SOURCES           = "Sources";
     public final static String SOURCE            = "Source";
-
-    public final static String MODULES           = "Modules";
-    public final static String MODULE            = "Module";
-
     public final static String CACHES            = "Caches";
     public final static String ENTRY_CACHE       = "Entry Cache";
     public final static String SOURCE_CACHE      = "Source Cache";
+    public final static String HANDLERS          = "Handlers";
+    public final static String HANDLER           = "Handler";
     public final static String ENGINES           = "Engines";
     public final static String ENGINE            = "Engine";
     public final static String ENGINE_CACHE      = "Engine Cache";
     public final static String CONNECTORS        = "Connectors";
     public final static String CONNECTOR         = "Connector";
     public final static String CONNECTOR_CACHE   = "Connector Cache";
-
+    public final static String MODULES           = "Modules";
+    public final static String MODULE            = "Module";
     public final static String SCHEMAS           = "Schemas";
     public final static String SCHEMA            = "Schema";
     public final static String OBJECT_CLASSES    = "Object Classes";
@@ -88,74 +86,129 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
     public final static String APPENDER          = "Appender";
     public final static String LOGGERS           = "Loggers";
     public final static String LOGGER            = "Logger";
+    public final static String NIS               = "NIS";
 
-    TreeViewer treeViewer;
+	private TreeViewer treeViewer;
 
     Object clipboard;
 
     Collection nodes = new ArrayList();
-    ServersNode serversNode;
+
+    private PartitionsNode partitionsNode;
+    private SchemasNode schemasNode;
+    private ServicesNode servicesNode;
+    private LoggingNode loggingNode;
 
     public ObjectsView() {
-
-        serversNode = new ServersNode(
-                SERVERS,
-                SERVERS,
-                null
-        );
-
-        nodes.add(serversNode);
-/*
-        Node localPartitions = new Node(
-                LOCAL_FILES,
-                LOCAL_FILES,
+        partitionsNode = new PartitionsNode(
+                this,
+                PARTITIONS,
+                PARTITIONS,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
-                LOCAL_FILES,
-                null
-        );
+                PARTITIONS,
+                null);
+        nodes.add(partitionsNode);
 
-        nodes.add(localPartitions);
-
-        Node library = new Node(
-                LIBRARIES,
-                LIBRARIES,
+        schemasNode = new SchemasNode(
+                this,
+                SCHEMAS,
+                SCHEMAS,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
-                LIBRARIES,
+                SCHEMAS,
+                null);
+        nodes.add(schemasNode);
+
+        servicesNode = new ServicesNode(
+                this,
+                SERVICES,
+                SERVICES,
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                SERVICES,
+                null);
+        nodes.add(servicesNode);
+
+        loggingNode = new LoggingNode(
+                this,
+                LOGGING,
+                LOGGING,
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                LOGGING,
+                null);
+        nodes.add(loggingNode);
+
+        nodes.add(new HandlersNode(
+                this,
+                HANDLERS,
+                HANDLERS,
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                HANDLERS,
+                this
+        ));
+
+        nodes.add(new EnginesNode(
+                this,
+                ENGINES,
+                ENGINES,
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                ENGINES,
+                this
+        ));
+
+        nodes.add(new ConnectorNode(
+                this,
+                CONNECTOR,
+                CONNECTOR,
+                PenrosePlugin.getImage(PenroseImage.CONNECTOR),
+                CONNECTOR,
                 null
-        );
+        ));
 
-        nodes.add(library);
-*/
-    }
+        nodes.add(new AdministratorNode(
+                this,
+                ADMINISTRATOR,
+                ADMINISTRATOR,
+                PenrosePlugin.getImage(PenroseImage.ADMINISTRATOR),
+                ADMINISTRATOR,
+                null
+        ));
 
-    public Collection getServerNodes() throws Exception {
-        return serversNode.getChildren();
-    }
+        nodes.add(new SystemPropertiesNode(
+                this,
+                SYSTEM_PROPERTIES,
+                SYSTEM_PROPERTIES,
+                PenrosePlugin.getImage(PenroseImage.SYSTEM_PROPERTIES),
+                SYSTEM_PROPERTIES,
+                null
+        ));
 
-    public ServerNode getServerNode(String name) throws Exception {
-        Collection serverNodes = serversNode.getChildren();
-        for (Iterator i=serverNodes.iterator(); i.hasNext(); ) {
-            ServerNode serverNode = (ServerNode)i.next();
-            Server server = serverNode.getServer();
-            if (name.equals(server.getName())) return serverNode;
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        if (penroseApplication.getLicense() != null) {
+            nodes.add(new NISNode(
+                    this,
+                    NIS,
+                    NIS,
+                    PenrosePlugin.getImage(PenroseImage.MODULE),
+                    NIS,
+                    null
+            ));
         }
-        return null;
     }
+	
+	/**
+	 * This is a callback that will allow us to create the viewer and initialize
+	 * it.
+	 */
+	public void createPartControl(Composite parent) {
+		try {
+			treeViewer = new TreeViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
 
-    public void createPartControl(final Composite parent) {
-        try {
-            treeViewer = new TreeViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
-
-            treeViewer.setContentProvider(new ObjectsContentProvider(this));
+			treeViewer.setContentProvider(new ObjectsContentProvider(this));
             treeViewer.setLabelProvider(new ObjectsLabelProvider(this));
-            treeViewer.setInput(getViewSite());
-            treeViewer.addSelectionChangedListener(this);
+			treeViewer.setInput(getViewSite());
+			treeViewer.addSelectionChangedListener(this);
 
-            MenuManager menuManager = new MenuManager("#PopupMenu");
-            menuManager.setRemoveAllWhenShown(true);
-
-            menuManager.addMenuListener(new IMenuListener() {
-                public void menuAboutToShow(IMenuManager manager) {
+			Helper.hookContextMenu(treeViewer.getControl(), new IMenuListener() {
+				public void menuAboutToShow(IMenuManager manager) {
 
                     try {
                         if (treeViewer.getTree().getSelectionCount() == 0) return;
@@ -166,44 +219,10 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                         node.showMenu(manager);
 
                     } catch (Exception e) {
-                        log.error(e.getMessage(), e);
-
-                        MessageDialog.openError(
-                                parent.getShell(),
-                                "ERROR",
-                                e.getMessage()
-                        );
+                        log.debug(e.getMessage(), e);
                     }
-                }
-            });
-
-            Menu menu = menuManager.createContextMenu(treeViewer.getControl());
-            treeViewer.getControl().setMenu(menu);
-
-            treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-                public void selectionChanged(SelectionChangedEvent event) {
-
-                    try {
-                        StructuredSelection selection = (StructuredSelection)event.getSelection();
-                        if (selection.isEmpty()) return;
-
-                        Object object = selection.getFirstElement();
-                        SelectionEvent e = new SelectionEvent(new Date(), object);
-
-                        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                        penroseStudio.fireSelectionEvent(e);
-
-                    } catch (Exception e) {
-                        log.error(e.getMessage(), e);
-
-                        MessageDialog.openError(
-                                parent.getShell(),
-                                "ERROR",
-                                e.getMessage()
-                        );
-                    }
-                }
-            });
+				}
+			});
 
             treeViewer.addDoubleClickListener(new IDoubleClickListener() {
                 public void doubleClick(DoubleClickEvent event) {
@@ -217,69 +236,18 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                         treeViewer.refresh();
 
                     } catch (Exception e) {
-                        log.error(e.getMessage(), e);
-
-                        MessageDialog.openError(
-                                parent.getShell(),
-                                "ERROR",
-                                e.getMessage()
-                        );
+                        log.debug(e.getMessage(), e);
                     }
                 }
             });
 
-            treeViewer.addTreeListener(new ITreeViewerListener() {
-                public void treeCollapsed(TreeExpansionEvent event) {
-                    try {
-                        /*
-                        ISelection selection = treeViewer.getSelection();
-                        Object object = ((IStructuredSelection)selection).getFirstElement();
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+			penroseApplication.addChangeListener(this);
 
-                        Node node = (Node)object;
-                        node.collapse();
-
-                        treeViewer.refresh();
-                        */
-
-                    } catch (Exception e) {
-                        log.error(e.getMessage(), e);
-
-                        MessageDialog.openError(
-                                parent.getShell(),
-                                "ERROR",
-                                e.getMessage()
-                        );
-                    }
-                }
-
-                public void treeExpanded(TreeExpansionEvent event) {
-                    try {
-                        Node node = (Node)event.getElement();
-                        node.expand();
-
-                        //treeViewer.refresh();
-
-                    } catch (Exception e) {
-                        log.error(e.getMessage(), e);
-
-                        MessageDialog.openError(
-                                parent.getShell(),
-                                "ERROR",
-                                e.getMessage()
-                        );
-                    }
-                }
-            });
-
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.addChangeListener(this);
-
-            show(serversNode);
-
-        } catch (Exception ex) {
-            log.debug(ex.toString(), ex);
-        }
-    }
+		} catch (Exception ex) {
+			log.debug(ex.toString(), ex);
+		}
+	}
 
     public void setClipboard(Object object) throws Exception {
         this.clipboard = object;
@@ -289,16 +257,16 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
         return clipboard;
     }
 
-    public void setFocus() {
-        treeViewer.getControl().setFocus();
-    }
-
-    public void selectionChanged(SelectionChangedEvent event) {
-    }
-
-    public void objectChanged(ChangeEvent event) {
+	public void setFocus() {
+		treeViewer.getControl().setFocus();
+	}
+	
+	public void selectionChanged(SelectionChangedEvent event) {
+	}
+	
+    public void handleChange(Object o) {
         treeViewer.refresh();
-    }
+	}
 
     public void show(Object object) {
         treeViewer.setExpandedState(object, true);
@@ -312,30 +280,27 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
         this.treeViewer = treeViewer;
     }
 
-    public Node getSelectedNode() {
-        StructuredSelection selection = (StructuredSelection)treeViewer.getSelection();
-        if (selection.isEmpty()) return null;
-
-        return (Node)selection.getFirstElement();
+    public PartitionsNode getPartitionsNode() {
+        return partitionsNode;
     }
 
-    public Collection getSelectedNodes() {
-        StructuredSelection selection = (StructuredSelection)treeViewer.getSelection();
-        if (selection.isEmpty()) return null;
-
-        return selection.toList();
+    public void setPartitionsNode(PartitionsNode partitionsNode) {
+        this.partitionsNode = partitionsNode;
     }
 
-    public ServerNode getSelectedServerNode() {
-        Node node = getSelectedNode();
-
-        while (node != null && !(node instanceof ServerNode)) node = node.getParent();
-
-        if (node == null) return null;
-        return (ServerNode)node;
+    public SchemasNode getSchemasNode() {
+        return schemasNode;
     }
 
-    public Collection getNodes() {
-        return nodes;
+    public void setSchemasNode(SchemasNode schemasNode) {
+        this.schemasNode = schemasNode;
+    }
+
+    public ServicesNode getServicesNode() {
+        return servicesNode;
+    }
+
+    public void setServicesNode(ServicesNode servicesNode) {
+        this.servicesNode = servicesNode;
     }
 }

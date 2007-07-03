@@ -20,17 +20,14 @@ package org.safehaus.penrose.studio.preview;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.studio.server.ServerNode;
 
 /**
  * @author Endi S. Dewata
  */
 public class PreviewEditorInput implements IEditorInput {
 
-    private ServerNode serverNode;
-    private String baseDn;
-    private String bindDn;
-    private String bindPassword;
+    public PreviewEditorInput() {
+    }
 
     public boolean exists() {
         return true;
@@ -61,37 +58,5 @@ public class PreviewEditorInput implements IEditorInput {
         if (!(o instanceof PreviewEditorInput)) return false;
 
         return true;
-    }
-
-    public String getBindDn() {
-        return bindDn;
-    }
-
-    public void setBindDn(String bindDn) {
-        this.bindDn = bindDn;
-    }
-
-    public String getBindPassword() {
-        return bindPassword;
-    }
-
-    public void setBindPassword(String bindPassword) {
-        this.bindPassword = bindPassword;
-    }
-
-    public String getBaseDn() {
-        return baseDn;
-    }
-
-    public void setBaseDn(String baseDn) {
-        this.baseDn = baseDn;
-    }
-
-    public ServerNode getProjectNode() {
-        return serverNode;
-    }
-
-    public void setProjectNode(ServerNode serverNode) {
-        this.serverNode = serverNode;
     }
 }

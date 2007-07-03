@@ -18,9 +18,7 @@
 package org.safehaus.penrose.studio.schema.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.studio.server.ServerNode;
-import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.schema.SchemaConfig;
 import org.safehaus.penrose.schema.SchemaManager;
@@ -78,22 +76,18 @@ public class NewSchemaWizard extends Wizard {
             schemaConfig.setName(name);
             schemaConfig.setPath(path);
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            ServerNode serverNode = penroseStudio.getSelectedServerNode();
-            if (serverNode == null) return false;
-
-            String workDir = serverNode.getWorkDir();
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            String workDir = penroseApplication.getWorkDir();
 
             Schema schema = new Schema(schemaConfig);
 
             SchemaWriter schemaWriter = new SchemaWriter(workDir);
             schemaWriter.write(schema);
 
-            Server server = serverNode.getServer();
-            PenroseConfig penroseConfig = server.getPenroseConfig();
+            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
             penroseConfig.addSchemaConfig(schemaConfig);
 
-            SchemaManager schemaManager = server.getSchemaManager();
+            SchemaManager schemaManager = penroseApplication.getSchemaManager();
             schemaManager.addSchema(schema);
 
             return true;

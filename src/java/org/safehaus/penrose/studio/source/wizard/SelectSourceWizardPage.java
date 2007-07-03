@@ -28,9 +28,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.partition.ConnectionConfig;
+import org.safehaus.penrose.partition.SourceConfig;
+import org.safehaus.penrose.studio.PenroseApplication;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;
@@ -134,15 +134,15 @@ public class SelectSourceWizardPage extends WizardPage {
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    NewSourceWizard wizard = new NewSourceWizard(partition);
+                    SourceWizard wizard = new SourceWizard(partition);
                     WizardDialog dialog = new WizardDialog(parent.getShell(), wizard);
                     dialog.setPageSize(600, 300);
                     dialog.open();
 
                     refresh();
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.fireChangeEvent();
+                    PenroseApplication penroseApplication = PenroseApplication.getInstance();
+                    penroseApplication.notifyChangeListeners();
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
@@ -163,12 +163,12 @@ public class SelectSourceWizardPage extends WizardPage {
 
                 if (!confirm) return;
 
-                partition.removeSourceConfig(sourceConfig.getName());
+                partition.getSources().removeSourceConfig(sourceConfig.getName());
 
                 refresh();
 
-                PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                penroseStudio.fireChangeEvent();
+                PenroseApplication penroseApplication = PenroseApplication.getInstance();
+                penroseApplication.notifyChangeListeners();
             }
         });
 
@@ -179,7 +179,7 @@ public class SelectSourceWizardPage extends WizardPage {
         sourceTable.removeAll();
         infoTable.removeAll();
 
-        Collection sourceConfigs = partition.getSourceConfigs();
+        Collection sourceConfigs = partition.getSources().getSourceConfigs();
         for (Iterator i=sourceConfigs.iterator(); i.hasNext(); ) {
             SourceConfig sourceConfig = (SourceConfig)i.next();
             ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());

@@ -20,16 +20,11 @@ package org.safehaus.penrose.studio.properties;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.config.PenroseConfig;
-import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
  */
 public class SystemPropertiesEditorInput implements IEditorInput {
-
-    private Server server;
-    private PenroseConfig penroseConfig;
 
     public SystemPropertiesEditorInput() {
     }
@@ -43,7 +38,7 @@ public class SystemPropertiesEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "["+server.getName()+"] System Properties";
+        return "System Properties";
     }
 
     public IPersistableElement getPersistable() {
@@ -51,7 +46,7 @@ public class SystemPropertiesEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return getName();
+        return "System Properties";
     }
 
     public Object getAdapter(Class aClass) {
@@ -65,33 +60,8 @@ public class SystemPropertiesEditorInput implements IEditorInput {
     }
 
     public boolean equals(Object object) {
-        if (object == null || object.getClass() != getClass()) return false;
-
-        SystemPropertiesEditorInput ei = (SystemPropertiesEditorInput)object;
-
-        if (!equals(penroseConfig, ei.penroseConfig)) return false;
+        if((object == null) || (object.getClass() != getClass())) return false;
 
         return true;
-    }
-
-    public int hashCode() {
-        return (server == null ? 0 : server.hashCode()) +
-                (penroseConfig == null ? 0 : penroseConfig.hashCode());
-    }
-
-    public PenroseConfig getPenroseConfig() {
-        return penroseConfig;
-    }
-
-    public void setPenroseConfig(PenroseConfig penroseConfig) {
-        this.penroseConfig = penroseConfig;
-    }
-
-    public Server getProject() {
-        return server;
-    }
-
-    public void setProject(Server server) {
-        this.server = server;
     }
 }

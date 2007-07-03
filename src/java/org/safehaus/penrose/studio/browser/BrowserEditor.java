@@ -37,11 +37,17 @@ import org.eclipse.ui.part.*;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.ietf.ldap.*;
-import org.safehaus.penrose.util.EntryUtil;
+import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.util.ApplicationConfig;
+import org.safehaus.penrose.config.PenroseConfig;
+import org.safehaus.penrose.user.UserConfig;
+import org.safehaus.penrose.service.ServiceConfig;
+import org.safehaus.penrose.ldap.DN;
 
 public class BrowserEditor extends EditorPart {
 
-    private Logger log = Logger.getLogger(getClass());
+	private Logger log = Logger.getLogger(getClass());
 
     public final static String LDAP_PORT             = "ldapPort";
     public final static int DEFAULT_LDAP_PORT        = 10389;
@@ -53,19 +59,19 @@ public class BrowserEditor extends EditorPart {
     Table table;
 
     LDAPConnection connection = new LDAPConnection();
-    String password;
+
+    String bindDn;
+    byte[] password;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         setSite(site);
         setInput(input);
-
-        setPartName(input.getName());
     }
 
     public void dispose() {
     }
 
-    public void createPartControl(final Composite parent) {
+	public void createPartControl(final Composite parent) {
 
         parent.setLayout(new GridLayout());
 
@@ -101,8 +107,8 @@ public class BrowserEditor extends EditorPart {
                     dialog.setHostname(url.getHost());
                     dialog.setPort(url.getPort());
                     dialog.setBaseDn(url.getDN());
-                    dialog.setBindDn(bindDnText.getText());
-                    dialog.setBindPassword(password);
+                    dialog.setBindDn(bindDn);
+                    dialog.setBindPassword(new String(password));
                     dialog.open();
 
                     if (dialog.getAction() == BrowserDialog.CANCEL) return;
@@ -110,10 +116,11 @@ public class BrowserEditor extends EditorPart {
                     String hostname = dialog.getHostname();
                     int port = dialog.getPort();
                     String baseDn = dialog.getBaseDn();
-                    String bindDn = dialog.getBindDn();
-                    String password = dialog.getBindPassword();
 
-                    open(hostname, port, baseDn, bindDn, password);
+                    bindDn = dialog.getBindDn();
+                    password = dialog.getBindPassword().getBytes();
+
+                    open(hostname, port, baseDn);
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
@@ -170,25 +177,32 @@ public class BrowserEditor extends EditorPart {
         tc.setWidth(400);
 
         try {
-            BrowserEditorInput ei = (BrowserEditorInput)getEditorInput();
-            String hostname = ei.getHostname();
-            int port = ei.getPort();
-            String baseDn = ei.getBaseDn();
-            String bindDn = ei.getBindDn();
-            String bindPassword = ei.getBindPassword();
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
 
-            open(hostname, port, baseDn, bindDn, bindPassword);
+            ApplicationConfig applicationConfig = penroseApplication.getApplicationConfig();
+            Project project = applicationConfig.getCurrentProject();
+            String hostname = project.getHost();
+
+            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+            ServiceConfig serviceConfig = penroseConfig.getServiceConfig("LDAP");
+            String s = serviceConfig.getParameter(LDAP_PORT);
+            int port = s == null ? DEFAULT_LDAP_PORT : Integer.parseInt(s);
+
+            bindDn = penroseConfig.getRootDn().toString();
+            password = penroseConfig.getRootPassword();
+
+            open(hostname, port, "");
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
             MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
         }
-    }
+	}
 
-    public void setFocus() {
-    }
+	public void setFocus() {
+	}
 
-    public void open(String hostname, int port, String baseDn, String bindDn, String password) throws Exception {
+    public void open(String hostname, int port, String baseDn) throws Exception {
 
         tree.removeAll();
         connection.disconnect();
@@ -197,17 +211,16 @@ public class BrowserEditor extends EditorPart {
 
         urlText.setText(ldapUrl.toString());
         bindDnText.setText(bindDn == null ? "" : bindDn);
-        this.password = password;
 
         connection.connect(hostname, port);
-        connection.bind(3, bindDn, password == null ? null : password.getBytes());
+        connection.bind(3, bindDn, password);
 
         baseDn = baseDn == null ? "" : baseDn;
         String name = "".equals(baseDn) ? "Root DSE" : baseDn;
 
         TreeItem treeItem = new TreeItem(tree, SWT.NONE);
         treeItem.setText(name);
-        treeItem.setData(baseDn);
+        treeItem.setData(new DN(baseDn));
 
         showChildren(treeItem);
         showEntry(treeItem);
@@ -222,10 +235,10 @@ public class BrowserEditor extends EditorPart {
         TreeItem items[] = parentItem.getItems();
         for (int i=0; i<items.length; i++) items[i].dispose();
 
-        String parentDn = (String)parentItem.getData();
+        DN parentDn = (DN)parentItem.getData();
 
-        if ("".equals(parentDn)) {
-            LDAPSearchResults sr = connection.search("", LDAPConnection.SCOPE_BASE, "(objectClass=*)", new String[0], false);
+        if (parentDn.isEmpty()) {
+            LDAPSearchResults sr = connection.search("", LDAPConnection.SCOPE_BASE, "(objectClass=*)", new String[] { "*", "+" }, false);
             LDAPEntry parentEntry = sr.next();
 
             LDAPAttribute namingContexts = parentEntry.getAttribute("namingContexts");
@@ -235,20 +248,20 @@ public class BrowserEditor extends EditorPart {
 
                 TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
                 treeItem.setText(namingContext);
-                treeItem.setData(namingContext);
+                treeItem.setData(new DN(namingContext));
 
                 new TreeItem(treeItem, SWT.NONE);
             }
 
         } else {
 
-            LDAPSearchResults sr = connection.search(parentDn, LDAPConnection.SCOPE_ONE, "(objectClass=*)", new String[0], true);
+            LDAPSearchResults sr = connection.search(parentDn.toString(), LDAPConnection.SCOPE_ONE, "(objectClass=*)", new String[] { "*", "+" }, true);
 
             while (sr.hasMore()) {
                 try {
                     LDAPEntry entry = sr.next();
-                    String dn = entry.getDN();
-                    String rdn = EntryUtil.getRdn(dn).toString();
+                    DN dn = new DN(entry.getDN());
+                    String rdn = dn.getRdn().toString();
 
                     TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
                     treeItem.setText(rdn);
@@ -268,15 +281,15 @@ public class BrowserEditor extends EditorPart {
 
         table.removeAll();
 
-        String dn = (String)treeItem.getData();
-        if (dn == null) return;
+        DN dn = (DN)treeItem.getData();
 
-        LDAPSearchResults sr;
-        if ("".equals(dn)) {
-            sr = connection.search(dn, LDAPConnection.SCOPE_BASE, "(objectClass=*)", new String[] { "*", "+" }, false);
-        } else {
-            sr = connection.search(dn, LDAPConnection.SCOPE_BASE, "(objectClass=*)", new String[0], false);
-        }
+        LDAPSearchResults sr = connection.search(
+                dn.toString(),
+                LDAPConnection.SCOPE_BASE,
+                "(objectClass=*)",
+                new String[] { "*", "+" },
+                false
+        );
 
         if (!sr.hasMore()) return;
 

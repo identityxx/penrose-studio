@@ -25,7 +25,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.util.FileUtil;
-import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenroseWorkbenchAdvisor;
 import org.safehaus.penrose.studio.PenroseWorkbenchWindowAdvisor;
 import org.safehaus.penrose.studio.PenroseActionBarAdvisor;
@@ -60,10 +60,10 @@ public class EnterLicenseKeyAction extends Action {
 
             FileUtil.copy(filename, licenseFile);
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.loadLicense();
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            penroseApplication.loadLicense();
 /*
-            LicenseManager licenseManager = new LicenseManager(penroseStudio.getPublicKey());
+            LicenseManager licenseManager = new LicenseManager(penroseApplication.getPublicKey());
 
             LicenseReader licenseReader = new LicenseReader(licenseManager);
             licenseReader.read(licenseFile);
@@ -76,9 +76,9 @@ public class EnterLicenseKeyAction extends Action {
                 throw new Exception("Invalid license.");
             }
 
-            penroseStudio.setLicense(license);
+            penroseApplication.setLicense(license);
 */
-            PenroseWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
+            PenroseWorkbenchAdvisor workbenchAdvisor = penroseApplication.getWorkbenchAdvisor();
             PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
             PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 

@@ -19,11 +19,12 @@ package org.safehaus.penrose.studio.schema.action;
 
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.tree.Node;
+import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.schema.wizard.ImportSchemaWizard;
 import org.apache.log4j.Logger;
 
@@ -39,6 +40,9 @@ public class ImportSchemaAction extends Action {
 	public void run() {
         try {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            IWorkbenchPage page = window.getActivePage();
+            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+
             Shell shell = window.getShell();
 
             ImportSchemaWizard wizard = new ImportSchemaWizard();
@@ -46,11 +50,10 @@ public class ImportSchemaAction extends Action {
             dialog.setPageSize(600, 300);
             dialog.open();
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            Node node = penroseStudio.getServerNode("Penrose Server");
-            penroseStudio.show(node);
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            penroseApplication.notifyChangeListeners();
 
-            penroseStudio.fireChangeEvent();
+            objectsView.show(objectsView.getSchemasNode());
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

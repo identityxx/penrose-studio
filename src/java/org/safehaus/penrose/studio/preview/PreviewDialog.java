@@ -121,6 +121,7 @@ public class PreviewDialog extends Dialog {
         passwordLabel.setText("Password:");
 
 		bindPasswordText = new Text(composite, SWT.BORDER | SWT.PASSWORD);
+		
         bindPasswordText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         return composite;

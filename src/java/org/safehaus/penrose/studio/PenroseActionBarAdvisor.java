@@ -19,134 +19,168 @@ package org.safehaus.penrose.studio;
 
 import org.eclipse.jface.action.*;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.swt.SWT;
-import org.safehaus.penrose.studio.server.ServerNode;
-import org.safehaus.penrose.studio.event.SelectionListener;
-import org.safehaus.penrose.studio.event.SelectionEvent;
-import org.safehaus.penrose.studio.event.ChangeListener;
-import org.safehaus.penrose.studio.event.ChangeEvent;
-import org.safehaus.penrose.studio.action.PenroseStudioActions;
+import org.safehaus.penrose.studio.preview.action.PreviewAction;
+import org.safehaus.penrose.studio.preview.action.RestartAction;
+import org.safehaus.penrose.studio.welcome.action.WelcomeAction;
+import org.safehaus.penrose.studio.welcome.action.AboutAction;
+import org.safehaus.penrose.studio.welcome.action.ShowCommercialFeaturesAction;
+import org.safehaus.penrose.studio.welcome.action.EnterLicenseKeyAction;
+import org.safehaus.penrose.studio.object.ObjectsAction;
+import org.safehaus.penrose.studio.validation.ValidationAction;
+import org.safehaus.penrose.studio.console.ConsoleAction;
+import org.safehaus.penrose.studio.partition.action.NewPartitionAction;
+import org.safehaus.penrose.studio.partition.action.ImportPartitionAction;
+import org.safehaus.penrose.studio.partition.action.NewLDAPSnapshotPartitionAction;
+import org.safehaus.penrose.studio.partition.action.NewLDAPProxyPartitionAction;
+import org.safehaus.penrose.studio.service.action.NewServiceAction;
+import org.safehaus.penrose.studio.project.action.OpenAction;
+import org.safehaus.penrose.studio.project.action.SaveAction;
+import org.safehaus.penrose.studio.project.action.UploadAction;
+import org.safehaus.penrose.studio.schema.action.ImportSchemaAction;
+import org.safehaus.penrose.studio.schema.action.NewSchemaAction;
+import org.safehaus.penrose.studio.browser.action.BrowserAction;
 import org.apache.log4j.Logger;
 
-public class PenroseActionBarAdvisor
-        extends ActionBarAdvisor
-        implements ChangeListener, SelectionListener {
+public class PenroseActionBarAdvisor extends ActionBarAdvisor {
 
     Logger log = Logger.getLogger(getClass());
+
+    OpenAction connectAction;
+    SaveAction saveAction;
+    UploadAction uploadAction;
+    IAction quitAction;
+
+    NewPartitionAction newPartitionAction;
+    ImportPartitionAction importPartitionAction;
+    NewLDAPSnapshotPartitionAction newLDAPSnapshotPartitionAction;
+    NewLDAPProxyPartitionAction newLDAPProxyPartitionAction;
+
+    NewSchemaAction newSchemaAction;
+    ImportSchemaAction importSchemaAction;
+
+    NewServiceAction newServiceAction;
+
+    ObjectsAction objectsAction;
+    ValidationAction validationAction;
+    ConsoleAction consoleAction;
+
+    BrowserAction browserAction;
+    PreviewAction previewAction;
+    RestartAction restartAction;
+
+    WelcomeAction welcomeAction;
+
+    ShowCommercialFeaturesAction showCommercialFeaturesAction;
+    EnterLicenseKeyAction enterLicenseKeyAction;
+
+    AboutAction aboutAction;
 
     MenuManager partitionMenu;
     MenuManager helpMenu;
 
-    IToolBarManager standardToolBar;
-    IToolBarManager previewToolBar;
-
     public PenroseActionBarAdvisor(IActionBarConfigurer configurer) {
         super(configurer);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.addChangeListener(this);
-        penroseStudio.addSelectionListener(this);
     }
 
     protected void makeActions(final IWorkbenchWindow window) {
         super.makeActions(window);
 
         try {
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            PenroseStudioActions penroseStudioActions = penroseStudio.getActions();
+            connectAction = new OpenAction();
+            register(connectAction);
 
-            register(penroseStudioActions.getNewAction());
-            register(penroseStudioActions.getConnectAction());
-            register(penroseStudioActions.getDisconnectAction());
-            register(penroseStudioActions.getDisconnectAllAction());
-            register(penroseStudioActions.getSaveAction());
-            register(penroseStudioActions.getUploadAction());
-            register(penroseStudioActions.getExitAction());
+            saveAction = new SaveAction();
+            register(saveAction);
 
-            register(penroseStudioActions.getCutAction());
-            register(penroseStudioActions.getCopyAction());
-            register(penroseStudioActions.getPasteAction());
-            register(penroseStudioActions.getDeleteAction());
+            uploadAction = new UploadAction();
+            register(uploadAction);
 
-            setConnected(false);
+            quitAction = ActionFactory.QUIT.create(window);
+            quitAction.setAccelerator(SWT.ALT | SWT.F4);
+            register(quitAction);
+
+            newPartitionAction = new NewPartitionAction();
+            importPartitionAction = new ImportPartitionAction();
+            newLDAPSnapshotPartitionAction = new NewLDAPSnapshotPartitionAction();
+            newLDAPProxyPartitionAction = new NewLDAPProxyPartitionAction();
+
+            newSchemaAction = new NewSchemaAction();
+            importSchemaAction = new ImportSchemaAction();
+
+            newServiceAction = new NewServiceAction();
+
+            objectsAction = new ObjectsAction();
+            validationAction = new ValidationAction();
+            consoleAction = new ConsoleAction();
+
+            browserAction = new BrowserAction();
+            previewAction = new PreviewAction();
+            restartAction = new RestartAction();
+
+            welcomeAction = new WelcomeAction();
+            showCommercialFeaturesAction = new ShowCommercialFeaturesAction();
+            enterLicenseKeyAction = new EnterLicenseKeyAction();
+            aboutAction = new AboutAction();
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
         }
     }
 
-    public void setConnected(boolean connected) {
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseStudioActions penroseStudioActions = penroseStudio.getActions();
-
-        penroseStudioActions.setConnected(connected);
-    }
-
     public void fillPartitionMenu() {
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseStudioActions penroseStudioActions = penroseStudio.getActions();
 
         partitionMenu.removeAll();
 
-        partitionMenu.add(penroseStudioActions.getNewPartitionAction());
-        partitionMenu.add(penroseStudioActions.getImportPartitionAction());
+        partitionMenu.add(newPartitionAction);
+        partitionMenu.add(importPartitionAction);
 
-        if (penroseStudioActions.getShowCommercialFeaturesAction().isChecked()) {
+        if (showCommercialFeaturesAction.isChecked()) {
             partitionMenu.add(new Separator());
-            partitionMenu.add(penroseStudioActions.getNewLDAPSnapshotPartitionAction());
-            partitionMenu.add(penroseStudioActions.getNewLDAPProxyPartitionAction());
+            partitionMenu.add(newLDAPSnapshotPartitionAction);
+            partitionMenu.add(newLDAPProxyPartitionAction);
         }
     }
 
     public void fillHelpMenu() {
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseStudioActions penroseStudioActions = penroseStudio.getActions();
-
         helpMenu.removeAll();
 
-        helpMenu.add(penroseStudioActions.getWelcomeAction());
+        helpMenu.add(welcomeAction);
+
         helpMenu.add(new Separator());
-        helpMenu.add(penroseStudioActions.getEnterLicenseKeyAction());
+
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        //if (penroseApplication.isFreeware()) {
+        //    helpMenu.add(showCommercialFeaturesAction);
+        //}
+
+        helpMenu.add(enterLicenseKeyAction);
+
         helpMenu.add(new Separator());
-        helpMenu.add(penroseStudioActions.getAboutAction());
+        helpMenu.add(aboutAction);
     }
 
     protected void fillMenuBar(IMenuManager menuBar) {
+        log.debug("fillMenuBar");
         super.fillMenuBar(menuBar);
 
         try {
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            PenroseStudioActions penroseStudioActions = penroseStudio.getActions();
-
             MenuManager fileMenu = new MenuManager("&File", "file");
             menuBar.add(fileMenu);
 
-            fileMenu.add(penroseStudioActions.getNewAction());
-            fileMenu.add(penroseStudioActions.getConnectAction());
-            fileMenu.add(penroseStudioActions.getDisconnectAction());
-            fileMenu.add(penroseStudioActions.getDisconnectAllAction());
+            fileMenu.add(connectAction);
             fileMenu.add(new Separator());
-            fileMenu.add(penroseStudioActions.getSaveAction());
+            fileMenu.add(saveAction);
             fileMenu.add(new Separator());
-            fileMenu.add(penroseStudioActions.getUploadAction());
-            fileMenu.add(penroseStudioActions.getRestartAction());
+            fileMenu.add(uploadAction);
+            fileMenu.add(restartAction);
 
             fileMenu.add(new Separator());
-            fileMenu.add(penroseStudioActions.getExitAction());
-
-            MenuManager editMenu = new MenuManager("&Edit", "edit");
-            menuBar.add(editMenu);
-
-            editMenu.add(penroseStudioActions.getCutAction());
-            editMenu.add(penroseStudioActions.getCopyAction());
-            editMenu.add(penroseStudioActions.getPasteAction());
-            editMenu.add(penroseStudioActions.getDeleteAction());
-            editMenu.add(new Separator());
-            editMenu.add(penroseStudioActions.getPropertiesAction());
+            fileMenu.add(quitAction);
 
             partitionMenu = new MenuManager("&Partition", "partition");
             menuBar.add(partitionMenu);
@@ -156,26 +190,26 @@ public class PenroseActionBarAdvisor
             MenuManager schemaMenu = new MenuManager("&Schema", "schema");
             menuBar.add(schemaMenu);
 
-            schemaMenu.add(penroseStudioActions.getNewSchemaAction());
-            schemaMenu.add(penroseStudioActions.getImportSchemaAction());
+            schemaMenu.add(newSchemaAction);
+            schemaMenu.add(importSchemaAction);
 
             MenuManager serviceMenu = new MenuManager("S&ervice", "service");
             menuBar.add(serviceMenu);
 
-            serviceMenu.add(penroseStudioActions.getNewServiceAction());
+            serviceMenu.add(newServiceAction);
 
             MenuManager toolsMenu = new MenuManager("&Tools", "tools");
             menuBar.add(toolsMenu);
 
-            toolsMenu.add(penroseStudioActions.getPreviewAction());
-            toolsMenu.add(penroseStudioActions.getBrowserAction());
+            toolsMenu.add(previewAction);
+            toolsMenu.add(browserAction);
 
             MenuManager windowMenu = new MenuManager("&Window", "window");
             menuBar.add(windowMenu);
 
-            windowMenu.add(penroseStudioActions.getObjectsAction());
-            windowMenu.add(penroseStudioActions.getValidationAction());
-            windowMenu.add(penroseStudioActions.getConsoleAction());
+            windowMenu.add(objectsAction);
+            windowMenu.add(validationAction);
+            windowMenu.add(consoleAction);
 
             helpMenu = new MenuManager("&Help", "help");
             menuBar.add(helpMenu);
@@ -188,40 +222,34 @@ public class PenroseActionBarAdvisor
     }
     
     protected void fillCoolBar(ICoolBarManager coolBar) {
+        log.debug("fillCoolBar");
         super.fillCoolBar(coolBar);
 
         try {
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            PenroseStudioActions penroseStudioActions = penroseStudio.getActions();
-
-            standardToolBar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+            IToolBarManager standardToolBar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
             coolBar.add(new ToolBarContributionItem(standardToolBar, "standard"));
-
-            ActionContributionItem newProjectCI = new ActionContributionItem(penroseStudioActions.getNewAction());
-            standardToolBar.add(newProjectCI);
-
-            ActionContributionItem openProjectCI = new ActionContributionItem(penroseStudioActions.getConnectAction());
-            standardToolBar.add(openProjectCI);
-
-            ActionContributionItem closeProjectCI = new ActionContributionItem(penroseStudioActions.getDisconnectAction());
-            standardToolBar.add(closeProjectCI);
-
-            ActionContributionItem saveCI = new ActionContributionItem(penroseStudioActions.getSaveAction());
+            
+            ActionContributionItem saveCI = new ActionContributionItem(saveAction);
             standardToolBar.add(saveCI);
+            
+            standardToolBar.add(new Separator());
+            
+            ActionContributionItem connectCI = new ActionContributionItem(connectAction);
+            standardToolBar.add(connectCI);
 
-            ActionContributionItem uploadCI = new ActionContributionItem(penroseStudioActions.getUploadAction());
+            ActionContributionItem uploadCI = new ActionContributionItem(uploadAction);
             standardToolBar.add(uploadCI);
 
-            ActionContributionItem restartCI = new ActionContributionItem(penroseStudioActions.getRestartAction());
+            ActionContributionItem restartCI = new ActionContributionItem(restartAction);
             standardToolBar.add(restartCI);
 
-            previewToolBar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+            IToolBarManager previewToolBar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
             coolBar.add(new ToolBarContributionItem(previewToolBar, "preview"));
 
-            ActionContributionItem previewCI = new ActionContributionItem(penroseStudioActions.getPreviewAction());
+            ActionContributionItem previewCI = new ActionContributionItem(previewAction);
             previewToolBar.add(previewCI);
 
-            ActionContributionItem browserCI = new ActionContributionItem(penroseStudioActions.getBrowserAction());
+            ActionContributionItem browserCI = new ActionContributionItem(browserAction);
             previewToolBar.add(browserCI);
 
         } catch (Exception e) {
@@ -229,27 +257,11 @@ public class PenroseActionBarAdvisor
         }
     }
 
-    public void objectChanged(ChangeEvent event) {
-        update();
+    public ShowCommercialFeaturesAction getShowCommercialFeaturesAction() {
+        return showCommercialFeaturesAction;
     }
 
-    public void objectSelected(SelectionEvent event) {
-        update();
-    }
-
-    public void update() {
-        try {
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            ServerNode serverNode = penroseStudio.getSelectedServerNode();
-
-            if (serverNode == null) {
-                setConnected(false);
-            } else {
-                setConnected(serverNode.isConnected());
-            }
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
+    public void setShowCommercialFeaturesAction(ShowCommercialFeaturesAction showCommercialFeaturesAction) {
+        this.showCommercialFeaturesAction = showCommercialFeaturesAction;
     }
 }

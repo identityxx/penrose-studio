@@ -25,7 +25,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.studio.mapping.editor.SourceDialog;
+import org.safehaus.penrose.studio.mapping.SourceDialog;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -77,7 +77,7 @@ public class SelectSourcesWizardPage extends WizardPage implements SelectionList
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
 
-                Collection sources = partition.getSourceConfigs();
+                Collection sources = partition.getSources().getSourceConfigs();
                 if (sources.size() == 0) {
                     System.out.println("There is no sources defined.");
                     return;

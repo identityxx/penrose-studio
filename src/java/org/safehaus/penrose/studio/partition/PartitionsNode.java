@@ -18,12 +18,11 @@
 package org.safehaus.penrose.studio.partition;
 
 import org.safehaus.penrose.studio.*;
-import org.safehaus.penrose.studio.action.PenroseStudioActions;
-import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.partition.action.NewPartitionAction;
 import org.safehaus.penrose.studio.partition.action.ImportPartitionAction;
 import org.safehaus.penrose.studio.partition.action.NewLDAPSnapshotPartitionAction;
 import org.safehaus.penrose.studio.partition.action.NewLDAPProxyPartitionAction;
+import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionManager;
@@ -46,104 +45,64 @@ public class PartitionsNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    Server server;
+    ObjectsView view;
 
-    public PartitionsNode(Server server, String name, Image image, Object object, Node parent) {
-        super(name, image, object, parent);
-        this.server = server;
+    public PartitionsNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+        super(name, type, image, object, parent);
+        this.view = view;
     }
 
     public void showMenu(IMenuManager manager) {
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseStudioActions actions = penroseStudio.getActions();
-
         manager.add(new NewPartitionAction());
         manager.add(new ImportPartitionAction());
 
-        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseWorkbenchAdvisor workbenchAdvisor = penroseApplication.getWorkbenchAdvisor();
+        PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
+        PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
-        manager.add(new NewLDAPSnapshotPartitionAction());
-        manager.add(new NewLDAPProxyPartitionAction());
-
-        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-
-        manager.add(actions.getPasteAction());
-    }
-
-    public boolean canPaste(Object object) throws Exception {
-        return object instanceof Partition;
-    }
-
-    public void paste(Object object) throws Exception {
-
-        Partition newPartition = (Partition)object;
-        String originalName = newPartition.getName();
-        PartitionManager partitionManager = server.getPartitionManager();
-
-        int counter = 1;
-        String name = originalName;
-        while (partitionManager.getPartition(name) != null) {
-            counter++;
-            name = newPartition.getName()+" ("+counter+")";
-        }
-
-        PartitionConfig partitionConfig = newPartition.getPartitionConfig();
-        partitionConfig.setName(name);
-
-        partitionManager.addPartition(newPartition);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.fireChangeEvent();
+        //if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
+            manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+            manager.add(new NewLDAPSnapshotPartitionAction());
+            manager.add(new NewLDAPProxyPartitionAction());
+        //}
     }
 
     public boolean hasChildren() throws Exception {
-        PartitionManager partitionManager = server.getPartitionManager();
-        return !partitionManager.getAllPartitions().isEmpty();
-/*
-        PenroseClient client = server.getClient();
-        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-        return !partitionManagerClient.getPartitionNames().isEmpty();
-*/
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PartitionManager partitionManager = penroseApplication.getPartitionManager();
+        if (partitionManager == null) return false;
+        return !partitionManager.getPartitions().isEmpty();
     }
 
     public Collection getChildren() throws Exception {
 
         Collection children = new ArrayList();
 
-        PartitionManager partitionManager = server.getPartitionManager();
-/*
-        PenroseClient client = server.getClient();
-        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-
-        for (Iterator i=partitionManagerClient.getPartitionNames().iterator(); i.hasNext(); ) {
-            String partitionName = (String)i.next();
-            PartitionConfig partitionConfig = partitionManagerClient.getPartitionConfig(partitionName);
-*/
-        for (Iterator i=partitionManager.getAllPartitions().iterator(); i.hasNext(); ) {
-            Partition partition = (Partition)i.next();
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+        PartitionManager partitionManager = penroseApplication.getPartitionManager();
+        
+        Collection partitionConfigs = penroseConfig.getPartitionConfigs();
+        for (Iterator i=partitionConfigs.iterator(); i.hasNext(); ) {
+            PartitionConfig partitionConfig = (PartitionConfig)i.next();
+            Partition partition = partitionManager.getPartition(partitionConfig.getName());
 
             PartitionNode partitionNode = new PartitionNode(
-                    server,
-                    partition.getName(),
+                    view,
+                    partitionConfig.getName(),
+                    ObjectsView.PARTITION,
                     PenrosePlugin.getImage(PenroseImage.PARTITION),
-                    partition,
+                    partitionConfig,
                     this
             );
 
+            partitionNode.setPartitionConfig(partitionConfig);
             partitionNode.setPartition(partition);
 
             children.add(partitionNode);
         }
 
         return children;
-    }
-
-    public Server getServer() {
-        return server;
-    }
-
-    public void setServer(Server server) {
-        this.server = server;
     }
 }

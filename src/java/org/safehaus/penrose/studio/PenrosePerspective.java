@@ -21,7 +21,7 @@ import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.safehaus.penrose.studio.object.ObjectsView;
-import org.safehaus.penrose.studio.mapping.editor.MappingEditor;
+import org.safehaus.penrose.studio.mapping.MappingEditor;
 import org.safehaus.penrose.studio.validation.ValidationView;
 import org.safehaus.penrose.studio.console.ConsoleView;
 

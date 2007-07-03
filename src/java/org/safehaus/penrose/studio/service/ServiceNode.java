@@ -18,16 +18,18 @@
 package org.safehaus.penrose.studio.service;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.service.editor.ServiceEditorInput;
-import org.safehaus.penrose.studio.service.editor.ServiceEditor;
-import org.safehaus.penrose.studio.action.PenroseStudioActions;
-import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchPage;
@@ -41,54 +43,66 @@ public class ServiceNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    Server server;
+    ObjectsView view;
 
     private ServiceConfig serviceConfig;
 
-    public ServiceNode(String name, Image image, Object object, Node parent) {
-        super(name, image, object, parent);
+    public ServiceNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+        super(name, type, image, object, parent);
+        this.view = view;
     }
 
     public void showMenu(IMenuManager manager) {
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseStudioActions actions = penroseStudio.getActions();
+        manager.add(new Action("Open") {
+            public void run() {
+                try {
+                    open();
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                }
+            }
+        });
 
-        manager.add(actions.getOpenAction());
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        manager.add(actions.getCopyAction());
-        manager.add(actions.getPasteAction());
-        manager.add(actions.getDeleteAction());
+        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
+            public void run() {
+                try {
+                    remove();
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                }
+            }
+        });
     }
 
     public void open() throws Exception {
 
-        ServiceEditorInput ei = new ServiceEditorInput();
-        ei.setServer(server);
-        ei.setServiceConfig(serviceConfig);
+        ServiceEditorInput ei = new ServiceEditorInput(serviceConfig);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
         page.openEditor(ei, ServiceEditor.class.getName());
     }
 
-    public Object copy() throws Exception {
-        return serviceConfig;
-    }
+    public void remove() throws Exception {
 
-    public boolean canPaste(Object object) throws Exception {
-        return getParent().canPaste(object);
-    }
+        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 
-    public void paste(Object object) throws Exception {
-        getParent().paste(object);
-    }
+        boolean confirm = MessageDialog.openQuestion(
+                shell,
+                "Confirmation",
+                "Remove \""+serviceConfig.getName()+"\"?");
 
-    public void delete() throws Exception {
-        PenroseConfig penroseConfig = server.getPenroseConfig();
+        if (!confirm) return;
+
+        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
         penroseConfig.removeServiceConfig(serviceConfig.getName());
+
+        penroseApplication.notifyChangeListeners();
     }
 
     public ServiceConfig getServiceConfig() {
@@ -97,13 +111,5 @@ public class ServiceNode extends Node {
 
     public void setServiceConfig(ServiceConfig serviceConfig) {
         this.serviceConfig = serviceConfig;
-    }
-
-    public Server getServer() {
-        return server;
-    }
-
-    public void setServer(Server server) {
-        this.server = server;
     }
 }

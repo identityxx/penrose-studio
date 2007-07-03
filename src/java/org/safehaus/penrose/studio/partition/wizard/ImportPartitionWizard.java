@@ -18,13 +18,12 @@
 package org.safehaus.penrose.studio.partition.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.server.ServerNode;
-import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.partition.PartitionManager;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionReader;
+import org.safehaus.penrose.config.PenroseConfig;
 import org.apache.log4j.Logger;
 
 /**
@@ -54,24 +53,23 @@ public class ImportPartitionWizard extends Wizard {
         try {
 
             String name = namePage.getPartitionName();
+            String path = "partitions/"+name;
 
             String directory = locationPage.getLocation();
 
-            PartitionConfig partitionConfig = new PartitionConfig(name);
+            PartitionConfig partitionConfig = new PartitionConfig(name, path);
 
             PartitionReader partitionReader = new PartitionReader();
-            Partition partition = partitionReader.read(directory, partitionConfig);
+            Partition partition = partitionReader.read(partitionConfig, directory);
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            ServerNode serverNode = penroseStudio.getSelectedServerNode();
-            if (serverNode == null) return false;
+            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+            penroseConfig.addPartitionConfig(partitionConfig);
 
-            Server server = serverNode.getServer();
-
-            PartitionManager partitionManager = server.getPartitionManager();
+            PartitionManager partitionManager = penroseApplication.getPartitionManager();
             partitionManager.addPartition(partition);
 
-            penroseStudio.fireChangeEvent();
+            penroseApplication.notifyChangeListeners();
 
             return true;
 

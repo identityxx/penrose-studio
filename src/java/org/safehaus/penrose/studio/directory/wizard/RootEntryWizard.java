@@ -20,12 +20,12 @@ package org.safehaus.penrose.studio.directory.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.mapping.EntryMapping;
-import org.safehaus.penrose.mapping.Row;
+import org.safehaus.penrose.ldap.RDN;
+import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.StaticEntryDNWizardPage;
-import org.safehaus.penrose.util.EntryUtil;
 import org.safehaus.penrose.acl.ACI;
 import org.apache.log4j.Logger;
 
@@ -74,8 +74,8 @@ public class RootEntryWizard extends Wizard {
             attrPage.setObjectClasses(objectClasses);
 
             if (!objectClasses.isEmpty()) {
-                String dn = dnPage.getDn();
-                Row rdn = EntryUtil.getRdn(dn);
+                DN dn = new DN(dnPage.getDn());
+                RDN rdn = dn.getRdn();
                 attrPage.setRdn(rdn);
             }
         }

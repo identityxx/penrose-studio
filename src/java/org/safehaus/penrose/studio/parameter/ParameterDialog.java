@@ -100,11 +100,8 @@ public class ParameterDialog extends Dialog {
         valueText.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         Composite buttons = new Composite(parent, SWT.NONE);
+        buttons.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         buttons.setLayout(new RowLayout());
-
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalAlignment = GridData.END;
-        buttons.setLayoutData(gd);
 
 		Button saveButton = new Button(buttons, SWT.PUSH);
         saveButton.setText("Save");

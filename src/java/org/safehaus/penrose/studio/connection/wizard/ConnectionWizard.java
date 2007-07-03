@@ -19,11 +19,15 @@ package org.safehaus.penrose.studio.connection.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.safehaus.penrose.jdbc.JDBCAdapter;
-import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.partition.ConnectionConfig;
 import org.safehaus.penrose.studio.driver.Driver;
 import org.safehaus.penrose.studio.util.Helper;
+import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.connection.ConnectionManager;
+import org.safehaus.penrose.connection.Connection;
 import org.apache.log4j.Logger;
 
 import javax.naming.InitialContext;
@@ -46,15 +50,15 @@ public class ConnectionWizard extends Wizard {
     public ConnectionDriverPage driverPage = new ConnectionDriverPage();
     public JDBCConnectionWizardPage jdbcPage = new JDBCConnectionWizardPage();
 
-    public LDAPConnectionInfoWizardPage ldapInfoPage = new LDAPConnectionInfoWizardPage();
-    public LDAPConnectionParametersWizardPage ldapParametersPage = new LDAPConnectionParametersWizardPage();
+    public JNDIConnectionInfoWizardPage jndiInfoPage = new JNDIConnectionInfoWizardPage();
+    public JNDIConnectionParametersWizardPage jndiParametersPage = new JNDIConnectionParametersWizardPage();
 
     public ConnectionWizard(Partition partition) {
         this.partition = partition;
 
         Map parameters = new TreeMap();
         parameters.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        ldapParametersPage.setParameters(parameters);
+        jndiParametersPage.setParameters(parameters);
 
         setWindowTitle("New Connection");
     }
@@ -70,8 +74,8 @@ public class ConnectionWizard extends Wizard {
 
         } else if ("LDAP".equals(adapterName)) {
             //if (!jndiPage.isPageComplete()) return false;
-            if (!ldapInfoPage.isPageComplete()) return false;
-            if (!ldapParametersPage.isPageComplete()) return false;
+            if (!jndiInfoPage.isPageComplete()) return false;
+            if (!jndiParametersPage.isPageComplete()) return false;
         }
 
         return true;
@@ -82,8 +86,8 @@ public class ConnectionWizard extends Wizard {
         addPage(driverPage);
         addPage(jdbcPage);
         //addPage(jndiPage);
-        addPage(ldapInfoPage);
-        addPage(ldapParametersPage);
+        addPage(jndiInfoPage);
+        addPage(jndiParametersPage);
     }
 
     public IWizardPage getNextPage(IWizardPage page) {
@@ -95,16 +99,16 @@ public class ConnectionWizard extends Wizard {
 
             } else if ("LDAP".equals(adapter)) {
                 //return jndiPage;
-                return ldapInfoPage;
+                return jndiInfoPage;
             }
 
         } else if (page == jdbcPage) {
             return null;
 
-        } else if (page == ldapInfoPage) {
-            return ldapParametersPage;
+        } else if (page == jndiInfoPage) {
+            return jndiParametersPage;
 
-        } else if (page == ldapParametersPage) {
+        } else if (page == jndiParametersPage) {
             return null;
         }
 
@@ -115,11 +119,11 @@ public class ConnectionWizard extends Wizard {
         if (page == jdbcPage) {
             return driverPage;
 
-        } else if (page == ldapInfoPage) {
+        } else if (page == jndiInfoPage) {
             return driverPage;
 
-        } else if (page == ldapParametersPage) {
-            return ldapInfoPage;
+        } else if (page == jndiParametersPage) {
+            return jndiInfoPage;
         }
 
         return super.getPreviousPage(page);
@@ -136,25 +140,20 @@ public class ConnectionWizard extends Wizard {
 
             if ("JDBC".equals(adapterName)) {
 
-                String driver = jdbcPage.getParameter(JDBCAdapter.DRIVER);
-                connectionConfig.setParameter(JDBCAdapter.DRIVER, driver);
+                Map<String,String> parameters = jdbcPage.getParameters();
+                connectionConfig.setParameters(parameters);
 
-                String url = jdbcPage.getParameter(JDBCAdapter.URL);
-                url = Helper.replace(url, jdbcPage.getParameters());
-                connectionConfig.setParameter(JDBCAdapter.URL, url);
-
-                String user = jdbcPage.getParameter(JDBCAdapter.USER);
-                if (user != null) connectionConfig.setParameter(JDBCAdapter.USER, user);
-
-                String password = jdbcPage.getParameter(JDBCAdapter.PASSWORD);
-                if (password != null) connectionConfig.setParameter(JDBCAdapter.PASSWORD, password);
+                Map<String,String> allParameters = jdbcPage.getAllParameters();
+                String url = allParameters.get(JDBCClient.URL);
+                url = Helper.replace(url, allParameters);
+                connectionConfig.setParameter(JDBCClient.URL, url);
 
             } else if ("LDAP".equals(adapterName)) {
-                connectionConfig.setParameter(InitialContext.PROVIDER_URL, ldapInfoPage.getURL()+"/"+ldapInfoPage.getSuffix());
-                connectionConfig.setParameter(InitialContext.SECURITY_PRINCIPAL, ldapInfoPage.getBindDN());
-                connectionConfig.setParameter(InitialContext.SECURITY_CREDENTIALS, ldapInfoPage.getPassword());
+                connectionConfig.setParameter(InitialContext.PROVIDER_URL, jndiInfoPage.getURL()+"/"+jndiInfoPage.getSuffix());
+                connectionConfig.setParameter(InitialContext.SECURITY_PRINCIPAL, jndiInfoPage.getBindDN());
+                connectionConfig.setParameter(InitialContext.SECURITY_CREDENTIALS, jndiInfoPage.getPassword());
 
-                Map parameters = ldapParametersPage.getParameters();
+                Map parameters = jndiParametersPage.getParameters();
                 for (Iterator i=parameters.keySet().iterator(); i.hasNext(); ) {
                     String paramName = (String)i.next();
                     String paramValue = (String)parameters.get(paramName);

@@ -25,12 +25,12 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.jdbc.JDBCClient;
-import org.safehaus.penrose.jdbc.TableConfig;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.jdbc.JDBCAdapter;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.source.FieldConfig;
+import org.safehaus.penrose.adapter.jdbc.JDBCAdapter;
+import org.safehaus.penrose.partition.ConnectionConfig;
+import org.safehaus.penrose.partition.FieldConfig;
+import org.safehaus.penrose.partition.TableConfig;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -55,7 +55,7 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
     Table tableTable;
     Table fieldTable;
 
-    private Collection fields;
+    Collection fields;
     ConnectionConfig connectionConfig;
 
     public JDBCTableWizardPage() {
@@ -203,8 +203,8 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
         try {
             showCatalogsAndSchemas();
 
-            String driver   = connectionConfig.getParameter(JDBCAdapter.DRIVER);
-            String username = connectionConfig.getParameter(JDBCAdapter.USER);
+            String driver   = connectionConfig.getParameter(JDBCClient.DRIVER);
+            String username = connectionConfig.getParameter(JDBCClient.USER);
 
             if ("oracle.jdbc.driver.OracleDriver".equals(driver)) {
                 schemaCombo.setText(username.toUpperCase());
@@ -232,7 +232,6 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
         schemaCombo.removeAll();
 
         JDBCClient client = new JDBCClient(connectionConfig.getParameters());
-        client.connect();
 
         Collection catalogs = client.getCatalogs();
         Collection schemas = client.getSchemas();
@@ -255,8 +254,6 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
 
         JDBCClient client = new JDBCClient(connectionConfig.getParameters());
 
-        client.connect();
-
         Collection tables = client.getTables(getCatalog(), getSchema());
 
         for (Iterator i=tables.iterator(); i.hasNext(); ) {
@@ -278,15 +275,13 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
 
         JDBCClient client = new JDBCClient(connectionConfig.getParameters());
 
-        client.connect();
-
         fields = client.getColumns(getCatalog(), getSchema(), getTableName());
 
         for (Iterator i=fields.iterator(); i.hasNext(); ) {
             FieldConfig field = (FieldConfig)i.next();
 
             TableItem it = new TableItem(fieldTable, SWT.NONE);
-            it.setImage(PenrosePlugin.getImage(field.isPK() ? PenroseImage.KEY : PenroseImage.NOKEY));
+            it.setImage(PenrosePlugin.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
             it.setText(0, field.getName());
             it.setText(1, field.getType());
         }
@@ -319,8 +314,7 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
     }
 
     public boolean validatePage() {
-        if (getTableName() == null) return false;
-        return true;
+        return getTableName() != null;
     }
 
     public void widgetSelected(SelectionEvent event) {
