@@ -174,6 +174,7 @@ public class ObjectClassWizardPage extends WizardPage {
         selectedTable = new Table(composite, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
         selectedTable.setLayoutData(new GridData(GridData.FILL_BOTH));
 
+        setPageComplete(validatePage());
     }
 
     public void setVisible(boolean visible) {
@@ -215,13 +216,21 @@ public class ObjectClassWizardPage extends WizardPage {
             item.setData(objectClass);
         }
 
+        log.debug("Object classes:");
         for (Iterator i=selectedOCs.iterator(); i.hasNext(); ) {
             String objectClass = (String)i.next();
+            log.debug(" - "+objectClass);
 
             TableItem item = new TableItem(selectedTable, SWT.NONE);
             item.setText(objectClass);
             item.setData(objectClass);
         }
+
+        setPageComplete(validatePage());
+    }
+
+    public boolean validatePage() {
+        return !selectedOCs.isEmpty();
     }
 
     public void setSelecteObjectClasses(Collection list) {

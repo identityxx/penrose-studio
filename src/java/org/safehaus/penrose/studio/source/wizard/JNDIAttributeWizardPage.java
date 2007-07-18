@@ -27,7 +27,7 @@ import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.schema.ObjectClass;
-import org.safehaus.penrose.partition.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.apache.log4j.Logger;

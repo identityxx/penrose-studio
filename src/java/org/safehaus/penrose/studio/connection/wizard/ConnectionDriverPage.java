@@ -74,7 +74,7 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
             Collection list = reader.getDrivers();
             
             //TODO: actually get the loaded bundles and put on the list as a driver
-            list.addAll(loadLibraries());
+            //list.addAll(loadLibraries());
             
             for (Iterator i=list.iterator(); i.hasNext(); ) {
                 Driver driver = (Driver)i.next();

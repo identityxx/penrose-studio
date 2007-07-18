@@ -37,7 +37,7 @@ import org.safehaus.penrose.studio.connection.action.NewSourceAction;
 import org.safehaus.penrose.studio.connection.editor.*;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -139,7 +139,7 @@ public class ConnectionNode extends Node {
 
         if (!confirm) return;
 
-        partition.removeConnectionConfig(connectionConfig.getName());
+        partition.getConnections().removeConnectionConfig(connectionConfig.getName());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         penroseApplication.notifyChangeListeners();
@@ -159,13 +159,13 @@ public class ConnectionNode extends Node {
 
         int counter = 1;
         String name = newConnectionConfig.getName();
-        while (partition.getConnectionConfig(name) != null) {
+        while (partition.getConnections().getConnectionConfig(name) != null) {
             counter++;
             name = newConnectionConfig.getName()+" ("+counter+")";
         }
 
         newConnectionConfig.setName(name);
-        partition.addConnectionConfig(newConnectionConfig);
+        partition.getConnections().addConnectionConfig(newConnectionConfig);
 
         view.setClipboard(null);
 

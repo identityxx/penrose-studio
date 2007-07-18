@@ -25,6 +25,7 @@ import org.safehaus.penrose.studio.util.SnapshotUtil;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;
@@ -98,7 +99,7 @@ public class CreateLDAPSnapshotWizard extends Wizard {
                 connectionConfig.setParameter(paramName, paramValue);
             }
 
-            partition.addConnectionConfig(connectionConfig);
+            partition.getConnections().addConnectionConfig(connectionConfig);
 
             LDAPClient client = new LDAPClient(connectionConfig.getParameters());
 

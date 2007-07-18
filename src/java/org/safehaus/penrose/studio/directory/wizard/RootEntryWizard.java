@@ -92,7 +92,7 @@ public class RootEntryWizard extends Wizard {
 
             entryMapping.addACI(new ACI("rs"));
 
-            partition.addEntryMapping(entryMapping);
+            partition.getMappings().addEntryMapping(entryMapping);
 
             return true;
 

@@ -28,7 +28,7 @@ import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.source.wizard.JDBCSourceWizard;
 import org.safehaus.penrose.studio.source.wizard.JNDISourceWizard;
 import org.safehaus.penrose.studio.connection.ConnectionNode;
-import org.safehaus.penrose.partition.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
 

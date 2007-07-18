@@ -24,7 +24,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.partition.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.handler.HandlerManager;
 import org.apache.log4j.Logger;

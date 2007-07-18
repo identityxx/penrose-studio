@@ -29,9 +29,9 @@ import org.safehaus.penrose.studio.PenroseActionBarAdvisor;
 import org.safehaus.penrose.studio.connection.editor.JNDIConnectionSchemaPage;
 import org.safehaus.penrose.studio.connection.editor.JNDIConnectionPropertiesPage;
 import org.safehaus.penrose.studio.connection.editor.JNDIConnectionEditorInput;
-import org.safehaus.penrose.partition.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.SourceConfig;
+import org.safehaus.penrose.source.SourceConfig;
 import org.apache.log4j.Logger;
 
 import java.util.Iterator;
@@ -100,7 +100,7 @@ public class JNDIConnectionEditor extends FormEditor {
     public void store() throws Exception {
 
         if (!origConnectionConfig.getName().equals(connectionConfig.getName())) {
-            partition.renameConnectionConfig(origConnectionConfig, connectionConfig.getName());
+            partition.getConnections().renameConnectionConfig(origConnectionConfig, connectionConfig.getName());
 
             for (Iterator i=partition.getSources().getSourceConfigs().iterator(); i.hasNext(); ) {
                 SourceConfig sourceConfig = (SourceConfig)i.next();
@@ -109,7 +109,7 @@ public class JNDIConnectionEditor extends FormEditor {
             }
         }
 
-        partition.modifyConnectionConfig(connectionConfig.getName(), connectionConfig);
+        partition.getConnections().modifyConnectionConfig(connectionConfig.getName(), connectionConfig);
 
         setPartName(partition.getName()+"/"+connectionConfig.getName());
 

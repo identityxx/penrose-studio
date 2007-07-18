@@ -39,8 +39,9 @@ import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.source.Sources;
-import org.safehaus.penrose.source.SourceManager;
-import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.FieldConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
 public class JNDISourcePropertyPage extends FormPage {
@@ -78,7 +79,7 @@ public class JNDISourcePropertyPage extends FormPage {
         this.partition = editor.partition;
         this.source = editor.sourceConfig;
 
-        ConnectionConfig connectionConfig = partition.getConnectionConfig(source.getConnectionName());
+        ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(source.getConnectionName());
         if (connectionConfig != null) {
             client = new LDAPClient(connectionConfig.getParameters());
         }
@@ -456,7 +457,7 @@ public class JNDISourcePropertyPage extends FormPage {
             String oldName = source.getName();
             String newName = sourceNameText.getText();
 
-            Collection entries = partition.getEntryMappings();
+            Collection entries = partition.getMappings().getEntryMappings();
             for (Iterator i=entries.iterator(); i.hasNext(); ) {
                 EntryMapping entry = (EntryMapping)i.next();
 

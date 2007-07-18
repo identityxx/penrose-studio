@@ -12,9 +12,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.SourceConfig;
-import org.safehaus.penrose.partition.ConnectionConfig;
-import org.safehaus.penrose.partition.FieldConfig;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.studio.source.JNDIFieldDialog;
 import org.safehaus.penrose.studio.source.FieldDialog;
@@ -22,11 +22,9 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.source.Sources;
-import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.SourceMapping;
 import org.safehaus.penrose.nis.*;
-import org.safehaus.penrose.naming.PenroseContext;
 
 import java.util.Iterator;
 import java.util.Collection;
@@ -65,7 +63,7 @@ public class NISSourcePropertyPage extends FormPage {
         this.partition = editor.partition;
         this.source = editor.sourceConfig;
 
-        ConnectionConfig connectionConfig = partition.getConnectionConfig(source.getConnectionName());
+        ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(source.getConnectionName());
         if (connectionConfig == null) return;
 
         String method = (String)connectionConfig.getParameter(NISAdapter.METHOD);
@@ -406,7 +404,7 @@ public class NISSourcePropertyPage extends FormPage {
             String oldName = source.getName();
             String newName = sourceNameText.getText();
 
-            Collection entries = partition.getEntryMappings();
+            Collection entries = partition.getMappings().getEntryMappings();
             for (Iterator i=entries.iterator(); i.hasNext(); ) {
                 EntryMapping entry = (EntryMapping)i.next();
 

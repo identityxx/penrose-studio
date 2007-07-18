@@ -38,10 +38,8 @@ import org.safehaus.penrose.studio.source.editor.*;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.SourceConfig;
-import org.safehaus.penrose.partition.ConnectionConfig;
-import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.source.SourceManager;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
 import java.util.Iterator;
@@ -111,7 +109,7 @@ public class SourceNode extends Node {
 
     public void open() throws Exception {
 
-        ConnectionConfig con = partition.getConnectionConfig(sourceConfig.getConnectionName());
+        ConnectionConfig con = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();

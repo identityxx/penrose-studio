@@ -28,7 +28,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.apache.log4j.Logger;
 
@@ -175,7 +175,7 @@ public class SelectConnectionWizardPage extends WizardPage {
 
                 if (!confirm) return;
 
-                partition.removeConnectionConfig(connectionConfig.getName());
+                partition.getConnections().removeConnectionConfig(connectionConfig.getName());
 
                 refresh();
 

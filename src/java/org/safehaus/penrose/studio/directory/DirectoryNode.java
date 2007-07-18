@@ -69,14 +69,14 @@ public class DirectoryNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        return !partition.getRootEntryMappings().isEmpty();
+        return !partition.getMappings().getRootEntryMappings().isEmpty();
     }
 
     public Collection getChildren() throws Exception {
 
         Collection children = new ArrayList();
 
-        Collection rootEntryMappings = partition.getRootEntryMappings();
+        Collection rootEntryMappings = partition.getMappings().getRootEntryMappings();
         for (Iterator i=rootEntryMappings.iterator(); i.hasNext(); ) {
             EntryMapping entryMapping = (EntryMapping)i.next();
 

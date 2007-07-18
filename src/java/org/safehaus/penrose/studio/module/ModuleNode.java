@@ -120,8 +120,8 @@ public class ModuleNode extends Node {
 
         if (!confirm) return;
 
-        partition.removeModuleMapping(moduleConfig.getName());
-        partition.removeModuleConfig(moduleConfig.getName());
+        partition.getModules().removeModuleMapping(moduleConfig.getName());
+        partition.getModules().removeModuleConfig(moduleConfig.getName());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         penroseApplication.notifyChangeListeners();
@@ -142,21 +142,21 @@ public class ModuleNode extends Node {
 
         int counter = 1;
         String name = oldName;
-        while (partition.getModuleConfig(name) != null) {
+        while (partition.getModules().getModuleConfig(name) != null) {
             counter++;
             name = oldName+" ("+counter+")";
         }
 
         newModuleConfig.setName(name);
-        partition.addModuleConfig(newModuleConfig);
+        partition.getModules().addModuleConfig(newModuleConfig);
 
-        Collection mappings = partition.getModuleMappings(oldName);
+        Collection mappings = partition.getModules().getModuleMappings(oldName);
         if (mappings != null) {
             for (Iterator i=mappings.iterator(); i.hasNext(); ) {
                 ModuleMapping mapping = (ModuleMapping)((ModuleMapping)i.next()).clone();
                 mapping.setModuleName(name);
                 mapping.setModuleConfig(newModuleConfig);
-                partition.addModuleMapping(mapping);
+                partition.getModules().addModuleMapping(mapping);
             }
         }
 

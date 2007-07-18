@@ -28,9 +28,9 @@ import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.source.Sources;
-import org.safehaus.penrose.source.SourceManager;
-import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.handler.HandlerManager;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
 import javax.naming.InitialContext;
@@ -107,7 +107,7 @@ public class CreateLDAPProxyWizard extends Wizard {
                 connectionConfig.setParameter(paramName, paramValue);
             }
 
-            partition.addConnectionConfig(connectionConfig);
+            partition.getConnections().addConnectionConfig(connectionConfig);
 
             Sources sources = partition.getSources();
 
@@ -126,7 +126,7 @@ public class CreateLDAPProxyWizard extends Wizard {
 
             rootEntry.addACI(new ACI("rs"));
 
-            partition.addEntryMapping(rootEntry);
+            partition.getMappings().addEntryMapping(rootEntry);
 
             if (infoPage.getMapRootDse()) {
                 SourceConfig rootDseSourceConfig = new SourceConfig();
@@ -148,7 +148,7 @@ public class CreateLDAPProxyWizard extends Wizard {
 
                 rootDseEntryMapping.addACI(new ACI("rs"));
 
-                partition.addEntryMapping(rootDseEntryMapping);
+                partition.getMappings().addEntryMapping(rootDseEntryMapping);
             }
 
             if (infoPage.getMapADSchema()) {

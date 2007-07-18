@@ -28,8 +28,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.ConnectionConfig;
-import org.safehaus.penrose.partition.SourceConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.apache.log4j.Logger;
 
@@ -73,7 +73,7 @@ public class SelectSourceWizardPage extends WizardPage {
             public void widgetSelected(SelectionEvent event) {
                 TableItem ti = sourceTable.getSelection()[0];
                 SourceConfig sourceConfig = (SourceConfig)ti.getData();
-                ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
+                ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
 
                 String baseDn = sourceConfig.getParameter("baseDn");
                 baseDn = baseDn == null ? "" : baseDn;
@@ -182,7 +182,7 @@ public class SelectSourceWizardPage extends WizardPage {
         Collection sourceConfigs = partition.getSources().getSourceConfigs();
         for (Iterator i=sourceConfigs.iterator(); i.hasNext(); ) {
             SourceConfig sourceConfig = (SourceConfig)i.next();
-            ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
+            ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
             if (!"LDAP".equals(connectionConfig.getAdapterName())) continue;
 
             TableItem item = new TableItem(sourceTable, SWT.NONE);

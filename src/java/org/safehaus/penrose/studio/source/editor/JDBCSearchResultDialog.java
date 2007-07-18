@@ -12,8 +12,8 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.partition.SourceConfig;
-import org.safehaus.penrose.partition.FieldConfig;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.partition.Partition;
 
 import java.util.Iterator;

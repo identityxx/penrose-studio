@@ -364,7 +364,7 @@ public class ModuleEditor extends EditorPart {
         tc.setText("Filter");
         tc.setWidth(200);
 
-        Collection mappings = partition.getModuleMappings(moduleConfig.getName());
+        Collection mappings = partition.getModules().getModuleMappings(moduleConfig.getName());
         if (mappings != null) {
 	        for (Iterator i=mappings.iterator(); i.hasNext(); ) {
 	            ModuleMapping mapping = (ModuleMapping)i.next();
@@ -447,22 +447,22 @@ public class ModuleEditor extends EditorPart {
 
         boolean rename = !origModuleConfig.getName().equals(moduleConfig.getName());
         if (rename) {
-            partition.removeModuleConfig(origModuleConfig.getName());
+            partition.getModules().removeModuleConfig(origModuleConfig.getName());
         }
 
         origModuleConfig.copy(moduleConfig);
 
         if (rename) {
-            partition.addModuleConfig(origModuleConfig);
+            partition.getModules().addModuleConfig(origModuleConfig);
         }
 
-        partition.removeModuleMapping(moduleConfig.getName());
+        partition.getModules().removeModuleMapping(moduleConfig.getName());
 
         Item items[] = mappingsTable.getItems();
         for (int i=0; i<items.length; i++) {
             ModuleMapping mapping = (ModuleMapping)items[i].getData();
             mapping.setModuleName(moduleConfig.getName());
-            partition.addModuleMapping(mapping);
+            partition.getModules().addModuleMapping(mapping);
         }
 
         setPartName(partition.getName()+"/"+moduleConfig.getName());

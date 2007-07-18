@@ -1,16 +1,13 @@
 package org.safehaus.penrose.studio.util;
 
-import org.safehaus.penrose.partition.SourceConfig;
-import org.safehaus.penrose.partition.FieldConfig;
-import org.safehaus.penrose.partition.ConnectionConfig;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.FieldConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.AttributeMapping;
 import org.safehaus.penrose.mapping.Expression;
 import org.safehaus.penrose.mapping.SourceMapping;
-import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.RDN;
 
@@ -135,7 +132,7 @@ public class ADUtil {
         SourceMapping sourceMapping = new SourceMapping("s", sourceConfig.getName());
         entryMapping.addSourceMapping(sourceMapping);
 
-        partition.addEntryMapping(entryMapping);
+        partition.getMappings().addEntryMapping(entryMapping);
 
         return entryMapping;
     }

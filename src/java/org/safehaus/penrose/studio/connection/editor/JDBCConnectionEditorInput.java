@@ -17,12 +17,6 @@
  */
 package org.safehaus.penrose.studio.connection.editor;
 
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IPersistableElement;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.partition.ConnectionConfig;
-import org.safehaus.penrose.partition.Partition;
-
 /**
  * @author Endi S. Dewata
  */

@@ -133,7 +133,7 @@ public class PartitionNode extends Node {
 
         int counter = 1;
         String name = originalName;
-        while (partition.getConnectionConfig(name) != null) {
+        while (partition.getConnections().getConnectionConfig(name) != null) {
             counter++;
             name = newPartitionConfig.getName()+" ("+counter+")";
         }

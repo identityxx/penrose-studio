@@ -24,6 +24,8 @@ import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.DNBuilder;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;
@@ -61,7 +63,7 @@ public class CreateLDAPProxyWizard extends Wizard {
     public boolean performFinish() {
         try {
             SourceConfig sourceConfig = sourcePage.getSourceConfig();
-            ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
+            ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
 
             String url = (String)connectionConfig.getParameter(Context.PROVIDER_URL);
 
@@ -101,7 +103,7 @@ public class CreateLDAPProxyWizard extends Wizard {
 
             entryMapping.setHandlerName("PROXY");
 
-            partition.addEntryMapping(entryMapping);
+            partition.getMappings().addEntryMapping(entryMapping);
 
             return true;
 

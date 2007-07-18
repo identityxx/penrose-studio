@@ -12,7 +12,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
 
 import javax.naming.InitialContext;

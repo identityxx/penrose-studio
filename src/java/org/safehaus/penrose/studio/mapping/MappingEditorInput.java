@@ -29,11 +29,11 @@ import org.safehaus.penrose.partition.Partition;
 public class MappingEditorInput implements IEditorInput {
 
     private Partition partition;
-    private EntryMapping entryDefinition;
+    private EntryMapping entryMapping;
 
-    public MappingEditorInput(Partition partition, EntryMapping entryDefinition) {
+    public MappingEditorInput(Partition partition, EntryMapping entryMapping) {
         this.partition = partition;
-        this.entryDefinition = entryDefinition;
+        this.entryMapping = entryMapping;
     }
 
     public boolean exists() {
@@ -45,7 +45,7 @@ public class MappingEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return entryDefinition.getDn().toString();
+        return entryMapping.getDn().toString();
     }
 
     public IPersistableElement getPersistable() {
@@ -53,7 +53,7 @@ public class MappingEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return entryDefinition.getDn().toString();
+        return entryMapping.getDn().toString();
     }
 
     public Object getAdapter(Class aClass) {
@@ -65,15 +65,15 @@ public class MappingEditorInput implements IEditorInput {
         if (!(o instanceof MappingEditorInput)) return false;
 
         MappingEditorInput cei = (MappingEditorInput)o;
-        return entryDefinition.equals(cei.entryDefinition);
+        return entryMapping.equals(cei.entryMapping);
     }
 
-    public EntryMapping getEntryDefinition() {
-        return entryDefinition;
+    public EntryMapping getEntryMapping() {
+        return entryMapping;
     }
 
-    public void setEntryDefinition(EntryMapping entryDefinition) {
-        this.entryDefinition = entryDefinition;
+    public void setEntryMapping(EntryMapping entryMapping) {
+        this.entryMapping = entryMapping;
     }
 
     public Partition getPartition() {

@@ -15,14 +15,15 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.config.PenroseConfig;
-import org.safehaus.penrose.adapter.AdapterConfig;
 import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.connection.ConnectionManager;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.FieldConfig;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -164,7 +165,7 @@ public class JNDISourceBrowsePage extends FormPage {
             PenroseContext penroseContext = penroseApplication.getPenroseContext();
 
             ConnectionManager connectionManager = penroseContext.getConnectionManager();
-            ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
+            ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
             Connection connection = connectionManager.createConnection(partition, connectionConfig);
 
             connection.start();

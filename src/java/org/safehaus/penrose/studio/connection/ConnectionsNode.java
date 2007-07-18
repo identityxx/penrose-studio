@@ -24,7 +24,7 @@ import org.safehaus.penrose.studio.connection.action.NewConnectionAction;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
@@ -80,13 +80,13 @@ public class ConnectionsNode extends Node {
 
         int counter = 1;
         String name = newConnectionConfig.getName();
-        while (partition.getConnectionConfig(name) != null) {
+        while (partition.getConnections().getConnectionConfig(name) != null) {
             counter++;
             name = newConnectionConfig.getName()+" ("+counter+")";
         }
 
         newConnectionConfig.setName(name);
-        partition.addConnectionConfig(newConnectionConfig);
+        partition.getConnections().addConnectionConfig(newConnectionConfig);
 
         view.setClipboard(null);
 

@@ -33,7 +33,7 @@ public class MappingEditor extends FormEditor implements ModifyListener {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Partition partition;
+    Partition partition;
 	EntryMapping entry;
     EntryMapping origEntry;
 
@@ -43,7 +43,7 @@ public class MappingEditor extends FormEditor implements ModifyListener {
         MappingEditorInput mei = (MappingEditorInput)input;
 
         partition = mei.getPartition();
-        origEntry = mei.getEntryDefinition();
+        origEntry = mei.getEntryMapping();
 
         try {
             entry = (EntryMapping)origEntry.clone();
@@ -102,10 +102,10 @@ public class MappingEditor extends FormEditor implements ModifyListener {
 	public void store() throws Exception {
 
         if (!origEntry.getDn().equals(entry.getDn())) {
-            partition.renameEntryMapping(origEntry, entry.getDn());
+            partition.getMappings().renameEntryMapping(origEntry, entry.getDn());
         }
 
-        partition.modifyEntryMapping(origEntry, entry);
+        origEntry.copy(entry);
 
         String dn;
         if (entry.getDn().isEmpty()) {

@@ -28,7 +28,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.partition.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;

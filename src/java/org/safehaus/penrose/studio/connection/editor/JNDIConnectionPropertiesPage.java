@@ -28,7 +28,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
-import org.safehaus.penrose.partition.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.apache.log4j.Logger;

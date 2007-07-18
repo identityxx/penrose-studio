@@ -117,8 +117,13 @@ public class DynamicEntryWizard extends Wizard {
 
             entryMapping.addObjectClasses(ocPage.getSelectedObjectClasses());
 
+            log.debug("Attribute mappings:");
             Collection attributeMappings = attrPage.getAttributeMappings();
-            entryMapping.addAttributeMappings(attributeMappings);
+            for (Iterator i=attributeMappings.iterator(); i.hasNext(); ) {
+                AttributeMapping attributeMapping = (AttributeMapping)i.next();
+                log.debug(" - "+attributeMapping.getName()+" <= "+attributeMapping.getVariable());
+                entryMapping.addAttributeMapping(attributeMapping);
+            }
 
             RDNBuilder rb = new RDNBuilder();
             for (Iterator i=attributeMappings.iterator(); i.hasNext(); ) {
@@ -133,12 +138,16 @@ public class DynamicEntryWizard extends Wizard {
             db.append(parentMapping.getDn());
             entryMapping.setDn(db.toDn());
 
-            // add reverse mappings
+            log.debug("Reverse mappings:");
             for (Iterator i=entryMapping.getAttributeMappings().iterator(); i.hasNext(); ) {
                 AttributeMapping attributeMapping = (AttributeMapping)i.next();
+                String name = attributeMapping.getName();
 
                 String variable = attributeMapping.getVariable();
-                if (variable == null) continue;
+                if (variable == null) {
+                    log.debug("Attribute "+name+" can't be reverse mapped.");
+                    continue;
+                }
 
                 int j = variable.indexOf(".");
                 String sourceName = variable.substring(0, j);
@@ -146,13 +155,18 @@ public class DynamicEntryWizard extends Wizard {
 
                 SourceMapping sourceMapping = entryMapping.getSourceMapping(sourceName);
                 Collection fieldMappings = sourceMapping.getFieldMappings(fieldName);
-                if (fieldMappings != null && !fieldMappings.isEmpty()) continue;
+                if (fieldMappings != null && !fieldMappings.isEmpty()) {
+                    log.debug("Attribute "+name+" has been reverse mapped.");
+                    continue;
+                }
+
+                log.debug(" - "+sourceName+"."+fieldName+" <= "+name);
 
                 FieldMapping fieldMapping = new FieldMapping(fieldName, FieldMapping.VARIABLE, attributeMapping.getName());
                 sourceMapping.addFieldMapping(fieldMapping);
             }
 
-            partition.addEntryMapping(entryMapping);
+            partition.getMappings().addEntryMapping(entryMapping);
 
             return true;
 

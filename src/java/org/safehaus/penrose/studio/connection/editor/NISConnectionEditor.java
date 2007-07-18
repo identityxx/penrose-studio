@@ -7,8 +7,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.ConnectionConfig;
-import org.safehaus.penrose.partition.SourceConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenroseWorkbenchAdvisor;
 import org.safehaus.penrose.studio.PenroseWorkbenchWindowAdvisor;
@@ -80,7 +80,7 @@ public class NISConnectionEditor extends FormEditor {
     public void store() throws Exception {
 
         if (!origConnectionConfig.getName().equals(connectionConfig.getName())) {
-            partition.renameConnectionConfig(origConnectionConfig, connectionConfig.getName());
+            partition.getConnections().renameConnectionConfig(origConnectionConfig, connectionConfig.getName());
 
             for (Iterator i=partition.getSources().getSourceConfigs().iterator(); i.hasNext(); ) {
                 SourceConfig sourceConfig = (SourceConfig)i.next();
@@ -89,7 +89,7 @@ public class NISConnectionEditor extends FormEditor {
             }
         }
 
-        partition.modifyConnectionConfig(connectionConfig.getName(), connectionConfig);
+        partition.getConnections().modifyConnectionConfig(connectionConfig.getName(), connectionConfig);
 
         setPartName(partition.getName()+"/"+connectionConfig.getName());
 

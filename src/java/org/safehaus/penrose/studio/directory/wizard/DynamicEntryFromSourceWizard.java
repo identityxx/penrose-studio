@@ -135,7 +135,7 @@ public class DynamicEntryFromSourceWizard extends Wizard {
                 sourceMapping.addFieldMapping(fieldMapping);
             }
 
-            partition.addEntryMapping(entryMapping);
+            partition.getMappings().addEntryMapping(entryMapping);
 
             return true;
 

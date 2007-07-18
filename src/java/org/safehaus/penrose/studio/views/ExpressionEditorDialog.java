@@ -53,8 +53,8 @@ import org.safehaus.penrose.studio.views.BaseDialog;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.util.Pair;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.SourceConfig;
-import org.safehaus.penrose.partition.FieldConfig;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.FieldConfig;
 import org.apache.log4j.Logger;
 
 public class ExpressionEditorDialog extends BaseDialog {

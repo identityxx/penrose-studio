@@ -24,7 +24,7 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.SourceConfig;
+import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.SourceMapping;
 import org.safehaus.penrose.source.Sources;
@@ -91,7 +91,7 @@ public class JDBCSourceEditor extends FormEditor {
 
             sources.renameSourceConfig(origSourceConfig, sourceConfig.getName());
 
-            for (Iterator i=partition.getEntryMappings().iterator(); i.hasNext(); ) {
+            for (Iterator i=partition.getMappings().getEntryMappings().iterator(); i.hasNext(); ) {
                 EntryMapping entryMapping = (EntryMapping)i.next();
                 for (Iterator j=entryMapping.getSourceMappings().iterator(); j.hasNext(); ) {
                     SourceMapping sourceMapping = (SourceMapping)j.next();

@@ -41,8 +41,6 @@ import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.mapping.MappingEditorInput;
 import org.safehaus.penrose.studio.mapping.MappingEditor;
-import org.safehaus.penrose.studio.connection.editor.JNDIConnectionEditor;
-import org.safehaus.penrose.studio.connection.editor.JDBCConnectionEditor;
 import org.safehaus.penrose.studio.connection.editor.*;
 import org.safehaus.penrose.studio.source.editor.*;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -50,6 +48,8 @@ import org.safehaus.penrose.studio.plugin.PluginManager;
 import org.safehaus.penrose.studio.plugin.Plugin;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.partition.*;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 
 public class ValidationView extends ViewPart {
 
@@ -167,7 +167,7 @@ public class ValidationView extends ViewPart {
 		} else if (object instanceof SourceConfig) {
 			SourceConfig sourceConfig = (SourceConfig)object;
             Partition partition = partitionManager.getPartition(sourceConfig);
-            ConnectionConfig connection = partition.getConnectionConfig(sourceConfig.getConnectionName());
+            ConnectionConfig connection = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
 
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();

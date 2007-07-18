@@ -22,7 +22,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.*;
-import org.safehaus.penrose.partition.FieldConfig;
+import org.safehaus.penrose.source.FieldConfig;
 
 import java.util.*;
 

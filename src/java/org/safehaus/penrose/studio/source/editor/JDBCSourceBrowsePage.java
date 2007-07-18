@@ -18,9 +18,12 @@ import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.util.LDAPUtil;
 import org.safehaus.penrose.connection.ConnectionManager;
 import org.safehaus.penrose.connection.Connection;
+import org.safehaus.penrose.connection.ConnectionConfig;
 
 import java.util.Iterator;
 import java.util.Collection;
@@ -181,7 +184,7 @@ public class JDBCSourceBrowsePage extends FormPage {
             PenroseContext penroseContext = penroseApplication.getPenroseContext();
 
             ConnectionManager connectionManager = penroseContext.getConnectionManager();
-            ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
+            ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
             Connection connection = connectionManager.createConnection(partition, connectionConfig);
 
             connection.start();
@@ -235,7 +238,7 @@ public class JDBCSourceBrowsePage extends FormPage {
             PenroseContext penroseContext = penroseApplication.getPenroseContext();
 
             ConnectionManager connectionManager = penroseContext.getConnectionManager();
-            ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
+            ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
             Connection connection = connectionManager.createConnection(partition, connectionConfig);
 
             connection.start();
@@ -282,7 +285,7 @@ public class JDBCSourceBrowsePage extends FormPage {
             PenroseContext penroseContext = penroseApplication.getPenroseContext();
 
             ConnectionManager connectionManager = penroseContext.getConnectionManager();
-            ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
+            ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
             Connection connection = connectionManager.createConnection(partition, connectionConfig);
 
             connection.start();
@@ -354,7 +357,7 @@ public class JDBCSourceBrowsePage extends FormPage {
             PenroseContext penroseContext = penroseApplication.getPenroseContext();
 
             ConnectionManager connectionManager = penroseContext.getConnectionManager();
-            ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
+            ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
             Connection connection = connectionManager.createConnection(partition, connectionConfig);
 
             connection.start();

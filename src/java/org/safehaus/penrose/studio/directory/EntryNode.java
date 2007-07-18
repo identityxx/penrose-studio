@@ -200,7 +200,7 @@ public class EntryNode extends Node {
             EntryNode entryNode = (EntryNode)node;
 
             EntryMapping entryMapping = entryNode.getEntryMapping();
-            partition.removeEntryMapping(entryMapping);
+            partition.getMappings().removeEntryMapping(entryMapping);
         }
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
@@ -208,7 +208,7 @@ public class EntryNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        Collection children = partition.getChildren(entryMapping);
+        Collection children = partition.getMappings().getChildren(entryMapping);
         return (children != null && children.size() > 0);
     }
 
@@ -216,7 +216,7 @@ public class EntryNode extends Node {
 
         Collection children = new ArrayList();
 
-        for (Iterator i=partition.getChildren(entryMapping).iterator(); i.hasNext(); ) {
+        for (Iterator i=partition.getMappings().getChildren(entryMapping).iterator(); i.hasNext(); ) {
             EntryMapping childMapping = (EntryMapping)i.next();
 
             EntryNode entryNode = new EntryNode(

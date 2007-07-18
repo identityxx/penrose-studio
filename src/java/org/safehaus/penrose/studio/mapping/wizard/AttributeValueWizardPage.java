@@ -33,8 +33,8 @@ import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.SourceConfig;
-import org.safehaus.penrose.partition.FieldConfig;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.ldap.RDN;
 import org.apache.log4j.Logger;
 
@@ -319,7 +319,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
     public void refresh() {
         attributeTable.removeAll();
 
-        //System.out.println("Attributes:");
+        log.debug("Attributes:");
         for (Iterator i=attributeMappings.values().iterator(); i.hasNext(); ) {
             Collection list = (Collection)i.next();
 
@@ -345,7 +345,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                     value = expression == null ? null : expression.getScript();
                 }
 
-                //System.out.println(" - "+ad.getName());
+                log.debug(" - "+ad.getName()+": "+value);
 
                 TableItem it = new TableItem(attributeTable, SWT.CHECK);
                 it.setImage(PenrosePlugin.getImage(ad.isRdn() ? PenroseImage.KEY : PenroseImage.NOKEY));
@@ -355,21 +355,39 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                 it.setData(ad);
             }
         }
+
+        setPageComplete(validatePage());
     }
 
     public boolean validatePage() {
-        if (!needRdn) return true;
+
+        if (attributeMappings.isEmpty()) return false;
+
+        boolean rdn = false;
 
         for (Iterator i=attributeMappings.values().iterator(); i.hasNext(); ) {
             Collection list = (Collection)i.next();
 
             for (Iterator j=list.iterator(); j.hasNext(); ) {
                 AttributeMapping ad = (AttributeMapping)j.next();
-                if (ad.isRdn()) return true;
+                if (ad.isRdn()) rdn = true;
+
+                if (ad.getConstant() != null) continue;
+                if (ad.getBinary() != null) continue;
+                if (ad.getVariable() != null) continue;
+                if (ad.getExpression() != null) continue;
+
+                log.debug("Attribute "+ad.getName()+" not set.");
+                return false;
             }
         }
 
-        return false;
+        if (needRdn & !rdn) {
+            log.debug("RDN not found.");
+            return false;
+        }
+
+        return true;
     }
 
     public void updateImages() {

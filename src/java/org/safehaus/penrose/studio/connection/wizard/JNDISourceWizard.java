@@ -19,18 +19,15 @@ package org.safehaus.penrose.studio.connection.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.safehaus.penrose.partition.SourceConfig;
-import org.safehaus.penrose.partition.ConnectionConfig;
-import org.safehaus.penrose.partition.FieldConfig;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.studio.source.wizard.JNDIFieldWizardPage;
 import org.safehaus.penrose.studio.source.wizard.JNDIAttributeWizardPage;
-import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.ldap.DN;
-import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.source.SourceManager;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;

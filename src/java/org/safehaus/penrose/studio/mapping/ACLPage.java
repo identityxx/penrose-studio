@@ -402,7 +402,7 @@ public class ACLPage extends FormPage implements ModifyListener {
         tc.setWidth(120);
 
         Partition partition = editor.getPartition();
-        EntryMapping parentEntry = partition.getParent(entry);
+        EntryMapping parentEntry = partition.getMappings().getParent(entry);
         while (parentEntry != null) {
             Collection acl = parentEntry.getACL();
             for (Iterator i=acl.iterator(); i.hasNext(); ) {
@@ -420,7 +420,7 @@ public class ACLPage extends FormPage implements ModifyListener {
                 item.setText(7, parentEntry.getDn().toString());
                 item.setData(aci);
             }
-            parentEntry = partition.getParent(parentEntry);
+            parentEntry = partition.getMappings().getParent(parentEntry);
         }
 
         GridData gd = new GridData(GridData.FILL_BOTH);

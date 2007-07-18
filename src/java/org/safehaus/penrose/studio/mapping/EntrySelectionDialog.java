@@ -91,7 +91,7 @@ public class EntrySelectionDialog extends Dialog {
                     items[i].dispose();
                 }
 
-                Collection children = partition.getChildren(entry);
+                Collection children = partition.getMappings().getChildren(entry);
                 for (Iterator i=children.iterator(); i.hasNext(); ) {
                     EntryMapping child = (EntryMapping)i.next();
 
@@ -153,7 +153,7 @@ public class EntrySelectionDialog extends Dialog {
     public void setPartition(Partition partition) {
         this.partition = partition;
 
-        Collection rootEntries = partition.getRootEntryMappings();
+        Collection rootEntries = partition.getMappings().getRootEntryMappings();
         for (Iterator i=rootEntries.iterator(); i.hasNext(); ) {
             EntryMapping entry = (EntryMapping)i.next();
             String dn = entry.getDn().isEmpty() ? "Root DSE" : entry.getDn().toString();

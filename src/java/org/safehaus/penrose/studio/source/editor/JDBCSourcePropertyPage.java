@@ -33,7 +33,9 @@ import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.source.JDBCFieldDialog;
 import org.safehaus.penrose.studio.source.FieldDialog;
 import org.safehaus.penrose.jdbc.JDBCClient;
-import org.safehaus.penrose.adapter.jdbc.JDBCAdapter;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.FieldConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
 public class JDBCSourcePropertyPage extends FormPage {
@@ -268,7 +270,7 @@ public class JDBCSourcePropertyPage extends FormPage {
                     PartitionManager partitionManager = penroseApplication.getPartitionManager();
                     Partition partition = partitionManager.getPartition(sourceConfig);
 
-                    ConnectionConfig connectionConfig = partition.getConnectionConfig(sourceConfig.getConnectionName());
+                    ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
 
                     String catalog = sourceConfig.getParameter(JDBCClient.CATALOG);
                     String schema = sourceConfig.getParameter(JDBCClient.SCHEMA);
@@ -355,7 +357,7 @@ public class JDBCSourcePropertyPage extends FormPage {
                     PartitionManager partitionManager = penroseApplication.getPartitionManager();
                     Partition partition = partitionManager.getPartition(sourceConfig);
 
-                    ConnectionConfig connection = partition.getConnectionConfig(sourceConfig.getConnectionName());
+                    ConnectionConfig connection = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
 
                     String catalogName = sourceConfig.getParameter(JDBCClient.CATALOG);
                     String schemaName = sourceConfig.getParameter(JDBCClient.SCHEMA);
@@ -409,7 +411,7 @@ public class JDBCSourcePropertyPage extends FormPage {
                     PartitionManager partitionManager = penroseApplication.getPartitionManager();
                     Partition partition = partitionManager.getPartition(sourceConfig);
 
-                    ConnectionConfig connection = partition.getConnectionConfig(sourceConfig.getConnectionName());
+                    ConnectionConfig connection = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
 
                     String catalogName = sourceConfig.getParameter(JDBCClient.CATALOG);
                     String schemaName = sourceConfig.getParameter(JDBCClient.SCHEMA);

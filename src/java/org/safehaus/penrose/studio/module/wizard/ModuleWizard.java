@@ -69,13 +69,13 @@ public class ModuleWizard extends Wizard {
                 module.setParameter(name, (String)parameters.get(name));
             }
 
-            partition.addModuleConfig(module);
+            partition.getModules().addModuleConfig(module);
 
             Collection mappings = mappingPage.getMappings();
             for (Iterator i=mappings.iterator(); i.hasNext(); ) {
                 ModuleMapping mapping = (ModuleMapping)i.next();
                 mapping.setModuleName(propertyPage.getModuleName());
-                partition.addModuleMapping(mapping);
+                partition.getModules().addModuleMapping(mapping);
             }
 
             PenroseApplication penroseApplication = PenroseApplication.getInstance();

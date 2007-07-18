@@ -34,8 +34,8 @@ import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.SourceConfig;
-import org.safehaus.penrose.partition.FieldConfig;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.apache.log4j.Logger;
 
@@ -376,11 +376,16 @@ public class SourcesPage extends FormPage implements ModifyListener {
 
         SourceConfig sourceConfig = editor.getPartition().getSources().getSourceConfig(sourceMapping.getSourceName());
 
+        log.debug("Source "+sourceMapping.getName()+" "+sourceConfig.getName()+":");
         for (Iterator i=sourceConfig.getFieldConfigs().iterator(); i.hasNext(); ) {
             FieldConfig fieldConfig = (FieldConfig)i.next();
+            String fieldName = fieldConfig.getName();
 
-            Collection fieldMappings = sourceMapping.getFieldMappings(fieldConfig.getName());
-            if (fieldMappings == null) continue;
+            Collection fieldMappings = sourceMapping.getFieldMappings(fieldName);
+            if (fieldMappings == null) {
+                log.debug("Field "+fieldName+" is not used in the mapping.");
+                continue;
+            }
 
             for (Iterator j=fieldMappings.iterator(); j.hasNext(); ) {
                 FieldMapping fieldMapping = (FieldMapping)j.next();
@@ -404,10 +409,12 @@ public class SourcesPage extends FormPage implements ModifyListener {
                     value = expression == null ? null : expression.getScript();
                 }
 
+                log.debug(" - "+fieldName+": "+value);
+
                 TableItem item = new TableItem(table, SWT.CHECK);
                 item.setChecked(fieldConfig.isPrimaryKey());
                 item.setImage(PenrosePlugin.getImage(fieldConfig.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
-                item.setText(0, fieldConfig.getName());
+                item.setText(0, fieldName);
                 item.setText(1, value == null ? "" : value);
                 item.setData(fieldMapping);
             }

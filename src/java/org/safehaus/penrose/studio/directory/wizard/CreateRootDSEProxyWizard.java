@@ -19,12 +19,11 @@ package org.safehaus.penrose.studio.directory.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
-import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.acl.ACI;
-import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.source.SourceManager;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
 /**
@@ -79,7 +78,7 @@ public class CreateRootDSEProxyWizard extends Wizard {
 
             entryMapping.addACI(new ACI("rs"));
 
-            partition.addEntryMapping(entryMapping);
+            partition.getMappings().addEntryMapping(entryMapping);
 
             return true;
 

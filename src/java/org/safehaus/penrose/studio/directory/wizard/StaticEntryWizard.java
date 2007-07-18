@@ -93,7 +93,7 @@ public class StaticEntryWizard extends Wizard {
             entryMapping.addObjectClasses(ocPage.getSelectedObjectClasses());
             entryMapping.addAttributeMappings(attrPage.getAttributeMappings());
 
-            partition.addEntryMapping(entryMapping);
+            partition.getMappings().addEntryMapping(entryMapping);
 
             return true;
 

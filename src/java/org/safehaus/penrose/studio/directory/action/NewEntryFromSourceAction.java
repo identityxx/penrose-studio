@@ -31,8 +31,8 @@ import org.safehaus.penrose.mapping.SourceMapping;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.AttributeMapping;
 import org.safehaus.penrose.mapping.FieldMapping;
-import org.safehaus.penrose.partition.SourceConfig;
-import org.safehaus.penrose.partition.FieldConfig;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.filter.*;
 import org.safehaus.penrose.ldap.DNBuilder;
@@ -156,7 +156,7 @@ public class NewEntryFromSourceAction extends Action {
 
             entry.addSourceMapping(sourceMapping);
 
-            partition.addEntryMapping(entry);
+            partition.getMappings().addEntryMapping(entry);
 
             penroseApplication.notifyChangeListeners();
 
