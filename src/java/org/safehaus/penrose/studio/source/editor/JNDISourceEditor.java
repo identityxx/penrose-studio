@@ -24,10 +24,11 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.SourceMapping;
-import org.safehaus.penrose.source.Sources;
+import org.safehaus.penrose.source.SourceConfigs;
 import org.apache.log4j.Logger;
 
 import java.util.Iterator;
@@ -36,7 +37,7 @@ public class JNDISourceEditor extends FormEditor {
 
     Logger log = Logger.getLogger(getClass());
 
-    Partition partition;
+    PartitionConfig partitionConfig;
 	SourceConfig sourceConfig;
     SourceConfig origSourceConfig;
 
@@ -46,13 +47,13 @@ public class JNDISourceEditor extends FormEditor {
 
         try {
             JNDISourceEditorInput ei = (JNDISourceEditorInput)input;
-            partition = ei.getPartition();
+            partitionConfig = ei.getPartitionConfig();
             origSourceConfig = ei.getSourceConfig();
             sourceConfig = (SourceConfig)origSourceConfig.clone();
 
             setSite(site);
             setInput(input);
-            setPartName(partition.getName()+"/"+sourceConfig.getName());
+            setPartName(partitionConfig.getName()+"/"+sourceConfig.getName());
             
         } catch (Exception e) {
             throw new PartInitException(e.getMessage(), e);
@@ -83,11 +84,11 @@ public class JNDISourceEditor extends FormEditor {
 
 	public void store() throws Exception {
 
-        Sources sources = partition.getSources();
+        SourceConfigs sources = partitionConfig.getSourceConfigs();
         if (!origSourceConfig.getName().equals(sourceConfig.getName())) {
             sources.renameSourceConfig(origSourceConfig, sourceConfig.getName());
 
-            for (Iterator i=partition.getMappings().getEntryMappings().iterator(); i.hasNext(); ) {
+            for (Iterator i=partitionConfig.getDirectoryConfigs().getEntryMappings().iterator(); i.hasNext(); ) {
                 EntryMapping entryMapping = (EntryMapping)i.next();
                 for (Iterator j=entryMapping.getSourceMappings().iterator(); j.hasNext(); ) {
                     SourceMapping sourceMapping = (SourceMapping)j.next();
@@ -99,7 +100,7 @@ public class JNDISourceEditor extends FormEditor {
 
         sources.modifySourceConfig(sourceConfig.getName(), sourceConfig);
 
-        setPartName(partition.getName()+"/"+sourceConfig.getName());
+        setPartName(this.partitionConfig.getName()+"/"+sourceConfig.getName());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         penroseApplication.notifyChangeListeners();
@@ -132,11 +133,11 @@ public class JNDISourceEditor extends FormEditor {
         }
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

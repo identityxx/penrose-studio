@@ -19,12 +19,9 @@ package org.safehaus.penrose.studio.service;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.service.ServiceConfig;
-import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.config.PenroseConfig;
 import org.apache.log4j.Logger;
 
 import java.util.Map;
-import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
@@ -57,17 +54,12 @@ public class ServiceWizard extends Wizard {
             serviceConfig.setDescription(propertyPage.getDescription());
             serviceConfig.setEnabled(propertyPage.isEnabled());
 
-            Map parameters = parameterPage.getParameters();
-            for (Iterator i=parameters.keySet().iterator(); i.hasNext(); ) {
-                String name = (String)i.next();
-                String value = (String)parameters.get(name);
+            Map<String,String> parameters = parameterPage.getParameters();
+            for (String name : parameters.keySet()) {
+                String value = parameters.get(name);
 
                 serviceConfig.setParameter(name, value);
             }
-
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
-            penroseConfig.addServiceConfig(serviceConfig);
 
             return true;
 

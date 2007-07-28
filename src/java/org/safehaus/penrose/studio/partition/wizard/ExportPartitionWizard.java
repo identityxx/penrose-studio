@@ -28,12 +28,12 @@ public class ExportPartitionWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
 
     public PartitionLocationPage locationPage = new PartitionLocationPage();
 
-    public ExportPartitionWizard(Partition partition) {
-        this.partition = partition;
+    public ExportPartitionWizard(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
 
         setWindowTitle("Export Partition");
         locationPage.setDescription("Enter the location to which the partition will be exported.");
@@ -52,7 +52,7 @@ public class ExportPartitionWizard extends Wizard {
             String directory = locationPage.getLocation();
 
             PartitionWriter partitionWriter = new PartitionWriter(directory);
-            partitionWriter.write(partition);
+            partitionWriter.write(partitionConfig);
 
             return true;
 
@@ -70,11 +70,11 @@ public class ExportPartitionWizard extends Wizard {
         return true;
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

@@ -21,18 +21,18 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.mapping.EntryMapping;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 
 /**
  * @author Endi S. Dewata
  */
 public class MappingEditorInput implements IEditorInput {
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     private EntryMapping entryMapping;
 
-    public MappingEditorInput(Partition partition, EntryMapping entryMapping) {
-        this.partition = partition;
+    public MappingEditorInput(PartitionConfig partition, EntryMapping entryMapping) {
+        this.partitionConfig = partition;
         this.entryMapping = entryMapping;
     }
 
@@ -76,11 +76,11 @@ public class MappingEditorInput implements IEditorInput {
         this.entryMapping = entryMapping;
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

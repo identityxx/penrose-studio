@@ -24,7 +24,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.mapping.*;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.studio.mapping.RelationshipDialog;
@@ -40,14 +40,14 @@ public class RelationshipWizardPage extends WizardPage implements SelectionListe
 
     public final static String NAME = "Data source relationships";
 
-    Partition partition;
+    PartitionConfig partitionConfig;
     Table relationshipTable;
 
     private Collection sourceMappings;
 
-    public RelationshipWizardPage(Partition partition) {
+    public RelationshipWizardPage(PartitionConfig partition) {
         super(NAME);
-        this.partition = partition;
+        this.partitionConfig = partition;
         setDescription("Add data source relationships. This step is optional.");
     }
 
@@ -81,7 +81,7 @@ public class RelationshipWizardPage extends WizardPage implements SelectionListe
                 for (Iterator i=sourceMappings.iterator(); i.hasNext(); ) {
                     SourceMapping source = (SourceMapping)i.next();
 
-                    SourceConfig sourceDefinition = partition.getSources().getSourceConfig(source.getSourceName());
+                    SourceConfig sourceDefinition = partitionConfig.getSourceConfigs().getSourceConfig(source.getSourceName());
 
                     Collection fields = sourceDefinition.getFieldConfigs();
                     for (Iterator j=fields.iterator(); j.hasNext(); ) {

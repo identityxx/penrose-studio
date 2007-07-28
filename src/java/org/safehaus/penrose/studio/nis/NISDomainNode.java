@@ -4,10 +4,11 @@ import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.*;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.nis.NISDomain;
+import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.Partitions;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
@@ -46,10 +47,10 @@ public class NISDomainNode extends Node {
         this.domain = (NISDomain)object;
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
-        SourceManager sourceManager = penroseContext.getSourceManager();
+        Partitions partitions = penroseApplication.getPartitions();
+        Partition partition = partitions.getPartition("DEFAULT");
 
-        domains = sourceManager.getSource("DEFAULT", "penrose.domains");
+        domains = partition.getSource("penrose.domains");
     }
 
     public void showMenu(IMenuManager manager) throws Exception {

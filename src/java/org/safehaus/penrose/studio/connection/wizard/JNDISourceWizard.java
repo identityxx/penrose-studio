@@ -23,6 +23,7 @@ import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.source.wizard.JNDIFieldWizardPage;
 import org.safehaus.penrose.studio.source.wizard.JNDIAttributeWizardPage;
 import org.safehaus.penrose.ldap.RDN;
@@ -42,7 +43,7 @@ public class JNDISourceWizard extends Wizard {
     Logger log = Logger.getLogger(getClass());
 
     private LDAPClient client;
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     private ConnectionConfig connectionConfig;
     private String baseDn;
     private String filter;
@@ -54,13 +55,13 @@ public class JNDISourceWizard extends Wizard {
     public JNDIAttributeWizardPage attributesPage;
     public JNDIFieldWizardPage fieldsPage = new JNDIFieldWizardPage();
 
-    public JNDISourceWizard(LDAPClient client, Partition partition, ConnectionConfig connectionConfig, String baseDn) throws Exception {
+    public JNDISourceWizard(LDAPClient client, PartitionConfig partition, ConnectionConfig connectionConfig, String baseDn) throws Exception {
         this(client, partition, connectionConfig, baseDn, "(objectClass=*)", "OBJECT", new ArrayList());
     }
     
     public JNDISourceWizard(
             LDAPClient client,
-            Partition partition,
+            PartitionConfig partition,
             ConnectionConfig connectionConfig,
             String baseDn,
             String filter,
@@ -68,7 +69,7 @@ public class JNDISourceWizard extends Wizard {
             Collection attributeNames) throws Exception {
 
         this.client = client;
-        this.partition = partition;
+        this.partitionConfig = partition;
         this.connectionConfig = connectionConfig;
         this.baseDn = baseDn;
         this.filter = filter;
@@ -88,7 +89,7 @@ public class JNDISourceWizard extends Wizard {
         propertyPage = new JNDISourceWizardPage(name, baseDn, filter, scope);
         
         attributesPage = new JNDIAttributeWizardPage(attributeNames);
-        attributesPage.setConnectionConfig(partition, connectionConfig);
+        attributesPage.setConnectionConfig(connectionConfig);
 
         setWindowTitle(connectionConfig.getName()+" - New Source");
     }
@@ -117,7 +118,7 @@ public class JNDISourceWizard extends Wizard {
                 sourceConfig.addFieldConfig(field);
             }
 
-            partition.getSources().addSourceConfig(sourceConfig);
+            partitionConfig.getSourceConfigs().addSourceConfig(sourceConfig);
 
             return true;
 
@@ -168,11 +169,11 @@ public class JNDISourceWizard extends Wizard {
         this.connectionConfig = connectionConfig;
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

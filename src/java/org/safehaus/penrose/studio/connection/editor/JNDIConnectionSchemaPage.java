@@ -29,7 +29,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.AttributeType;
@@ -56,7 +56,7 @@ public class JNDIConnectionSchemaPage extends FormPage {
     Table attributeTypesTable;
 
     JNDIConnectionEditor editor;
-    Partition partition;
+    PartitionConfig partitionConfig;
     ConnectionConfig connectionConfig;
 
     Schema schema;
@@ -65,7 +65,7 @@ public class JNDIConnectionSchemaPage extends FormPage {
         super(editor, "SCHEMA", "  Schema  ");
 
         this.editor = editor;
-        this.partition = editor.getPartition();
+        this.partitionConfig = editor.getPartitionConfig();
         this.connectionConfig = editor.getConnectionConfig();
     }
 

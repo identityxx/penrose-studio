@@ -26,6 +26,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 
 import javax.naming.Context;
@@ -62,7 +63,8 @@ public class SelectJNDIConnectionWizardPage extends WizardPage {
         gd.widthHint = 100;
         connectionTable.setLayoutData(gd);
 
-        Collection connectionConfigs = partition.getConnectionConfigs();
+        PartitionConfig partitionConfig = partition.getPartitionConfig();
+        Collection connectionConfigs = partitionConfig.getConnectionConfigs().getConnectionConfigs();
         for (Iterator i=connectionConfigs.iterator(); i.hasNext(); ) {
             ConnectionConfig connectionConfig = (ConnectionConfig)i.next();
             if (!"LDAP".equals(connectionConfig.getAdapterName())) continue;

@@ -34,6 +34,7 @@ import org.safehaus.penrose.mapping.FieldMapping;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.filter.*;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDNBuilder;
@@ -67,10 +68,10 @@ public class NewEntryFromSourceAction extends Action {
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
             //if (!penroseApplication.isCommercial()) return;
 
-            Partition partition = node.getPartition();
+            PartitionConfig partitionConfig = node.getPartitionConfig();
             EntryMapping entryMapping = node.getEntryMapping();
 
-            Collection sourceConfigs = partition.getSources().getSourceConfigs();
+            Collection sourceConfigs = partitionConfig.getSourceConfigs().getSourceConfigs();
             if (sourceConfigs.size() == 0) {
                 System.out.println("There is no sources defined.");
                 return;
@@ -86,7 +87,7 @@ public class NewEntryFromSourceAction extends Action {
 
             if (!dialog.isSaved()) return;
 
-            SourceConfig sourceConfig = partition.getSources().getSourceConfig(sourceMapping.getSourceName());
+            SourceConfig sourceConfig = partitionConfig.getSourceConfigs().getSourceConfig(sourceMapping.getSourceName());
 
             final EntryMapping entry = new EntryMapping();
 
@@ -156,7 +157,7 @@ public class NewEntryFromSourceAction extends Action {
 
             entry.addSourceMapping(sourceMapping);
 
-            partition.getMappings().addEntryMapping(entry);
+            partitionConfig.getDirectoryConfigs().addEntryMapping(entry);
 
             penroseApplication.notifyChangeListeners();
 

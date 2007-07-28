@@ -32,7 +32,7 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.mapping.*;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.ldap.RDN;
@@ -53,7 +53,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
     public final static int VARIABLE   = 1;
     public final static int EXPRESSION = 2;
 
-    Partition partition;
+    PartitionConfig partitionConfig;
     Table attributeTable;
 
     private Collection sourceMappings;
@@ -65,9 +65,9 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
     private boolean needRdn = false;
 
-    public AttributeValueWizardPage(Partition partition) {
+    public AttributeValueWizardPage(PartitionConfig partition) {
         super(NAME);
-        this.partition = partition;
+        this.partitionConfig = partition;
         setDescription("Double-click the attribute to enter the values. Select attributes that will be used as RDN.");
     }
 
@@ -103,7 +103,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                         if (sourceMappings != null) {
                             for (Iterator i=sourceMappings.iterator(); i.hasNext(); ) {
                                 SourceMapping sourceMapping = (SourceMapping)i.next();
-                                SourceConfig sourceConfig = partition.getSources().getSourceConfig(sourceMapping.getSourceName());
+                                SourceConfig sourceConfig = partitionConfig.getSourceConfigs().getSourceConfig(sourceMapping.getSourceName());
                                 dialog.addVariable(sourceMapping.getName());
 
                                 Collection fields = sourceConfig.getFieldConfigs();

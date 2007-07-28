@@ -4,6 +4,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 
 /**
@@ -11,14 +12,14 @@ import org.safehaus.penrose.connection.ConnectionConfig;
  */
 public class ConnectionEditorInput implements IEditorInput {
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     private ConnectionConfig connectionConfig;
 
     public ConnectionEditorInput() {
     }
 
-    public ConnectionEditorInput(Partition partition, ConnectionConfig connectionConfig) {
-        this.partition = partition;
+    public ConnectionEditorInput(PartitionConfig partitionConfig, ConnectionConfig connectionConfig) {
+        this.partitionConfig = partitionConfig;
         this.connectionConfig = connectionConfig;
     }
 
@@ -47,7 +48,7 @@ public class ConnectionEditorInput implements IEditorInput {
     }
 
     public int hashCode() {
-        return (partition == null ? 0 : partition.hashCode()) +
+        return (partitionConfig == null ? 0 : partitionConfig.hashCode()) +
                 (connectionConfig == null ? 0 : connectionConfig.hashCode());
     }
 
@@ -63,7 +64,7 @@ public class ConnectionEditorInput implements IEditorInput {
 
         ConnectionEditorInput cei = (ConnectionEditorInput)o;
 
-        if (!equals(partition, cei.partition)) return false;
+        if (!equals(partitionConfig, cei.partitionConfig)) return false;
         if (!equals(connectionConfig, cei.connectionConfig)) return false;
 
         return true;
@@ -77,11 +78,11 @@ public class ConnectionEditorInput implements IEditorInput {
         this.connectionConfig = connectionConfig;
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

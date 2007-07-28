@@ -28,9 +28,9 @@ public class LoggingNode extends Node {
         return true;
     }
 
-    public Collection getChildren() throws Exception {
+    public Collection<Node> getChildren() throws Exception {
 
-        Collection children = new ArrayList();
+        Collection<Node> children = new ArrayList<Node>();
 
         children.add(new AppendersNode(
                 view,

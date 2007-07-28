@@ -47,7 +47,6 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
     Combo scopeCombo;
     Text objectClassesText;
 
-    Partition partition;
     ConnectionConfig connectionConfig;
     LDAPClient client;
 
@@ -122,8 +121,7 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
         setPageComplete(validatePage());
     }
 
-    public void setConnectionConfig(Partition partition, ConnectionConfig connectionConfig) {
-        this.partition = partition;
+    public void setConnectionConfig(ConnectionConfig connectionConfig) {
         this.connectionConfig = connectionConfig;
 
         try {

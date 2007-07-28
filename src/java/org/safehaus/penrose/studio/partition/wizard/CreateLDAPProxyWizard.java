@@ -24,10 +24,9 @@ import org.safehaus.penrose.studio.util.SchemaUtil;
 import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionInfoWizardPage;
 import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionParametersWizardPage;
 import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.acl.ACI;
-import org.safehaus.penrose.source.Sources;
+import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.handler.HandlerManager;
 import org.safehaus.penrose.connection.ConnectionConfig;
@@ -79,18 +78,10 @@ public class CreateLDAPProxyWizard extends Wizard {
     public boolean performFinish() {
         try {
             String name = infoPage.getPartitionName();
-            String path = "partitions/"+name;
 
-            PartitionConfig partitionConfig = new PartitionConfig();
-            partitionConfig.setName(name);
-            partitionConfig.setPath(path);
+            PartitionConfig partitionConfig = new PartitionConfig(name);
 
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
-            penroseConfig.addPartitionConfig(partitionConfig);
-
-            PartitionManager partitionManager = penroseApplication.getPartitionManager();
-            Partition partition = partitionManager.load(penroseApplication.getWorkDir(), partitionConfig);
 
             ConnectionConfig connectionConfig = new ConnectionConfig();
             connectionConfig.setName(name);
@@ -107,9 +98,9 @@ public class CreateLDAPProxyWizard extends Wizard {
                 connectionConfig.setParameter(paramName, paramValue);
             }
 
-            partition.getConnections().addConnectionConfig(connectionConfig);
+            partitionConfig.getConnectionConfigs().addConnectionConfig(connectionConfig);
 
-            Sources sources = partition.getSources();
+            SourceConfigs sources = partitionConfig.getSourceConfigs();
 
             SourceConfig sourceConfig = new SourceConfig(name, name);
             sourceConfig.setParameter("baseDn", connectionInfoPage.getSuffix());
@@ -126,7 +117,7 @@ public class CreateLDAPProxyWizard extends Wizard {
 
             rootEntry.addACI(new ACI("rs"));
 
-            partition.getMappings().addEntryMapping(rootEntry);
+            partitionConfig.getDirectoryConfigs().addEntryMapping(rootEntry);
 
             if (infoPage.getMapRootDse()) {
                 SourceConfig rootDseSourceConfig = new SourceConfig();
@@ -148,7 +139,7 @@ public class CreateLDAPProxyWizard extends Wizard {
 
                 rootDseEntryMapping.addACI(new ACI("rs"));
 
-                partition.getMappings().addEntryMapping(rootDseEntryMapping);
+                partitionConfig.getDirectoryConfigs().addEntryMapping(rootDseEntryMapping);
             }
 
             if (infoPage.getMapADSchema()) {
@@ -160,20 +151,15 @@ public class CreateLDAPProxyWizard extends Wizard {
 
                 if (PartitionProxyPage.LDAP.equals(schemaFormat)) {
                     ADUtil util = new ADUtil();
-                    schemaMapping = util.createSchemaProxy(partition, connectionConfig, sourceSchemaDn, destSchemaDn);
+                    schemaMapping = util.createSchemaProxy(partitionConfig, connectionConfig, sourceSchemaDn, destSchemaDn);
 
                 } else {
                     SchemaUtil util = new SchemaUtil();
-                    schemaMapping = util.createSchemaProxy(partition, connectionConfig, sourceSchemaDn, destSchemaDn);
+                    schemaMapping = util.createSchemaProxy(partitionConfig, connectionConfig, sourceSchemaDn, destSchemaDn);
                 }
 
                 schemaMapping.addACI(new ACI("rs"));
             }
-
-            //AdapterConfig adapterConfig = penroseConfig.getAdapterConfig("LDAP");
-
-            //ConnectionManager connectionManager = penroseApplication.getConnectionManager();
-            //connectionManager.init(partition, connectionConfig, adapterConfig);
 
             penroseApplication.notifyChangeListeners();
 

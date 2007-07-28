@@ -32,7 +32,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.studio.connection.wizard.JNDISourceWizard;
@@ -62,7 +62,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
     Table table;
 
     JNDIConnectionEditor editor;
-    Partition partition;
+    PartitionConfig partitionConfig;
     ConnectionConfig connectionConfig;
 
     Schema schema;
@@ -71,7 +71,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
         super(editor, "BROWSER", "  Browser  ");
 
         this.editor = editor;
-        this.partition = editor.getPartition();
+        this.partitionConfig = editor.getPartitionConfig();
         this.connectionConfig = editor.getConnectionConfig();
     }
 
@@ -178,7 +178,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
 
                     JNDISourceWizard wizard = new JNDISourceWizard(
                             client,
-                            partition,
+                            partitionConfig,
                             connectionConfig,
                             baseDn,
                             "(objectClass=*)",
@@ -213,7 +213,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
 
                     JNDISourceWizard wizard = new JNDISourceWizard(
                             client,
-                            partition,
+                            partitionConfig,
                             connectionConfig,
                             baseDn,
                             "(objectClass=*)",
@@ -271,7 +271,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
 
                     JNDISourceWizard wizard = new JNDISourceWizard(
                             client,
-                            partition,
+                            partitionConfig,
                             connectionConfig,
                             parentDn.toString(),
                             filter,

@@ -59,9 +59,9 @@ public class SchemasNode extends Node {
         return !penroseConfig.getSchemaConfigs().isEmpty();
     }
 
-    public Collection getChildren() throws Exception {
+    public Collection<Node> getChildren() throws Exception {
 
-        Collection children = new ArrayList();
+        Collection<Node> children = new ArrayList<Node>();
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();

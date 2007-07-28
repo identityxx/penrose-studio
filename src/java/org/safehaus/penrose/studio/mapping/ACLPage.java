@@ -20,6 +20,7 @@ package org.safehaus.penrose.studio.mapping;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
@@ -401,8 +402,8 @@ public class ACLPage extends FormPage implements ModifyListener {
         tc.setText("Source");
         tc.setWidth(120);
 
-        Partition partition = editor.getPartition();
-        EntryMapping parentEntry = partition.getMappings().getParent(entry);
+        PartitionConfig partitionConfig = editor.getPartitionConfig();
+        EntryMapping parentEntry = partitionConfig.getDirectoryConfigs().getParent(entry);
         while (parentEntry != null) {
             Collection acl = parentEntry.getACL();
             for (Iterator i=acl.iterator(); i.hasNext(); ) {
@@ -420,7 +421,7 @@ public class ACLPage extends FormPage implements ModifyListener {
                 item.setText(7, parentEntry.getDn().toString());
                 item.setData(aci);
             }
-            parentEntry = partition.getMappings().getParent(parentEntry);
+            parentEntry = partitionConfig.getDirectoryConfigs().getParent(parentEntry);
         }
 
         GridData gd = new GridData(GridData.FILL_BOTH);

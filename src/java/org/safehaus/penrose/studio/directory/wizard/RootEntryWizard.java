@@ -23,6 +23,7 @@ import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.StaticEntryDNWizardPage;
@@ -38,15 +39,15 @@ public class RootEntryWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     private EntryMapping entryMapping;
 
     public StaticEntryDNWizardPage dnPage;
     public ObjectClassWizardPage ocPage;
     public AttributeValueWizardPage attrPage;
 
-    public RootEntryWizard(Partition partition) {
-        this.partition = partition;
+    public RootEntryWizard(PartitionConfig partition) {
+        this.partitionConfig = partition;
 
         dnPage = new StaticEntryDNWizardPage(partition);
         ocPage = new ObjectClassWizardPage();
@@ -92,7 +93,7 @@ public class RootEntryWizard extends Wizard {
 
             entryMapping.addACI(new ACI("rs"));
 
-            partition.getMappings().addEntryMapping(entryMapping);
+            partitionConfig.getDirectoryConfigs().addEntryMapping(entryMapping);
 
             return true;
 
@@ -114,11 +115,11 @@ public class RootEntryWizard extends Wizard {
         this.entryMapping = entryMapping;
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

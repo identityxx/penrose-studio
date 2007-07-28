@@ -27,7 +27,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.PenroseApplication;
@@ -49,11 +49,11 @@ public class SelectSourceWizardPage extends WizardPage {
     Table sourceTable;
     Table infoTable;
 
-    Partition partition;
+    PartitionConfig partitionConfig;
 
-    public SelectSourceWizardPage(Partition partition) {
+    public SelectSourceWizardPage(PartitionConfig partitionConfig) {
         super(NAME);
-        this.partition = partition;
+        this.partitionConfig = partitionConfig;
         setDescription("Select source.");
     }
 
@@ -73,7 +73,7 @@ public class SelectSourceWizardPage extends WizardPage {
             public void widgetSelected(SelectionEvent event) {
                 TableItem ti = sourceTable.getSelection()[0];
                 SourceConfig sourceConfig = (SourceConfig)ti.getData();
-                ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
+                ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
 
                 String baseDn = sourceConfig.getParameter("baseDn");
                 baseDn = baseDn == null ? "" : baseDn;
@@ -134,7 +134,7 @@ public class SelectSourceWizardPage extends WizardPage {
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    SourceWizard wizard = new SourceWizard(partition);
+                    SourceWizard wizard = new SourceWizard(partitionConfig);
                     WizardDialog dialog = new WizardDialog(parent.getShell(), wizard);
                     dialog.setPageSize(600, 300);
                     dialog.open();
@@ -163,7 +163,7 @@ public class SelectSourceWizardPage extends WizardPage {
 
                 if (!confirm) return;
 
-                partition.getSources().removeSourceConfig(sourceConfig.getName());
+                partitionConfig.getSourceConfigs().removeSourceConfig(sourceConfig.getName());
 
                 refresh();
 
@@ -179,10 +179,10 @@ public class SelectSourceWizardPage extends WizardPage {
         sourceTable.removeAll();
         infoTable.removeAll();
 
-        Collection sourceConfigs = partition.getSources().getSourceConfigs();
+        Collection sourceConfigs = partitionConfig.getSourceConfigs().getSourceConfigs();
         for (Iterator i=sourceConfigs.iterator(); i.hasNext(); ) {
             SourceConfig sourceConfig = (SourceConfig)i.next();
-            ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
+            ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
             if (!"LDAP".equals(connectionConfig.getAdapterName())) continue;
 
             TableItem item = new TableItem(sourceTable, SWT.NONE);

@@ -37,7 +37,7 @@ public class JDBCSourceWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     private ConnectionConfig connectionConfig;
     private SourceConfig sourceConfig;
 
@@ -46,8 +46,8 @@ public class JDBCSourceWizard extends Wizard {
     public JDBCFieldWizardPage jdbcFieldsPage;
     public JDBCPrimaryKeyWizardPage jdbcPrimaryKeyPage;
 
-    public JDBCSourceWizard(Partition partition, ConnectionConfig connectionConfig) {
-        this.partition = partition;
+    public JDBCSourceWizard(PartitionConfig partition, ConnectionConfig connectionConfig) {
+        this.partitionConfig = partition;
         this.connectionConfig = connectionConfig;
 
         propertyPage = new SourceWizardPage();
@@ -123,7 +123,7 @@ public class JDBCSourceWizard extends Wizard {
                 sourceConfig.addFieldConfig(field);
             }
 
-            partition.getSources().addSourceConfig(sourceConfig);
+            partitionConfig.getSourceConfigs().addSourceConfig(sourceConfig);
 
             return true;
 
@@ -153,11 +153,11 @@ public class JDBCSourceWizard extends Wizard {
         this.connectionConfig = connectionConfig;
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

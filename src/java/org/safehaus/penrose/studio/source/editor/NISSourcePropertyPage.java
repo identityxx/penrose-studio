@@ -12,6 +12,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.source.FieldConfig;
@@ -21,7 +22,7 @@ import org.safehaus.penrose.studio.source.FieldDialog;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.source.Sources;
+import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.SourceMapping;
 import org.safehaus.penrose.nis.*;
@@ -49,7 +50,7 @@ public class NISSourcePropertyPage extends FormPage {
     Button removeButton;
 
     NISSourceEditor editor;
-    Partition partition;
+    PartitionConfig partitionConfig;
 	SourceConfig source;
 
 	NISClient client;
@@ -60,10 +61,10 @@ public class NISSourcePropertyPage extends FormPage {
         super(editor, "PROPERTIES", "  Properties  ");
 
         this.editor = editor;
-        this.partition = editor.partition;
+        this.partitionConfig = editor.partitionConfig;
         this.source = editor.sourceConfig;
 
-        ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(source.getConnectionName());
+        ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(source.getConnectionName());
         if (connectionConfig == null) return;
 
         String method = (String)connectionConfig.getParameter(NISAdapter.METHOD);
@@ -144,7 +145,7 @@ public class NISSourcePropertyPage extends FormPage {
         gd.widthHint = 200;
 		connectionNameCombo.setLayoutData(gd);
 
-        for (Iterator i=partition.getConnectionConfigs().iterator(); i.hasNext(); ) {
+        for (Iterator i=partitionConfig.getConnectionConfigs().getConnectionConfigs().iterator(); i.hasNext(); ) {
             ConnectionConfig connectionConfig = (ConnectionConfig)i.next();
             connectionNameCombo.add(connectionConfig.getName());
         }
@@ -396,15 +397,14 @@ public class NISSourcePropertyPage extends FormPage {
 
     public void store() throws Exception {
 
-        Partition partition = editor.getPartition();
-        Sources sources = partition.getSources();
+        SourceConfigs sources = partitionConfig.getSourceConfigs();
 
         if (!sourceNameText.getText().equals(source.getName())) {
 
             String oldName = source.getName();
             String newName = sourceNameText.getText();
 
-            Collection entries = partition.getMappings().getEntryMappings();
+            Collection entries = partitionConfig.getDirectoryConfigs().getEntryMappings();
             for (Iterator i=entries.iterator(); i.hasNext(); ) {
                 EntryMapping entry = (EntryMapping)i.next();
 

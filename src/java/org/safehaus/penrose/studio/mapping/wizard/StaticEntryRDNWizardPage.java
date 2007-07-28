@@ -24,7 +24,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.mapping.EntryMapping;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.mapping.EntrySelectionDialog;
 import org.ietf.ldap.LDAPDN;
 
@@ -39,13 +39,13 @@ public class StaticEntryRDNWizardPage extends WizardPage implements ModifyListen
     Text parentDnText;
     Button browseButton;
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     private EntryMapping parentMapping;
 
-    public StaticEntryRDNWizardPage(Partition partition, EntryMapping parentMapping) {
+    public StaticEntryRDNWizardPage(PartitionConfig partition, EntryMapping parentMapping) {
         super(NAME);
 
-        this.partition = partition;
+        this.partitionConfig = partition;
         this.parentMapping = parentMapping;
 
         setDescription("Enter the RDN of the entry.");
@@ -104,7 +104,7 @@ public class StaticEntryRDNWizardPage extends WizardPage implements ModifyListen
             public void widgetSelected(SelectionEvent event) {
                 EntrySelectionDialog dialog = new EntrySelectionDialog(parent.getShell(), SWT.NONE);
                 dialog.setText("Select parent entry...");
-                dialog.setPartition(partition);
+                dialog.setPartitionConfig(partitionConfig);
                 dialog.open();
 
                 EntryMapping parentEntry = dialog.getEntryMapping();
@@ -135,11 +135,11 @@ public class StaticEntryRDNWizardPage extends WizardPage implements ModifyListen
         setPageComplete(validatePage());
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

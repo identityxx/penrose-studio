@@ -37,6 +37,7 @@ import org.safehaus.penrose.studio.connection.action.NewSourceAction;
 import org.safehaus.penrose.studio.connection.editor.*;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
@@ -52,7 +53,7 @@ public class ConnectionNode extends Node {
 
     ObjectsView view;
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     private ConnectionConfig connectionConfig;
 
     public ConnectionNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
@@ -119,7 +120,7 @@ public class ConnectionNode extends Node {
         Plugin plugin = pluginManager.getPlugin(connectionConfig.getAdapterName());
 
         ConnectionEditorInput cei = plugin.createConnectionEditorInput();
-        cei.setPartition(partition);
+        cei.setPartitionConfig(partitionConfig);
         cei.setConnectionConfig(connectionConfig);
 
         String connectionEditorClass = plugin.getConnectionEditorClass();
@@ -139,7 +140,7 @@ public class ConnectionNode extends Node {
 
         if (!confirm) return;
 
-        partition.getConnections().removeConnectionConfig(connectionConfig.getName());
+        partitionConfig.getConnectionConfigs().removeConnectionConfig(connectionConfig.getName());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         penroseApplication.notifyChangeListeners();
@@ -159,13 +160,13 @@ public class ConnectionNode extends Node {
 
         int counter = 1;
         String name = newConnectionConfig.getName();
-        while (partition.getConnections().getConnectionConfig(name) != null) {
+        while (partitionConfig.getConnectionConfigs().getConnectionConfig(name) != null) {
             counter++;
             name = newConnectionConfig.getName()+" ("+counter+")";
         }
 
         newConnectionConfig.setName(name);
-        partition.getConnections().addConnectionConfig(newConnectionConfig);
+        partitionConfig.getConnectionConfigs().addConnectionConfig(newConnectionConfig);
 
         view.setClipboard(null);
 
@@ -177,19 +178,19 @@ public class ConnectionNode extends Node {
         return false;
     }
 
-    public Collection getChildren() throws Exception {
+    public Collection<Node> getChildren() throws Exception {
 
-        Collection children = new ArrayList();
+        Collection<Node> children = new ArrayList<Node>();
 
         return children;
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 
     public ConnectionConfig getConnectionConfig() {

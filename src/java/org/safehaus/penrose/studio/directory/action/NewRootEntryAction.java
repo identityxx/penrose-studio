@@ -50,7 +50,7 @@ public class NewRootEntryAction extends Action {
 
             Shell shell = window.getShell();
 
-            RootEntryWizard wizard = new RootEntryWizard(node.getPartition());
+            RootEntryWizard wizard = new RootEntryWizard(node.getPartitionConfig());
             WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.setPageSize(600, 300);
             dialog.open();

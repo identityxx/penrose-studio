@@ -38,7 +38,7 @@ import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.ldap.LDAPClient;
-import org.safehaus.penrose.source.Sources;
+import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
@@ -65,7 +65,7 @@ public class JNDISourcePropertyPage extends FormPage {
     Button removeButton;
 
     JNDISourceEditor editor;
-    Partition partition;
+    PartitionConfig partitionConfig;
 	SourceConfig source;
 	
 	LDAPClient client;
@@ -76,10 +76,10 @@ public class JNDISourcePropertyPage extends FormPage {
         super(editor, "PROPERTIES", "  Properties  ");
 
         this.editor = editor;
-        this.partition = editor.partition;
+        this.partitionConfig = editor.partitionConfig;
         this.source = editor.sourceConfig;
 
-        ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(source.getConnectionName());
+        ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(source.getConnectionName());
         if (connectionConfig != null) {
             client = new LDAPClient(connectionConfig.getParameters());
         }
@@ -147,7 +147,7 @@ public class JNDISourcePropertyPage extends FormPage {
         gd.widthHint = 200;
 		connectionNameCombo.setLayoutData(gd);
 
-        for (Iterator i=partition.getConnectionConfigs().iterator(); i.hasNext(); ) {
+        for (Iterator i=partitionConfig.getConnectionConfigs().getConnectionConfigs().iterator(); i.hasNext(); ) {
             ConnectionConfig connectionConfig = (ConnectionConfig)i.next();
             connectionNameCombo.add(connectionConfig.getName());
         }
@@ -449,15 +449,14 @@ public class JNDISourcePropertyPage extends FormPage {
 
     public void store() throws Exception {
 
-        Partition partition = editor.getPartition();
-        Sources sources = partition.getSources();
+        SourceConfigs sources = partitionConfig.getSourceConfigs();
 
         if (!sourceNameText.getText().equals(source.getName())) {
 
             String oldName = source.getName();
             String newName = sourceNameText.getText();
 
-            Collection entries = partition.getMappings().getEntryMappings();
+            Collection entries = partitionConfig.getDirectoryConfigs().getEntryMappings();
             for (Iterator i=entries.iterator(); i.hasNext(); ) {
                 EntryMapping entry = (EntryMapping)i.next();
 

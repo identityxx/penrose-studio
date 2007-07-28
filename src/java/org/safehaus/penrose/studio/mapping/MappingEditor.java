@@ -27,13 +27,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.apache.log4j.Logger;
 
 public class MappingEditor extends FormEditor implements ModifyListener {
 
     Logger log = Logger.getLogger(getClass());
 
-    Partition partition;
+    PartitionConfig partitionConfig;
 	EntryMapping entry;
     EntryMapping origEntry;
 
@@ -42,7 +43,7 @@ public class MappingEditor extends FormEditor implements ModifyListener {
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         MappingEditorInput mei = (MappingEditorInput)input;
 
-        partition = mei.getPartition();
+        partitionConfig = mei.getPartitionConfig();
         origEntry = mei.getEntryMapping();
 
         try {
@@ -101,8 +102,8 @@ public class MappingEditor extends FormEditor implements ModifyListener {
 
 	public void store() throws Exception {
 
-        if (!origEntry.getDn().equals(entry.getDn())) {
-            partition.getMappings().renameEntryMapping(origEntry, entry.getDn());
+        if (!origEntry.getDn().matches(entry.getDn())) {
+            partitionConfig.getDirectoryConfigs().renameEntryMapping(origEntry, entry.getDn());
         }
 
         origEntry.copy(entry);
@@ -150,12 +151,12 @@ public class MappingEditor extends FormEditor implements ModifyListener {
         checkDirty();
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }
 

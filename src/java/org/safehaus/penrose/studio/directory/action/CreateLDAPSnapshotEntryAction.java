@@ -54,7 +54,7 @@ public class CreateLDAPSnapshotEntryAction extends Action {
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
             //if (!penroseApplication.isCommercial()) return;
 
-            Wizard wizard = new CreateLDAPSnapshotWizard(node.getPartition());
+            Wizard wizard = new CreateLDAPSnapshotWizard(node.getPartitionConfig());
 
             WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.setPageSize(600, 300);

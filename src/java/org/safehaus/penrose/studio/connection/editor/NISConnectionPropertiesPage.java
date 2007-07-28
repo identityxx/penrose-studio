@@ -11,7 +11,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
 
@@ -38,14 +38,14 @@ public class NISConnectionPropertiesPage extends FormPage {
     String url;
 
     NISConnectionEditor editor;
-    Partition partition;
+    PartitionConfig partitionConfig;
     ConnectionConfig connectionConfig;
 
     public NISConnectionPropertiesPage(NISConnectionEditor editor) {
         super(editor, "PROPERTIES", "  Properties  ");
 
         this.editor = editor;
-        this.partition = editor.getPartition();
+        this.partitionConfig = editor.getPartitionConfig();
         this.connectionConfig = editor.getConnectionConfig();
     }
 

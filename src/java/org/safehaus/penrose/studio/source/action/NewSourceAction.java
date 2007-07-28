@@ -50,7 +50,7 @@ public class NewSourceAction extends Action {
 
             Shell shell = window.getShell();
 
-            SourceWizard wizard = new SourceWizard(node.getPartition());
+            SourceWizard wizard = new SourceWizard(node.getPartitionConfig());
             WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.setPageSize(600, 300);
             dialog.open();

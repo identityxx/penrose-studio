@@ -18,15 +18,16 @@ import org.safehaus.penrose.studio.nis.action.NISAction;
 import org.safehaus.penrose.studio.nis.action.NISActionRequest;
 import org.safehaus.penrose.studio.nis.action.NISActionResponse;
 import org.safehaus.penrose.studio.nis.action.Conflict;
-import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.adapter.jdbc.JDBCAdapter;
+import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.QueryResponse;
+import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.Partitions;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -65,11 +66,11 @@ public class NISGroupsPage extends FormPage {
         this.domain = editor.getDomain();
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
-        SourceManager sourceManager = penroseContext.getSourceManager();
+        Partitions partitions = penroseApplication.getPartitions();
+        Partition partition = partitions.getPartition("DEFAULT");
 
-        actions = sourceManager.getSource("DEFAULT", "penrose.actions");
-        domains = sourceManager.getSource("DEFAULT", "penrose.domains");
+        actions = partition.getSource("penrose.actions");
+        domains = partition.getSource("penrose.domains");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -327,8 +328,7 @@ public class NISGroupsPage extends FormPage {
         if (gidNumber == null) gidNumber = (Integer) attributes.getValue("origGidNumber");
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
-        SourceManager sourceManager = penroseContext.getSourceManager();
+        Partitions partitions = penroseApplication.getPartitions();
 
         SearchRequest searchRequest = new SearchRequest();
         SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
@@ -340,11 +340,12 @@ public class NISGroupsPage extends FormPage {
             Attributes attrs = searchResults.getAttributes();
 
             final String domainName = (String) attrs.getValue("name");
-            String partition = (String) attrs.getValue("partition");
+            String partitionName = (String) attrs.getValue("partition");
+            Partition partition = partitions.getPartition(partitionName);
 
             if (domain.getName().equals(domainName)) continue;
 
-            Source users = sourceManager.getSource(partition, "cache.groups");
+            Source users = partition.getSource("cache.groups");
 
             JDBCAdapter adapter = (JDBCAdapter)users.getConnection().getAdapter();
             JDBCClient client = adapter.getClient();
@@ -451,14 +452,14 @@ public class NISGroupsPage extends FormPage {
 
     public void edit(
             String domain,
-            String partition,
+            String partitionName,
             String cn,
             Integer origGidNumber
     ) throws Exception {
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
-        SourceManager sourceManager = penroseContext.getSourceManager();
+        Partitions partitions = penroseApplication.getPartitions();
+        Partition partition = partitions.getPartition(partitionName);
 
         RDNBuilder rb = new RDNBuilder();
         rb.set("domain", domain);
@@ -470,7 +471,7 @@ public class NISGroupsPage extends FormPage {
         dialog.setName(cn);
         dialog.setOrigGidNumber(origGidNumber);
 
-        Source penroseGroups = sourceManager.getSource(partition, "penrose.groups");
+        Source penroseGroups = partition.getSource("penrose.groups");
 
         SearchRequest request = new SearchRequest();
         request.setDn(dn);
@@ -485,7 +486,7 @@ public class NISGroupsPage extends FormPage {
             dialog.setNewGidNumber((Integer)attributes.getValue("gidNumber"));
         }
 
-        Source members = sourceManager.getSource(partition, "cache.groups_memberUid");
+        Source members = partition.getSource("cache.groups_memberUid");
 
         request = new SearchRequest();
         request.setFilter("(cn="+cn+")");
@@ -542,15 +543,15 @@ public class NISGroupsPage extends FormPage {
     public void checkGidNumber(String cn, Integer gidNumber) throws Exception {
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
-        SourceManager sourceManager = penroseContext.getSourceManager();
+        Partitions partitions = penroseApplication.getPartitions();
+        Partition partition = partitions.getPartition("DEFAULT");
 
         SearchRequest request = new SearchRequest();
         request.setFilter("(gidNumber=" + gidNumber + ")");
 
         SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
-        Source groups = sourceManager.getSource("DEFAULT", "penrose.groups");
+        Source groups = partition.getSource("penrose.groups");
         groups.search(request, response);
 
         while (response.hasNext()) {
@@ -574,11 +575,12 @@ public class NISGroupsPage extends FormPage {
             Attributes attributes = searchResults.getAttributes();
 
             String domainName = (String) attributes.getValue("name");
-            String partition = (String) attributes.getValue("partition");
+            String partitionName = (String) attributes.getValue("partition");
+            Partition partition2 = partitions.getPartition(partitionName);
 
             response = new SearchResponse<SearchResult>();
 
-            groups = sourceManager.getSource(partition, "cache.groups");
+            groups = partition2.getSource("cache.groups");
             groups.search(request, response);
 
             while (response.hasNext()) {

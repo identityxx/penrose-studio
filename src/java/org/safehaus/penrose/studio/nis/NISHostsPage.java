@@ -14,11 +14,12 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.nis.NISDomain;
+import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.Partitions;
 
 import java.util.Date;
 import java.util.Collection;
@@ -49,12 +50,11 @@ public class NISHostsPage extends FormPage {
         this.domain = editor.getDomain();
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
+        Partitions partitions = penroseApplication.getPartitions();
+        Partition partition = partitions.getPartition("DEFAULT");
 
-        final SourceManager sourceManager = penroseContext.getSourceManager();
-
-        hosts = sourceManager.getSource("DEFAULT", "penrose.hosts");
-        files = sourceManager.getSource("DEFAULT", "penrose.files");
+        hosts = partition.getSource("penrose.hosts");
+        files = partition.getSource("penrose.files");
     }
 
     public void createFormContent(IManagedForm managedForm) {

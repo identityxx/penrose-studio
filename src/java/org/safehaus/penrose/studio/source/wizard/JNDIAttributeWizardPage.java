@@ -186,26 +186,25 @@ public class JNDIAttributeWizardPage extends WizardPage {
         addAllButton.setText(">>");
         addAllButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                Map map = new TreeMap();
+                Map<String,AttributeType> map = new TreeMap<String,AttributeType>();
                 TableItem items[] = selectedAttrTable.getItems();
-                for (int i=0; i<items.length; i++) {
-                    AttributeType attrType = (AttributeType)items[i].getData();
+                for (TableItem item : items) {
+                    AttributeType attrType = (AttributeType) item.getData();
                     map.put(attrType.getName(), attrType);
                 }
 
                 items = availableAttrTable.getItems();
-                for (int i=0; i<items.length; i++) {
-                    AttributeType attrType = (AttributeType)items[i].getData();
+                for (TableItem item : items) {
+                    AttributeType attrType = (AttributeType) item.getData();
                     map.put(attrType.getName(), attrType);
-                    items[i].dispose();
+                    item.dispose();
                 }
 
                 selectedAttrTable.removeAll();
-                for (Iterator i=map.values().iterator(); i.hasNext(); ) {
-                    AttributeType attrType = (AttributeType)i.next();
+                for (AttributeType attributeType : map.values()) {
                     TableItem item = new TableItem(selectedAttrTable, SWT.NONE);
-                    item.setText(attrType.getName());
-                    item.setData(attrType);
+                    item.setText(attributeType.getName());
+                    item.setData(attributeType);
                 }
 
                 setPageComplete(validatePage());
@@ -216,26 +215,25 @@ public class JNDIAttributeWizardPage extends WizardPage {
         removeAllButton.setText("<<");
         removeAllButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                Map map = new TreeMap();
+                Map<String,AttributeType> map = new TreeMap<String,AttributeType>();
                 TableItem items[] = availableAttrTable.getItems();
-                for (int i=0; i<items.length; i++) {
-                    AttributeType attrType = (AttributeType)items[i].getData();
+                for (TableItem item : items) {
+                    AttributeType attrType = (AttributeType) item.getData();
                     map.put(attrType.getName(), attrType);
                 }
 
                 items = selectedAttrTable.getItems();
-                for (int i=0; i<items.length; i++) {
-                    AttributeType attrType = (AttributeType)items[i].getData();
+                for (TableItem item : items) {
+                    AttributeType attrType = (AttributeType) item.getData();
                     map.put(attrType.getName(), attrType);
-                    items[i].dispose();
+                    item.dispose();
                 }
 
                 availableAttrTable.removeAll();
-                for (Iterator i=map.values().iterator(); i.hasNext(); ) {
-                    AttributeType attrType = (AttributeType)i.next();
+                for (AttributeType attributeType : map.values()) {
                     TableItem item = new TableItem(availableAttrTable, SWT.NONE);
-                    item.setText(attrType.getName());
-                    item.setData(attrType);
+                    item.setText(attributeType.getName());
+                    item.setData(attributeType);
                 }
 
                 setPageComplete(validatePage());
@@ -248,7 +246,7 @@ public class JNDIAttributeWizardPage extends WizardPage {
         setPageComplete(validatePage());
     }
 
-    public void setConnectionConfig(Partition partition, ConnectionConfig connectionConfig) {
+    public void setConnectionConfig(ConnectionConfig connectionConfig) {
         try {
             if (schema == null) {
                 LDAPClient client = new LDAPClient(connectionConfig.getParameters());

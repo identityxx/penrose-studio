@@ -13,17 +13,16 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.util.LDAPUtil;
-import org.safehaus.penrose.connection.ConnectionManager;
+import org.safehaus.penrose.ldap.LDAP;
 import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.config.PenroseConfig;
+import org.safehaus.penrose.naming.PenroseContext;
 
 import java.util.Iterator;
 import java.util.Collection;
@@ -39,14 +38,14 @@ public class JDBCSourceBrowsePage extends FormPage {
     Table table;
 
     JDBCSourceEditor editor;
-    Partition partition;
+    PartitionConfig partitionConfig;
     SourceConfig sourceConfig;
 
     public JDBCSourceBrowsePage(JDBCSourceEditor editor) {
         super(editor, "BROWSE", "  Browse  ");
 
         this.editor = editor;
-        this.partition = editor.partition;
+        this.partitionConfig = editor.partitionConfig;
         this.sourceConfig = editor.sourceConfig;
     }
 
@@ -169,7 +168,7 @@ public class JDBCSourceBrowsePage extends FormPage {
     public void add(final Shell parent) {
         try {
             JDBCSearchResultDialog dialog = new JDBCSearchResultDialog(parent.getShell(), SWT.NONE);
-            dialog.setPartition(partition);
+            dialog.setPartitionConfig(partitionConfig);
             dialog.setSourceConfig(sourceConfig);
             dialog.open();
 
@@ -179,18 +178,17 @@ public class JDBCSourceBrowsePage extends FormPage {
             DN dn = new DN(rdn);
             Attributes attributes = dialog.getAttributes();
 
+            ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
 
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
             PenroseContext penroseContext = penroseApplication.getPenroseContext();
 
-            ConnectionManager connectionManager = penroseContext.getConnectionManager();
-            ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
-            Connection connection = connectionManager.createConnection(partition, connectionConfig);
+            Partitions partitions = new Partitions();
+            Partition partition = partitions.init(penroseConfig, penroseContext, partitionConfig);
+            Connection connection = partition.createConnection(connectionConfig);
 
-            connection.start();
-
-            SourceManager sourceManager = penroseContext.getSourceManager();
-            Source source = sourceManager.createSource(partition, sourceConfig, connection);
+            Source source = partition.createSource(sourceConfig, connection);
 
             source.add(dn, attributes);
 
@@ -219,7 +217,7 @@ public class JDBCSourceBrowsePage extends FormPage {
             RDN rdn = dn.getRdn();
 
             JDBCSearchResultDialog dialog = new JDBCSearchResultDialog(parent, SWT.NONE);
-            dialog.setPartition(partition);
+            dialog.setPartitionConfig(partitionConfig);
             dialog.setSourceConfig(sourceConfig);
             dialog.setRdn(rdn);
             dialog.setAttributes(searchResult.getAttributes());
@@ -229,22 +227,22 @@ public class JDBCSourceBrowsePage extends FormPage {
 
             RDN newRdn = dialog.getRdn();
 
-            Collection<Modification> modifications = LDAPUtil.createModifications(
+            Collection<Modification> modifications = LDAP.createModifications(
                     searchResult.getAttributes(),
                     dialog.getAttributes()
             );
 
+            ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
+
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
             PenroseContext penroseContext = penroseApplication.getPenroseContext();
 
-            ConnectionManager connectionManager = penroseContext.getConnectionManager();
-            ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
-            Connection connection = connectionManager.createConnection(partition, connectionConfig);
+            Partitions partitions = new Partitions();
+            Partition partition = partitions.init(penroseConfig, penroseContext, partitionConfig);
+            Connection connection = partition.createConnection(connectionConfig);
 
-            connection.start();
-
-            SourceManager sourceManager = penroseContext.getSourceManager();
-            Source source = sourceManager.createSource(partition, sourceConfig, connection);
+            Source source = partition.createSource(sourceConfig, connection);
 
             if (!rdn.equals(newRdn)) {
                 source.modrdn(dn, newRdn, true);
@@ -281,17 +279,17 @@ public class JDBCSourceBrowsePage extends FormPage {
 
             DN dn = searchResult.getDn();
 
+            ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
+
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
             PenroseContext penroseContext = penroseApplication.getPenroseContext();
 
-            ConnectionManager connectionManager = penroseContext.getConnectionManager();
-            ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
-            Connection connection = connectionManager.createConnection(partition, connectionConfig);
+            Partitions partitions = new Partitions();
+            Partition partition = partitions.init(penroseConfig, penroseContext, partitionConfig);
+            Connection connection = partition.createConnection(connectionConfig);
 
-            connection.start();
-
-            SourceManager sourceManager = penroseContext.getSourceManager();
-            Source source = sourceManager.createSource(partition, sourceConfig, connection);
+            Source source = partition.createSource(sourceConfig, connection);
 
             source.delete(dn);
 
@@ -354,16 +352,16 @@ public class JDBCSourceBrowsePage extends FormPage {
 
         try {
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
             PenroseContext penroseContext = penroseApplication.getPenroseContext();
 
-            ConnectionManager connectionManager = penroseContext.getConnectionManager();
-            ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
-            Connection connection = connectionManager.createConnection(partition, connectionConfig);
+            Partitions partitions = new Partitions();
+            Partition partition = partitions.init(penroseConfig, penroseContext, partitionConfig);
 
-            connection.start();
+            ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
+            Connection connection = partition.createConnection(connectionConfig);
 
-            SourceManager sourceManager = penroseContext.getSourceManager();
-            Source source = sourceManager.createSource(partition, sourceConfig, connection);
+            Source source = partition.createSource(sourceConfig, connection);
 
             source.search(request, response);
 

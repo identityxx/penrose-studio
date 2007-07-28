@@ -2,16 +2,17 @@ package org.safehaus.penrose.studio.nis.action;
 
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.source.Source;
-import org.safehaus.penrose.source.SourceManager;
-import org.safehaus.penrose.adapter.jdbc.JDBCAdapter;
+import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.jdbc.Assignment;
-import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.ldap.Attributes;
 import org.safehaus.penrose.ldap.SearchRequest;
 import org.safehaus.penrose.ldap.SearchResult;
 import org.safehaus.penrose.ldap.SearchResponse;
+import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.Partitions;
 
 import java.util.*;
 import java.sql.ResultSet;
@@ -23,7 +24,7 @@ public class ConflictingUIDFinderAction extends NISAction {
 
     public String sourceName = "cache.users";
 
-    SourceManager sourceManager;
+    Partitions partitions;
     Map<String,String> map = new TreeMap<String,String>();
 
     public ConflictingUIDFinderAction() throws Exception {
@@ -32,10 +33,10 @@ public class ConflictingUIDFinderAction extends NISAction {
         setDescription("Finds users from different domains with conflicting UIDs");
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
+        partitions = penroseApplication.getPartitions();
+        Partition partition = partitions.getPartition("DEFAULT");
 
-        sourceManager = penroseContext.getSourceManager();
-        Source domains = sourceManager.getSource("DEFAULT", "penrose.domains");
+        Source domains = partition.getSource("penrose.domains");
 
         SearchRequest searchRequest = new SearchRequest();
         SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
@@ -47,9 +48,9 @@ public class ConflictingUIDFinderAction extends NISAction {
             Attributes attributes = searchResult.getAttributes();
 
             String domain = (String)attributes.getValue("name");
-            String partition = (String)attributes.getValue("partition");
+            String partitionName = (String)attributes.getValue("partition");
 
-            map.put(domain, partition);
+            map.put(domain, partitionName);
         }
     }
 
@@ -72,11 +73,13 @@ public class ConflictingUIDFinderAction extends NISAction {
             final NISActionResponse response
     ) throws Exception {
 
-        final String partition1 = map.get(domain1);
-        final Source source1 = sourceManager.getSource(partition1, sourceName);
+        final String partitionName1 = map.get(domain1);
+        Partition partition1 = partitions.getPartition(partitionName1);
+        final Source source1 = partition1.getSource(sourceName);
 
-        final String partition2 = map.get(domain2);
-        final Source source2 = sourceManager.getSource(partition2, sourceName);
+        final String partitionName2 = map.get(domain2);
+        Partition partition2 = partitions.getPartition(partitionName2);
+        final Source source2 = partition2.getSource(sourceName);
 
         JDBCAdapter adapter1 = (JDBCAdapter)source1.getConnection().getAdapter();
         JDBCClient client1 = adapter1.getClient();
@@ -116,14 +119,14 @@ public class ConflictingUIDFinderAction extends NISAction {
 
                 Attributes attributes1 = new Attributes();
                 attributes1.setValue("domain", domain1);
-                attributes1.setValue("partition", partition1);
+                attributes1.setValue("partition", partitionName1);
                 attributes1.setValue("uid", uid1);
                 attributes1.setValue("origUidNumber", origUidNumber1);
                 attributes1.setValue("uidNumber", uidNumber1);
 
                 Attributes attributes2 = new Attributes();
                 attributes2.setValue("domain", domain2);
-                attributes2.setValue("partition", partition2);
+                attributes2.setValue("partition", partitionName2);
                 attributes2.setValue("uid", uid2);
                 attributes2.setValue("origUidNumber", origUidNumber2);
                 attributes2.setValue("uidNumber", uidNumber2);

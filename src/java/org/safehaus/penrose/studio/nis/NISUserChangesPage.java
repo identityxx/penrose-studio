@@ -15,10 +15,11 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.source.Source;
-import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.ldap.*;
+import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.Partitions;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -48,10 +49,10 @@ public class NISUserChangesPage extends FormPage {
         this.domain = editor.getDomain();
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
-        SourceManager sourceManager = penroseContext.getSourceManager();
+        Partitions partitions = penroseApplication.getPartitions();
+        Partition partition = partitions.getPartition("DEFAULT");
 
-        users = sourceManager.getSource("DEFAULT", "penrose.users");
+        users = partition.getSource("penrose.users");
     }
 
     public void createFormContent(IManagedForm managedForm) {

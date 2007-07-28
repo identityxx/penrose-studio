@@ -27,14 +27,12 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;
-import java.util.Iterator;
-import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
@@ -48,17 +46,17 @@ public class SelectConnectionWizardPage extends WizardPage {
     Table connectionTable;
     Table infoTable;
 
-    Partition partition;
+    PartitionConfig partitionConfig;
     String adapterType;
 
-    public SelectConnectionWizardPage(Partition partition) {
-        this(partition, null);
+    public SelectConnectionWizardPage(PartitionConfig partitionConfig) {
+        this(partitionConfig, null);
     }
 
-    public SelectConnectionWizardPage(Partition partition, String adapterType) {
+    public SelectConnectionWizardPage(PartitionConfig partitionConfig, String adapterType) {
         super(NAME);
 
-        this.partition = partition;
+        this.partitionConfig = partitionConfig;
         this.adapterType = adapterType;
 
         setDescription("Select connection.");
@@ -146,7 +144,7 @@ public class SelectConnectionWizardPage extends WizardPage {
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
 
-                ConnectionWizard wizard = new ConnectionWizard(partition);
+                ConnectionWizard wizard = new ConnectionWizard(partitionConfig);
                 WizardDialog dialog = new WizardDialog(parent.getShell(), wizard);
                 dialog.setPageSize(600, 300);
                 dialog.open();
@@ -175,7 +173,7 @@ public class SelectConnectionWizardPage extends WizardPage {
 
                 if (!confirm) return;
 
-                partition.getConnections().removeConnectionConfig(connectionConfig.getName());
+                partitionConfig.getConnectionConfigs().removeConnectionConfig(connectionConfig.getName());
 
                 refresh();
 
@@ -191,9 +189,7 @@ public class SelectConnectionWizardPage extends WizardPage {
         connectionTable.removeAll();
         infoTable.removeAll();
 
-        Collection connectionConfigs = partition.getConnectionConfigs();
-        for (Iterator i=connectionConfigs.iterator(); i.hasNext(); ) {
-            ConnectionConfig connectionConfig = (ConnectionConfig)i.next();
+        for (ConnectionConfig connectionConfig : partitionConfig.getConnectionConfigs().getConnectionConfigs()) {
             String adapterName = connectionConfig.getAdapterName();
             if (adapterType != null && !adapterType.equals(adapterName)) continue;
 
@@ -211,7 +207,6 @@ public class SelectConnectionWizardPage extends WizardPage {
     }
 
     public boolean validatePage() {
-        if (getConnectionConfig() == null) return false;
-        return true;
+        return getConnectionConfig() != null;
     }
 }

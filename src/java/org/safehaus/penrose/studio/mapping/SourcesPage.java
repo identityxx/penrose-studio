@@ -34,6 +34,7 @@ import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.studio.PenrosePlugin;
@@ -105,7 +106,8 @@ public class SourcesPage extends FormPage implements ModifyListener {
 
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                Collection sources = editor.getPartition().getSources().getSourceConfigs();
+                PartitionConfig partitionConfig = editor.getPartitionConfig();
+                Collection sources = partitionConfig.getSourceConfigs().getSourceConfigs();
                 if (sources.size() == 0) {
                     System.out.println("There is no sources defined.");
                     return;
@@ -138,7 +140,8 @@ public class SourcesPage extends FormPage implements ModifyListener {
                 CTabItem item = tabFolder.getSelection();
                 if (item == null) return;
 
-                Collection sources = editor.getPartition().getSources().getSourceConfigs();
+                PartitionConfig partitionConfig = editor.getPartitionConfig();
+                Collection sources = partitionConfig.getSourceConfigs().getSourceConfigs();
                 if (sources.size() == 0) {
                     System.out.println("There is no sources defined.");
                     return;
@@ -326,8 +329,8 @@ public class SourcesPage extends FormPage implements ModifyListener {
                 FieldSelectionDialog dialog = new FieldSelectionDialog(editor.getParent().getShell(), SWT.NONE);
                 dialog.setText("Add field...");
 
-                Partition partition = editor.getPartition();
-                SourceConfig sourceConfig = partition.getSources().getSourceConfig(sourceMapping.getSourceName());
+                PartitionConfig partitionConfig = editor.getPartitionConfig();
+                SourceConfig sourceConfig = partitionConfig.getSourceConfigs().getSourceConfig(sourceMapping.getSourceName());
                 Collection fieldNames = new ArrayList();
                 for (Iterator i=sourceConfig.getFieldConfigs().iterator(); i.hasNext(); ) {
                     FieldConfig fieldConfig = (FieldConfig)i.next();
@@ -374,7 +377,8 @@ public class SourcesPage extends FormPage implements ModifyListener {
     public void refreshFields(SourceMapping sourceMapping, Table table) {
         table.removeAll();
 
-        SourceConfig sourceConfig = editor.getPartition().getSources().getSourceConfig(sourceMapping.getSourceName());
+        PartitionConfig partitionConfig = editor.getPartitionConfig();
+        SourceConfig sourceConfig = partitionConfig.getSourceConfigs().getSourceConfig(sourceMapping.getSourceName());
 
         log.debug("Source "+sourceMapping.getName()+" "+sourceConfig.getName()+":");
         for (Iterator i=sourceConfig.getFieldConfigs().iterator(); i.hasNext(); ) {

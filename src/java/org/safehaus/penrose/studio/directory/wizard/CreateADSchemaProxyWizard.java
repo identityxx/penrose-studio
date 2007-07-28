@@ -39,18 +39,18 @@ public class CreateADSchemaProxyWizard extends Wizard {
     SelectConnectionWizardPage connectionPage;
     SelectSchemaWizardPage schemaPage;
 
-    Partition partition;
+    PartitionConfig partitionConfig;
     EntryMapping parentMapping;
 
-    public CreateADSchemaProxyWizard(Partition partition) {
-        this(partition, null);
+    public CreateADSchemaProxyWizard(PartitionConfig partitionConfig) {
+        this(partitionConfig, null);
     }
 
-    public CreateADSchemaProxyWizard(Partition partition, EntryMapping parentMapping) {
-        this.partition = partition;
+    public CreateADSchemaProxyWizard(PartitionConfig partitionConfig, EntryMapping parentMapping) {
+        this.partitionConfig = partitionConfig;
         this.parentMapping = parentMapping;
 
-        connectionPage = new SelectConnectionWizardPage(partition, "LDAP");
+        connectionPage = new SelectConnectionWizardPage(partitionConfig, "LDAP");
         connectionPage.setDescription(
                 "Select Active Directory connection. "+
                 "The connection URL should point to the Root DSE (empty base DN)."
@@ -92,11 +92,11 @@ public class CreateADSchemaProxyWizard extends Wizard {
 
             if (SelectSchemaWizardPage.LDAP.equals(schemaFormat)) {
                 ADUtil util = new ADUtil();
-                schemaMapping = util.createSchemaProxy(partition, connectionConfig, sourceSchemaDn, destSchemaDn);
+                schemaMapping = util.createSchemaProxy(partitionConfig, connectionConfig, sourceSchemaDn, destSchemaDn);
 
             } else {
                 SchemaUtil util = new SchemaUtil();
-                schemaMapping = util.createSchemaProxy(partition, connectionConfig, sourceSchemaDn, destSchemaDn);
+                schemaMapping = util.createSchemaProxy(partitionConfig, connectionConfig, sourceSchemaDn, destSchemaDn);
             }
 
             schemaMapping.addACI(new ACI("rs"));

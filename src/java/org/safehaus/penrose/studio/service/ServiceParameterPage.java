@@ -93,8 +93,7 @@ public class ServiceParameterPage extends WizardPage implements SelectionListene
         removeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 TableItem items[] = parameterTable.getSelection();
-                for (int i=0; i<items.length; i++) {
-                    TableItem item = items[i];
+                for (TableItem item : items) {
                     item.dispose();
                 }
             }
@@ -103,11 +102,10 @@ public class ServiceParameterPage extends WizardPage implements SelectionListene
         setPageComplete(validatePage());
     }
 
-    public Map getParameters() {
-        Map parameters = new TreeMap();
+    public Map<String,String> getParameters() {
+        Map<String,String> parameters = new TreeMap<String,String>();
         TableItem items[] = parameterTable.getItems();
-        for (int i=0; i<items.length; i++) {
-            TableItem item = items[i];
+        for (TableItem item : items) {
             parameters.put(item.getText(0), item.getText(1));
         }
         return parameters;

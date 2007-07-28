@@ -54,7 +54,7 @@ public class MapLDAPTreeAction extends Action {
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
             //if (!penroseApplication.isCommercial()) return;
 
-            Wizard wizard = new CreateLDAPProxyWizard(node.getPartition(), node.getEntryMapping());
+            Wizard wizard = new CreateLDAPProxyWizard(node.getPartitionConfig(), node.getEntryMapping());
 
             WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.setPageSize(600, 300);

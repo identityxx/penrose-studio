@@ -6,10 +6,11 @@ import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.nis.NISDomain;
+import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.Partitions;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
@@ -65,10 +66,10 @@ public class NISNode extends Node {
     public boolean hasChildren() throws Exception {
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
-        SourceManager sourceManager = penroseContext.getSourceManager();
+        Partitions partitions = penroseApplication.getPartitions();
+        Partition partition = partitions.getPartition("DEFAULT");
 
-        Source domains = sourceManager.getSource("DEFAULT", "penrose.domains");
+        Source domains = partition.getSource("penrose.domains");
         if (domains == null) return false;
 
         SearchRequest request = new SearchRequest();
@@ -79,13 +80,13 @@ public class NISNode extends Node {
         return response.getTotalCount() > 0;
     }
 
-    public Collection getChildren() throws Exception {
+    public Collection<Node> getChildren() throws Exception {
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
-        SourceManager sourceManager = penroseContext.getSourceManager();
+        Partitions partitions = penroseApplication.getPartitions();
+        Partition partition = partitions.getPartition("DEFAULT");
 
-        Source domains = sourceManager.getSource("DEFAULT", "penrose.domains");
+        Source domains = partition.getSource("penrose.domains");
         if (domains == null) return null;
 
         SearchRequest request = new SearchRequest();
@@ -93,26 +94,26 @@ public class NISNode extends Node {
 
         domains.search(request, response);
 
-        Collection children = new ArrayList();
+        Collection<Node> children = new ArrayList<Node>();
 
         while (response.hasNext()) {
             SearchResult result = response.next();
             Attributes attributes = result.getAttributes();
             
             String name = (String)attributes.getValue("name");
-            String partition = (String)attributes.getValue("partition");
+            String partitionName = (String)attributes.getValue("partition");
             String server = (String)attributes.getValue("server");
             String suffix = (String)attributes.getValue("suffix");
 
             NISDomain domain = new NISDomain();
             domain.setName(name);
-            domain.setPartition(partition);
+            domain.setPartition(partitionName);
             domain.setServer(server);
             domain.setSuffix(suffix);
 
             NISDomainNode node = new NISDomainNode(
                     view,
-                    partition,
+                    partitionName,
                     ObjectsView.ENTRY,
                     PenrosePlugin.getImage(PenroseImage.NODE),
                     domain,
@@ -128,10 +129,10 @@ public class NISNode extends Node {
     public void newDomain() throws Exception {
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
-        SourceManager sourceManager = penroseContext.getSourceManager();
+        Partitions partitions = penroseApplication.getPartitions();
+        Partition partition = partitions.getPartition("DEFAULT");
 
-        Source domains = sourceManager.getSource("DEFAULT", "penrose.domains");
+        Source domains = partition.getSource("penrose.domains");
 
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
         NISDomainDialog dialog = new NISDomainDialog(shell, SWT.NONE);

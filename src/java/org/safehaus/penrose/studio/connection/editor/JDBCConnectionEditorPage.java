@@ -7,6 +7,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 
 /**
@@ -18,13 +19,13 @@ public class JDBCConnectionEditorPage extends FormPage {
 
     protected FormToolkit toolkit;
 
-    protected Partition partition;
+    protected PartitionConfig partitionConfig;
     protected ConnectionConfig connectionConfig;
 
     public JDBCConnectionEditorPage(JDBCConnectionEditor editor, String name, String label) {
         super(editor, name, label);
 
-        partition = editor.getPartition();
+        partitionConfig = editor.getPartitionConfig();
         connectionConfig = editor.getConnectionConfig();
     }
 
@@ -52,12 +53,12 @@ public class JDBCConnectionEditorPage extends FormPage {
         this.toolkit = toolkit;
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 
     public ConnectionConfig getConnectionConfig() {

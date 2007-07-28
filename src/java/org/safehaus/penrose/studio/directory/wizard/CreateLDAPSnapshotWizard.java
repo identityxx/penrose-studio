@@ -32,12 +32,12 @@ public class CreateLDAPSnapshotWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    Partition partition;
+    PartitionConfig partitionConfig;
     SelectConnectionWizardPage connectionPage;
 
-    public CreateLDAPSnapshotWizard(Partition partition) {
-        this.partition = partition;
-        this.connectionPage = new SelectConnectionWizardPage(partition, "LDAP");
+    public CreateLDAPSnapshotWizard(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
+        this.connectionPage = new SelectConnectionWizardPage(partitionConfig, "LDAP");
         setWindowTitle("Create LDAP Snapshot");
     }
 
@@ -53,7 +53,7 @@ public class CreateLDAPSnapshotWizard extends Wizard {
             LDAPClient client = new LDAPClient(connectionConfig.getParameters());
 
             SnapshotUtil snapshotUtil = new SnapshotUtil();
-            snapshotUtil.createSnapshot(partition, client);
+            snapshotUtil.createSnapshot(partitionConfig, client);
             
             return true;
 

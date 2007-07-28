@@ -19,16 +19,15 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.filter.OrFilter;
 import org.safehaus.penrose.filter.SimpleFilter;
 import org.safehaus.penrose.filter.AndFilter;
-
-import java.util.*;
+import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.Partitions;
 
 /**
  * @author Endi S. Dewata
@@ -59,11 +58,11 @@ public class NISFilesPage extends FormPage implements Runnable {
         this.domain = editor.getDomain();
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
-        SourceManager sourceManager = penroseContext.getSourceManager();
+        Partitions partitions = penroseApplication.getPartitions();
+        Partition partition = partitions.getPartition("DEFAULT");
 
-        hosts = sourceManager.getSource("DEFAULT", "penrose.hosts");
-        files = sourceManager.getSource("DEFAULT", "penrose.files");
+        hosts = partition.getSource("penrose.hosts");
+        files = partition.getSource("penrose.files");
     }
 
     public void createFormContent(IManagedForm managedForm) {

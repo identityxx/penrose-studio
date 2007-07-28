@@ -45,9 +45,9 @@ public class EnginesNode extends Node {
         return true;
     }
 
-    public Collection getChildren() throws Exception {
+    public Collection<Node> getChildren() throws Exception {
 
-        Collection children = new ArrayList();
+        Collection<Node> children = new ArrayList<Node>();
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         Collection engineConfigs = penroseApplication.getPenroseConfig().getEngineConfigs();

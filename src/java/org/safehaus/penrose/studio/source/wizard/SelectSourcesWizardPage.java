@@ -24,7 +24,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.mapping.*;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.mapping.SourceDialog;
 
 import java.util.Collection;
@@ -37,12 +37,12 @@ public class SelectSourcesWizardPage extends WizardPage implements SelectionList
 
     public final static String NAME = "Data sources";
 
-    Partition partition;
+    PartitionConfig partitionConfig;
     Table sourceTable;
 
-    public SelectSourcesWizardPage(Partition partition) {
+    public SelectSourcesWizardPage(PartitionConfig partition) {
         super(NAME);
-        this.partition = partition;
+        this.partitionConfig = partition;
     }
 
     public void createControl(final Composite parent) {
@@ -77,7 +77,7 @@ public class SelectSourcesWizardPage extends WizardPage implements SelectionList
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
 
-                Collection sources = partition.getSources().getSourceConfigs();
+                Collection sources = partitionConfig.getSourceConfigs().getSourceConfigs();
                 if (sources.size() == 0) {
                     System.out.println("There is no sources defined.");
                     return;

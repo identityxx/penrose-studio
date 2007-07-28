@@ -53,6 +53,7 @@ import org.safehaus.penrose.studio.views.BaseDialog;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.util.Pair;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.apache.log4j.Logger;
@@ -366,7 +367,10 @@ public class ExpressionEditorDialog extends BaseDialog {
 			Collection sources = entry.getSourceMappings();
 			for (Iterator i=sources.iterator(); i.hasNext(); ) {
 				SourceMapping source = (SourceMapping)i.next();
-				SourceConfig sourceConfig = partition.getSources().getSourceConfig(source.getSourceName());
+
+                PartitionConfig partitionConfig = partition.getPartitionConfig();
+				SourceConfig sourceConfig = partitionConfig.getSourceConfigs().getSourceConfig(source.getSourceName());
+
 				Object[] fields = sourceConfig.getFieldConfigs().toArray();
 				Image icon = PenrosePlugin.getImage(PenroseImage.SOURCE);
 

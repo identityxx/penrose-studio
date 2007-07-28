@@ -58,14 +58,14 @@ public class JDBCSourcePropertyPage extends FormPage {
     Button removeButton;
 
     JDBCSourceEditor editor;
-    Partition partition;
+    PartitionConfig partitionConfig;
 	SourceConfig sourceConfig;
 
     public JDBCSourcePropertyPage(JDBCSourceEditor editor) {
         super(editor, "PROPERTIES", "  Properties  ");
 
         this.editor = editor;
-        this.partition = editor.partition;
+        this.partitionConfig = editor.partitionConfig;
         this.sourceConfig = editor.sourceConfig;
     }
 
@@ -131,8 +131,7 @@ public class JDBCSourcePropertyPage extends FormPage {
         gd.widthHint = 200;
 		connectionNameCombo.setLayoutData(gd);
 
-        for (Iterator i=partition.getConnectionConfigs().iterator(); i.hasNext(); ) {
-            ConnectionConfig connectionConfig = (ConnectionConfig)i.next();
+        for (ConnectionConfig connectionConfig : partitionConfig.getConnectionConfigs().getConnectionConfigs()) {
             connectionNameCombo.add(connectionConfig.getName());
         }
 
@@ -267,10 +266,10 @@ public class JDBCSourcePropertyPage extends FormPage {
                     String oldName = fieldConfig.getName();
 
                     PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    PartitionManager partitionManager = penroseApplication.getPartitionManager();
-                    Partition partition = partitionManager.getPartition(sourceConfig);
+                    PartitionConfigs partitionConfigs = penroseApplication.getPartitionConfigs();
+                    PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(sourceConfig);
 
-                    ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
+                    ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
 
                     String catalog = sourceConfig.getParameter(JDBCClient.CATALOG);
                     String schema = sourceConfig.getParameter(JDBCClient.SCHEMA);
@@ -354,10 +353,10 @@ public class JDBCSourcePropertyPage extends FormPage {
                     FieldConfig fieldDefinition = new FieldConfig();
 
                     PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    PartitionManager partitionManager = penroseApplication.getPartitionManager();
-                    Partition partition = partitionManager.getPartition(sourceConfig);
+                    PartitionConfigs partitionConfigs = penroseApplication.getPartitionConfigs();
+                    PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(sourceConfig);
 
-                    ConnectionConfig connection = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
+                    ConnectionConfig connection = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
 
                     String catalogName = sourceConfig.getParameter(JDBCClient.CATALOG);
                     String schemaName = sourceConfig.getParameter(JDBCClient.SCHEMA);
@@ -408,10 +407,10 @@ public class JDBCSourcePropertyPage extends FormPage {
                     String oldName = fieldDefinition.getName();
 
                     PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    PartitionManager partitionManager = penroseApplication.getPartitionManager();
-                    Partition partition = partitionManager.getPartition(sourceConfig);
+                    PartitionConfigs partitionConfigs = penroseApplication.getPartitionConfigs();
+                    PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(sourceConfig);
 
-                    ConnectionConfig connection = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
+                    ConnectionConfig connection = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
 
                     String catalogName = sourceConfig.getParameter(JDBCClient.CATALOG);
                     String schemaName = sourceConfig.getParameter(JDBCClient.SCHEMA);

@@ -50,7 +50,7 @@ public class NewModuleAction extends Action {
 
             Shell shell = window.getShell();
 
-            ModuleWizard wizard = new ModuleWizard(node.getPartition());
+            ModuleWizard wizard = new ModuleWizard(node.getPartitionConfig());
             WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.setPageSize(600, 300);
             dialog.open();

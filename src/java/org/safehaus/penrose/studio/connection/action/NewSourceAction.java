@@ -30,6 +30,7 @@ import org.safehaus.penrose.studio.source.wizard.JNDISourceWizard;
 import org.safehaus.penrose.studio.connection.ConnectionNode;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.apache.log4j.Logger;
 
 public class NewSourceAction extends Action {
@@ -53,18 +54,18 @@ public class NewSourceAction extends Action {
 
             Shell shell = window.getShell();
 
-            Partition partition = node.getPartition();
+            PartitionConfig partitionConfig = node.getPartitionConfig();
             ConnectionConfig connectionConfig = node.getConnectionConfig();
             String adapterName = connectionConfig.getAdapterName();
 
             if ("JDBC".equals(adapterName)) {
-                JDBCSourceWizard wizard = new JDBCSourceWizard(partition, connectionConfig);
+                JDBCSourceWizard wizard = new JDBCSourceWizard(partitionConfig, connectionConfig);
                 WizardDialog dialog = new WizardDialog(shell, wizard);
                 dialog.setPageSize(600, 300);
                 dialog.open();
 
             } else if ("LDAP".equals(adapterName)) {
-                JNDISourceWizard wizard = new JNDISourceWizard(partition, connectionConfig);
+                JNDISourceWizard wizard = new JNDISourceWizard(partitionConfig, connectionConfig);
                 WizardDialog dialog = new WizardDialog(shell, wizard);
                 dialog.setPageSize(600, 300);
                 dialog.open();

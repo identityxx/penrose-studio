@@ -22,17 +22,18 @@ import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 
 /**
  * @author Endi S. Dewata
  */
 public class ModuleEditorInput implements IEditorInput {
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     private ModuleConfig moduleConfig;
 
-    public ModuleEditorInput(Partition partition, ModuleConfig moduleConfig) {
-        this.partition = partition;
+    public ModuleEditorInput(PartitionConfig partitionConfig, ModuleConfig moduleConfig) {
+        this.partitionConfig = partitionConfig;
         this.moduleConfig = moduleConfig;
     }
 
@@ -76,11 +77,11 @@ public class ModuleEditorInput implements IEditorInput {
         this.moduleConfig = moduleConfig;
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

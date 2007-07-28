@@ -26,16 +26,17 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.partition.wizard.ExportPartitionWizard;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.apache.log4j.Logger;
 
 public class ExportPartitionAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
-    Partition partition;
+    PartitionConfig partitionConfig;
 
-	public ExportPartitionAction(Partition partition) {
-        this.partition = partition;
+	public ExportPartitionAction(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
         setText("Export Partition...");
         setId(getClass().getName());
 	}
@@ -48,7 +49,7 @@ public class ExportPartitionAction extends Action {
 
             Shell shell = window.getShell();
 
-            ExportPartitionWizard wizard = new ExportPartitionWizard(partition);
+            ExportPartitionWizard wizard = new ExportPartitionWizard(partitionConfig);
             WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.setPageSize(600, 300);
             dialog.open();

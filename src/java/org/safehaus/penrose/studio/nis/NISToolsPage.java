@@ -19,15 +19,16 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.source.Source;
-import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.ldap.SearchRequest;
 import org.safehaus.penrose.ldap.SearchResult;
 import org.safehaus.penrose.ldap.SearchResponse;
 import org.safehaus.penrose.ldap.Attributes;
 import org.safehaus.penrose.agent.client.FindClient;
 import org.safehaus.penrose.nis.NISDomain;
+import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.Partitions;
 
 import java.util.*;
 
@@ -65,10 +66,10 @@ public class NISToolsPage extends FormPage {
         actions.put("Change file GID number", "changeGid");
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
-        SourceManager sourceManager = penroseContext.getSourceManager();
+        Partitions partitions = penroseApplication.getPartitions();
+        Partition partition = partitions.getPartition("DEFAULT");
 
-        hosts = sourceManager.getSource("DEFAULT", "penrose.hosts");
+        hosts = partition.getSource("penrose.hosts");
     }
 
     public void createFormContent(IManagedForm managedForm) {

@@ -19,12 +19,10 @@ package org.safehaus.penrose.studio.partition.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.partition.PartitionManager;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.PartitionReader;
-import org.safehaus.penrose.config.PenroseConfig;
+import org.safehaus.penrose.partition.PartitionConfigs;
 import org.apache.log4j.Logger;
+
+import java.io.File;
 
 /**
  * @author Endi S. Dewata
@@ -52,22 +50,15 @@ public class ImportPartitionWizard extends Wizard {
     public boolean performFinish() {
         try {
 
-            String name = namePage.getPartitionName();
-            String path = "partitions/"+name;
-
             String directory = locationPage.getLocation();
 
-            PartitionConfig partitionConfig = new PartitionConfig(name, path);
-
-            PartitionReader partitionReader = new PartitionReader();
-            Partition partition = partitionReader.read(partitionConfig, directory);
+            File dir = new File(directory);
+            if (!dir.isDirectory()) return false;
 
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
-            penroseConfig.addPartitionConfig(partitionConfig);
+            PartitionConfigs partitionConfigs = penroseApplication.getPartitionConfigs();
 
-            PartitionManager partitionManager = penroseApplication.getPartitionManager();
-            partitionManager.addPartition(partition);
+            partitionConfigs.load(dir);
 
             penroseApplication.notifyChangeListeners();
 

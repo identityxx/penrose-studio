@@ -30,6 +30,7 @@ import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.apache.log4j.Logger;
 
@@ -59,14 +60,14 @@ public class JNDIConnectionPropertiesPage extends FormPage {
     String url;
 
     JNDIConnectionEditor editor;
-    Partition partition;
+    PartitionConfig partitionConfig;
     ConnectionConfig connectionConfig;
 
     public JNDIConnectionPropertiesPage(JNDIConnectionEditor editor) {
         super(editor, "PROPERTIES", "  Properties  ");
 
         this.editor = editor;
-        this.partition = editor.getPartition();
+        this.partitionConfig = editor.getPartitionConfig();
         this.connectionConfig = editor.getConnectionConfig();
     }
 

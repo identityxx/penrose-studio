@@ -39,15 +39,15 @@ public class CreateLDAPProxyWizard extends Wizard {
 
     public SelectSourceWizardPage sourcePage;
 
-    Partition partition;
+    PartitionConfig partitionConfig;
     EntryMapping parentMapping;
 
-    public CreateLDAPProxyWizard(Partition partition) {
+    public CreateLDAPProxyWizard(PartitionConfig partition) {
         this(partition, null);
     }
 
-    public CreateLDAPProxyWizard(Partition partition, EntryMapping parentMapping) {
-        this.partition = partition;
+    public CreateLDAPProxyWizard(PartitionConfig partition, EntryMapping parentMapping) {
+        this.partitionConfig = partition;
         this.parentMapping = parentMapping;
 
         sourcePage = new SelectSourceWizardPage(partition);
@@ -63,9 +63,9 @@ public class CreateLDAPProxyWizard extends Wizard {
     public boolean performFinish() {
         try {
             SourceConfig sourceConfig = sourcePage.getSourceConfig();
-            ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
+            ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
 
-            String url = (String)connectionConfig.getParameter(Context.PROVIDER_URL);
+            String url = connectionConfig.getParameter(Context.PROVIDER_URL);
 
             int index = url.indexOf("://");
             index = url.indexOf("/", index+3);
@@ -103,7 +103,7 @@ public class CreateLDAPProxyWizard extends Wizard {
 
             entryMapping.setHandlerName("PROXY");
 
-            partition.getMappings().addEntryMapping(entryMapping);
+            partitionConfig.getDirectoryConfigs().addEntryMapping(entryMapping);
 
             return true;
 

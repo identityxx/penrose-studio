@@ -23,7 +23,6 @@ import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionInfoWizardPag
 import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionParametersWizardPage;
 import org.safehaus.penrose.studio.util.SnapshotUtil;
 import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
@@ -71,18 +70,10 @@ public class CreateLDAPSnapshotWizard extends Wizard {
     public boolean performFinish() {
         try {
             String name = namePage.getPartitionName();
-            String path = "partitions/"+name;
 
-            PartitionConfig partitionConfig = new PartitionConfig();
-            partitionConfig.setName(name);
-            partitionConfig.setPath(path);
+            PartitionConfig partitionConfig = new PartitionConfig(name);
 
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
-            penroseConfig.addPartitionConfig(partitionConfig);
-
-            PartitionManager partitionManager = penroseApplication.getPartitionManager();
-            Partition partition = partitionManager.load(penroseApplication.getWorkDir(), partitionConfig);
 
             ConnectionConfig connectionConfig = new ConnectionConfig();
             connectionConfig.setName(name);
@@ -99,12 +90,12 @@ public class CreateLDAPSnapshotWizard extends Wizard {
                 connectionConfig.setParameter(paramName, paramValue);
             }
 
-            partition.getConnections().addConnectionConfig(connectionConfig);
+            partitionConfig.getConnectionConfigs().addConnectionConfig(connectionConfig);
 
             LDAPClient client = new LDAPClient(connectionConfig.getParameters());
 
             SnapshotUtil snapshotUtil = new SnapshotUtil();
-            snapshotUtil.createSnapshot(partition, client);
+            snapshotUtil.createSnapshot(partitionConfig, client);
 
             penroseApplication.notifyChangeListeners();
 

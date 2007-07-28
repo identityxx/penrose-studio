@@ -25,7 +25,7 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.module.action.NewModuleAction;
 import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
@@ -46,7 +46,7 @@ public class ModulesNode extends Node {
 
     ObjectsView view;
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
 
     public ModulesNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
@@ -81,21 +81,21 @@ public class ModulesNode extends Node {
 
         int counter = 1;
         String name = oldName;
-        while (partition.getModules().getModuleConfig(name) != null) {
+        while (partitionConfig.getModuleConfigs().getModuleConfig(name) != null) {
             counter++;
             name = oldName+" ("+counter+")";
         }
 
         newModuleConfig.setName(name);
-        partition.getModules().addModuleConfig(newModuleConfig);
+        partitionConfig.getModuleConfigs().addModuleConfig(newModuleConfig);
 
-        Collection mappings = partition.getModules().getModuleMappings(oldName);
+        Collection mappings = partitionConfig.getModuleConfigs().getModuleMappings(oldName);
         if (mappings != null) {
             for (Iterator i=mappings.iterator(); i.hasNext(); ) {
                 ModuleMapping mapping = (ModuleMapping)((ModuleMapping)i.next()).clone();
                 mapping.setModuleName(name);
                 mapping.setModuleConfig(newModuleConfig);
-                partition.getModules().addModuleMapping(mapping);
+                partitionConfig.getModuleConfigs().addModuleMapping(mapping);
             }
         }
 
@@ -106,14 +106,14 @@ public class ModulesNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        return !partition.getModules().getModuleConfigs().isEmpty();
+        return !partitionConfig.getModuleConfigs().getModuleConfigs().isEmpty();
     }
 
-    public Collection getChildren() throws Exception {
+    public Collection<Node> getChildren() throws Exception {
 
-        Collection children = new ArrayList();
+        Collection<Node> children = new ArrayList<Node>();
 
-        Collection modules = partition.getModules().getModuleConfigs();
+        Collection modules = partitionConfig.getModuleConfigs().getModuleConfigs();
         for (Iterator i=modules.iterator(); i.hasNext(); ) {
             ModuleConfig moduleConfig = (ModuleConfig)i.next();
 
@@ -126,7 +126,7 @@ public class ModulesNode extends Node {
                     this
             );
 
-            moduleNode.setPartition(partition);
+            moduleNode.setPartitionConfig(this.partitionConfig);
             moduleNode.setModuleConfig(moduleConfig);
 
             children.add(moduleNode);
@@ -135,11 +135,11 @@ public class ModulesNode extends Node {
         return children;
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

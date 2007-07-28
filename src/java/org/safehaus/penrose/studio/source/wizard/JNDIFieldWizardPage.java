@@ -80,16 +80,15 @@ public class JNDIFieldWizardPage extends WizardPage implements SelectionListener
         setPageComplete(validatePage());
     }
 
-    public void setAttributeTypes(Collection attributeTypes) {
-        setAttributeTypes(attributeTypes, new ArrayList());
+    public void setAttributeTypes(Collection<AttributeType> attributeTypes) {
+        setAttributeTypes(attributeTypes, new ArrayList<String>());
     }
 
-    public void setAttributeTypes(Collection attributeTypes, Collection primaryKeyNames) {
+    public void setAttributeTypes(Collection<AttributeType> attributeTypes, Collection<String> primaryKeyNames) {
         fieldTable.removeAll();
 
-        for (Iterator i=attributeTypes.iterator(); i.hasNext(); ) {
-            AttributeType attrType = (AttributeType)i.next();
-            String name = attrType.getName();
+        for (AttributeType attributeType : attributeTypes) {
+            String name = attributeType.getName();
             boolean pk = primaryKeyNames.contains(name.toLowerCase());
 
             FieldConfig field = new FieldConfig();
@@ -107,11 +106,11 @@ public class JNDIFieldWizardPage extends WizardPage implements SelectionListener
         setPageComplete(validatePage());
     }
 
-    public Collection getFields() {
-        Collection fields = new ArrayList();
+    public Collection<FieldConfig> getFields() {
+        Collection<FieldConfig> fields = new ArrayList<FieldConfig>();
         TableItem items[] = fieldTable.getItems();
-        for (int i=0; i<items.length; i++) {
-            FieldConfig field = (FieldConfig)items[i].getData();
+        for (TableItem item : items) {
+            FieldConfig field = (FieldConfig) item.getData();
             fields.add(field);
         }
         return fields;
@@ -121,8 +120,7 @@ public class JNDIFieldWizardPage extends WizardPage implements SelectionListener
         TableItem items[] = fieldTable.getItems();
         if (items.length == 0) return true;
 
-        for (int i=0; i<items.length; i++) {
-            TableItem item = items[i];
+        for (TableItem item : items) {
             if (item.getChecked()) return true;
         }
 
@@ -131,9 +129,8 @@ public class JNDIFieldWizardPage extends WizardPage implements SelectionListener
 
     public void updateImages() {
         TableItem items[] = fieldTable.getItems();
-        for (int i=0; i<items.length; i++) {
-            TableItem item = items[i];
-            FieldConfig field = (FieldConfig)items[i].getData();
+        for (TableItem item : items) {
+            FieldConfig field = (FieldConfig) item.getData();
             field.setPrimaryKey(item.getChecked());
             item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
         }

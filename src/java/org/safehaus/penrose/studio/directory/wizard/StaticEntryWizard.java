@@ -21,6 +21,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.StaticEntryRDNWizardPage;
@@ -37,7 +38,7 @@ public class StaticEntryWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     private EntryMapping parentMapping;
     private EntryMapping entryMapping;
 
@@ -45,14 +46,14 @@ public class StaticEntryWizard extends Wizard {
     public ObjectClassWizardPage ocPage;
     public AttributeValueWizardPage attrPage;
 
-    public StaticEntryWizard(Partition partition, EntryMapping parentMapping) {
-        this.partition = partition;
+    public StaticEntryWizard(PartitionConfig partitionConfig, EntryMapping parentMapping) {
+        this.partitionConfig = partitionConfig;
         this.parentMapping = parentMapping;
         setWindowTitle("Adding static entry");
 
-        rdnPage = new StaticEntryRDNWizardPage(partition, parentMapping);
+        rdnPage = new StaticEntryRDNWizardPage(partitionConfig, parentMapping);
         ocPage = new ObjectClassWizardPage();
-        attrPage = new AttributeValueWizardPage(partition);
+        attrPage = new AttributeValueWizardPage(partitionConfig);
     }
 
     public boolean canFinish() {
@@ -93,7 +94,7 @@ public class StaticEntryWizard extends Wizard {
             entryMapping.addObjectClasses(ocPage.getSelectedObjectClasses());
             entryMapping.addAttributeMappings(attrPage.getAttributeMappings());
 
-            partition.getMappings().addEntryMapping(entryMapping);
+            partitionConfig.getDirectoryConfigs().addEntryMapping(entryMapping);
 
             return true;
 
@@ -115,12 +116,12 @@ public class StaticEntryWizard extends Wizard {
         this.entryMapping = entryMapping;
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 
     public EntryMapping getParentMapping() {

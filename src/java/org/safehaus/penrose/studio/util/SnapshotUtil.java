@@ -3,10 +3,9 @@ package org.safehaus.penrose.studio.util;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.schema.attributeSyntax.AttributeSyntax;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.ldap.RDN;
-import org.safehaus.penrose.ldap.RDNBuilder;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.mapping.AttributeMapping;
 import org.safehaus.penrose.ldap.LDAPClient;
@@ -18,36 +17,33 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.Attribute;
 import javax.naming.NamingEnumeration;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
  */
 public class SnapshotUtil {
 
-    Logger log = LoggerFactory.getLogger(getClass());
+    public Logger log = LoggerFactory.getLogger(getClass());
 
-    public void createSnapshot(Partition partition, LDAPClient client) throws Exception {
-        createEntries(partition, client, "");
+    public void createSnapshot(PartitionConfig partitionConfig, LDAPClient client) throws Exception {
+        createEntries(partitionConfig, client, "");
     }
     
-    public void createEntries(Partition partition, LDAPClient client, String baseDn) throws Exception {
+    public void createEntries(PartitionConfig partitionConfig, LDAPClient client, String baseDn) throws Exception {
         if ("".equals(baseDn)) {
             SearchResult entry = client.getEntry(baseDn);
             if (entry == null) return;
             
             EntryMapping entryMapping = createMapping(client, entry);
-            partition.getMappings().addEntryMapping(entryMapping);
+            partitionConfig.getDirectoryConfigs().addEntryMapping(entryMapping);
         }
 
-        Collection children = client.getChildren(baseDn);
-        for (Iterator i=children.iterator(); i.hasNext(); ) {
-            SearchResult entry = (SearchResult)i.next();
+        Collection<SearchResult> children = client.getChildren(baseDn);
+        for (SearchResult entry : children) {
             EntryMapping entryMapping = createMapping(client, entry);
-            partition.getMappings().addEntryMapping(entryMapping);
+            partitionConfig.getDirectoryConfigs().addEntryMapping(entryMapping);
 
-            createEntries(partition, client, entry.getName());
+            createEntries(partitionConfig, client, entry.getName());
         }
 
     }
@@ -72,26 +68,22 @@ public class SnapshotUtil {
             boolean binary = attributeSyntax != null && attributeSyntax.isHumanReadable();
             log.debug(" - "+name+": binary "+binary);
 
-            Collection values = new ArrayList();
+            boolean oc = "objectClass".equalsIgnoreCase(name);
+
             for (NamingEnumeration j=attribute.getAll(); j.hasMore(); ) {
                 Object value = j.next();
-                values.add(value);
-            }
 
-            if ("objectClass".equalsIgnoreCase(name)) {
-                entryMapping.addObjectClasses(values);
-                continue;
-            }
+                if (oc) {
+                    entryMapping.addObjectClass(value.toString());
+                    continue;
+                }
 
-            for (Iterator j=values.iterator(); j.hasNext(); ) {
-                Object value = j.next();
                 boolean rdnAttr = false;
 
                 if (!binary) {
                     String string = value.toString();
-                    for (Iterator k=rdn.getNames().iterator(); k.hasNext(); ) {
-                        String n = (String)k.next();
-                        String v = (String)rdn.get(n);
+                    for (String n : rdn.getNames()) {
+                        String v = (String) rdn.get(n);
                         if (name.equalsIgnoreCase(n) && string.equalsIgnoreCase(v)) {
                             rdnAttr = true;
                             break;

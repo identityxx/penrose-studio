@@ -15,15 +15,16 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.nis.action.*;
-import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
-import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.adapter.jdbc.JDBCAdapter;
+import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.QueryResponse;
+import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.Partitions;
 
 import java.util.*;
 import java.sql.ResultSet;
@@ -59,11 +60,11 @@ public class NISUsersPage extends FormPage {
         this.domain = editor.getDomain();
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
-        SourceManager sourceManager = penroseContext.getSourceManager();
+        Partitions partitions = penroseApplication.getPartitions();
+        Partition partition = partitions.getPartition("DEFAULT");
 
-        actions = sourceManager.getSource("DEFAULT", "penrose.actions");
-        domains = sourceManager.getSource("DEFAULT", "penrose.domains");
+        actions = partition.getSource("penrose.actions");
+        domains = partition.getSource("penrose.domains");
 
     }
 
@@ -322,8 +323,7 @@ public class NISUsersPage extends FormPage {
         if (uidNumber == null) uidNumber = (Integer) attributes.getValue("origUidNumber");
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
-        SourceManager sourceManager = penroseContext.getSourceManager();
+        Partitions partitions = penroseApplication.getPartitions();
 
         SearchRequest searchRequest = new SearchRequest();
         SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
@@ -335,11 +335,12 @@ public class NISUsersPage extends FormPage {
             Attributes attrs = searchResults.getAttributes();
 
             final String domainName = (String) attrs.getValue("name");
-            String partition = (String) attrs.getValue("partition");
+            String partitionName = (String) attrs.getValue("partition");
+            Partition partition = partitions.getPartition(partitionName);
 
             if (domain.getName().equals(domainName)) continue;
             
-            Source users = sourceManager.getSource(partition, "cache.users");
+            Source users = partition.getSource("cache.users");
 
             JDBCAdapter adapter = (JDBCAdapter)users.getConnection().getAdapter();
             JDBCClient client = adapter.getClient();
@@ -446,14 +447,14 @@ public class NISUsersPage extends FormPage {
 
     public void edit(
             String domain,
-            String partition,
+            String partitionName,
             String uid,
             Integer origUidNumber
     ) throws Exception {
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
-        SourceManager sourceManager = penroseContext.getSourceManager();
+        Partitions partitions = penroseApplication.getPartitions();
+        Partition partition = partitions.getPartition(partitionName);
 
         RDNBuilder rb = new RDNBuilder();
         rb.set("domain", domain);
@@ -465,7 +466,7 @@ public class NISUsersPage extends FormPage {
         dialog.setUid(uid);
         dialog.setOrigUidNumber(origUidNumber);
 
-        Source penroseUsers = sourceManager.getSource(partition, "penrose.users");
+        Source penroseUsers = partition.getSource("penrose.users");
 
         SearchRequest request = new SearchRequest();
         request.setDn(dn);
@@ -521,15 +522,15 @@ public class NISUsersPage extends FormPage {
     public void checkUidNumber(String uid, Integer uidNumber) throws Exception {
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseContext penroseContext = penroseApplication.getPenroseContext();
-        SourceManager sourceManager = penroseContext.getSourceManager();
+        Partitions partitions = penroseApplication.getPartitions();
+        Partition partition = partitions.getPartition("DEFAULT");
 
         SearchRequest request = new SearchRequest();
         request.setFilter("(uidNumber=" + uidNumber + ")");
 
         SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
-        Source users = sourceManager.getSource("DEFAULT", "penrose.users");
+        Source users = partition.getSource("penrose.users");
         users.search(request, response);
 
         while (response.hasNext()) {
@@ -553,11 +554,12 @@ public class NISUsersPage extends FormPage {
             Attributes attributes = searchResults.getAttributes();
 
             String domainName = (String) attributes.getValue("name");
-            String partition = (String) attributes.getValue("partition");
+            String partitionName = (String) attributes.getValue("partition");
+            Partition partition2 = partitions.getPartition(partitionName);
 
             response = new SearchResponse<SearchResult>();
 
-            users = sourceManager.getSource(partition, "cache.users");
+            users = partition2.getSource("cache.users");
             users.search(request, response);
 
             while (response.hasNext()) {

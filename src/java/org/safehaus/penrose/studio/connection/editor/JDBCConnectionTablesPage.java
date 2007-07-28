@@ -31,14 +31,16 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.source.TableConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.connection.JDBCSourceWizard;
-import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.connection.ConnectionManager;
 import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.adapter.jdbc.JDBCAdapter;
+import org.safehaus.penrose.partition.Partitions;
+import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.config.PenroseConfig;
+import org.safehaus.penrose.naming.PenroseContext;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -179,7 +181,7 @@ public class JDBCConnectionTablesPage extends JDBCConnectionEditorPage {
                     TableItem ti = tablesTable.getSelection()[0];
                     TableConfig tableConfig = (TableConfig)ti.getData();
 
-                    JDBCSourceWizard wizard = new JDBCSourceWizard(partition, connectionConfig, tableConfig);
+                    JDBCSourceWizard wizard = new JDBCSourceWizard(partitionConfig, connectionConfig, tableConfig);
                     WizardDialog dialog = new WizardDialog(getEditor().getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
                     dialog.open();
@@ -219,11 +221,13 @@ public class JDBCConnectionTablesPage extends JDBCConnectionEditorPage {
             tablesTable.removeAll();
 
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
             PenroseContext penroseContext = penroseApplication.getPenroseContext();
 
-            ConnectionManager connectionManager = penroseContext.getConnectionManager();
-            Connection connection = connectionManager.createConnection(partition, connectionConfig);
-            connection.start();
+            Partitions partitions = new Partitions();
+            Partition partition = partitions.init(penroseConfig, penroseContext, partitionConfig);
+
+            Connection connection = partition.createConnection(connectionConfig);
 
             JDBCAdapter jdbcAdapter = (JDBCAdapter)connection.getAdapter();
             JDBCClient client = jdbcAdapter.getClient();
@@ -299,11 +303,12 @@ public class JDBCConnectionTablesPage extends JDBCConnectionEditorPage {
             tablesTable.removeAll();
 
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
             PenroseContext penroseContext = penroseApplication.getPenroseContext();
 
-            ConnectionManager connectionManager = penroseContext.getConnectionManager();
-            Connection connection = connectionManager.createConnection(partition, connectionConfig);
-            connection.start();
+            Partitions partitions = new Partitions();
+            Partition partition = partitions.init(penroseConfig, penroseContext, partitionConfig);
+            Connection connection = partition.createConnection(connectionConfig);
 
             JDBCAdapter jdbcAdapter = (JDBCAdapter)connection.getAdapter();
             JDBCClient client = jdbcAdapter.getClient();

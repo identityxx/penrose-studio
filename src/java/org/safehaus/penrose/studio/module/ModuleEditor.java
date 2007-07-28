@@ -35,7 +35,7 @@ import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.apache.log4j.Logger;
 
 public class ModuleEditor extends EditorPart {
@@ -50,7 +50,7 @@ public class ModuleEditor extends EditorPart {
 	Table parametersTable;
     Table mappingsTable;
 
-    Partition partition;
+    PartitionConfig partitionConfig;
 
     Collection mappings;
 
@@ -59,7 +59,7 @@ public class ModuleEditor extends EditorPart {
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         ModuleEditorInput ei = (ModuleEditorInput)input;
 
-        partition = ei.getPartition();
+        partitionConfig = ei.getPartitionConfig();
         origModuleConfig = ei.getModuleConfig();
 
         try {
@@ -70,7 +70,7 @@ public class ModuleEditor extends EditorPart {
 
         setSite(site);
         setInput(input);
-        setPartName(partition.getName()+"/"+moduleConfig.getName());
+        setPartName(partitionConfig.getName()+"/"+moduleConfig.getName());
     }
 
     public void createPartControl(Composite parent) {
@@ -364,7 +364,7 @@ public class ModuleEditor extends EditorPart {
         tc.setText("Filter");
         tc.setWidth(200);
 
-        Collection mappings = partition.getModules().getModuleMappings(moduleConfig.getName());
+        Collection mappings = partitionConfig.getModuleConfigs().getModuleMappings(moduleConfig.getName());
         if (mappings != null) {
 	        for (Iterator i=mappings.iterator(); i.hasNext(); ) {
 	            ModuleMapping mapping = (ModuleMapping)i.next();
@@ -447,25 +447,25 @@ public class ModuleEditor extends EditorPart {
 
         boolean rename = !origModuleConfig.getName().equals(moduleConfig.getName());
         if (rename) {
-            partition.getModules().removeModuleConfig(origModuleConfig.getName());
+            partitionConfig.getModuleConfigs().removeModuleConfig(origModuleConfig.getName());
         }
 
         origModuleConfig.copy(moduleConfig);
 
         if (rename) {
-            partition.getModules().addModuleConfig(origModuleConfig);
+            partitionConfig.getModuleConfigs().addModuleConfig(origModuleConfig);
         }
 
-        partition.getModules().removeModuleMapping(moduleConfig.getName());
+        partitionConfig.getModuleConfigs().removeModuleMapping(moduleConfig.getName());
 
         Item items[] = mappingsTable.getItems();
         for (int i=0; i<items.length; i++) {
             ModuleMapping mapping = (ModuleMapping)items[i].getData();
             mapping.setModuleName(moduleConfig.getName());
-            partition.getModules().addModuleMapping(mapping);
+            partitionConfig.getModuleConfigs().addModuleMapping(mapping);
         }
 
-        setPartName(partition.getName()+"/"+moduleConfig.getName());
+        setPartName(this.partitionConfig.getName()+"/"+moduleConfig.getName());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         penroseApplication.notifyChangeListeners();

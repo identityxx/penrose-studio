@@ -79,19 +79,18 @@ public class JDBCPrimaryKeyWizardPage extends WizardPage implements SelectionLis
         setPageComplete(validatePage());
     }
 
-    public void setFieldConfigs(Collection fieldConfigs) {
+    public void setFieldConfigs(Collection<FieldConfig> fieldConfigs) {
         try {
             fieldsTable.removeAll();
 
-            for (Iterator i=fieldConfigs.iterator(); i.hasNext(); ) {
-                FieldConfig field = (FieldConfig)i.next();
+            for (FieldConfig fieldConfig : fieldConfigs) {
 
                 TableItem it = new TableItem(fieldsTable, SWT.CHECK);
-                it.setImage(PenrosePlugin.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
-                it.setText(0, field.getName());
-                it.setText(1, field.getType());
-                it.setChecked(field.isPrimaryKey());
-                it.setData(field);
+                it.setImage(PenrosePlugin.getImage(fieldConfig.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                it.setText(0, fieldConfig.getName());
+                it.setText(1, fieldConfig.getType());
+                it.setChecked(fieldConfig.isPrimaryKey());
+                it.setData(fieldConfig);
             }
 
         } catch (Exception e) {
@@ -99,11 +98,11 @@ public class JDBCPrimaryKeyWizardPage extends WizardPage implements SelectionLis
         }
     }
 
-    public Collection getFields() {
-        Collection fields = new ArrayList();
+    public Collection<FieldConfig> getFields() {
+        Collection<FieldConfig> fields = new ArrayList<FieldConfig>();
         TableItem items[] = fieldsTable.getItems();
-        for (int i=0; i<items.length; i++) {
-            FieldConfig field = (FieldConfig)items[i].getData();
+        for (TableItem item : items) {
+            FieldConfig field = (FieldConfig) item.getData();
             fields.add(field);
         }
         return fields;
@@ -115,14 +114,13 @@ public class JDBCPrimaryKeyWizardPage extends WizardPage implements SelectionLis
 
     public void updateImages() {
         TableItem items[] = fieldsTable.getItems();
-        for (int i=0; i<items.length; i++) {
-            TableItem item = items[i];
-            FieldConfig field = (FieldConfig)item.getData();
+        for (TableItem item : items) {
+            FieldConfig field = (FieldConfig) item.getData();
             field.setPrimaryKey(item.getChecked());
             item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
-           
+
         }
-        
+
     }
 
     public void widgetSelected(SelectionEvent event) {

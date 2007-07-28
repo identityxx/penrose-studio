@@ -14,16 +14,15 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.connection.ConnectionManager;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
+import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.config.PenroseConfig;
+import org.safehaus.penrose.naming.PenroseContext;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -40,14 +39,14 @@ public class JNDISourceBrowsePage extends FormPage {
     Table table;
 
     JNDISourceEditor editor;
-    Partition partition;
+    PartitionConfig partitionConfig;
     SourceConfig sourceConfig;
 
     public JNDISourceBrowsePage(JNDISourceEditor editor) throws Exception {
         super(editor, "BROWSE", "  Browse  ");
 
         this.editor = editor;
-        this.partition = editor.partition;
+        this.partitionConfig = editor.partitionConfig;
         this.sourceConfig = editor.sourceConfig;
     }
 
@@ -162,16 +161,16 @@ public class JNDISourceBrowsePage extends FormPage {
 
         try {
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
             PenroseContext penroseContext = penroseApplication.getPenroseContext();
 
-            ConnectionManager connectionManager = penroseContext.getConnectionManager();
-            ConnectionConfig connectionConfig = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
-            Connection connection = connectionManager.createConnection(partition, connectionConfig);
+            Partitions partitions = new Partitions();
+            Partition partition = partitions.init(penroseConfig, penroseContext, partitionConfig);
 
-            connection.start();
+            ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
+            Connection connection = partition.createConnection(connectionConfig);
 
-            SourceManager sourceManager = penroseContext.getSourceManager();
-            Source source = sourceManager.createSource(partition, sourceConfig, connection);
+            Source source = partition.createSource(sourceConfig, connection);
 
             source.search(sc, sr);
 

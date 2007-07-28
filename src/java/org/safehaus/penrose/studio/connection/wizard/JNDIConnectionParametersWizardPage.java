@@ -30,7 +30,6 @@ import org.safehaus.penrose.studio.parameter.ParameterDialog;
 
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
@@ -41,7 +40,7 @@ public class JNDIConnectionParametersWizardPage extends WizardPage implements Mo
 
     Table parametersTable;
 
-    Map parameters = new TreeMap();
+    Map<String,Object> parameters = new TreeMap<String,Object>();
 
     public JNDIConnectionParametersWizardPage() {
         super(NAME);
@@ -99,8 +98,8 @@ public class JNDIConnectionParametersWizardPage extends WizardPage implements Mo
                 if (parametersTable.getSelectionCount() == 0) return;
 
                 TableItem items[] = parametersTable.getSelection();
-                for (int i=0; i<items.length; i++) {
-                    String name = items[i].getText(0);
+                for (TableItem item : items) {
+                    String name = item.getText(0);
                     parameters.remove(name);
                 }
 
@@ -113,20 +112,19 @@ public class JNDIConnectionParametersWizardPage extends WizardPage implements Mo
         setPageComplete(validatePage());
     }
 
-    public void setParameters(Map parameters) {
+    public void setParameters(Map<String,Object> parameters) {
         this.parameters.putAll(parameters);
     }
 
-    public Map getParameters() {
+    public Map<String,Object> getParameters() {
         return parameters;
     }
 
     public void refresh() {
         parametersTable.removeAll();
 
-        for (Iterator i=parameters.keySet().iterator(); i.hasNext(); ) {
-            String name = (String)i.next();
-            String value = (String)parameters.get(name);
+        for (String name : parameters.keySet()) {
+            String value = (String) parameters.get(name);
 
             TableItem ti = new TableItem(parametersTable, SWT.NONE);
             ti.setText(0, name);

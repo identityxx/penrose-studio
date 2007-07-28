@@ -25,9 +25,8 @@ import org.safehaus.penrose.studio.partition.action.NewLDAPProxyPartitionAction;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.PartitionManager;
+import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.config.PenroseConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
@@ -36,7 +35,6 @@ import org.apache.log4j.Logger;
 
 import java.util.Collection;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
@@ -70,23 +68,19 @@ public class PartitionsNode extends Node {
 
     public boolean hasChildren() throws Exception {
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PartitionManager partitionManager = penroseApplication.getPartitionManager();
-        if (partitionManager == null) return false;
-        return !partitionManager.getPartitions().isEmpty();
+        PartitionConfigs partitionConfigs = penroseApplication.getPartitionConfigs();
+        if (partitionConfigs == null) return false;
+        return !partitionConfigs.getPartitionConfigs().isEmpty();
     }
 
-    public Collection getChildren() throws Exception {
+    public Collection<Node> getChildren() throws Exception {
 
-        Collection children = new ArrayList();
+        Collection<Node> children = new ArrayList<Node>();
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
-        PartitionManager partitionManager = penroseApplication.getPartitionManager();
-        
-        Collection partitionConfigs = penroseConfig.getPartitionConfigs();
-        for (Iterator i=partitionConfigs.iterator(); i.hasNext(); ) {
-            PartitionConfig partitionConfig = (PartitionConfig)i.next();
-            Partition partition = partitionManager.getPartition(partitionConfig.getName());
+        PartitionConfigs partitionConfigs = penroseApplication.getPartitionConfigs();
+
+        for (PartitionConfig partitionConfig : partitionConfigs.getPartitionConfigs()) {
 
             PartitionNode partitionNode = new PartitionNode(
                     view,
@@ -98,7 +92,6 @@ public class PartitionsNode extends Node {
             );
 
             partitionNode.setPartitionConfig(partitionConfig);
-            partitionNode.setPartition(partition);
 
             children.add(partitionNode);
         }

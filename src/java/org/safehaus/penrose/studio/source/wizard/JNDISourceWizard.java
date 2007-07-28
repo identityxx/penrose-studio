@@ -22,7 +22,7 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.source.wizard.JNDITreeWizardPage;
 import org.apache.log4j.Logger;
 
@@ -36,7 +36,7 @@ public class JNDISourceWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     private ConnectionConfig connectionConfig;
     private SourceConfig sourceConfig;
 
@@ -45,8 +45,8 @@ public class JNDISourceWizard extends Wizard {
     public JNDIAttributeWizardPage jndiAttributesPage;
     public JNDIFieldWizardPage jndiFieldsPage;
 
-    public JNDISourceWizard(Partition partition, ConnectionConfig connectionConfig) throws Exception {
-        this.partition = partition;
+    public JNDISourceWizard(PartitionConfig partitionConfig, ConnectionConfig connectionConfig) throws Exception {
+        this.partitionConfig = partitionConfig;
         this.connectionConfig = connectionConfig;
 
         propertyPage = new SourceWizardPage();
@@ -77,10 +77,10 @@ public class JNDISourceWizard extends Wizard {
 
     public IWizardPage getNextPage(IWizardPage page) {
         if (propertyPage == page) {
-            jndiTreePage.setConnectionConfig(partition, connectionConfig);
+            jndiTreePage.setConnectionConfig(connectionConfig);
 
         } else if (jndiTreePage == page) {
-            jndiAttributesPage.setConnectionConfig(partition, connectionConfig);
+            jndiAttributesPage.setConnectionConfig(connectionConfig);
 
         } else if (jndiAttributesPage == page) {
             Collection attributeTypes = jndiAttributesPage.getAttributeTypes();
@@ -101,13 +101,13 @@ public class JNDISourceWizard extends Wizard {
             sourceConfig.setParameter("scope", jndiTreePage.getScope());
             sourceConfig.setParameter("objectClasses", jndiTreePage.getObjectClasses());
 
-            Collection fields = jndiFieldsPage.getFields();
+            Collection<FieldConfig> fields = jndiFieldsPage.getFields();
             for (Iterator i=fields.iterator(); i.hasNext(); ) {
                 FieldConfig field = (FieldConfig)i.next();
                 sourceConfig.addFieldConfig(field);
             }
 
-            partition.getSources().addSourceConfig(sourceConfig);
+            partitionConfig.getSourceConfigs().addSourceConfig(sourceConfig);
 
             return true;
 
@@ -137,11 +137,11 @@ public class JNDISourceWizard extends Wizard {
         this.connectionConfig = connectionConfig;
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

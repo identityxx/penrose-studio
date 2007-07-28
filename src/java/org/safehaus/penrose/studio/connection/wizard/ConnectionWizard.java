@@ -22,14 +22,13 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.studio.driver.Driver;
 import org.safehaus.penrose.studio.util.Helper;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.apache.log4j.Logger;
 
 import javax.naming.InitialContext;
 import javax.naming.Context;
 import java.util.Map;
-import java.util.Iterator;
 import java.util.TreeMap;
 
 /**
@@ -39,7 +38,7 @@ public class ConnectionWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     private ConnectionConfig connectionConfig;
 
     public ConnectionNamePage namePage = new ConnectionNamePage();
@@ -49,10 +48,10 @@ public class ConnectionWizard extends Wizard {
     public JNDIConnectionInfoWizardPage jndiInfoPage = new JNDIConnectionInfoWizardPage();
     public JNDIConnectionParametersWizardPage jndiParametersPage = new JNDIConnectionParametersWizardPage();
 
-    public ConnectionWizard(Partition partition) {
-        this.partition = partition;
+    public ConnectionWizard(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
 
-        Map parameters = new TreeMap();
+        Map<String,Object> parameters = new TreeMap<String,Object>();
         parameters.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         jndiParametersPage.setParameters(parameters);
 
@@ -149,16 +148,15 @@ public class ConnectionWizard extends Wizard {
                 connectionConfig.setParameter(InitialContext.SECURITY_PRINCIPAL, jndiInfoPage.getBindDN());
                 connectionConfig.setParameter(InitialContext.SECURITY_CREDENTIALS, jndiInfoPage.getPassword());
 
-                Map parameters = jndiParametersPage.getParameters();
-                for (Iterator i=parameters.keySet().iterator(); i.hasNext(); ) {
-                    String paramName = (String)i.next();
-                    String paramValue = (String)parameters.get(paramName);
+                Map<String,Object> parameters = jndiParametersPage.getParameters();
+                for (String paramName : parameters.keySet()) {
+                    String paramValue = (String) parameters.get(paramName);
 
                     connectionConfig.setParameter(paramName, paramValue);
                 }
             }
 
-            partition.getConnections().addConnectionConfig(connectionConfig);
+            partitionConfig.getConnectionConfigs().addConnectionConfig(connectionConfig);
 
             return true;
 
@@ -180,11 +178,11 @@ public class ConnectionWizard extends Wizard {
         return true;
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

@@ -51,12 +51,14 @@ import org.safehaus.penrose.log4j.Log4jConfigReader;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.safehaus.penrose.log4j.Log4jConfigWriter;
 import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.service.ServiceConfigs;
 
 import javax.crypto.Cipher;
 
 public class PenroseApplication implements IPlatformRunnable {
 
-    Logger log = Logger.getLogger(getClass());
+    public Logger log = Logger.getLogger(getClass());
+    public boolean debug = log.isDebugEnabled();
 
     public static String PRODUCT_NAME;
     public static String PRODUCT_VERSION;
@@ -73,6 +75,11 @@ public class PenroseApplication implements IPlatformRunnable {
     File homeDir;
 
     ApplicationConfig applicationConfig = new ApplicationConfig();
+
+    PartitionConfigs partitionConfigs = new PartitionConfigs();
+    Partitions partitions = new Partitions();
+    ServiceConfigs serviceConfigs = new ServiceConfigs();
+
     PenroseConfig penroseConfig = new PenroseConfig();
     PenroseClient client;
 
@@ -81,7 +88,7 @@ public class PenroseApplication implements IPlatformRunnable {
     PluginManager pluginManager = new PluginManager();
 
     PenroseWorkbenchAdvisor workbenchAdvisor;
-    ArrayList changeListeners = new ArrayList();
+    ArrayList<ChangeListener> changeListeners = new ArrayList<ChangeListener>();
 
     License license;
     Log4jConfig loggingConfig;
@@ -183,11 +190,10 @@ public class PenroseApplication implements IPlatformRunnable {
 	}
 
 	public void notifyChangeListeners() {
-		for (int i=0; i<changeListeners.size(); i++) {
-			ChangeListener listener = (ChangeListener)changeListeners.get(i);
-			listener.handleChange(null);
-		}
-	}
+        for (ChangeListener listener : changeListeners) {
+            listener.handleChange(null);
+        }
+    }
 
 	public ApplicationConfig getApplicationConfig() {
 		return applicationConfig;
@@ -204,16 +210,42 @@ public class PenroseApplication implements IPlatformRunnable {
         downloadFolder("conf", dir);
         downloadFolder("schema", dir);
         downloadFolder("partitions", dir);
+        downloadFolder("services", dir);
 
         log.debug("Opening project from "+dir);
 
         PenroseConfigReader penroseConfigReader = new PenroseConfigReader(dir+"/conf/server.xml");
         penroseConfig = penroseConfigReader.read();
 
-        penroseContext = new PenroseContext();
+        penroseContext = new PenroseContext(dir);
         penroseContext.init(penroseConfig);
-        penroseContext.load(dir);
         penroseContext.start();
+
+        String partitionsDir = (dir == null ? "" : dir+ File.separator)+"partitions";
+
+        File partitions = new File(partitionsDir);
+        if (!partitions.isDirectory()) return;
+
+        for (File file : partitions.listFiles()) {
+            if (!file.isDirectory()) continue;
+
+            if (debug) log.debug("----------------------------------------------------------------------------------");
+
+            partitionConfigs.load(file);
+        }
+
+        String services = (dir == null ? "" : dir+ File.separator)+"services";
+
+        File servicesDir = new File(services);
+        if (!servicesDir.isDirectory()) return;
+
+        for (File file : servicesDir.listFiles()) {
+            if (!file.isDirectory()) continue;
+
+            if (debug) log.debug("----------------------------------------------------------------------------------");
+
+            serviceConfigs.load(file);
+        }
 
         //initSystemProperties();
         //initSchemaManager(dir);
@@ -231,15 +263,13 @@ public class PenroseApplication implements IPlatformRunnable {
     public void loadLoggers() throws Exception {
         loggerManager.clear();
 
-        for (Iterator i=client.getLoggerNames().iterator(); i.hasNext(); ) {
-            String loggerName = (String)i.next();
+        for (String loggerName : client.getLoggerNames()) {
             loggerManager.addLogger(loggerName);
         }
 
     }
     public void initSystemProperties() throws Exception {
-        for (Iterator i=penroseConfig.getSystemPropertyNames().iterator(); i.hasNext(); ) {
-            String name = (String)i.next();
+        for (String name : penroseConfig.getSystemPropertyNames()) {
             String value = penroseConfig.getSystemProperty(name);
 
             System.setProperty(name, value);
@@ -259,7 +289,7 @@ public class PenroseApplication implements IPlatformRunnable {
 
     public void loadPartitions(String dir) throws Exception {
 
-        partitionManager = penroseContext.getPartitionManager();
+        partitionManager = penroseContext.getPartitionConfigs();
 
         for (Iterator i=penroseConfig.getPartitionConfigs().iterator(); i.hasNext(); ) {
             PartitionConfig partitionConfig = (PartitionConfig)i.next();
@@ -280,24 +310,22 @@ public class PenroseApplication implements IPlatformRunnable {
 
     public void validatePartitions() throws Exception {
 
-        PartitionManager partitionManager = penroseContext.getPartitionManager();
-        PartitionValidator partitionValidator = partitionManager.getPartitionValidator();
+        Collection<PartitionValidationResult> results = new ArrayList<PartitionValidationResult>();
 
-        Collection results = new ArrayList();
+        PartitionValidator partitionValidator = new PartitionValidator();
+        partitionValidator.setPenroseConfig(penroseConfig);
+        partitionValidator.setPenroseContext(penroseContext);
 
-        for (Iterator i=penroseConfig.getPartitionConfigs().iterator(); i.hasNext(); ) {
-            PartitionConfig partitionConfig = (PartitionConfig)i.next();
+        for (PartitionConfig partitionConfig : partitionConfigs.getPartitionConfigs()) {
 
-            Partition partition = partitionManager.getPartition(partitionConfig.getName());
-            Collection list = partitionValidator.validate(partition);
+            Collection<PartitionValidationResult> list = partitionValidator.validate(partitionConfig);
 
-            for (Iterator j=list.iterator(); j.hasNext(); ) {
-                PartitionValidationResult resultPartition = (PartitionValidationResult)j.next();
+            for (PartitionValidationResult resultPartition : list) {
 
                 if (resultPartition.getType().equals(PartitionValidationResult.ERROR)) {
-                    log.error("ERROR: "+resultPartition.getMessage()+" ["+resultPartition.getSource()+"]");
+                    log.error("ERROR: " + resultPartition.getMessage() + " [" + resultPartition.getSource() + "]");
                 } else {
-                    log.warn("WARNING: "+resultPartition.getMessage()+" ["+resultPartition.getSource()+"]");
+                    log.warn("WARNING: " + resultPartition.getMessage() + " [" + resultPartition.getSource() + "]");
                 }
             }
 
@@ -352,8 +380,7 @@ public class PenroseApplication implements IPlatformRunnable {
 
         saveLoggingConfig(dir);
 
-        PartitionManager partitionManager = penroseContext.getPartitionManager();
-        partitionManager.store(dir, penroseConfig.getPartitionConfigs());
+        partitionConfigs.store(dir, partitionConfigs.getPartitionConfigs());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         penroseApplication.setDirty(false);
@@ -377,9 +404,8 @@ public class PenroseApplication implements IPlatformRunnable {
         File outputDir = new File(localDir);
         outputDir.mkdirs();
 
-        Collection filenames = client.listFiles(remotePath);
-        for (Iterator i = filenames.iterator(); i.hasNext(); ) {
-            String filename = (String)i.next();
+        Collection<String> filenames = client.listFiles(remotePath);
+        for (String filename : filenames) {
             download(filename, outputDir);
         }
     }
@@ -399,19 +425,19 @@ public class PenroseApplication implements IPlatformRunnable {
 		out.close();
 	}
 
-    public Collection listFiles(String directory) throws Exception {
-        Collection results = new ArrayList();
+    public Collection<String> listFiles(String directory) throws Exception {
+        Collection<String> results = new ArrayList<String>();
         listFiles(null, new File(directory), results);
         return results;
     }
 
-    public void listFiles(String prefix, File directory, Collection results) throws Exception {
+    public void listFiles(String prefix, File directory, Collection<String> results) throws Exception {
         File children[] = directory.listFiles();
-        for (int i=0; i<children.length; i++) {
-            if (children[i].isDirectory()) {
-                listFiles((prefix == null ? "" : prefix+"/")+children[i].getName(), children[i], results);
+        for (File file : children) {
+            if (file.isDirectory()) {
+                listFiles((prefix == null ? "" : prefix + "/") + file.getName(), file, results);
             } else {
-                results.add((prefix == null ? "" : prefix+"/")+children[i].getName());
+                results.add((prefix == null ? "" : prefix + "/") + file.getName());
             }
         }
     }
@@ -419,9 +445,8 @@ public class PenroseApplication implements IPlatformRunnable {
     public void uploadFolder(String localDir) throws Exception {
         File inputDir = new File(localDir);
 
-        Collection files = listFiles(localDir);
-        for (Iterator i=files.iterator(); i.hasNext(); ) {
-            String filename = (String)i.next();
+        Collection<String> files = listFiles(localDir);
+        for (String filename : files) {
             upload(inputDir, filename);
         }
     }
@@ -440,8 +465,16 @@ public class PenroseApplication implements IPlatformRunnable {
 		client.upload(filename, content);
 	}
 
-    public PartitionManager getPartitionManager() throws Exception {
-        return penroseContext == null ? null : penroseContext.getPartitionManager();
+    public PartitionConfigs getPartitionConfigs() {
+        return partitionConfigs;
+    }
+
+    public Partitions getPartitions() {
+        return partitions;
+    }
+
+    public ServiceConfigs getServiceConfigs() {
+        return serviceConfigs;
     }
 
     public SchemaManager getSchemaManager() {

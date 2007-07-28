@@ -53,9 +53,9 @@ public class AttributeTypesNode extends Node {
         return !schema.getAttributeTypes().isEmpty();
     }
 
-    public Collection getChildren() throws Exception {
+    public Collection<Node> getChildren() throws Exception {
 
-        Collection children = new ArrayList();
+        Collection<Node> children = new ArrayList<Node>();
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         SchemaManager schemaManager = penroseApplication.getSchemaManager();

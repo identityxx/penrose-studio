@@ -40,7 +40,7 @@ public class JDBCSourceWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     private ConnectionConfig connectionConfig;
     private TableConfig tableConfig;
     private SourceConfig sourceConfig;
@@ -49,8 +49,8 @@ public class JDBCSourceWizard extends Wizard {
     public JDBCFieldWizardPage fieldsPage;
     public JDBCPrimaryKeyWizardPage primaryKeyPage = new JDBCPrimaryKeyWizardPage();
 
-    public JDBCSourceWizard(Partition partition, ConnectionConfig connectionConfig, TableConfig tableConfig) {
-        this.partition = partition;
+    public JDBCSourceWizard(PartitionConfig partition, ConnectionConfig connectionConfig, TableConfig tableConfig) {
+        this.partitionConfig = partition;
         this.connectionConfig = connectionConfig;
         this.tableConfig = tableConfig;
 
@@ -99,7 +99,7 @@ public class JDBCSourceWizard extends Wizard {
                 sourceConfig.addFieldConfig(field);
             }
 
-            partition.getSources().addSourceConfig(sourceConfig);
+            partitionConfig.getSourceConfigs().addSourceConfig(sourceConfig);
 
             return true;
 
@@ -147,11 +147,11 @@ public class JDBCSourceWizard extends Wizard {
         this.connectionConfig = connectionConfig;
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

@@ -23,7 +23,7 @@ import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.ldap.DN;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
@@ -43,7 +43,7 @@ public class DirectoryNode extends Node {
 
     ObjectsView view;
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
 
     public DirectoryNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
@@ -69,14 +69,14 @@ public class DirectoryNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        return !partition.getMappings().getRootEntryMappings().isEmpty();
+        return !partitionConfig.getDirectoryConfigs().getRootEntryMappings().isEmpty();
     }
 
-    public Collection getChildren() throws Exception {
+    public Collection<Node> getChildren() throws Exception {
 
-        Collection children = new ArrayList();
+        Collection<Node> children = new ArrayList<Node>();
 
-        Collection rootEntryMappings = partition.getMappings().getRootEntryMappings();
+        Collection rootEntryMappings = partitionConfig.getDirectoryConfigs().getRootEntryMappings();
         for (Iterator i=rootEntryMappings.iterator(); i.hasNext(); ) {
             EntryMapping entryMapping = (EntryMapping)i.next();
 
@@ -96,7 +96,7 @@ public class DirectoryNode extends Node {
                     this
             );
 
-            entryNode.setPartition(partition);
+            entryNode.setPartitionConfig(this.partitionConfig);
             entryNode.setEntryMapping(entryMapping);
 
             children.add(entryNode);
@@ -105,11 +105,11 @@ public class DirectoryNode extends Node {
         return children;
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

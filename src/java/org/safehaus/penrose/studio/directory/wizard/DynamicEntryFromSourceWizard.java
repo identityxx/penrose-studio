@@ -24,6 +24,7 @@ import org.safehaus.penrose.mapping.AttributeMapping;
 import org.safehaus.penrose.mapping.FieldMapping;
 import org.safehaus.penrose.mapping.SourceMapping;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.source.wizard.SelectSourcesWizardPage;
@@ -41,7 +42,7 @@ public class DynamicEntryFromSourceWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     private EntryMapping parentMapping;
     private EntryMapping entryMapping = new EntryMapping();
 
@@ -49,8 +50,8 @@ public class DynamicEntryFromSourceWizard extends Wizard {
     public ObjectClassWizardPage ocPage;
     public AttributeValueWizardPage attrPage;
 
-    public DynamicEntryFromSourceWizard(Partition partition, EntryMapping parentMapping) {
-        this.partition = partition;
+    public DynamicEntryFromSourceWizard(PartitionConfig partition, EntryMapping parentMapping) {
+        this.partitionConfig = partition;
         this.parentMapping = parentMapping;
         setWindowTitle("Mapping Active Directory Users");
 
@@ -135,7 +136,7 @@ public class DynamicEntryFromSourceWizard extends Wizard {
                 sourceMapping.addFieldMapping(fieldMapping);
             }
 
-            partition.getMappings().addEntryMapping(entryMapping);
+            partitionConfig.getDirectoryConfigs().addEntryMapping(entryMapping);
 
             return true;
 
@@ -165,11 +166,11 @@ public class DynamicEntryFromSourceWizard extends Wizard {
         this.entryMapping = entryMapping;
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

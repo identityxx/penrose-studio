@@ -50,7 +50,7 @@ public class NewConnectionAction extends Action {
 
             Shell shell = window.getShell();
 
-            ConnectionWizard wizard = new ConnectionWizard(node.getPartition());
+            ConnectionWizard wizard = new ConnectionWizard(node.getPartitionConfig());
             WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.setPageSize(600, 300);
             dialog.open();

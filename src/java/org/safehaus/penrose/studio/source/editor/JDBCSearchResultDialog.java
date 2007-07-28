@@ -15,6 +15,7 @@ import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 
 import java.util.Iterator;
 import java.util.Collection;
@@ -35,7 +36,7 @@ public class JDBCSearchResultDialog extends Dialog {
 
     Map texts = new HashMap();
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     SourceConfig sourceConfig;
 
     private RDN rdn;
@@ -216,11 +217,11 @@ public class JDBCSearchResultDialog extends Dialog {
         this.attributes.set(attributes);
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

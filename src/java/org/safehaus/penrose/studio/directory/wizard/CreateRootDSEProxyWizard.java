@@ -35,25 +35,24 @@ public class CreateRootDSEProxyWizard extends Wizard {
 
     public SelectConnectionWizardPage connectionPage;
 
-    Partition partition;
+    PartitionConfig partitionConfig;
     EntryMapping parentMapping;
 
-    public CreateRootDSEProxyWizard(Partition partition) {
-        this(partition, null);
+    public CreateRootDSEProxyWizard(PartitionConfig partitionConfig) {
+        this(partitionConfig, null);
     }
 
-    public CreateRootDSEProxyWizard(Partition partition, EntryMapping parentMapping) {
-        this.partition = partition;
+    public CreateRootDSEProxyWizard(PartitionConfig partitionConfig, EntryMapping parentMapping) {
+        this.partitionConfig = partitionConfig;
         this.parentMapping = parentMapping;
 
-        connectionPage = new SelectConnectionWizardPage(partition);
+        connectionPage = new SelectConnectionWizardPage(partitionConfig);
 
         setWindowTitle("New Root DSE Proxy");
     }
 
     public boolean canFinish() {
-        if (!connectionPage.isPageComplete()) return false;
-        return true;
+        return connectionPage.isPageComplete();
     }
 
     public boolean performFinish() {
@@ -67,7 +66,7 @@ public class CreateRootDSEProxyWizard extends Wizard {
             sourceConfig.setParameter("scope", "OBJECT");
             sourceConfig.setParameter("filter", "objectClass=*");
 
-            partition.getSources().addSourceConfig(sourceConfig);
+            partitionConfig.getSourceConfigs().addSourceConfig(sourceConfig);
 
             EntryMapping entryMapping = new EntryMapping();
 
@@ -78,7 +77,7 @@ public class CreateRootDSEProxyWizard extends Wizard {
 
             entryMapping.addACI(new ACI("rs"));
 
-            partition.getMappings().addEntryMapping(entryMapping);
+            partitionConfig.getDirectoryConfigs().addEntryMapping(entryMapping);
 
             return true;
 

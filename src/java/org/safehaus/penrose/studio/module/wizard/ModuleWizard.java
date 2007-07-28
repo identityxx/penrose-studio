@@ -21,7 +21,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.apache.log4j.Logger;
 
 import java.util.Iterator;
@@ -35,15 +35,15 @@ public class ModuleWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    Partition partition;
+    PartitionConfig partitionConfig;
     ModuleConfig module;
 
     public ModuleWizardPage propertyPage = new ModuleWizardPage();
     public ModuleParameterWizardPage parameterPage = new ModuleParameterWizardPage();
     public ModuleMappingWizardPage mappingPage = new ModuleMappingWizardPage();
 
-    public ModuleWizard(Partition partition) {
-        this.partition = partition;
+    public ModuleWizard(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
         setWindowTitle("New Module");
     }
 
@@ -69,13 +69,13 @@ public class ModuleWizard extends Wizard {
                 module.setParameter(name, (String)parameters.get(name));
             }
 
-            partition.getModules().addModuleConfig(module);
+            partitionConfig.getModuleConfigs().addModuleConfig(module);
 
             Collection mappings = mappingPage.getMappings();
             for (Iterator i=mappings.iterator(); i.hasNext(); ) {
                 ModuleMapping mapping = (ModuleMapping)i.next();
                 mapping.setModuleName(propertyPage.getModuleName());
-                partition.getModules().addModuleMapping(mapping);
+                partitionConfig.getModuleConfigs().addModuleMapping(mapping);
             }
 
             PenroseApplication penroseApplication = PenroseApplication.getInstance();

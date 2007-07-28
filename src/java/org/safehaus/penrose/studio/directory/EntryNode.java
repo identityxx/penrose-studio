@@ -39,6 +39,7 @@ import org.safehaus.penrose.studio.directory.action.MapLDAPTreeAction;
 import org.safehaus.penrose.studio.directory.action.NewEntryFromSourceAction;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -54,7 +55,7 @@ public class EntryNode extends Node {
 
     ObjectsView view;
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     private EntryMapping entryMapping;
 
     public EntryNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
@@ -151,7 +152,7 @@ public class EntryNode extends Node {
 
     public void open() throws Exception {
 
-        MappingEditorInput mei = new MappingEditorInput(partition, entryMapping);
+        MappingEditorInput mei = new MappingEditorInput(partitionConfig, entryMapping);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -161,7 +162,7 @@ public class EntryNode extends Node {
 
     public void editSources() throws Exception {
 
-        MappingEditorInput mei = new MappingEditorInput(partition, entryMapping);
+        MappingEditorInput mei = new MappingEditorInput(partitionConfig, entryMapping);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -172,7 +173,7 @@ public class EntryNode extends Node {
 
     public void editACL() throws Exception {
 
-        MappingEditorInput mei = new MappingEditorInput(partition, entryMapping);
+        MappingEditorInput mei = new MappingEditorInput(partitionConfig, entryMapping);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -200,7 +201,7 @@ public class EntryNode extends Node {
             EntryNode entryNode = (EntryNode)node;
 
             EntryMapping entryMapping = entryNode.getEntryMapping();
-            partition.getMappings().removeEntryMapping(entryMapping);
+            partitionConfig.getDirectoryConfigs().removeEntryMapping(entryMapping);
         }
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
@@ -208,15 +209,15 @@ public class EntryNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        Collection children = partition.getMappings().getChildren(entryMapping);
+        Collection children = partitionConfig.getDirectoryConfigs().getChildren(entryMapping);
         return (children != null && children.size() > 0);
     }
 
-    public Collection getChildren() throws Exception {
+    public Collection<Node> getChildren() throws Exception {
 
-        Collection children = new ArrayList();
+        Collection<Node> children = new ArrayList<Node>();
 
-        for (Iterator i=partition.getMappings().getChildren(entryMapping).iterator(); i.hasNext(); ) {
+        for (Iterator i=partitionConfig.getDirectoryConfigs().getChildren(entryMapping).iterator(); i.hasNext(); ) {
             EntryMapping childMapping = (EntryMapping)i.next();
 
             EntryNode entryNode = new EntryNode(
@@ -228,7 +229,7 @@ public class EntryNode extends Node {
                     this
             );
 
-            entryNode.setPartition(partition);
+            entryNode.setPartitionConfig(partitionConfig);
             entryNode.setEntryMapping(childMapping);
 
             children.add(entryNode);
@@ -237,12 +238,12 @@ public class EntryNode extends Node {
         return children;
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 
     public EntryMapping getEntryMapping() {

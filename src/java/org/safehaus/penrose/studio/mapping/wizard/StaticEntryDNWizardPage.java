@@ -24,7 +24,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.ietf.ldap.LDAPDN;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 
 /**
  * @author Endi S. Dewata
@@ -35,12 +35,12 @@ public class StaticEntryDNWizardPage extends WizardPage implements ModifyListene
 
     Text dnText;
 
-    Partition partition;
+    PartitionConfig partitionConfig;
 
-    public StaticEntryDNWizardPage(Partition partition) {
+    public StaticEntryDNWizardPage(PartitionConfig partitionConfig) {
         super(NAME);
 
-        this.partition = partition;
+        this.partitionConfig = partitionConfig;
 
         setDescription("Enter the DN of the entry.");
     }

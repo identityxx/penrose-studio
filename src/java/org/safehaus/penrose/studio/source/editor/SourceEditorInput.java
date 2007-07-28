@@ -4,6 +4,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 
 /**
@@ -11,14 +12,14 @@ import org.safehaus.penrose.source.SourceConfig;
  */
 public class SourceEditorInput implements IEditorInput {
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     private SourceConfig sourceConfig;
 
     public SourceEditorInput() {
     }
 
-    public SourceEditorInput(Partition partition, SourceConfig sourceConfig) {
-        this.partition = partition;
+    public SourceEditorInput(PartitionConfig partitionConfig, SourceConfig sourceConfig) {
+        this.partitionConfig = partitionConfig;
         this.sourceConfig = sourceConfig;
     }
 
@@ -62,11 +63,11 @@ public class SourceEditorInput implements IEditorInput {
         this.sourceConfig = sourceConfig;
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

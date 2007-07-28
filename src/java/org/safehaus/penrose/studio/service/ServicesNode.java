@@ -57,10 +57,10 @@ public class ServicesNode extends Node {
         return true;
     }
 
-    public Collection getChildren() throws Exception {
+    public Collection<Node> getChildren() throws Exception {
 
-        Collection children = new ArrayList();
-
+        Collection<Node> children = new ArrayList<Node>();
+/*
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
         for (Iterator i=penroseConfig.getServiceConfigs().iterator(); i.hasNext(); ) {
@@ -79,7 +79,7 @@ public class ServicesNode extends Node {
 
             children.add(serviceNode);
         }
-
+*/
         return children;
     }
 }

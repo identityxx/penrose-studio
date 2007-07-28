@@ -73,15 +73,14 @@ public class AppendersNode extends Node {
         return !loggingConfig.getAppenderConfigs().isEmpty();
     }
 
-    public Collection getChildren() throws Exception {
+    public Collection<Node> getChildren() throws Exception {
 
-        Collection children = new ArrayList();
+        Collection<Node> children = new ArrayList<Node>();
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         Log4jConfig loggingConfig = penroseApplication.getLoggingConfig();
 
-        for (Iterator i=loggingConfig.getAppenderConfigs().iterator(); i.hasNext(); ) {
-            AppenderConfig appenderConfig = (AppenderConfig)i.next();
+        for (AppenderConfig appenderConfig : loggingConfig.getAppenderConfigs()) {
 
             AppenderNode appenderNode = new AppenderNode(
                     view,

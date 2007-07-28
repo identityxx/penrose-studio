@@ -15,7 +15,8 @@ import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.Link;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.config.PenroseConfig;
-import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.handler.HandlerConfig;
 import org.safehaus.penrose.engine.EngineConfig;
 
@@ -61,6 +62,7 @@ public class MiscPage extends FormPage {
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+        PartitionConfigs partitionConfigs = penroseApplication.getPartitionConfigs();
 
         Composite composite = toolkit.createComposite(parent);
 		composite.setLayout(new GridLayout(2, false));
@@ -75,8 +77,8 @@ public class MiscPage extends FormPage {
         partitionCombo = new Combo(composite, SWT.BORDER);
         partitionCombo.add("");
 
-        for (PartitionConfig partitionConfig : penroseConfig.getPartitionConfigs()) {
-            partitionCombo.add(partitionConfig.getName());
+        for (String name : partitionConfigs.getPartitionNames()) {
+            partitionCombo.add(name);
         }
 
         if (link != null && link.getPartitionName() != null) {

@@ -146,19 +146,19 @@ public class ValidationView extends ViewPart {
 		Object object = item.getData();
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PartitionManager partitionManager = penroseApplication.getPartitionManager();
+        PartitionConfigs partitionConfigs = penroseApplication.getPartitionConfigs();
         PluginManager pluginManager = penroseApplication.getPluginManager();
 
         if (object instanceof ConnectionConfig) {
             ConnectionConfig connectionConfig = (ConnectionConfig)object;
-            Partition partition = partitionManager.getPartition(connectionConfig);
+            PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(connectionConfig);
 
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
 
             Plugin plugin = pluginManager.getPlugin(connectionConfig.getAdapterName());
             ConnectionEditorInput cei = plugin.createConnectionEditorInput();
-            cei.setPartition(partition);
+            cei.setPartitionConfig(partitionConfig);
             cei.setConnectionConfig(connectionConfig);
 
             String connectionEditorClass = plugin.getConnectionEditorClass();
@@ -166,15 +166,15 @@ public class ValidationView extends ViewPart {
 
 		} else if (object instanceof SourceConfig) {
 			SourceConfig sourceConfig = (SourceConfig)object;
-            Partition partition = partitionManager.getPartition(sourceConfig);
-            ConnectionConfig connection = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
+            PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(sourceConfig);
+            ConnectionConfig connection = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
 
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
 
             Plugin plugin = pluginManager.getPlugin(connection.getAdapterName());
             SourceEditorInput sei = plugin.createSourceEditorInput();
-            sei.setPartition(partition);
+            sei.setPartitionConfig(partitionConfig);
             sei.setSourceConfig(sourceConfig);
 
             String sourceEditorClass = plugin.getSourceEditorClass();
@@ -182,9 +182,9 @@ public class ValidationView extends ViewPart {
 
 		} else if (object instanceof EntryMapping) {
             EntryMapping entryDefinition = (EntryMapping)object;
-            Partition partition = partitionManager.getPartition(entryDefinition);
+            PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(entryDefinition);
 
-            MappingEditorInput mei = new MappingEditorInput(partition, entryDefinition);
+            MappingEditorInput mei = new MappingEditorInput(partitionConfig, entryDefinition);
 
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();

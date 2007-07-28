@@ -23,7 +23,7 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.connection.action.NewConnectionAction;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
@@ -45,7 +45,7 @@ public class ConnectionsNode extends Node {
 
     ObjectsView view;
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
 
     public ConnectionsNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
@@ -80,13 +80,13 @@ public class ConnectionsNode extends Node {
 
         int counter = 1;
         String name = newConnectionConfig.getName();
-        while (partition.getConnections().getConnectionConfig(name) != null) {
+        while (partitionConfig.getConnectionConfigs().getConnectionConfig(name) != null) {
             counter++;
             name = newConnectionConfig.getName()+" ("+counter+")";
         }
 
         newConnectionConfig.setName(name);
-        partition.getConnections().addConnectionConfig(newConnectionConfig);
+        partitionConfig.getConnectionConfigs().addConnectionConfig(newConnectionConfig);
 
         view.setClipboard(null);
 
@@ -95,14 +95,14 @@ public class ConnectionsNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        return !partition.getConnectionConfigs().isEmpty();
+        return !partitionConfig.getConnectionConfigs().getConnectionConfigs().isEmpty();
     }
 
-    public Collection getChildren() throws Exception {
+    public Collection<Node> getChildren() throws Exception {
         
-        Collection children = new ArrayList();
+        Collection<Node> children = new ArrayList<Node>();
 
-        Collection connectionConfigs = partition.getConnectionConfigs();
+        Collection connectionConfigs = partitionConfig.getConnectionConfigs().getConnectionConfigs();
         for (Iterator i=connectionConfigs.iterator(); i.hasNext(); ) {
             ConnectionConfig connectionConfig = (ConnectionConfig)i.next();
 
@@ -115,7 +115,7 @@ public class ConnectionsNode extends Node {
                     this
             );
 
-            connectionNode.setPartition(partition);
+            connectionNode.setPartitionConfig(this.partitionConfig);
             connectionNode.setConnectionConfig(connectionConfig);
 
             children.add(connectionNode);
@@ -124,11 +124,11 @@ public class ConnectionsNode extends Node {
         return children;
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

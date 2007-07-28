@@ -119,7 +119,7 @@ public class Node {
         return false;
     }
 
-    public Collection getChildren() throws Exception {
+    public Collection<Node> getChildren() throws Exception {
         return null;
     }
 }

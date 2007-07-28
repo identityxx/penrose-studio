@@ -7,6 +7,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.PenroseApplication;
@@ -25,14 +26,14 @@ public class NISConnectionEditor extends FormEditor {
 
     boolean dirty;
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     ConnectionConfig origConnectionConfig;
     private ConnectionConfig connectionConfig;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         ConnectionEditorInput cei = (ConnectionEditorInput)input;
 
-        partition = cei.getPartition();
+        partitionConfig = cei.getPartitionConfig();
         origConnectionConfig = cei.getConnectionConfig();
 
         try {
@@ -43,7 +44,7 @@ public class NISConnectionEditor extends FormEditor {
 
         setSite(site);
         setInput(input);
-        setPartName(partition.getName()+"/"+connectionConfig.getName());
+        setPartName(partitionConfig.getName()+"/"+connectionConfig.getName());
     }
 
     public void addPages() {
@@ -80,18 +81,18 @@ public class NISConnectionEditor extends FormEditor {
     public void store() throws Exception {
 
         if (!origConnectionConfig.getName().equals(connectionConfig.getName())) {
-            partition.getConnections().renameConnectionConfig(origConnectionConfig, connectionConfig.getName());
+            partitionConfig.getConnectionConfigs().renameConnectionConfig(origConnectionConfig, connectionConfig.getName());
 
-            for (Iterator i=partition.getSources().getSourceConfigs().iterator(); i.hasNext(); ) {
+            for (Iterator i=partitionConfig.getSourceConfigs().getSourceConfigs().iterator(); i.hasNext(); ) {
                 SourceConfig sourceConfig = (SourceConfig)i.next();
                 if (!sourceConfig.getConnectionName().equals(origConnectionConfig.getName())) continue;
                 sourceConfig.setConnectionName(connectionConfig.getName());
             }
         }
 
-        partition.getConnections().modifyConnectionConfig(connectionConfig.getName(), connectionConfig);
+        partitionConfig.getConnectionConfigs().modifyConnectionConfig(connectionConfig.getName(), connectionConfig);
 
-        setPartName(partition.getName()+"/"+connectionConfig.getName());
+        setPartName(this.partitionConfig.getName()+"/"+connectionConfig.getName());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         penroseApplication.notifyChangeListeners();
@@ -124,12 +125,12 @@ public class NISConnectionEditor extends FormEditor {
         }
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 
     public ConnectionConfig getConnectionConfig() {

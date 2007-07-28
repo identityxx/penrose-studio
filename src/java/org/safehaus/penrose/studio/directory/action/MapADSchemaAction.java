@@ -54,7 +54,7 @@ public class MapADSchemaAction extends Action {
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
             //if (!penroseApplication.isCommercial()) return;
 
-            Wizard wizard = new CreateADSchemaProxyWizard(node.getPartition());
+            Wizard wizard = new CreateADSchemaProxyWizard(node.getPartitionConfig());
 
             WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.setPageSize(600, 300);

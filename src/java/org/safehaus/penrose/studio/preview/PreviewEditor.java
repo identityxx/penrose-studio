@@ -36,13 +36,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.Penrose;
 import org.safehaus.penrose.PenroseFactory;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.user.UserConfig;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.session.Session;
 import org.safehaus.penrose.session.SessionManager;
 import org.safehaus.penrose.session.SessionContext;
 import org.safehaus.penrose.studio.PenroseApplication;
-import org.ietf.ldap.LDAPException;
 
 import java.util.Iterator;
 
@@ -280,9 +278,9 @@ public class PreviewEditor extends EditorPart {
                 new TreeItem(treeItem, SWT.NONE);
             }
 
-            if (response.getReturnCode() != LDAPException.SUCCESS) {
+            if (response.getReturnCode() != LDAP.SUCCESS) {
                 TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
-                treeItem.setText(LDAPException.resultCodeToString(response.getReturnCode()));
+                treeItem.setText(LDAP.getMessage(response.getReturnCode()));
             }
         }
     }

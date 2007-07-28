@@ -38,6 +38,7 @@ import org.safehaus.penrose.studio.source.editor.*;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
@@ -53,7 +54,7 @@ public class SourceNode extends Node {
 
     ObjectsView view;
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     private ConnectionConfig connectionConfig;
     private SourceConfig sourceConfig;
 
@@ -109,7 +110,7 @@ public class SourceNode extends Node {
 
     public void open() throws Exception {
 
-        ConnectionConfig con = partition.getConnections().getConnectionConfig(sourceConfig.getConnectionName());
+        ConnectionConfig con = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -119,7 +120,7 @@ public class SourceNode extends Node {
         Plugin plugin = pluginManager.getPlugin(con.getAdapterName());
 
         SourceEditorInput sei = plugin.createSourceEditorInput();
-        sei.setPartition(partition);
+        sei.setPartitionConfig(this.partitionConfig);
         sei.setSourceConfig(sourceConfig);
 
         String sourceEditorClassName = plugin.getSourceEditorClass();
@@ -146,7 +147,7 @@ public class SourceNode extends Node {
 
             SourceNode sourceNode = (SourceNode)node;
             SourceConfig sourceConfig = sourceNode.getSourceConfig();
-            partition.getSources().removeSourceConfig(sourceConfig.getName());
+            partitionConfig.getSourceConfigs().removeSourceConfig(sourceConfig.getName());
         }
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
@@ -167,13 +168,13 @@ public class SourceNode extends Node {
 
         int counter = 1;
         String name = newSourceDefinition.getName();
-        while (partition.getSources().getSourceConfig(name) != null) {
+        while (partitionConfig.getSourceConfigs().getSourceConfig(name) != null) {
             counter++;
             name = newSourceDefinition.getName()+" ("+counter+")";
         }
 
         newSourceDefinition.setName(name);
-        partition.getSources().addSourceConfig(newSourceDefinition);
+        partitionConfig.getSourceConfigs().addSourceConfig(newSourceDefinition);
 
         view.setClipboard(null);
 
@@ -181,12 +182,12 @@ public class SourceNode extends Node {
         penroseApplication.notifyChangeListeners();
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 
     public ConnectionConfig getConnectionConfig() {

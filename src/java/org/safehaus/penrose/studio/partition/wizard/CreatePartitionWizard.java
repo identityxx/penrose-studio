@@ -20,9 +20,7 @@ package org.safehaus.penrose.studio.partition.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.partition.PartitionManager;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.config.PenroseConfig;
+import org.safehaus.penrose.partition.PartitionConfigs;
 import org.apache.log4j.Logger;
 
 /**
@@ -48,25 +46,13 @@ public class CreatePartitionWizard extends Wizard {
     public boolean performFinish() {
         try {
             String name = namePage.getPartitionName();
-            String path;
-            if ("DEFAULT".equals(name)) {
-                path = "conf";
-            } else {
-                path = "partitions/"+name;
-            }
 
-            PartitionConfig partitionConfig = new PartitionConfig();
-            partitionConfig.setName(name);
-            partitionConfig.setPath(path);
-
-            Partition partition = new Partition(partitionConfig);
+            PartitionConfig partitionConfig = new PartitionConfig(name);
 
             PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
-            penroseConfig.addPartitionConfig(partitionConfig);
 
-            PartitionManager partitionManager = penroseApplication.getPartitionManager();
-            partitionManager.addPartition(partition);
+            PartitionConfigs partitionConfigs = penroseApplication.getPartitionConfigs();
+            partitionConfigs.addPartitionConfig(partitionConfig);
 
             penroseApplication.notifyChangeListeners();
 

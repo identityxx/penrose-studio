@@ -38,6 +38,8 @@ import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDNBuilder;
+import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.partition.Partition;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -131,7 +133,7 @@ public class LDAPPage extends FormPage {
             public void widgetSelected(SelectionEvent event) {
                 EntrySelectionDialog dialog = new EntrySelectionDialog(parent.getShell(), SWT.NONE);
                 dialog.setText("Select parent entry...");
-                dialog.setPartition(editor.getPartition());
+                dialog.setPartitionConfig(editor.getPartitionConfig());
                 dialog.open();
 
                 EntryMapping parentEntry = dialog.getEntryMapping();
@@ -396,7 +398,9 @@ public class LDAPPage extends FormPage {
         Collection sources = entry.getSourceMappings();
         for (Iterator i=sources.iterator(); i.hasNext(); ) {
             SourceMapping source = (SourceMapping)i.next();
-            SourceConfig sourceConfig = editor.getPartition().getSources().getSourceConfig(source.getSourceName());
+
+            PartitionConfig partitionConfig = editor.getPartitionConfig();
+            SourceConfig sourceConfig = partitionConfig.getSourceConfigs().getSourceConfig(source.getSourceName());
             dialog.addVariable(source.getName());
 
             for (Iterator j=sourceConfig.getFieldConfigs().iterator(); j.hasNext(); ) {

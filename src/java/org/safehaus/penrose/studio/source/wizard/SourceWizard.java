@@ -38,7 +38,7 @@ public class SourceWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     private SourceConfig sourceConfig;
 
     public SourceWizardPage propertyPage;
@@ -52,8 +52,8 @@ public class SourceWizard extends Wizard {
     public JNDIAttributeWizardPage jndiAttributesPage;
     public JNDIFieldWizardPage jndiFieldsPage;
 
-    public SourceWizard(Partition partition) throws Exception {
-        this.partition = partition;
+    public SourceWizard(PartitionConfig partition) throws Exception {
+        this.partitionConfig = partition;
 
         propertyPage = new SourceWizardPage();
         connectionPage = new SelectConnectionWizardPage(partition);
@@ -118,7 +118,7 @@ public class SourceWizard extends Wizard {
                 return jdbcTablePage;
 
             } else if ("LDAP".equals(adapterName)) {
-                jndiTreePage.setConnectionConfig(partition, connectionConfig);
+                jndiTreePage.setConnectionConfig(connectionConfig);
                 return jndiTreePage;
 
             } else {
@@ -139,7 +139,7 @@ public class SourceWizard extends Wizard {
 
         } else if (jndiTreePage == page) {
             ConnectionConfig connectionConfig = connectionPage.getConnectionConfig();
-            jndiAttributesPage.setConnectionConfig(partition, connectionConfig);
+            jndiAttributesPage.setConnectionConfig(connectionConfig);
 
         } else if (jndiAttributesPage == page) {
             Collection attributeTypes = jndiAttributesPage.getAttributeTypes();
@@ -207,7 +207,7 @@ public class SourceWizard extends Wizard {
 
             }
 
-            partition.getSources().addSourceConfig(sourceConfig);
+            partitionConfig.getSourceConfigs().addSourceConfig(sourceConfig);
 
             return true;
 
@@ -229,11 +229,11 @@ public class SourceWizard extends Wizard {
         return true;
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

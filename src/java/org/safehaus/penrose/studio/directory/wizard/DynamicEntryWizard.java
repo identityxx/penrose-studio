@@ -21,6 +21,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.source.wizard.SelectSourcesWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.RelationshipWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
@@ -39,7 +40,7 @@ public class DynamicEntryWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     private EntryMapping parentMapping;
     private EntryMapping entryMapping = new EntryMapping();
 
@@ -48,8 +49,8 @@ public class DynamicEntryWizard extends Wizard {
     public ObjectClassWizardPage ocPage;
     public AttributeValueWizardPage attrPage;
 
-    public DynamicEntryWizard(Partition partition, EntryMapping parentMapping) {
-        this.partition = partition;
+    public DynamicEntryWizard(PartitionConfig partition, EntryMapping parentMapping) {
+        this.partitionConfig = partition;
         this.parentMapping = parentMapping;
         setWindowTitle("Adding dynamic entry");
 
@@ -166,7 +167,7 @@ public class DynamicEntryWizard extends Wizard {
                 sourceMapping.addFieldMapping(fieldMapping);
             }
 
-            partition.getMappings().addEntryMapping(entryMapping);
+            partitionConfig.getDirectoryConfigs().addEntryMapping(entryMapping);
 
             return true;
 
@@ -203,11 +204,11 @@ public class DynamicEntryWizard extends Wizard {
         this.entryMapping = entryMapping;
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

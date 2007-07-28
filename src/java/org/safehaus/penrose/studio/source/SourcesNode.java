@@ -24,8 +24,9 @@ import org.safehaus.penrose.studio.source.action.NewSourceAction;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.source.Sources;
+import org.safehaus.penrose.source.SourceConfigs;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
@@ -46,7 +47,7 @@ public class SourcesNode extends Node {
 
     ObjectsView view;
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     private String path;
 
     public SourcesNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
@@ -81,7 +82,7 @@ public class SourcesNode extends Node {
 
         int counter = 1;
         String name = newSourceDefinition.getName();
-        Sources sources = partition.getSources();
+        SourceConfigs sources = partitionConfig.getSourceConfigs();
         while (sources.getSourceConfig(name) != null) {
             counter++;
             name = newSourceDefinition.getName()+" ("+counter+")";
@@ -100,22 +101,20 @@ public class SourcesNode extends Node {
         return !getChildren().isEmpty();
     }
 
-    public Collection getChildren() throws Exception {
+    public Collection<Node> getChildren() throws Exception {
 
-        Map children = new LinkedHashMap();
+        Map<String,Node> children = new LinkedHashMap<String,Node>();
 
-        Collection sourceConfigs = partition.getSources().getSourceConfigs();
-        for (Iterator i=sourceConfigs.iterator(); i.hasNext(); ) {
-            SourceConfig sourceConfig = (SourceConfig)i.next();
+        for (SourceConfig sourceConfig : partitionConfig.getSourceConfigs().getSourceConfigs()) {
             String sourceName = sourceConfig.getName();
 
             // log.debug("Checking "+ path +" with "+sourceName);
-            if (path != null && !sourceName.startsWith(path +SEPARATOR)) continue;
+            if (path != null && !sourceName.startsWith(path + SEPARATOR)) continue;
 
-            int p = sourceName.indexOf(SEPARATOR, path == null ? 0 : path.length()+1);
+            int p = sourceName.indexOf(SEPARATOR, path == null ? 0 : path.length() + 1);
 
             if (p >= 0) { // intermediate node
-                String label = sourceName.substring(path == null ? 0 : path.length()+1, p);
+                String label = sourceName.substring(path == null ? 0 : path.length() + 1, p);
 
                 if (!children.containsKey(label)) {
                     // log.debug("Creating sources node "+label);
@@ -128,14 +127,14 @@ public class SourcesNode extends Node {
                             this
                     );
 
-                    sourcesNode.setPartition(partition);
+                    sourcesNode.setPartitionConfig(this.partitionConfig);
                     sourcesNode.setPath(sourceName.substring(0, p));
 
                     children.put(label, sourcesNode);
                 }
 
             } else { // leaf node
-                String label = sourceName.substring(path == null ? 0 : path.length()+1);
+                String label = sourceName.substring(path == null ? 0 : path.length() + 1);
 
                 // log.debug("Creating source node "+label);
                 SourceNode sourceNode = new SourceNode(
@@ -147,7 +146,7 @@ public class SourcesNode extends Node {
                         this
                 );
 
-                sourceNode.setPartition(partition);
+                sourceNode.setPartitionConfig(this.partitionConfig);
                 sourceNode.setSourceConfig(sourceConfig);
 
                 children.put(label, sourceNode);
@@ -157,12 +156,12 @@ public class SourcesNode extends Node {
         return children.values();
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 
     public String getPath() {

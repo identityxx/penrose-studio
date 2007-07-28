@@ -43,6 +43,7 @@ import org.safehaus.penrose.studio.util.ApplicationConfig;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.user.UserConfig;
 import org.safehaus.penrose.service.ServiceConfig;
+import org.safehaus.penrose.service.ServiceConfigs;
 import org.safehaus.penrose.ldap.DN;
 
 public class BrowserEditor extends EditorPart {
@@ -183,11 +184,12 @@ public class BrowserEditor extends EditorPart {
             Project project = applicationConfig.getCurrentProject();
             String hostname = project.getHost();
 
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
-            ServiceConfig serviceConfig = penroseConfig.getServiceConfig("LDAP");
-            String s = serviceConfig.getParameter(LDAP_PORT);
+            ServiceConfigs serviceConfigs = penroseApplication.getServiceConfigs();
+            ServiceConfig serviceConfig = serviceConfigs.getServiceConfig("LDAP");
+            String s = serviceConfig == null ? null : serviceConfig.getParameter(LDAP_PORT);
             int port = s == null ? DEFAULT_LDAP_PORT : Integer.parseInt(s);
 
+            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
             bindDn = penroseConfig.getRootDn().toString();
             password = penroseConfig.getRootPassword();
 

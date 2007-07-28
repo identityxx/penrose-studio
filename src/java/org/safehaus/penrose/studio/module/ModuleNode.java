@@ -25,6 +25,7 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
@@ -49,7 +50,7 @@ public class ModuleNode extends Node {
 
     ObjectsView view;
 
-    private Partition partition;
+    private PartitionConfig partitionConfig;
     private ModuleConfig moduleConfig;
 
     public ModuleNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
@@ -104,7 +105,7 @@ public class ModuleNode extends Node {
 
     public void open() throws Exception {
 
-        ModuleEditorInput mei = new ModuleEditorInput(partition, moduleConfig);
+        ModuleEditorInput mei = new ModuleEditorInput(partitionConfig, moduleConfig);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -120,8 +121,8 @@ public class ModuleNode extends Node {
 
         if (!confirm) return;
 
-        partition.getModules().removeModuleMapping(moduleConfig.getName());
-        partition.getModules().removeModuleConfig(moduleConfig.getName());
+        partitionConfig.getModuleConfigs().removeModuleMapping(moduleConfig.getName());
+        partitionConfig.getModuleConfigs().removeModuleConfig(moduleConfig.getName());
 
         PenroseApplication penroseApplication = PenroseApplication.getInstance();
         penroseApplication.notifyChangeListeners();
@@ -142,21 +143,21 @@ public class ModuleNode extends Node {
 
         int counter = 1;
         String name = oldName;
-        while (partition.getModules().getModuleConfig(name) != null) {
+        while (partitionConfig.getModuleConfigs().getModuleConfig(name) != null) {
             counter++;
             name = oldName+" ("+counter+")";
         }
 
         newModuleConfig.setName(name);
-        partition.getModules().addModuleConfig(newModuleConfig);
+        partitionConfig.getModuleConfigs().addModuleConfig(newModuleConfig);
 
-        Collection mappings = partition.getModules().getModuleMappings(oldName);
+        Collection mappings = partitionConfig.getModuleConfigs().getModuleMappings(oldName);
         if (mappings != null) {
             for (Iterator i=mappings.iterator(); i.hasNext(); ) {
                 ModuleMapping mapping = (ModuleMapping)((ModuleMapping)i.next()).clone();
                 mapping.setModuleName(name);
                 mapping.setModuleConfig(newModuleConfig);
-                partition.getModules().addModuleMapping(mapping);
+                partitionConfig.getModuleConfigs().addModuleMapping(mapping);
             }
         }
 
@@ -166,12 +167,12 @@ public class ModuleNode extends Node {
         penroseApplication.notifyChangeListeners();
     }
 
-    public Partition getPartition() {
-        return partition;
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 
     public ModuleConfig getModuleConfig() {
