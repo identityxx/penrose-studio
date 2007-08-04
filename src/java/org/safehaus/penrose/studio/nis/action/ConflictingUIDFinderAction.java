@@ -1,6 +1,6 @@
 package org.safehaus.penrose.studio.nis.action;
 
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.jdbc.JDBCClient;
@@ -10,7 +10,6 @@ import org.safehaus.penrose.ldap.Attributes;
 import org.safehaus.penrose.ldap.SearchRequest;
 import org.safehaus.penrose.ldap.SearchResult;
 import org.safehaus.penrose.ldap.SearchResponse;
-import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.Partitions;
 
@@ -32,9 +31,9 @@ public class ConflictingUIDFinderAction extends NISAction {
         setName("Conflicting UID Finder");
         setDescription("Finds users from different domains with conflicting UIDs");
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        partitions = penroseApplication.getPartitions();
-        Partition partition = partitions.getPartition("DEFAULT");
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        partitions = penroseStudio.getPartitions();
+        Partition partition = partitions.getPartition("nis");
 
         Source domains = partition.getSource("penrose.domains");
 

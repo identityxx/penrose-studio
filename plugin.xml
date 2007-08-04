@@ -159,7 +159,7 @@
          name="application"
          point="org.eclipse.core.runtime.applications">
       <application>
-         <run class="org.safehaus.penrose.studio.PenroseApplication"/>
+         <run class="org.safehaus.penrose.studio.PenroseStudio"/>
       </application>
    </extension>
    <extension

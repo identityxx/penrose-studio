@@ -263,7 +263,7 @@ public class ACIDialog extends Dialog {
                 //scope = scopeCombo.getText();
                 action = actionCombo.getText();
 
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 if (readCheckbox.getSelection()) sb.append(ACI.PERMISSION_READ);
                 if (searchCheckbox.getSelection()) sb.append(ACI.PERMISSION_SEARCH);
                 if (writeCheckbox.getSelection()) sb.append(ACI.PERMISSION_WRITE);

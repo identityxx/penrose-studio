@@ -47,7 +47,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.safehaus.penrose.mapping.*;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.views.BaseDialog;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -127,8 +127,8 @@ public class ExpressionEditorDialog extends BaseDialog {
 	
 	public void store(Object obj) {
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.setDirty(true);
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.setDirty(true);
 
 		if (obj instanceof FieldMapping) {
             String s = expression.getText().trim();

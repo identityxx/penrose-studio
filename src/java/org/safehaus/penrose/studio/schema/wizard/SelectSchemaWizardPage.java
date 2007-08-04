@@ -26,7 +26,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.ldap.LDAPClient;
-import org.safehaus.penrose.handler.HandlerManager;
+import org.safehaus.penrose.ldap.LDAP;
 import org.apache.log4j.Logger;
 
 import javax.naming.NamingEnumeration;
@@ -40,8 +40,8 @@ public class SelectSchemaWizardPage extends WizardPage {
 
     Logger log = Logger.getLogger(getClass());
 
-    public final static String ACTIVE_DIRECTORY = "Active Directory";
-    public final static String LDAP             = "LDAP";
+    public final static String AD_SCHEMA   = "Active Directory";
+    public final static String LDAP_SCHEMA = "LDAP";
 
     public final static String NAME = "Schema";
 
@@ -106,7 +106,7 @@ public class SelectSchemaWizardPage extends WizardPage {
         newDnButton = new Button(destinationSchemaComposite, SWT.RADIO);
 
         destSchemaText = new Text(destinationSchemaComposite, SWT.BORDER);
-        destSchemaText.setText(HandlerManager.SCHEMA_DN.toString());
+        destSchemaText.setText(LDAP.SCHEMA_DN.toString());
         destSchemaText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         new Label(composite, SWT.NONE);
@@ -188,7 +188,7 @@ public class SelectSchemaWizardPage extends WizardPage {
     }
 
     public String getSchemaFormat() {
-        return adFormatButton.getSelection() ? ACTIVE_DIRECTORY : LDAP;
+        return adFormatButton.getSelection() ? AD_SCHEMA : LDAP_SCHEMA;
     }
 
     public void setConnectionConfig(ConnectionConfig connectionConfig) {

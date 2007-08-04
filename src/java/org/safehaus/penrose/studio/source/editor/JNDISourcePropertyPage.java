@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.source.JNDIFieldDialog;
@@ -357,8 +357,8 @@ public class JNDISourcePropertyPage extends FormPage {
                 try {
                     FieldConfig fieldDefinition = new FieldConfig();
 
-                    PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    SchemaManager schemaManager = penroseApplication.getSchemaManager();
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    SchemaManager schemaManager = penroseStudio.getSchemaManager();
                     Collection<AttributeType> attributeTypes = schemaManager.getAttributeTypes();
 
                     JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
@@ -392,8 +392,8 @@ public class JNDISourcePropertyPage extends FormPage {
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     String oldName = fieldDefinition.getName();
 
-                    PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    SchemaManager schemaManager = penroseApplication.getSchemaManager();
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    SchemaManager schemaManager = penroseStudio.getSchemaManager();
                     Collection attributeTypes = schemaManager.getAttributeTypes();
 
                     JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
@@ -490,8 +490,8 @@ public class JNDISourcePropertyPage extends FormPage {
             source.addFieldConfig(field);
         }
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
 
         checkDirty();
     }

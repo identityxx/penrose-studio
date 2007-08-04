@@ -20,7 +20,7 @@ package org.safehaus.penrose.studio.schema;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenrosePlugin;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.schema.SchemaConfig;
 import org.safehaus.penrose.schema.SchemaManager;
@@ -87,8 +87,8 @@ public class SchemaNode extends Node {
 
     public void open() throws Exception {
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        SchemaManager schemaManager = penroseApplication.getSchemaManager();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        SchemaManager schemaManager = penroseStudio.getSchemaManager();
         Schema schema = schemaManager.getSchema(schemaConfig.getName());
         SchemaEditorInput ei = new SchemaEditorInput(schemaConfig, schema);
 
@@ -108,14 +108,14 @@ public class SchemaNode extends Node {
 
         if (!confirm) return;
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
         penroseConfig.removeSchemaConfig(schemaConfig.getName());
 
-        SchemaManager schemaManager = penroseApplication.getSchemaManager();
+        SchemaManager schemaManager = penroseStudio.getSchemaManager();
         schemaManager.removeSchema(schemaConfig.getName());
 
-        penroseApplication.notifyChangeListeners();
+        penroseStudio.notifyChangeListeners();
     }
 
     public boolean hasChildren() throws Exception {

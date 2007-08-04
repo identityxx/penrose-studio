@@ -2,7 +2,7 @@ package org.safehaus.penrose.studio.handler;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.handler.HandlerConfig;
@@ -32,8 +32,8 @@ public class HandlersNode extends Node {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        Collection handlerConfigs = penroseApplication.getPenroseConfig().getHandlerConfigs();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Collection handlerConfigs = penroseStudio.getPenroseConfig().getHandlerConfigs();
 
         for (Iterator i=handlerConfigs.iterator(); i.hasNext(); ) {
             HandlerConfig handlerConfig = (HandlerConfig)i.next();

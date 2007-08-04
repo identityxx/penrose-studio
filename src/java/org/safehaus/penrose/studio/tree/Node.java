@@ -27,11 +27,11 @@ import java.util.Collection;
  */
 public class Node {
 
-    private String name;
-    private String type;
-    private Image image;
-    private Object object;
-    private Object parent;
+    protected String name;
+    protected String type;
+    protected Image image;
+    protected Object object;
+    protected Object parent;
 
     public Node(String name, String type, Image image, Object object, Object parent) {
         this.name = name;

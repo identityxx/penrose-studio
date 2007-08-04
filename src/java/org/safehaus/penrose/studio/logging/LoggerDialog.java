@@ -26,7 +26,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.log4j.LoggerConfig;
 import org.safehaus.penrose.log4j.RootConfig;
 import org.safehaus.penrose.log4j.Log4jConfig;
@@ -189,8 +189,8 @@ public class LoggerDialog extends Dialog {
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
 
-                PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                Log4jConfig loggingConfig = penroseApplication.getLoggingConfig();
+                PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                Log4jConfig loggingConfig = penroseStudio.getLoggingConfig();
                 Collection appenderConfigs = loggingConfig.getAppenderConfigs();
 
                 AppenderSelectionDialog dialog = new AppenderSelectionDialog(shell, SWT.NONE);

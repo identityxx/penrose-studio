@@ -17,7 +17,7 @@
  */
 package org.safehaus.penrose.studio.logging;
 
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.object.ObjectsView;
@@ -75,8 +75,8 @@ public class LoggersNode extends Node {
     }
 
     public void open() throws Exception {
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        Log4jConfig loggingConfig = penroseApplication.getLoggingConfig();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Log4jConfig loggingConfig = penroseStudio.getLoggingConfig();
 
         RootConfig rootConfig = loggingConfig.getRootConfig();
         if (rootConfig == null) rootConfig = new RootConfig();
@@ -98,8 +98,8 @@ public class LoggersNode extends Node {
     }
 
     public void createLogger() throws Exception {
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        Log4jConfig loggingConfig = penroseApplication.getLoggingConfig();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Log4jConfig loggingConfig = penroseStudio.getLoggingConfig();
 
         LoggerConfig loggerConfig = new LoggerConfig();
 
@@ -113,12 +113,12 @@ public class LoggersNode extends Node {
 
         loggingConfig.addLoggerConfig(loggerConfig);
 
-        penroseApplication.notifyChangeListeners();
+        penroseStudio.notifyChangeListeners();
     }
 
     public boolean hasChildren() throws Exception {
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        Log4jConfig loggingConfig = penroseApplication.getLoggingConfig();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Log4jConfig loggingConfig = penroseStudio.getLoggingConfig();
 
         return !loggingConfig.getLoggerConfigs().isEmpty();
     }
@@ -127,8 +127,8 @@ public class LoggersNode extends Node {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        Log4jConfig loggingConfig = penroseApplication.getLoggingConfig();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Log4jConfig loggingConfig = penroseStudio.getLoggingConfig();
 
         for (Iterator i=loggingConfig.getLoggerConfigs().iterator(); i.hasNext(); ) {
             LoggerConfig loggerConfig = (LoggerConfig)i.next();

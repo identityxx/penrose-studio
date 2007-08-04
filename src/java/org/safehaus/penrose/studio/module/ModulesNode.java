@@ -19,7 +19,7 @@ package org.safehaus.penrose.studio.module;
 
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.module.action.NewModuleAction;
@@ -101,8 +101,8 @@ public class ModulesNode extends Node {
 
         view.setClipboard(null);
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public boolean hasChildren() throws Exception {

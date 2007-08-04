@@ -11,7 +11,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
@@ -21,11 +20,12 @@ import org.safehaus.penrose.studio.source.JNDIFieldDialog;
 import org.safehaus.penrose.studio.source.FieldDialog;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.SourceMapping;
 import org.safehaus.penrose.nis.*;
+import org.safehaus.penrose.nis.adapter.NISAdapter;
 
 import java.util.Iterator;
 import java.util.Collection;
@@ -305,8 +305,8 @@ public class NISSourcePropertyPage extends FormPage {
                 try {
                     FieldConfig fieldDefinition = new FieldConfig();
 
-                    PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    SchemaManager schemaManager = penroseApplication.getSchemaManager();
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    SchemaManager schemaManager = penroseStudio.getSchemaManager();
                     Collection attributeTypes = schemaManager.getAttributeTypes();
 
                     JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
@@ -340,8 +340,8 @@ public class NISSourcePropertyPage extends FormPage {
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     String oldName = fieldDefinition.getName();
 
-                    PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    SchemaManager schemaManager = penroseApplication.getSchemaManager();
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    SchemaManager schemaManager = penroseStudio.getSchemaManager();
                     Collection attributeTypes = schemaManager.getAttributeTypes();
 
                     JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
@@ -436,8 +436,8 @@ public class NISSourcePropertyPage extends FormPage {
             source.addFieldConfig(field);
         }
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
 
         setDirty(false);
     }

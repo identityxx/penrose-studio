@@ -27,7 +27,7 @@ import java.io.IOException;
  */
 public class ConsoleWriter extends Writer {
 
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     Text text;
     int length = 2000;
 

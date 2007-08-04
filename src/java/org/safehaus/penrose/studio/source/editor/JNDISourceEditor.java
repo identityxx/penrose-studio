@@ -22,8 +22,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.mapping.EntryMapping;
@@ -102,8 +101,8 @@ public class JNDISourceEditor extends FormEditor {
 
         setPartName(this.partitionConfig.getName()+"/"+sourceConfig.getName());
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
 
         checkDirty();
 	}

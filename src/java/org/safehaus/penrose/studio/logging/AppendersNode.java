@@ -2,7 +2,7 @@ package org.safehaus.penrose.studio.logging;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.log4j.Log4jConfig;
@@ -17,7 +17,6 @@ import org.eclipse.ui.PlatformUI;
 
 import java.util.Collection;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
@@ -48,8 +47,8 @@ public class AppendersNode extends Node {
 
     public void createAppender() throws Exception {
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        Log4jConfig loggingConfig = penroseApplication.getLoggingConfig();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Log4jConfig loggingConfig = penroseStudio.getLoggingConfig();
 
         AppenderConfig appenderConfig = new AppenderConfig();
 
@@ -63,12 +62,12 @@ public class AppendersNode extends Node {
 
         loggingConfig.addAppenderConfig(appenderConfig);
 
-        penroseApplication.notifyChangeListeners();
+        penroseStudio.notifyChangeListeners();
     }
 
     public boolean hasChildren() throws Exception {
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        Log4jConfig loggingConfig = penroseApplication.getLoggingConfig();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Log4jConfig loggingConfig = penroseStudio.getLoggingConfig();
 
         return !loggingConfig.getAppenderConfigs().isEmpty();
     }
@@ -77,8 +76,8 @@ public class AppendersNode extends Node {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        Log4jConfig loggingConfig = penroseApplication.getLoggingConfig();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Log4jConfig loggingConfig = penroseStudio.getLoggingConfig();
 
         for (AppenderConfig appenderConfig : loggingConfig.getAppenderConfigs()) {
 

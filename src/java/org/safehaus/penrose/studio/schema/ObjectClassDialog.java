@@ -353,7 +353,7 @@ public class ObjectClassDialog extends Dialog {
 
         if (objectClass.getOid() != null) oidText.setText(objectClass.getOid());
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (Iterator i=objectClass.getNames().iterator(); i.hasNext(); ) {
             String name = (String)i.next();
             if (sb.length() > 0) sb.append(" ");
@@ -365,7 +365,7 @@ public class ObjectClassDialog extends Dialog {
 
         if (objectClass.getType() != null) typeCombo.setText(objectClass.getType());
 
-        sb = new StringBuffer();
+        sb = new StringBuilder();
         for (Iterator i=objectClass.getSuperClasses().iterator(); i.hasNext(); ) {
             String superClass = (String)i.next();
             if (sb.length() > 0) sb.append(" ");

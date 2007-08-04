@@ -42,7 +42,7 @@ public class Helper {
 
     public static String replace(String string, Map values) {
 
-        StringBuffer sb = new StringBuffer(string);
+        StringBuilder sb = new StringBuilder(string);
         int i = sb.indexOf("${");
         while (i >= 0) {
             int j = sb.indexOf("}", i+2);

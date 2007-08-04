@@ -30,7 +30,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.schema.AttributeType;
 import org.apache.log4j.Logger;
 
@@ -111,7 +111,7 @@ public class AttributeTypeEditor extends EditorPart implements ModifyListener, S
         gd.widthHint = 100;
         namesLabel.setLayoutData(gd);
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (Iterator i=attributeType.getNames().iterator(); i.hasNext(); ) {
             String name = (String)i.next();
             if (sb.length() > 0) sb.append(" ");
@@ -270,7 +270,7 @@ public class AttributeTypeEditor extends EditorPart implements ModifyListener, S
 
     public void store() throws Exception {
 
-        //Schema schema = PenroseApplication.getSchema();
+        //Schema schema = PenroseStudio.getSchema();
 
         boolean rename = !oidText.getText().equals(attributeType.getOid());
         if (rename) {
@@ -285,8 +285,8 @@ public class AttributeTypeEditor extends EditorPart implements ModifyListener, S
 
         setPartName("Object Class - "+attributeType.getName());
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
 
         checkDirty();
     }

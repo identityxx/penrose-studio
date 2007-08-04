@@ -7,7 +7,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.handler.HandlerConfig;
 
 /**
@@ -83,8 +83,8 @@ public class HandlerEditor extends MultiPageEditorPart {
 
         setPartName("Handler - "+handlerConfig.getName());
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
 
         checkDirty();
     }

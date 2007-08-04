@@ -40,7 +40,7 @@ import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.session.Session;
 import org.safehaus.penrose.session.SessionManager;
 import org.safehaus.penrose.session.SessionContext;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 
 import java.util.Iterator;
 
@@ -172,8 +172,8 @@ public class PreviewEditor extends EditorPart {
         tc.setWidth(400);
 
         try {
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
 
             open("", penroseConfig.getRootDn().toString(), penroseConfig.getRootPassword());
 
@@ -197,10 +197,10 @@ public class PreviewEditor extends EditorPart {
         bindDnText.setText(bindDn == null ? "" : bindDn);
         this.password = password;
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
 
         PenroseFactory penroseFactory = PenroseFactory.getInstance();
-        penrose = penroseFactory.createPenrose(penroseApplication.getWorkDir());
+        penrose = penroseFactory.createPenrose(penroseStudio.getWorkDir());
         penrose.start();
 
         SessionContext sessionContext = penrose.getSessionContext();

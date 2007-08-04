@@ -385,7 +385,7 @@ public class AttributeTypeDialog extends Dialog {
 
         if (attributeType.getOid() != null) oidText.setText(attributeType.getOid());
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (Iterator i=attributeType.getNames().iterator(); i.hasNext(); ) {
             String name = (String)i.next();
             if (sb.length() > 0) sb.append(" ");

@@ -37,11 +37,10 @@ import org.eclipse.ui.part.*;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.ietf.ldap.*;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.util.ApplicationConfig;
 import org.safehaus.penrose.config.PenroseConfig;
-import org.safehaus.penrose.user.UserConfig;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.safehaus.penrose.service.ServiceConfigs;
 import org.safehaus.penrose.ldap.DN;
@@ -178,18 +177,18 @@ public class BrowserEditor extends EditorPart {
         tc.setWidth(400);
 
         try {
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
 
-            ApplicationConfig applicationConfig = penroseApplication.getApplicationConfig();
+            ApplicationConfig applicationConfig = penroseStudio.getApplicationConfig();
             Project project = applicationConfig.getCurrentProject();
             String hostname = project.getHost();
 
-            ServiceConfigs serviceConfigs = penroseApplication.getServiceConfigs();
+            ServiceConfigs serviceConfigs = penroseStudio.getServiceConfigs();
             ServiceConfig serviceConfig = serviceConfigs.getServiceConfig("LDAP");
             String s = serviceConfig == null ? null : serviceConfig.getParameter(LDAP_PORT);
             int port = s == null ? DEFAULT_LDAP_PORT : Integer.parseInt(s);
 
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+            PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
             bindDn = penroseConfig.getRootDn().toString();
             password = penroseConfig.getRootPassword();
 

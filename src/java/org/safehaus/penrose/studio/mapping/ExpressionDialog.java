@@ -613,7 +613,7 @@ public class ExpressionDialog extends Dialog {
 
         //log.debug("Writing "+bytes.length+" bytes.");
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         int lines = bytes.length / 16 + 1;
         int pos = 0;
@@ -625,7 +625,7 @@ public class ExpressionDialog extends Dialog {
             sb.append(index);
             sb.append(": ");
 
-            StringBuffer text = new StringBuffer();
+            StringBuilder text = new StringBuilder();
 
             for (int j=0; j<16; j++) {
 

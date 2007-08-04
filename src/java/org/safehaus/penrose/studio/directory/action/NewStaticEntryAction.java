@@ -26,7 +26,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.directory.wizard.StaticEntryWizard;
 import org.safehaus.penrose.studio.directory.EntryNode;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.apache.log4j.Logger;
 
 public class NewStaticEntryAction extends Action {
@@ -55,8 +55,8 @@ public class NewStaticEntryAction extends Action {
             dialog.setPageSize(600, 300);
             dialog.open();
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            penroseApplication.notifyChangeListeners();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            penroseStudio.notifyChangeListeners();
 
             objectsView.show(node);
 

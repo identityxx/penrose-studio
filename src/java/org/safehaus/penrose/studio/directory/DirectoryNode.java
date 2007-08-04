@@ -22,7 +22,6 @@ import org.safehaus.penrose.studio.directory.action.*;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
@@ -54,8 +53,8 @@ public class DirectoryNode extends Node {
 
         manager.add(new NewRootEntryAction(this));
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseWorkbenchAdvisor workbenchAdvisor = penroseApplication.getWorkbenchAdvisor();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
         PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
         PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 

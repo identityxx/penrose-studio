@@ -33,6 +33,11 @@ public class FileUtil {
 
     public static void copy(File file1, File file2) throws Exception {
         if (file1.getAbsoluteFile().equals(file2.getAbsoluteFile())) return;
+        
+        if (file1.isDirectory()) {
+            copyFolder(file1, file2);
+            return;
+        }
 
         File parent = file2.getParentFile();
         if (parent != null) parent.mkdirs();
@@ -92,7 +97,7 @@ public class FileUtil {
 		FileReader r = new FileReader(file);
 		BufferedReader br = new BufferedReader(r);
 		String line = "";
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		while (line != null) {
 			line = br.readLine();
 			if (line == null) break;

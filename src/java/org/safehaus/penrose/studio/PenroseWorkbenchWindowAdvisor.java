@@ -61,9 +61,9 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     public void preWindowOpen() {
         // log.debug("preWindowOpen");
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
         try {
-            penroseApplication.loadLicense();
+            penroseStudio.loadLicense();
         } catch (Exception e) {
             log.error(e.getMessage());
         }
@@ -84,7 +84,7 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
             Project project = dialog.getProject();
 
-            penroseApplication.getApplicationConfig().setCurrentProject(project);
+            penroseStudio.getApplicationConfig().setCurrentProject(project);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -113,13 +113,13 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     public void postWindowCreate() {
         // log.debug("postWindowCreate");
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        ApplicationConfig applicationConfig = penroseApplication.getApplicationConfig();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        ApplicationConfig applicationConfig = penroseStudio.getApplicationConfig();
 
         try {
             IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 
-            Project project = penroseApplication.getApplicationConfig().getCurrentProject();
+            Project project = penroseStudio.getApplicationConfig().getCurrentProject();
             configurer.setTitle("Penrose Studio - "+project.getName());
 
             //IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
@@ -144,9 +144,9 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         }
 
         try {
-            penroseApplication.connect();
-            penroseApplication.open(penroseApplication.getWorkDir());
-            penroseApplication.disconnect();
+            penroseStudio.connect();
+            penroseStudio.open();
+            penroseStudio.disconnect();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -167,8 +167,8 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     public void postWindowOpen() {
         // log.debug("postWindowOpen");
         try {
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            penroseApplication.validatePartitions();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            penroseStudio.validatePartitions();
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
 

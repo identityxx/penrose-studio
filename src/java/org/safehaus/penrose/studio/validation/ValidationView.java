@@ -37,7 +37,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.part.*;
 import org.safehaus.penrose.mapping.*;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.mapping.MappingEditorInput;
 import org.safehaus.penrose.studio.mapping.MappingEditor;
@@ -74,8 +74,8 @@ public class ValidationView extends ViewPart {
 				Action refreshAction = new Action("Refresh") {
 					public void run() {
                         try {
-                            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                            penroseApplication.validatePartitions();
+                            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                            penroseStudio.validatePartitions();
                         } catch (Exception e) {
                             log.debug(e.getMessage(), e);
                         }
@@ -145,9 +145,9 @@ public class ValidationView extends ViewPart {
         TableItem item = table.getSelection()[0];
 		Object object = item.getData();
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PartitionConfigs partitionConfigs = penroseApplication.getPartitionConfigs();
-        PluginManager pluginManager = penroseApplication.getPluginManager();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PartitionConfigs partitionConfigs = penroseStudio.getPartitionConfigs();
+        PluginManager pluginManager = penroseStudio.getPluginManager();
 
         if (object instanceof ConnectionConfig) {
             ConnectionConfig connectionConfig = (ConnectionConfig)object;

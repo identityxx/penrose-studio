@@ -24,7 +24,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.FillLayout;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.SchemaManager;
@@ -79,8 +79,8 @@ public class ObjectClassWizardPage extends WizardPage {
             public void widgetSelected(SelectionEvent event) {
                 if (availableTable.getSelectionCount() == 0) return;
 
-                PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                SchemaManager schemaManager = penroseApplication.getSchemaManager();
+                PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                SchemaManager schemaManager = penroseStudio.getSchemaManager();
 
                 TableItem items[] = availableTable.getSelection();
                 for (int i=0; i<items.length; i++) {
@@ -104,8 +104,8 @@ public class ObjectClassWizardPage extends WizardPage {
             public void widgetSelected(SelectionEvent event) {
                 if (selectedTable.getSelectionCount() == 0) return;
 
-                PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                SchemaManager schemaManager = penroseApplication.getSchemaManager();
+                PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                SchemaManager schemaManager = penroseStudio.getSchemaManager();
 
                 TableItem items[] = selectedTable.getSelection();
                 for (int i=0; i<items.length; i++) {
@@ -185,8 +185,8 @@ public class ObjectClassWizardPage extends WizardPage {
 
     public void init() {
         try {
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            Schema schema = penroseApplication.getSchemaManager().getAllSchema();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            Schema schema = penroseStudio.getSchemaManager().getAllSchema();
 
             Collection ocNames = new ArrayList();
             for (Iterator i=schema.getObjectClasses().iterator(); i.hasNext(); ) {

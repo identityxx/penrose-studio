@@ -24,7 +24,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.util.ApplicationConfig;
@@ -50,18 +50,18 @@ public class SaveAction extends Action {
         IWorkbenchPage page = window.getActivePage();
         page.saveAllEditors(false);
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        ApplicationConfig applicationConfig = penroseApplication.getApplicationConfig();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        ApplicationConfig applicationConfig = penroseStudio.getApplicationConfig();
 
         try {
-            File workDir = new File(penroseApplication.getWorkDir());
-            File workTmp = new File(penroseApplication.getWorkDir()+".tmp");
-            File workBackup = new File(penroseApplication.getWorkDir()+".bak");
+            File workDir = penroseStudio.getWorkDir();
+            File workTmp = new File(penroseStudio.getWorkDir(), ".tmp");
+            File workBackup = new File(penroseStudio.getWorkDir(), ".bak");
 
             FileUtil.delete(workTmp);
-            copyFolder(workDir, workTmp);
+            FileUtil.copy(workDir, workTmp);
 
-            penroseApplication.save(workTmp.getAbsolutePath());
+            penroseStudio.save(workTmp);
 
             FileUtil.delete(workBackup);
             workDir.renameTo(workBackup);
@@ -78,29 +78,6 @@ public class SaveAction extends Action {
                     "Failed saving "+applicationConfig.getCurrentProject().getName()+" configuration.\n"+
                             "See penrose-studio-log.txt for details."
             );
-        }
-    }
-
-    public static void copyFolder(String dirname1, String dirname2) throws Exception {
-        File dir1 = new File(dirname1);
-        File dir2 = new File(dirname2);
-        copyFolder(dir1, dir2);
-    }
-
-    public static void copyFolder(File dir1, File dir2) throws Exception {
-        dir2.mkdirs();
-
-        File files[] = dir1.listFiles();
-        if (files != null) {
-            for (int i=0; i<files.length; i++) {
-                File target = new File(dir2, files[i].getName());
-
-                if (files[i].isDirectory()) {
-                    copyFolder(files[i], target);
-                } else {
-                    FileUtil.copy(files[i], target);
-                }
-            }
         }
     }
 }

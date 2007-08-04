@@ -26,7 +26,7 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.partition.action.ExportPartitionAction;
 import org.safehaus.penrose.studio.object.ObjectsView;
@@ -41,30 +41,85 @@ import org.apache.log4j.Logger;
 
 import java.util.Collection;
 import java.util.ArrayList;
+import java.io.File;
 
 /**
  * @author Endi S. Dewata
  */
 public class PartitionNode extends Node {
 
-    Logger log = Logger.getLogger(getClass());
+    public Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
 
     private PartitionConfig partitionConfig;
 
+    Action copyAction;
+
     public PartitionNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
         this.view = view;
+        this.partitionConfig = (PartitionConfig)object;
     }
 
     public void showMenu(IMenuManager manager) {
 
-        manager.add(new ExportPartitionAction(partitionConfig));
+        manager.add(new Action("Open") {
+            public void run() {
+                try {
+                    open();
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Action("Close") {
+            public void run() {
+                try {
+                    close();
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                }
+            }
+            public boolean isEnabled() {
+                return partitionConfig != null;
+            }
+        });
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-/*
+        manager.add(new Action("Save") {
+            public void run() {
+                try {
+                    save();
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                }
+            }
+            public boolean isEnabled() {
+                return partitionConfig != null;
+            }
+        });
+
+        manager.add(new Action("Upload") {
+            public void run() {
+                try {
+                    upload();
+                } catch (Exception e) {
+                    log.debug(e.getMessage(), e);
+                }
+            }
+            public boolean isEnabled() {
+                return partitionConfig != null;
+            }
+        });
+
+        manager.add(new ExportPartitionAction(this));
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+
         manager.add(new Action("Copy") {
             public void run() {
                 try {
@@ -72,6 +127,9 @@ public class PartitionNode extends Node {
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
                 }
+            }
+            public boolean isEnabled() {
+                return partitionConfig != null;
             }
         });
 
@@ -83,8 +141,14 @@ public class PartitionNode extends Node {
                     log.debug(e.getMessage(), e);
                 }
             }
+            public boolean isEnabled() {
+                Object object = view.getClipboard();
+                return object != null && object instanceof PartitionConfig;
+            }
         });
-*/
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
         manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
             public void run() {
                 try {
@@ -94,6 +158,58 @@ public class PartitionNode extends Node {
                 }
             }
         });
+    }
+
+    public void open() throws Exception {
+        log.debug("Opening "+name+" partition.");
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+
+        File workDir = penroseStudio.getWorkDir();
+        File dir = new File(workDir, "partitions"+File.separator+name);
+
+        penroseStudio.downloadFolder("partitions"+File.separator+name, workDir);
+
+        PartitionConfigs partitionConfigs = penroseStudio.getPartitionConfigs();
+        partitionConfig = partitionConfigs.load(dir);
+
+        penroseStudio.notifyChangeListeners();
+    }
+
+    public void save() throws Exception {
+        log.debug("Saving "+name+" partition.");
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PartitionConfigs partitionConfigs = penroseStudio.getPartitionConfigs();
+        
+        File workDir = penroseStudio.getWorkDir();
+        partitionConfigs.store(workDir, partitionConfig);
+    }
+
+    public void upload() throws Exception {
+        log.debug("Uploading "+name+" partition.");
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        
+        File workDir = penroseStudio.getWorkDir();
+
+        File dir = new File(workDir, File.separator+"partitions"+File.separator+name);
+        Collection<String> files = penroseStudio.listFiles("partitions/"+name, dir);
+
+        for (String filename : files) {
+            penroseStudio.upload(workDir, filename);
+        }
+    }
+
+    public void close() throws Exception {
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+
+        PartitionConfigs partitionConfigs = penroseStudio.getPartitionConfigs();
+        partitionConfigs.removePartitionConfig(partitionConfig.getName());
+
+        partitionConfig = null;
+
+        penroseStudio.notifyChangeListeners();
     }
 
     public void remove() throws Exception {
@@ -107,52 +223,35 @@ public class PartitionNode extends Node {
 
         if (!confirm) return;
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
 
-        PartitionConfigs partitionConfigs = penroseApplication.getPartitionConfigs();
+        PartitionConfigs partitionConfigs = penroseStudio.getPartitionConfigs();
         partitionConfigs.removePartitionConfig(partitionConfig.getName());
 
-        penroseApplication.notifyChangeListeners();
+        partitionConfig = null;
+
+        penroseStudio.notifyChangeListeners();
     }
 
     public void copy() throws Exception {
+        log.debug("Copying "+name+" partition.");
         view.setClipboard(partitionConfig);
     }
 
     public void paste() throws Exception {
-
-        Object object = view.getClipboard();
-        if (!(object instanceof PartitionConfig)) return;
-
-        PartitionConfig oldPartition = (PartitionConfig)object;
-        PartitionConfig newPartition = (PartitionConfig)oldPartition.clone();
-
-        String originalName = newPartition.getName();
-
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PartitionConfigs partitionConfigs = penroseApplication.getPartitionConfigs();
-
-        int counter = 1;
-        String name = originalName+" ("+counter+")";
-        while (partitionConfigs.getPartitionConfig(name) != null) {
-            counter++;
-            name = originalName+" ("+counter+")";
-        }
-
-        newPartition.setName(name);
-
-        partitionConfigs.addPartitionConfig(newPartition);
-
-        view.setClipboard(null);
+        PartitionsNode partitionsNode = (PartitionsNode)parent;
+        partitionsNode.paste();
     }
 
     public boolean hasChildren() throws Exception {
-        return true;
+        log.debug("Partition "+name+" has no children.");
+        return partitionConfig != null;
     }
 
-    public Collection getChildren() throws Exception {
+    public Collection<Node> getChildren() throws Exception {
 
         Collection<Node> children = new ArrayList<Node>();
+        if (partitionConfig == null) return children;
 
         DirectoryNode directoryNode = new DirectoryNode(
                 view,

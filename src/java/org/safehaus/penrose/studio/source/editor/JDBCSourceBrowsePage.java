@@ -20,7 +20,7 @@ import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.ldap.LDAP;
 import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.naming.PenroseContext;
 
@@ -180,12 +180,18 @@ public class JDBCSourceBrowsePage extends FormPage {
 
             ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
-            PenroseContext penroseContext = penroseApplication.getPenroseContext();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
+            PenroseContext penroseContext = penroseStudio.getPenroseContext();
 
             Partitions partitions = new Partitions();
-            Partition partition = partitions.init(penroseConfig, penroseContext, partitionConfig);
+
+            PartitionContext partitionContext = new PartitionContext();
+            partitionContext.setPenroseConfig(penroseConfig);
+            partitionContext.setPenroseContext(penroseContext);
+
+            Partition partition = partitions.init(partitionConfig, partitionContext);
+
             Connection connection = partition.createConnection(connectionConfig);
 
             Source source = partition.createSource(sourceConfig, connection);
@@ -234,12 +240,18 @@ public class JDBCSourceBrowsePage extends FormPage {
 
             ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
-            PenroseContext penroseContext = penroseApplication.getPenroseContext();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
+            PenroseContext penroseContext = penroseStudio.getPenroseContext();
 
             Partitions partitions = new Partitions();
-            Partition partition = partitions.init(penroseConfig, penroseContext, partitionConfig);
+
+            PartitionContext partitionContext = new PartitionContext();
+            partitionContext.setPenroseConfig(penroseConfig);
+            partitionContext.setPenroseContext(penroseContext);
+
+            Partition partition = partitions.init(partitionConfig, partitionContext);
+
             Connection connection = partition.createConnection(connectionConfig);
 
             Source source = partition.createSource(sourceConfig, connection);
@@ -281,12 +293,18 @@ public class JDBCSourceBrowsePage extends FormPage {
 
             ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
-            PenroseContext penroseContext = penroseApplication.getPenroseContext();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
+            PenroseContext penroseContext = penroseStudio.getPenroseContext();
 
             Partitions partitions = new Partitions();
-            Partition partition = partitions.init(penroseConfig, penroseContext, partitionConfig);
+
+            PartitionContext partitionContext = new PartitionContext();
+            partitionContext.setPenroseConfig(penroseConfig);
+            partitionContext.setPenroseContext(penroseContext);
+
+            Partition partition = partitions.init(partitionConfig, partitionContext);
+
             Connection connection = partition.createConnection(connectionConfig);
 
             Source source = partition.createSource(sourceConfig, connection);
@@ -351,12 +369,17 @@ public class JDBCSourceBrowsePage extends FormPage {
         };
 
         try {
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
-            PenroseContext penroseContext = penroseApplication.getPenroseContext();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
+            PenroseContext penroseContext = penroseStudio.getPenroseContext();
 
             Partitions partitions = new Partitions();
-            Partition partition = partitions.init(penroseConfig, penroseContext, partitionConfig);
+
+            PartitionContext partitionContext = new PartitionContext();
+            partitionContext.setPenroseConfig(penroseConfig);
+            partitionContext.setPenroseContext(penroseContext);
+
+            Partition partition = partitions.init(partitionConfig, partitionContext);
 
             ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
             Connection connection = partition.createConnection(connectionConfig);

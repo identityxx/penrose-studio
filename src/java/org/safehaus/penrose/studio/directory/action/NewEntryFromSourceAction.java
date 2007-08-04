@@ -25,7 +25,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.jface.action.Action;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.directory.EntryNode;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.mapping.SourceDialog;
 import org.safehaus.penrose.mapping.SourceMapping;
 import org.safehaus.penrose.mapping.EntryMapping;
@@ -33,7 +33,6 @@ import org.safehaus.penrose.mapping.AttributeMapping;
 import org.safehaus.penrose.mapping.FieldMapping;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.filter.*;
 import org.safehaus.penrose.ldap.DNBuilder;
@@ -65,8 +64,8 @@ public class NewEntryFromSourceAction extends Action {
 
             Shell shell = window.getShell();
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            //if (!penroseApplication.isCommercial()) return;
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            //if (!penroseStudio.isCommercial()) return;
 
             PartitionConfig partitionConfig = node.getPartitionConfig();
             EntryMapping entryMapping = node.getEntryMapping();
@@ -159,7 +158,7 @@ public class NewEntryFromSourceAction extends Action {
 
             partitionConfig.getDirectoryConfigs().addEntryMapping(entry);
 
-            penroseApplication.notifyChangeListeners();
+            penroseStudio.notifyChangeListeners();
 
             objectsView.show(node);
 

@@ -19,7 +19,7 @@ package org.safehaus.penrose.studio.user;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.user.UserConfig;
 import org.eclipse.swt.graphics.Image;
@@ -58,8 +58,8 @@ public class AdministratorNode extends Node {
     }
 
     public void open() throws Exception {
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
         UserConfig userConfig = penroseConfig.getRootUserConfig();
 
         UserEditorInput ei = new UserEditorInput(userConfig);

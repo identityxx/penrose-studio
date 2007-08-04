@@ -76,7 +76,7 @@ public class WelcomeEditor extends EditorPart {
         font = new Font(parent.getDisplay(), "Arial", 16, SWT.BOLD);
         ft.setFont("font", font);
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("<form>");
         sb.append("<p><span font=\"font\">Welcome to Penrose Studio</span></p>");
         sb.append("<p><img href=\"welcome\"/></p>");

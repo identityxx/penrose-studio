@@ -17,21 +17,15 @@
  */
 package org.safehaus.penrose.studio.service;
 
-import org.safehaus.penrose.studio.PenrosePlugin;
-import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseApplication;
 import org.safehaus.penrose.studio.service.action.NewServiceAction;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.service.ServiceConfig;
-import org.safehaus.penrose.config.PenroseConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
@@ -61,7 +55,7 @@ public class ServicesNode extends Node {
 
         Collection<Node> children = new ArrayList<Node>();
 /*
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseStudio penroseApplication = PenroseStudio.getInstance();
         PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
         for (Iterator i=penroseConfig.getServiceConfigs().iterator(); i.hasNext(); ) {
             ServiceConfig serviceConfig = (ServiceConfig)i.next();

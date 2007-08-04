@@ -24,12 +24,11 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.util.ApplicationConfig;
 import org.safehaus.penrose.studio.browser.BrowserEditorInput;
 import org.safehaus.penrose.studio.browser.BrowserEditor;
-import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.safehaus.penrose.service.ServiceConfigs;
 import org.apache.log4j.Logger;
@@ -58,13 +57,13 @@ public class BrowserAction extends Action {
         try {
             IWorkbenchPage activePage = window.getActivePage();
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
 
-            ApplicationConfig applicationConfig = penroseApplication.getApplicationConfig();
+            ApplicationConfig applicationConfig = penroseStudio.getApplicationConfig();
             Project project = applicationConfig.getCurrentProject();
             String hostname = project.getHost();
 
-            ServiceConfigs serviceConfigs = penroseApplication.getServiceConfigs();
+            ServiceConfigs serviceConfigs = penroseStudio.getServiceConfigs();
             ServiceConfig serviceConfig = serviceConfigs.getServiceConfig("LDAP");
             String s = serviceConfig == null ? null : serviceConfig.getParameter(LDAP_PORT);
             int port = s == null ? DEFAULT_LDAP_PORT : Integer.parseInt(s);

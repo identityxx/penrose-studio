@@ -230,7 +230,7 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
         String host = getHost();
         int port = getPort();
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(protocol);
         sb.append("://");
         sb.append(host);

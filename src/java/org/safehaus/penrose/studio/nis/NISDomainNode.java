@@ -6,7 +6,6 @@ import org.safehaus.penrose.studio.*;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.Partitions;
 import org.apache.log4j.Logger;
@@ -46,9 +45,9 @@ public class NISDomainNode extends Node {
         this.view = view;
         this.domain = (NISDomain)object;
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        Partitions partitions = penroseApplication.getPartitions();
-        Partition partition = partitions.getPartition("DEFAULT");
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Partitions partitions = penroseStudio.getPartitions();
+        Partition partition = partitions.getPartition("nis");
 
         domains = partition.getSource("penrose.domains");
     }
@@ -167,8 +166,8 @@ public class NISDomainNode extends Node {
 
         domains.modify(newDn, modifications);
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public void remove() throws Exception {
@@ -198,8 +197,8 @@ public class NISDomainNode extends Node {
             domains.delete(dn);
         }
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public NISDomain getDomain() {

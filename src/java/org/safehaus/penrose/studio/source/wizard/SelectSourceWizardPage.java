@@ -30,7 +30,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;
@@ -141,8 +141,8 @@ public class SelectSourceWizardPage extends WizardPage {
 
                     refresh();
 
-                    PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    penroseApplication.notifyChangeListeners();
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    penroseStudio.notifyChangeListeners();
 
                 } catch (Exception e) {
                     log.debug(e.getMessage(), e);
@@ -167,8 +167,8 @@ public class SelectSourceWizardPage extends WizardPage {
 
                 refresh();
 
-                PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                penroseApplication.notifyChangeListeners();
+                PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                penroseStudio.notifyChangeListeners();
             }
         });
 

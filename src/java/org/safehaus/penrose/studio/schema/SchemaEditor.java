@@ -8,8 +8,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.SchemaWriter;
 import org.safehaus.penrose.schema.SchemaManager;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.apache.log4j.Logger;
+
+import java.io.File;
 
 /**
  * @author Endi S. Dewata
@@ -66,15 +68,15 @@ public class SchemaEditor extends FormEditor {
     }
 
     public void store() throws Exception {
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        SchemaManager schemaManager = penroseApplication.getSchemaManager();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        SchemaManager schemaManager = penroseStudio.getSchemaManager();
         schemaManager.removeSchema(origSchema.getName());
 
         origSchema.copy(schema);
 
         schemaManager.addSchema(origSchema);
 
-        String workDir = penroseApplication.getWorkDir();
+        File workDir = penroseStudio.getWorkDir();
 
         log.debug("Writing schema "+origSchema.getName()+" to "+workDir);
 
@@ -83,7 +85,7 @@ public class SchemaEditor extends FormEditor {
 
         setPartName("Schema - "+origSchema.getName());
 
-        penroseApplication.notifyChangeListeners();
+        penroseStudio.notifyChangeListeners();
 
         checkDirty();
     }

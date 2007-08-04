@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.*;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.cache.CacheConfig;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.apache.log4j.Logger;
@@ -54,8 +54,8 @@ public class ConnectorCachePage {
 
     public ConnectorCachePage(ConnectorEditor editor) {
         this.editor = editor;
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseConfig serverConfig = penroseApplication.getPenroseConfig();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseConfig serverConfig = penroseStudio.getPenroseConfig();
         //this.cacheConfig = serverConfig.getSourceCacheConfig();
     }
 

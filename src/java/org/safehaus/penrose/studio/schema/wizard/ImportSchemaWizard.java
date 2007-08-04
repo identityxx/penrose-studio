@@ -18,7 +18,7 @@
 package org.safehaus.penrose.studio.schema.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.schema.SchemaConfig;
@@ -56,22 +56,22 @@ public class ImportSchemaWizard extends Wizard {
             String name = namePage.getSchemaName();
             String path = schemaExtDir+"/"+name+".schema";
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            String workDir = penroseApplication.getWorkDir();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            File workDir = penroseStudio.getWorkDir();
 
-            String file1 = filePage.getFilename();
-            String file2 = workDir+File.separator+path;
+            File file1 = new File(filePage.getFilename());
+            File file2 = new File(workDir, File.separator+path);
             FileUtil.copy(file1, file2);
 
             SchemaConfig schemaConfig = new SchemaConfig();
             schemaConfig.setName(name);
             schemaConfig.setPath(path);
 
-            PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+            PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
             penroseConfig.addSchemaConfig(schemaConfig);
 
-            SchemaManager schemaManager = penroseApplication.getSchemaManager();
-            schemaManager.init(penroseApplication.getWorkDir(), schemaConfig);
+            SchemaManager schemaManager = penroseStudio.getSchemaManager();
+            schemaManager.init(penroseStudio.getWorkDir(), schemaConfig);
 
             return true;
 

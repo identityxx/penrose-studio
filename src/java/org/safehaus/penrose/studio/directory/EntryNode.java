@@ -38,7 +38,6 @@ import org.safehaus.penrose.studio.directory.action.NewDynamicEntryAction;
 import org.safehaus.penrose.studio.directory.action.MapLDAPTreeAction;
 import org.safehaus.penrose.studio.directory.action.NewEntryFromSourceAction;
 import org.safehaus.penrose.mapping.EntryMapping;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.apache.log4j.Logger;
 
@@ -137,8 +136,8 @@ public class EntryNode extends Node {
 
     public void showCommercialMenu(IMenuManager manager) throws Exception {
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseWorkbenchAdvisor workbenchAdvisor = penroseApplication.getWorkbenchAdvisor();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
         PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
         PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
@@ -204,8 +203,8 @@ public class EntryNode extends Node {
             partitionConfig.getDirectoryConfigs().removeEntryMapping(entryMapping);
         }
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public boolean hasChildren() throws Exception {

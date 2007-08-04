@@ -2,13 +2,12 @@ package org.safehaus.penrose.studio.nis;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.Partitions;
 import org.eclipse.swt.graphics.Image;
@@ -65,9 +64,12 @@ public class NISNode extends Node {
 
     public boolean hasChildren() throws Exception {
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        Partitions partitions = penroseApplication.getPartitions();
-        Partition partition = partitions.getPartition("DEFAULT");
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Partitions partitions = penroseStudio.getPartitions();
+        if (partitions == null) return false;
+
+        Partition partition = partitions.getPartition("nis");
+        if (partition == null) return false;
 
         Source domains = partition.getSource("penrose.domains");
         if (domains == null) return false;
@@ -82,9 +84,14 @@ public class NISNode extends Node {
 
     public Collection<Node> getChildren() throws Exception {
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        Partitions partitions = penroseApplication.getPartitions();
-        Partition partition = partitions.getPartition("DEFAULT");
+        Collection<Node> children = new ArrayList<Node>();
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Partitions partitions = penroseStudio.getPartitions();
+        if (partitions == null) return children;
+
+        Partition partition = partitions.getPartition("nis");
+        if (partition == null) return children;
 
         Source domains = partition.getSource("penrose.domains");
         if (domains == null) return null;
@@ -93,8 +100,6 @@ public class NISNode extends Node {
         SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
         domains.search(request, response);
-
-        Collection<Node> children = new ArrayList<Node>();
 
         while (response.hasNext()) {
             SearchResult result = response.next();
@@ -128,9 +133,9 @@ public class NISNode extends Node {
 
     public void newDomain() throws Exception {
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        Partitions partitions = penroseApplication.getPartitions();
-        Partition partition = partitions.getPartition("DEFAULT");
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Partitions partitions = penroseStudio.getPartitions();
+        Partition partition = partitions.getPartition("nis");
 
         Source domains = partition.getSource("penrose.domains");
 
@@ -154,11 +159,11 @@ public class NISNode extends Node {
 
         domains.add(dn, attributes);
 
-        penroseApplication.notifyChangeListeners();
+        penroseStudio.notifyChangeListeners();
     }
 
     public void refresh() throws Exception {
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 }

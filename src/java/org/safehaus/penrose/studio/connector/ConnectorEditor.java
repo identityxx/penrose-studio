@@ -23,7 +23,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.connector.ConnectorConfig;
 import org.apache.log4j.Logger;
 
@@ -103,8 +103,8 @@ public class ConnectorEditor extends MultiPageEditorPart {
 
         origConnectorConfig.copy(connectorConfig);
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
 
         checkDirty();
     }

@@ -43,10 +43,7 @@ import org.safehaus.penrose.studio.plugin.*;
 import org.safehaus.penrose.schema.*;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.*;
-import com.identyx.license.License;
-import com.identyx.license.LicenseUtil;
-import com.identyx.license.LicenseManager;
-import com.identyx.license.LicenseReader;
+import com.identyx.license.*;
 import org.safehaus.penrose.log4j.Log4jConfigReader;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.safehaus.penrose.log4j.Log4jConfigWriter;
@@ -55,7 +52,7 @@ import org.safehaus.penrose.service.ServiceConfigs;
 
 import javax.crypto.Cipher;
 
-public class PenroseApplication implements IPlatformRunnable {
+public class PenroseStudio implements IPlatformRunnable {
 
     public Logger log = Logger.getLogger(getClass());
     public boolean debug = log.isDebugEnabled();
@@ -69,9 +66,9 @@ public class PenroseApplication implements IPlatformRunnable {
 
     public final static String FEATURE_NOT_AVAILABLE = "This feature is only available in the commercial version.";
 
-    public static PenroseApplication instance;
+    public static PenroseStudio instance;
 
-    String workDir;
+    File workDir;
     File homeDir;
 
     ApplicationConfig applicationConfig = new ApplicationConfig();
@@ -97,7 +94,7 @@ public class PenroseApplication implements IPlatformRunnable {
 
     static {
         try {
-            Package pkg = PenroseApplication.class.getPackage();
+            Package pkg = PenroseStudio.class.getPackage();
 
             PRODUCT_NAME    = pkg.getImplementationTitle() == null ? PRODUCT_NAME : pkg.getImplementationTitle();
             PRODUCT_VERSION = pkg.getImplementationVersion() == null ? PRODUCT_VERSION : pkg.getImplementationVersion();
@@ -108,18 +105,18 @@ public class PenroseApplication implements IPlatformRunnable {
         }
     }
 
-    public PenroseApplication() throws Exception {
+    public PenroseStudio() throws Exception {
 
-        String userHome = System.getProperty("user.home");
+        File userHome = new File(System.getProperty("user.home"));
 
         homeDir = new File(userHome, ".penrose");
         homeDir.mkdirs();
 
-        workDir = userHome+File.separator+".penrose"+File.separator+"work";
+        workDir = new File(homeDir, "work");
 
         workbenchAdvisor = new PenroseWorkbenchAdvisor();
 
-        PenroseApplication.instance = this;
+        instance = this;
 
         PluginConfig pluginConfig = new PluginConfig();
         pluginConfig.setName("JDBC");
@@ -137,7 +134,7 @@ public class PenroseApplication implements IPlatformRunnable {
         pluginManager.init(pluginConfig);
     }
 
-    public static PenroseApplication getInstance() {
+    public static PenroseStudio getInstance() {
         return instance;
     }
 
@@ -176,7 +173,7 @@ public class PenroseApplication implements IPlatformRunnable {
             saveApplicationConfig();
         }
 
-        log.debug("Loading projects from "+file.getAbsolutePath());
+        log.debug("Loading projects from "+file);
 
 		try {
 			applicationConfig.load(file);
@@ -200,59 +197,57 @@ public class PenroseApplication implements IPlatformRunnable {
 	}
 
 
-    public void open(String dir) throws Exception {
+    public void open() throws Exception {
 
-        FileUtil.delete(dir);
+        FileUtil.delete(workDir);
 
         log.debug("-------------------------------------------------------------------------------------");
-        log.debug("Downloading configuration to "+dir);
+        log.debug("Downloading configuration to "+ workDir);
 
-        downloadFolder("conf", dir);
-        downloadFolder("schema", dir);
-        downloadFolder("partitions", dir);
-        downloadFolder("services", dir);
+        downloadFolder("conf", workDir);
+        downloadFolder("schema", workDir);
+        //downloadFolder("partitions", workDir);
+        downloadFolder("services", workDir);
 
-        log.debug("Opening project from "+dir);
+        log.debug("Opening project from "+ workDir);
 
-        PenroseConfigReader penroseConfigReader = new PenroseConfigReader(dir+"/conf/server.xml");
+        PenroseConfigReader penroseConfigReader = new PenroseConfigReader(new File(workDir, "conf/server.xml"));
         penroseConfig = penroseConfigReader.read();
 
-        penroseContext = new PenroseContext(dir);
+        penroseContext = new PenroseContext(workDir);
         penroseContext.init(penroseConfig);
         penroseContext.start();
-
-        String partitionsDir = (dir == null ? "" : dir+ File.separator)+"partitions";
+/*
+        String partitionsDir = (workDir == null ? "" : workDir + File.separator)+"partitions";
 
         File partitions = new File(partitionsDir);
         if (!partitions.isDirectory()) return;
 
-        for (File file : partitions.listFiles()) {
-            if (!file.isDirectory()) continue;
+        for (File dir : partitions.listFiles()) {
+            if (!dir.isDirectory()) continue;
 
             if (debug) log.debug("----------------------------------------------------------------------------------");
 
-            partitionConfigs.load(file);
+            partitionConfigs.load(dir);
         }
-
-        String services = (dir == null ? "" : dir+ File.separator)+"services";
-
-        File servicesDir = new File(services);
+*/
+        File servicesDir = new File(workDir, "services");
         if (!servicesDir.isDirectory()) return;
 
-        for (File file : servicesDir.listFiles()) {
-            if (!file.isDirectory()) continue;
+        for (File dir : servicesDir.listFiles()) {
+            if (!dir.isDirectory()) continue;
 
             if (debug) log.debug("----------------------------------------------------------------------------------");
 
-            serviceConfigs.load(file);
+            serviceConfigs.load(dir);
         }
 
         //initSystemProperties();
-        //initSchemaManager(dir);
-        //loadPartitions(dir);
+        //initSchemaManager(base);
+        //loadPartitions(base);
         //validatePartitions();
 
-        loadLoggingConfig(dir);
+        loadLoggingConfig(workDir);
         //loadLoggers();
 
         notifyChangeListeners();
@@ -299,8 +294,12 @@ public class PenroseApplication implements IPlatformRunnable {
     }
 */
     public void loadLoggingConfig(String dir) throws Exception {
+        loadLoggingConfig(new File(dir));
+    }
+
+    public void loadLoggingConfig(File dir) throws Exception {
         try {
-            Log4jConfigReader reader = new Log4jConfigReader(new File(dir+"/conf/log4j.xml"));
+            Log4jConfigReader reader = new Log4jConfigReader(new File(dir, "/conf/log4j.xml"));
             loggingConfig = reader.read();
         } catch (Exception e) {
             log.error("ERROR: "+e.getMessage());
@@ -353,8 +352,8 @@ public class PenroseApplication implements IPlatformRunnable {
     }
 
     public void connect() throws Exception {
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        Project project = penroseApplication.getApplicationConfig().getCurrentProject();
+        PenroseStudio penroseStudio = getInstance();
+        Project project = penroseStudio.getApplicationConfig().getCurrentProject();
         connect(project);
     }
 
@@ -367,10 +366,9 @@ public class PenroseApplication implements IPlatformRunnable {
         //client.close();
     }
 
-    public void save(String dir) throws Exception {
+    public void save(File dir) throws Exception {
 
-        File file = new File(dir);
-        file.mkdirs();
+        dir.mkdirs();
 
         log.debug("-------------------------------------------------------------------------------------");
         log.debug("Saving configuration to "+dir);
@@ -380,33 +378,63 @@ public class PenroseApplication implements IPlatformRunnable {
 
         saveLoggingConfig(dir);
 
-        partitionConfigs.store(dir, partitionConfigs.getPartitionConfigs());
+        for (PartitionConfig partitionConfig : partitionConfigs.getPartitionConfigs()) {
+            partitionConfigs.store(dir, partitionConfig);
+        }
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.setDirty(false);
+        PenroseStudio penroseStudio = getInstance();
+        penroseStudio.setDirty(false);
 
         validatePartitions();
     }
 
-    public void saveLoggingConfig(String dir) throws Exception {
-        Log4jConfigWriter writer = new Log4jConfigWriter(dir+"/conf/log4j.xml");
+    public void saveLoggingConfig(File dir) throws Exception {
+        Log4jConfigWriter writer = new Log4jConfigWriter(new File(dir, "/conf/log4j.xml"));
         writer.write(loggingConfig);
     }
 
-    public void upload(String dir) throws Exception {
-        log.debug("Uploading configuration from "+dir);
+    public void uploadFolder(String localDir) throws Exception {
+        uploadFolder(new File(localDir));
+    }
 
-        uploadFolder(dir);
+    public void uploadFolder(File localDir) throws Exception {
 
+        Collection<String> files = listFiles(localDir);
+        for (String filename : files) {
+            upload(localDir, filename);
+        }
+    }
+
+    public void upload(File localDir, String filename) throws Exception {
+        log.debug("Uploading "+filename);
+
+        File file = new File(localDir, filename);
+        FileInputStream in = new FileInputStream(file);
+
+        byte content[] = new byte[(int)file.length()];
+        in.read(content);
+
+        in.close();
+
+		client.upload(filename, content);
+	}
+
+    public void upload() throws Exception {
+        log.debug("Uploading configuration from "+workDir);
+
+        uploadFolder(workDir);
     }
 
     public void downloadFolder(String remotePath, String localDir) throws Exception {
-        File outputDir = new File(localDir);
-        outputDir.mkdirs();
+        downloadFolder(remotePath, new File(localDir));
+    }
+
+    public void downloadFolder(String remotePath, File localDir) throws Exception {
+        localDir.mkdirs();
 
         Collection<String> filenames = client.listFiles(remotePath);
         for (String filename : filenames) {
-            download(filename, outputDir);
+            download(filename, localDir);
         }
     }
 
@@ -426,8 +454,16 @@ public class PenroseApplication implements IPlatformRunnable {
 	}
 
     public Collection<String> listFiles(String directory) throws Exception {
+        return listFiles(new File(directory));
+    }
+
+    public Collection<String> listFiles(File directory) throws Exception {
+        return listFiles(null, directory);
+    }
+
+    public Collection<String> listFiles(String prefix, File directory) throws Exception {
         Collection<String> results = new ArrayList<String>();
-        listFiles(null, new File(directory), results);
+        listFiles(prefix, directory, results);
         return results;
     }
 
@@ -441,29 +477,6 @@ public class PenroseApplication implements IPlatformRunnable {
             }
         }
     }
-
-    public void uploadFolder(String localDir) throws Exception {
-        File inputDir = new File(localDir);
-
-        Collection<String> files = listFiles(localDir);
-        for (String filename : files) {
-            upload(inputDir, filename);
-        }
-    }
-
-    public void upload(File localDir, String filename) throws Exception {
-        log.debug("Uploading "+filename);
-
-        File file = new File(localDir, filename);
-        FileInputStream in = new FileInputStream(file);
-
-        byte content[] = new byte[(int)file.length()];
-        in.read(content);
-
-        in.close();
-
-		client.upload(filename, content);
-	}
 
     public PartitionConfigs getPartitionConfigs() {
         return partitionConfigs;
@@ -481,11 +494,11 @@ public class PenroseApplication implements IPlatformRunnable {
         return penroseContext == null ? null : penroseContext.getSchemaManager();
     }
 
-    public String getWorkDir() {
+    public File getWorkDir() {
         return workDir;
     }
 
-    public void setWorkDir(String workDir) {
+    public void setWorkDir(File workDir) {
         this.workDir = workDir;
     }
 
@@ -532,18 +545,17 @@ public class PenroseApplication implements IPlatformRunnable {
 
     public void loadLicense() throws Exception {
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PublicKey publicKey = penroseApplication.getPublicKey();
+        PenroseStudio penroseStudio = getInstance();
+        PublicKey publicKey = penroseStudio.getPublicKey();
 
         String filename = "penrose.license";
 
         File file = new File(filename);
 
         LicenseManager licenseManager = new LicenseManager(publicKey);
-        LicenseReader licenseReader = new LicenseReader(licenseManager);
-        licenseReader.read(file);
-
-        License license = licenseManager.getLicense("Penrose Studio");
+        Licenses licenses = licenseManager.loadLicenses(file);
+        licenseManager.addLicenses(licenses);
+        License license = licenses.getLicense("Penrose Studio");
 
         boolean valid = licenseManager.isValid(license);
         if (!valid) throw new Exception("Invalid license.");
@@ -551,7 +563,7 @@ public class PenroseApplication implements IPlatformRunnable {
         String type = license.getParameter("type");
         if (type != null && "FREEWARE".equals(type)) throw new Exception("Invalid license.");
 
-        penroseApplication.setLicense(license);
+        penroseStudio.setLicense(license);
     }
 
     public License getLicense() {

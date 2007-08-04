@@ -25,7 +25,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.project.ProjectDialog;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.apache.log4j.Logger;
@@ -45,7 +45,7 @@ public class OpenAction extends Action {
 	public void run() {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
 
         try {
             ProjectDialog dialog = new ProjectDialog(window.getShell(), SWT.NONE);
@@ -56,10 +56,10 @@ public class OpenAction extends Action {
             Project project = dialog.getProject();
             window.getShell().setText("Penrose Studio - "+project.getName());
 
-            penroseApplication.getApplicationConfig().setCurrentProject(project);
-            penroseApplication.connect(project);
-            penroseApplication.open(penroseApplication.getWorkDir());
-            penroseApplication.disconnect();
+            penroseStudio.getApplicationConfig().setCurrentProject(project);
+            penroseStudio.connect(project);
+            penroseStudio.open();
+            penroseStudio.disconnect();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -69,7 +69,7 @@ public class OpenAction extends Action {
             MessageDialog.openError(
                     shell,
                     "ERROR",
-                    "Failed opening "+penroseApplication.getApplicationConfig().getCurrentProject().getName()+" configuration.\n"+
+                    "Failed opening "+ penroseStudio.getApplicationConfig().getCurrentProject().getName()+" configuration.\n"+
                             "See penrose-studio-log.txt for details."
             );
         }

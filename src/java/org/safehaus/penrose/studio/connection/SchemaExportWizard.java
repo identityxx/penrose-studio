@@ -19,7 +19,7 @@ package org.safehaus.penrose.studio.connection;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.schema.*;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -77,8 +77,8 @@ public class SchemaExportWizard extends Wizard {
 
     public void removeDuplicates() {
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        SchemaManager schemaManager = penroseApplication.getSchemaManager();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        SchemaManager schemaManager = penroseStudio.getSchemaManager();
 
         Collection attributeTypes = schemaManager.getAttributeTypes();
         for (Iterator i=attributeTypes.iterator(); i.hasNext(); ) {

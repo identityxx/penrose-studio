@@ -25,7 +25,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.connector.ConnectorConfig;
 import org.apache.log4j.Logger;
 
@@ -91,8 +91,8 @@ public class ConnectorNode extends Node {
 
     public void open() throws Exception {
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        ConnectorConfig connectorConfig = penroseApplication.getPenroseConfig().getConnectorConfig();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        ConnectorConfig connectorConfig = penroseStudio.getPenroseConfig().getConnectorConfig();
         ConnectorEditorInput ei = new ConnectorEditorInput(connectorConfig);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

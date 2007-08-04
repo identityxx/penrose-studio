@@ -21,7 +21,7 @@ import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.log4j.LoggerConfig;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.eclipse.swt.graphics.Image;
@@ -81,9 +81,9 @@ public class LoggerNode extends Node {
     }
 
     public void remove() throws Exception {
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        Log4jConfig loggingConfig = penroseApplication.getLoggingConfig();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Log4jConfig loggingConfig = penroseStudio.getLoggingConfig();
         loggingConfig.removeLoggerConfig(loggerConfig.getName());
-        penroseApplication.notifyChangeListeners();
+        penroseStudio.notifyChangeListeners();
     }
 }

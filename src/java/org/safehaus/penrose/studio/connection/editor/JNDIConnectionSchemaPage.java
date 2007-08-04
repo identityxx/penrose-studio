@@ -33,7 +33,7 @@ import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.AttributeType;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.connection.SchemaExportWizard;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.apache.log4j.Logger;
@@ -78,10 +78,10 @@ public class JNDIConnectionSchemaPage extends FormPage {
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
 /*
-        if (penroseApplication.isFreeware()) {
-            Label label = toolkit.createLabel(body, PenroseApplication.FEATURE_NOT_AVAILABLE);
+        if (penroseStudio.isFreeware()) {
+            Label label = toolkit.createLabel(body, PenroseStudio.FEATURE_NOT_AVAILABLE);
             label.setLayoutData(new GridData(GridData.FILL_BOTH));
             return;
         }

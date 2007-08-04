@@ -20,7 +20,7 @@ package org.safehaus.penrose.studio.module.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.apache.log4j.Logger;
 
@@ -78,8 +78,8 @@ public class ModuleWizard extends Wizard {
                 partitionConfig.getModuleConfigs().addModuleMapping(mapping);
             }
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            penroseApplication.notifyChangeListeners();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            penroseStudio.notifyChangeListeners();
 
             return true;
 

@@ -17,7 +17,7 @@
  */
 package org.safehaus.penrose.studio.connector;
 
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.object.ObjectsView;
@@ -48,8 +48,8 @@ public class ConnectorsNode extends Node {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        ConnectorConfig connectorConfig = penroseApplication.getPenroseConfig().getConnectorConfig();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        ConnectorConfig connectorConfig = penroseStudio.getPenroseConfig().getConnectorConfig();
 
         children.add(new ConnectorNode(
                 view,

@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.object.ObjectsView;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.source.wizard.SourceWizard;
 import org.safehaus.penrose.studio.source.SourcesNode;
 import org.apache.log4j.Logger;
@@ -55,8 +55,8 @@ public class NewSourceAction extends Action {
             dialog.setPageSize(600, 300);
             dialog.open();
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            penroseApplication.notifyChangeListeners();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            penroseStudio.notifyChangeListeners();
 
             objectsView.show(node);
 

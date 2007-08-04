@@ -17,7 +17,7 @@
  */
 package org.safehaus.penrose.studio.schema;
 
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.tree.Node;
@@ -47,8 +47,8 @@ public class AttributeTypesNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        SchemaManager schemaManager = penroseApplication.getSchemaManager();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        SchemaManager schemaManager = penroseStudio.getSchemaManager();
         Schema schema = schemaManager.getSchema(schemaConfig.getName());
         return !schema.getAttributeTypes().isEmpty();
     }
@@ -57,8 +57,8 @@ public class AttributeTypesNode extends Node {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        SchemaManager schemaManager = penroseApplication.getSchemaManager();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        SchemaManager schemaManager = penroseStudio.getSchemaManager();
         Schema schema = schemaManager.getSchema(schemaConfig.getName());
 
         Collection attributeTypes = schema.getAttributeTypes();

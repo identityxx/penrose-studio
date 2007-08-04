@@ -13,11 +13,10 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.Partitions;
 
@@ -49,9 +48,9 @@ public class NISHostsPage extends FormPage {
         this.editor = editor;
         this.domain = editor.getDomain();
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        Partitions partitions = penroseApplication.getPartitions();
-        Partition partition = partitions.getPartition("DEFAULT");
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Partitions partitions = penroseStudio.getPartitions();
+        Partition partition = partitions.getPartition("nis");
 
         hosts = partition.getSource("penrose.hosts");
         files = partition.getSource("penrose.files");

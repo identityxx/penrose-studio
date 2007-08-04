@@ -13,10 +13,9 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.Link;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.partition.PartitionConfigs;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.handler.HandlerConfig;
 import org.safehaus.penrose.engine.EngineConfig;
 
@@ -60,9 +59,9 @@ public class MiscPage extends FormPage {
 
 	public Composite createMiscelleanousSection(Composite parent) {
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
-        PartitionConfigs partitionConfigs = penroseApplication.getPartitionConfigs();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
+        PartitionConfigs partitionConfigs = penroseStudio.getPartitionConfigs();
 
         Composite composite = toolkit.createComposite(parent);
 		composite.setLayout(new GridLayout(2, false));

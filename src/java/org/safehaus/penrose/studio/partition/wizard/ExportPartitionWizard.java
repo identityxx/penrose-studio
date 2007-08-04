@@ -21,6 +21,8 @@ import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.partition.*;
 import org.apache.log4j.Logger;
 
+import java.io.File;
+
 /**
  * @author Endi S. Dewata
  */
@@ -49,10 +51,10 @@ public class ExportPartitionWizard extends Wizard {
     public boolean performFinish() {
         try {
 
-            String directory = locationPage.getLocation();
+            File directory = new File(locationPage.getLocation());
 
-            PartitionWriter partitionWriter = new PartitionWriter(directory);
-            partitionWriter.write(partitionConfig);
+            PartitionWriter partitionWriter = new PartitionWriter();
+            partitionWriter.write(directory, partitionConfig);
 
             return true;
 

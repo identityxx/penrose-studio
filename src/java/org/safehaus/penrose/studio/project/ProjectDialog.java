@@ -27,7 +27,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -113,10 +113,10 @@ public class ProjectDialog extends Dialog {
             Composite composite = createHeadSection(parent);
             composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            penroseApplication.loadApplicationConfig();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            penroseStudio.loadApplicationConfig();
 
-            Collection list = penroseApplication.getApplicationConfig().getProjects();
+            Collection list = penroseStudio.getApplicationConfig().getProjects();
             for (Iterator i=list.iterator(); i.hasNext(); ) {
 				Project project = (Project)i.next();
 
@@ -223,8 +223,8 @@ public class ProjectDialog extends Dialog {
                     int counter = 2;
                     String newName = project.getName()+" ("+counter+")";
 
-                    PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    while (penroseApplication.getApplicationConfig().getProject(newName) != null) {
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    while (penroseStudio.getApplicationConfig().getProject(newName) != null) {
                         counter++;
                         newName = project.getName()+" ("+counter+")";
                     }
@@ -232,8 +232,8 @@ public class ProjectDialog extends Dialog {
                     Project newProject = new Project(project);
                     newProject.setName(newName);
 
-                    penroseApplication.getApplicationConfig().addProject(newProject);
-                    penroseApplication.saveApplicationConfig();
+                    penroseStudio.getApplicationConfig().addProject(newProject);
+                    penroseStudio.saveApplicationConfig();
 
                     TableItem item = new TableItem(projectTable, SWT.NONE);
                     item.setText(newProject.getName());
@@ -370,9 +370,9 @@ public class ProjectDialog extends Dialog {
         String server = project.getHost()+(project.getPort() == 0 ? "" : ":"+project.getPort());
 
         try {
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            penroseApplication.connect(project);
-            penroseApplication.disconnect();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            penroseStudio.connect(project);
+            penroseStudio.disconnect();
 /*
             PenroseClient client = new PenroseClient(project.getHost(), project.getPort(), project.getUsername(), project.getPassword());
             client.connect();
@@ -399,9 +399,9 @@ public class ProjectDialog extends Dialog {
 
         if (dialog.getAction() == ProjectEditorDialog.CANCEL) return;
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.getApplicationConfig().addProject(project);
-        penroseApplication.saveApplicationConfig();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.getApplicationConfig().addProject(project);
+        penroseStudio.saveApplicationConfig();
 
         TableItem item = new TableItem(projectTable, SWT.NONE);
         item.setText(project.getName());
@@ -415,9 +415,9 @@ public class ProjectDialog extends Dialog {
 		TableItem item = projectTable.getSelection()[0];
         Project project = (Project)item.getData();
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-		penroseApplication.getApplicationConfig().removeProject(project.getName());
-        penroseApplication.saveApplicationConfig();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+		penroseStudio.getApplicationConfig().removeProject(project.getName());
+        penroseStudio.saveApplicationConfig();
 
 		item.dispose();
 	}
@@ -436,14 +436,14 @@ public class ProjectDialog extends Dialog {
 
         if (dialog.getAction() == ProjectEditorDialog.CANCEL) return;
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
 
         if (!oldProjectName.equals(project.getName())) {
-            penroseApplication.getApplicationConfig().removeProject(oldProjectName);
-            penroseApplication.getApplicationConfig().addProject(project);
+            penroseStudio.getApplicationConfig().removeProject(oldProjectName);
+            penroseStudio.getApplicationConfig().addProject(project);
         }
 
-        penroseApplication.saveApplicationConfig();
+        penroseStudio.saveApplicationConfig();
 
         item.setText(project.getName());
         projectTable.redraw();

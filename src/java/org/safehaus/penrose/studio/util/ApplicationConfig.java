@@ -42,7 +42,7 @@ public class ApplicationConfig {
 	}
 	
 	public void load(File file) throws Exception {
-		log.debug("Loading project configurations file from: "+file.getAbsolutePath());
+		log.debug("Loading project configurations file from: "+file);
 		try {
 			Digester digester = new Digester();
 			digester.addObjectCreate("config/project", Project.class);

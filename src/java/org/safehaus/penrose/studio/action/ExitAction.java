@@ -22,9 +22,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.studio.PenroseApplication;
-import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudio;
 
 public class ExitAction implements IWorkbenchWindowActionDelegate {
 
@@ -37,8 +35,8 @@ public class ExitAction implements IWorkbenchWindowActionDelegate {
 	public void run(IAction action) {
 		boolean confirmed = true;
 		
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        if (penroseApplication.isDirty()) {
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        if (penroseStudio.isDirty()) {
             confirmed = MessageDialog.openConfirm(
                     window.getShell(),
                     "Confirm Exit",

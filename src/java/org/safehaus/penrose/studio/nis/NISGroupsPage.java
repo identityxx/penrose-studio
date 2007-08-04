@@ -13,7 +13,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.nis.action.NISAction;
 import org.safehaus.penrose.studio.nis.action.NISActionRequest;
 import org.safehaus.penrose.studio.nis.action.NISActionResponse;
@@ -25,7 +25,6 @@ import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.QueryResponse;
-import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.Partitions;
 
@@ -65,9 +64,9 @@ public class NISGroupsPage extends FormPage {
         this.editor = editor;
         this.domain = editor.getDomain();
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        Partitions partitions = penroseApplication.getPartitions();
-        Partition partition = partitions.getPartition("DEFAULT");
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Partitions partitions = penroseStudio.getPartitions();
+        Partition partition = partitions.getPartition("nis");
 
         actions = partition.getSource("penrose.actions");
         domains = partition.getSource("penrose.domains");
@@ -327,8 +326,8 @@ public class NISGroupsPage extends FormPage {
         Integer gidNumber = (Integer) attributes.getValue("gidNumber");
         if (gidNumber == null) gidNumber = (Integer) attributes.getValue("origGidNumber");
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        Partitions partitions = penroseApplication.getPartitions();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Partitions partitions = penroseStudio.getPartitions();
 
         SearchRequest searchRequest = new SearchRequest();
         SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
@@ -457,8 +456,8 @@ public class NISGroupsPage extends FormPage {
             Integer origGidNumber
     ) throws Exception {
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        Partitions partitions = penroseApplication.getPartitions();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Partitions partitions = penroseStudio.getPartitions();
         Partition partition = partitions.getPartition(partitionName);
 
         RDNBuilder rb = new RDNBuilder();
@@ -542,9 +541,9 @@ public class NISGroupsPage extends FormPage {
 
     public void checkGidNumber(String cn, Integer gidNumber) throws Exception {
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        Partitions partitions = penroseApplication.getPartitions();
-        Partition partition = partitions.getPartition("DEFAULT");
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Partitions partitions = penroseStudio.getPartitions();
+        Partition partition = partitions.getPartition("nis");
 
         SearchRequest request = new SearchRequest();
         request.setFilter("(gidNumber=" + gidNumber + ")");

@@ -25,7 +25,7 @@ import org.eclipse.jface.viewers.*;
 import org.eclipse.jface.action.*;
 import org.eclipse.swt.SWT;
 import org.safehaus.penrose.studio.util.ChangeListener;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.handler.HandlersNode;
@@ -92,7 +92,7 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
 
     Object clipboard;
 
-    Collection nodes = new ArrayList();
+    Collection<Node> nodes = new ArrayList<Node>();
 
     private PartitionsNode partitionsNode;
     private SchemasNode schemasNode;
@@ -181,8 +181,8 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                 null
         ));
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        if (penroseApplication.getLicense() != null) {
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        if (penroseStudio.getLicense() != null) {
             nodes.add(new NISNode(
                     this,
                     NIS,
@@ -241,8 +241,8 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                 }
             });
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-			penroseApplication.addChangeListener(this);
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+			penroseStudio.addChangeListener(this);
 
 		} catch (Exception ex) {
 			log.debug(ex.toString(), ex);
@@ -253,7 +253,7 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
         this.clipboard = object;
     }
 
-    public Object getClipboard() throws Exception {
+    public Object getClipboard() {
         return clipboard;
     }
 

@@ -11,7 +11,7 @@ import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.SourceMapping;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 
 import java.util.Iterator;
 
@@ -84,8 +84,8 @@ public class NISSourceEditor extends FormEditor {
 
         setPartName(this.partitionConfig.getName()+"/"+sourceConfig.getName());
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
 
         setDirty(false);
 	}

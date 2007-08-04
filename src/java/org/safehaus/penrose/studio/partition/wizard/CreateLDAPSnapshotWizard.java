@@ -18,7 +18,7 @@
 package org.safehaus.penrose.studio.partition.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionInfoWizardPage;
 import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionParametersWizardPage;
 import org.safehaus.penrose.studio.util.SnapshotUtil;
@@ -73,7 +73,7 @@ public class CreateLDAPSnapshotWizard extends Wizard {
 
             PartitionConfig partitionConfig = new PartitionConfig(name);
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
 
             ConnectionConfig connectionConfig = new ConnectionConfig();
             connectionConfig.setName(name);
@@ -97,7 +97,7 @@ public class CreateLDAPSnapshotWizard extends Wizard {
             SnapshotUtil snapshotUtil = new SnapshotUtil();
             snapshotUtil.createSnapshot(partitionConfig, client);
 
-            penroseApplication.notifyChangeListeners();
+            penroseStudio.notifyChangeListeners();
 
             return true;
 

@@ -23,7 +23,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.apache.log4j.Logger;
 
@@ -49,8 +49,8 @@ public class SystemPropertiesEditor extends MultiPageEditorPart {
         setInput(input);
         setPartName("System Properties");
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        PenroseConfig penroseConfig = penroseApplication.getPenroseConfig();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
 
         origProperties = penroseConfig.getSystemProperties();
         properties.putAll(origProperties);
@@ -99,8 +99,8 @@ public class SystemPropertiesEditor extends MultiPageEditorPart {
         origProperties.clear();
         origProperties.putAll(properties);
         
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
 
         checkDirty();
     }

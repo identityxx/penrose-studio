@@ -20,7 +20,7 @@ package org.safehaus.penrose.studio.service;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenrosePlugin;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.eclipse.swt.graphics.Image;
@@ -97,8 +97,8 @@ public class ServiceNode extends Node {
 
         if (!confirm) return;
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public ServiceConfig getServiceConfig() {

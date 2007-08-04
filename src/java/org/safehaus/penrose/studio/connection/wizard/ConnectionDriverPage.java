@@ -21,7 +21,6 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -60,7 +59,7 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
 
     public final static String NAME = "Connection Type";
 
-    Map drivers = new TreeMap();
+    Map<String,Driver> drivers = new TreeMap<String,Driver>();
     Table adapterTable;
 
     public ConnectionDriverPage() {
@@ -71,18 +70,15 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
             
         	
         	DriverReader reader = new DriverReader("conf/drivers.xml");
-            Collection list = reader.getDrivers();
+            Collection<Driver> list = reader.getDrivers();
             
             //TODO: actually get the loaded bundles and put on the list as a driver
             //list.addAll(loadLibraries());
-            
-            for (Iterator i=list.iterator(); i.hasNext(); ) {
-                Driver driver = (Driver)i.next();
+
+            for (Driver driver : list) {
                 addDriver(driver);
             }
-            
-           
-            
+
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
@@ -181,37 +177,37 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
 		// bundles will be children of the lib directory. eg: conf/lib/mysql
 		File f = new File("conf/lib");
 
-		log.debug("Dynamically Loading libraries on " + f.getAbsolutePath());
+		log.debug("Dynamically Loading libraries on " + f);
 
 	
 		
 		
 		String[] dirs = f.list();
-		for (int i = 0; i < dirs.length; i++) {
-			File dir = new File(f.getAbsolutePath()+File.separator+dirs[i]);
-	
-	
-			BundleContext context = PenrosePlugin.getDefault().getBundleContext();
-			
-			log.debug("Installing bundle for "+ dir.getAbsolutePath());
-			
-			try{
-			
-				this.installBundle("file://"+ dir.getAbsolutePath());
-			
-			}catch(BundleException e){
-				log.debug(e.getMessage(), e);	           
-			}catch(ClassCastException e){
-				log.debug(e.getMessage(), e);
-				MessageDialog.openError(getShell(), "Error", e.getMessage());
-			}
-			
-			
-			Driver d = new Driver();
-			
-			
-		}
-		// Class cl = Class.forName("com.mysql.jdbc.Driver");
+        for (String dir1 : dirs) {
+            File dir = new File(f, dir1);
+
+
+            BundleContext context = PenrosePlugin.getDefault().getBundleContext();
+
+            log.debug("Installing bundle for " + dir);
+
+            try {
+
+                this.installBundle("file://" + dir.getAbsolutePath());
+
+            } catch (BundleException e) {
+                log.debug(e.getMessage(), e);
+            } catch (ClassCastException e) {
+                log.debug(e.getMessage(), e);
+                MessageDialog.openError(getShell(), "Error", e.getMessage());
+            }
+
+
+            Driver d = new Driver();
+
+
+        }
+        // Class cl = Class.forName("com.mysql.jdbc.Driver");
 		// com.mysql.jdbc.Driver d = (com.mysql.jdbc.Driver)cl.newInstance();
 		return new ArrayList();
 	}
@@ -238,11 +234,10 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
 		Class c = bundle.loadClass("com.mysql.jdbc.Driver");
 
 		Method[] m = c.getMethods();
-		for (int j = 0; j < m.length; j++) {
-			Method method = m[j];
-			System.out.println(method.getName());
+        for (Method method : m) {
+            System.out.println(method.getName());
 
-		}
+        }
     }
     
     
@@ -353,9 +348,8 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
 
     public void refresh() {
         adapterTable.removeAll();
-        for (Iterator i=drivers.keySet().iterator(); i.hasNext(); ) {
-            String name = (String)i.next();
-            Driver driver = (Driver)drivers.get(name);
+        for (String name : drivers.keySet()) {
+            Driver driver = drivers.get(name);
 
             TableItem item = new TableItem(adapterTable, SWT.NONE);
             item.setText(name);
@@ -368,13 +362,12 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
     }
 
     public Driver removeDriver(String name) {
-        return (Driver)drivers.remove(name);
+        return drivers.remove(name);
     }
 
     public void saveDrivers() throws Exception {
         DriverWriter writer = new DriverWriter("conf/drivers.xml");
-        for (Iterator i=drivers.values().iterator(); i.hasNext(); ) {
-            Driver driver = (Driver)i.next();
+        for (Driver driver : drivers.values()) {
             writer.write(driver);
         }
         writer.close();
@@ -388,8 +381,7 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
     }
 
     public boolean validatePage() {
-        if (getDriver() == null) return false;
-        return true;
+        return getDriver() != null;
     }
 
     public void widgetSelected(SelectionEvent event) {

@@ -18,7 +18,7 @@
 package org.safehaus.penrose.studio.partition.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.util.ADUtil;
 import org.safehaus.penrose.studio.util.SchemaUtil;
 import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionInfoWizardPage;
@@ -28,8 +28,8 @@ import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.handler.HandlerManager;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.ldap.LDAP;
 import org.apache.log4j.Logger;
 
 import javax.naming.InitialContext;
@@ -81,7 +81,7 @@ public class CreateLDAPProxyWizard extends Wizard {
 
             PartitionConfig partitionConfig = new PartitionConfig(name);
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
 
             ConnectionConfig connectionConfig = new ConnectionConfig();
             connectionConfig.setName(name);
@@ -145,7 +145,7 @@ public class CreateLDAPProxyWizard extends Wizard {
             if (infoPage.getMapADSchema()) {
                 String schemaFormat = infoPage.getSchemaFormat();
                 String sourceSchemaDn = "CN=Schema,CN=Configuration,"+connectionInfoPage.getSuffix();
-                String destSchemaDn = HandlerManager.SCHEMA_DN.toString();
+                String destSchemaDn = LDAP.SCHEMA_DN.toString();
 
                 EntryMapping schemaMapping;
 
@@ -161,7 +161,7 @@ public class CreateLDAPProxyWizard extends Wizard {
                 schemaMapping.addACI(new ACI("rs"));
             }
 
-            penroseApplication.notifyChangeListeners();
+            penroseStudio.notifyChangeListeners();
 
             return true;
 

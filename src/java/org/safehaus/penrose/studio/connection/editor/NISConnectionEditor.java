@@ -6,11 +6,10 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseWorkbenchAdvisor;
 import org.safehaus.penrose.studio.PenroseWorkbenchWindowAdvisor;
 import org.safehaus.penrose.studio.PenroseActionBarAdvisor;
@@ -51,8 +50,8 @@ public class NISConnectionEditor extends FormEditor {
         try {
             addPage(new NISConnectionPropertiesPage(this));
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            PenroseWorkbenchAdvisor workbenchAdvisor = penroseApplication.getWorkbenchAdvisor();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            PenroseWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
             PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
             PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
@@ -94,8 +93,8 @@ public class NISConnectionEditor extends FormEditor {
 
         setPartName(this.partitionConfig.getName()+"/"+connectionConfig.getName());
 
-        PenroseApplication penroseApplication = PenroseApplication.getInstance();
-        penroseApplication.notifyChangeListeners();
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
 
         checkDirty();
     }

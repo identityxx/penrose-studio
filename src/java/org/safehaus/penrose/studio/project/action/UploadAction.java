@@ -22,7 +22,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.swt.SWT;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.apache.log4j.Logger;
@@ -43,10 +43,10 @@ public class UploadAction extends Action {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
         try {
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            penroseApplication.connect();
-    		penroseApplication.upload(penroseApplication.getWorkDir());
-            penroseApplication.disconnect();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            penroseStudio.connect();
+    		penroseStudio.upload();
+            penroseStudio.disconnect();
 
         } catch (Exception e) {
             log.debug(e.getMessage(), e);

@@ -90,7 +90,7 @@ public class CreateADSchemaProxyWizard extends Wizard {
 
             EntryMapping schemaMapping;
 
-            if (SelectSchemaWizardPage.LDAP.equals(schemaFormat)) {
+            if (SelectSchemaWizardPage.LDAP_SCHEMA.equals(schemaFormat)) {
                 ADUtil util = new ADUtil();
                 schemaMapping = util.createSchemaProxy(partitionConfig, connectionConfig, sourceSchemaDn, destSchemaDn);
 

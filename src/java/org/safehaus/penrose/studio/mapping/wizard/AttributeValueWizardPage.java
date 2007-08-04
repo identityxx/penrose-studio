@@ -24,7 +24,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.mapping.AttributeTypeSelectionDialog;
 import org.safehaus.penrose.studio.mapping.ExpressionDialog;
@@ -165,8 +165,8 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                     AttributeTypeSelectionDialog dialog = new AttributeTypeSelectionDialog(parent.getShell(), SWT.NONE);
                     dialog.setText("Add attributes...");
 
-                    PenroseApplication penroseApplication = PenroseApplication.getInstance();
-                    dialog.setSchemaManager(penroseApplication.getSchemaManager());
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    dialog.setSchemaManager(penroseStudio.getSchemaManager());
 
                     dialog.open();
                     if (dialog.getAction() == AttributeTypeSelectionDialog.CANCEL) return;
@@ -253,8 +253,8 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
     public void init() {
         try {
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            SchemaManager schemaManager = penroseApplication.getSchemaManager();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            SchemaManager schemaManager = penroseStudio.getSchemaManager();
 
             System.out.println("Object classes:");
             for (Iterator i=objectClasses.iterator(); i.hasNext(); ) {

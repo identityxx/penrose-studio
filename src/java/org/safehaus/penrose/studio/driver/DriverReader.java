@@ -34,12 +34,12 @@ public class DriverReader {
 
     public Logger log = Logger.getLogger(DriverReader.class);
 
-    Collection drivers = new ArrayList();
+    Collection<Driver> drivers = new ArrayList<Driver>();
     Iterator iterator;
 
     public DriverReader(String filename) throws Exception{
         File file = new File(filename);
-        log.debug("Loading drivers from: "+file.getAbsolutePath());
+        log.debug("Loading drivers from: "+file);
 
         ClassLoader cl = getClass().getClassLoader();
         URL url = cl.getResource("org/safehaus/penrose/studio/driver/drivers-digester-rules.xml");
@@ -55,7 +55,7 @@ public class DriverReader {
         drivers.add(driver);
     }
 
-	public Collection getDrivers() {
+	public Collection<Driver> getDrivers() {
         return drivers;
 	}
 }

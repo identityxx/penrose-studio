@@ -25,7 +25,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.object.ObjectsView;
-import org.safehaus.penrose.studio.PenroseApplication;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.partition.wizard.CreateLDAPProxyWizard;
 import org.apache.log4j.Logger;
 
@@ -46,8 +46,8 @@ public class NewLDAPProxyPartitionAction extends Action {
 
             Shell shell = window.getShell();
 
-            PenroseApplication penroseApplication = PenroseApplication.getInstance();
-            //if (!penroseApplication.isCommercial()) return;
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            //if (!penroseStudio.isCommercial()) return;
 
             Wizard wizard = new CreateLDAPProxyWizard();
 
