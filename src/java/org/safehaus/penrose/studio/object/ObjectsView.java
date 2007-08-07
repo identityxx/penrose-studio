@@ -219,7 +219,7 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                         node.showMenu(manager);
 
                     } catch (Exception e) {
-                        log.debug(e.getMessage(), e);
+                        log.error(e.getMessage(), e);
                     }
 				}
 			});
@@ -236,7 +236,7 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
                         treeViewer.refresh();
 
                     } catch (Exception e) {
-                        log.debug(e.getMessage(), e);
+                        log.error(e.getMessage(), e);
                     }
                 }
             });

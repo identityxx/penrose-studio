@@ -43,7 +43,7 @@ public class ObjectsAction extends Action {
             page.showView(ObjectsView.class.getName());
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 	}
 }

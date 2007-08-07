@@ -35,7 +35,7 @@ public class NISEditor extends FormEditor {
             addPage(new NISToolsPage(this));
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 

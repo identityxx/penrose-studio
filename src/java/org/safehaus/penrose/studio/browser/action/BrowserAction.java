@@ -75,7 +75,7 @@ public class BrowserAction extends Action {
             activePage.openEditor(ei, BrowserEditor.class.getName());
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             MessageDialog.openError(window.getShell(), "Error", e.getMessage());
         }
 	}

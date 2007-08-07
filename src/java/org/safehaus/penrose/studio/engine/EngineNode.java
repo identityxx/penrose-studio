@@ -49,7 +49,7 @@ public class EngineNode extends Node {
                 try {
                     open();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -61,7 +61,7 @@ public class EngineNode extends Node {
                 try {
                     view.copy(connectorConfig);
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -71,7 +71,7 @@ public class EngineNode extends Node {
                 try {
                     view.paste(connectorConfig);
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -81,7 +81,7 @@ public class EngineNode extends Node {
                 try {
                     remove();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });

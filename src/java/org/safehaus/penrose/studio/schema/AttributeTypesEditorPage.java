@@ -118,7 +118,7 @@ public class AttributeTypesEditorPage extends FormPage {
                     refresh();
                     checkDirty();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -140,7 +140,7 @@ public class AttributeTypesEditorPage extends FormPage {
                     checkDirty();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -161,7 +161,7 @@ public class AttributeTypesEditorPage extends FormPage {
                     checkDirty();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });

@@ -273,7 +273,7 @@ public class JDBCFieldWizardPage extends WizardPage {
             }
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
 
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);

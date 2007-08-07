@@ -127,7 +127,7 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
             aboutAction = new AboutAction();
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -217,7 +217,7 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
             fillHelpMenu();
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
     
@@ -253,7 +253,7 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
             previewToolBar.add(browserCI);
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 

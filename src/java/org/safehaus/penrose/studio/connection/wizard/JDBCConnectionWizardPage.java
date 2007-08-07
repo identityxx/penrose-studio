@@ -105,7 +105,7 @@ public class JDBCConnectionWizardPage extends WizardPage implements ModifyListen
                     );
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -189,7 +189,7 @@ public class JDBCConnectionWizardPage extends WizardPage implements ModifyListen
             fieldComposite.layout();
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 

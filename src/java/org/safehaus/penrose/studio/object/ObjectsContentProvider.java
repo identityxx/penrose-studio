@@ -20,10 +20,10 @@ package org.safehaus.penrose.studio.object;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
+import java.util.ArrayList;
 
 public class ObjectsContentProvider implements ITreeContentProvider {
 
@@ -42,19 +42,18 @@ public class ObjectsContentProvider implements ITreeContentProvider {
     }
 
     public Object[] getChildren(Object element) {
+        Collection<Object> list = new ArrayList<Object>();
         try {
             Node node = (Node)element;
             
-            Collection children = node.getChildren();
-            if (children == null) return new Object[0];
-
-            return node.getChildren().toArray();
+            Collection<Node> children = node.getChildren();
+            if (children != null) list.addAll(children);
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 
-        return new Object[0];
+        return list.toArray();
     }
 
     public Object[] getElements(Object inputElement) {
@@ -72,7 +71,7 @@ public class ObjectsContentProvider implements ITreeContentProvider {
             return node.hasChildren();
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 
         return false;

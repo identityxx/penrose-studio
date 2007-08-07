@@ -70,7 +70,7 @@ public class ConnectorEditor extends MultiPageEditorPart {
             load();
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -92,7 +92,7 @@ public class ConnectorEditor extends MultiPageEditorPart {
             store();
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -127,7 +127,7 @@ public class ConnectorEditor extends MultiPageEditorPart {
             }
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
 
         } finally {
             firePropertyChange(PROP_DIRTY);

@@ -89,7 +89,7 @@ public class ModuleParameterWizardPage extends WizardPage implements SelectionLi
                     item.setText(1, dialog.getValue());
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -118,7 +118,7 @@ public class ModuleParameterWizardPage extends WizardPage implements SelectionLi
                     parametersTable.redraw();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -136,7 +136,7 @@ public class ModuleParameterWizardPage extends WizardPage implements SelectionLi
                     item.dispose();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });

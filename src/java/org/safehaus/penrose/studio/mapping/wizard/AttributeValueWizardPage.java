@@ -129,7 +129,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                     refresh();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
 
@@ -181,7 +181,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                     refresh();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -312,7 +312,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
             setPageComplete(validatePage());
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 

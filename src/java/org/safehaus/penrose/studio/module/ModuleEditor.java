@@ -101,7 +101,7 @@ public class ModuleEditor extends EditorPart {
             section.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 	    } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 	}
 
@@ -215,7 +215,7 @@ public class ModuleEditor extends EditorPart {
                     checkDirty();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -250,7 +250,7 @@ public class ModuleEditor extends EditorPart {
                     checkDirty();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -291,7 +291,7 @@ public class ModuleEditor extends EditorPart {
                     checkDirty();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -314,7 +314,7 @@ public class ModuleEditor extends EditorPart {
                     checkDirty();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -429,7 +429,7 @@ public class ModuleEditor extends EditorPart {
         try {
             store();
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -487,7 +487,7 @@ public class ModuleEditor extends EditorPart {
             }
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
 
         } finally {
             firePropertyChange(PROP_DIRTY);

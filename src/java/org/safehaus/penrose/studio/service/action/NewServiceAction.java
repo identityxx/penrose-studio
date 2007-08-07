@@ -25,7 +25,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.service.ServiceWizard;
+import org.safehaus.penrose.studio.service.wizard.ServiceWizard;
 import org.apache.log4j.Logger;
 
 public class NewServiceAction extends Action {
@@ -56,7 +56,7 @@ public class NewServiceAction extends Action {
             objectsView.show(objectsView.getServicesNode());
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 	}
 	

@@ -35,7 +35,7 @@ public class ConflictingUIDFinderAction extends NISAction {
         partitions = penroseStudio.getPartitions();
         Partition partition = partitions.getPartition("nis");
 
-        Source domains = partition.getSource("penrose.domains");
+        Source domains = partition.getSource("penrose_domains");
 
         SearchRequest searchRequest = new SearchRequest();
         SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();

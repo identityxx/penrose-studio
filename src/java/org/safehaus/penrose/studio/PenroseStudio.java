@@ -206,8 +206,8 @@ public class PenroseStudio implements IPlatformRunnable {
 
         downloadFolder("conf", workDir);
         downloadFolder("schema", workDir);
-        //downloadFolder("partitions", workDir);
-        downloadFolder("services", workDir);
+        downloadFolder("partitions", workDir);
+        //downloadFolder("services", workDir);
 
         log.debug("Opening project from "+ workDir);
 
@@ -217,7 +217,7 @@ public class PenroseStudio implements IPlatformRunnable {
         penroseContext = new PenroseContext(workDir);
         penroseContext.init(penroseConfig);
         penroseContext.start();
-/*
+
         String partitionsDir = (workDir == null ? "" : workDir + File.separator)+"partitions";
 
         File partitions = new File(partitionsDir);
@@ -230,7 +230,7 @@ public class PenroseStudio implements IPlatformRunnable {
 
             partitionConfigs.load(dir);
         }
-*/
+/*
         File servicesDir = new File(workDir, "services");
         if (!servicesDir.isDirectory()) return;
 
@@ -241,7 +241,7 @@ public class PenroseStudio implements IPlatformRunnable {
 
             serviceConfigs.load(dir);
         }
-
+*/
         //initSystemProperties();
         //initSchemaManager(base);
         //loadPartitions(base);
@@ -546,13 +546,12 @@ public class PenroseStudio implements IPlatformRunnable {
     public void loadLicense() throws Exception {
 
         PenroseStudio penroseStudio = getInstance();
-        PublicKey publicKey = penroseStudio.getPublicKey();
 
         String filename = "penrose.license";
 
         File file = new File(filename);
 
-        LicenseManager licenseManager = new LicenseManager(publicKey);
+        LicenseManager licenseManager = LicenseManager.getInstance();
         Licenses licenses = licenseManager.loadLicenses(file);
         licenseManager.addLicenses(licenses);
         License license = licenses.getLicense("Penrose Studio");

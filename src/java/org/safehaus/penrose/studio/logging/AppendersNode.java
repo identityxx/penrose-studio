@@ -39,7 +39,7 @@ public class AppendersNode extends Node {
                 try {
                     createAppender();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });

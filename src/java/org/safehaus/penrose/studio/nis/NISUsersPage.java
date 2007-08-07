@@ -62,8 +62,8 @@ public class NISUsersPage extends FormPage {
         Partitions partitions = penroseStudio.getPartitions();
         Partition partition = partitions.getPartition("nis");
 
-        actions = partition.getSource("penrose.actions");
-        domains = partition.getSource("penrose.domains");
+        actions = partition.getSource("penrose_actions");
+        domains = partition.getSource("penrose_domains");
 
     }
 
@@ -116,7 +116,7 @@ public class NISUsersPage extends FormPage {
             actionCombo.select(0);
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             String message = e.toString();
             if (message.length() > 500) {
                 message = message.substring(0, 500) + "...";
@@ -150,7 +150,7 @@ public class NISUsersPage extends FormPage {
                 try {
                     run();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     String message = e.toString();
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";
@@ -204,7 +204,7 @@ public class NISUsersPage extends FormPage {
                     showMatches(attributes);
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     String message = e.toString();
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";
@@ -275,7 +275,7 @@ public class NISUsersPage extends FormPage {
                     edit(domain, partition, uid, origUidNumber);
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     String message = e.toString();
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";
@@ -465,7 +465,7 @@ public class NISUsersPage extends FormPage {
         dialog.setUid(uid);
         dialog.setOrigUidNumber(origUidNumber);
 
-        Source penroseUsers = partition.getSource("penrose.users");
+        Source penroseUsers = partition.getSource("penrose_users");
 
         SearchRequest request = new SearchRequest();
         request.setDn(dn);
@@ -529,7 +529,7 @@ public class NISUsersPage extends FormPage {
 
         SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
-        Source users = partition.getSource("penrose.users");
+        Source users = partition.getSource("penrose_users");
         users.search(request, response);
 
         while (response.hasNext()) {

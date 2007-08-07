@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.service;
+package org.safehaus.penrose.studio.service.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.service.ServiceConfig;
@@ -64,7 +64,7 @@ public class ServiceWizard extends Wizard {
             return true;
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             return false;
         }
     }

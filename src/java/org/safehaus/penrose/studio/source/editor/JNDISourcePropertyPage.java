@@ -304,7 +304,7 @@ public class JNDISourcePropertyPage extends FormPage {
                     checkDirty();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
 
@@ -374,7 +374,7 @@ public class JNDISourcePropertyPage extends FormPage {
                     checkDirty();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -414,7 +414,7 @@ public class JNDISourcePropertyPage extends FormPage {
                     checkDirty();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -437,7 +437,7 @@ public class JNDISourcePropertyPage extends FormPage {
                     checkDirty();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });

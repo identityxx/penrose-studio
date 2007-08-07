@@ -91,7 +91,7 @@ public class DriverPropertyPage extends WizardPage implements ModifyListener {
             adapterNameCombo.setText(driver.getAdapterName() == null ? "" : driver.getAdapterName());
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 

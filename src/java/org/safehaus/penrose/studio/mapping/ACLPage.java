@@ -163,7 +163,7 @@ public class ACLPage extends FormPage implements ModifyListener {
                     checkDirty();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -199,7 +199,7 @@ public class ACLPage extends FormPage implements ModifyListener {
                     checkDirty();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -241,7 +241,7 @@ public class ACLPage extends FormPage implements ModifyListener {
                     checkDirty();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });

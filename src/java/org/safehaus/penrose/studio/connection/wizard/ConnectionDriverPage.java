@@ -81,7 +81,7 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
 
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             MessageDialog.openError(getShell(), "Error", e.getMessage());
             
         }
@@ -179,15 +179,12 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
 
 		log.debug("Dynamically Loading libraries on " + f);
 
-	
-		
-		
 		String[] dirs = f.list();
         for (String dir1 : dirs) {
             File dir = new File(f, dir1);
 
 
-            BundleContext context = PenrosePlugin.getDefault().getBundleContext();
+            BundleContext context = PenrosePlugin.getInstance().getBundleContext();
 
             log.debug("Installing bundle for " + dir);
 
@@ -196,9 +193,9 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
                 this.installBundle("file://" + dir.getAbsolutePath());
 
             } catch (BundleException e) {
-                log.debug(e.getMessage(), e);
+                log.error(e.getMessage(), e);
             } catch (ClassCastException e) {
-                log.debug(e.getMessage(), e);
+                log.error(e.getMessage(), e);
                 MessageDialog.openError(getShell(), "Error", e.getMessage());
             }
 
@@ -213,7 +210,7 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
 	}
     
     private void installBundle(String dir) throws BundleException, ClassNotFoundException {
-    	BundleContext context = PenrosePlugin.getDefault().getBundleContext();
+    	BundleContext context = PenrosePlugin.getInstance().getBundleContext();
     	
     	Bundle bundle = context.installBundle(dir);
 		
@@ -286,7 +283,7 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
                     
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     e.printStackTrace();
                 }
             }
@@ -313,7 +310,7 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
                     refresh();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -336,7 +333,7 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
                     setPageComplete(validatePage());
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });

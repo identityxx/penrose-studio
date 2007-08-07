@@ -51,7 +51,7 @@ public class NISGroupChangesPage extends FormPage {
         Partitions partitions = penroseStudio.getPartitions();
         Partition partition = partitions.getPartition("nis");
 
-        groups = partition.getSource("penrose.groups");
+        groups = partition.getSource("penrose_groups");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -109,7 +109,7 @@ public class NISGroupChangesPage extends FormPage {
             changesTable.select(indices);
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             String message = e.toString();
             if (message.length() > 500) {
                 message = message.substring(0, 500) + "...";
@@ -144,7 +144,7 @@ public class NISGroupChangesPage extends FormPage {
             }
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             String message = e.toString();
             if (message.length() > 500) {
                 message = message.substring(0, 500) + "...";
@@ -232,7 +232,7 @@ public class NISGroupChangesPage extends FormPage {
                     groups.add(dn, attributes);
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     String message = e.toString();
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";
@@ -286,7 +286,7 @@ public class NISGroupChangesPage extends FormPage {
                     groups.modify(result.getDn(), modifications);
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     String message = e.toString();
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";
@@ -319,7 +319,7 @@ public class NISGroupChangesPage extends FormPage {
                     changesTable.select(index);
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     String message = e.toString();
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";
@@ -354,7 +354,7 @@ public class NISGroupChangesPage extends FormPage {
                     page.gidText.setText(""+origGidNumber);
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     String message = e.toString();
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";
@@ -388,7 +388,7 @@ public class NISGroupChangesPage extends FormPage {
                     page.toText.setText(""+gidNumber);
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     String message = e.toString();
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";
@@ -422,7 +422,7 @@ public class NISGroupChangesPage extends FormPage {
                     page.toText.setText(""+origGidNumber);
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     String message = e.toString();
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";
@@ -458,7 +458,7 @@ public class NISGroupChangesPage extends FormPage {
                     groups.modify(result.getDn(), modifications);
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     String message = e.toString();
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";

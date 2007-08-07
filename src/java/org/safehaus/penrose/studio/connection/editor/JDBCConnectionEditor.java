@@ -73,7 +73,7 @@ public class JDBCConnectionEditor extends FormEditor {
             addPage(new JDBCConnectionAdvancedPage(this));
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -81,7 +81,7 @@ public class JDBCConnectionEditor extends FormEditor {
         try {
             store();
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -128,7 +128,7 @@ public class JDBCConnectionEditor extends FormEditor {
             }
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
 
         } finally {
             firePropertyChange(PROP_DIRTY);

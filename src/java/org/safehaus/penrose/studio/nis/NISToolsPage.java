@@ -68,7 +68,7 @@ public class NISToolsPage extends FormPage {
         Partitions partitions = penroseStudio.getPartitions();
         Partition partition = partitions.getPartition("nis");
 
-        hosts = partition.getSource("penrose.hosts");
+        hosts = partition.getSource("penrose_hosts");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -121,7 +121,7 @@ public class NISToolsPage extends FormPage {
            hostsList.selectAll();
 
        } catch (Exception e) {
-           log.debug(e.getMessage(), e);
+           log.error(e.getMessage(), e);
            String message = e.toString();
            if (message.length() > 500) {
                message = message.substring(0, 500) + "...";
@@ -216,7 +216,7 @@ public class NISToolsPage extends FormPage {
                 try {
                     run();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     String message = e.toString();
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";

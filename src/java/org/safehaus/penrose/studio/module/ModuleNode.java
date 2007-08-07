@@ -64,7 +64,7 @@ public class ModuleNode extends Node {
                 try {
                     open();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -76,7 +76,7 @@ public class ModuleNode extends Node {
                 try {
                     copy();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -86,7 +86,7 @@ public class ModuleNode extends Node {
                 try {
                     paste();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -96,7 +96,7 @@ public class ModuleNode extends Node {
                 try {
                     remove();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });

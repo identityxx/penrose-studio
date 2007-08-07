@@ -281,7 +281,7 @@ public class JDBCConnectionTablesPage extends JDBCConnectionEditorPage {
             }
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
 
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -342,7 +342,7 @@ public class JDBCConnectionTablesPage extends JDBCConnectionEditorPage {
             }
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
 
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -382,7 +382,7 @@ public class JDBCConnectionTablesPage extends JDBCConnectionEditorPage {
             }
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
 
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);

@@ -130,7 +130,7 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
             }
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -164,7 +164,7 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
             item.setExpanded(true);
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -197,7 +197,7 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
                 new TreeItem(it, SWT.NONE);
             }
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 

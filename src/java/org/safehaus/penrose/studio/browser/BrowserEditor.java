@@ -123,7 +123,7 @@ public class BrowserEditor extends EditorPart {
                     open(hostname, port, baseDn);
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
                 }
             }
@@ -143,7 +143,7 @@ public class BrowserEditor extends EditorPart {
                     showChildren(treeItem);
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
                 }
             }
@@ -158,7 +158,7 @@ public class BrowserEditor extends EditorPart {
                     showEntry(treeItem);
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
                 }
             }
@@ -195,7 +195,7 @@ public class BrowserEditor extends EditorPart {
             open(hostname, port, "");
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
         }
 	}

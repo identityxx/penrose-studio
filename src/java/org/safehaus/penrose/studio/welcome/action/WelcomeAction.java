@@ -44,7 +44,7 @@ public class WelcomeAction extends Action {
             page.openEditor(new WelcomeEditorInput(), WelcomeEditor.class.getName());
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 	}
 }

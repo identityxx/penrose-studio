@@ -88,7 +88,7 @@ public class EnterLicenseKeyAction extends Action {
             actionBarAdvisor.fillHelpMenu();
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             MessageDialog.openError(shell, "Error", e.getMessage());
         }
     }

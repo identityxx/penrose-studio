@@ -137,7 +137,7 @@ public class JNDIConnectionSchemaPage extends FormPage {
                     dialog.setPageSize(600, 300);
                     dialog.open();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
 
                     StringWriter sw = new StringWriter();
                     PrintWriter pw = new PrintWriter(sw);
@@ -228,7 +228,7 @@ public class JNDIConnectionSchemaPage extends FormPage {
                 item.setData(oc);
             }
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
 
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);

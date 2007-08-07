@@ -200,7 +200,7 @@ public class ObjectClassWizardPage extends WizardPage {
             refresh();
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 

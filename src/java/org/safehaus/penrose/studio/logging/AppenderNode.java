@@ -38,7 +38,7 @@ public class AppenderNode extends Node {
                 try {
                     open();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -48,7 +48,7 @@ public class AppenderNode extends Node {
                 try {
                     remove();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });

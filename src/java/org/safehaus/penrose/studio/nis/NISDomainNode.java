@@ -3,11 +3,13 @@ package org.safehaus.penrose.studio.nis;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.*;
+import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.Partitions;
+import org.safehaus.penrose.partition.PartitionConfigs;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
@@ -26,6 +28,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import java.util.Iterator;
 import java.util.Collection;
 import java.util.ArrayList;
+import java.io.File;
 
 /**
  * @author Endi S. Dewata
@@ -49,7 +52,7 @@ public class NISDomainNode extends Node {
         Partitions partitions = penroseStudio.getPartitions();
         Partition partition = partitions.getPartition("nis");
 
-        domains = partition.getSource("penrose.domains");
+        domains = partition.getSource("penrose_domains");
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -59,7 +62,7 @@ public class NISDomainNode extends Node {
                 try {
                     open();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -69,7 +72,7 @@ public class NISDomainNode extends Node {
                 try {
                     edit();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -81,7 +84,7 @@ public class NISDomainNode extends Node {
                 try {
                     //copy(connection);
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -91,7 +94,7 @@ public class NISDomainNode extends Node {
                 try {
                     //paste(connection);
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -101,7 +104,7 @@ public class NISDomainNode extends Node {
                 try {
                     remove();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -182,6 +185,11 @@ public class NISDomainNode extends Node {
 
         if (!confirm) return;
 
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PartitionConfigs partitionConfigs = penroseStudio.getPartitionConfigs();
+
+        File workDir = penroseStudio.getWorkDir();
+
         for (Iterator i=selection.iterator(); i.hasNext(); ) {
             Node node = (Node)i.next();
             if (!(node instanceof NISDomainNode)) continue;
@@ -189,15 +197,21 @@ public class NISDomainNode extends Node {
             NISDomainNode domainNode = (NISDomainNode)node;
             NISDomain result = domainNode.getDomain();
 
+            String name = result.getName();
+            
             RDNBuilder rb = new RDNBuilder();
-            rb.set("name", domain.getName());
+            rb.set("name", name);
             RDN rdn = rb.toRdn();
             DN dn = new DN(rdn);
 
             domains.delete(dn);
+
+            File dir = new File(workDir, "partitions"+File.separator+name);
+            FileUtil.delete(dir);
+
+            partitionConfigs.removePartitionConfig(name);
         }
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
 

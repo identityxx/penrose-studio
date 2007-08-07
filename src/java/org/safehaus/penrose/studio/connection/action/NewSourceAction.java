@@ -76,7 +76,7 @@ public class NewSourceAction extends Action {
             objectsView.show(node);
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 	}
 	

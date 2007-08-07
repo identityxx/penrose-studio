@@ -23,6 +23,7 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.service.ServiceConfig;
+import org.safehaus.penrose.service.ServiceConfigs;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.IMenuManager;
@@ -34,6 +35,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.apache.log4j.Logger;
+
+import java.io.File;
 
 /**
  * @author Endi S. Dewata
@@ -49,6 +52,7 @@ public class ServiceNode extends Node {
     public ServiceNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
         this.view = view;
+        serviceConfig = (ServiceConfig)object;
     }
 
     public void showMenu(IMenuManager manager) {
@@ -58,7 +62,7 @@ public class ServiceNode extends Node {
                 try {
                     open();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -71,19 +75,46 @@ public class ServiceNode extends Node {
                 try {
                     remove();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
     }
 
     public void open() throws Exception {
+        if (serviceConfig == null) {
+            load();
+        }
 
         ServiceEditorInput ei = new ServiceEditorInput(serviceConfig);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
         page.openEditor(ei, ServiceEditor.class.getName());
+    }
+
+    public void load() throws Exception {
+        log.debug("Opening "+name+" service.");
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+
+        File workDir = penroseStudio.getWorkDir();
+        File dir = new File(workDir, "services"+File.separator+name);
+
+        penroseStudio.downloadFolder("services"+File.separator+name, workDir);
+
+        ServiceConfigs serviceConfigs = penroseStudio.getServiceConfigs();
+        serviceConfig = serviceConfigs.load(dir);
+    }
+
+    public void save() throws Exception {
+        log.debug("Saving "+name+" service.");
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        ServiceConfigs serviceConfigs = penroseStudio.getServiceConfigs();
+
+        File workDir = penroseStudio.getWorkDir();
+        //serviceConfigs.store(workDir, serviceConfig);
     }
 
     public void remove() throws Exception {
@@ -98,6 +129,12 @@ public class ServiceNode extends Node {
         if (!confirm) return;
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
+
+        ServiceConfigs serviceConfigs = penroseStudio.getServiceConfigs();
+        serviceConfigs.removeServiceConfig(serviceConfig.getName());
+
+        serviceConfig = null;
+
         penroseStudio.notifyChangeListeners();
     }
 

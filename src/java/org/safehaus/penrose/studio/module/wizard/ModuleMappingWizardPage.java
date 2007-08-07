@@ -100,7 +100,7 @@ public class ModuleMappingWizardPage extends WizardPage implements SelectionList
                     item.setData(mapping);
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -129,7 +129,7 @@ public class ModuleMappingWizardPage extends WizardPage implements SelectionList
                     mappingsTable.redraw();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -147,7 +147,7 @@ public class ModuleMappingWizardPage extends WizardPage implements SelectionList
                     item.dispose();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });

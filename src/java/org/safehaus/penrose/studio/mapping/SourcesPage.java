@@ -303,7 +303,7 @@ public class SourcesPage extends FormPage implements ModifyListener {
                     checkDirty();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -455,7 +455,7 @@ public class SourcesPage extends FormPage implements ModifyListener {
                 createSourceTab(tabFolder, source);
             }
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 }

@@ -60,7 +60,7 @@ public class NewSchemaAction extends Action {
             objectsView.show(objectsView.getSchemasNode());
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 	}
 	

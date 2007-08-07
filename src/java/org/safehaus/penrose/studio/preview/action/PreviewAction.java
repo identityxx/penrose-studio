@@ -52,7 +52,7 @@ public class PreviewAction extends Action {
             activePage.openEditor(new PreviewEditorInput(), PreviewEditor.class.getName());
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             String message = e.toString();
             if (message.length() > 500) {
                 message = message.substring(0, 500) + "...";

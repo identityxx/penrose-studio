@@ -203,7 +203,7 @@ public class LDAPPage extends FormPage {
                     checkDirty();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -285,7 +285,7 @@ public class LDAPPage extends FormPage {
                     refreshRdn();
                     checkDirty();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -345,7 +345,7 @@ public class LDAPPage extends FormPage {
                     checkDirty();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });

@@ -145,7 +145,7 @@ public class SelectSourceWizardPage extends WizardPage {
                     penroseStudio.notifyChangeListeners();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });

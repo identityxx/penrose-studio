@@ -42,7 +42,7 @@ public class ConsoleAction extends Action {
             page.showView(ConsoleView.class.getName());
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 	}
 }

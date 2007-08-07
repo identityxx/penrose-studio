@@ -82,7 +82,7 @@ public class AttributeTypeEditor extends EditorPart implements ModifyListener, S
             section.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 	    } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 	}
 
@@ -254,7 +254,7 @@ public class AttributeTypeEditor extends EditorPart implements ModifyListener, S
         try {
             store();
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -305,7 +305,7 @@ public class AttributeTypeEditor extends EditorPart implements ModifyListener, S
             }
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         } finally {
             firePropertyChange(PROP_DIRTY);
         }

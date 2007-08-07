@@ -59,7 +59,7 @@ public class PartitionNode extends Node {
     public PartitionNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
         this.view = view;
-        this.partitionConfig = (PartitionConfig)object;
+        partitionConfig = (PartitionConfig)object;
     }
 
     public void showMenu(IMenuManager manager) {
@@ -69,7 +69,7 @@ public class PartitionNode extends Node {
                 try {
                     open();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -79,7 +79,7 @@ public class PartitionNode extends Node {
                 try {
                     close();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
             public boolean isEnabled() {
@@ -94,7 +94,7 @@ public class PartitionNode extends Node {
                 try {
                     save();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
             public boolean isEnabled() {
@@ -107,7 +107,7 @@ public class PartitionNode extends Node {
                 try {
                     upload();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
             public boolean isEnabled() {
@@ -125,7 +125,7 @@ public class PartitionNode extends Node {
                 try {
                     copy();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
             public boolean isEnabled() {
@@ -138,7 +138,7 @@ public class PartitionNode extends Node {
                 try {
                     paste();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
             public boolean isEnabled() {
@@ -154,14 +154,18 @@ public class PartitionNode extends Node {
                 try {
                     remove();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
     }
 
     public void open() throws Exception {
-        log.debug("Opening "+name+" partition.");
+        load();
+    }
+
+    public void load() throws Exception {
+        log.debug("Loading "+name+" partition.");
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
 
@@ -172,8 +176,6 @@ public class PartitionNode extends Node {
 
         PartitionConfigs partitionConfigs = penroseStudio.getPartitionConfigs();
         partitionConfig = partitionConfigs.load(dir);
-
-        penroseStudio.notifyChangeListeners();
     }
 
     public void save() throws Exception {
@@ -244,14 +246,16 @@ public class PartitionNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        log.debug("Partition "+name+" has no children.");
-        return partitionConfig != null;
+        return true;
     }
 
     public Collection<Node> getChildren() throws Exception {
 
+        if (partitionConfig == null) {
+            load();
+        }
+
         Collection<Node> children = new ArrayList<Node>();
-        if (partitionConfig == null) return children;
 
         DirectoryNode directoryNode = new DirectoryNode(
                 view,

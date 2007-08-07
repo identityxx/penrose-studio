@@ -198,7 +198,7 @@ public class LicenseDialog extends Dialog {
             licenseButton.setFocus();
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 

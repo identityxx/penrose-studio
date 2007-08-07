@@ -94,7 +94,7 @@ public class JDBCPrimaryKeyWizardPage extends WizardPage implements SelectionLis
             }
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 

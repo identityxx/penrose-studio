@@ -52,8 +52,8 @@ public class NISHostsPage extends FormPage {
         Partitions partitions = penroseStudio.getPartitions();
         Partition partition = partitions.getPartition("nis");
 
-        hosts = partition.getSource("penrose.hosts");
-        files = partition.getSource("penrose.files");
+        hosts = partition.getSource("penrose_hosts");
+        files = partition.getSource("penrose_files");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -113,7 +113,7 @@ public class NISHostsPage extends FormPage {
             hostsTable.select(indices);
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             String message = e.toString();
             if (message.length() > 500) {
                 message = message.substring(0, 500) + "...";
@@ -168,7 +168,7 @@ public class NISHostsPage extends FormPage {
                     add();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     String message = e.toString();
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";
@@ -190,7 +190,7 @@ public class NISHostsPage extends FormPage {
                     edit();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     String message = e.toString();
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";
@@ -212,7 +212,7 @@ public class NISHostsPage extends FormPage {
                     remove();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     String message = e.toString();
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";
@@ -236,7 +236,7 @@ public class NISHostsPage extends FormPage {
                     updateFiles();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     String message = e.toString();
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";

@@ -170,7 +170,7 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.validatePartitions();
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
 
             String message = e.toString();
             if (message.length() > 500) {

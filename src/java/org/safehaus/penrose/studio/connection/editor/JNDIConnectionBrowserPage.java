@@ -411,7 +411,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
             item.setExpanded(true);
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
 
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -456,7 +456,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
                 new TreeItem(it, SWT.NONE);
             }
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
 
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);

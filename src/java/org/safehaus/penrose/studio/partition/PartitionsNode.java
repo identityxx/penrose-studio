@@ -80,7 +80,7 @@ public class PartitionsNode extends Node {
                 try {
                     paste();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
             public boolean isEnabled() {
@@ -142,7 +142,6 @@ public class PartitionsNode extends Node {
         String oldName = oldPartition.getName();
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        IWorkbenchPage page = window.getActivePage();
         Shell shell = window.getShell();
 
         PartitionDialog dialog = new PartitionDialog(shell, SWT.NONE);
@@ -177,6 +176,7 @@ public class PartitionsNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
+
         if (children == null) {
             refresh();
         }

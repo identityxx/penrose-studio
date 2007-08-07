@@ -72,7 +72,7 @@ public class MappingEditor extends FormEditor implements ModifyListener {
             //addPage(new EntryCachePage(this));
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -92,7 +92,7 @@ public class MappingEditor extends FormEditor implements ModifyListener {
         try {
             store();
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -139,7 +139,7 @@ public class MappingEditor extends FormEditor implements ModifyListener {
             }
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
 
         } finally {
             firePropertyChange(PROP_DIRTY);

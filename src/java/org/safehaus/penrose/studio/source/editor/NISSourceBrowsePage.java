@@ -180,7 +180,7 @@ public class NISSourceBrowsePage extends FormPage {
             connection.stop();
             
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             String message = e.toString();
             if (message.length() > 500) {
                 message = message.substring(0, 500) + "...";

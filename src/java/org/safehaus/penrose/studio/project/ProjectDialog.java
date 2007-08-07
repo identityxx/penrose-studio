@@ -131,7 +131,7 @@ public class ProjectDialog extends Dialog {
 
         } catch (Exception e) {
            e.printStackTrace();
-        	log.debug(e.getMessage(), e);
+        	log.error(e.getMessage(), e);
         }
 	}
 

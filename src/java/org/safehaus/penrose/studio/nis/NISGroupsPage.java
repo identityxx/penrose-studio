@@ -68,8 +68,8 @@ public class NISGroupsPage extends FormPage {
         Partitions partitions = penroseStudio.getPartitions();
         Partition partition = partitions.getPartition("nis");
 
-        actions = partition.getSource("penrose.actions");
-        domains = partition.getSource("penrose.domains");
+        actions = partition.getSource("penrose_actions");
+        domains = partition.getSource("penrose_domains");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -121,7 +121,7 @@ public class NISGroupsPage extends FormPage {
             actionCombo.select(0);
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             String message = e.toString();
             if (message.length() > 500) {
                 message = message.substring(0, 500) + "...";
@@ -155,7 +155,7 @@ public class NISGroupsPage extends FormPage {
                 try {
                     run();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     String message = e.toString();
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";
@@ -209,7 +209,7 @@ public class NISGroupsPage extends FormPage {
                     showMatches(attributes);
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     String message = e.toString();
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";
@@ -280,7 +280,7 @@ public class NISGroupsPage extends FormPage {
                     edit(domain, partition, cn, origGidNumber);
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     String message = e.toString();
                     if (message.length() > 500) {
                         message = message.substring(0, 500) + "...";
@@ -470,7 +470,7 @@ public class NISGroupsPage extends FormPage {
         dialog.setName(cn);
         dialog.setOrigGidNumber(origGidNumber);
 
-        Source penroseGroups = partition.getSource("penrose.groups");
+        Source penroseGroups = partition.getSource("penrose_groups");
 
         SearchRequest request = new SearchRequest();
         request.setDn(dn);
@@ -550,7 +550,7 @@ public class NISGroupsPage extends FormPage {
 
         SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
-        Source groups = partition.getSource("penrose.groups");
+        Source groups = partition.getSource("penrose_groups");
         groups.search(request, response);
 
         while (response.hasNext()) {

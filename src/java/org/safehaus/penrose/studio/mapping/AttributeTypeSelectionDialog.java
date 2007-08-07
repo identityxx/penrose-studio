@@ -210,7 +210,7 @@ public class AttributeTypeSelectionDialog extends Dialog implements SelectionLis
             String ocName = objectClassCombo.getText();
             showAttributes(ocName);
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 

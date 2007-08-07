@@ -85,7 +85,7 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
                     showFieldNames();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
 
                     StringWriter sw = new StringWriter();
                     PrintWriter pw = new PrintWriter(sw);
@@ -113,7 +113,7 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
                     showFieldNames();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
 
                     StringWriter sw = new StringWriter();
                     PrintWriter pw = new PrintWriter(sw);
@@ -140,7 +140,7 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
                     showFieldNames();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
 
                     StringWriter sw = new StringWriter();
                     PrintWriter pw = new PrintWriter(sw);
@@ -213,7 +213,7 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
             setPageComplete(validatePage());
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
 
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -328,7 +328,7 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
             setPageComplete(validatePage());
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
 
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);

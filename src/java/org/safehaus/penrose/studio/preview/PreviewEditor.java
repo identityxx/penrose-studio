@@ -42,8 +42,6 @@ import org.safehaus.penrose.session.SessionManager;
 import org.safehaus.penrose.session.SessionContext;
 import org.safehaus.penrose.studio.PenroseStudio;
 
-import java.util.Iterator;
-
 public class PreviewEditor extends EditorPart {
 
     private Logger log = Logger.getLogger(getClass());
@@ -68,7 +66,7 @@ public class PreviewEditor extends EditorPart {
             if (session != null) session.close();
             if (penrose != null) penrose.stop();
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
         }
     }
@@ -138,7 +136,7 @@ public class PreviewEditor extends EditorPart {
                     showChildren(treeItem);
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
                 }
             }
@@ -153,7 +151,7 @@ public class PreviewEditor extends EditorPart {
                     showEntry(treeItem);
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
                 }
             }
@@ -178,7 +176,7 @@ public class PreviewEditor extends EditorPart {
             open("", penroseConfig.getRootDn().toString(), penroseConfig.getRootPassword());
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
         }
     }
@@ -244,9 +242,10 @@ public class PreviewEditor extends EditorPart {
             SearchResult parentEntry = response.next();
 
             Attribute namingContexts = parentEntry.getAttributes().get("namingContexts");
+            if (namingContexts == null) return;
 
-            for (Iterator i = namingContexts.getValues().iterator(); i.hasNext(); ) {
-                String namingContext = i.next().toString();
+            for (Object o : namingContexts.getValues()) {
+                String namingContext = o.toString();
 
                 TreeItem treeItem = new TreeItem(parentItem, SWT.NONE);
                 treeItem.setText(namingContext);
@@ -306,12 +305,10 @@ public class PreviewEditor extends EditorPart {
 
         Attributes attributes = entry.getAttributes();
 
-        for (Iterator i = attributes.getAll().iterator(); i.hasNext(); ) {
-            Attribute attribute = (Attribute)i.next();
+        for (Attribute attribute : attributes.getAll()) {
             String name = attribute.getName();
 
-            for (Iterator e = attribute.getValues().iterator(); e.hasNext(); ) {
-                Object object = e.next();
+            for (Object object : attribute.getValues()) {
                 String value = object instanceof byte[] ? "(binary)" : object.toString();
 
                 TableItem tableItem = new TableItem(table, SWT.NONE);

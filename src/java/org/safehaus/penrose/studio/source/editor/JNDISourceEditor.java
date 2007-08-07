@@ -66,7 +66,7 @@ public class JNDISourceEditor extends FormEditor {
             //addPage(new JNDISourceCachePage(this));
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -74,7 +74,7 @@ public class JNDISourceEditor extends FormEditor {
         try {
             store();
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -125,7 +125,7 @@ public class JNDISourceEditor extends FormEditor {
             }
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
 
         } finally {
             firePropertyChange(PROP_DIRTY);

@@ -83,7 +83,7 @@ public class ObjectClassEditor extends EditorPart implements ModifyListener, Sel
             section.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 	    } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 	}
 
@@ -277,7 +277,7 @@ public class ObjectClassEditor extends EditorPart implements ModifyListener, Sel
         try {
             store();
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -328,7 +328,7 @@ public class ObjectClassEditor extends EditorPart implements ModifyListener, Sel
             }
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         } finally {
             firePropertyChange(PROP_DIRTY);
         }

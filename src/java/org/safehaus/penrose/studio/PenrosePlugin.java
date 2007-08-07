@@ -20,22 +20,20 @@ package org.safehaus.penrose.studio;
 import org.eclipse.ui.plugin.*;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.packageadmin.PackageAdmin;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import java.util.*;
 import java.io.File;
-import java.lang.reflect.Method;
 
 public class PenrosePlugin extends AbstractUIPlugin {
 
     Logger log = Logger.getLogger(getClass());
 
-	private static PenrosePlugin plugin;
+	public static PenrosePlugin instance;
+    public static HashMap<String,Image> images = new HashMap<String,Image>();
+
 	private ResourceBundle resourceBundle;
 	
 	private BundleContext bundleContext;
@@ -48,7 +46,7 @@ public class PenrosePlugin extends AbstractUIPlugin {
             PropertyConfigurator.configure(log4jProperties.getAbsolutePath());
         }
 
-		plugin = this;
+		instance = this;
 		try {
 			resourceBundle = ResourceBundle.getBundle("org.safehaus.penrose.rcp.PenrosePluginResources");
 		} catch (MissingResourceException x) {
@@ -56,11 +54,9 @@ public class PenrosePlugin extends AbstractUIPlugin {
 		}
 	}
 
-
-	
-	  public BundleContext getBundleContext(){
-		  return this.bundleContext;
-	  }
+    public BundleContext getBundleContext(){
+        return this.bundleContext;
+    }
 	
 	/**
 	 * This method is called upon plug-in activation
@@ -79,7 +75,7 @@ public class PenrosePlugin extends AbstractUIPlugin {
             //page.openEditor(new WelcomeEditorInput(), WelcomeEditor.class.getName());
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 	}
 
@@ -91,19 +87,12 @@ public class PenrosePlugin extends AbstractUIPlugin {
 		super.stop(context);
 	}
 
-	/**
-	 * Returns the shared instance.
-	 */
-	public static PenrosePlugin getDefault() {
-		return plugin;
+	public static PenrosePlugin getInstance() {
+		return instance;
 	}
 
-	/**
-	 * Returns the string from the plugin's resource bundle,
-	 * or 'key' if not found.
-	 */
 	public static String getResourceString(String key) {
-		ResourceBundle bundle = PenrosePlugin.getDefault().getResourceBundle();
+		ResourceBundle bundle = PenrosePlugin.getInstance().getResourceBundle();
 		try {
 			return (bundle != null) ? bundle.getString(key) : key;
 		} catch (MissingResourceException e) {
@@ -111,9 +100,6 @@ public class PenrosePlugin extends AbstractUIPlugin {
 		}
 	}
 
-	/**
-	 * Returns the plugin's resource bundle,
-	 */
 	public ResourceBundle getResourceBundle() {
 		return resourceBundle;
 	}
@@ -122,10 +108,8 @@ public class PenrosePlugin extends AbstractUIPlugin {
         return AbstractUIPlugin.imageDescriptorFromPlugin("org.safehaus.penrose", path);
     }
 
-    static HashMap images = new HashMap();
-
 	public static Image getImage(String path) {
-		Image image = (Image)images.get(path);
+		Image image = images.get(path);
         if (image == null) {
             ImageDescriptor descriptor = PenrosePlugin.getImageDescriptor(path);
             image = descriptor.createImage();

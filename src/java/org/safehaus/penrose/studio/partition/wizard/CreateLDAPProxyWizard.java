@@ -166,7 +166,7 @@ public class CreateLDAPProxyWizard extends Wizard {
             return true;
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             return false;
         }
     }

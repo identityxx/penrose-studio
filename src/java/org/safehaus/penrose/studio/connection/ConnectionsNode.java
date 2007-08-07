@@ -63,7 +63,7 @@ public class ConnectionsNode extends Node {
                 try {
                     paste();
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });

@@ -66,7 +66,7 @@ public class UserEditor extends MultiPageEditorPart {
             load();
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -88,7 +88,7 @@ public class UserEditor extends MultiPageEditorPart {
             store();
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -125,7 +125,7 @@ public class UserEditor extends MultiPageEditorPart {
             }
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
 
         } finally {
             firePropertyChange(PROP_DIRTY);

@@ -105,7 +105,7 @@ public class DriverParameterPage extends WizardPage implements SelectionListener
                     addParameter(parameter);
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -132,7 +132,7 @@ public class DriverParameterPage extends WizardPage implements SelectionListener
                     refresh();
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -152,7 +152,7 @@ public class DriverParameterPage extends WizardPage implements SelectionListener
                     removeParameter(parameter);
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -174,7 +174,7 @@ public class DriverParameterPage extends WizardPage implements SelectionListener
                     moveUp(parameter);
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -194,7 +194,7 @@ public class DriverParameterPage extends WizardPage implements SelectionListener
                     moveDown(parameter);
 
                 } catch (Exception e) {
-                    log.debug(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -222,7 +222,7 @@ public class DriverParameterPage extends WizardPage implements SelectionListener
             refresh();
 
         } catch (Exception e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
