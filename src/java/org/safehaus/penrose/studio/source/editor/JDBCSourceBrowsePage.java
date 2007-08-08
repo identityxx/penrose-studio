@@ -190,7 +190,9 @@ public class JDBCSourceBrowsePage extends FormPage {
             partitionContext.setPenroseConfig(penroseConfig);
             partitionContext.setPenroseContext(penroseContext);
 
-            Partition partition = partitions.init(partitionConfig, partitionContext);
+            Partition partition = new Partition();
+            partition.init(partitionConfig, partitionContext);
+            partitions.addPartition(partition);
 
             Connection connection = partition.createConnection(connectionConfig);
 
@@ -250,7 +252,9 @@ public class JDBCSourceBrowsePage extends FormPage {
             partitionContext.setPenroseConfig(penroseConfig);
             partitionContext.setPenroseContext(penroseContext);
 
-            Partition partition = partitions.init(partitionConfig, partitionContext);
+            Partition partition = new Partition();
+            partition.init(partitionConfig, partitionContext);
+            partitions.addPartition(partition);
 
             Connection connection = partition.createConnection(connectionConfig);
 
@@ -303,7 +307,9 @@ public class JDBCSourceBrowsePage extends FormPage {
             partitionContext.setPenroseConfig(penroseConfig);
             partitionContext.setPenroseContext(penroseContext);
 
-            Partition partition = partitions.init(partitionConfig, partitionContext);
+            Partition partition = new Partition();
+            partition.init(partitionConfig, partitionContext);
+            partitions.addPartition(partition);
 
             Connection connection = partition.createConnection(connectionConfig);
 
@@ -379,7 +385,9 @@ public class JDBCSourceBrowsePage extends FormPage {
             partitionContext.setPenroseConfig(penroseConfig);
             partitionContext.setPenroseContext(penroseContext);
 
-            Partition partition = partitions.init(partitionConfig, partitionContext);
+            Partition partition = new Partition();
+            partition.init(partitionConfig, partitionContext);
+            partitions.addPartition(partition);
 
             ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
             Connection connection = partition.createConnection(connectionConfig);

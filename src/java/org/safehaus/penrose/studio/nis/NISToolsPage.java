@@ -18,16 +18,12 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.source.Source;
-import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.ldap.SearchRequest;
 import org.safehaus.penrose.ldap.SearchResult;
 import org.safehaus.penrose.ldap.SearchResponse;
 import org.safehaus.penrose.ldap.Attributes;
 import org.safehaus.penrose.agent.client.FindClient;
 import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.Partitions;
 
 import java.util.*;
 
@@ -50,25 +46,19 @@ public class NISToolsPage extends FormPage {
 
     NISEditor editor;
     NISDomain domain;
+    NISTool nisTool;
 
     Map<String,String> actions = new LinkedHashMap<String,String>();
-
-    Source hosts;
 
     public NISToolsPage(NISEditor editor) {
         super(editor, "TOOLS", "  Tools  ");
 
         this.editor = editor;
-        this.domain = editor.getDomain();
+        domain = editor.getDomain();
+        nisTool = editor.getNisTool();
 
         actions.put("Change file UID number", "changeUid");
         actions.put("Change file GID number", "changeGid");
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Partitions partitions = penroseStudio.getPartitions();
-        Partition partition = partitions.getPartition("nis");
-
-        hosts = partition.getSource("penrose_hosts");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -116,7 +106,7 @@ public class NISToolsPage extends FormPage {
                }
            };
 
-           hosts.search(request, response);
+           nisTool.getHosts().search(request, response);
 
            hostsList.selectAll();
 
@@ -260,8 +250,6 @@ public class NISToolsPage extends FormPage {
         messageLabel.setText("Running...");
 
         table.removeAll();
-
-        int counter = 0;
 
         String title = actionsCombo.getText();
         String action = (String)actionsCombo.getData(title);

@@ -18,15 +18,11 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.filter.OrFilter;
 import org.safehaus.penrose.filter.SimpleFilter;
 import org.safehaus.penrose.filter.AndFilter;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.Partitions;
 
 /**
  * @author Endi S. Dewata
@@ -46,22 +42,14 @@ public class NISFilesPage extends FormPage implements Runnable {
 
     NISEditor editor;
     NISDomain domain;
-
-    Source hosts;
-    Source files;
+    NISTool nisTool;
 
     public NISFilesPage(NISEditor editor) {
         super(editor, "FILES", "  Files  ");
 
         this.editor = editor;
-        this.domain = editor.getDomain();
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Partitions partitions = penroseStudio.getPartitions();
-        Partition partition = partitions.getPartition("nis");
-
-        hosts = partition.getSource("penrose_hosts");
-        files = partition.getSource("penrose_files");
+        domain = editor.getDomain();
+        nisTool = editor.getNisTool();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -107,7 +95,7 @@ public class NISFilesPage extends FormPage implements Runnable {
                }
            };
 
-           hosts.search(request, response);
+           nisTool.getHosts().search(request, response);
 
            hostsList.selectAll();
 
@@ -299,7 +287,7 @@ public class NISFilesPage extends FormPage implements Runnable {
             }
         };
 
-        files.search(request, response);
+        nisTool.getFiles().search(request, response);
 
         counter += response.getTotalCount();
 

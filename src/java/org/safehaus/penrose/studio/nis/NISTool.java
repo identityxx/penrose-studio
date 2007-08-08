@@ -8,11 +8,15 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.connection.Connection;
+import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
+import org.safehaus.penrose.jdbc.JDBCClient;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.filters.ExpandProperties;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.FilterChain;
 import org.apache.tools.ant.taskdefs.Copy;
+import org.apache.log4j.Logger;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -24,6 +28,8 @@ import java.io.File;
  * @author Endi Sukma Dewata
  */
 public class NISTool {
+
+    public Logger log = Logger.getLogger(getClass());
 
     File workDir;
     PenroseConfig penroseConfig;
@@ -40,7 +46,7 @@ public class NISTool {
     protected Source groups;
 
     protected Map<String,NISDomain> nisDomains = new TreeMap<String,NISDomain>();
-    protected Partitions nisPartitions = new Partitions();
+    protected Partitions partitions = new Partitions();
 
     public void init(PenroseStudio penroseStudio) throws Exception {
 
@@ -48,7 +54,6 @@ public class NISTool {
         penroseContext = penroseStudio.getPenroseContext();
 
         PartitionConfigs partitionConfigs = penroseStudio.getPartitionConfigs();
-        Partitions partitions = penroseStudio.getPartitions();
 
         workDir = penroseStudio.getWorkDir();
 
@@ -62,7 +67,8 @@ public class NISTool {
         partitionContext.setPenroseConfig(penroseConfig);
         partitionContext.setPenroseContext(penroseContext);
 
-        nisPartition = partitions.init(partitionConfig, partitionContext);
+        nisPartition = new Partition();
+        nisPartition.init(partitionConfig, partitionContext);
 
         domains = nisPartition.getSource("penrose_domains");
         actions = nisPartition.getSource("penrose_actions");
@@ -72,7 +78,10 @@ public class NISTool {
         users   = nisPartition.getSource("penrose_users");
         groups  = nisPartition.getSource("penrose_groups");
 
-        // Initialize NIS partitions
+        initNisDomains(partitionConfigs);
+    }
+
+    public void initNisDomains(PartitionConfigs partitionConfigs) throws Exception {
 
         SearchRequest searchRequest = new SearchRequest();
         SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
@@ -98,14 +107,16 @@ public class NISTool {
 
             File pDir = new File(workDir, "partitions"+File.separator+partitionName);
 
-            PartitionConfig pConf = partitionConfigs.getPartitionConfig(partitionName);
+            PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(partitionName);
 
-            PartitionContext pContext = new PartitionContext();
-            pContext.setPath(pDir);
-            pContext.setPenroseConfig(penroseConfig);
-            pContext.setPenroseContext(penroseContext);
+            PartitionContext partitionContext = new PartitionContext();
+            partitionContext.setPath(pDir);
+            partitionContext.setPenroseConfig(penroseConfig);
+            partitionContext.setPenroseContext(penroseContext);
 
-            nisPartitions.init(pConf, pContext);
+            Partition partition = new Partition();
+            partition.init(partitionConfig, partitionContext);
+            partitions.addPartition(partition);
         }
     }
 
@@ -162,7 +173,9 @@ public class NISTool {
         partitionContext.setPenroseConfig(penroseConfig);
         partitionContext.setPenroseContext(penroseContext);
 
-        nisPartitions.init(partitionConfig, partitionContext);
+        Partition partition = new Partition();
+        partition.init(partitionConfig, partitionContext);
+        partitions.addPartition(partition);
 
         RDNBuilder rb = new RDNBuilder();
         rb.set("name", domainName);
@@ -175,6 +188,12 @@ public class NISTool {
         attributes.setValue("suffix", suffix);
 
         domains.add(dn, attributes);
+
+        for (Source source : partition.getSources()) {
+            String name = source.getName();
+            if (!name.startsWith("cache_")) continue;
+            createSource(partition, source);
+        }
 
         nisDomains.put(domainName, domain);
     }
@@ -232,6 +251,10 @@ public class NISTool {
         DN dn = new DN(rdn);
 
         domains.delete(dn);
+
+        nisDomains.remove(domainName);
+
+        partitions.removePartition(partitionName);
     }
 
     public Source getDomains() {
@@ -298,12 +321,12 @@ public class NISTool {
         this.nisDomains = nisDomains;
     }
 
-    public Partitions getNisPartitions() {
-        return nisPartitions;
+    public Partitions getPartitions() {
+        return partitions;
     }
 
-    public void setNisPartitions(Partitions nisPartitions) {
-        this.nisPartitions = nisPartitions;
+    public void setPartitions(Partitions partitions) {
+        this.partitions = partitions;
     }
 
     public Partition getNisPartition() {
@@ -312,5 +335,39 @@ public class NISTool {
 
     public void setNisPartition(Partition nisPartition) {
         this.nisPartition = nisPartition;
+    }
+
+    public void createDatabase(String database) throws Exception {
+
+        log.debug("Creating database "+database+".");
+
+        Connection connection = nisPartition.getConnection("MySQL");
+        JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
+        JDBCClient client = adapter.getClient();
+        client.createDatabase(database);
+    }
+
+    public void dropDatabase(String database) throws Exception {
+
+        log.debug("Dropping database "+database+".");
+
+        Connection connection = nisPartition.getConnection("MySQL");
+        JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
+        JDBCClient client = adapter.getClient();
+        client.dropDatabase(database);
+    }
+
+    public void createSource(Partition partition, Source source) throws Exception {
+        Connection connection = partition.getConnection("Cache");
+        JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
+        JDBCClient client = adapter.getClient();
+        client.createTable(source);
+    }
+
+    public void dropSource(Partition partition, Source source) throws Exception {
+        Connection connection = partition.getConnection("Cache");
+        JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
+        JDBCClient client = adapter.getClient();
+        client.dropTable(source);
     }
 }

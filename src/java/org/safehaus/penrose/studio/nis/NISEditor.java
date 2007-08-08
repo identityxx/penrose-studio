@@ -7,7 +7,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.partition.Partitions;
 
 public class NISEditor extends FormEditor {
 

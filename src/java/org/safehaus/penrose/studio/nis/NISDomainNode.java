@@ -27,7 +27,7 @@ import java.util.Iterator;
  */
 public class NISDomainNode extends Node {
 
-    Logger log = Logger.getLogger(getClass());
+    public Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
 
@@ -60,6 +60,28 @@ public class NISDomainNode extends Node {
             public void run() {
                 try {
                     edit();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(new Action("Create Database") {
+            public void run() {
+                try {
+                    createDatabase();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Action("Drop Database") {
+            public void run() {
+                try {
+                    dropDatabase();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
@@ -171,9 +193,23 @@ public class NISDomainNode extends Node {
 
             partitionConfigs.removePartitionConfig(domainName);
             penroseStudio.removeDirectory("partitions/"+partitionName);
+
+            try {
+                nisTool.dropDatabase(domain.getPartition());
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
         }
 
         penroseStudio.notifyChangeListeners();
+    }
+
+    public void createDatabase() throws Exception {
+        nisTool.createDatabase(domain.getPartition());
+    }
+
+    public void dropDatabase() throws Exception {
+        nisTool.dropDatabase(domain.getPartition());
     }
 
     public NISDomain getDomain() {

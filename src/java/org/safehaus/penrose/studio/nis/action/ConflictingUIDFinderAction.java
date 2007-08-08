@@ -50,10 +50,10 @@ public class ConflictingUIDFinderAction extends NISAction {
 
         log.debug("Checking conflicts between "+domain1.getName()+" and "+domain2.getName()+".");
 
-        final Partition partition1 = nisTool.getNisPartitions().getPartition(domain1.getPartition());
+        final Partition partition1 = nisTool.getPartitions().getPartition(domain1.getPartition());
         final Source source1 = partition1.getSource(CACHE_USERS);
 
-        final Partition partition2 = nisTool.getNisPartitions().getPartition(domain2.getPartition());
+        final Partition partition2 = nisTool.getPartitions().getPartition(domain2.getPartition());
         final Source source2 = partition2.getSource(CACHE_USERS);
 
         JDBCAdapter adapter1 = (JDBCAdapter)source1.getConnection().getAdapter();

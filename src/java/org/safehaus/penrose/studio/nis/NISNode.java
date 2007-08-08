@@ -6,6 +6,8 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.nis.NISDomain;
+import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.source.Source;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
@@ -19,7 +21,6 @@ import org.apache.log4j.Logger;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.Map;
-import java.io.File;
 
 /**
  * @author Endi S. Dewata
@@ -122,7 +123,13 @@ public class NISNode extends Node {
         String partitionName = dialog.getPartition();
         String server = dialog.getServer();
         String suffix = dialog.getSuffix();
-        
+
+        try {
+            nisTool.createDatabase(partitionName);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+
         NISDomain domain = new NISDomain();
         domain.setName(domainName);
         domain.setPartition(partitionName);

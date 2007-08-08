@@ -74,7 +74,6 @@ public class PenroseStudio implements IPlatformRunnable {
     ApplicationConfig applicationConfig = new ApplicationConfig();
 
     PartitionConfigs partitionConfigs = new PartitionConfigs();
-    Partitions partitions = new Partitions();
     ServiceConfigs serviceConfigs = new ServiceConfigs();
 
     PenroseConfig penroseConfig = new PenroseConfig();
@@ -496,10 +495,6 @@ public class PenroseStudio implements IPlatformRunnable {
 
     public PartitionConfigs getPartitionConfigs() {
         return partitionConfigs;
-    }
-
-    public Partitions getPartitions() {
-        return partitions;
     }
 
     public ServiceConfigs getServiceConfigs() {

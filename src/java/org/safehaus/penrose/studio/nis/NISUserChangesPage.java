@@ -14,11 +14,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.source.Source;
-import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.Partitions;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -38,20 +34,14 @@ public class NISUserChangesPage extends FormPage {
 
     NISEditor editor;
     NISDomain domain;
-
-    Source users;
+    NISTool nisTool;
 
     public NISUserChangesPage(NISEditor editor) throws Exception {
         super(editor, "USER_CHANGES", "  User Changes ");
 
         this.editor = editor;
-        this.domain = editor.getDomain();
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Partitions partitions = penroseStudio.getPartitions();
-        Partition partition = partitions.getPartition("nis");
-
-        users = partition.getSource("penrose_users");
+        domain = editor.getDomain();
+        nisTool = editor.getNisTool();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -104,7 +94,7 @@ public class NISUserChangesPage extends FormPage {
                 }
             };
 
-            users.search(request, response);
+            nisTool.getUsers().search(request, response);
 
             changesTable.select(indices);
 
@@ -229,7 +219,7 @@ public class NISUserChangesPage extends FormPage {
                     attributes.setValue("uidNumber", dialog.getNewValue());
                     attributes.setValue("message", dialog.getMessage());
 
-                    users.add(dn, attributes);
+                    nisTool.getUsers().add(dn, attributes);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -283,7 +273,7 @@ public class NISUserChangesPage extends FormPage {
                     modifications.add(new Modification(Modification.REPLACE, new Attribute("uidNumber", uidNumber)));
                     modifications.add(new Modification(Modification.REPLACE, new Attribute("message", message)));
 
-                    users.modify(result.getDn(), modifications);
+                    nisTool.getUsers().modify(result.getDn(), modifications);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -313,7 +303,7 @@ public class NISUserChangesPage extends FormPage {
                     for (TableItem ti : items) {
                         SearchResult result = (SearchResult)ti.getData();
 
-                        users.delete(result.getDn());
+                        nisTool.getUsers().delete(result.getDn());
                     }
 
                     changesTable.select(index);
@@ -455,7 +445,7 @@ public class NISUserChangesPage extends FormPage {
                         modifications.add(new Modification(Modification.REPLACE, new Attribute("active", "1")));
                     }
 
-                    users.modify(result.getDn(), modifications);
+                    nisTool.getUsers().modify(result.getDn(), modifications);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);

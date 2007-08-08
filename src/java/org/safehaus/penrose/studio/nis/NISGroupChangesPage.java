@@ -38,20 +38,14 @@ public class NISGroupChangesPage extends FormPage {
 
     NISEditor editor;
     NISDomain domain;
-
-    Source groups;
+    NISTool nisTool;
 
     public NISGroupChangesPage(NISEditor editor) throws Exception {
         super(editor, "GROUP_CHANGES", "  Group Changes ");
 
         this.editor = editor;
-        this.domain = editor.getDomain();
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Partitions partitions = penroseStudio.getPartitions();
-        Partition partition = partitions.getPartition("nis");
-
-        groups = partition.getSource("penrose_groups");
+        domain = editor.getDomain();
+        nisTool = editor.getNisTool();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -104,7 +98,7 @@ public class NISGroupChangesPage extends FormPage {
                 }
             };
 
-            groups.search(request, response);
+            nisTool.getGroups().search(request, response);
 
             changesTable.select(indices);
 
@@ -229,7 +223,7 @@ public class NISGroupChangesPage extends FormPage {
                     attributes.setValue("gidNumber", dialog.getNewValue());
                     attributes.setValue("message", dialog.getMessage());
 
-                    groups.add(dn, attributes);
+                    nisTool.getGroups().add(dn, attributes);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -283,7 +277,7 @@ public class NISGroupChangesPage extends FormPage {
                     modifications.add(new Modification(Modification.REPLACE, new Attribute("gidNumber", gidNumber)));
                     modifications.add(new Modification(Modification.REPLACE, new Attribute("message", message)));
 
-                    groups.modify(result.getDn(), modifications);
+                    nisTool.getGroups().modify(result.getDn(), modifications);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -313,7 +307,7 @@ public class NISGroupChangesPage extends FormPage {
                     for (TableItem ti : items) {
                         SearchResult result = (SearchResult)ti.getData();
 
-                        groups.delete(result.getDn());
+                        nisTool.getGroups().delete(result.getDn());
                     }
 
                     changesTable.select(index);
@@ -455,7 +449,7 @@ public class NISGroupChangesPage extends FormPage {
                         modifications.add(new Modification(Modification.REPLACE, new Attribute("active", "1")));
                     }
 
-                    groups.modify(result.getDn(), modifications);
+                    nisTool.getGroups().modify(result.getDn(), modifications);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);

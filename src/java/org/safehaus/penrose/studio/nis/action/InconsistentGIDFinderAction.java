@@ -1,20 +1,14 @@
 package org.safehaus.penrose.studio.nis.action;
 
-import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.source.Source;
-import org.safehaus.penrose.ldap.SearchRequest;
-import org.safehaus.penrose.ldap.SearchResult;
-import org.safehaus.penrose.ldap.SearchResponse;
 import org.safehaus.penrose.ldap.Attributes;
 import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.Partitions;
+import org.safehaus.penrose.nis.NISDomain;
 
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.sql.ResultSet;
@@ -26,34 +20,9 @@ public class InconsistentGIDFinderAction extends NISAction {
 
     public final static String CACHE_GROUPS = "cache_groups";
 
-    Partitions partitions;
-    Map<String,String> map = new TreeMap<String,String>();
-
     public InconsistentGIDFinderAction() throws Exception {
-
         setName("Inconsistent GID Finder");
         setDescription("Finds groups with inconsistent GID numbers across domains");
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        partitions = penroseStudio.getPartitions();
-        Partition partition = partitions.getPartition("nis");
-
-        Source domains = partition.getSource("penrose_domains");
-
-        SearchRequest searchRequest = new SearchRequest();
-        SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
-
-        domains.search(searchRequest, searchResponse);
-
-        while (searchResponse.hasNext()) {
-            SearchResult searchResult = searchResponse.next();
-            Attributes attributes = searchResult.getAttributes();
-
-            String domain = (String)attributes.getValue("name");
-            String partitionName = (String)attributes.getValue("partition");
-
-            map.put(domain, partitionName);
-        }
     }
 
     public void execute(
@@ -61,26 +30,31 @@ public class InconsistentGIDFinderAction extends NISAction {
             final NISActionResponse response
     ) throws Exception {
 
-        for (String domain : map.keySet()) {
-            if (request.getDomain().equals(domain)) continue;
-            execute(request.getDomain(), domain, response);
+        String domainName1 = request.getDomain();
+        NISDomain domain1 = nisTool.getNisDomains().get(domainName1);
+
+        for (String domainName2 : nisTool.getNisDomains().keySet()) {
+            if (domainName1.equals(domainName2)) continue;
+
+            NISDomain domain2 = nisTool.getNisDomains().get(domainName2);
+            execute(domain1, domain2, response);
         }
 
         response.close();
     }
 
     public void execute(
-            final String domain1,
-            final String domain2,
+            final NISDomain domain1,
+            final NISDomain domain2,
             final NISActionResponse response
     ) throws Exception {
 
-        final String partitionName1 = map.get(domain1);
-        Partition partition1 = partitions.getPartition(partitionName1);
+        log.debug("Checking conflicts between "+domain1.getName()+" and "+domain2.getName()+".");
+
+        final Partition partition1 = nisTool.getPartitions().getPartition(domain1.getPartition());
         final Source source1 = partition1.getSource(CACHE_GROUPS);
 
-        final String partitionName2 = map.get(domain2);
-        Partition partition2 = partitions.getPartition(partitionName2);
+        final Partition partition2 = nisTool.getPartitions().getPartition(domain2.getPartition());
         final Source source2 = partition2.getSource(CACHE_GROUPS);
 
         JDBCAdapter adapter1 = (JDBCAdapter)source1.getConnection().getAdapter();
@@ -104,8 +78,8 @@ public class InconsistentGIDFinderAction extends NISAction {
                 " order by a.cn";
 
         Collection<Assignment> assignments = new ArrayList<Assignment>();
-        assignments.add(new Assignment(domain1));
-        assignments.add(new Assignment(domain2));
+        assignments.add(new Assignment(domain1.getName()));
+        assignments.add(new Assignment(domain2.getName()));
 
         QueryResponse queryResponse = new QueryResponse() {
             public void add(Object object) throws Exception {
@@ -120,15 +94,15 @@ public class InconsistentGIDFinderAction extends NISAction {
                 Integer gidNumber2 = (Integer)rs.getObject(6);
 
                 Attributes attributes1 = new Attributes();
-                attributes1.setValue("domain", domain1);
-                attributes1.setValue("partition", partitionName1);
+                attributes1.setValue("domain", domain1.getName());
+                attributes1.setValue("partition", domain1.getPartition());
                 attributes1.setValue("cn", cn1);
                 attributes1.setValue("origGidNumber", origGidNumber1);
                 attributes1.setValue("gidNumber", gidNumber1);
 
                 Attributes attributes2 = new Attributes();
-                attributes2.setValue("domain", domain2);
-                attributes2.setValue("partition", partitionName2);
+                attributes2.setValue("domain", domain2.getName());
+                attributes2.setValue("partition", domain2.getPartition());
                 attributes2.setValue("cn", cn2);
                 attributes2.setValue("origGidNumber", origGidNumber2);
                 attributes2.setValue("gidNumber", gidNumber2);

@@ -323,7 +323,7 @@ public class NISUsersPage extends FormPage {
 
             final String domainName = (String) attrs.getValue("name");
             String partitionName = (String) attrs.getValue("partition");
-            Partition partition = nisTool.getNisPartitions().getPartition(partitionName);
+            Partition partition = nisTool.getPartitions().getPartition(partitionName);
 
             if (domain.getName().equals(domainName)) continue;
             
@@ -440,7 +440,7 @@ public class NISUsersPage extends FormPage {
             Integer origUidNumber
     ) throws Exception {
 
-        Partition partition = nisTool.getNisPartitions().getPartition(partitionName);
+        Partition partition = nisTool.getPartitions().getPartition(partitionName);
 
         RDNBuilder rb = new RDNBuilder();
         rb.set("domain", domain);
@@ -539,7 +539,7 @@ public class NISUsersPage extends FormPage {
 
             String domainName = (String) attributes.getValue("name");
             String partitionName = (String) attributes.getValue("partition");
-            Partition partition2 = nisTool.getNisPartitions().getPartition(partitionName);
+            Partition partition2 = nisTool.getPartitions().getPartition(partitionName);
 
             response = new SearchResponse<SearchResult>();
 

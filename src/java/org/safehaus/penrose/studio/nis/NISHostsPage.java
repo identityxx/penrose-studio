@@ -13,12 +13,8 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.Partitions;
 
 import java.util.Date;
 import java.util.Collection;
@@ -36,24 +32,16 @@ public class NISHostsPage extends FormPage {
 
     NISEditor editor;
     NISDomain domain;
+    NISTool nisTool;
 
     Table hostsTable;
-
-    Source hosts;
-    Source files;
 
     public NISHostsPage(NISEditor editor) {
         super(editor, "HOSTS", "  Hosts ");
 
         this.editor = editor;
-        this.domain = editor.getDomain();
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Partitions partitions = penroseStudio.getPartitions();
-        Partition partition = partitions.getPartition("nis");
-
-        hosts = partition.getSource("penrose_hosts");
-        files = partition.getSource("penrose_files");
+        domain = editor.getDomain();
+        nisTool = editor.getNisTool();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -108,7 +96,7 @@ public class NISHostsPage extends FormPage {
                 }
             };
 
-            hosts.search(request, response);
+            nisTool.getHosts().search(request, response);
 
             hostsTable.select(indices);
 
@@ -282,7 +270,7 @@ public class NISHostsPage extends FormPage {
         attributes.setValue("port", dialog.getPort());
         attributes.setValue("paths", dialog.getPaths());
 
-        hosts.add(dn, attributes);
+        nisTool.getHosts().add(dn, attributes);
     }
 
     public void edit() throws Exception {
@@ -309,7 +297,7 @@ public class NISHostsPage extends FormPage {
         RDN newRdn = rb.toRdn();
 
         if (!dn.getRdn().equals(newRdn)) {
-            hosts.modrdn(dn, newRdn, true);
+            nisTool.getHosts().modrdn(dn, newRdn, true);
         }
 
         DNBuilder db = new DNBuilder();
@@ -329,7 +317,7 @@ public class NISHostsPage extends FormPage {
                 new Attribute("paths", dialog.getPaths())
         ));
 
-        hosts.modify(newDn, modifications);
+        nisTool.getHosts().modify(newDn, modifications);
 
     }
 
@@ -340,7 +328,7 @@ public class NISHostsPage extends FormPage {
         for (TableItem ti : items) {
             SearchResult result = (SearchResult) ti.getData();
             DN dn = result.getDn();
-            hosts.delete(dn);
+            nisTool.getHosts().delete(dn);
         }
     }
 
@@ -364,9 +352,9 @@ public class NISHostsPage extends FormPage {
                     new Attribute("status", "UPDATING")
             ));
 
-            hosts.modify(result.getDn(), modifications);
+            nisTool.getHosts().modify(result.getDn(), modifications);
 
-            Runnable runnable = new UpdateFilesRunnable(result, hosts, files);
+            Runnable runnable = new UpdateFilesRunnable(result, nisTool.getHosts(), nisTool.getFiles());
             runnable.run();
 
             //new Thread(runnable).start();
