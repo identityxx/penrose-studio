@@ -24,7 +24,7 @@ import java.sql.ResultSet;
  */
 public class InconsistentUIDFinderAction extends NISAction {
 
-    public String sourceName = "cache.users";
+    public final static String CACHE_USERS = "cache_users";
 
     Partitions partitions;
     Map<String,String> map = new TreeMap<String,String>();
@@ -77,11 +77,11 @@ public class InconsistentUIDFinderAction extends NISAction {
 
         final String partitionName1 = map.get(domain1);
         Partition partition1 = partitions.getPartition(partitionName1);
-        final Source source1 = partition1.getSource(sourceName);
+        final Source source1 = partition1.getSource(CACHE_USERS);
 
         final String partitionName2 = map.get(domain2);
         Partition partition2 = partitions.getPartition(partitionName2);
-        final Source source2 = partition2.getSource(sourceName);
+        final Source source2 = partition2.getSource(CACHE_USERS);
 
         JDBCAdapter adapter1 = (JDBCAdapter)source1.getConnection().getAdapter();
         JDBCClient client1 = adapter1.getClient();

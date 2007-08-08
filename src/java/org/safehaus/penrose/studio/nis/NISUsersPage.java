@@ -13,7 +13,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.nis.action.*;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
@@ -23,7 +22,6 @@ import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.Partitions;
 
 import java.util.*;
 import java.sql.ResultSet;
@@ -35,6 +33,8 @@ public class NISUsersPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
+    public final static String CACHE_USERS = "cache_users";
+    
     FormToolkit toolkit;
 
     Combo actionCombo;
@@ -46,9 +46,7 @@ public class NISUsersPage extends FormPage {
 
     NISEditor editor;
     NISDomain domain;
-
-    Source actions;
-    Source domains;
+    NISTool nisTool;
 
     Map<String,Collection<Conflict>> conflicts = new TreeMap<String,Collection<Conflict>>();
 
@@ -56,15 +54,8 @@ public class NISUsersPage extends FormPage {
         super(editor, "USERS", "  Users  ");
 
         this.editor = editor;
-        this.domain = editor.getDomain();
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Partitions partitions = penroseStudio.getPartitions();
-        Partition partition = partitions.getPartition("nis");
-
-        actions = partition.getSource("penrose_actions");
-        domains = partition.getSource("penrose_domains");
-
+        domain = editor.getDomain();
+        nisTool = editor.getNisTool();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -111,7 +102,7 @@ public class NISUsersPage extends FormPage {
                 }
             };
 
-            actions.search(request, response);
+            nisTool.getActions().search(request, response);
 
             actionCombo.select(0);
 
@@ -321,13 +312,10 @@ public class NISUsersPage extends FormPage {
         Integer uidNumber = (Integer) attributes.getValue("uidNumber");
         if (uidNumber == null) uidNumber = (Integer) attributes.getValue("origUidNumber");
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Partitions partitions = penroseStudio.getPartitions();
-
         SearchRequest searchRequest = new SearchRequest();
         SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
 
-        domains.search(searchRequest, searchResponse);
+        nisTool.getDomains().search(searchRequest, searchResponse);
 
         while (searchResponse.hasNext()) {
             SearchResult searchResults = searchResponse.next();
@@ -335,11 +323,11 @@ public class NISUsersPage extends FormPage {
 
             final String domainName = (String) attrs.getValue("name");
             String partitionName = (String) attrs.getValue("partition");
-            Partition partition = partitions.getPartition(partitionName);
+            Partition partition = nisTool.getNisPartitions().getPartition(partitionName);
 
             if (domain.getName().equals(domainName)) continue;
             
-            Source users = partition.getSource("cache.users");
+            Source users = partition.getSource(CACHE_USERS);
 
             JDBCAdapter adapter = (JDBCAdapter)users.getConnection().getAdapter();
             JDBCClient client = adapter.getClient();
@@ -390,6 +378,7 @@ public class NISUsersPage extends FormPage {
 
         Class clazz = Class.forName(className);
         NISAction action = (NISAction) clazz.newInstance();
+        action.setNisTool(nisTool);
 
         NISActionRequest request = new NISActionRequest();
         request.setDomain(domain.getName());
@@ -397,7 +386,7 @@ public class NISUsersPage extends FormPage {
         SearchRequest searchRequest = new SearchRequest();
         SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
 
-        domains.search(searchRequest, searchResponse);
+        nisTool.getDomains().search(searchRequest, searchResponse);
 
         while (searchResponse.hasNext()) {
             SearchResult result = searchResponse.next();
@@ -451,9 +440,7 @@ public class NISUsersPage extends FormPage {
             Integer origUidNumber
     ) throws Exception {
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Partitions partitions = penroseStudio.getPartitions();
-        Partition partition = partitions.getPartition(partitionName);
+        Partition partition = nisTool.getNisPartitions().getPartition(partitionName);
 
         RDNBuilder rb = new RDNBuilder();
         rb.set("domain", domain);
@@ -520,9 +507,7 @@ public class NISUsersPage extends FormPage {
 
     public void checkUidNumber(String uid, Integer uidNumber) throws Exception {
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Partitions partitions = penroseStudio.getPartitions();
-        Partition partition = partitions.getPartition("nis");
+        Partition partition = nisTool.getNisPartition();
 
         SearchRequest request = new SearchRequest();
         request.setFilter("(uidNumber=" + uidNumber + ")");
@@ -546,7 +531,7 @@ public class NISUsersPage extends FormPage {
         SearchRequest searchRequest = new SearchRequest();
         SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
 
-        domains.search(searchRequest, searchResponse);
+        nisTool.getDomains().search(searchRequest, searchResponse);
 
         while (searchResponse.hasNext()) {
             SearchResult searchResults = searchResponse.next();
@@ -554,11 +539,11 @@ public class NISUsersPage extends FormPage {
 
             String domainName = (String) attributes.getValue("name");
             String partitionName = (String) attributes.getValue("partition");
-            Partition partition2 = partitions.getPartition(partitionName);
+            Partition partition2 = nisTool.getNisPartitions().getPartition(partitionName);
 
             response = new SearchResponse<SearchResult>();
 
-            users = partition2.getSource("cache.users");
+            users = partition2.getSource(CACHE_USERS);
             users.search(request, response);
 
             while (response.hasNext()) {

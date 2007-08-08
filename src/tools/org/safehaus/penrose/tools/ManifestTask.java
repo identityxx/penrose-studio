@@ -51,14 +51,12 @@ public class ManifestTask extends Task {
         File libDir = new File(dir);
         File files[] = libDir.listFiles();
 
-        Collection list = new ArrayList();
-        for (int i=0; i<files.length; i++) {
-            File f = files[i];
-
+        Collection<String> list = new ArrayList<String>();
+        for (File f : files) {
             if (!f.isFile()) continue;
             if (!f.getName().endsWith(".jar")) continue;
 
-            list.add(newDir+"/"+f.getName());
+            list.add(newDir + "/" + f.getName());
         }
 
         boolean first = true;

@@ -7,15 +7,18 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.nis.NISDomain;
+import org.safehaus.penrose.partition.Partitions;
 
 public class NISEditor extends FormEditor {
 
     Logger log = Logger.getLogger(getClass());
 
+    NISTool nisTool;
     NISDomain domain;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         NISEditorInput ei = (NISEditorInput)input;
+        nisTool = ei.getNisTool();
         domain = ei.getDomain();
 
         setSite(site);
@@ -59,5 +62,9 @@ public class NISEditor extends FormEditor {
 
     public void setDomain(NISDomain domain) {
         this.domain = domain;
+    }
+
+    public NISTool getNisTool() {
+        return nisTool;
     }
 }

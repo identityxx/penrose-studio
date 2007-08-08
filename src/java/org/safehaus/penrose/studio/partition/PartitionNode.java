@@ -172,7 +172,7 @@ public class PartitionNode extends Node {
         File workDir = penroseStudio.getWorkDir();
         File dir = new File(workDir, "partitions"+File.separator+name);
 
-        penroseStudio.downloadFolder("partitions"+File.separator+name, workDir);
+        penroseStudio.downloadFolder(workDir, "partitions"+File.separator+name);
 
         PartitionConfigs partitionConfigs = penroseStudio.getPartitionConfigs();
         partitionConfig = partitionConfigs.load(dir);
@@ -194,13 +194,7 @@ public class PartitionNode extends Node {
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         
         File workDir = penroseStudio.getWorkDir();
-
-        File dir = new File(workDir, File.separator+"partitions"+File.separator+name);
-        Collection<String> files = penroseStudio.listFiles("partitions/"+name, dir);
-
-        for (String filename : files) {
-            penroseStudio.upload(workDir, filename);
-        }
+        penroseStudio.uploadFolder("partitions/"+name);
     }
 
     public void close() throws Exception {

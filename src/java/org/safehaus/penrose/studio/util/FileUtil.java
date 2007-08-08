@@ -65,13 +65,13 @@ public class FileUtil {
 
         File files[] = dir1.listFiles();
         if (files != null) {
-            for (int i=0; i<files.length; i++) {
-                File target = new File(dir2, files[i].getName());
-                
-                if (files[i].isDirectory()) {
-                    copyFolder(files[i], target);
+            for (File file : files) {
+                File target = new File(dir2, file.getName());
+
+                if (file.isDirectory()) {
+                    copyFolder(file, target);
                 } else {
-                    copy(files[i], target);
+                    copy(file, target);
                 }
             }
         }
@@ -82,28 +82,28 @@ public class FileUtil {
     }
 
     public static void delete(File dir) {
-
         File files[] = dir.listFiles();
         if (files != null) {
-            for (int i=0; i<files.length; i++) {
-                delete(files[i]);
+            for (File file : files) {
+                delete(file);
             }
         }
-
         dir.delete();
     }
 
 	public static String getContent(File file) throws IOException {
+        StringBuilder sb = new StringBuilder();
+
 		FileReader r = new FileReader(file);
 		BufferedReader br = new BufferedReader(r);
-		String line = "";
-		StringBuilder sb = new StringBuilder();
-		while (line != null) {
-			line = br.readLine();
-			if (line == null) break;
+
+        String line;
+		while ((line = br.readLine()) != null) {
 			sb.append(line);
 		}
-		r.close();
+
+        r.close();
+
 		return sb.toString();
 	}
 }

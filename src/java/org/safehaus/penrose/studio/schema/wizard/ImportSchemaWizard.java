@@ -60,7 +60,7 @@ public class ImportSchemaWizard extends Wizard {
             File workDir = penroseStudio.getWorkDir();
 
             File file1 = new File(filePage.getFilename());
-            File file2 = new File(workDir, File.separator+path);
+            File file2 = new File(workDir, path);
             FileUtil.copy(file1, file2);
 
             SchemaConfig schemaConfig = new SchemaConfig();

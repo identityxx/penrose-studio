@@ -101,7 +101,7 @@ public class ServiceNode extends Node {
         File workDir = penroseStudio.getWorkDir();
         File dir = new File(workDir, "services"+File.separator+name);
 
-        penroseStudio.downloadFolder("services"+File.separator+name, workDir);
+        penroseStudio.downloadFolder(workDir, "services"+File.separator+name);
 
         ServiceConfigs serviceConfigs = penroseStudio.getServiceConfigs();
         serviceConfig = serviceConfigs.load(dir);

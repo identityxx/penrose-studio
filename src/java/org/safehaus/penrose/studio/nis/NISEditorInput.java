@@ -10,6 +10,7 @@ import org.safehaus.penrose.nis.NISDomain;
  */
 public class NISEditorInput implements IEditorInput {
 
+    private NISTool nisTool;
     private NISDomain domain;
 
     public NISEditorInput() {
@@ -55,5 +56,13 @@ public class NISEditorInput implements IEditorInput {
 
     public void setDomain(NISDomain domain) {
         this.domain = domain;
+    }
+
+    public NISTool getNisTool() {
+        return nisTool;
+    }
+
+    public void setNisTool(NISTool nisTool) {
+        this.nisTool = nisTool;
     }
 }

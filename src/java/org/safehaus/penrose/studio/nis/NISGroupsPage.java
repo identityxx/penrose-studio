@@ -13,7 +13,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.nis.action.NISAction;
 import org.safehaus.penrose.studio.nis.action.NISActionRequest;
 import org.safehaus.penrose.studio.nis.action.NISActionResponse;
@@ -26,7 +25,6 @@ import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.Partitions;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -41,6 +39,8 @@ public class NISGroupsPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
+    public final static String CACHE_GROUPS = "cache_groups";
+
     FormToolkit toolkit;
 
     Combo actionCombo;
@@ -52,9 +52,7 @@ public class NISGroupsPage extends FormPage {
 
     NISEditor editor;
     NISDomain domain;
-
-    Source actions;
-    Source domains;
+    NISTool nisTool;
 
     Map<String,Collection<Conflict>> conflicts = new TreeMap<String,Collection<Conflict>>();
 
@@ -62,14 +60,8 @@ public class NISGroupsPage extends FormPage {
         super(editor, "GROUPS", "  Groups  ");
 
         this.editor = editor;
-        this.domain = editor.getDomain();
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Partitions partitions = penroseStudio.getPartitions();
-        Partition partition = partitions.getPartition("nis");
-
-        actions = partition.getSource("penrose_actions");
-        domains = partition.getSource("penrose_domains");
+        domain = editor.getDomain();
+        nisTool = editor.getNisTool();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -116,7 +108,7 @@ public class NISGroupsPage extends FormPage {
                 }
             };
 
-            actions.search(request, response);
+            nisTool.getActions().search(request, response);
 
             actionCombo.select(0);
 
@@ -326,13 +318,10 @@ public class NISGroupsPage extends FormPage {
         Integer gidNumber = (Integer) attributes.getValue("gidNumber");
         if (gidNumber == null) gidNumber = (Integer) attributes.getValue("origGidNumber");
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Partitions partitions = penroseStudio.getPartitions();
-
         SearchRequest searchRequest = new SearchRequest();
         SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
 
-        domains.search(searchRequest, searchResponse);
+        nisTool.getDomains().search(searchRequest, searchResponse);
 
         while (searchResponse.hasNext()) {
             SearchResult searchResults = searchResponse.next();
@@ -340,11 +329,11 @@ public class NISGroupsPage extends FormPage {
 
             final String domainName = (String) attrs.getValue("name");
             String partitionName = (String) attrs.getValue("partition");
-            Partition partition = partitions.getPartition(partitionName);
+            Partition partition = nisTool.getNisPartitions().getPartition(partitionName);
 
             if (domain.getName().equals(domainName)) continue;
 
-            Source users = partition.getSource("cache.groups");
+            Source users = partition.getSource(CACHE_GROUPS);
 
             JDBCAdapter adapter = (JDBCAdapter)users.getConnection().getAdapter();
             JDBCClient client = adapter.getClient();
@@ -395,6 +384,7 @@ public class NISGroupsPage extends FormPage {
 
         Class clazz = Class.forName(className);
         NISAction action = (NISAction) clazz.newInstance();
+        action.setNisTool(nisTool);
 
         NISActionRequest request = new NISActionRequest();
         request.setDomain(domain.getName());
@@ -402,7 +392,7 @@ public class NISGroupsPage extends FormPage {
         SearchRequest searchRequest = new SearchRequest();
         SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
 
-        domains.search(searchRequest, searchResponse);
+        nisTool.getDomains().search(searchRequest, searchResponse);
 
         while (searchResponse.hasNext()) {
             SearchResult result = searchResponse.next();
@@ -456,9 +446,7 @@ public class NISGroupsPage extends FormPage {
             Integer origGidNumber
     ) throws Exception {
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Partitions partitions = penroseStudio.getPartitions();
-        Partition partition = partitions.getPartition(partitionName);
+        Partition partition = nisTool.getNisPartitions().getPartition(partitionName);
 
         RDNBuilder rb = new RDNBuilder();
         rb.set("domain", domain);
@@ -485,7 +473,7 @@ public class NISGroupsPage extends FormPage {
             dialog.setNewGidNumber((Integer)attributes.getValue("gidNumber"));
         }
 
-        Source members = partition.getSource("cache.groups_memberUid");
+        Source members = partition.getSource(CACHE_GROUPS+"_memberUid");
 
         request = new SearchRequest();
         request.setFilter("(cn="+cn+")");
@@ -541,9 +529,7 @@ public class NISGroupsPage extends FormPage {
 
     public void checkGidNumber(String cn, Integer gidNumber) throws Exception {
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Partitions partitions = penroseStudio.getPartitions();
-        Partition partition = partitions.getPartition("nis");
+        Partition partition = nisTool.getNisPartition();
 
         SearchRequest request = new SearchRequest();
         request.setFilter("(gidNumber=" + gidNumber + ")");
@@ -567,7 +553,7 @@ public class NISGroupsPage extends FormPage {
         SearchRequest searchRequest = new SearchRequest();
         SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
 
-        domains.search(searchRequest, searchResponse);
+        nisTool.getDomains().search(searchRequest, searchResponse);
 
         while (searchResponse.hasNext()) {
             SearchResult searchResults = searchResponse.next();
@@ -575,11 +561,11 @@ public class NISGroupsPage extends FormPage {
 
             String domainName = (String) attributes.getValue("name");
             String partitionName = (String) attributes.getValue("partition");
-            Partition partition2 = partitions.getPartition(partitionName);
+            Partition partition2 = nisTool.getNisPartitions().getPartition(partitionName);
 
             response = new SearchResponse<SearchResult>();
 
-            groups = partition2.getSource("cache.groups");
+            groups = partition2.getSource(CACHE_GROUPS);
             groups.search(request, response);
 
             while (response.hasNext()) {

@@ -1,6 +1,7 @@
 package org.safehaus.penrose.studio.nis.action;
 
 import org.apache.log4j.Logger;
+import org.safehaus.penrose.studio.nis.NISTool;
 
 /**
  * @author Endi S. Dewata
@@ -9,8 +10,9 @@ public class NISAction {
 
     public Logger log = Logger.getLogger(getClass());
 
-    private String name;
-    private String description;
+    protected String name;
+    protected String description;
+    protected NISTool nisTool;
 
     public void execute(NISActionRequest request, NISActionResponse response) throws Exception {
     }
@@ -29,5 +31,13 @@ public class NISAction {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public NISTool getNisTool() {
+        return nisTool;
+    }
+
+    public void setNisTool(NISTool nisTool) {
+        this.nisTool = nisTool;
     }
 }

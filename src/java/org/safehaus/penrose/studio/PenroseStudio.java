@@ -204,9 +204,9 @@ public class PenroseStudio implements IPlatformRunnable {
         log.debug("-------------------------------------------------------------------------------------");
         log.debug("Downloading configuration to "+ workDir);
 
-        downloadFolder("conf", workDir);
-        downloadFolder("schema", workDir);
-        downloadFolder("partitions", workDir);
+        downloadFolder(workDir, "conf");
+        downloadFolder(workDir, "schema");
+        downloadFolder(workDir, "partitions");
         //downloadFolder("services", workDir);
 
         log.debug("Opening project from "+ workDir);
@@ -393,30 +393,36 @@ public class PenroseStudio implements IPlatformRunnable {
         writer.write(loggingConfig);
     }
 
-    public void uploadFolder(String localDir) throws Exception {
-        uploadFolder(new File(localDir));
+    public void uploadFolder(String path) throws Exception {
+        uploadFolder(workDir, path);
+    }
+    
+    public void uploadFolder(File localDir, String path) throws Exception {
+        File dir = new File(localDir, path);
+        Collection<String> files = listFiles(dir, path);
+        for (String filename : files) {
+            upload(localDir, filename);
+        }
     }
 
     public void uploadFolder(File localDir) throws Exception {
-
         Collection<String> files = listFiles(localDir);
         for (String filename : files) {
             upload(localDir, filename);
         }
     }
 
-    public void upload(File localDir, String filename) throws Exception {
-        log.debug("Uploading "+filename);
+    public void upload(File localDir, String path) throws Exception {
+        log.debug("Uploading "+path);
 
-        File file = new File(localDir, filename);
+        File file = new File(localDir, path);
+
         FileInputStream in = new FileInputStream(file);
-
         byte content[] = new byte[(int)file.length()];
         in.read(content);
-
         in.close();
 
-		client.upload(filename, content);
+		client.upload(path, content);
 	}
 
     public void upload() throws Exception {
@@ -425,55 +431,65 @@ public class PenroseStudio implements IPlatformRunnable {
         uploadFolder(workDir);
     }
 
-    public void downloadFolder(String remotePath, String localDir) throws Exception {
-        downloadFolder(remotePath, new File(localDir));
-    }
-
-    public void downloadFolder(String remotePath, File localDir) throws Exception {
+    public void downloadFolder(File localDir, String path) throws Exception {
         localDir.mkdirs();
 
-        Collection<String> filenames = client.listFiles(remotePath);
+        Collection<String> filenames = client.listFiles(path);
         for (String filename : filenames) {
-            download(filename, localDir);
+            download(localDir, filename);
         }
     }
 
-    public void download(String filename, File localDir) throws Exception {
-        log.debug("Downloading "+filename);
+    public void download(File localDir, String path) throws Exception {
+        log.debug("Downloading "+ path);
 
-        byte content[] = client.download(filename);
+        File file = new File(localDir, path);
+
+        if (path.endsWith("/")) {
+            file.mkdirs();
+            return;
+        }
+
+        byte content[] = client.download(path);
         if (content == null) return;
 
-        File file = new File(localDir, filename);
         file.getParentFile().mkdirs();
 
         FileOutputStream out = new FileOutputStream(file);
 		out.write(content);
-
 		out.close();
 	}
+
+    public void createDirectory(String path) throws Exception {
+        client.createDirectory(path);
+    }
+
+    public void removeDirectory(String path) throws Exception {
+        client.removeDirectory(path);
+    }
 
     public Collection<String> listFiles(String directory) throws Exception {
         return listFiles(new File(directory));
     }
 
     public Collection<String> listFiles(File directory) throws Exception {
-        return listFiles(null, directory);
+        return listFiles(directory, null);
     }
 
-    public Collection<String> listFiles(String prefix, File directory) throws Exception {
+    public Collection<String> listFiles(File directory, String path) throws Exception {
         Collection<String> results = new ArrayList<String>();
-        listFiles(prefix, directory, results);
+        listFiles(directory, path, results);
         return results;
     }
 
-    public void listFiles(String prefix, File directory, Collection<String> results) throws Exception {
+    public void listFiles(File directory, String path, Collection<String> results) throws Exception {
         File children[] = directory.listFiles();
         for (File file : children) {
+            String filename = (path == null ? "" : path + "/") + file.getName();
             if (file.isDirectory()) {
-                listFiles((prefix == null ? "" : prefix + "/") + file.getName(), file, results);
+                listFiles(file, filename, results);
             } else {
-                results.add((prefix == null ? "" : prefix + "/") + file.getName());
+                results.add(filename);
             }
         }
     }

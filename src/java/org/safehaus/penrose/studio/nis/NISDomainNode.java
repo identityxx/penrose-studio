@@ -3,12 +3,7 @@ package org.safehaus.penrose.studio.nis;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.*;
-import org.safehaus.penrose.studio.util.FileUtil;
-import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.Partitions;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Image;
@@ -26,9 +21,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 
 import java.util.Iterator;
-import java.util.Collection;
-import java.util.ArrayList;
-import java.io.File;
 
 /**
  * @author Endi S. Dewata
@@ -39,20 +31,17 @@ public class NISDomainNode extends Node {
 
     ObjectsView view;
 
+    NISTool nisTool;
     NISDomain domain;
 
-    Source domains;
-    
     public NISDomainNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
         this.view = view;
-        this.domain = (NISDomain)object;
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Partitions partitions = penroseStudio.getPartitions();
-        Partition partition = partitions.getPartition("nis");
+        domain = (NISDomain)object;
+        NISNode nisNode = (NISNode)parent;
 
-        domains = partition.getSource("penrose_domains");
+        nisTool = nisNode.getNisTool();
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -113,6 +102,7 @@ public class NISDomainNode extends Node {
     public void open() throws Exception {
 
         NISEditorInput ei = new NISEditorInput();
+        ei.setNisTool(nisTool);
         ei.setDomain(domain);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -121,11 +111,6 @@ public class NISDomainNode extends Node {
     }
 
     public void edit() throws Exception {
-
-        RDNBuilder rb = new RDNBuilder();
-        rb.set("name", domain.getName());
-        RDN rdn = rb.toRdn();
-        DN dn = new DN(rdn);
 
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
         NISDomainDialog dialog = new NISDomainDialog(shell, SWT.NONE);
@@ -138,36 +123,20 @@ public class NISDomainNode extends Node {
         int action = dialog.getAction();
         if (action == NISUserDialog.CANCEL) return;
 
-        rb.set("name", dialog.getName());
-        RDN newRdn = rb.toRdn();
+        String domainName = dialog.getName();
+        String partitionName = dialog.getPartition();
+        String server = dialog.getServer();
+        String suffix = dialog.getSuffix();
 
-        if (!dn.getRdn().equals(newRdn)) {
-            domains.modrdn(dn, newRdn, true);
-        }
+        NISDomain newDomain = new NISDomain();
+        newDomain.setName(domainName);
+        newDomain.setPartition(partitionName);
+        newDomain.setServer(server);
+        newDomain.setSuffix(suffix);
 
-        DNBuilder db = new DNBuilder();
-        db.append(newRdn);
-        db.append(dn.getParentDn());
-        DN newDn = db.toDn();
+        nisTool.updateDomain(domain, newDomain);
 
-        Collection<Modification> modifications = new ArrayList<Modification>();
-
-        modifications.add(new Modification(
-                Modification.REPLACE,
-                new Attribute("partition", dialog.getPartition())
-        ));
-
-        modifications.add(new Modification(
-                Modification.REPLACE,
-                new Attribute("server", dialog.getServer())
-        ));
-
-        modifications.add(new Modification(
-                Modification.REPLACE,
-                new Attribute("suffix", dialog.getSuffix())
-        ));
-
-        domains.modify(newDn, modifications);
+        domain = newDomain;
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
@@ -188,28 +157,20 @@ public class NISDomainNode extends Node {
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         PartitionConfigs partitionConfigs = penroseStudio.getPartitionConfigs();
 
-        File workDir = penroseStudio.getWorkDir();
-
         for (Iterator i=selection.iterator(); i.hasNext(); ) {
             Node node = (Node)i.next();
             if (!(node instanceof NISDomainNode)) continue;
 
             NISDomainNode domainNode = (NISDomainNode)node;
-            NISDomain result = domainNode.getDomain();
+            NISDomain domain = domainNode.getDomain();
 
-            String name = result.getName();
-            
-            RDNBuilder rb = new RDNBuilder();
-            rb.set("name", name);
-            RDN rdn = rb.toRdn();
-            DN dn = new DN(rdn);
+            String domainName = domain.getName();
+            String partitionName = domain.getPartition();
 
-            domains.delete(dn);
+            nisTool.removeDomain(domain);
 
-            File dir = new File(workDir, "partitions"+File.separator+name);
-            FileUtil.delete(dir);
-
-            partitionConfigs.removePartitionConfig(name);
+            partitionConfigs.removePartitionConfig(domainName);
+            penroseStudio.removeDirectory("partitions/"+partitionName);
         }
 
         penroseStudio.notifyChangeListeners();
