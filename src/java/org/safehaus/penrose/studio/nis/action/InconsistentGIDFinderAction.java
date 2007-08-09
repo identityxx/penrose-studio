@@ -60,11 +60,8 @@ public class InconsistentGIDFinderAction extends NISAction {
         JDBCAdapter adapter1 = (JDBCAdapter)source1.getConnection().getAdapter();
         JDBCClient client1 = adapter1.getClient();
 
-        String catalog1 = source1.getParameter(JDBCClient.CATALOG);
-        String table1 = catalog1+"."+source1.getParameter(JDBCClient.TABLE);
-
-        String catalog2 = source2.getParameter(JDBCClient.CATALOG);
-        String table2 = catalog2+"."+source2.getParameter(JDBCClient.TABLE);
+        String table1 = client1.getTableName(source1);
+        String table2 = client1.getTableName(source2);
 
         String sql = "select a.cn, a.gidNumber, b.gidNumber, c.cn, c.gidNumber, d.gidNumber" +
                 " from "+table1+" a"+

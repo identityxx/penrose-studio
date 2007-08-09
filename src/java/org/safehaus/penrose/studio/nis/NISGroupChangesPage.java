@@ -14,11 +14,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.source.Source;
-import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.Partitions;
 
 import java.util.Collection;
 import java.util.ArrayList;

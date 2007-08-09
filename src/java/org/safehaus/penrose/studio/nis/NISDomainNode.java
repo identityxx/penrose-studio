@@ -4,7 +4,6 @@ import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.*;
 import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.partition.PartitionConfigs;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
@@ -68,6 +67,28 @@ public class NISDomainNode extends Node {
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
+        manager.add(new Action("Create Partition") {
+            public void run() {
+                try {
+                    createPartition();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Action("Remove Partition") {
+            public void run() {
+                try {
+                    removePartition();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
         manager.add(new Action("Create Database") {
             public void run() {
                 try {
@@ -78,10 +99,30 @@ public class NISDomainNode extends Node {
             }
         });
 
-        manager.add(new Action("Drop Database") {
+        manager.add(new Action("Load Database") {
             public void run() {
                 try {
-                    dropDatabase();
+                    loadDatabase();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Action("Clean Database") {
+            public void run() {
+                try {
+                    cleanDatabase();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Action("Remove Database") {
+            public void run() {
+                try {
+                    removeDatabase();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
@@ -177,7 +218,6 @@ public class NISDomainNode extends Node {
         if (!confirm) return;
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PartitionConfigs partitionConfigs = penroseStudio.getPartitionConfigs();
 
         for (Iterator i=selection.iterator(); i.hasNext(); ) {
             Node node = (Node)i.next();
@@ -186,30 +226,46 @@ public class NISDomainNode extends Node {
             NISDomainNode domainNode = (NISDomainNode)node;
             NISDomain domain = domainNode.getDomain();
 
-            String domainName = domain.getName();
-            String partitionName = domain.getPartition();
-
+            nisTool.removePartition(domain);
+            nisTool.removeDatabase(domain);
             nisTool.removeDomain(domain);
 
-            partitionConfigs.removePartitionConfig(domainName);
-            penroseStudio.removeDirectory("partitions/"+partitionName);
-
-            try {
-                nisTool.dropDatabase(domain.getPartition());
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
+            penroseStudio.removeDirectory("partitions/"+domain.getPartition());
         }
 
         penroseStudio.notifyChangeListeners();
     }
 
-    public void createDatabase() throws Exception {
-        nisTool.createDatabase(domain.getPartition());
+    public void createPartition() throws Exception {
+        nisTool.createPartition(domain);
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.uploadFolder("partitions/"+domain.getPartition());
+        penroseStudio.notifyChangeListeners();
     }
 
-    public void dropDatabase() throws Exception {
-        nisTool.dropDatabase(domain.getPartition());
+    public void removePartition() throws Exception {
+        nisTool.removePartition(domain);
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.removeDirectory("partitions/"+domain.getPartition());
+        penroseStudio.notifyChangeListeners();
+    }
+
+    public void createDatabase() throws Exception {
+        nisTool.createDatabase(domain);
+    }
+
+    public void loadDatabase() throws Exception {
+        nisTool.loadDatabase(domain);
+    }
+
+    public void cleanDatabase() throws Exception {
+        nisTool.cleanDatabase(domain);
+    }
+
+    public void removeDatabase() throws Exception {
+        nisTool.removeDatabase(domain);
     }
 
     public NISDomain getDomain() {

@@ -8,6 +8,8 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.source.Source;
+import org.safehaus.penrose.config.PenroseConfig;
+import org.safehaus.penrose.naming.PenroseContext;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
@@ -21,6 +23,7 @@ import org.apache.log4j.Logger;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.Map;
+import java.io.File;
 
 /**
  * @author Endi S. Dewata
@@ -69,9 +72,12 @@ public class NISNode extends Node {
 
     public void start() throws Exception {
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
+        PenroseContext penroseContext = penroseStudio.getPenroseContext();
+        File workDir = penroseStudio.getWorkDir();
 
         nisTool = new NISTool();
-        nisTool.init(penroseStudio);
+        nisTool.init(penroseConfig, penroseContext, workDir);
     }
 
     public boolean hasChildren() throws Exception {
@@ -109,8 +115,6 @@ public class NISNode extends Node {
 
         if (nisTool == null) start();
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
         NISDomainDialog dialog = new NISDomainDialog(shell, SWT.NONE);
 
@@ -124,12 +128,6 @@ public class NISNode extends Node {
         String server = dialog.getServer();
         String suffix = dialog.getSuffix();
 
-        try {
-            nisTool.createDatabase(partitionName);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-
         NISDomain domain = new NISDomain();
         domain.setName(domainName);
         domain.setPartition(partitionName);
@@ -137,7 +135,10 @@ public class NISNode extends Node {
         domain.setSuffix(suffix);
 
         nisTool.createDomain(domain);
+        nisTool.createDatabase(domain);
+        nisTool.createPartition(domain);
 
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.uploadFolder("partitions/"+partitionName);
 
         penroseStudio.notifyChangeListeners();

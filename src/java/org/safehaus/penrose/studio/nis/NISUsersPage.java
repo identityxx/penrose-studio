@@ -332,8 +332,7 @@ public class NISUsersPage extends FormPage {
             JDBCAdapter adapter = (JDBCAdapter)users.getConnection().getAdapter();
             JDBCClient client = adapter.getClient();
 
-            String catalog = users.getParameter(JDBCClient.CATALOG);
-            String table = catalog+"."+users.getParameter(JDBCClient.TABLE);
+            String table = client.getTableName(users);
 
             String sql = "select a.uid, a.uidNumber, b.uidNumber" +
                     " from "+table+" a"+

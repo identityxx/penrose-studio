@@ -102,7 +102,7 @@ public class SourcesNode extends Node {
 
     public Collection<Node> getChildren() throws Exception {
 
-        Map<String,Node> children = new LinkedHashMap<String,Node>();
+        Map<String,Node> children = new TreeMap<String,Node>();
 
         for (SourceConfig sourceConfig : partitionConfig.getSourceConfigs().getSourceConfigs()) {
             String sourceName = sourceConfig.getName();

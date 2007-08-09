@@ -31,7 +31,6 @@ import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
@@ -76,11 +75,11 @@ public class JDBCSourceWizard extends Wizard {
 
             String catalog = tableConfig.getCatalog();
             String schema = tableConfig.getSchema();
-            String tableName = tableConfig.getName();
+            String table = tableConfig.getName();
 
             sourceConfig.setParameter(JDBCClient.CATALOG, catalog);
             sourceConfig.setParameter(JDBCClient.SCHEMA, schema);
-            sourceConfig.setParameter(JDBCClient.TABLE, tableName);
+            sourceConfig.setParameter(JDBCClient.TABLE, table);
 
             String filter = fieldsPage.getFilter();
             if (filter != null) {
@@ -88,14 +87,13 @@ public class JDBCSourceWizard extends Wizard {
             }
 
             System.out.println("Saving fields :");
-            Collection fields = primaryKeyPage.getFields();
+            Collection<FieldConfig> fields = primaryKeyPage.getFields();
             if (fields.isEmpty()) {
                 fields = fieldsPage.getSelectedFieldConfigs();
             }
 
-            for (Iterator i=fields.iterator(); i.hasNext(); ) {
-                FieldConfig field = (FieldConfig)i.next();
-                System.out.println(" - "+field.getName()+" "+field.isPrimaryKey());
+            for (FieldConfig field : fields) {
+                System.out.println(" - " + field.getName() + " " + field.isPrimaryKey());
                 sourceConfig.addFieldConfig(field);
             }
 
@@ -128,7 +126,7 @@ public class JDBCSourceWizard extends Wizard {
             fieldsPage.setTableConfig(connectionConfig, tableConfig);
 
         } else if (fieldsPage == page) {
-            Collection selectedFields = fieldsPage.getSelectedFieldConfigs();
+            Collection<FieldConfig> selectedFields = fieldsPage.getSelectedFieldConfigs();
             primaryKeyPage.setFieldConfigs(selectedFields);
         }
 

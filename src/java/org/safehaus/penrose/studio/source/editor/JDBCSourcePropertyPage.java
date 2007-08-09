@@ -200,7 +200,6 @@ public class JDBCSourcePropertyPage extends FormPage {
         tableLabel.setLayoutData(gd);
 
         String tableName = sourceConfig.getParameter(JDBCClient.TABLE);
-        if (tableName == null) tableName = sourceConfig.getParameter(JDBCClient.TABLE_NAME);
 
 		tableText = toolkit.createText(composite, tableName, SWT.BORDER);
         gd = new GridData(GridData.FILL);
@@ -211,10 +210,8 @@ public class JDBCSourcePropertyPage extends FormPage {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(tableText.getText())) {
                     sourceConfig.removeParameter(JDBCClient.TABLE);
-                    sourceConfig.removeParameter(JDBCClient.TABLE_NAME);
                 } else {
                     sourceConfig.setParameter(JDBCClient.TABLE, tableText.getText());
-                    sourceConfig.removeParameter(JDBCClient.TABLE_NAME);
                 }
                 checkDirty();
             }
@@ -271,14 +268,9 @@ public class JDBCSourcePropertyPage extends FormPage {
 
                     ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
 
-                    String catalog = sourceConfig.getParameter(JDBCClient.CATALOG);
-                    String schema = sourceConfig.getParameter(JDBCClient.SCHEMA);
-                    String tableName = sourceConfig.getParameter(JDBCClient.TABLE);
-                    if (tableName == null) tableName = sourceConfig.getParameter(JDBCClient.TABLE_NAME);
-
                     JDBCClient client = new JDBCClient(connectionConfig.getParameters());
                     
-                    Collection fields = client.getColumns(catalog, schema, tableName);
+                    Collection fields = client.getColumns(sourceConfig);
                     client.close();
 
                     JDBCFieldDialog dialog = new JDBCFieldDialog(parent.getShell(), SWT.NONE);
@@ -356,23 +348,11 @@ public class JDBCSourcePropertyPage extends FormPage {
                     PartitionConfigs partitionConfigs = penroseStudio.getPartitionConfigs();
                     PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(sourceConfig);
 
-                    ConnectionConfig connection = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
+                    ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
 
-                    String catalogName = sourceConfig.getParameter(JDBCClient.CATALOG);
-                    String schemaName = sourceConfig.getParameter(JDBCClient.SCHEMA);
-                    String tableName = sourceConfig.getParameter(JDBCClient.TABLE);
-                    if (tableName == null) tableName = sourceConfig.getParameter(JDBCClient.TABLE_NAME);
-                    if (catalogName != null) tableName = catalogName+"."+tableName;
-                    if (schemaName != null) tableName = schemaName+"."+tableName;
+                    JDBCClient helper = new JDBCClient(connectionConfig.getParameters());
 
-                    JDBCClient helper = new JDBCClient(
-                            connection.getParameter(JDBCClient.DRIVER),
-                            connection.getParameter(JDBCClient.URL),
-                            connection.getParameter(JDBCClient.USER),
-                            connection.getParameter(JDBCClient.PASSWORD)
-                    );
-
-                    Collection fields = helper.getColumns(tableName);
+                    Collection fields = helper.getColumns(sourceConfig);
                     helper.close();
 
                     JDBCFieldDialog dialog = new JDBCFieldDialog(parent.getShell(), SWT.NONE);
@@ -410,23 +390,11 @@ public class JDBCSourcePropertyPage extends FormPage {
                     PartitionConfigs partitionConfigs = penroseStudio.getPartitionConfigs();
                     PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(sourceConfig);
 
-                    ConnectionConfig connection = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
+                    ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
 
-                    String catalogName = sourceConfig.getParameter(JDBCClient.CATALOG);
-                    String schemaName = sourceConfig.getParameter(JDBCClient.SCHEMA);
-                    String tableName = sourceConfig.getParameter(JDBCClient.TABLE);
-                    if (tableName == null) tableName = sourceConfig.getParameter(JDBCClient.TABLE_NAME);
-                    if (catalogName != null) tableName = catalogName+"."+tableName;
-                    if (schemaName != null) tableName = schemaName+"."+tableName;
+                    JDBCClient helper = new JDBCClient(connectionConfig.getParameters());
 
-                    JDBCClient helper = new JDBCClient(
-                            connection.getParameter(JDBCClient.DRIVER),
-                            connection.getParameter(JDBCClient.URL),
-                            connection.getParameter(JDBCClient.USER),
-                            connection.getParameter(JDBCClient.PASSWORD)
-                    );
-
-                    Collection fields = helper.getColumns(tableName);
+                    Collection fields = helper.getColumns(sourceConfig);
                     helper.close();
 
                     JDBCFieldDialog dialog = new JDBCFieldDialog(parent.getShell(), SWT.NONE);

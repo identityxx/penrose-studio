@@ -286,11 +286,11 @@ public class JDBCFieldWizardPage extends WizardPage {
         }
     }
 
-    public Collection getSelectedFieldConfigs() {
-        Collection fieldConfigs = new ArrayList();
+    public Collection<FieldConfig> getSelectedFieldConfigs() {
+        Collection<FieldConfig> fieldConfigs = new ArrayList<FieldConfig>();
         TableItem items[] = selectedTable.getItems();
-        for (int i=0; i<items.length; i++) {
-            FieldConfig fieldConfig = (FieldConfig)items[i].getData();
+        for (TableItem item : items) {
+            FieldConfig fieldConfig = (FieldConfig) item.getData();
             fieldConfigs.add(fieldConfig);
         }
         return fieldConfigs;
