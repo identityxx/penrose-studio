@@ -135,6 +135,7 @@ public class NISNode extends Node {
         domain.setSuffix(suffix);
 
         nisTool.createDomain(domain);
+        nisTool.createPartitionConfig(domain);
         nisTool.createDatabase(domain);
         nisTool.createPartition(domain);
 

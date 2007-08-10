@@ -121,7 +121,7 @@ public class NISTool {
         }
     }
 
-    public void createPartition(NISDomain domain) throws Exception {
+    public void createPartitionConfig(NISDomain domain) throws Exception {
 
         String domainName = domain.getName();
         String partitionName = domain.getPartition();
@@ -136,12 +136,8 @@ public class NISTool {
 
         project.setProperty("nis.server", server);
         project.setProperty("nis.domain", domainName);
-        project.setProperty("nis.client", "jndi");
 
-        project.setProperty("cache.server", "localhost");
         project.setProperty("cache.database", partitionName);
-        project.setProperty("cache.user", "penrose");
-        project.setProperty("cache.password", "penrose");
 
         project.setProperty("partition", partitionName);
         project.setProperty("suffix", suffix);
@@ -165,6 +161,15 @@ public class NISTool {
 
         PartitionConfig partitionConfig = partitionConfigs.load(newDir);
         partitionConfigs.addPartitionConfig(partitionConfig);
+    }
+
+    public void createPartition(NISDomain domain) throws Exception {
+
+        String partitionName = domain.getPartition();
+
+        File newDir = new File(workDir, "partitions"+File.separator+ partitionName);
+
+        PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getPartition());
 
         PartitionContext partitionContext = new PartitionContext();
         partitionContext.setPath(newDir);
@@ -234,15 +239,19 @@ public class NISTool {
         domains.modify(newDn, modifications);
     }
 
-    public void removePartition(NISDomain domain) throws Exception {
+    public void removePartitionConfig(NISDomain domain) throws Exception {
 
         String partitionName = domain.getPartition();
 
         partitionConfigs.removePartitionConfig(partitionName);
-        partitions.removePartition(partitionName);
 
         File partitionDir = new File(workDir, "partitions"+File.separator+ partitionName);
         FileUtil.delete(partitionDir);
+    }
+
+    public void removePartition(NISDomain domain) throws Exception {
+        String partitionName = domain.getPartition();
+        partitions.removePartition(partitionName);
     }
 
     public void removeDomain(NISDomain domain) throws Exception {

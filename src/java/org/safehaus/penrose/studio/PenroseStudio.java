@@ -393,41 +393,11 @@ public class PenroseStudio implements IPlatformRunnable {
     }
 
     public void uploadFolder(String path) throws Exception {
-        uploadFolder(workDir, path);
+        client.upload(workDir, path);
     }
     
-    public void uploadFolder(File localDir, String path) throws Exception {
-        File dir = new File(localDir, path);
-        Collection<String> files = listFiles(dir, path);
-        for (String filename : files) {
-            upload(localDir, filename);
-        }
-    }
-
-    public void uploadFolder(File localDir) throws Exception {
-        Collection<String> files = listFiles(localDir);
-        for (String filename : files) {
-            upload(localDir, filename);
-        }
-    }
-
-    public void upload(File localDir, String path) throws Exception {
-        log.debug("Uploading "+path);
-
-        File file = new File(localDir, path);
-
-        FileInputStream in = new FileInputStream(file);
-        byte content[] = new byte[(int)file.length()];
-        in.read(content);
-        in.close();
-
-		client.upload(path, content);
-	}
-
     public void upload() throws Exception {
-        log.debug("Uploading configuration from "+workDir);
-
-        uploadFolder(workDir);
+        client.upload(workDir);
     }
 
     public void downloadFolder(File localDir, String path) throws Exception {

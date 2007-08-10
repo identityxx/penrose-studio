@@ -228,6 +228,7 @@ public class NISDomainNode extends Node {
 
             nisTool.removePartition(domain);
             nisTool.removeDatabase(domain);
+            nisTool.removePartitionConfig(domain);
             nisTool.removeDomain(domain);
 
             penroseStudio.removeDirectory("partitions/"+domain.getPartition());
