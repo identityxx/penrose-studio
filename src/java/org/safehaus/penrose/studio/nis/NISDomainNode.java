@@ -241,6 +241,7 @@ public class NISDomainNode extends Node {
     }
 
     public void createPartition() throws Exception {
+        nisTool.createPartitionConfig(domain);
         nisTool.createPartition(domain);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -250,6 +251,7 @@ public class NISDomainNode extends Node {
 
     public void removePartition() throws Exception {
         nisTool.removePartition(domain);
+        nisTool.removePartitionConfig(domain);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.removeDirectory("partitions/"+domain.getPartition());
