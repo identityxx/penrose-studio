@@ -128,6 +128,11 @@ public class NISTool {
         String server = domain.getServer();
         String suffix = domain.getSuffix();
 
+        log.debug("Creating partition "+partitionName+".");
+        log.debug(" - domain: "+domainName);
+        log.debug(" - server: "+server);
+        log.debug(" - suffix: "+suffix);
+
         File oldDir = new File(workDir, "partitions"+File.separator+"nis_cache");
         File newDir = new File(workDir, "partitions"+File.separator+ partitionName);
         FileUtil.copy(oldDir, newDir);
@@ -143,6 +148,7 @@ public class NISTool {
         project.setProperty("suffix", suffix);
 
         Copy copy = new Copy();
+        copy.setOverwrite(true);
         copy.setProject(project);
 
         FileSet fs = new FileSet();
