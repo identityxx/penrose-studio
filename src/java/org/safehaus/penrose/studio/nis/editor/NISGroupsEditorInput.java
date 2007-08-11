@@ -1,19 +1,20 @@
-package org.safehaus.penrose.studio.nis;
+package org.safehaus.penrose.studio.nis.editor;
 
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.safehaus.penrose.studio.nis.NISTool;
 import org.safehaus.penrose.nis.NISDomain;
 
 /**
  * @author Endi S. Dewata
  */
-public class NISEditorInput implements IEditorInput {
+public class NISGroupsEditorInput implements IEditorInput {
 
     private NISTool nisTool;
     private NISDomain domain;
 
-    public NISEditorInput() {
+    public NISGroupsEditorInput() {
     }
 
     public boolean exists() {
@@ -25,7 +26,7 @@ public class NISEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "NIS";
+        return "NIS Groups - "+domain.getName();
     }
 
     public IPersistableElement getPersistable() {
@@ -33,7 +34,7 @@ public class NISEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return "NIS";
+        return "NIS Groups - "+domain.getName();
     }
 
     public Object getAdapter(Class aClass) {
@@ -42,9 +43,9 @@ public class NISEditorInput implements IEditorInput {
 
     public boolean equals(Object o) {
         if (o == null) return false;
-        if (!(o instanceof NISEditorInput)) return false;
+        if (!(o instanceof NISGroupsEditorInput)) return false;
 
-        NISEditorInput cei = (NISEditorInput)o;
+        NISGroupsEditorInput cei = (NISGroupsEditorInput)o;
         if (!domain.getName().equals(cei.domain.getName())) return false;
 
         return true;

@@ -5,9 +5,9 @@ import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.nis.editor.NISDomainDialog;
+import org.safehaus.penrose.studio.nis.editor.NISUserDialog;
 import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.naming.PenroseContext;
 import org.eclipse.swt.graphics.Image;
@@ -18,7 +18,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.apache.log4j.Logger;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -29,8 +28,6 @@ import java.io.File;
  * @author Endi S. Dewata
  */
 public class NISNode extends Node {
-
-    Logger log = Logger.getLogger(getClass());
 
     ObjectsView view;
 

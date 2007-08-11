@@ -149,10 +149,25 @@
            icon="images/service.png"
            class="org.safehaus.penrose.studio.service.ServiceEditor"/>
        <editor
-           id="org.safehaus.penrose.studio.nis.NISEditor"
+           id="org.safehaus.penrose.studio.nis.editor.NISEditor"
            name="NIS"
            icon="images/object.gif"
-           class="org.safehaus.penrose.studio.nis.NISEditor"/>
+           class="org.safehaus.penrose.studio.nis.editor.NISEditor"/>
+       <editor
+           id="org.safehaus.penrose.studio.nis.editor.NISUsersEditor"
+           name="NIS Users"
+           icon="images/object.gif"
+           class="org.safehaus.penrose.studio.nis.editor.NISUsersEditor"/>
+       <editor
+           id="org.safehaus.penrose.studio.nis.editor.NISGroupsEditor"
+           name="NIS Users"
+           icon="images/object.gif"
+           class="org.safehaus.penrose.studio.nis.editor.NISGroupsEditor"/>
+       <editor
+           id="org.safehaus.penrose.studio.nis.editor.NISFilesEditor"
+           name="NIS Users"
+           icon="images/object.gif"
+           class="org.safehaus.penrose.studio.nis.editor.NISFilesEditor"/>
    </extension>
    <extension
          id="application"

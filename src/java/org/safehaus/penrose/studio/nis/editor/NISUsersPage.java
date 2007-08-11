@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.nis;
+package org.safehaus.penrose.studio.nis.editor;
 
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -13,10 +13,8 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.nis.action.NISAction;
-import org.safehaus.penrose.studio.nis.action.NISActionRequest;
-import org.safehaus.penrose.studio.nis.action.NISActionResponse;
-import org.safehaus.penrose.studio.nis.action.Conflict;
+import org.safehaus.penrose.studio.nis.action.*;
+import org.safehaus.penrose.studio.nis.NISTool;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.nis.NISDomain;
@@ -26,38 +24,35 @@ import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.partition.Partition;
 
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.sql.ResultSet;
 
 /**
  * @author Endi S. Dewata
  */
-public class NISGroupsPage extends FormPage {
+public class NISUsersPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
-    public final static String CACHE_GROUPS = "cache_groups";
-
+    public final static String CACHE_USERS = "cache_users";
+    
     FormToolkit toolkit;
 
     Combo actionCombo;
 
     Label messageLabel;
-    Table groupsTable;
+    Table usersTable;
     Table conflictsTable;
     Table matchesTable;
 
-    NISEditor editor;
+    NISUsersEditor editor;
     NISDomain domain;
     NISTool nisTool;
 
     Map<String,Collection<Conflict>> conflicts = new TreeMap<String,Collection<Conflict>>();
 
-    public NISGroupsPage(NISEditor editor) {
-        super(editor, "GROUPS", "  Groups  ");
+    public NISUsersPage(NISUsersEditor editor) {
+        super(editor, "USERS", "  Users  ");
 
         this.editor = editor;
         domain = editor.getDomain();
@@ -68,7 +63,7 @@ public class NISGroupsPage extends FormPage {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("NIS Groups");
+        form.setText("NIS Users");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
@@ -95,7 +90,7 @@ public class NISGroupsPage extends FormPage {
             actionCombo.removeAll();
 
             SearchRequest request = new SearchRequest();
-            request.setFilter("(type=groups)");
+            request.setFilter("(type=users)");
 
             SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
                 public void add(SearchResult result) throws Exception {
@@ -172,28 +167,28 @@ public class NISGroupsPage extends FormPage {
         Label conflictsLabel = toolkit.createLabel(composite, "Conflicts:");
         conflictsLabel.setLayoutData(new GridData());
 
-        groupsTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
+        usersTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
         GridData gd = new GridData(GridData.FILL_BOTH);
         gd.verticalSpan = 3;
-        groupsTable.setLayoutData(gd);
+        usersTable.setLayoutData(gd);
 
-        groupsTable.setHeaderVisible(true);
-        groupsTable.setLinesVisible(true);
+        usersTable.setHeaderVisible(true);
+        usersTable.setLinesVisible(true);
 
-        TableColumn tc = new TableColumn(groupsTable, SWT.NONE);
-        tc.setText("Group");
+        TableColumn tc = new TableColumn(usersTable, SWT.NONE);
+        tc.setText("User");
         tc.setWidth(100);
 
-        tc = new TableColumn(groupsTable, SWT.NONE);
-        tc.setText("GID");
+        tc = new TableColumn(usersTable, SWT.NONE);
+        tc.setText("UID");
         tc.setWidth(80);
 
-        groupsTable.addSelectionListener(new SelectionAdapter() {
+        usersTable.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    if (groupsTable.getSelectionCount() == 0) return;
+                    if (usersTable.getSelectionCount() == 0) return;
 
-                    TableItem item = groupsTable.getSelection()[0];
+                    TableItem item = usersTable.getSelection()[0];
 
                     Attributes attributes = (Attributes)item.getData();
 
@@ -222,11 +217,11 @@ public class NISGroupsPage extends FormPage {
         tc.setWidth(120);
 
         tc = new TableColumn(conflictsTable, SWT.NONE);
-        tc.setText("Group");
+        tc.setText("User");
         tc.setWidth(100);
 
         tc = new TableColumn(conflictsTable, SWT.NONE);
-        tc.setText("GID");
+        tc.setText("UID");
         tc.setWidth(80);
 
         Label matchesLabel = toolkit.createLabel(composite, "Matches:");
@@ -243,11 +238,11 @@ public class NISGroupsPage extends FormPage {
         tc.setWidth(120);
 
         tc = new TableColumn(matchesTable, SWT.NONE);
-        tc.setText("Group");
+        tc.setText("User");
         tc.setWidth(100);
 
         tc = new TableColumn(matchesTable, SWT.NONE);
-        tc.setText("GID");
+        tc.setText("UID");
         tc.setWidth(80);
 
         Button editButton = new Button(composite, SWT.PUSH);
@@ -259,17 +254,17 @@ public class NISGroupsPage extends FormPage {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    if (groupsTable.getSelectionCount() == 0) return;
+                    if (usersTable.getSelectionCount() == 0) return;
 
-                    TableItem item = groupsTable.getSelection()[0];
+                    TableItem item = usersTable.getSelection()[0];
 
                     Attributes attributes = (Attributes)item.getData();
                     String domain = (String)attributes.getValue("domain");
                     String partition = (String)attributes.getValue("partition");
-                    String cn = (String)attributes.getValue("cn");
-                    Integer origGidNumber = (Integer)attributes.getValue("origGidNumber");
+                    String uid = (String)attributes.getValue("uid");
+                    Integer origUidNumber = (Integer)attributes.getValue("origUidNumber");
 
-                    edit(domain, partition, cn, origGidNumber);
+                    edit(domain, partition, uid, origUidNumber);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -289,8 +284,8 @@ public class NISGroupsPage extends FormPage {
 
         conflictsTable.removeAll();
 
-        String cn = (String) attributes.getValue("cn");
-        Collection<Conflict> list = conflicts.get(cn);
+        String uid1 = (String) attributes.getValue("uid");
+        Collection<Conflict> list = conflicts.get(uid1);
 
         if (list == null) return;
 
@@ -299,14 +294,14 @@ public class NISGroupsPage extends FormPage {
             Attributes attributes2 = conflict.getAttributes2();
 
             String domain2 = (String) attributes2.getValue("domain");
-            String cn2 = (String) attributes2.getValue("cn");
-            Integer gidNumber2 = (Integer) attributes2.getValue("gidNumber");
-            if (gidNumber2 == null) gidNumber2 = (Integer) attributes2.getValue("origGidNumber");
+            String uid2 = (String) attributes2.getValue("uid");
+            Integer uidNumber2 = (Integer) attributes2.getValue("uidNumber");
+            if (uidNumber2 == null) uidNumber2 = (Integer) attributes2.getValue("origUidNumber");
 
             TableItem ti = new TableItem(conflictsTable, SWT.NONE);
             ti.setText(0, domain2);
-            ti.setText(1, "" + cn2);
-            ti.setText(2, "" + gidNumber2);
+            ti.setText(1, "" + uid2);
+            ti.setText(2, "" + uidNumber2);
         }
     }
 
@@ -314,9 +309,9 @@ public class NISGroupsPage extends FormPage {
 
         matchesTable.removeAll();
 
-        String cn = (String) attributes.getValue("cn");
-        Integer gidNumber = (Integer) attributes.getValue("gidNumber");
-        if (gidNumber == null) gidNumber = (Integer) attributes.getValue("origGidNumber");
+        String uid = (String) attributes.getValue("uid");
+        Integer uidNumber = (Integer) attributes.getValue("uidNumber");
+        if (uidNumber == null) uidNumber = (Integer) attributes.getValue("origUidNumber");
 
         SearchRequest searchRequest = new SearchRequest();
         SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
@@ -332,38 +327,38 @@ public class NISGroupsPage extends FormPage {
             Partition partition = nisTool.getPartitions().getPartition(partitionName);
 
             if (domain.getName().equals(domainName)) continue;
-
-            Source users = partition.getSource(CACHE_GROUPS);
+            
+            Source users = partition.getSource(CACHE_USERS);
 
             JDBCAdapter adapter = (JDBCAdapter)users.getConnection().getAdapter();
             JDBCClient client = adapter.getClient();
 
             String table = client.getTableName(users);
 
-            String sql = "select a.cn, a.gidNumber, b.gidNumber" +
+            String sql = "select a.uid, a.uidNumber, b.uidNumber" +
                     " from "+table+" a"+
-                    " left join nis.groups b on b.domain=? and a.cn=b.cn"+
-                    " where a.cn = ? and (b.gidNumber is null and a.gidNumber = ? or b.gidNumber = ?)"+
-                    " order by a.cn";
+                    " left join nis.users b on b.domain=? and a.uid=b.uid"+
+                    " where a.uid = ? and (b.uidNumber is null and a.uidNumber = ? or b.uidNumber = ?)"+
+                    " order by a.uid";
 
             Collection<Assignment> assignments = new ArrayList<Assignment>();
             assignments.add(new Assignment(domainName));
-            assignments.add(new Assignment(cn));
-            assignments.add(new Assignment(gidNumber));
-            assignments.add(new Assignment(gidNumber));
+            assignments.add(new Assignment(uid));
+            assignments.add(new Assignment(uidNumber));
+            assignments.add(new Assignment(uidNumber));
 
             QueryResponse queryResponse = new QueryResponse() {
                 public void add(Object object) throws Exception {
                     ResultSet rs = (ResultSet)object;
 
-                    String cn2 = rs.getString(1);
-                    Integer gidNumber2 = (Integer)rs.getObject(3);
-                    if (gidNumber2 == null) gidNumber2 = (Integer)rs.getObject(2);
+                    String uid2 = rs.getString(1);
+                    Integer uidNumber2 = (Integer)rs.getObject(3);
+                    if (uidNumber2 == null) uidNumber2 = (Integer)rs.getObject(2);
 
                     TableItem ti = new TableItem(matchesTable, SWT.NONE);
                     ti.setText(0, domainName);
-                    ti.setText(1, "" + cn2);
-                    ti.setText(2, "" + gidNumber2);
+                    ti.setText(1, "" + uid2);
+                    ti.setText(2, "" + uidNumber2);
                 }
             };
 
@@ -373,7 +368,7 @@ public class NISGroupsPage extends FormPage {
 
     public void run() throws Exception {
 
-        groupsTable.removeAll();
+        usersTable.removeAll();
         conflictsTable.removeAll();
         matchesTable.removeAll();
         conflicts.clear();
@@ -405,12 +400,12 @@ public class NISGroupsPage extends FormPage {
                 Conflict conflict = (Conflict)object;
 
                 Attributes attributes1 = conflict.getAttributes1();
-                String cn = (String) attributes1.getValue("cn");
+                String uid = (String) attributes1.getValue("uid");
 
-                Collection<Conflict> list = conflicts.get(cn);
+                Collection<Conflict> list = conflicts.get(uid);
                 if (list == null) {
                     list = new ArrayList<Conflict>();
-                    conflicts.put(cn, list);
+                    conflicts.put(uid, list);
                 }
 
                 list.add(conflict);
@@ -420,72 +415,56 @@ public class NISGroupsPage extends FormPage {
         action.execute(request, response);
 
         for (Collection<Conflict> list : conflicts.values()) {
-
+            
             Conflict conflict = list.iterator().next();
 
             Attributes attributes1 = conflict.getAttributes1();
-            String cn = (String) attributes1.getValue("cn");
-            Integer gidNumber = (Integer)attributes1.getValue("gidNumber");
-            if (gidNumber == null) gidNumber = (Integer)attributes1.getValue("origGidNumber");
+            String uid = (String) attributes1.getValue("uid");
+            Integer uidNumber = (Integer)attributes1.getValue("uidNumber");
+            if (uidNumber == null) uidNumber = (Integer)attributes1.getValue("origUidNumber");
 
-            TableItem ti = new TableItem(groupsTable, SWT.NONE);
-            ti.setText(0, cn);
-            ti.setText(1, "" + gidNumber);
+            TableItem ti = new TableItem(usersTable, SWT.NONE);
+            ti.setText(0, uid);
+            ti.setText(1, "" + uidNumber);
 
             ti.setData(attributes1);
         }
 
-        messageLabel.setText("Found " + conflicts.size() + " groups(s).");
+        messageLabel.setText("Found " + conflicts.size() + " user(s).");
     }
 
     public void edit(
             String domain,
             String partitionName,
-            String cn,
-            Integer origGidNumber
+            String uid,
+            Integer origUidNumber
     ) throws Exception {
 
         Partition partition = nisTool.getPartitions().getPartition(partitionName);
 
         RDNBuilder rb = new RDNBuilder();
         rb.set("domain", domain);
-        rb.set("cn", cn);
+        rb.set("uid", uid);
         DN dn = new DN(rb.toRdn());
 
-        NISGroupDialog dialog = new NISGroupDialog(getSite().getShell(), SWT.NONE);
+        NISUserDialog dialog = new NISUserDialog(getSite().getShell(), SWT.NONE);
         dialog.setDomain(domain);
-        dialog.setName(cn);
-        dialog.setOrigGidNumber(origGidNumber);
+        dialog.setUid(uid);
+        dialog.setOrigUidNumber(origUidNumber);
 
-        Source penroseGroups = partition.getSource("penrose_groups");
+        Source penroseUsers = partition.getSource("penrose_users");
 
         SearchRequest request = new SearchRequest();
         request.setDn(dn);
 
         SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
-        penroseGroups.search(request, response);
+        penroseUsers.search(request, response);
 
         if (response.hasNext()) {
             SearchResult result = response.next();
             Attributes attributes = result.getAttributes();
-            dialog.setNewGidNumber((Integer)attributes.getValue("gidNumber"));
-        }
-
-        Source members = partition.getSource(CACHE_GROUPS+"_memberUid");
-
-        request = new SearchRequest();
-        request.setFilter("(cn="+cn+")");
-
-        response = new SearchResponse<SearchResult>();
-
-        members.search(request, response);
-
-        while (response.hasNext()) {
-            SearchResult result = response.next();
-            Attributes attributes = result.getAttributes();
-            String memberUid = (String) attributes.getValue("memberUid");
-            dialog.addMember(memberUid);
+            dialog.setNewUidNumber((Integer)attributes.getValue("uidNumber"));
         }
 
         dialog.open();
@@ -494,59 +473,59 @@ public class NISGroupsPage extends FormPage {
 
         if (action == NISUserDialog.CANCEL) return;
 
-        Integer newGidNumber = dialog.getGidNumber();
+        Integer uidNumber = dialog.getUidNumber();
         String message = dialog.getMessage();
 
-        if (action == NISGroupDialog.SET) {
+        if (action == NISUserDialog.SET) {
 
-            if (!origGidNumber.equals(newGidNumber)) checkGidNumber(cn, newGidNumber);
+            if (!origUidNumber.equals(uidNumber)) checkUidNumber(uid, uidNumber);
 
             Attributes attrs = new Attributes();
             attrs.setValue("domain", domain);
-            attrs.setValue("cn", cn);
-            attrs.setValue("origGidNumber", origGidNumber);
-            attrs.setValue("gidNumber", newGidNumber);
+            attrs.setValue("uid", uid);
+            attrs.setValue("origUidNumber", origUidNumber);
+            attrs.setValue("uidNumber", uidNumber);
             attrs.setValue("message", message);
 
-            penroseGroups.add(dn, attrs);
+            penroseUsers.add(dn, attrs);
 
-        } else if (action == NISGroupDialog.CHANGE) {
+        } else if (action == NISUserDialog.CHANGE) {
 
-            if (!origGidNumber.equals(newGidNumber)) checkGidNumber(cn, newGidNumber);
+            if (!origUidNumber.equals(uidNumber)) checkUidNumber(uid, uidNumber);
 
             Collection<Modification> modifications = new ArrayList<Modification>();
-            modifications.add(new Modification(Modification.REPLACE, new Attribute("gidNumber", newGidNumber)));
+            modifications.add(new Modification(Modification.REPLACE, new Attribute("uidNumber", uidNumber)));
             modifications.add(new Modification(Modification.REPLACE, new Attribute("message", message)));
 
-            penroseGroups.modify(dn, modifications);
+            penroseUsers.modify(dn, modifications);
 
-        } else { // if (action == NISGroupDialog.REMOVE) {
+        } else { // if (action == NISUserDialog.REMOVE) {
 
-            penroseGroups.delete(dn);
+            penroseUsers.delete(dn);
         }
     }
 
-    public void checkGidNumber(String cn, Integer gidNumber) throws Exception {
+    public void checkUidNumber(String uid, Integer uidNumber) throws Exception {
 
         Partition partition = nisTool.getNisPartition();
 
         SearchRequest request = new SearchRequest();
-        request.setFilter("(gidNumber=" + gidNumber + ")");
+        request.setFilter("(uidNumber=" + uidNumber + ")");
 
         SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
-        Source groups = partition.getSource("penrose_groups");
-        groups.search(request, response);
+        Source users = partition.getSource("penrose_users");
+        users.search(request, response);
 
         while (response.hasNext()) {
             SearchResult result = response.next();
             Attributes attributes = result.getAttributes();
 
             String domainName = (String)attributes.getValue("domain");
-            String cn2 = (String)attributes.getValue("cn");
-            if (cn.equals(cn2)) continue;
+            String uid2 = (String)attributes.getValue("uid");
+            if (uid.equals(uid2)) continue;
 
-            throw new Exception("GID number "+gidNumber+" is already allocated for user "+cn2+" in domain "+domainName);
+            throw new Exception("UID number "+uidNumber+" is already allocated for user "+uid2+" in domain "+domainName);
         }
 
         SearchRequest searchRequest = new SearchRequest();
@@ -564,17 +543,17 @@ public class NISGroupsPage extends FormPage {
 
             response = new SearchResponse<SearchResult>();
 
-            groups = partition2.getSource(CACHE_GROUPS);
-            groups.search(request, response);
+            users = partition2.getSource(CACHE_USERS);
+            users.search(request, response);
 
             while (response.hasNext()) {
                 SearchResult result = response.next();
                 Attributes attrs = result.getAttributes();
 
-                String cn2 = (String)attrs.getValue("cn");
-                if (cn.equals(cn2)) continue;
+                String uid2 = (String)attrs.getValue("uid");
+                if (uid.equals(uid2)) continue;
 
-                throw new Exception("GID number "+gidNumber+" is used by user "+cn2+" in domain "+domainName);
+                throw new Exception("UID number "+uidNumber+" is used by user "+uid2+" in domain "+domainName);
             }
         }
     }

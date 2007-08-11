@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.nis;
+package org.safehaus.penrose.studio.nis.editor;
 
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.IEditorSite;
@@ -7,6 +7,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.nis.NISDomain;
+import org.safehaus.penrose.studio.nis.*;
 
 public class NISEditor extends FormEditor {
 
@@ -28,10 +29,6 @@ public class NISEditor extends FormEditor {
     public void addPages() {
         try {
             addPage(new NISDomainPage(this));
-            addPage(new NISUsersPage(this));
-            addPage(new NISUserChangesPage(this));
-            addPage(new NISGroupsPage(this));
-            addPage(new NISGroupChangesPage(this));
             addPage(new NISHostsPage(this));
             addPage(new NISFilesPage(this));
             addPage(new NISToolsPage(this));

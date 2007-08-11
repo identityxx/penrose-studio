@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.nis;
+package org.safehaus.penrose.studio.nis.editor;
 
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -15,6 +15,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.ldap.*;
+import org.safehaus.penrose.studio.nis.NISTool;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -32,12 +33,12 @@ public class NISUserChangesPage extends FormPage {
     Text messageText;
     Button activateButton;
 
-    NISEditor editor;
+    NISUsersEditor editor;
     NISDomain domain;
     NISTool nisTool;
 
-    public NISUserChangesPage(NISEditor editor) throws Exception {
-        super(editor, "USER_CHANGES", "  User Changes ");
+    public NISUserChangesPage(NISUsersEditor editor) throws Exception {
+        super(editor, "CHANGES", "  Changes ");
 
         this.editor = editor;
         domain = editor.getDomain();
@@ -48,13 +49,13 @@ public class NISUserChangesPage extends FormPage {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("User Changes");
+        form.setText("Changes");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
         Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("User Changes");
+        section.setText("Changes");
         section.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         Control sourcesSection = createChangesSection(section);

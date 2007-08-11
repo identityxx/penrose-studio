@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.tree;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
+import org.apache.log4j.Logger;
 
 import java.util.Collection;
 
@@ -26,6 +27,8 @@ import java.util.Collection;
  * @author Endi S. Dewata
  */
 public class Node {
+
+    public Logger log = Logger.getLogger(getClass());
 
     protected String name;
     protected String type;

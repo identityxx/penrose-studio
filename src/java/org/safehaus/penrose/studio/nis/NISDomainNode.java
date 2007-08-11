@@ -3,8 +3,11 @@ package org.safehaus.penrose.studio.nis;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.*;
+import org.safehaus.penrose.studio.nis.editor.NISEditorInput;
+import org.safehaus.penrose.studio.nis.editor.NISEditor;
+import org.safehaus.penrose.studio.nis.editor.NISDomainDialog;
+import org.safehaus.penrose.studio.nis.editor.NISUserDialog;
 import org.safehaus.penrose.nis.NISDomain;
-import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
@@ -20,18 +23,18 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 
 import java.util.Iterator;
+import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
  */
 public class NISDomainNode extends Node {
 
-    public Logger log = Logger.getLogger(getClass());
-
     ObjectsView view;
 
-    NISTool nisTool;
-    NISDomain domain;
+    private NISTool nisTool;
+    private NISDomain domain;
 
     public NISDomainNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
@@ -275,5 +278,65 @@ public class NISDomainNode extends Node {
 
     public void setDomain(NISDomain domain) {
         this.domain = domain;
+    }
+
+    public boolean hasChildren() throws Exception {
+        return true;
+    }
+
+    public Collection<Node> getChildren() throws Exception {
+        Collection<Node> children = new ArrayList<Node>();
+
+        NISUsersNode usersNode = new NISUsersNode(
+                view,
+                "Users",
+                ObjectsView.ENTRY,
+                PenrosePlugin.getImage(PenroseImage.NODE),
+                null,
+                this
+        );
+
+        usersNode.setNisTool(nisTool);
+        usersNode.setDomain(domain);
+
+        children.add(usersNode);
+
+        NISGroupsNode groupsNode = new NISGroupsNode(
+                view,
+                "Groups",
+                ObjectsView.ENTRY,
+                PenrosePlugin.getImage(PenroseImage.NODE),
+                null,
+                this
+        );
+
+        groupsNode.setNisTool(nisTool);
+        groupsNode.setDomain(domain);
+
+        children.add(groupsNode);
+/*
+        NISFilesNode filesNode = new NISFilesNode(
+                view,
+                "Files",
+                ObjectsView.ENTRY,
+                PenrosePlugin.getImage(PenroseImage.NODE),
+                null,
+                this
+        );
+
+        filesNode.setNisTool(nisTool);
+        filesNode.setDomain(domain);
+
+        children.add(filesNode);
+*/
+        return children;
+    }
+
+    public NISTool getNisTool() {
+        return nisTool;
+    }
+
+    public void setNisTool(NISTool nisTool) {
+        this.nisTool = nisTool;
     }
 }

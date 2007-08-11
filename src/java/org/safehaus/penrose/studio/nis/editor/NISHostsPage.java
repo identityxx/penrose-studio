@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.nis;
+package org.safehaus.penrose.studio.nis.editor;
 
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -15,6 +15,9 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.nis.NISDomain;
+import org.safehaus.penrose.studio.nis.editor.NISEditor;
+import org.safehaus.penrose.studio.nis.NISTool;
+import org.safehaus.penrose.studio.nis.editor.UpdateFilesRunnable;
 
 import java.util.Date;
 import java.util.Collection;

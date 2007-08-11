@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.nis;
+package org.safehaus.penrose.studio.nis.editor;
 
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.agent.client.FindClient;
