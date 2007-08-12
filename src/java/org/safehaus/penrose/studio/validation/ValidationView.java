@@ -39,8 +39,8 @@ import org.eclipse.ui.part.*;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
-import org.safehaus.penrose.studio.mapping.MappingEditorInput;
-import org.safehaus.penrose.studio.mapping.MappingEditor;
+import org.safehaus.penrose.studio.mapping.editor.MappingEditorInput;
+import org.safehaus.penrose.studio.mapping.editor.MappingEditor;
 import org.safehaus.penrose.studio.connection.editor.*;
 import org.safehaus.penrose.studio.source.editor.*;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -61,8 +61,6 @@ public class ValidationView extends ViewPart {
     private Collection results = new ArrayList();
 
 	public void createPartControl(Composite parent) {
-        log.debug("createPartControl");
-
 		this.parent = parent;
 		
 		parent.setLayout(new FillLayout());
@@ -75,7 +73,7 @@ public class ValidationView extends ViewPart {
 					public void run() {
                         try {
                             PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                            penroseStudio.validatePartitions();
+                            //penroseStudio.validatePartitions();
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
                         }
@@ -146,7 +144,7 @@ public class ValidationView extends ViewPart {
 		Object object = item.getData();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PartitionConfigs partitionConfigs = penroseStudio.getPartitionConfigs();
+        PartitionConfigs partitionConfigs = null; //penroseStudio.getPartitionConfigs();
         PluginManager pluginManager = penroseStudio.getPluginManager();
 
         if (object instanceof ConnectionConfig) {

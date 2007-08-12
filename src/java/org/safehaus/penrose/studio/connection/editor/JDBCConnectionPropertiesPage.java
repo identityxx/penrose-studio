@@ -30,7 +30,7 @@ import org.safehaus.penrose.jdbc.JDBCClient;
 /**
  * @author Endi S. Dewata
  */
-public class JDBCConnectionPropertiesPage extends JDBCConnectionEditorPage {
+public class JDBCConnectionPropertiesPage extends ConnectionEditorPage {
 
     Text nameText;
     Text descriptionText;

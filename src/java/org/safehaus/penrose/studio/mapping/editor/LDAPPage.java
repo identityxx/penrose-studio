@@ -14,8 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- */
-package org.safehaus.penrose.studio.mapping;
+ */package org.safehaus.penrose.studio.mapping.editor;
 
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
@@ -29,6 +28,12 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.mapping.editor.MappingEditor;
+import org.safehaus.penrose.studio.mapping.EntrySelectionDialog;
+import org.safehaus.penrose.studio.mapping.ObjectClassSelectionDialog;
+import org.safehaus.penrose.studio.mapping.AttributeTypeSelectionDialog;
+import org.safehaus.penrose.studio.mapping.ExpressionDialog;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.SchemaManager;
@@ -182,8 +187,8 @@ public class LDAPPage extends FormPage {
                     ObjectClassSelectionDialog dialog = new ObjectClassSelectionDialog(editor.getParent().getShell(), SWT.NONE);
                     dialog.setText("Add object classes...");
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    SchemaManager schemaManager = penroseStudio.getSchemaManager();
+                    Project project = editor.getProjectNode().getProject();
+                    SchemaManager schemaManager = project.getSchemaManager();
 
                     Collection<String> ocNames = new TreeSet<String>();
                     for (Iterator i=schemaManager.getObjectClasses().iterator(); i.hasNext(); ) {
@@ -328,8 +333,8 @@ public class LDAPPage extends FormPage {
                     AttributeTypeSelectionDialog dialog = new AttributeTypeSelectionDialog(editor.getParent().getShell(), SWT.NONE);
                     dialog.setText("Add attributes...");
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    dialog.setSchemaManager(penroseStudio.getSchemaManager());
+                    Project project = editor.getProjectNode().getProject();
+                    dialog.setSchemaManager(project.getSchemaManager());
 
                     dialog.open();
                     if (dialog.getAction() == AttributeTypeSelectionDialog.CANCEL) return;
@@ -484,19 +489,17 @@ public class LDAPPage extends FormPage {
         editor.checkDirty();
     }
 
-    public Map getObjectClasses(Collection ocNames) {
+    public Map getObjectClasses(Collection<String> ocNames) {
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        SchemaManager schemaManager = penroseStudio.getSchemaManager();
+        Project project = editor.getProjectNode().getProject();
+        SchemaManager schemaManager = project.getSchemaManager();
 
-        Map objectClasses = new TreeMap();
+        Map<String,ObjectClass> objectClasses = new TreeMap<String,ObjectClass>();
 
-        for (Iterator i=ocNames.iterator(); i.hasNext(); ) {
-            String ocName = (String)i.next();
-            Collection ocs = schemaManager.getAllObjectClasses(ocName);
+        for (String ocName : ocNames) {
+            Collection<ObjectClass> ocs = schemaManager.getAllObjectClasses(ocName);
 
-            for (Iterator j=ocs.iterator(); j.hasNext(); ) {
-                ObjectClass oc = (ObjectClass)j.next();
+            for (ObjectClass oc : ocs) {
                 objectClasses.put(oc.getName(), oc);
             }
         }

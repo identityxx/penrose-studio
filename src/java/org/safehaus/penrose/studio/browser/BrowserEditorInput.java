@@ -28,6 +28,8 @@ public class BrowserEditorInput implements IEditorInput {
 
     private String hostname;
     private int port;
+    private String bindDn;
+    private byte[] password;
 
     public BrowserEditorInput() {
     }
@@ -77,5 +79,21 @@ public class BrowserEditorInput implements IEditorInput {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public String getBindDn() {
+        return bindDn;
+    }
+
+    public void setBindDn(String bindDn) {
+        this.bindDn = bindDn;
+    }
+
+    public byte[] getPassword() {
+        return password;
+    }
+
+    public void setPassword(byte[] password) {
+        this.password = password;
     }
 }

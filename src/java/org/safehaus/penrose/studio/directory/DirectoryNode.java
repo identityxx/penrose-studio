@@ -18,8 +18,11 @@
 package org.safehaus.penrose.studio.directory;
 
 import org.safehaus.penrose.studio.*;
+import org.safehaus.penrose.studio.partition.PartitionsNode;
+import org.safehaus.penrose.studio.partition.PartitionNode;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.directory.action.*;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.PartitionConfig;
@@ -40,23 +43,29 @@ public class DirectoryNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
+    protected ServersView view;
+    protected ProjectNode projectNode;
+    protected PartitionsNode partitionsNode;
+    protected PartitionNode partitionNode;
 
     private PartitionConfig partitionConfig;
 
-    public DirectoryNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public DirectoryNode(String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
-        this.view = view;
+        partitionNode = (PartitionNode)parent;
+        partitionsNode = partitionNode.getPartitionsNode();
+        projectNode = partitionsNode.getProjectNode();
+        view = projectNode.getView();
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
 
         manager.add(new NewRootEntryAction(this));
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
-        PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
-        PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
+        //PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        //PenroseWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
+        //PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
+        //PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
         //if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
             manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -87,9 +96,8 @@ public class DirectoryNode extends Node {
             }
 
             EntryNode entryNode = new EntryNode(
-                    view,
                     dn,
-                    ObjectsView.ENTRY,
+                    ServersView.ENTRY,
                     PenrosePlugin.getImage(PenroseImage.HOME_NODE),
                     entryMapping,
                     this
@@ -110,5 +118,37 @@ public class DirectoryNode extends Node {
 
     public void setPartitionConfig(PartitionConfig partitionConfig) {
         this.partitionConfig = partitionConfig;
+    }
+
+    public ServersView getView() {
+        return view;
+    }
+
+    public void setView(ServersView view) {
+        this.view = view;
+    }
+
+    public ProjectNode getProjectNode() {
+        return projectNode;
+    }
+
+    public void setProjectNode(ProjectNode projectNode) {
+        this.projectNode = projectNode;
+    }
+
+    public PartitionsNode getPartitionsNode() {
+        return partitionsNode;
+    }
+
+    public void setPartitionsNode(PartitionsNode partitionsNode) {
+        this.partitionsNode = partitionsNode;
+    }
+
+    public PartitionNode getPartitionNode() {
+        return partitionNode;
+    }
+
+    public void setPartitionNode(PartitionNode partitionNode) {
+        this.partitionNode = partitionNode;
     }
 }

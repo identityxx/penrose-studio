@@ -18,10 +18,12 @@
 package org.safehaus.penrose.studio.schema;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.schema.SchemaConfig;
 import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.schema.Schema;
@@ -43,13 +45,17 @@ public class SchemaNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
+    ServersView view;
+    protected ProjectNode projectNode;
+    protected SchemasNode schemasNode;
 
     private SchemaConfig schemaConfig;
 
-    public SchemaNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public SchemaNode(String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
-        this.view = view;
+        schemasNode = (SchemasNode)parent;
+        projectNode = schemasNode.getProjectNode();
+        view = projectNode.getView();
     }
 
     public void showMenu(IMenuManager manager) {
@@ -87,10 +93,12 @@ public class SchemaNode extends Node {
 
     public void open() throws Exception {
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        SchemaManager schemaManager = penroseStudio.getSchemaManager();
+        Project project = projectNode.getProject();
+        SchemaManager schemaManager = project.getSchemaManager();
         Schema schema = schemaManager.getSchema(schemaConfig.getName());
+
         SchemaEditorInput ei = new SchemaEditorInput(schemaConfig, schema);
+        ei.setProjectNode(projectNode);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -108,13 +116,14 @@ public class SchemaNode extends Node {
 
         if (!confirm) return;
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
+        Project project = projectNode.getProject();
+        PenroseConfig penroseConfig = project.getPenroseConfig();
         penroseConfig.removeSchemaConfig(schemaConfig.getName());
 
-        SchemaManager schemaManager = penroseStudio.getSchemaManager();
+        SchemaManager schemaManager = project.getSchemaManager();
         schemaManager.removeSchema(schemaConfig.getName());
 
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
 
@@ -128,10 +137,10 @@ public class SchemaNode extends Node {
 
         AttributeTypesNode attributeTypesNode = new AttributeTypesNode(
                 view,
-                ObjectsView.ATTRIBUTE_TYPES,
-                ObjectsView.ATTRIBUTE_TYPES,
+                ServersView.ATTRIBUTE_TYPES,
+                ServersView.ATTRIBUTE_TYPES,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
-                ObjectsView.ATTRIBUTE_TYPES,
+                ServersView.ATTRIBUTE_TYPES,
                 this
         );
 
@@ -141,10 +150,10 @@ public class SchemaNode extends Node {
 
         ObjectClassesNode objectClassesNode = new ObjectClassesNode(
                 view,
-                ObjectsView.OBJECT_CLASSES,
-                ObjectsView.OBJECT_CLASSES,
+                ServersView.OBJECT_CLASSES,
+                ServersView.OBJECT_CLASSES,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
-                ObjectsView.OBJECT_CLASSES,
+                ServersView.OBJECT_CLASSES,
                 this
         );
 
@@ -161,5 +170,21 @@ public class SchemaNode extends Node {
 
     public void setSchemaConfig(SchemaConfig schemaConfig) {
         this.schemaConfig = schemaConfig;
+    }
+
+    public ProjectNode getProjectNode() {
+        return projectNode;
+    }
+
+    public void setProjectNode(ProjectNode projectNode) {
+        this.projectNode = projectNode;
+    }
+
+    public SchemasNode getSchemasNode() {
+        return schemasNode;
+    }
+
+    public void setSchemasNode(SchemasNode schemasNode) {
+        this.schemasNode = schemasNode;
     }
 }

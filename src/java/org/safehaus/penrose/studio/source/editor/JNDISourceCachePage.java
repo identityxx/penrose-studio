@@ -25,16 +25,13 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.*;
-import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.source.SourceConfig;
 
 /**
  * @author Endi S. Dewata
  */
-public class JNDISourceCachePage extends FormPage {
-
-    FormToolkit toolkit;
+public class JNDISourceCachePage extends SourceEditorPage {
 
     Text filterCacheSizeText;
     Text filterCacheExpirationText;
@@ -45,21 +42,14 @@ public class JNDISourceCachePage extends FormPage {
     Text sizeLimitText;
     Combo loadingMethodCombo;
 
-    JNDISourceEditor editor;
-	SourceConfig sourceConfig;
-
     public JNDISourceCachePage(JNDISourceEditor editor) {
         super(editor, "CACHE", "  Cache  ");
-
-        this.editor = editor;
-        this.sourceConfig = editor.sourceConfig;
     }
 
     public void createFormContent(IManagedForm managedForm) {
-        toolkit = managedForm.getToolkit();
+        super.createFormContent(managedForm);
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Source Editor");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
@@ -257,9 +247,5 @@ public class JNDISourceCachePage extends FormPage {
         });
 
         return composite;
-    }
-
-    public void checkDirty() {
-        editor.checkDirty();
     }
 }

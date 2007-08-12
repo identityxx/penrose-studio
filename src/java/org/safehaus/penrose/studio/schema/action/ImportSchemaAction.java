@@ -23,8 +23,9 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.schema.wizard.ImportSchemaWizard;
 import org.apache.log4j.Logger;
 
@@ -41,11 +42,13 @@ public class ImportSchemaAction extends Action {
         try {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
-            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+            ServersView serversView = (ServersView)page.showView(ServersView.class.getName());
+            ProjectNode projectNode = serversView.getSelectedProjectNode();
 
             Shell shell = window.getShell();
 
-            ImportSchemaWizard wizard = new ImportSchemaWizard();
+            ImportSchemaWizard wizard = new ImportSchemaWizard(projectNode);
+
             WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.setPageSize(600, 300);
             dialog.open();
@@ -53,7 +56,7 @@ public class ImportSchemaAction extends Action {
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 
-            objectsView.show(objectsView.getSchemasNode());
+            serversView.open(projectNode.getSchemasNode());
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

@@ -18,11 +18,13 @@
 package org.safehaus.penrose.studio.service;
 
 import org.safehaus.penrose.studio.service.action.NewServiceAction;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.eclipse.swt.graphics.Image;
@@ -40,33 +42,32 @@ public class ServicesNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
+    private ServersView view;
+    private ProjectNode projectNode;
 
     protected Map<String,Node> children;
 
-    public ServicesNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public ServicesNode(String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
-        this.view = view;
+        projectNode = (ProjectNode)parent;
+        view = projectNode.getView();
     }
 
     public void showMenu(IMenuManager manager) {
-
         manager.add(new NewServiceAction());
-
     }
 
     public void refresh() throws Exception {
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseClient penroseClient = penroseStudio.getClient();
+        Project project = projectNode.getProject();
+        PenroseClient client = project.getClient();
 
         children = new TreeMap<String,Node>();
 
-        for (ServiceConfig serviceConfig : penroseStudio.getServiceConfigs().getServiceConfigs()) {
+        for (ServiceConfig serviceConfig : project.getServiceConfigs().getServiceConfigs()) {
 
             ServiceNode serviceNode = new ServiceNode(
-                    view,
                     serviceConfig.getName(),
-                    ObjectsView.SERVICE,
+                    ServersView.SERVICE,
                     PenrosePlugin.getImage(PenroseImage.SERVICE),
                     serviceConfig,
                     this
@@ -75,14 +76,13 @@ public class ServicesNode extends Node {
             children.put(serviceConfig.getName(), serviceNode);
         }
 
-        for (String name : penroseClient.getServiceNames()) {
+        for (String name : client.getServiceNames()) {
 
             if (children.containsKey(name)) continue;
 
             ServiceNode serviceNode = new ServiceNode(
-                    view,
                     name,
-                    ObjectsView.SERVICE,
+                    ServersView.SERVICE,
                     PenrosePlugin.getImage(PenroseImage.SERVICE),
                     null,
                     this
@@ -108,5 +108,21 @@ public class ServicesNode extends Node {
         }
 
         return children.values();
+    }
+
+    public ServersView getView() {
+        return view;
+    }
+
+    public void setView(ServersView view) {
+        this.view = view;
+    }
+
+    public ProjectNode getProjectNode() {
+        return projectNode;
+    }
+
+    public void setProjectNode(ProjectNode projectNode) {
+        this.projectNode = projectNode;
     }
 }

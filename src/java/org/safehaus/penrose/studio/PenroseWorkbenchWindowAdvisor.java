@@ -32,16 +32,14 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.studio.project.ProjectDialog;
-import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.welcome.WelcomeEditorInput;
 import org.safehaus.penrose.studio.welcome.WelcomeEditor;
-import org.safehaus.penrose.studio.util.ApplicationConfig;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
-    Logger log = Logger.getLogger(getClass());
+    Logger log = LoggerFactory.getLogger(getClass());
 
     private PenroseActionBarAdvisor actionBarAdvisor;
 
@@ -76,16 +74,16 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             configurer.setTitle("Penrose Studio");
             //configurer.setShowCoolBar(true);
             //configurer.setShowStatusLine(true);
-
+/*
             ProjectDialog dialog = new ProjectDialog(shell);
             dialog.open();
 
             if (dialog.getAction() == ProjectDialog.CANCEL) System.exit(0);
 
-            Project project = dialog.getProject();
+            Project project = dialog.getProjectConfig();
 
             penroseStudio.getApplicationConfig().setCurrentProject(project);
-
+*/
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             System.exit(0);
@@ -113,19 +111,12 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     public void postWindowCreate() {
         // log.debug("postWindowCreate");
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        ApplicationConfig applicationConfig = penroseStudio.getApplicationConfig();
 
         try {
             IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
+            configurer.setTitle("Penrose Studio");
 
-            Project project = penroseStudio.getApplicationConfig().getCurrentProject();
-            configurer.setTitle("Penrose Studio - "+project.getName());
-
-            //IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
             IWorkbenchWindow window = configurer.getWindow();
-
-            //IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
             page.openEditor(new WelcomeEditorInput(), WelcomeEditor.class.getName());
 
@@ -138,15 +129,14 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             MessageDialog.openError(
                     shell,
                     "ERROR",
-                    "Failed opening "+applicationConfig.getCurrentProject().getName()+" configuration.\n"+
-                            "See penrose-studio-log.txt for details."
+                    "Failed opening Penrose Studio.\n"+
+                            "See penrose-studio.log for details."
             );
         }
-
+/*
         try {
             penroseStudio.connect();
             penroseStudio.open();
-            penroseStudio.disconnect();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -157,18 +147,18 @@ public class PenroseWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             MessageDialog.openError(
                     shell,
                     "ERROR",
-                    "Failed opening "+applicationConfig.getCurrentProject().getName()+" configuration.\n"+
-                            "See penrose-studio-log.txt for details."
+                    "Failed opening Penrose Studio.\n"+
+                            "See penrose-studio.log for details."
             );
         }
-
+*/
     }
 
     public void postWindowOpen() {
         // log.debug("postWindowOpen");
         try {
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.validatePartitions();
+            //PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            //penroseStudio.validatePartitions();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
 

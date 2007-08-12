@@ -1,0 +1,311 @@
+package org.safehaus.penrose.studio.project;
+
+import org.safehaus.penrose.studio.tree.Node;
+import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.partition.PartitionsNode;
+import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.nis.NISNode;
+import org.safehaus.penrose.studio.properties.SystemPropertiesNode;
+import org.safehaus.penrose.studio.user.AdministratorNode;
+import org.safehaus.penrose.studio.connector.ConnectorNode;
+import org.safehaus.penrose.studio.engine.EnginesNode;
+import org.safehaus.penrose.studio.handler.HandlersNode;
+import org.safehaus.penrose.studio.logging.LoggingNode;
+import org.safehaus.penrose.studio.service.ServicesNode;
+import org.safehaus.penrose.studio.schema.SchemasNode;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.ui.IWorkbenchActionConstants;
+
+import java.util.Collection;
+import java.util.ArrayList;
+
+/**
+ * @author Endi S. Dewata
+ */
+public class ProjectNode extends Node {
+
+    protected ServersView view;
+
+    protected ProjectConfig projectConfig;
+    protected Project project;
+
+    Collection<Node> children;
+
+    protected PartitionsNode partitionsNode;
+    protected SchemasNode    schemasNode;
+    protected ServicesNode   servicesNode;
+    protected LoggingNode    loggingNode;
+
+    public ProjectNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
+        super(name, type, image, object, parent);
+
+        this.view = view;
+
+        projectConfig = (ProjectConfig)object;
+        project = new Project(projectConfig);
+
+        children = new ArrayList<Node>();
+
+        partitionsNode = new PartitionsNode(
+                view,
+                "Partitions",
+                "Partitions",
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                "Partitions",
+                this);
+        children.add(partitionsNode);
+
+        schemasNode = new SchemasNode(
+                "Schemas",
+                "Schemas",
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                "Schemas",
+                this);
+        children.add(schemasNode);
+
+        servicesNode = new ServicesNode(
+                "Services",
+                "Services",
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                "Services",
+                this);
+        children.add(servicesNode);
+
+        loggingNode = new LoggingNode(
+                view,
+                "Logging",
+                "Logging",
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                "Logging",
+                this);
+        children.add(loggingNode);
+
+        children.add(new HandlersNode(
+                view,
+                "Handlers",
+                "Handlers",
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                "Handlers",
+                this
+        ));
+
+        children.add(new EnginesNode(
+                view,
+                "Engines",
+                "Engines",
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                "Engines",
+                this
+        ));
+
+        children.add(new ConnectorNode(
+                view,
+                "Connector",
+                "Connector",
+                PenrosePlugin.getImage(PenroseImage.CONNECTOR),
+                "Connector",
+                this
+        ));
+
+        children.add(new AdministratorNode(
+                view,
+                "Administrator",
+                "Administrator",
+                PenrosePlugin.getImage(PenroseImage.ADMINISTRATOR),
+                "Administrator",
+                this
+        ));
+
+        children.add(new SystemPropertiesNode(
+                view,
+                "System Properties",
+                "System Properties",
+                PenrosePlugin.getImage(PenroseImage.SYSTEM_PROPERTIES),
+                "System Properties",
+                this
+        ));
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        if (penroseStudio.getLicense() != null) {
+            children.add(new NISNode(
+                    "NIS",
+                    "NIS",
+                    PenrosePlugin.getImage(PenroseImage.MODULE),
+                    "NIS",
+                    this
+            ));
+        }
+    }
+
+    public void showMenu(IMenuManager manager) {
+
+        manager.add(new Action("Open") {
+            public void run() {
+                try {
+                    open();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+            public boolean isEnabled() {
+                return !project.isConnected();
+            }
+        });
+
+        manager.add(new Action("Close") {
+            public void run() {
+                try {
+                    close();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+            public boolean isEnabled() {
+                return project.isConnected();
+            }
+        });
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
+            public void run() {
+                try {
+                    remove();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+            public boolean isEnabled() {
+                return !project.isConnected();
+            }
+        });
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(new Action("Properties", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
+            public void run() {
+                try {
+                    edit();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+            public boolean isEnabled() {
+                return !project.isConnected();
+            }
+        });
+    }
+
+    public void open() throws Exception {
+        project.connect();
+        view.open(this);
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
+    }
+
+    public void close() throws Exception {
+        project.close();
+        view.close(this);
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
+    }
+
+    public void edit() throws Exception {
+
+        String oldProjectName = projectConfig.getName();
+
+        Shell shell = view.getSite().getShell();
+        ProjectEditorDialog dialog = new ProjectEditorDialog(shell, SWT.NONE);
+        dialog.setProjectConfig(projectConfig);
+        dialog.open();
+
+        if (dialog.getAction() == ProjectEditorDialog.CANCEL) return;
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+
+        if (!oldProjectName.equals(projectConfig.getName())) {
+            penroseStudio.getApplicationConfig().removeProject(oldProjectName);
+            penroseStudio.getApplicationConfig().addProject(projectConfig);
+        }
+
+        penroseStudio.saveApplicationConfig();
+        penroseStudio.notifyChangeListeners();
+    }
+
+    public void remove() throws Exception {
+        ServersView view = ServersView.getInstance();
+        view.removeProjectConfig(projectConfig.getName());
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
+    }
+    
+    public boolean hasChildren() throws Exception {
+        return project.isConnected();
+    }
+
+    public Collection<Node> getChildren() throws Exception {
+        return children;
+    }
+
+    public PartitionsNode getPartitionsNode() {
+        return partitionsNode;
+    }
+
+    public void setPartitionsNode(PartitionsNode partitionsNode) {
+        this.partitionsNode = partitionsNode;
+    }
+
+    public SchemasNode getSchemasNode() {
+        return schemasNode;
+    }
+
+    public void setSchemasNode(SchemasNode schemasNode) {
+        this.schemasNode = schemasNode;
+    }
+
+    public ServicesNode getServicesNode() {
+        return servicesNode;
+    }
+
+    public void setServicesNode(ServicesNode servicesNode) {
+        this.servicesNode = servicesNode;
+    }
+
+    public LoggingNode getLoggingNode() {
+        return loggingNode;
+    }
+
+    public void setLoggingNode(LoggingNode loggingNode) {
+        this.loggingNode = loggingNode;
+    }
+
+    public ProjectConfig getProjectConfig() {
+        return projectConfig;
+    }
+
+    public void setProjectConfig(ProjectConfig projectConfig) {
+        this.projectConfig = projectConfig;
+    }
+
+    public ServersView getView() {
+        return view;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+}

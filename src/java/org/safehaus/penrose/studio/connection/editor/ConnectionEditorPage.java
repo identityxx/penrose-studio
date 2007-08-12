@@ -6,25 +6,31 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.studio.project.ProjectNode;
 
 /**
  * @author Endi S. Dewata
  */
-public class JDBCConnectionEditorPage extends FormPage {
+public class ConnectionEditorPage extends FormPage {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
     protected FormToolkit toolkit;
 
+    protected ConnectionEditor editor;
+
+    protected ProjectNode projectNode;
     protected PartitionConfig partitionConfig;
     protected ConnectionConfig connectionConfig;
 
-    public JDBCConnectionEditorPage(JDBCConnectionEditor editor, String name, String label) {
+    public ConnectionEditorPage(ConnectionEditor editor, String name, String label) {
         super(editor, name, label);
 
+        this.editor = editor;
+
+        projectNode = editor.getProjectNode();
         partitionConfig = editor.getPartitionConfig();
         connectionConfig = editor.getConnectionConfig();
     }
@@ -69,8 +75,15 @@ public class JDBCConnectionEditorPage extends FormPage {
         this.connectionConfig = connectionConfig;
     }
 
+    public ProjectNode getProjectNode() {
+        return projectNode;
+    }
+
+    public void setProjectNode(ProjectNode projectNode) {
+        this.projectNode = projectNode;
+    }
+
     public void checkDirty() {
-        JDBCConnectionEditor editor = (JDBCConnectionEditor)getEditor();
         editor.checkDirty();
     }
 }

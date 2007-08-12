@@ -18,9 +18,9 @@
 package org.safehaus.penrose.studio.schema.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.util.FileUtil;
-import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.schema.SchemaConfig;
 import org.safehaus.penrose.schema.SchemaManager;
 import org.apache.log4j.Logger;
@@ -34,11 +34,15 @@ public class ImportSchemaWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
+    private ProjectNode projectNode;
+
     public SchemaNameWizardPage namePage = new SchemaNameWizardPage();
     public SchemaFileWizardPage filePage = new SchemaFileWizardPage();
 
-    public ImportSchemaWizard() {
+    public ImportSchemaWizard(ProjectNode projectNode) {
         setWindowTitle("Import Schema");
+
+        this.projectNode = projectNode;
     }
 
     public boolean canFinish() {
@@ -51,27 +55,25 @@ public class ImportSchemaWizard extends Wizard {
 
     public boolean performFinish() {
         try {
+            Project project = projectNode.getProject();
+
             String schemaExtDir = "schema/ext";
             
             String name = namePage.getSchemaName();
             String path = schemaExtDir+"/"+name+".schema";
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            File workDir = penroseStudio.getWorkDir();
-
             File file1 = new File(filePage.getFilename());
-            File file2 = new File(workDir, path);
+            File file2 = new File(project.getWorkDir(), path);
             FileUtil.copy(file1, file2);
 
             SchemaConfig schemaConfig = new SchemaConfig();
             schemaConfig.setName(name);
             schemaConfig.setPath(path);
 
-            PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
-            penroseConfig.addSchemaConfig(schemaConfig);
+            project.getPenroseConfig().addSchemaConfig(schemaConfig);
 
-            SchemaManager schemaManager = penroseStudio.getSchemaManager();
-            schemaManager.init(penroseStudio.getWorkDir(), schemaConfig);
+            SchemaManager schemaManager = project.getSchemaManager();
+            schemaManager.init(project.getWorkDir(), schemaConfig);
 
             return true;
 
@@ -88,5 +90,13 @@ public class ImportSchemaWizard extends Wizard {
 
     public boolean needsPreviousAndNextButtons() {
         return true;
+    }
+
+    public ProjectNode getProjectNode() {
+        return projectNode;
+    }
+
+    public void setProjectNode(ProjectNode projectNode) {
+        this.projectNode = projectNode;
     }
 }

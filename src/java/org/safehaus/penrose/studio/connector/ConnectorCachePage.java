@@ -54,9 +54,6 @@ public class ConnectorCachePage {
 
     public ConnectorCachePage(ConnectorEditor editor) {
         this.editor = editor;
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseConfig serverConfig = penroseStudio.getPenroseConfig();
-        //this.cacheConfig = serverConfig.getSourceCacheConfig();
     }
 
     public Control createControl() {

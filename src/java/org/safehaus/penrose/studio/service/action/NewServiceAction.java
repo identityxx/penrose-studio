@@ -23,8 +23,9 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.service.wizard.ServiceWizard;
 import org.apache.log4j.Logger;
 
@@ -41,7 +42,7 @@ public class NewServiceAction extends Action {
         try {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
-            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+            ServersView serversView = (ServersView)page.showView(ServersView.class.getName());
 
             Shell shell = window.getShell();
 
@@ -53,7 +54,8 @@ public class NewServiceAction extends Action {
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 
-            objectsView.show(objectsView.getServicesNode());
+            ProjectNode projectNode = serversView.getSelectedProjectNode();
+            serversView.open(projectNode.getServicesNode());
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

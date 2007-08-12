@@ -18,9 +18,11 @@
 package org.safehaus.penrose.studio.partition;
 
 import org.safehaus.penrose.studio.*;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.studio.partition.action.*;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.PartitionConfig;
@@ -32,7 +34,6 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.apache.log4j.Logger;
@@ -49,13 +50,15 @@ public class PartitionsNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
+    protected ServersView view;
+    protected ProjectNode projectNode;
 
     protected Map<String,Node> children;
 
-    public PartitionsNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public PartitionsNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
         this.view = view;
+        projectNode = (ProjectNode)parent;
     }
 
     public void showMenu(IMenuManager manager) {
@@ -95,17 +98,16 @@ public class PartitionsNode extends Node {
     }
 
     public void refresh() throws Exception {
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseClient penroseClient = penroseStudio.getClient();
+        Project project = projectNode.getProject();
+        PenroseClient client = project.getClient();
 
         children = new TreeMap<String,Node>();
 
-        for (PartitionConfig partitionConfig : penroseStudio.getPartitionConfigs().getPartitionConfigs()) {
+        for (PartitionConfig partitionConfig : project.getPartitionConfigs().getPartitionConfigs()) {
 
             PartitionNode partitionNode = new PartitionNode(
-                    view,
                     partitionConfig.getName(),
-                    ObjectsView.PARTITION,
+                    ServersView.PARTITION,
                     PenrosePlugin.getImage(PenroseImage.PARTITION),
                     partitionConfig,
                     this
@@ -114,14 +116,13 @@ public class PartitionsNode extends Node {
             children.put(partitionConfig.getName(), partitionNode);
         }
 
-        for (String name : penroseClient.getPartitionNames()) {
+        for (String name : client.getPartitionNames()) {
 
             if (children.containsKey(name)) continue;
 
             PartitionNode partitionNode = new PartitionNode(
-                    view,
                     name,
-                    ObjectsView.PARTITION,
+                    ServersView.PARTITION,
                     PenrosePlugin.getImage(PenroseImage.PARTITION),
                     null,
                     this
@@ -156,10 +157,9 @@ public class PartitionsNode extends Node {
 
         log.debug("Pasting "+oldName+" partition into "+newName+".");
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PartitionConfigs partitionConfigs = penroseStudio.getPartitionConfigs();
-
-        File workDir = penroseStudio.getWorkDir();
+        Project project = projectNode.getProject();
+        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+        File workDir = project.getWorkDir();
 
         File oldDir = new File(workDir, "partitions"+File.separator+oldName);
         File newDir = new File(workDir, "partitions"+File.separator+newName);
@@ -172,6 +172,7 @@ public class PartitionsNode extends Node {
 
         refresh();
 
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
 
@@ -191,5 +192,13 @@ public class PartitionsNode extends Node {
         }
 
         return children.values();
+    }
+
+    public ProjectNode getProjectNode() {
+        return projectNode;
+    }
+
+    public void setProjectNode(ProjectNode projectNode) {
+        this.projectNode = projectNode;
     }
 }

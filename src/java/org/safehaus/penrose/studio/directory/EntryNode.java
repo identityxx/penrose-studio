@@ -30,9 +30,13 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.studio.*;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.partition.PartitionsNode;
+import org.safehaus.penrose.studio.partition.PartitionNode;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.mapping.*;
+import org.safehaus.penrose.studio.mapping.editor.MappingEditor;
+import org.safehaus.penrose.studio.mapping.editor.MappingEditorInput;
 import org.safehaus.penrose.studio.directory.action.NewStaticEntryAction;
 import org.safehaus.penrose.studio.directory.action.NewDynamicEntryAction;
 import org.safehaus.penrose.studio.directory.action.MapLDAPTreeAction;
@@ -52,14 +56,28 @@ public class EntryNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
+    protected ServersView view;
+    protected ProjectNode projectNode;
+    protected PartitionsNode partitionsNode;
+    protected PartitionNode partitionNode;
+    protected DirectoryNode directoryNode;
 
     private PartitionConfig partitionConfig;
     private EntryMapping entryMapping;
 
-    public EntryNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public EntryNode(String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
-        this.view = view;
+
+        if (parent instanceof DirectoryNode) {
+            directoryNode = (DirectoryNode)parent;
+        } else if (parent instanceof EntryNode) {
+            directoryNode = ((EntryNode)parent).getDirectoryNode();
+        }
+
+        partitionNode = directoryNode.getPartitionNode();
+        partitionsNode = partitionNode.getPartitionsNode();
+        projectNode = partitionsNode.getProjectNode();
+        view = projectNode.getView();
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -136,10 +154,10 @@ public class EntryNode extends Node {
 
     public void showCommercialMenu(IMenuManager manager) throws Exception {
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
-        PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
-        PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
+        //PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        //PenroseWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
+        //PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
+        //PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
         //if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
             manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -152,6 +170,7 @@ public class EntryNode extends Node {
     public void open() throws Exception {
 
         MappingEditorInput mei = new MappingEditorInput(partitionConfig, entryMapping);
+        mei.setProjectNode(projectNode);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -162,6 +181,7 @@ public class EntryNode extends Node {
     public void editSources() throws Exception {
 
         MappingEditorInput mei = new MappingEditorInput(partitionConfig, entryMapping);
+        mei.setProjectNode(projectNode);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -173,6 +193,7 @@ public class EntryNode extends Node {
     public void editACL() throws Exception {
 
         MappingEditorInput mei = new MappingEditorInput(partitionConfig, entryMapping);
+        mei.setProjectNode(projectNode);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -216,13 +237,11 @@ public class EntryNode extends Node {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        for (Iterator i=partitionConfig.getDirectoryConfigs().getChildren(entryMapping).iterator(); i.hasNext(); ) {
-            EntryMapping childMapping = (EntryMapping)i.next();
+        for (EntryMapping childMapping : partitionConfig.getDirectoryConfigs().getChildren(entryMapping)) {
 
             EntryNode entryNode = new EntryNode(
-                    view,
                     childMapping.getRdn().toString(),
-                    ObjectsView.ENTRY,
+                    ServersView.ENTRY,
                     PenrosePlugin.getImage(PenroseImage.NODE),
                     childMapping,
                     this
@@ -251,5 +270,45 @@ public class EntryNode extends Node {
 
     public void setEntryMapping(EntryMapping entryMapping) {
         this.entryMapping = entryMapping;
+    }
+
+    public ServersView getView() {
+        return view;
+    }
+
+    public void setView(ServersView view) {
+        this.view = view;
+    }
+
+    public ProjectNode getProjectNode() {
+        return projectNode;
+    }
+
+    public void setProjectNode(ProjectNode projectNode) {
+        this.projectNode = projectNode;
+    }
+
+    public PartitionsNode getPartitionsNode() {
+        return partitionsNode;
+    }
+
+    public void setPartitionsNode(PartitionsNode partitionsNode) {
+        this.partitionsNode = partitionsNode;
+    }
+
+    public PartitionNode getPartitionNode() {
+        return partitionNode;
+    }
+
+    public void setPartitionNode(PartitionNode partitionNode) {
+        this.partitionNode = partitionNode;
+    }
+
+    public DirectoryNode getDirectoryNode() {
+        return directoryNode;
+    }
+
+    public void setDirectoryNode(DirectoryNode directoryNode) {
+        this.directoryNode = directoryNode;
     }
 }

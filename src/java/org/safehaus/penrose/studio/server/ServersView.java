@@ -15,12 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.object;
+package org.safehaus.penrose.studio.server;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.part.*;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.jface.viewers.*;
 import org.eclipse.jface.action.*;
 import org.eclipse.swt.SWT;
@@ -28,27 +32,20 @@ import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.handler.HandlersNode;
-import org.safehaus.penrose.studio.nis.NISNode;
-import org.safehaus.penrose.studio.logging.LoggingNode;
-import org.safehaus.penrose.studio.properties.SystemPropertiesNode;
-import org.safehaus.penrose.studio.user.AdministratorNode;
-import org.safehaus.penrose.studio.service.ServicesNode;
+import org.safehaus.penrose.studio.server.ServersContentProvider;
+import org.safehaus.penrose.studio.server.ServersLabelProvider;
+import org.safehaus.penrose.studio.project.ProjectConfig;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.connector.ConnectorNode;
-import org.safehaus.penrose.studio.engine.EnginesNode;
-import org.safehaus.penrose.studio.schema.SchemasNode;
-import org.safehaus.penrose.studio.partition.PartitionsNode;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class ObjectsView extends ViewPart implements ChangeListener, ISelectionChangedListener {
+public class ServersView extends ViewPart implements ChangeListener, ISelectionChangedListener {
 
     Logger log = Logger.getLogger(getClass());
 
-    public final static String PARTITIONS        = "Partitions";
     public final static String PARTITION         = "Partition";
     public final static String DIRECTORY         = "Directory";
     public final static String ENTRY             = "Entry";
@@ -60,138 +57,32 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
     public final static String CACHES            = "Caches";
     public final static String ENTRY_CACHE       = "Entry Cache";
     public final static String SOURCE_CACHE      = "Source Cache";
-    public final static String HANDLERS          = "Handlers";
     public final static String HANDLER           = "Handler";
     public final static String ENGINES           = "Engines";
     public final static String ENGINE            = "Engine";
     public final static String ENGINE_CACHE      = "Engine Cache";
     public final static String CONNECTORS        = "Connectors";
-    public final static String CONNECTOR         = "Connector";
     public final static String CONNECTOR_CACHE   = "Connector Cache";
     public final static String MODULES           = "Modules";
     public final static String MODULE            = "Module";
-    public final static String SCHEMAS           = "Schemas";
     public final static String SCHEMA            = "Schema";
     public final static String OBJECT_CLASSES    = "Object Classes";
     public final static String OBJECT_CLASS      = "Object Class";
     public final static String ATTRIBUTE_TYPES   = "Attribute Types";
     public final static String ATTRIBUTE_TYPE    = "Attribute Type";
-    public final static String SERVICES          = "Services";
     public final static String SERVICE           = "Service";
-    public final static String ADMINISTRATOR     = "Administrator";
     public final static String ROOT_DSE          = "Root DSE";
-    public final static String SYSTEM_PROPERTIES = "System Properties";
-    public final static String LOGGING           = "Logging";
     public final static String APPENDERS         = "Appenders";
     public final static String APPENDER          = "Appender";
     public final static String LOGGERS           = "Loggers";
     public final static String LOGGER            = "Logger";
-    public final static String NIS               = "NIS";
 
-	private TreeViewer treeViewer;
+    ServersContentProvider contentProvider;
+    private TreeViewer treeViewer;
 
     Object clipboard;
 
-    Collection<Node> nodes = new ArrayList<Node>();
-
-    private PartitionsNode partitionsNode;
-    private SchemasNode schemasNode;
-    private ServicesNode servicesNode;
-    private LoggingNode loggingNode;
-
-    public ObjectsView() {
-        partitionsNode = new PartitionsNode(
-                this,
-                PARTITIONS,
-                PARTITIONS,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
-                PARTITIONS,
-                null);
-        nodes.add(partitionsNode);
-
-        schemasNode = new SchemasNode(
-                this,
-                SCHEMAS,
-                SCHEMAS,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
-                SCHEMAS,
-                null);
-        nodes.add(schemasNode);
-
-        servicesNode = new ServicesNode(
-                this,
-                SERVICES,
-                SERVICES,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
-                SERVICES,
-                null);
-        nodes.add(servicesNode);
-
-        loggingNode = new LoggingNode(
-                this,
-                LOGGING,
-                LOGGING,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
-                LOGGING,
-                null);
-        nodes.add(loggingNode);
-
-        nodes.add(new HandlersNode(
-                this,
-                HANDLERS,
-                HANDLERS,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
-                HANDLERS,
-                this
-        ));
-
-        nodes.add(new EnginesNode(
-                this,
-                ENGINES,
-                ENGINES,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
-                ENGINES,
-                this
-        ));
-
-        nodes.add(new ConnectorNode(
-                this,
-                CONNECTOR,
-                CONNECTOR,
-                PenrosePlugin.getImage(PenroseImage.CONNECTOR),
-                CONNECTOR,
-                null
-        ));
-
-        nodes.add(new AdministratorNode(
-                this,
-                ADMINISTRATOR,
-                ADMINISTRATOR,
-                PenrosePlugin.getImage(PenroseImage.ADMINISTRATOR),
-                ADMINISTRATOR,
-                null
-        ));
-
-        nodes.add(new SystemPropertiesNode(
-                this,
-                SYSTEM_PROPERTIES,
-                SYSTEM_PROPERTIES,
-                PenrosePlugin.getImage(PenroseImage.SYSTEM_PROPERTIES),
-                SYSTEM_PROPERTIES,
-                null
-        ));
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        if (penroseStudio.getLicense() != null) {
-            nodes.add(new NISNode(
-                    this,
-                    NIS,
-                    NIS,
-                    PenrosePlugin.getImage(PenroseImage.MODULE),
-                    NIS,
-                    null
-            ));
-        }
+    public ServersView() {
     }
 	
 	/**
@@ -200,10 +91,12 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
 	 */
 	public void createPartControl(Composite parent) {
 		try {
-			treeViewer = new TreeViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
+            contentProvider = new ServersContentProvider(this);
 
-			treeViewer.setContentProvider(new ObjectsContentProvider(this));
-            treeViewer.setLabelProvider(new ObjectsLabelProvider(this));
+            treeViewer = new TreeViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
+
+			treeViewer.setContentProvider(contentProvider);
+            treeViewer.setLabelProvider(new ServersLabelProvider(this));
 			treeViewer.setInput(getViewSite());
 			treeViewer.addSelectionChangedListener(this);
 
@@ -227,8 +120,8 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
             treeViewer.addDoubleClickListener(new IDoubleClickListener() {
                 public void doubleClick(DoubleClickEvent event) {
                     try {
-                        ISelection selection = treeViewer.getSelection();
-                        Object object = ((IStructuredSelection)selection).getFirstElement();
+                        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
+                        Object object = selection.getFirstElement();
 
                         Node node = (Node)object;
                         node.open();
@@ -268,8 +161,12 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
         treeViewer.refresh();
 	}
 
-    public void show(Object object) {
+    public void open(Object object) {
         treeViewer.setExpandedState(object, true);
+    }
+
+    public void close(Object object) {
+        treeViewer.setExpandedState(object, false);
     }
 
     public TreeViewer getTreeViewer() {
@@ -280,27 +177,40 @@ public class ObjectsView extends ViewPart implements ChangeListener, ISelectionC
         this.treeViewer = treeViewer;
     }
 
-    public PartitionsNode getPartitionsNode() {
-        return partitionsNode;
+    public void addProjectConfig(ProjectConfig projectConfig) {
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.getApplicationConfig().addProject(projectConfig);
+        penroseStudio.saveApplicationConfig();
+
+        contentProvider.addProjectConfig(projectConfig);
     }
 
-    public void setPartitionsNode(PartitionsNode partitionsNode) {
-        this.partitionsNode = partitionsNode;
+    public void removeProjectConfig(String name) {
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.getApplicationConfig().removeProject(name);
+        penroseStudio.saveApplicationConfig();
+
+        contentProvider.removeProjectConfig(name);
     }
 
-    public SchemasNode getSchemasNode() {
-        return schemasNode;
+    public ProjectNode getSelectedProjectNode() {
+        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
+        if (selection == null) return null;
+
+        Node node = (Node)selection.getFirstElement();
+
+        while (node != null) {
+            if (node instanceof ProjectNode) return (ProjectNode)node;
+            node = (Node)node.getParent();
+        }
+
+        return null;
     }
 
-    public void setSchemasNode(SchemasNode schemasNode) {
-        this.schemasNode = schemasNode;
-    }
-
-    public ServicesNode getServicesNode() {
-        return servicesNode;
-    }
-
-    public void setServicesNode(ServicesNode servicesNode) {
-        this.servicesNode = servicesNode;
+    public static ServersView getInstance() throws Exception {
+        IWorkbench workbench = PlatformUI.getWorkbench();
+        IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+        IWorkbenchPage page = window.getActivePage();
+        return (ServersView)page.showView(ServersView.class.getName());
     }
 }

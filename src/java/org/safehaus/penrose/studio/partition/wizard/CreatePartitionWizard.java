@@ -19,6 +19,8 @@ package org.safehaus.penrose.studio.partition.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.apache.log4j.Logger;
@@ -30,9 +32,11 @@ public class CreatePartitionWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
+    public ProjectNode projectNode;
     public PartitionNamePage namePage = new PartitionNamePage();
 
-    public CreatePartitionWizard() {
+    public CreatePartitionWizard(ProjectNode projectNode) {
+        this.projectNode = projectNode;
         setWindowTitle("New Partition");
     }
 
@@ -49,11 +53,11 @@ public class CreatePartitionWizard extends Wizard {
 
             PartitionConfig partitionConfig = new PartitionConfig(name);
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-
-            PartitionConfigs partitionConfigs = penroseStudio.getPartitionConfigs();
+            Project project = projectNode.getProject();
+            PartitionConfigs partitionConfigs = project.getPartitionConfigs();
             partitionConfigs.addPartitionConfig(partitionConfig);
 
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 
             return true;

@@ -5,9 +5,10 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.ProjectNode;
 
 public class RefreshAction extends Action {
 
@@ -28,9 +29,10 @@ public class RefreshAction extends Action {
 
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
-            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+            ServersView serversView = (ServersView)page.showView(ServersView.class.getName());
 
-            objectsView.show(objectsView.getPartitionsNode());
+            ProjectNode projectNode = serversView.getSelectedProjectNode();
+            serversView.open(projectNode.getPartitionsNode());
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();

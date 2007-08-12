@@ -18,12 +18,15 @@
 package org.safehaus.penrose.studio.service;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.safehaus.penrose.service.ServiceConfigs;
+import org.safehaus.penrose.management.PenroseClient;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.IMenuManager;
@@ -45,14 +48,18 @@ public class ServiceNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
+    ServersView view;
+    ProjectNode projectNode;
+    ServicesNode servicesNode;
 
     private ServiceConfig serviceConfig;
 
-    public ServiceNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public ServiceNode(String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
-        this.view = view;
         serviceConfig = (ServiceConfig)object;
+        servicesNode = (ServicesNode)parent;
+        projectNode = servicesNode.getProjectNode();
+        view = projectNode.getView();
     }
 
     public void showMenu(IMenuManager manager) {
@@ -96,24 +103,22 @@ public class ServiceNode extends Node {
     public void load() throws Exception {
         log.debug("Opening "+name+" service.");
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        Project project = projectNode.getProject();
+        project.download("services"+File.separator+name);
 
-        File workDir = penroseStudio.getWorkDir();
-        File dir = new File(workDir, "services"+File.separator+name);
+        File dir = new File(project.getWorkDir(), "services"+File.separator+name);
 
-        penroseStudio.downloadFolder(workDir, "services"+File.separator+name);
-
-        ServiceConfigs serviceConfigs = penroseStudio.getServiceConfigs();
+        ServiceConfigs serviceConfigs = project.getServiceConfigs();
         serviceConfig = serviceConfigs.load(dir);
     }
 
     public void save() throws Exception {
         log.debug("Saving "+name+" service.");
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        ServiceConfigs serviceConfigs = penroseStudio.getServiceConfigs();
+        Project project = projectNode.getProject();
+        ServiceConfigs serviceConfigs = project.getServiceConfigs();
 
-        File workDir = penroseStudio.getWorkDir();
+        File workDir = project.getWorkDir();
         //serviceConfigs.store(workDir, serviceConfig);
     }
 
@@ -128,13 +133,13 @@ public class ServiceNode extends Node {
 
         if (!confirm) return;
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-
-        ServiceConfigs serviceConfigs = penroseStudio.getServiceConfigs();
+        Project project = projectNode.getProject();
+        ServiceConfigs serviceConfigs = project.getServiceConfigs();
         serviceConfigs.removeServiceConfig(serviceConfig.getName());
 
         serviceConfig = null;
 
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
 

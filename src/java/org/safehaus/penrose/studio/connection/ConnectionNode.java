@@ -30,9 +30,12 @@ import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.partition.PartitionsNode;
+import org.safehaus.penrose.studio.partition.PartitionNode;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.plugin.PluginManager;
 import org.safehaus.penrose.studio.plugin.Plugin;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.connection.action.NewSourceAction;
 import org.safehaus.penrose.studio.connection.editor.*;
 import org.safehaus.penrose.studio.tree.Node;
@@ -50,14 +53,22 @@ public class ConnectionNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
+    ServersView view;
+    ProjectNode projectNode;
+    PartitionsNode partitionsNode;
+    PartitionNode partitionNode;
+    ConnectionsNode connectionsNode;
 
     private PartitionConfig partitionConfig;
     private ConnectionConfig connectionConfig;
 
-    public ConnectionNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public ConnectionNode(String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
-        this.view = view;
+        connectionsNode = (ConnectionsNode)parent;
+        partitionNode = connectionsNode.getPartitionNode();
+        partitionsNode = partitionNode.getPartitionsNode();
+        projectNode = partitionsNode.getProjectNode();
+        this.view = projectNode.getView();
     }
 
     public void showMenu(IMenuManager manager) {
@@ -118,14 +129,15 @@ public class ConnectionNode extends Node {
         PluginManager pluginManager = penroseStudio.getPluginManager();
         Plugin plugin = pluginManager.getPlugin(connectionConfig.getAdapterName());
 
-        ConnectionEditorInput cei = plugin.createConnectionEditorInput();
-        cei.setPartitionConfig(partitionConfig);
-        cei.setConnectionConfig(connectionConfig);
+        ConnectionEditorInput ei = plugin.createConnectionEditorInput();
+        ei.setPartitionConfig(partitionConfig);
+        ei.setConnectionConfig(connectionConfig);
+        ei.setProjectNode(projectNode);
 
         String connectionEditorClass = plugin.getConnectionEditorClass();
 
         log.debug("Opening "+connectionEditorClass);
-        page.openEditor(cei, connectionEditorClass);
+        page.openEditor(ei, connectionEditorClass);
     }
 
     public void remove() throws Exception {

@@ -40,11 +40,17 @@ import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.session.Session;
 import org.safehaus.penrose.session.SessionManager;
 import org.safehaus.penrose.session.SessionContext;
-import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.ProjectConfig;
+
+import java.io.File;
 
 public class PreviewEditor extends EditorPart {
 
     private Logger log = Logger.getLogger(getClass());
+
+    ProjectConfig projectConfig;
+    PenroseConfig penroseConfig;
+    File workDir;
 
     Text baseDnText;
     Text bindDnText;
@@ -57,8 +63,14 @@ public class PreviewEditor extends EditorPart {
     byte[] password;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+        PreviewEditorInput ei = (PreviewEditorInput)input;
+        projectConfig = ei.getProject();
+        workDir = ei.getWorkDir();
+        penroseConfig = ei.getPenroseConfig();
+
         setSite(site);
         setInput(input);
+        setPartName(projectConfig.getName());
     }
 
     public void dispose() {
@@ -170,9 +182,6 @@ public class PreviewEditor extends EditorPart {
         tc.setWidth(400);
 
         try {
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
-
             open("", penroseConfig.getRootDn().toString(), penroseConfig.getRootPassword());
 
         } catch (Exception e) {
@@ -195,10 +204,8 @@ public class PreviewEditor extends EditorPart {
         bindDnText.setText(bindDn == null ? "" : bindDn);
         this.password = password;
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-
         PenroseFactory penroseFactory = PenroseFactory.getInstance();
-        penrose = penroseFactory.createPenrose(penroseStudio.getWorkDir());
+        penrose = penroseFactory.createPenrose(workDir);
         penrose.start();
 
         SessionContext sessionContext = penrose.getSessionContext();

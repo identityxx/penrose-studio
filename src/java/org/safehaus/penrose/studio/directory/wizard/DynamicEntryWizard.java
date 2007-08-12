@@ -26,6 +26,7 @@ import org.safehaus.penrose.studio.source.wizard.SelectSourcesWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.RelationshipWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.ldap.RDNBuilder;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.apache.log4j.Logger;
@@ -40,6 +41,7 @@ public class DynamicEntryWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
+    private ProjectNode projectNode;
     private PartitionConfig partitionConfig;
     private EntryMapping parentMapping;
     private EntryMapping entryMapping = new EntryMapping();
@@ -49,7 +51,8 @@ public class DynamicEntryWizard extends Wizard {
     public ObjectClassWizardPage ocPage;
     public AttributeValueWizardPage attrPage;
 
-    public DynamicEntryWizard(PartitionConfig partition, EntryMapping parentMapping) {
+    public DynamicEntryWizard(ProjectNode projectNode, PartitionConfig partition, EntryMapping parentMapping) {
+        this.projectNode = projectNode;
         this.partitionConfig = partition;
         this.parentMapping = parentMapping;
         setWindowTitle("Adding dynamic entry");
@@ -59,10 +62,10 @@ public class DynamicEntryWizard extends Wizard {
         
         relationshipPage = new RelationshipWizardPage(partition);
 
-        ocPage = new ObjectClassWizardPage();
+        ocPage = new ObjectClassWizardPage(projectNode);
         //ocPage.setSelecteObjectClasses(entryMapping.getObjectClasses());
 
-        attrPage = new AttributeValueWizardPage(partition);
+        attrPage = new AttributeValueWizardPage(projectNode, partition);
         attrPage.setDefaultType(AttributeValueWizardPage.VARIABLE);
     }
 

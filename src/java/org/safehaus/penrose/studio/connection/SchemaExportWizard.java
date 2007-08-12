@@ -20,6 +20,8 @@ package org.safehaus.penrose.studio.connection;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.schema.*;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -33,12 +35,14 @@ public class SchemaExportWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
+    private ProjectNode projectNode;
     private Schema schema;
 
     public SchemaExportPage page = new SchemaExportPage();
     public SchemaSyntaxMappingPage syntaxMappingPage;
 
-    public SchemaExportWizard(Schema schema) {
+    public SchemaExportWizard(ProjectNode projectNode, Schema schema) {
+        this.projectNode = projectNode;
         this.schema = schema;
 
         syntaxMappingPage = new SchemaSyntaxMappingPage(schema);
@@ -77,8 +81,8 @@ public class SchemaExportWizard extends Wizard {
 
     public void removeDuplicates() {
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        SchemaManager schemaManager = penroseStudio.getSchemaManager();
+        Project project = projectNode.getProject();
+        SchemaManager schemaManager = project.getSchemaManager();
 
         Collection attributeTypes = schemaManager.getAttributeTypes();
         for (Iterator i=attributeTypes.iterator(); i.hasNext(); ) {

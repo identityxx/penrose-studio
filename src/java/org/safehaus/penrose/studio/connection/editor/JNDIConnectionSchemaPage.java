@@ -23,63 +23,45 @@ import org.eclipse.swt.SWT;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
-import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.connection.SchemaExportWizard;
 import org.safehaus.penrose.ldap.LDAPClient;
-import org.apache.log4j.Logger;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.io.StringWriter;
 import java.io.PrintWriter;
 
 /**
  * @author Endi S. Dewata
  */
-public class JNDIConnectionSchemaPage extends FormPage {
-
-    Logger log = Logger.getLogger(getClass());
-
-    FormToolkit toolkit;
+public class JNDIConnectionSchemaPage extends ConnectionEditorPage {
 
     Table objectClassesTable;
     Table attributeTypesTable;
-
-    JNDIConnectionEditor editor;
-    PartitionConfig partitionConfig;
-    ConnectionConfig connectionConfig;
 
     Schema schema;
 
     public JNDIConnectionSchemaPage(JNDIConnectionEditor editor) {
         super(editor, "SCHEMA", "  Schema  ");
-
-        this.editor = editor;
-        this.partitionConfig = editor.getPartitionConfig();
-        this.connectionConfig = editor.getConnectionConfig();
     }
 
     public void createFormContent(IManagedForm managedForm) {
-        toolkit = managedForm.getToolkit();
+        super.createFormContent(managedForm);
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Schema");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
 /*
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
         if (penroseStudio.isFreeware()) {
             Label label = toolkit.createLabel(body, PenroseStudio.FEATURE_NOT_AVAILABLE);
             label.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -132,7 +114,7 @@ public class JNDIConnectionSchemaPage extends FormPage {
 
                     Schema newSchema = (Schema)schema.clone();
 
-                    SchemaExportWizard wizard = new SchemaExportWizard(newSchema);
+                    SchemaExportWizard wizard = new SchemaExportWizard(projectNode, newSchema);
                     WizardDialog dialog = new WizardDialog(shell, wizard);
                     dialog.setPageSize(600, 300);
                     dialog.open();
@@ -208,25 +190,22 @@ public class JNDIConnectionSchemaPage extends FormPage {
             LDAPClient client = new LDAPClient(connectionConfig.getParameters());
             schema = client.getSchema();
 
-            Collection attributeTypes = schema.getAttributeTypes();
-            for (Iterator i=attributeTypes.iterator(); i.hasNext(); ) {
-                AttributeType at = (AttributeType)i.next();
-
+            Collection<AttributeType> attributeTypes = schema.getAttributeTypes();
+            for (AttributeType at : attributeTypes) {
                 TableItem item = new TableItem(attributeTypesTable, SWT.NONE);
                 item.setText(0, at.getName());
                 item.setText(1, at.getDescription() == null ? "" : at.getDescription());
                 item.setData(at);
             }
 
-            Collection objectClasses = schema.getObjectClasses();
-            for (Iterator i=objectClasses.iterator(); i.hasNext(); ) {
-                ObjectClass oc = (ObjectClass)i.next();
-
+            Collection<ObjectClass> objectClasses = schema.getObjectClasses();
+            for (ObjectClass oc : objectClasses) {
                 TableItem item = new TableItem(objectClassesTable, SWT.NONE);
                 item.setText(0, oc.getName());
                 item.setText(1, oc.getDescription() == null ? "" : oc.getDescription());
                 item.setData(oc);
             }
+
         } catch (Exception e) {
             log.error(e.getMessage(), e);
 

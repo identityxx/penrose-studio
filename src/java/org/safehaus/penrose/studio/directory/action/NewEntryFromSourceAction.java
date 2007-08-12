@@ -23,7 +23,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
 import org.eclipse.jface.action.Action;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.directory.EntryNode;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.mapping.SourceDialog;
@@ -60,7 +60,7 @@ public class NewEntryFromSourceAction extends Action {
         try {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
-            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+            ServersView serversView = (ServersView)page.showView(ServersView.class.getName());
 
             Shell shell = window.getShell();
 
@@ -160,7 +160,7 @@ public class NewEntryFromSourceAction extends Action {
 
             penroseStudio.notifyChangeListeners();
 
-            objectsView.show(node);
+            serversView.open(node);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

@@ -20,7 +20,7 @@ package org.safehaus.penrose.studio.logging;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.safehaus.penrose.log4j.LoggerConfig;
@@ -44,9 +44,9 @@ public class LoggersNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
+    ServersView view;
 
-    public LoggersNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public LoggersNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
         this.view = view;
     }
@@ -136,7 +136,7 @@ public class LoggersNode extends Node {
             LoggerNode loggerNode = new LoggerNode(
                     view,
                     loggerConfig.getName(),
-                    ObjectsView.LOGGER,
+                    ServersView.LOGGER,
                     PenrosePlugin.getImage(PenroseImage.LOGGER),
                     loggerConfig,
                     this

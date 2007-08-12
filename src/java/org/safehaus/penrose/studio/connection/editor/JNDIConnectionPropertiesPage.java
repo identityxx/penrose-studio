@@ -23,16 +23,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.events.*;
 import org.eclipse.ui.forms.widgets.*;
-import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.ldap.LDAPClient;
-import org.apache.log4j.Logger;
 
 import javax.naming.InitialContext;
 import javax.naming.Context;
@@ -41,11 +36,7 @@ import java.util.*;
 /**
  * @author Endi S. Dewata
  */
-public class JNDIConnectionPropertiesPage extends FormPage {
-
-    Logger log = Logger.getLogger(getClass());
-
-    FormToolkit toolkit;
+public class JNDIConnectionPropertiesPage extends ConnectionEditorPage {
 
     Text nameText;
     Combo protocolCombo;
@@ -59,23 +50,14 @@ public class JNDIConnectionPropertiesPage extends FormPage {
 
     String url;
 
-    JNDIConnectionEditor editor;
-    PartitionConfig partitionConfig;
-    ConnectionConfig connectionConfig;
-
     public JNDIConnectionPropertiesPage(JNDIConnectionEditor editor) {
         super(editor, "PROPERTIES", "  Properties  ");
-
-        this.editor = editor;
-        this.partitionConfig = editor.getPartitionConfig();
-        this.connectionConfig = editor.getConnectionConfig();
     }
 
     public void createFormContent(IManagedForm managedForm) {
-        toolkit = managedForm.getToolkit();
+        super.createFormContent(managedForm);
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Connection Editor");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
@@ -213,7 +195,7 @@ public class JNDIConnectionPropertiesPage extends FormPage {
             public void widgetSelected(SelectionEvent e) {
                 try {
                     LDAPClient client = new LDAPClient(connectionConfig.getParameters());
-                    Collection list = client.getNamingContexts();
+                    Collection<String> list = client.getNamingContexts();
 
                     suffixCombo.removeAll();
                     for (Iterator i=list.iterator(); i.hasNext(); ) {

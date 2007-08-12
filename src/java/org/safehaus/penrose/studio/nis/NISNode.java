@@ -1,15 +1,18 @@
 package org.safehaus.penrose.studio.nis;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.nis.editor.NISDomainDialog;
 import org.safehaus.penrose.studio.nis.editor.NISUserDialog;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.management.PenroseClient;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
@@ -29,13 +32,15 @@ import java.io.File;
  */
 public class NISNode extends Node {
 
-    ObjectsView view;
+    private ServersView view;
+    private ProjectNode projectNode;
 
     protected NISTool nisTool;
 
-    public NISNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public NISNode(String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
-        this.view = view;
+        projectNode = (ProjectNode)parent;
+        view = projectNode.getView();
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -68,10 +73,10 @@ public class NISNode extends Node {
     }
 
     public void start() throws Exception {
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
-        PenroseContext penroseContext = penroseStudio.getPenroseContext();
-        File workDir = penroseStudio.getWorkDir();
+        Project project = projectNode.getProject();
+        PenroseConfig penroseConfig = project.getPenroseConfig();
+        PenroseContext penroseContext = project.getPenroseContext();
+        File workDir = project.getWorkDir();
 
         nisTool = new NISTool();
         nisTool.init(penroseConfig, penroseContext, workDir);
@@ -94,9 +99,8 @@ public class NISNode extends Node {
         for (NISDomain nisDomain : nisTool.getNisDomains().values()) {
 
             NISDomainNode node = new NISDomainNode(
-                    view,
                     nisDomain.getName(),
-                    ObjectsView.ENTRY,
+                    ServersView.ENTRY,
                     PenrosePlugin.getImage(PenroseImage.NODE),
                     nisDomain,
                     this
@@ -136,9 +140,10 @@ public class NISNode extends Node {
         nisTool.createDatabase(domain);
         nisTool.createPartition(domain);
 
+        Project project = projectNode.getProject();
+        project.upload("partitions/"+partitionName);
+        
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.uploadFolder("partitions/"+partitionName);
-
         penroseStudio.notifyChangeListeners();
     }
 
@@ -153,5 +158,21 @@ public class NISNode extends Node {
 
     public void setNisTool(NISTool nisTool) {
         this.nisTool = nisTool;
+    }
+
+    public ServersView getView() {
+        return view;
+    }
+
+    public void setView(ServersView view) {
+        this.view = view;
+    }
+
+    public ProjectNode getProjectNode() {
+        return projectNode;
+    }
+
+    public void setProjectNode(ProjectNode projectNode) {
+        this.projectNode = projectNode;
     }
 }

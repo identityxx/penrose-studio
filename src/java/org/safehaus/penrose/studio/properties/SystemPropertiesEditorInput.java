@@ -20,11 +20,14 @@ package org.safehaus.penrose.studio.properties;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.safehaus.penrose.config.PenroseConfig;
 
 /**
  * @author Endi S. Dewata
  */
 public class SystemPropertiesEditorInput implements IEditorInput {
+
+    private PenroseConfig penroseConfig;
 
     public SystemPropertiesEditorInput() {
     }
@@ -63,5 +66,13 @@ public class SystemPropertiesEditorInput implements IEditorInput {
         if((object == null) || (object.getClass() != getClass())) return false;
 
         return true;
+    }
+
+    public PenroseConfig getPenroseConfig() {
+        return penroseConfig;
+    }
+
+    public void setPenroseConfig(PenroseConfig penroseConfig) {
+        this.penroseConfig = penroseConfig;
     }
 }

@@ -27,6 +27,7 @@ import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.StaticEntryDNWizardPage;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.acl.ACI;
 import org.apache.log4j.Logger;
 
@@ -39,6 +40,7 @@ public class RootEntryWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
+    private ProjectNode projectNode;
     private PartitionConfig partitionConfig;
     private EntryMapping entryMapping;
 
@@ -46,12 +48,13 @@ public class RootEntryWizard extends Wizard {
     public ObjectClassWizardPage ocPage;
     public AttributeValueWizardPage attrPage;
 
-    public RootEntryWizard(PartitionConfig partition) {
+    public RootEntryWizard(ProjectNode projectNode, PartitionConfig partition) {
+        this.projectNode = projectNode;
         this.partitionConfig = partition;
 
         dnPage = new StaticEntryDNWizardPage(partition);
-        ocPage = new ObjectClassWizardPage();
-        attrPage = new AttributeValueWizardPage(partition);
+        ocPage = new ObjectClassWizardPage(projectNode);
+        attrPage = new AttributeValueWizardPage(projectNode, partition);
         
         setWindowTitle("Adding root entry");
     }

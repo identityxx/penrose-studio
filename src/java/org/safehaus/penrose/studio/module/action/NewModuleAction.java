@@ -23,7 +23,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.module.wizard.ModuleWizard;
 import org.safehaus.penrose.studio.module.ModulesNode;
@@ -46,7 +46,7 @@ public class NewModuleAction extends Action {
         try {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
-            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+            ServersView serversView = (ServersView)page.showView(ServersView.class.getName());
 
             Shell shell = window.getShell();
 
@@ -58,7 +58,7 @@ public class NewModuleAction extends Action {
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 
-            objectsView.show(node);
+            serversView.open(node);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

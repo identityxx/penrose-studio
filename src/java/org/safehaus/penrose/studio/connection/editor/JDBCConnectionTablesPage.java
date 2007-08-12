@@ -35,6 +35,7 @@ import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.connection.JDBCSourceWizard;
 import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.partition.Partitions;
@@ -51,7 +52,7 @@ import java.io.PrintWriter;
 /**
  * @author Endi S. Dewata
  */
-public class JDBCConnectionTablesPage extends JDBCConnectionEditorPage {
+public class JDBCConnectionTablesPage extends ConnectionEditorPage {
 
     Combo catalogCombo;
     Combo schemaCombo;
@@ -221,9 +222,9 @@ public class JDBCConnectionTablesPage extends JDBCConnectionEditorPage {
             schemaCombo.removeAll();
             tablesTable.removeAll();
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
-            PenroseContext penroseContext = penroseStudio.getPenroseContext();
+            Project project = projectNode.getProject();
+            PenroseConfig penroseConfig = project.getPenroseConfig();
+            PenroseContext penroseContext = project.getPenroseContext();
 
             Partitions partitions = new Partitions();
 
@@ -310,9 +311,9 @@ public class JDBCConnectionTablesPage extends JDBCConnectionEditorPage {
 
             tablesTable.removeAll();
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
-            PenroseContext penroseContext = penroseStudio.getPenroseContext();
+            Project project = projectNode.getProject();
+            PenroseConfig penroseConfig = project.getPenroseConfig();
+            PenroseContext penroseContext = project.getPenroseContext();
 
             Partitions partitions = new Partitions();
 

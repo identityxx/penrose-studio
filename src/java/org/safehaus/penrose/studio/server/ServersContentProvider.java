@@ -15,24 +15,39 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.object;
+package org.safehaus.penrose.studio.server;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.safehaus.penrose.studio.tree.Node;
+import org.safehaus.penrose.studio.project.ProjectConfig;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
-public class ObjectsContentProvider implements ITreeContentProvider {
+public class ServersContentProvider implements ITreeContentProvider {
 
     protected Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
+    ServersView view;
+    Map<String,Node> servers = new TreeMap<String,Node>();
 
-    public ObjectsContentProvider(ObjectsView view) {
+    public ServersContentProvider(ServersView view) {
         this.view = view;
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.loadApplicationConfig();
+
+        for (ProjectConfig projectConfig : penroseStudio.getApplicationConfig().getProjects()) {
+            addProjectConfig(projectConfig);
+        }
     }
 
     public void inputChanged(Viewer v, Object oldInput, Object newInput) {
@@ -57,7 +72,7 @@ public class ObjectsContentProvider implements ITreeContentProvider {
     }
 
     public Object[] getElements(Object inputElement) {
-        return view.nodes.toArray();
+        return servers.values().toArray();
     }
 
     public Object getParent(Object element) {
@@ -75,5 +90,22 @@ public class ObjectsContentProvider implements ITreeContentProvider {
         }
 
         return false;
+    }
+
+    public void addProjectConfig(ProjectConfig projectConfig) {
+        ProjectNode projectNode = new ProjectNode(
+                view,
+                projectConfig.getName(),
+                "Project",
+                PenrosePlugin.getImage(PenroseImage.LOGO16),
+                projectConfig,
+                null
+        );
+
+        servers.put(projectConfig.getName(), projectNode);
+    }
+
+    public void removeProjectConfig(String name) {
+        servers.remove(name);
     }
 }

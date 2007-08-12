@@ -20,11 +20,19 @@ package org.safehaus.penrose.studio.preview;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.safehaus.penrose.studio.project.ProjectConfig;
+import org.safehaus.penrose.config.PenroseConfig;
+
+import java.io.File;
 
 /**
  * @author Endi S. Dewata
  */
 public class PreviewEditorInput implements IEditorInput {
+
+    private ProjectConfig projectConfig;
+    private File workDir;
+    private PenroseConfig penroseConfig;
 
     public PreviewEditorInput() {
     }
@@ -58,5 +66,29 @@ public class PreviewEditorInput implements IEditorInput {
         if (!(o instanceof PreviewEditorInput)) return false;
 
         return true;
+    }
+
+    public File getWorkDir() {
+        return workDir;
+    }
+
+    public void setWorkDir(File workDir) {
+        this.workDir = workDir;
+    }
+
+    public ProjectConfig getProject() {
+        return projectConfig;
+    }
+
+    public void setProject(ProjectConfig projectConfig) {
+        this.projectConfig = projectConfig;
+    }
+
+    public PenroseConfig getPenroseConfig() {
+        return penroseConfig;
+    }
+
+    public void setPenroseConfig(PenroseConfig penroseConfig) {
+        this.penroseConfig = penroseConfig;
     }
 }

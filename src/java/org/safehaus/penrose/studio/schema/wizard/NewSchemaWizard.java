@@ -19,6 +19,8 @@ package org.safehaus.penrose.studio.schema.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.schema.SchemaConfig;
 import org.safehaus.penrose.schema.SchemaManager;
@@ -35,10 +37,14 @@ public class NewSchemaWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
+    private ProjectNode projectNode;
+
     public SchemaNameWizardPage namePage = new SchemaNameWizardPage();
 
-    public NewSchemaWizard() {
+    public NewSchemaWizard(ProjectNode projectNode) {
         setWindowTitle("New Schema");
+
+        this.projectNode = projectNode;
     }
 
     public boolean canFinish() {
@@ -76,18 +82,16 @@ public class NewSchemaWizard extends Wizard {
             schemaConfig.setName(name);
             schemaConfig.setPath(path);
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            File workDir = penroseStudio.getWorkDir();
+            Project project = projectNode.getProject();
 
             Schema schema = new Schema(schemaConfig);
 
-            SchemaWriter schemaWriter = new SchemaWriter(workDir);
+            SchemaWriter schemaWriter = new SchemaWriter(project.getWorkDir());
             schemaWriter.write(schema);
 
-            PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
-            penroseConfig.addSchemaConfig(schemaConfig);
+            project.getPenroseConfig().addSchemaConfig(schemaConfig);
 
-            SchemaManager schemaManager = penroseStudio.getSchemaManager();
+            SchemaManager schemaManager = project.getSchemaManager();
             schemaManager.addSchema(schema);
 
             return true;
@@ -104,5 +108,13 @@ public class NewSchemaWizard extends Wizard {
 
     public boolean needsPreviousAndNextButtons() {
         return true;
+    }
+
+    public ProjectNode getProjectNode() {
+        return projectNode;
+    }
+
+    public void setProjectNode(ProjectNode projectNode) {
+        this.projectNode = projectNode;
     }
 }

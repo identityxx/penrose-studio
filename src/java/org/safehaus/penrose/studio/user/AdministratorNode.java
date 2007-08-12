@@ -18,8 +18,10 @@
 package org.safehaus.penrose.studio.user;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.user.UserConfig;
 import org.eclipse.swt.graphics.Image;
@@ -37,11 +39,13 @@ public class AdministratorNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
+    ServersView view;
+    ProjectNode projectNode;
 
-    public AdministratorNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public AdministratorNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
-        this.view = view;
+        projectNode = (ProjectNode)parent;
+        this.view = projectNode.getView();
     }
 
     public void showMenu(IMenuManager manager) {
@@ -58,8 +62,8 @@ public class AdministratorNode extends Node {
     }
 
     public void open() throws Exception {
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
+        Project project = projectNode.getProject();
+        PenroseConfig penroseConfig = project.getPenroseConfig();
         UserConfig userConfig = penroseConfig.getRootUserConfig();
 
         UserEditorInput ei = new UserEditorInput(userConfig);

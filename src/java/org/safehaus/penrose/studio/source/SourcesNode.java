@@ -20,9 +20,12 @@ package org.safehaus.penrose.studio.source;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.partition.PartitionsNode;
+import org.safehaus.penrose.studio.partition.PartitionNode;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.source.action.NewSourceAction;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceConfigs;
@@ -42,16 +45,29 @@ public class SourcesNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    public final static char SEPARATOR = '.';
+    public final static char SEPARATOR = '_';
 
-    ObjectsView view;
+    protected ServersView view;
+    protected ProjectNode projectNode;
+    protected PartitionsNode partitionsNode;
+    protected PartitionNode partitionNode;
 
     private PartitionConfig partitionConfig;
     private String path;
 
-    public SourcesNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public SourcesNode(String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
-        this.view = view;
+
+        if (parent instanceof PartitionNode) {
+            partitionNode = (PartitionNode)parent;
+
+        } else if (parent instanceof SourcesNode) {
+            partitionNode = ((SourcesNode)parent).getPartitionNode();
+        }
+
+        partitionsNode = partitionNode.getPartitionsNode();
+        projectNode = partitionsNode.getProjectNode();
+        view = projectNode.getView();
     }
 
     public void showMenu(IMenuManager manager) {
@@ -118,11 +134,10 @@ public class SourcesNode extends Node {
                 if (!children.containsKey(label)) {
                     // log.debug("Creating sources node "+label);
                     SourcesNode sourcesNode = new SourcesNode(
-                            view,
                             label,
-                            ObjectsView.SOURCES,
+                            ServersView.SOURCES,
                             PenrosePlugin.getImage(PenroseImage.FOLDER),
-                            ObjectsView.SOURCES,
+                            ServersView.SOURCES,
                             this
                     );
 
@@ -137,9 +152,8 @@ public class SourcesNode extends Node {
 
                 // log.debug("Creating source node "+label);
                 SourceNode sourceNode = new SourceNode(
-                        view,
                         label,
-                        ObjectsView.SOURCE,
+                        ServersView.SOURCE,
                         PenrosePlugin.getImage(PenroseImage.SOURCE),
                         sourceConfig,
                         this
@@ -169,5 +183,37 @@ public class SourcesNode extends Node {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public ServersView getView() {
+        return view;
+    }
+
+    public void setView(ServersView view) {
+        this.view = view;
+    }
+
+    public ProjectNode getProjectNode() {
+        return projectNode;
+    }
+
+    public void setProjectNode(ProjectNode projectNode) {
+        this.projectNode = projectNode;
+    }
+
+    public PartitionsNode getPartitionsNode() {
+        return partitionsNode;
+    }
+
+    public void setPartitionsNode(PartitionsNode partitionsNode) {
+        this.partitionsNode = partitionsNode;
+    }
+
+    public PartitionNode getPartitionNode() {
+        return partitionNode;
+    }
+
+    public void setPartitionNode(PartitionNode partitionNode) {
+        this.partitionNode = partitionNode;
     }
 }

@@ -20,7 +20,9 @@ package org.safehaus.penrose.studio.schema;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.SchemaConfig;
@@ -37,18 +39,22 @@ import java.util.Iterator;
  */
 public class ObjectClassesNode extends Node {
 
-    ObjectsView view;
+    ServersView view;
+    ProjectNode projectNode;
+    SchemaNode schemaNode;
 
     private SchemaConfig schemaConfig;
 
-    public ObjectClassesNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public ObjectClassesNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
-        this.view = view;
+        schemaNode = (SchemaNode)parent;
+        projectNode = schemaNode.getProjectNode();
+        this.view = projectNode.getView();
     }
 
     public boolean hasChildren() throws Exception {
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        SchemaManager schemaManager = penroseStudio.getSchemaManager();
+        Project project = projectNode.getProject();
+        SchemaManager schemaManager = project.getSchemaManager();
         Schema schema = schemaManager.getSchema(schemaConfig.getName());
         return !schema.getObjectClasses().isEmpty();
     }
@@ -57,8 +63,8 @@ public class ObjectClassesNode extends Node {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        SchemaManager schemaManager = penroseStudio.getSchemaManager();
+        Project project = projectNode.getProject();
+        SchemaManager schemaManager = project.getSchemaManager();
         Schema schema = schemaManager.getSchema(schemaConfig.getName());
 
         Collection objectClasses = schema.getObjectClasses();
@@ -68,7 +74,7 @@ public class ObjectClassesNode extends Node {
             children.add(new ObjectClassNode(
                     view,
                     objectClass.getName(),
-                    ObjectsView.OBJECT_CLASS,
+                    ServersView.OBJECT_CLASS,
                     PenrosePlugin.getImage(PenroseImage.OBJECT_CLASS),
                     objectClass,
                     this

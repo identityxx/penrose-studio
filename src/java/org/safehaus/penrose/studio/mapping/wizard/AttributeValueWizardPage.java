@@ -29,6 +29,8 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.mapping.AttributeTypeSelectionDialog;
 import org.safehaus.penrose.studio.mapping.ExpressionDialog;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.mapping.*;
@@ -53,6 +55,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
     public final static int VARIABLE   = 1;
     public final static int EXPRESSION = 2;
 
+    ProjectNode projectNode;
     PartitionConfig partitionConfig;
     Table attributeTable;
 
@@ -65,8 +68,9 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
     private boolean needRdn = false;
 
-    public AttributeValueWizardPage(PartitionConfig partition) {
+    public AttributeValueWizardPage(ProjectNode projectNode, PartitionConfig partition) {
         super(NAME);
+        this.projectNode = projectNode;
         this.partitionConfig = partition;
         setDescription("Double-click the attribute to enter the values. Select attributes that will be used as RDN.");
     }
@@ -165,8 +169,8 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                     AttributeTypeSelectionDialog dialog = new AttributeTypeSelectionDialog(parent.getShell(), SWT.NONE);
                     dialog.setText("Add attributes...");
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    dialog.setSchemaManager(penroseStudio.getSchemaManager());
+                    Project project = projectNode.getProject();
+                    dialog.setSchemaManager(project.getSchemaManager());
 
                     dialog.open();
                     if (dialog.getAction() == AttributeTypeSelectionDialog.CANCEL) return;
@@ -253,8 +257,8 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
     public void init() {
         try {
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            SchemaManager schemaManager = penroseStudio.getSchemaManager();
+            Project project = projectNode.getProject();
+            SchemaManager schemaManager = project.getSchemaManager();
 
             System.out.println("Object classes:");
             for (Iterator i=objectClasses.iterator(); i.hasNext(); ) {

@@ -23,10 +23,10 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.partition.wizard.ExportPartitionWizard;
 import org.safehaus.penrose.studio.partition.PartitionNode;
-import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.apache.log4j.Logger;
 
 public class ExportPartitionAction extends Action {
@@ -45,7 +45,7 @@ public class ExportPartitionAction extends Action {
         try {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
-            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+            ServersView serversView = (ServersView)page.showView(ServersView.class.getName());
 
             Shell shell = window.getShell();
 
@@ -54,7 +54,8 @@ public class ExportPartitionAction extends Action {
             dialog.setPageSize(600, 300);
             dialog.open();
 
-            objectsView.show(objectsView.getPartitionsNode());
+            ProjectNode projectNode = serversView.getSelectedProjectNode();
+            serversView.open(projectNode.getPartitionsNode());
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

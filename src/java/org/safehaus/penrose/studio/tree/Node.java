@@ -29,6 +29,7 @@ import java.util.Collection;
 public class Node {
 
     public Logger log = Logger.getLogger(getClass());
+    public boolean debug = log.isDebugEnabled();
 
     protected String name;
     protected String type;

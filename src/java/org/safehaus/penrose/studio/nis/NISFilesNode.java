@@ -1,7 +1,7 @@
 package org.safehaus.penrose.studio.nis;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.nis.NISDomain;
 import org.eclipse.swt.graphics.Image;
 
@@ -13,12 +13,12 @@ import java.util.ArrayList;
  */
 public class NISFilesNode extends Node {
 
-    ObjectsView view;
+    ServersView view;
 
     private NISTool nisTool;
     private NISDomain domain;
 
-    public NISFilesNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public NISFilesNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
         this.view = view;
     }

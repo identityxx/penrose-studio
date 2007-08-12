@@ -24,25 +24,19 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.forms.widgets.*;
-import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.source.JDBCFieldDialog;
 import org.safehaus.penrose.studio.source.FieldDialog;
 import org.safehaus.penrose.jdbc.JDBCClient;
-import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.apache.log4j.Logger;
 
-public class JDBCSourcePropertyPage extends FormPage {
-
-    Logger log = Logger.getLogger(getClass());
-
-    FormToolkit toolkit;
+public class JDBCSourcePropertyPage extends SourceEditorPage {
 
     Text sourceNameText;
 	Combo connectionNameCombo;
@@ -57,23 +51,14 @@ public class JDBCSourcePropertyPage extends FormPage {
     Button editButton;
     Button removeButton;
 
-    JDBCSourceEditor editor;
-    PartitionConfig partitionConfig;
-	SourceConfig sourceConfig;
-
     public JDBCSourcePropertyPage(JDBCSourceEditor editor) {
         super(editor, "PROPERTIES", "  Properties  ");
-
-        this.editor = editor;
-        this.partitionConfig = editor.partitionConfig;
-        this.sourceConfig = editor.sourceConfig;
     }
 
     public void createFormContent(IManagedForm managedForm) {
-        toolkit = managedForm.getToolkit();
+        super.createFormContent(managedForm);
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Source Editor");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
@@ -262,8 +247,8 @@ public class JDBCSourcePropertyPage extends FormPage {
                     FieldConfig fieldConfig = (FieldConfig)item.getData();
                     String oldName = fieldConfig.getName();
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    PartitionConfigs partitionConfigs = penroseStudio.getPartitionConfigs();
+                    Project project = projectNode.getProject();
+                    PartitionConfigs partitionConfigs = project.getPartitionConfigs();
                     PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(sourceConfig);
 
                     ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
@@ -344,8 +329,8 @@ public class JDBCSourcePropertyPage extends FormPage {
                 try {
                     FieldConfig fieldDefinition = new FieldConfig();
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    PartitionConfigs partitionConfigs = penroseStudio.getPartitionConfigs();
+                    Project project = projectNode.getProject();
+                    PartitionConfigs partitionConfigs = project.getPartitionConfigs();
                     PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(sourceConfig);
 
                     ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
@@ -386,8 +371,8 @@ public class JDBCSourcePropertyPage extends FormPage {
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     String oldName = fieldDefinition.getName();
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    PartitionConfigs partitionConfigs = penroseStudio.getPartitionConfigs();
+                    Project project = projectNode.getProject();
+                    PartitionConfigs partitionConfigs = project.getPartitionConfigs();
                     PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(sourceConfig);
 
                     ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());

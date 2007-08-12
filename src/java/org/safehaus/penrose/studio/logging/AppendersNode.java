@@ -1,7 +1,7 @@
 package org.safehaus.penrose.studio.logging;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -25,9 +25,9 @@ public class AppendersNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
+    ServersView view;
 
-    public AppendersNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public AppendersNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
         this.view = view;
     }
@@ -84,7 +84,7 @@ public class AppendersNode extends Node {
             AppenderNode appenderNode = new AppenderNode(
                     view,
                     appenderConfig.getName(),
-                    ObjectsView.APPENDER,
+                    ServersView.APPENDER,
                     PenrosePlugin.getImage(PenroseImage.APPENDER),
                     appenderConfig,
                     this

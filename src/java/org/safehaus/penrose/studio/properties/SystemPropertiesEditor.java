@@ -39,18 +39,20 @@ public class SystemPropertiesEditor extends MultiPageEditorPart {
 
     boolean dirty;
 
+    PenroseConfig penroseConfig;
+
     Map<String,String> origProperties;
     Map<String,String> properties = new TreeMap<String,String>();
 
     SystemPropertiesPage propertyPage;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+        SystemPropertiesEditorInput ei = (SystemPropertiesEditorInput)input;
+        penroseConfig = ei.getPenroseConfig();
+
         setSite(site);
         setInput(input);
         setPartName("System Properties");
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
 
         origProperties = penroseConfig.getSystemProperties();
         properties.putAll(origProperties);

@@ -25,6 +25,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.FillLayout;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.SchemaManager;
@@ -49,12 +51,14 @@ public class ObjectClassWizardPage extends WizardPage {
     Button addAllButton;
     Button removeAllButton;
 
-    Collection availableOCs = new TreeSet();
-    Collection selectedOCs = new TreeSet();
+    ProjectNode projectNode;
+    Collection<String> availableOCs = new TreeSet<String>();
+    Collection<String> selectedOCs = new TreeSet<String>();
 
-    public ObjectClassWizardPage() {
+    public ObjectClassWizardPage(ProjectNode projectNode) {
         super(NAME);
 
+        this.projectNode = projectNode;
         setDescription("Select object classes.");
     }
 
@@ -79,16 +83,15 @@ public class ObjectClassWizardPage extends WizardPage {
             public void widgetSelected(SelectionEvent event) {
                 if (availableTable.getSelectionCount() == 0) return;
 
-                PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                SchemaManager schemaManager = penroseStudio.getSchemaManager();
+                Project project = projectNode.getProject();
+                SchemaManager schemaManager = project.getSchemaManager();
 
                 TableItem items[] = availableTable.getSelection();
-                for (int i=0; i<items.length; i++) {
-                    String objectClass = (String)items[i].getData();
+                for (TableItem item : items) {
+                    String objectClass = (String) item.getData();
 
-                    Collection ocNames = schemaManager.getAllObjectClassNames(objectClass);
-                    for (Iterator j=ocNames.iterator(); j.hasNext(); ) {
-                        String ocName = (String)j.next();
+                    Collection<String> ocNames = schemaManager.getAllObjectClassNames(objectClass);
+                    for (String ocName : ocNames) {
                         availableOCs.remove(ocName);
                         selectedOCs.add(ocName);
                     }
@@ -104,8 +107,8 @@ public class ObjectClassWizardPage extends WizardPage {
             public void widgetSelected(SelectionEvent event) {
                 if (selectedTable.getSelectionCount() == 0) return;
 
-                PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                SchemaManager schemaManager = penroseStudio.getSchemaManager();
+                Project project = projectNode.getProject();
+                SchemaManager schemaManager = project.getSchemaManager();
 
                 TableItem items[] = selectedTable.getSelection();
                 for (int i=0; i<items.length; i++) {
@@ -185,8 +188,8 @@ public class ObjectClassWizardPage extends WizardPage {
 
     public void init() {
         try {
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            Schema schema = penroseStudio.getSchemaManager().getAllSchema();
+            Project project = projectNode.getProject();
+            Schema schema = project.getSchemaManager().getAllSchema();
 
             Collection ocNames = new ArrayList();
             for (Iterator i=schema.getObjectClasses().iterator(); i.hasNext(); ) {

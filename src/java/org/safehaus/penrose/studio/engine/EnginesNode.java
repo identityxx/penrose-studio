@@ -20,7 +20,9 @@ package org.safehaus.penrose.studio.engine;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.engine.EngineConfig;
 import org.eclipse.swt.graphics.Image;
@@ -34,11 +36,13 @@ import java.util.Iterator;
  */
 public class EnginesNode extends Node {
 
-    ObjectsView view;
+    ServersView view;
+    ProjectNode projectNode;
 
-    public EnginesNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public EnginesNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
-        this.view = view;
+        projectNode = (ProjectNode)parent;
+        this.view = projectNode.getView();
     }
 
     public boolean hasChildren() throws Exception {
@@ -49,8 +53,8 @@ public class EnginesNode extends Node {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Collection engineConfigs = penroseStudio.getPenroseConfig().getEngineConfigs();
+        Project project = projectNode.getProject();
+        Collection engineConfigs = project.getPenroseConfig().getEngineConfigs();
 
         for (Iterator i=engineConfigs.iterator(); i.hasNext(); ) {
             EngineConfig engineConfig = (EngineConfig)i.next();
@@ -58,7 +62,7 @@ public class EnginesNode extends Node {
             children.add(new EngineNode(
                     view,
                     engineConfig.getName(),
-                    ObjectsView.ENGINE,
+                    ServersView.ENGINE,
                     PenrosePlugin.getImage(PenroseImage.ENGINE),
                     engineConfig,
                     this

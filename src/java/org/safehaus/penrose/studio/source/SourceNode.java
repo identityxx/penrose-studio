@@ -32,10 +32,13 @@ import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.partition.PartitionsNode;
+import org.safehaus.penrose.studio.partition.PartitionNode;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.plugin.PluginManager;
 import org.safehaus.penrose.studio.plugin.Plugin;
 import org.safehaus.penrose.studio.source.editor.*;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
@@ -51,15 +54,23 @@ public class SourceNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
+    protected ServersView view;
+    protected ProjectNode projectNode;
+    protected PartitionsNode partitionsNode;
+    protected PartitionNode partitionNode;
+    protected SourcesNode sourcesNode;
 
     private PartitionConfig partitionConfig;
     private ConnectionConfig connectionConfig;
     private SourceConfig sourceConfig;
 
-    public SourceNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public SourceNode(String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
-        this.view = view;
+        sourcesNode = (SourcesNode)parent;
+        partitionNode = sourcesNode.getPartitionNode();
+        partitionsNode = partitionNode.getPartitionsNode();
+        projectNode = partitionsNode.getProjectNode();
+        view = projectNode.getView();
     }
 
     public void showMenu(IMenuManager manager) {
@@ -119,6 +130,7 @@ public class SourceNode extends Node {
         Plugin plugin = pluginManager.getPlugin(con.getAdapterName());
 
         SourceEditorInput sei = plugin.createSourceEditorInput();
+        sei.setProjectNode(projectNode);
         sei.setPartitionConfig(this.partitionConfig);
         sei.setSourceConfig(sourceConfig);
 

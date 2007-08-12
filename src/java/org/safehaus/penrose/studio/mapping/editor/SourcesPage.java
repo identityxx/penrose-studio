@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.mapping;
+package org.safehaus.penrose.studio.mapping.editor;
 
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
@@ -33,11 +33,14 @@ import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.mapping.editor.MappingEditor;
+import org.safehaus.penrose.studio.mapping.SourceDialog;
+import org.safehaus.penrose.studio.mapping.ExpressionDialog;
+import org.safehaus.penrose.studio.mapping.FieldSelectionDialog;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;

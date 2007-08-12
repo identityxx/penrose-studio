@@ -1,10 +1,7 @@
 package org.safehaus.penrose.studio.source.editor;
 
-import org.apache.log4j.Logger;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
-import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
@@ -15,45 +12,31 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.source.Source;
-import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.ldap.LDAP;
 import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.studio.project.Project;
 
 import java.util.Iterator;
 import java.util.Collection;
 
-public class JDBCSourceBrowsePage extends FormPage {
-
-    Logger log = Logger.getLogger(getClass());
-
-    FormToolkit toolkit;
+public class JDBCSourceBrowsePage extends SourceEditorPage {
 
     Text maxSizeText;
 
     Table table;
 
-    JDBCSourceEditor editor;
-    PartitionConfig partitionConfig;
-    SourceConfig sourceConfig;
-
     public JDBCSourceBrowsePage(JDBCSourceEditor editor) {
         super(editor, "BROWSE", "  Browse  ");
-
-        this.editor = editor;
-        this.partitionConfig = editor.partitionConfig;
-        this.sourceConfig = editor.sourceConfig;
     }
 
     public void createFormContent(IManagedForm managedForm) {
-        toolkit = managedForm.getToolkit();
+        super.createFormContent(managedForm);
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Source Editor");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
@@ -93,12 +76,10 @@ public class JDBCSourceBrowsePage extends FormPage {
 
         table.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Collection fields = sourceConfig.getFieldConfigs();
-        for (Iterator i=fields.iterator(); i.hasNext(); ) {
-            FieldConfig fieldDefinition = (FieldConfig)i.next();
-
+        Collection<FieldConfig> fields = sourceConfig.getFieldConfigs();
+        for (FieldConfig fieldConfig : fields) {
             TableColumn tc = new TableColumn(table, SWT.NONE);
-            tc.setText(fieldDefinition.getName());
+            tc.setText(fieldConfig.getName());
             tc.setWidth(100);
         }
 
@@ -180,9 +161,9 @@ public class JDBCSourceBrowsePage extends FormPage {
 
             ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
-            PenroseContext penroseContext = penroseStudio.getPenroseContext();
+            Project project = projectNode.getProject();
+            PenroseConfig penroseConfig = project.getPenroseConfig();
+            PenroseContext penroseContext = project.getPenroseContext();
 
             Partitions partitions = new Partitions();
 
@@ -242,9 +223,9 @@ public class JDBCSourceBrowsePage extends FormPage {
 
             ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
-            PenroseContext penroseContext = penroseStudio.getPenroseContext();
+            Project project = projectNode.getProject();
+            PenroseConfig penroseConfig = project.getPenroseConfig();
+            PenroseContext penroseContext = project.getPenroseContext();
 
             Partitions partitions = new Partitions();
 
@@ -297,9 +278,9 @@ public class JDBCSourceBrowsePage extends FormPage {
 
             ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
-            PenroseContext penroseContext = penroseStudio.getPenroseContext();
+            Project project = projectNode.getProject();
+            PenroseConfig penroseConfig = project.getPenroseConfig();
+            PenroseContext penroseContext = project.getPenroseContext();
 
             Partitions partitions = new Partitions();
 
@@ -375,9 +356,9 @@ public class JDBCSourceBrowsePage extends FormPage {
         };
 
         try {
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
-            PenroseContext penroseContext = penroseStudio.getPenroseContext();
+            Project project = projectNode.getProject();
+            PenroseConfig penroseConfig = project.getPenroseConfig();
+            PenroseContext penroseContext = project.getPenroseContext();
 
             Partitions partitions = new Partitions();
 
@@ -406,9 +387,5 @@ public class JDBCSourceBrowsePage extends FormPage {
             }
             MessageDialog.openError(editor.getSite().getShell(), "Error", message);
         }
-    }
-
-    public void checkDirty() {
-        editor.checkDirty();
     }
 }

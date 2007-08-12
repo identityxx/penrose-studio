@@ -20,8 +20,8 @@ package org.safehaus.penrose.studio;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
-import org.safehaus.penrose.studio.object.ObjectsView;
-import org.safehaus.penrose.studio.mapping.MappingEditor;
+import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.mapping.editor.MappingEditor;
 import org.safehaus.penrose.studio.validation.ValidationView;
 import org.safehaus.penrose.studio.console.ConsoleView;
 
@@ -30,7 +30,7 @@ public class PenrosePerspective implements IPerspectiveFactory {
 	public final static String PERSPECTIVE_ID = PenrosePerspective.class.getName();
 
 	public final static String ID_MAPPING_VIEW     = MappingEditor.class.getName();
-	public final static String ID_OBJECTS_VIEW     = ObjectsView.class.getName();
+	public final static String ID_OBJECTS_VIEW     = ServersView.class.getName();
 	public final static String ID_VALIDATION_VIEW  = ValidationView.class.getName();
     public final static String ID_CONSOLE_VIEW      = ConsoleView.class.getName();
 
@@ -42,10 +42,11 @@ public class PenrosePerspective implements IPerspectiveFactory {
 
         IFolderLayout left = layout.createFolder("left", IPageLayout.LEFT, 0.26f, editorArea);
         left.addView(ID_OBJECTS_VIEW);
-
+/*
         IFolderLayout lowerCenter = layout.createFolder("lowerCenter", IPageLayout.BOTTOM, 0.80f, editorArea);
         lowerCenter.addView(ID_VALIDATION_VIEW);
         lowerCenter.addView(ID_CONSOLE_VIEW);
+*/
 	}
 
 }

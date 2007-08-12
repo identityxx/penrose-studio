@@ -20,8 +20,11 @@ package org.safehaus.penrose.studio.connection;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.partition.PartitionsNode;
+import org.safehaus.penrose.studio.partition.PartitionNode;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.connection.action.NewConnectionAction;
-import org.safehaus.penrose.studio.object.ObjectsView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
@@ -43,13 +46,19 @@ public class ConnectionsNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
+    private ServersView view;
+    private ProjectNode projectNode;
+    private PartitionsNode partitionsNode;
+    private PartitionNode partitionNode;
 
     private PartitionConfig partitionConfig;
 
-    public ConnectionsNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public ConnectionsNode(String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
-        this.view = view;
+        partitionNode = (PartitionNode)parent;
+        partitionsNode = partitionNode.getPartitionsNode();
+        projectNode = partitionsNode.getProjectNode();
+        view = projectNode.getView();
     }
 
     public void showMenu(IMenuManager manager) {
@@ -107,9 +116,8 @@ public class ConnectionsNode extends Node {
             ConnectionConfig connectionConfig = (ConnectionConfig)i.next();
 
             ConnectionNode connectionNode = new ConnectionNode(
-                    view,
                     connectionConfig.getName(),
-                    ObjectsView.CONNECTION,
+                    ServersView.CONNECTION,
                     PenrosePlugin.getImage(PenroseImage.CONNECTION),
                     connectionConfig,
                     this
@@ -130,5 +138,37 @@ public class ConnectionsNode extends Node {
 
     public void setPartitionConfig(PartitionConfig partitionConfig) {
         this.partitionConfig = partitionConfig;
+    }
+
+    public ServersView getView() {
+        return view;
+    }
+
+    public void setView(ServersView view) {
+        this.view = view;
+    }
+
+    public ProjectNode getProjectNode() {
+        return projectNode;
+    }
+
+    public void setProjectNode(ProjectNode projectNode) {
+        this.projectNode = projectNode;
+    }
+
+    public PartitionsNode getPartitionsNode() {
+        return partitionsNode;
+    }
+
+    public void setPartitionsNode(PartitionsNode partitionsNode) {
+        this.partitionsNode = partitionsNode;
+    }
+
+    public PartitionNode getPartitionNode() {
+        return partitionNode;
+    }
+
+    public void setPartitionNode(PartitionNode partitionNode) {
+        this.partitionNode = partitionNode;
     }
 }

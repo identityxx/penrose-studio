@@ -9,6 +9,8 @@ import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.SchemaWriter;
 import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -20,6 +22,8 @@ public class SchemaEditor extends FormEditor {
 
     Logger log = Logger.getLogger(getClass());
 
+    ProjectNode projectNode;
+
     public Schema origSchema;
     public Schema schema;
 
@@ -27,6 +31,7 @@ public class SchemaEditor extends FormEditor {
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         SchemaEditorInput sei = (SchemaEditorInput)input;
+        projectNode = sei.getProjectNode();
 
         origSchema = sei.getSchema();
         try {
@@ -68,23 +73,22 @@ public class SchemaEditor extends FormEditor {
     }
 
     public void store() throws Exception {
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        SchemaManager schemaManager = penroseStudio.getSchemaManager();
+        Project project = projectNode.getProject();
+        SchemaManager schemaManager = project.getSchemaManager();
         schemaManager.removeSchema(origSchema.getName());
 
         origSchema.copy(schema);
 
         schemaManager.addSchema(origSchema);
 
-        File workDir = penroseStudio.getWorkDir();
+        log.debug("Writing schema "+origSchema.getName()+" to "+project.getWorkDir());
 
-        log.debug("Writing schema "+origSchema.getName()+" to "+workDir);
-
-        SchemaWriter schemaWriter = new SchemaWriter(workDir);
+        SchemaWriter schemaWriter = new SchemaWriter(project.getWorkDir());
         schemaWriter.write(origSchema);
 
         setPartName("Schema - "+origSchema.getName());
 
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
 
         checkDirty();

@@ -1,26 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE licenses PUBLIC "-//Identyx/DTD License 1.0//EN" "http://www.identyx.com/dtd/license.dtdd">
 
 <licenses>
   <license>
     <product-name>Penrose Server</product-name>
-    <product-version>1.2</product-version>
-    <create-date>05/11/2007</create-date>
-    <expiry-date>08/11/2007</expiry-date>
+    <product-version>2.0</product-version>
+    <create-date>07/01/2007</create-date>
+    <expiry-date>12/31/2007</expiry-date>
+    <license-key>434d4060081105ebd80cf66075857e91</license-key>
     <parameter>
       <param-name>type</param-name>
       <param-value>EVALUATION</param-value>
     </parameter>
-    <license-key>9842f3e444ded08d02dbc6ea97392e35</license-key>
   </license>
   <license>
     <product-name>Penrose Studio</product-name>
-    <product-version>1.2</product-version>
-    <create-date>05/11/2007</create-date>
-    <expiry-date>08/11/2007</expiry-date>
+    <product-version>2.0</product-version>
+    <create-date>07/01/2007</create-date>
+    <expiry-date>12/31/2007</expiry-date>
+    <license-key>0cfe1f3505fbcff4ed7f2f8665d48ffa</license-key>
     <parameter>
       <param-name>type</param-name>
       <param-value>EVALUATION</param-value>
     </parameter>
-    <license-key>3cca2818c476d99c1baffbe9dbccc2bb</license-key>
   </license>
 </licenses>

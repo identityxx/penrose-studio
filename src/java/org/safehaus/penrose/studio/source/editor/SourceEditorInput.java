@@ -6,12 +6,14 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.studio.project.ProjectNode;
 
 /**
  * @author Endi S. Dewata
  */
 public class SourceEditorInput implements IEditorInput {
 
+    private ProjectNode projectNode;
     private PartitionConfig partitionConfig;
     private SourceConfig sourceConfig;
 
@@ -69,5 +71,13 @@ public class SourceEditorInput implements IEditorInput {
 
     public void setPartitionConfig(PartitionConfig partitionConfig) {
         this.partitionConfig = partitionConfig;
+    }
+
+    public ProjectNode getProjectNode() {
+        return projectNode;
+    }
+
+    public void setProjectNode(ProjectNode projectNode) {
+        this.projectNode = projectNode;
     }
 }

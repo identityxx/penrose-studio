@@ -20,11 +20,11 @@
       </category>
       <view
             allowMultiple="false"
-            class="org.safehaus.penrose.studio.object.ObjectsView"
+            class="org.safehaus.penrose.studio.server.ServersView"
             category="penrose"
-            name="Objects"
+            name="Servers"
             icon="images/penrose16.ico"
-            id="org.safehaus.penrose.studio.object.ObjectsView"/>
+            id="org.safehaus.penrose.studio.server.ServersView"/>
       <view
             allowMultiple="false"
             class="org.safehaus.penrose.studio.validation.ValidationView"
@@ -84,10 +84,10 @@
             icon="images/source.gif"
             class="org.safehaus.penrose.studio.source.editor.NISSourceEditor"/>
        <editor
-            id="org.safehaus.penrose.studio.mapping.MappingEditor"
+            id="org.safehaus.penrose.studio.mapping.editor.MappingEditor"
             name="Mapping"
             icon="images/penrose16.ico"
-            class="org.safehaus.penrose.studio.mapping.MappingEditor"/>
+            class="org.safehaus.penrose.studio.mapping.editor.MappingEditor"/>
        <editor
            id="org.safehaus.penrose.studio.browser.BrowserEditor"
            name="Browser"
@@ -191,7 +191,7 @@
         <product
                 name="Penrose Studio"
                 application="org.safehaus.penrose.application">
-            <property
+        <property
                 name="windowImages"
                 value="images/penrose16.gif,images/penrose32.gif"/>
         </product>

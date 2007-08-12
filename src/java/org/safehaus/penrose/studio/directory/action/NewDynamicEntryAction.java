@@ -23,10 +23,11 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.directory.wizard.DynamicEntryWizard;
 import org.safehaus.penrose.studio.directory.EntryNode;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.apache.log4j.Logger;
 
 public class NewDynamicEntryAction extends Action {
@@ -46,11 +47,12 @@ public class NewDynamicEntryAction extends Action {
         try {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
-            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+            ServersView serversView = (ServersView)page.showView(ServersView.class.getName());
+            ProjectNode projectNode = node.getProjectNode();
 
             Shell shell = window.getShell();
 
-            DynamicEntryWizard wizard = new DynamicEntryWizard(node.getPartitionConfig(), node.getEntryMapping());
+            DynamicEntryWizard wizard = new DynamicEntryWizard(projectNode, node.getPartitionConfig(), node.getEntryMapping());
             WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.setPageSize(600, 300);
             dialog.open();
@@ -58,7 +60,7 @@ public class NewDynamicEntryAction extends Action {
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 
-            objectsView.show(node);
+            serversView.open(node);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

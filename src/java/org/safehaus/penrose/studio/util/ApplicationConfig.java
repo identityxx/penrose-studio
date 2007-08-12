@@ -27,25 +27,25 @@ import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.dom4j.tree.DefaultElement;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.project.ProjectConfig;
 
 public class ApplicationConfig {
 	
 	private Logger log = Logger.getLogger(getClass().getName());
 
-	Map projects = new TreeMap();
+	Map<String, ProjectConfig> projects = new TreeMap<String, ProjectConfig>();
 	
-    Project currentProject;
+    ProjectConfig currentProjectConfig;
 
 	public ApplicationConfig() {
 		super();
 	}
 	
 	public void load(File file) throws Exception {
-		log.debug("Loading project configurations file from: "+file);
+		log.debug("Loading Penrose Studio configuration from "+file+".");
 		try {
 			Digester digester = new Digester();
-			digester.addObjectCreate("config/project", Project.class);
+			digester.addObjectCreate("config/project", ProjectConfig.class);
 			digester.addSetProperties("config/project");
 			digester.addSetNext("config/project", "addProject");
 			digester.setValidating(false);
@@ -72,12 +72,12 @@ public class ApplicationConfig {
 		writer.close();
 	}
 	
-	public void addProject(Project project) {
-		projects.put(project.getName(), project);
+	public void addProject(ProjectConfig projectConfig) {
+		projects.put(projectConfig.getName(), projectConfig);
 	}
 
-    public Project getProject(String name) {
-        return (Project)projects.get(name);
+    public ProjectConfig getProject(String name) {
+        return projects.get(name);
     }
     
     public void removeProject(String name) {
@@ -87,23 +87,22 @@ public class ApplicationConfig {
 	public Element toElement() {
 		Element element = new DefaultElement("config");
 
-		for (Iterator i=projects.values().iterator(); i.hasNext(); ) {
-			Project project = (Project)i.next();
-			element.add(project.toElement());
-		}
+        for (ProjectConfig projectConfig : projects.values()) {
+            element.add(projectConfig.toElement());
+        }
 
-		return element;
+        return element;
 	}
 	
-	public Collection getProjects() {
+	public Collection<ProjectConfig> getProjects() {
 		return projects.values();
 	}
 	
-    public void setCurrentProject(Project project) {
-        this.currentProject = project;
+    public void setCurrentProject(ProjectConfig projectConfig) {
+        this.currentProjectConfig = projectConfig;
     }
 
-	public Project getCurrentProject() {
-		return currentProject;
+	public ProjectConfig getCurrentProject() {
+		return currentProjectConfig;
 	}
 }

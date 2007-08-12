@@ -18,7 +18,6 @@
 package org.safehaus.penrose.studio.browser;
 
 import java.util.Enumeration;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
@@ -37,12 +36,6 @@ import org.eclipse.ui.part.*;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.ietf.ldap.*;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.util.ApplicationConfig;
-import org.safehaus.penrose.config.PenroseConfig;
-import org.safehaus.penrose.service.ServiceConfig;
-import org.safehaus.penrose.service.ServiceConfigs;
 import org.safehaus.penrose.ldap.DN;
 
 public class BrowserEditor extends EditorPart {
@@ -60,10 +53,18 @@ public class BrowserEditor extends EditorPart {
 
     LDAPConnection connection = new LDAPConnection();
 
+    String hostname;
+    int port;
     String bindDn;
     byte[] password;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+        BrowserEditorInput ei = (BrowserEditorInput)input;
+        hostname = ei.getHostname();
+        port = ei.getPort();
+        bindDn = ei.getBindDn();
+        password = ei.getPassword();
+
         setSite(site);
         setInput(input);
     }
@@ -177,21 +178,6 @@ public class BrowserEditor extends EditorPart {
         tc.setWidth(400);
 
         try {
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-
-            ApplicationConfig applicationConfig = penroseStudio.getApplicationConfig();
-            Project project = applicationConfig.getCurrentProject();
-            String hostname = project.getHost();
-
-            ServiceConfigs serviceConfigs = penroseStudio.getServiceConfigs();
-            ServiceConfig serviceConfig = serviceConfigs.getServiceConfig("LDAP");
-            String s = serviceConfig == null ? null : serviceConfig.getParameter(LDAP_PORT);
-            int port = s == null ? DEFAULT_LDAP_PORT : Integer.parseInt(s);
-
-            PenroseConfig penroseConfig = penroseStudio.getPenroseConfig();
-            bindDn = penroseConfig.getRootDn().toString();
-            password = penroseConfig.getRootPassword();
-
             open(hostname, port, "");
 
         } catch (Exception e) {
@@ -234,7 +220,7 @@ public class BrowserEditor extends EditorPart {
     public void showChildren(TreeItem parentItem) throws Exception {
 
         TreeItem items[] = parentItem.getItems();
-        for (int i=0; i<items.length; i++) items[i].dispose();
+        for (TreeItem item : items) item.dispose();
 
         DN parentDn = (DN)parentItem.getData();
 
@@ -298,12 +284,12 @@ public class BrowserEditor extends EditorPart {
 
         LDAPAttributeSet attributes = entry.getAttributeSet();
 
-        for (Iterator i = attributes.iterator(); i.hasNext(); ) {
-            LDAPAttribute attribute = (LDAPAttribute)i.next();
+        for (Object object : attributes) {
+            LDAPAttribute attribute = (LDAPAttribute) object;
             String name = attribute.getName();
 
-            for (Enumeration e = attribute.getStringValues(); e.hasMoreElements(); ) {
-                String value = (String)e.nextElement();
+            for (Enumeration e = attribute.getStringValues(); e.hasMoreElements();) {
+                String value = (String) e.nextElement();
 
                 TableItem tableItem = new TableItem(table, SWT.NONE);
                 tableItem.setText(0, name);

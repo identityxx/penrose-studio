@@ -1,7 +1,5 @@
 package org.safehaus.penrose.studio.source.editor;
 
-import org.eclipse.ui.forms.editor.FormPage;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.IManagedForm;
@@ -10,32 +8,26 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
-import org.apache.log4j.Logger;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.schema.SchemaManager;
+import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.studio.source.JNDIFieldDialog;
 import org.safehaus.penrose.studio.source.FieldDialog;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.SourceMapping;
 import org.safehaus.penrose.nis.*;
 import org.safehaus.penrose.nis.adapter.NISAdapter;
 
-import java.util.Iterator;
 import java.util.Collection;
 import java.util.ArrayList;
 
-public class NISSourcePropertyPage extends FormPage {
-
-    Logger log = Logger.getLogger(getClass());
-
-    FormToolkit toolkit;
+public class NISSourcePropertyPage extends SourceEditorPage {
 
 	Text sourceNameText;
     Combo connectionNameCombo;
@@ -49,10 +41,6 @@ public class NISSourcePropertyPage extends FormPage {
     Button editButton;
     Button removeButton;
 
-    NISSourceEditor editor;
-    PartitionConfig partitionConfig;
-	SourceConfig source;
-
 	NISClient client;
 
 	String[] scopes = new String[] { "OBJECT", "ONELEVEL", "SUBTREE" };
@@ -60,14 +48,10 @@ public class NISSourcePropertyPage extends FormPage {
     public NISSourcePropertyPage(NISSourceEditor editor) throws Exception {
         super(editor, "PROPERTIES", "  Properties  ");
 
-        this.editor = editor;
-        this.partitionConfig = editor.partitionConfig;
-        this.source = editor.sourceConfig;
-
-        ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(source.getConnectionName());
+        ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
         if (connectionConfig == null) return;
 
-        String method = (String)connectionConfig.getParameter(NISAdapter.METHOD);
+        String method = connectionConfig.getParameter(NISAdapter.METHOD);
         if (method == null) method = NISAdapter.DEFAULT_METHOD;
 
         if (NISAdapter.LOCAL.equals(method)) {
@@ -84,10 +68,9 @@ public class NISSourcePropertyPage extends FormPage {
     }
 
     public void createFormContent(IManagedForm managedForm) {
-        toolkit = managedForm.getToolkit();
+        super.createFormContent(managedForm);
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Source Editor");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
@@ -126,14 +109,14 @@ public class NISSourcePropertyPage extends FormPage {
         gd.widthHint = 100;
         sourceNameLabel.setLayoutData(gd);
 
-        sourceNameText = toolkit.createText(composite, source.getName(), SWT.BORDER);
+        sourceNameText = toolkit.createText(composite, sourceConfig.getName(), SWT.BORDER);
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
 		sourceNameText.setLayoutData(gd);
 
         sourceNameText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                source.setName(sourceNameText.getText());
+                sourceConfig.setName(sourceNameText.getText());
                 setDirty(true);
             }
         });
@@ -145,16 +128,15 @@ public class NISSourcePropertyPage extends FormPage {
         gd.widthHint = 200;
 		connectionNameCombo.setLayoutData(gd);
 
-        for (Iterator i=partitionConfig.getConnectionConfigs().getConnectionConfigs().iterator(); i.hasNext(); ) {
-            ConnectionConfig connectionConfig = (ConnectionConfig)i.next();
+        for (ConnectionConfig connectionConfig : partitionConfig.getConnectionConfigs().getConnectionConfigs()) {
             connectionNameCombo.add(connectionConfig.getName());
         }
 
-        connectionNameCombo.setText(source.getConnectionName());
+        connectionNameCombo.setText(sourceConfig.getConnectionName());
 
         connectionNameCombo.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                source.setConnectionName(connectionNameCombo.getText());
+                sourceConfig.setConnectionName(connectionNameCombo.getText());
                 setDirty(true);
             }
         });
@@ -172,7 +154,7 @@ public class NISSourcePropertyPage extends FormPage {
         gd.widthHint = 100;
         baseDnLabel.setLayoutData(gd);
 
-        String s = source.getParameter("base");
+        String s = sourceConfig.getParameter("base");
 		baseText = toolkit.createText(composite, s == null ? "" : s, SWT.BORDER);
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
@@ -181,9 +163,9 @@ public class NISSourcePropertyPage extends FormPage {
         baseText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(baseText.getText())) {
-                    source.removeParameter("base");
+                    sourceConfig.removeParameter("base");
                 } else {
-                    source.setParameter("base", baseText.getText());
+                    sourceConfig.setParameter("base", baseText.getText());
                 }
                 setDirty(true);
             }
@@ -191,7 +173,7 @@ public class NISSourcePropertyPage extends FormPage {
 
         toolkit.createLabel(composite, "Object Classes:");
 
-        s = source.getParameter("objectClasses");
+        s = sourceConfig.getParameter("objectClasses");
         objectClassesText = toolkit.createText(composite, s == null ? "" : s, SWT.BORDER);
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
@@ -200,9 +182,9 @@ public class NISSourcePropertyPage extends FormPage {
         objectClassesText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(objectClassesText.getText())) {
-                    source.removeParameter("objectClasses");
+                    sourceConfig.removeParameter("objectClasses");
                 } else {
-                    source.setParameter("objectClasses", objectClassesText.getText());
+                    sourceConfig.setParameter("objectClasses", objectClassesText.getText());
                 }
                 setDirty(true);
             }
@@ -232,7 +214,7 @@ public class NISSourcePropertyPage extends FormPage {
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     String oldName = fieldDefinition.getName();
 
-                    Collection attributeTypes = new ArrayList();
+                    Collection<AttributeType> attributeTypes = new ArrayList<AttributeType>();
 
                     JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setAttributeTypes(attributeTypes);
@@ -244,7 +226,7 @@ public class NISSourcePropertyPage extends FormPage {
                     String newName = fieldDefinition.getName();
 
                     if (!oldName.equals(newName)) {
-                        source.renameFieldConfig(oldName, newName);
+                        sourceConfig.renameFieldConfig(oldName, newName);
                     }
 
                     refresh();
@@ -305,9 +287,9 @@ public class NISSourcePropertyPage extends FormPage {
                 try {
                     FieldConfig fieldDefinition = new FieldConfig();
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    SchemaManager schemaManager = penroseStudio.getSchemaManager();
-                    Collection attributeTypes = schemaManager.getAttributeTypes();
+                    Project project = projectNode.getProject();
+                    SchemaManager schemaManager = project.getSchemaManager();
+                    Collection<AttributeType> attributeTypes = schemaManager.getAttributeTypes();
 
                     JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setAttributeTypes(attributeTypes);
@@ -316,7 +298,7 @@ public class NISSourcePropertyPage extends FormPage {
 
                     if (dialog.getAction() == FieldDialog.CANCEL) return;
 
-                    source.addFieldConfig(fieldDefinition);
+                    sourceConfig.addFieldConfig(fieldDefinition);
 
                     refresh();
                     setDirty(true);
@@ -340,9 +322,9 @@ public class NISSourcePropertyPage extends FormPage {
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     String oldName = fieldDefinition.getName();
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    SchemaManager schemaManager = penroseStudio.getSchemaManager();
-                    Collection attributeTypes = schemaManager.getAttributeTypes();
+                    Project project = projectNode.getProject();
+                    SchemaManager schemaManager = project.getSchemaManager();
+                    Collection<AttributeType> attributeTypes = schemaManager.getAttributeTypes();
 
                     JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setAttributeTypes(attributeTypes);
@@ -354,7 +336,7 @@ public class NISSourcePropertyPage extends FormPage {
                     String newName = fieldDefinition.getName();
 
                     if (!oldName.equals(newName)) {
-                        source.renameFieldConfig(oldName, newName);
+                        sourceConfig.renameFieldConfig(oldName, newName);
                     }
 
                     refresh();
@@ -376,9 +358,9 @@ public class NISSourcePropertyPage extends FormPage {
                     if (fieldTable.getSelectionCount() == 0) return;
 
                     TableItem items[] = fieldTable.getSelection();
-                    for (int i=0; i<items.length; i++) {
-                        FieldConfig fieldDefinition = (FieldConfig)items[i].getData();
-                        source.removeFieldConfig(fieldDefinition);
+                    for (TableItem item : items) {
+                        FieldConfig fieldDefinition = (FieldConfig) item.getData();
+                        sourceConfig.removeFieldConfig(fieldDefinition);
                     }
 
                     refresh();
@@ -399,14 +381,13 @@ public class NISSourcePropertyPage extends FormPage {
 
         SourceConfigs sources = partitionConfig.getSourceConfigs();
 
-        if (!sourceNameText.getText().equals(source.getName())) {
+        if (!sourceNameText.getText().equals(sourceConfig.getName())) {
 
-            String oldName = source.getName();
+            String oldName = sourceConfig.getName();
             String newName = sourceNameText.getText();
 
-            Collection entries = partitionConfig.getDirectoryConfigs().getEntryMappings();
-            for (Iterator i=entries.iterator(); i.hasNext(); ) {
-                EntryMapping entry = (EntryMapping)i.next();
+            Collection<EntryMapping> entries = partitionConfig.getDirectoryConfigs().getEntryMappings();
+            for (EntryMapping entry : entries) {
 
                 SourceMapping s = entry.removeSourceMapping(oldName);
                 if (s == null) continue;
@@ -416,24 +397,23 @@ public class NISSourcePropertyPage extends FormPage {
             }
 
             sources.removeSourceConfig(oldName);
-            source.setName(newName);
-            sources.addSourceConfig(source);
+            sourceConfig.setName(newName);
+            sources.addSourceConfig(sourceConfig);
         }
 
-        source.setParameter("base", baseText.getText());
-        source.setParameter("objectClasses", objectClassesText.getText());
+        sourceConfig.setParameter("base", baseText.getText());
+        sourceConfig.setParameter("objectClasses", objectClassesText.getText());
 
         TableItem[] items = fieldTable.getItems();
-        source.getFieldConfigs().clear();
+        sourceConfig.getFieldConfigs().clear();
 
-        for (int i=0; i<items.length; i++) {
-            TableItem item = items[i];
-            FieldConfig field = (FieldConfig)item.getData();
+        for (TableItem item : items) {
+            FieldConfig field = (FieldConfig) item.getData();
             field.setName("".equals(item.getText(1)) ? item.getText(0) : item.getText(1));
             field.setOriginalName(item.getText(0));
             field.setType(item.getText(2));
-            field.setPrimaryKey(items[i].getChecked());
-            source.addFieldConfig(field);
+            field.setPrimaryKey(item.getChecked());
+            sourceConfig.addFieldConfig(field);
         }
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -445,21 +425,16 @@ public class NISSourcePropertyPage extends FormPage {
     public void refresh() {
         fieldTable.removeAll();
 
-        Collection fields = source.getFieldConfigs();
-        for (Iterator i=fields.iterator(); i.hasNext(); ) {
-            FieldConfig fieldDefinition = (FieldConfig)i.next();
+        Collection<FieldConfig> fields = sourceConfig.getFieldConfigs();
+        for (FieldConfig fieldConfig : fields) {
 
             TableItem item = new TableItem(fieldTable, SWT.CHECK);
-            item.setChecked(fieldDefinition.isPrimaryKey());
-            item.setImage(PenrosePlugin.getImage(fieldDefinition.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
-            item.setText(0, fieldDefinition.getName().equals(fieldDefinition.getOriginalName()) ? fieldDefinition.getName() : fieldDefinition.getOriginalName());
-            item.setText(1, fieldDefinition.getName().equals(fieldDefinition.getOriginalName()) ? "" : fieldDefinition.getName());
-            item.setText(2, fieldDefinition.getType());
-            item.setData(fieldDefinition);
+            item.setChecked(fieldConfig.isPrimaryKey());
+            item.setImage(PenrosePlugin.getImage(fieldConfig.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
+            item.setText(0, fieldConfig.getName().equals(fieldConfig.getOriginalName()) ? fieldConfig.getName() : fieldConfig.getOriginalName());
+            item.setText(1, fieldConfig.getName().equals(fieldConfig.getOriginalName()) ? "" : fieldConfig.getName());
+            item.setText(2, fieldConfig.getType());
+            item.setData(fieldConfig);
         }
-    }
-
-    public void setDirty(boolean dirty) {
-        editor.setDirty(dirty);
     }
 }

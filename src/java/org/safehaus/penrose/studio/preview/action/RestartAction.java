@@ -21,9 +21,13 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.management.PenroseClient;
 import org.apache.log4j.Logger;
 
@@ -44,8 +48,11 @@ public class RestartAction extends Action {
 	public void run() {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         try {
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            PenroseClient client = penroseStudio.getClient();
+            IWorkbenchPage page = window.getActivePage();
+            ServersView serversView = (ServersView)page.showView(ServersView.class.getName());
+            ProjectNode projectNode = serversView.getSelectedProjectNode();
+            Project project = projectNode.getProject();
+            PenroseClient client = project.getClient();
             client.restart();
 
         } catch (Exception e) {

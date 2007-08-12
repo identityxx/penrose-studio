@@ -27,19 +27,15 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
-import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.studio.connection.wizard.JNDISourceWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.ldap.DN;
-import org.apache.log4j.Logger;
 
 import javax.naming.directory.SearchResult;
 import javax.naming.directory.Attributes;
@@ -52,40 +48,27 @@ import java.io.PrintWriter;
 /**
  * @author Endi S. Dewata
  */
-public class JNDIConnectionBrowserPage extends FormPage implements TreeListener {
-
-    Logger log = Logger.getLogger(getClass());
-
-    FormToolkit toolkit;
+public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements TreeListener {
 
     Tree tree;
     Table table;
-
-    JNDIConnectionEditor editor;
-    PartitionConfig partitionConfig;
-    ConnectionConfig connectionConfig;
 
     Schema schema;
 
     public JNDIConnectionBrowserPage(JNDIConnectionEditor editor) {
         super(editor, "BROWSER", "  Browser  ");
-
-        this.editor = editor;
-        this.partitionConfig = editor.getPartitionConfig();
-        this.connectionConfig = editor.getConnectionConfig();
     }
 
     public void createFormContent(IManagedForm managedForm) {
-        toolkit = managedForm.getToolkit();
+        super.createFormContent(managedForm);
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Browser");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
 /*
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
         if (penroseStudio.isFreeware()) {
             Label label = toolkit.createLabel(body, PenroseStudio.FEATURE_NOT_AVAILABLE);
             label.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -296,7 +279,7 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
     }
 
     public Collection getAttributeNames(Schema schema, SearchResult entry) throws Exception {
-        Map map = new TreeMap();
+        Map<String,ObjectClass> map = new TreeMap<String,ObjectClass>();
 
         Attributes attributes = entry.getAttributes();
 
@@ -306,18 +289,15 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
             schema.getAllObjectClasses(ocName, map);
         }
 
-        Collection attributeNames = new TreeSet();
+        Collection<String> attributeNames = new TreeSet<String>();
 
-        for (Iterator i=map.values().iterator(); i.hasNext(); ) {
-            ObjectClass oc = (ObjectClass)i.next();
+        for (ObjectClass oc : map.values()) {
 
-            for (Iterator j=oc.getRequiredAttributes().iterator(); j.hasNext(); ) {
-                String atName = (String)j.next();
+            for (String atName : oc.getRequiredAttributes()) {
                 attributeNames.add(atName);
             }
 
-            for (Iterator j=oc.getOptionalAttributes().iterator(); j.hasNext(); ) {
-                String atName = (String)j.next();
+            for (String atName : oc.getOptionalAttributes()) {
                 attributeNames.add(atName);
             }
         }
@@ -393,10 +373,9 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
             }
             item.setData(root);
 
-            Collection results = client.getChildren("");
+            Collection<SearchResult> results = client.getChildren("");
 
-            for (Iterator i=results.iterator(); i.hasNext(); ) {
-                SearchResult entry = (SearchResult)i.next();
+            for (SearchResult entry : results) {
                 String dn = entry.getName();
 
                 TreeItem it = new TreeItem(item, SWT.NONE);
@@ -437,15 +416,14 @@ public class JNDIConnectionBrowserPage extends FormPage implements TreeListener 
             //log.debug("Expanding "+baseDn);
 
             TreeItem items[] = item.getItems();
-            for (int i=0; i<items.length; i++) {
-                items[i].dispose();
+            for (TreeItem item1 : items) {
+                item1.dispose();
             }
 
             LDAPClient client = new LDAPClient(connectionConfig.getParameters());
-            Collection results = client.getChildren(baseDn);
+            Collection<SearchResult> results = client.getChildren(baseDn);
 
-            for (Iterator i=results.iterator(); i.hasNext(); ) {
-                SearchResult en = (SearchResult)i.next();
+            for (SearchResult en : results) {
                 DN dn = new DN(en.getName());
                 String rdn = dn.getRdn().toString();
 

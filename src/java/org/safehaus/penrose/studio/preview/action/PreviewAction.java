@@ -24,6 +24,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.preview.PreviewEditorInput;
 import org.safehaus.penrose.studio.preview.PreviewEditor;
 import org.apache.log4j.Logger;
@@ -46,10 +49,19 @@ public class PreviewAction extends Action {
 	public void run() {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         try {
-            IWorkbenchPage activePage = window.getActivePage();
+            IWorkbenchPage page = window.getActivePage();
+            ServersView serversView = (ServersView)page.showView(ServersView.class.getName());
+            ProjectNode projectNode = serversView.getSelectedProjectNode();
+            Project project = projectNode.getProject();
 
-            //activePage.showView(ConsoleView.class.getName());
-            activePage.openEditor(new PreviewEditorInput(), PreviewEditor.class.getName());
+            //page.showView(ConsoleView.class.getName());
+
+            PreviewEditorInput ei = new PreviewEditorInput();
+            ei.setProject(project.getProjectConfig());
+            ei.setWorkDir(project.getWorkDir());
+            ei.setPenroseConfig(project.getPenroseConfig());
+            
+            page.openEditor(ei, PreviewEditor.class.getName());
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

@@ -27,6 +27,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.util.ApplicationConfig;
 import org.safehaus.penrose.studio.util.FileUtil;
 import org.apache.log4j.Logger;
@@ -48,24 +51,18 @@ public class SaveAction extends Action {
     public void run() {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
+
         page.saveAllEditors(false);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         ApplicationConfig applicationConfig = penroseStudio.getApplicationConfig();
 
         try {
-            File workDir = penroseStudio.getWorkDir();
-            File workTmp = new File(penroseStudio.getWorkDir(), ".tmp");
-            File workBackup = new File(penroseStudio.getWorkDir(), ".bak");
+            ServersView serversView = (ServersView)page.showView(ServersView.class.getName());
+            ProjectNode projectNode = serversView.getSelectedProjectNode();
+            Project project = projectNode.getProject();
 
-            FileUtil.delete(workTmp);
-            FileUtil.copy(workDir, workTmp);
-
-            penroseStudio.save(workTmp);
-
-            FileUtil.delete(workBackup);
-            workDir.renameTo(workBackup);
-            workTmp.renameTo(workDir);
+            project.save();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -76,7 +73,7 @@ public class SaveAction extends Action {
                     shell,
                     "ERROR",
                     "Failed saving "+applicationConfig.getCurrentProject().getName()+" configuration.\n"+
-                            "See penrose-studio-log.txt for details."
+                            "See penrose-studio.log for details."
             );
         }
     }

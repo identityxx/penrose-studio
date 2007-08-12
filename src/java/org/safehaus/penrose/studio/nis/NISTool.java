@@ -144,6 +144,7 @@ public class NISTool {
 
         project.setProperty("cache.database", partitionName);
 
+        project.setProperty("enabled", "true");
         project.setProperty("partition", partitionName);
         project.setProperty("suffix", suffix);
 

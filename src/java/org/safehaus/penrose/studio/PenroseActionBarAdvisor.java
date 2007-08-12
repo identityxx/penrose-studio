@@ -29,7 +29,7 @@ import org.safehaus.penrose.studio.welcome.action.WelcomeAction;
 import org.safehaus.penrose.studio.welcome.action.AboutAction;
 import org.safehaus.penrose.studio.welcome.action.ShowCommercialFeaturesAction;
 import org.safehaus.penrose.studio.welcome.action.EnterLicenseKeyAction;
-import org.safehaus.penrose.studio.object.ObjectsAction;
+import org.safehaus.penrose.studio.object.ServersAction;
 import org.safehaus.penrose.studio.validation.ValidationAction;
 import org.safehaus.penrose.studio.console.ConsoleAction;
 import org.safehaus.penrose.studio.partition.action.NewPartitionAction;
@@ -37,7 +37,7 @@ import org.safehaus.penrose.studio.partition.action.ImportPartitionAction;
 import org.safehaus.penrose.studio.partition.action.NewLDAPSnapshotPartitionAction;
 import org.safehaus.penrose.studio.partition.action.NewLDAPProxyPartitionAction;
 import org.safehaus.penrose.studio.service.action.NewServiceAction;
-import org.safehaus.penrose.studio.project.action.OpenAction;
+import org.safehaus.penrose.studio.project.action.NewAction;
 import org.safehaus.penrose.studio.project.action.SaveAction;
 import org.safehaus.penrose.studio.project.action.UploadAction;
 import org.safehaus.penrose.studio.schema.action.ImportSchemaAction;
@@ -49,7 +49,7 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
 
     Logger log = Logger.getLogger(getClass());
 
-    OpenAction connectAction;
+    NewAction newAction;
     SaveAction saveAction;
     UploadAction uploadAction;
     IAction quitAction;
@@ -64,7 +64,7 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
 
     NewServiceAction newServiceAction;
 
-    ObjectsAction objectsAction;
+    ServersAction serversAction;
     ValidationAction validationAction;
     ConsoleAction consoleAction;
 
@@ -90,8 +90,8 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
         super.makeActions(window);
 
         try {
-            connectAction = new OpenAction();
-            register(connectAction);
+            newAction = new NewAction();
+            register(newAction);
 
             saveAction = new SaveAction();
             register(saveAction);
@@ -113,7 +113,7 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
 
             newServiceAction = new NewServiceAction();
 
-            objectsAction = new ObjectsAction();
+            serversAction = new ServersAction();
             validationAction = new ValidationAction();
             consoleAction = new ConsoleAction();
 
@@ -153,11 +153,6 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
 
         helpMenu.add(new Separator());
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        //if (penroseStudio.isFreeware()) {
-        //    helpMenu.add(showCommercialFeaturesAction);
-        //}
-
         helpMenu.add(enterLicenseKeyAction);
 
         helpMenu.add(new Separator());
@@ -165,14 +160,13 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
     }
 
     protected void fillMenuBar(IMenuManager menuBar) {
-        log.debug("fillMenuBar");
         super.fillMenuBar(menuBar);
 
         try {
             MenuManager fileMenu = new MenuManager("&File", "file");
             menuBar.add(fileMenu);
 
-            fileMenu.add(connectAction);
+            fileMenu.add(newAction);
             fileMenu.add(new Separator());
             fileMenu.add(saveAction);
             fileMenu.add(new Separator());
@@ -207,7 +201,7 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
             MenuManager windowMenu = new MenuManager("&Window", "window");
             menuBar.add(windowMenu);
 
-            windowMenu.add(objectsAction);
+            windowMenu.add(serversAction);
             windowMenu.add(validationAction);
             windowMenu.add(consoleAction);
 
@@ -222,21 +216,20 @@ public class PenroseActionBarAdvisor extends ActionBarAdvisor {
     }
     
     protected void fillCoolBar(ICoolBarManager coolBar) {
-        log.debug("fillCoolBar");
         super.fillCoolBar(coolBar);
 
         try {
             IToolBarManager standardToolBar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
             coolBar.add(new ToolBarContributionItem(standardToolBar, "standard"));
             
+            ActionContributionItem connectCI = new ActionContributionItem(newAction);
+            standardToolBar.add(connectCI);
+
             ActionContributionItem saveCI = new ActionContributionItem(saveAction);
             standardToolBar.add(saveCI);
             
             standardToolBar.add(new Separator());
             
-            ActionContributionItem connectCI = new ActionContributionItem(connectAction);
-            standardToolBar.add(connectCI);
-
             ActionContributionItem uploadCI = new ActionContributionItem(uploadAction);
             standardToolBar.add(uploadCI);
 

@@ -24,7 +24,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.schema.AttributeType;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.apache.log4j.Logger;
 
@@ -35,9 +35,9 @@ public class AttributeTypeNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
+    ServersView view;
     
-    public AttributeTypeNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public AttributeTypeNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
         this.view = view;
     }

@@ -262,6 +262,7 @@
             <fileset dir="target/eclipse"/>
         </move>
         <move file="target/${dist.name}/eclipse.exe" tofile="target/${dist.name}/penrose-studio.exe"/>
+        <copy file="launcher/penrose-studio.exe" tofile="target/${dist.name}/penrose-studio.exe"/>
         <antcall target="build">
             <param name="platform" value="${platform}"/>
         </antcall>

@@ -20,7 +20,9 @@ package org.safehaus.penrose.studio.connector;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.connector.ConnectorConfig;
 import org.eclipse.swt.graphics.Image;
@@ -33,11 +35,13 @@ import java.util.ArrayList;
  */
 public class ConnectorsNode extends Node {
 
-    ObjectsView view;
+    ServersView view;
+    ProjectNode projectNode;
 
-    public ConnectorsNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public ConnectorsNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
-        this.view = view;
+        projectNode = (ProjectNode)parent;
+        this.view = projectNode.getView();
     }
 
     public boolean hasChildren() throws Exception {
@@ -48,13 +52,13 @@ public class ConnectorsNode extends Node {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        ConnectorConfig connectorConfig = penroseStudio.getPenroseConfig().getConnectorConfig();
+        Project project = projectNode.getProject();
+        ConnectorConfig connectorConfig = project.getPenroseConfig().getConnectorConfig();
 
         children.add(new ConnectorNode(
                 view,
                 connectorConfig.getName(),
-                ObjectsView.CONNECTOR,
+                "Connector",
                 PenrosePlugin.getImage(PenroseImage.CONNECTOR),
                 connectorConfig,
                 this

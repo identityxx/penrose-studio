@@ -15,22 +15,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.object;
+package org.safehaus.penrose.studio.server;
 
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.apache.log4j.Logger;
 
-public class ObjectsLabelProvider extends LabelProvider implements ITableLabelProvider {
+public class ServersLabelProvider extends LabelProvider implements ITableLabelProvider {
 
     protected Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
+    ServersView view;
 
-    public ObjectsLabelProvider(ObjectsView view) {
+    public ServersLabelProvider(ServersView view) {
         this.view = view;
     }
 

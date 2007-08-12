@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.mapping;
+package org.safehaus.penrose.studio.mapping.editor;
 
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
@@ -26,6 +26,11 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.mapping.editor.LDAPPage;
+import org.safehaus.penrose.studio.mapping.editor.SourcesPage;
+import org.safehaus.penrose.studio.mapping.editor.ACLPage;
+import org.safehaus.penrose.studio.mapping.editor.MiscPage;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.apache.log4j.Logger;
 
@@ -33,8 +38,9 @@ public class MappingEditor extends FormEditor implements ModifyListener {
 
     Logger log = Logger.getLogger(getClass());
 
-    PartitionConfig partitionConfig;
-	EntryMapping entry;
+    protected ProjectNode projectNode;
+    protected PartitionConfig partitionConfig;
+	protected EntryMapping entry;
     EntryMapping origEntry;
 
     boolean dirty;
@@ -42,6 +48,7 @@ public class MappingEditor extends FormEditor implements ModifyListener {
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         MappingEditorInput mei = (MappingEditorInput)input;
 
+        projectNode = mei.getProjectNode();
         partitionConfig = mei.getPartitionConfig();
         origEntry = mei.getEntryMapping();
 
@@ -156,6 +163,22 @@ public class MappingEditor extends FormEditor implements ModifyListener {
 
     public void setPartitionConfig(PartitionConfig partitionConfig) {
         this.partitionConfig = partitionConfig;
+    }
+
+    public ProjectNode getProjectNode() {
+        return projectNode;
+    }
+
+    public void setProjectNode(ProjectNode projectNode) {
+        this.projectNode = projectNode;
+    }
+
+    public EntryMapping getEntry() {
+        return entry;
+    }
+
+    public void setEntry(EntryMapping entry) {
+        this.entry = entry;
     }
 }
 

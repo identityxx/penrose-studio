@@ -15,7 +15,7 @@ import java.util.Iterator;
 /**
  * @author Endi S. Dewata
  */
-public class JDBCConnectionAdvancedPage extends JDBCConnectionEditorPage {
+public class JDBCConnectionAdvancedPage extends ConnectionEditorPage {
 
     Text nameText;
     Text adapterText;
@@ -61,8 +61,7 @@ public class JDBCConnectionAdvancedPage extends JDBCConnectionEditorPage {
 
         parametersTable.removeAll();
 
-        for (Iterator i = connectionConfig.getParameterNames().iterator(); i.hasNext(); ) {
-            String name = (String)i.next();
+        for (String name : connectionConfig.getParameterNames()) {
             String value = connectionConfig.getParameter(name);
 
             TableItem ti = new TableItem(parametersTable, SWT.NONE);

@@ -1,7 +1,5 @@
 package org.safehaus.penrose.studio.connection.editor;
 
-import org.eclipse.ui.forms.editor.FormPage;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.IManagedForm;
@@ -10,24 +8,16 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
-import org.apache.log4j.Logger;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
 
 import javax.naming.InitialContext;
 import javax.naming.Context;
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
  */
-public class NISConnectionPropertiesPage extends FormPage {
-
-    Logger log = Logger.getLogger(getClass());
-
-    FormToolkit toolkit;
+public class NISConnectionPropertiesPage extends ConnectionEditorPage {
 
     Text nameText;
     Text hostnameText;
@@ -37,23 +27,14 @@ public class NISConnectionPropertiesPage extends FormPage {
 
     String url;
 
-    NISConnectionEditor editor;
-    PartitionConfig partitionConfig;
-    ConnectionConfig connectionConfig;
-
     public NISConnectionPropertiesPage(NISConnectionEditor editor) {
         super(editor, "PROPERTIES", "  Properties  ");
-
-        this.editor = editor;
-        this.partitionConfig = editor.getPartitionConfig();
-        this.connectionConfig = editor.getConnectionConfig();
     }
 
     public void createFormContent(IManagedForm managedForm) {
-        toolkit = managedForm.getToolkit();
+        super.createFormContent(managedForm);
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Connection Editor");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
@@ -237,8 +218,8 @@ public class NISConnectionPropertiesPage extends FormPage {
                 if (parametersTable.getSelectionCount() == 0) return;
 
                 TableItem items[] = parametersTable.getSelection();
-                for (int i=0; i<items.length; i++) {
-                    String name = items[i].getText(0);
+                for (TableItem item : items) {
+                    String name = item.getText(0);
                     connectionConfig.removeParameter(name);
                 }
 
@@ -253,9 +234,8 @@ public class NISConnectionPropertiesPage extends FormPage {
     public void refresh() {
         parametersTable.removeAll();
 
-        Collection parameters = connectionConfig.getParameterNames();
-        for (Iterator i=parameters.iterator(); i.hasNext(); ) {
-            String name = (String)i.next();
+        Collection<String> parameters = connectionConfig.getParameterNames();
+        for (String name : parameters) {
 
             if (Context.PROVIDER_URL.equals(name)) continue;
 
@@ -271,9 +251,5 @@ public class NISConnectionPropertiesPage extends FormPage {
         String domain = domainText.getText();
 
         return "nis://" + hostname + "/" + domain;
-    }
-
-    public void checkDirty() {
-        editor.checkDirty();
     }
 }

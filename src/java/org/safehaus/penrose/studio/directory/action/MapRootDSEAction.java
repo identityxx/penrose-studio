@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.studio.directory.wizard.CreateRootDSEProxyWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.apache.log4j.Logger;
 
 public class MapRootDSEAction extends Action {
@@ -47,7 +47,7 @@ public class MapRootDSEAction extends Action {
         try {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
-            ObjectsView objectsView = (ObjectsView)page.showView(ObjectsView.class.getName());
+            ServersView serversView = (ServersView)page.showView(ServersView.class.getName());
 
             Shell shell = window.getShell();
 
@@ -62,7 +62,7 @@ public class MapRootDSEAction extends Action {
 
             penroseStudio.notifyChangeListeners();
 
-            objectsView.show(node);
+            serversView.open(node);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

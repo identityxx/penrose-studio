@@ -22,16 +22,17 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.apache.log4j.Logger;
+import org.safehaus.penrose.studio.server.ServersView;
 
 /**
  * @author Endi S. Dewata
  */
-public class ObjectsAction extends Action {
+public class ServersAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
-    public ObjectsAction() {
-        setText("&Objects");
+    public ServersAction() {
+        setText("&Servers");
         setId(getClass().getName());
     }
 
@@ -40,7 +41,7 @@ public class ObjectsAction extends Action {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
             IWorkbenchPage page = window.getActivePage();
-            page.showView(ObjectsView.class.getName());
+            page.showView(ServersView.class.getName());
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

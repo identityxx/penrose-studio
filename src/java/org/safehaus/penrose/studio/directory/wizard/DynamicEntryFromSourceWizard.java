@@ -28,6 +28,7 @@ import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.source.wizard.SelectSourcesWizardPage;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDNBuilder;
 import org.apache.log4j.Logger;
@@ -42,6 +43,7 @@ public class DynamicEntryFromSourceWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
+    private ProjectNode projectNode;
     private PartitionConfig partitionConfig;
     private EntryMapping parentMapping;
     private EntryMapping entryMapping = new EntryMapping();
@@ -50,7 +52,8 @@ public class DynamicEntryFromSourceWizard extends Wizard {
     public ObjectClassWizardPage ocPage;
     public AttributeValueWizardPage attrPage;
 
-    public DynamicEntryFromSourceWizard(PartitionConfig partition, EntryMapping parentMapping) {
+    public DynamicEntryFromSourceWizard(ProjectNode projectNode, PartitionConfig partition, EntryMapping parentMapping) {
+        this.projectNode = projectNode;
         this.partitionConfig = partition;
         this.parentMapping = parentMapping;
         setWindowTitle("Mapping Active Directory Users");
@@ -58,10 +61,10 @@ public class DynamicEntryFromSourceWizard extends Wizard {
         sourcesPage = new SelectSourcesWizardPage(partition);
         sourcesPage.setDescription("Select a source.");
 
-        ocPage = new ObjectClassWizardPage();
+        ocPage = new ObjectClassWizardPage(projectNode);
         //ocPage.setSelecteObjectClasses(entryMapping.getObjectClasses());
 
-        attrPage = new AttributeValueWizardPage(partition);
+        attrPage = new AttributeValueWizardPage(projectNode, partition);
         attrPage.setDefaultType(AttributeValueWizardPage.VARIABLE);
     }
 

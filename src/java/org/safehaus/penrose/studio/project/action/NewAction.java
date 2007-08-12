@@ -23,54 +23,57 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.studio.project.ProjectDialog;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.ProjectEditorDialog;
+import org.safehaus.penrose.studio.project.ProjectConfig;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.apache.log4j.Logger;
 
-public class OpenAction extends Action {
+public class NewAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
-	public OpenAction() {
-        setText("&Connect...");
-        setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.CONNECT));
-        setAccelerator(SWT.CTRL | 'O');
-        setToolTipText("Connect to Penrose Server");
+	public NewAction() {
+        setText("&New Connection...");
+        setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.NEW));
+        setAccelerator(SWT.CTRL | 'N');
+        setToolTipText("New Connection...");
         setId(getClass().getName());
 	}
 	
 	public void run() {
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        Shell shell = window.getShell();
 
         try {
-            ProjectDialog dialog = new ProjectDialog(window.getShell(), SWT.NONE);
+            ProjectConfig projectConfig = new ProjectConfig();
+            projectConfig.setName("localhost");
+            projectConfig.setHost("localhost");
+            projectConfig.setPort(1099);
+
+            ProjectEditorDialog dialog = new ProjectEditorDialog(shell, SWT.NONE);
+            dialog.setProjectConfig(projectConfig);
             dialog.open();
 
-            if (dialog.getAction() == ProjectDialog.CANCEL) return;
+            if (dialog.getAction() == ProjectEditorDialog.CANCEL) return;
 
-            Project project = dialog.getProject();
-            window.getShell().setText("Penrose Studio - "+project.getName());
+            ServersView view = ServersView.getInstance();
+            view.addProjectConfig(projectConfig);
 
-            penroseStudio.getApplicationConfig().setCurrentProject(project);
-            penroseStudio.connect(project);
-            penroseStudio.open();
-            penroseStudio.disconnect();
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            penroseStudio.notifyChangeListeners();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
 
-            Shell shell = window.getShell();
-
             MessageDialog.openError(
                     shell,
                     "ERROR",
-                    "Failed opening "+ penroseStudio.getApplicationConfig().getCurrentProject().getName()+" configuration.\n"+
-                            "See penrose-studio-log.txt for details."
+                    "Failed creating project.\n"+
+                            "See penrose-studio.log for details."
             );
         }
 	}

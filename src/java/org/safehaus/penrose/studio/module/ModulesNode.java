@@ -17,7 +17,7 @@
  */
 package org.safehaus.penrose.studio.module;
 
-import org.safehaus.penrose.studio.object.ObjectsView;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
@@ -44,11 +44,11 @@ public class ModulesNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ObjectsView view;
+    ServersView view;
 
     private PartitionConfig partitionConfig;
 
-    public ModulesNode(ObjectsView view, String name, String type, Image image, Object object, Object parent) {
+    public ModulesNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
         this.view = view;
     }
@@ -120,7 +120,7 @@ public class ModulesNode extends Node {
             ModuleNode moduleNode = new ModuleNode(
                     view,
                     moduleConfig.getName(),
-                    ObjectsView.MODULE,
+                    ServersView.MODULE,
                     PenrosePlugin.getImage(PenroseImage.MODULE),
                     moduleConfig,
                     this
