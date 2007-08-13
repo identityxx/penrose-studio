@@ -302,7 +302,8 @@
             <param name="rpm.prefix" value=""/>
             <param name="rpm.home" value="/usr/src/redhat"/>
             <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
-            <param name="rpm.name" value="${project.name}-${product.version}-1.i386.rpm"/>
+            <param name="rpm.arch" value="x86_64"/>
+            <param name="rpm.name" value="${project.name}-${product.version}-1.x86_64.rpm"/>
         </antcall>
     </target>
 
@@ -312,6 +313,7 @@
             <param name="rpm.prefix" value=""/>
             <param name="rpm.home" value="/usr/src/redhat"/>
             <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
+            <param name="rpm.arch" value="i386"/>
             <param name="rpm.name" value="${project.name}-${product.version}-1.i386.rpm"/>
         </antcall>
 
@@ -384,6 +386,7 @@
             <param name="rpm.prefix" value="${cygwin.home}"/>
             <param name="rpm.home" value="${cygwin.home}/usr/src/rpm"/>
             <param name="rpm.builder" value="${cygwin.home}/lib/rpm/rpmb.exe"/>
+            <param name="rpm.arch" value="i386"/>
             <param name="rpm.name" value="${project.name}-${product.version}-1.cygwin.i386.rpm"/>
         </antcall>
     </target>
@@ -408,7 +411,7 @@
             <arg line="-bb target/penrose-studio.spec"/>
         </exec>
         <copy todir="${project.dist}" failonerror="false"
-            file="${rpm.home}/RPMS/i386/${rpm.name}">
+            file="${rpm.home}/RPMS/${rpm.arch}/${rpm.name}">
         </copy>
         <copy file="bin/sfx-header" tofile="${project.dist}/${rpm.name}.bin" overwrite="true"/>
         <exec executable="${rpm.prefix}/bin/sh">
