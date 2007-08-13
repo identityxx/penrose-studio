@@ -21,7 +21,7 @@ public class PenroseImage {
 
     public final static String WELCOME           = "images/3steps.png";
 
-    public final static String NEW               = "images/new.gif";
+    public final static String NEW               = "images/filenew.png";
     public final static String CONNECT           = "images/connect_to_penrose.png";
     public final static String SAVE              = "images/save.png";
     public final static String UPLOAD            = "images/upload.png";
@@ -38,7 +38,7 @@ public class PenroseImage {
     public final static String OPEN_FOLDER       = "images/folder_yellow_open.png";
 	public final static String HOME_NODE         = "images/home.gif";
 	public final static String DYNAMIC_NODE      = "images/folder-mapped.gif";
-	public final static String NODE              = "images/folder.gif";
+	public final static String NODE              = "images/folder_yellow.png";
     public final static String HANDLER           = "images/engine.png";
     public final static String ENGINE            = "images/engine.png";
     public final static String CONNECTOR         = "images/connector.png";
@@ -47,8 +47,8 @@ public class PenroseImage {
     public final static String SCHEMA            = "images/schema.png";
     public final static String OBJECT_CLASS      = "images/schema.png";
     public final static String ATTRIBUTE_TYPE    = "images/schema.png";
-    public final static String BROWSER           = "images/browser.png";
-    public final static String PREVIEW           = "images/dirpreview.png";
+    public final static String BROWSER           = "images/browser_22x22.png";
+    public final static String PREVIEW           = "images/dirpreview_22x22.png";
     public final static String LOGO16            = "images/penrose16.png";
     public final static String ROOT_DSE          = "images/rootdse.png";
     public final static String ADMINISTRATOR     = "images/root.png";

@@ -68,7 +68,7 @@ public class PreviewDialog extends Dialog {
         shell.setLocation(l.x + (s.x - size.x)/2, l.y + (s.y - size.y)/2);
 
         shell.setText("Connect");
-        shell.setImage(PenrosePlugin.getImage(PenroseImage.BROWSER));
+        shell.setImage(PenrosePlugin.getImage(PenroseImage.PREVIEW));
 
         shell.open();
 

@@ -42,11 +42,11 @@ public class NISFilesPage extends FormPage implements Runnable {
     Label messageLabel;
     Table table;
 
-    NISEditor editor;
+    NISAlignmentToolEditor editor;
     NISDomain domain;
     NISTool nisTool;
 
-    public NISFilesPage(NISEditor editor) {
+    public NISFilesPage(NISAlignmentToolEditor editor) {
         super(editor, "FILES", "  Files  ");
 
         this.editor = editor;

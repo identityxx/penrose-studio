@@ -49,7 +49,7 @@ public class BrowserAction extends Action {
 
         setText("&Browser");
         setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.BROWSER));
-        setToolTipText("LDAP Browser");
+        setToolTipText("Browser");
         setId(getClass().getName());
     }
 

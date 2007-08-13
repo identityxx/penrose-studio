@@ -32,7 +32,7 @@ import java.util.*;
 /**
  * @author Endi S. Dewata
  */
-public class NISToolsPage extends FormPage {
+public class NISScriptsPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -46,14 +46,14 @@ public class NISToolsPage extends FormPage {
     Label messageLabel;
     Table table;
 
-    NISEditor editor;
+    NISAlignmentToolEditor editor;
     NISDomain domain;
     NISTool nisTool;
 
     Map<String,String> actions = new LinkedHashMap<String,String>();
 
-    public NISToolsPage(NISEditor editor) {
-        super(editor, "TOOLS", "  Tools  ");
+    public NISScriptsPage(NISAlignmentToolEditor editor) {
+        super(editor, "SCRIPTS", "  Scripts  ");
 
         this.editor = editor;
         domain = editor.getDomain();

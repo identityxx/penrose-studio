@@ -371,7 +371,7 @@ public class NISUserChangesPage extends FormPage {
                     Integer origUidNumber = (Integer)attributes.getValue("origUidNumber");
                     Integer uidNumber = (Integer)attributes.getValue("uidNumber");
 
-                    NISToolsPage page = (NISToolsPage)editor.setActivePage("TOOLS");
+                    NISScriptsPage page = (NISScriptsPage)editor.setActivePage("TOOLS");
                     page.actionsCombo.setText("Change file UID number");
 
                     page.hostsList.selectAll();
@@ -405,7 +405,7 @@ public class NISUserChangesPage extends FormPage {
                     Integer origUidNumber = (Integer)attributes.getValue("origUidNumber");
                     Integer uidNumber = (Integer)attributes.getValue("uidNumber");
 
-                    NISToolsPage page = (NISToolsPage)editor.setActivePage("TOOLS");
+                    NISScriptsPage page = (NISScriptsPage)editor.setActivePage("TOOLS");
                     page.actionsCombo.setText("Change file UID number");
 
                     page.hostsList.selectAll();

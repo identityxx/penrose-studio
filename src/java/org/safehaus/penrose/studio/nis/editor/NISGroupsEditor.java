@@ -5,13 +5,14 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.nis.NISTool;
 import org.safehaus.penrose.nis.NISDomain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NISGroupsEditor extends FormEditor {
 
-    Logger log = Logger.getLogger(getClass());
+    public Logger log = LoggerFactory.getLogger(getClass());
 
     NISTool nisTool;
     NISDomain domain;

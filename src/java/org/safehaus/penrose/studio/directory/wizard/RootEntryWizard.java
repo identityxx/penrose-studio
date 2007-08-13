@@ -22,7 +22,6 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.ldap.DN;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;

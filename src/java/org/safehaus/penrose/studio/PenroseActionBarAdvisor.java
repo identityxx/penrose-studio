@@ -29,7 +29,7 @@ import org.safehaus.penrose.studio.welcome.action.WelcomeAction;
 import org.safehaus.penrose.studio.welcome.action.AboutAction;
 import org.safehaus.penrose.studio.welcome.action.ShowCommercialFeaturesAction;
 import org.safehaus.penrose.studio.welcome.action.EnterLicenseKeyAction;
-import org.safehaus.penrose.studio.object.ServersAction;
+import org.safehaus.penrose.studio.server.action.ServersAction;
 import org.safehaus.penrose.studio.validation.ValidationAction;
 import org.safehaus.penrose.studio.console.ConsoleAction;
 import org.safehaus.penrose.studio.partition.action.NewPartitionAction;

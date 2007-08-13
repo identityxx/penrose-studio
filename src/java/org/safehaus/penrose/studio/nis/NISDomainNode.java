@@ -10,7 +10,6 @@ import org.safehaus.penrose.studio.nis.editor.NISEditor;
 import org.safehaus.penrose.studio.nis.editor.NISDomainDialog;
 import org.safehaus.penrose.studio.nis.editor.NISUserDialog;
 import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.management.PenroseClient;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
@@ -28,7 +27,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import java.util.Iterator;
 import java.util.Collection;
 import java.util.ArrayList;
-import java.io.File;
 
 /**
  * @author Endi S. Dewata
@@ -242,6 +240,8 @@ public class NISDomainNode extends Node {
             nisTool.removeDomain(domain);
 
             project.removeDirectory("partitions/"+domain.getPartition());
+
+            nisNode.removeNisDomain(domain.getName());
         }
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -304,7 +304,7 @@ public class NISDomainNode extends Node {
         NISUsersNode usersNode = new NISUsersNode(
                 view,
                 "Users",
-                ServersView.ENTRY,
+                "Users",
                 PenrosePlugin.getImage(PenroseImage.NODE),
                 null,
                 this
@@ -318,7 +318,7 @@ public class NISDomainNode extends Node {
         NISGroupsNode groupsNode = new NISGroupsNode(
                 view,
                 "Groups",
-                ServersView.ENTRY,
+                "Groups",
                 PenrosePlugin.getImage(PenroseImage.NODE),
                 null,
                 this
@@ -328,11 +328,11 @@ public class NISDomainNode extends Node {
         groupsNode.setDomain(domain);
 
         children.add(groupsNode);
-/*
-        NISFilesNode filesNode = new NISFilesNode(
+
+        NISAlignmentToolNode filesNode = new NISAlignmentToolNode(
                 view,
-                "Files",
-                ServersView.ENTRY,
+                "Alignment Tool",
+                "Alignment Tool",
                 PenrosePlugin.getImage(PenroseImage.NODE),
                 null,
                 this
@@ -342,7 +342,7 @@ public class NISDomainNode extends Node {
         filesNode.setDomain(domain);
 
         children.add(filesNode);
-*/
+
         return children;
     }
 

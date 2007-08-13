@@ -6,6 +6,10 @@ import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.browser.BrowserEditorInput;
+import org.safehaus.penrose.studio.browser.BrowserEditor;
+import org.safehaus.penrose.studio.preview.PreviewEditorInput;
+import org.safehaus.penrose.studio.preview.PreviewEditor;
 import org.safehaus.penrose.studio.nis.NISNode;
 import org.safehaus.penrose.studio.properties.SystemPropertiesNode;
 import org.safehaus.penrose.studio.user.AdministratorNode;
@@ -15,6 +19,10 @@ import org.safehaus.penrose.studio.handler.HandlersNode;
 import org.safehaus.penrose.studio.logging.LoggingNode;
 import org.safehaus.penrose.studio.service.ServicesNode;
 import org.safehaus.penrose.studio.schema.SchemasNode;
+import org.safehaus.penrose.service.ServiceConfigs;
+import org.safehaus.penrose.service.ServiceConfig;
+import org.safehaus.penrose.config.PenroseConfig;
+import org.safehaus.penrose.ldap.LDAPService;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
@@ -22,6 +30,9 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchPage;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -174,6 +185,60 @@ public class ProjectNode extends Node {
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
+        manager.add(new Action("Preview") {
+            public void run() {
+                try {
+                    preview();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+            public boolean isEnabled() {
+                return project.isConnected();
+            }
+        });
+
+        manager.add(new Action("Browser") {
+            public void run() {
+                try {
+                    browser();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+            public boolean isEnabled() {
+                return project.isConnected();
+            }
+        });
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(new Action("Copy") {
+            public void run() {
+                try {
+                    //copy();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+            public boolean isEnabled() {
+                return false;
+            }
+        });
+
+        manager.add(new Action("Paste") {
+            public void run() {
+                try {
+                    //paste();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+            public boolean isEnabled() {
+                return false;
+            }
+        });
+
         manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
             public void run() {
                 try {
@@ -248,7 +313,44 @@ public class ProjectNode extends Node {
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
-    
+
+    public void preview() throws Exception {
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        IWorkbenchPage page = window.getActivePage();
+
+        PreviewEditorInput ei = new PreviewEditorInput();
+        ei.setProject(project.getProjectConfig());
+        ei.setWorkDir(project.getWorkDir());
+        ei.setPenroseConfig(project.getPenroseConfig());
+
+        page.openEditor(ei, PreviewEditor.class.getName());
+    }
+
+    public void browser() throws Exception {
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        IWorkbenchPage page = window.getActivePage();
+
+        ProjectConfig projectConfig = project.getProjectConfig();
+        String hostname = projectConfig.getHost();
+
+        ServiceConfigs serviceConfigs = project.getServiceConfigs();
+        ServiceConfig serviceConfig = serviceConfigs.getServiceConfig("LDAP");
+        String s = serviceConfig == null ? null : serviceConfig.getParameter(LDAPService.LDAP_PORT);
+        int port = s == null ? LDAPService.DEFAULT_LDAP_PORT : Integer.parseInt(s);
+
+        PenroseConfig penroseConfig = project.getPenroseConfig();
+        String bindDn = penroseConfig.getRootDn().toString();
+        byte[] password = penroseConfig.getRootPassword();
+
+        BrowserEditorInput ei = new BrowserEditorInput();
+        ei.setHostname(hostname);
+        ei.setPort(port);
+        ei.setBindDn(bindDn);
+        ei.setPassword(password);
+
+        page.openEditor(ei, BrowserEditor.class.getName());
+    }
+
     public boolean hasChildren() throws Exception {
         return project.isConnected();
     }

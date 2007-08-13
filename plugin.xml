@@ -164,10 +164,10 @@
            icon="images/object.gif"
            class="org.safehaus.penrose.studio.nis.editor.NISGroupsEditor"/>
        <editor
-           id="org.safehaus.penrose.studio.nis.editor.NISFilesEditor"
-           name="NIS Users"
+           id="org.safehaus.penrose.studio.nis.editor.NISAlignmentToolEditor"
+           name="NIS Alignment Tool"
            icon="images/object.gif"
-           class="org.safehaus.penrose.studio.nis.editor.NISFilesEditor"/>
+           class="org.safehaus.penrose.studio.nis.editor.NISAlignmentToolEditor"/>
    </extension>
    <extension
          id="application"

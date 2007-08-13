@@ -5,13 +5,14 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.apache.log4j.Logger;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.studio.nis.*;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class NISEditor extends FormEditor {
 
-    Logger log = Logger.getLogger(getClass());
+    public Logger log = LoggerFactory.getLogger(getClass());
 
     NISTool nisTool;
     NISDomain domain;
@@ -29,9 +30,6 @@ public class NISEditor extends FormEditor {
     public void addPages() {
         try {
             addPage(new NISDomainPage(this));
-            addPage(new NISHostsPage(this));
-            addPage(new NISFilesPage(this));
-            addPage(new NISToolsPage(this));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

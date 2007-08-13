@@ -7,10 +7,10 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.studio.nis.NISTool;
 import org.safehaus.penrose.nis.NISDomain;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
-public class NISUsersEditor extends FormEditor {
+public class NISAlignmentToolEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
@@ -18,19 +18,20 @@ public class NISUsersEditor extends FormEditor {
     NISDomain domain;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        NISUsersEditorInput ei = (NISUsersEditorInput)input;
+        NISAlignmentToolEditorInput ei = (NISAlignmentToolEditorInput)input;
         nisTool = ei.getNisTool();
         domain = ei.getDomain();
 
         setSite(site);
         setInput(input);
-        setPartName("NIS Users - "+domain.getName());
+        setPartName("NIS Alignment Tool - "+domain.getName());
     }
 
     public void addPages() {
         try {
-            addPage(new NISUsersPage(this));
-            addPage(new NISUserChangesPage(this));
+            addPage(new NISHostsPage(this));
+            addPage(new NISFilesPage(this));
+            addPage(new NISScriptsPage(this));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

@@ -128,7 +128,7 @@ public class NISTool {
         String server = domain.getServer();
         String suffix = domain.getSuffix();
 
-        log.debug("Creating partition "+partitionName+".");
+        log.debug("Creating partition config "+partitionName+".");
         log.debug(" - domain: "+domainName);
         log.debug(" - server: "+server);
         log.debug(" - suffix: "+suffix);
@@ -173,6 +173,7 @@ public class NISTool {
     public void createPartition(NISDomain domain) throws Exception {
 
         String partitionName = domain.getPartition();
+        log.debug("Creating partition "+partitionName+".");
 
         File newDir = new File(workDir, "partitions"+File.separator+ partitionName);
 
@@ -191,6 +192,7 @@ public class NISTool {
     public void createDomain(NISDomain domain) throws Exception {
 
         String domainName = domain.getName();
+        log.debug("Creating domain "+domainName+".");
 
         RDNBuilder rb = new RDNBuilder();
         rb.set("name", domainName);
@@ -249,6 +251,7 @@ public class NISTool {
     public void removePartitionConfig(NISDomain domain) throws Exception {
 
         String partitionName = domain.getPartition();
+        log.debug("Removing partition "+partitionName+".");
 
         partitionConfigs.removePartitionConfig(partitionName);
 
@@ -257,13 +260,17 @@ public class NISTool {
     }
 
     public void removePartition(NISDomain domain) throws Exception {
+
         String partitionName = domain.getPartition();
+        log.debug("Removing partition config "+partitionName+".");
+
         partitions.removePartition(partitionName);
     }
 
     public void removeDomain(NISDomain domain) throws Exception {
 
         String domainName = domain.getName();
+        log.debug("Removing domain "+domainName+".");
 
         nisDomains.remove(domainName);
 

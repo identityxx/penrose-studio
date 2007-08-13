@@ -7,24 +7,22 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.nis.editor.NISDomainDialog;
-import org.safehaus.penrose.studio.nis.editor.NISUserDialog;
+import org.safehaus.penrose.studio.nis.wizard.NewNISDomainWizard;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.management.PenroseClient;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchActionConstants;
 
 import java.util.Collection;
-import java.util.ArrayList;
 import java.util.Map;
+import java.util.TreeMap;
 import java.io.File;
 
 /**
@@ -36,6 +34,9 @@ public class NISNode extends Node {
     private ProjectNode projectNode;
 
     protected NISTool nisTool;
+    protected boolean started;
+
+    Map<String,Node> children = new TreeMap<String,Node>();
 
     public NISNode(String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
@@ -45,6 +46,34 @@ public class NISNode extends Node {
 
     public void showMenu(IMenuManager manager) throws Exception {
 
+        manager.add(new Action("Open") {
+            public void run() {
+                try {
+                    open();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+            public boolean isEnabled() {
+                return !started;
+            }
+        });
+
+        manager.add(new Action("Close") {
+            public void run() {
+                try {
+                    close();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+            public boolean isEnabled() {
+                return started;
+            }
+        });
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
         manager.add(new Action("New Domain...") {
             public void run() {
                 try {
@@ -52,6 +81,9 @@ public class NISNode extends Node {
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
+            }
+            public boolean isEnabled() {
+                return started;
             }
         });
 
@@ -65,11 +97,23 @@ public class NISNode extends Node {
                     log.error(e.getMessage(), e);
                 }
             }
+            public boolean isEnabled() {
+                return started;
+            }
         });
     }
 
     public void open() throws Exception {
-        if (nisTool == null) start();
+        if (!started) start();
+    }
+
+    public void close() throws Exception {
+        nisTool = null;
+        children.clear();
+        started = false;
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public void start() throws Exception {
@@ -80,60 +124,56 @@ public class NISNode extends Node {
 
         nisTool = new NISTool();
         nisTool.init(penroseConfig, penroseContext, workDir);
+
+        for (NISDomain nisDomain : nisTool.getNisDomains().values()) {
+            addNisDomain(nisDomain);
+        }
+
+        started = true;
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
+    }
+
+    public void addNisDomain(NISDomain nisDomain) {
+
+        NISDomainNode node = new NISDomainNode(
+                nisDomain.getName(),
+                ServersView.ENTRY,
+                PenrosePlugin.getImage(PenroseImage.NODE),
+                nisDomain,
+                this
+        );
+
+        children.put(nisDomain.getName(), node);
+    }
+
+    public void removeNisDomain(String name) {
+        children.remove(name);
     }
 
     public boolean hasChildren() throws Exception {
 
-        if (nisTool == null) return true;
+        if (!started) return false;
 
         Map<String,NISDomain> domains = nisTool.getNisDomains();
         return domains.size() > 0;
     }
 
     public Collection<Node> getChildren() throws Exception {
-
-        if (nisTool == null) start();
-
-        Collection<Node> children = new ArrayList<Node>();
-
-        for (NISDomain nisDomain : nisTool.getNisDomains().values()) {
-
-            NISDomainNode node = new NISDomainNode(
-                    nisDomain.getName(),
-                    ServersView.ENTRY,
-                    PenrosePlugin.getImage(PenroseImage.NODE),
-                    nisDomain,
-                    this
-            );
-
-            children.add(node);
-        }
-
-        return children;
+        return children.values();
     }
 
     public void newDomain() throws Exception {
 
-        if (nisTool == null) start();
-
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-        NISDomainDialog dialog = new NISDomainDialog(shell, SWT.NONE);
 
+        NewNISDomainWizard wizard = new NewNISDomainWizard();
+        WizardDialog dialog = new WizardDialog(shell, wizard);
+        dialog.setPageSize(600, 300);
         dialog.open();
 
-        int action = dialog.getAction();
-        if (action == NISUserDialog.CANCEL) return;
-
-        String domainName = dialog.getName();
-        String partitionName = dialog.getPartition();
-        String server = dialog.getServer();
-        String suffix = dialog.getSuffix();
-
-        NISDomain domain = new NISDomain();
-        domain.setName(domainName);
-        domain.setPartition(partitionName);
-        domain.setServer(server);
-        domain.setSuffix(suffix);
+        NISDomain domain = wizard.getDomain();
 
         nisTool.createDomain(domain);
         nisTool.createPartitionConfig(domain);
@@ -141,8 +181,10 @@ public class NISNode extends Node {
         nisTool.createPartition(domain);
 
         Project project = projectNode.getProject();
-        project.upload("partitions/"+partitionName);
-        
+        project.upload("partitions/"+domain.getPartition());
+
+        addNisDomain(domain);
+
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }

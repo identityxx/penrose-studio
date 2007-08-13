@@ -371,7 +371,7 @@ public class NISGroupChangesPage extends FormPage {
                     Integer origGidNumber = (Integer)attributes.getValue("origGidNumber");
                     Integer gidNumber = (Integer)attributes.getValue("gidNumber");
 
-                    NISToolsPage page = (NISToolsPage)editor.setActivePage("TOOLS");
+                    NISScriptsPage page = (NISScriptsPage)editor.setActivePage("TOOLS");
                     page.actionsCombo.setText("Change file GID number");
 
                     page.hostsList.selectAll();
@@ -405,7 +405,7 @@ public class NISGroupChangesPage extends FormPage {
                     Integer origGidNumber = (Integer)attributes.getValue("origGidNumber");
                     Integer gidNumber = (Integer)attributes.getValue("gidNumber");
 
-                    NISToolsPage page = (NISToolsPage)editor.setActivePage("TOOLS");
+                    NISScriptsPage page = (NISScriptsPage)editor.setActivePage("TOOLS");
                     page.actionsCombo.setText("Change file GID number");
 
                     page.hostsList.selectAll();
