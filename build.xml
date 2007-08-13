@@ -32,16 +32,28 @@
     </path>
 
     <target name="init">
-        <echo message="Operating System: ${os.name} ${os.version}" />
+        <echo message="Operating System: ${os.name} ${os.version} (${os.arch})" />
         <condition property="isWindows">
             <os family="windows"/>
         </condition>
-        <condition property="isUnix">
+        <condition property="isLinux">
             <and>
                 <os family="unix"/>
                 <not>
                     <os family="mac"/>
                 </not>
+                <not>
+                    <os arch="amd64"/>
+                </not>
+            </and>
+        </condition>
+        <condition property="isLinux64">
+            <and>
+                <os family="unix"/>
+                <not>
+                    <os family="mac"/>
+                </not>
+                <os arch="amd64"/>
             </and>
         </condition>
         <condition property="isMac">
@@ -197,11 +209,12 @@
 
     <target name="dist" depends="init">
         <antcall target="build-linux"/>
+        <antcall target="build-linux-gtk-x86_64"/>
         <antcall target="build-macosx"/>
         <antcall target="build-win32"/>
     </target>
 
-    <target name="build-linux-gtk-x86_64" depends="init" if="isUnix">
+    <target name="build-linux-gtk-x86_64" depends="init" if="isLinux64">
         <property name="platform" value="linux-gtk-x86_64"/>
         <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>
         <!-- uncompress rpc -->
@@ -216,7 +229,7 @@
         </antcall>
     </target>
 
-    <target name="build-linux" depends="init" if="isUnix">
+    <target name="build-linux" depends="init" if="isLinux">
         <property name="platform" value="linux-gtk"/>
         <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>
         <!-- uncompress rpc -->
@@ -293,11 +306,12 @@
             file="target/${project.name}-${product.version}.jar">
         </copy>
         <antcall target="dist-linux"/>
+        <antcall target="dist-linux-gtk-x86_64"/>
         <antcall target="dist-macosx"/>
         <antcall target="dist-win32"/>
     </target>
 
-    <target name="dist-linux-gtk-x86_64" depends="build-linux-gtk-x86_64" if="isUnix">
+    <target name="dist-linux-gtk-x86_64" depends="build-linux-gtk-x86_64" if="isLinux64">
         <antcall target="rpm">
             <param name="rpm.prefix" value=""/>
             <param name="rpm.home" value="/usr/src/redhat"/>
@@ -307,7 +321,7 @@
         </antcall>
     </target>
 
-    <target name="dist-linux" depends="build-linux" if="isUnix">
+    <target name="dist-linux" depends="build-linux" if="isLinux">
 
     	<antcall target="rpm">
             <param name="rpm.prefix" value=""/>
@@ -438,18 +452,19 @@
 
     <target name="install" depends="init">
         <antcall target="install-linux"/>
+        <antcall target="install-linux-gtk-x86_64"/>
         <antcall target="install-macosx"/>
         <antcall target="install-win32"/>
     </target>
 
-    <target name="install-linux-gtk-x86_64" if="isUnix">
+    <target name="install-linux-gtk-x86_64" if="isLinux64">
         <antcall target="install-dist">
             <param name="platform" value="linux-gtk-x86_64"/>
         </antcall>
         <chmod dir="${penrose.studio.home}" includes="penrose-studio" perm="a+rx" />
     </target>
 
-    <target name="install-linux" if="isUnix">
+    <target name="install-linux" if="isLinux">
         <antcall target="install-dist">
             <param name="platform" value="linux-gtk"/>
         </antcall>
