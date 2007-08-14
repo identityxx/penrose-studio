@@ -63,7 +63,7 @@ public class NISCachePage extends FormPage {
         sourceNames.put("Aliases", "cache_aliases");
         sourceNames.put("Netgroups", "cache_netgroups");
         sourceNames.put("Ethernets", "cache_ethers");
-        sourceNames.put("BootParames", "cache_bootparams");
+        sourceNames.put("BootParams", "cache_bootparams");
         sourceNames.put("Networks", "cache_networks");
         sourceNames.put("AutomountMaps", "cache_automountMap");
         sourceNames.put("Automounts", "cache_automount");

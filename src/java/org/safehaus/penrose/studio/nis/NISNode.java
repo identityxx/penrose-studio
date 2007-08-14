@@ -121,9 +121,10 @@ public class NISNode extends Node {
     }
 
     public void close() throws Exception {
-        nisTool = null;
+        view.close(this);
         children.clear();
         started = false;
+        nisTool = null;
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
