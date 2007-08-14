@@ -271,17 +271,11 @@ public class ProjectNode extends Node {
     public void open() throws Exception {
         project.connect();
         view.open(this);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public void close() throws Exception {
         project.close();
         view.close(this);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public void edit() throws Exception {
@@ -352,10 +346,13 @@ public class ProjectNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        return project.isConnected();
+        return true;
     }
 
     public Collection<Node> getChildren() throws Exception {
+        if (!project.isConnected()) {
+            project.connect();
+        }
         return children;
     }
 

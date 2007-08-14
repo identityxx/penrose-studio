@@ -170,10 +170,10 @@ public class NISTool {
         partitionConfigs.addPartitionConfig(partitionConfig);
     }
 
-    public void createPartition(NISDomain domain) throws Exception {
+    public void initPartition(NISDomain domain) throws Exception {
 
         String partitionName = domain.getPartition();
-        log.debug("Creating partition "+partitionName+".");
+        log.debug("Initializing partition "+partitionName+".");
 
         File newDir = new File(workDir, "partitions"+File.separator+ partitionName);
 

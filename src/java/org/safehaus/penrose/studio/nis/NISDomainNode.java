@@ -85,6 +85,16 @@ public class NISDomainNode extends Node {
             }
         });
 
+        manager.add(new Action("Initialize Partition") {
+            public void run() {
+                try {
+                    initPartition();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
         manager.add(new Action("Remove Partition") {
             public void run() {
                 try {
@@ -221,7 +231,11 @@ public class NISDomainNode extends Node {
         IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
 
         boolean confirm = MessageDialog.openQuestion(shell,
-                "Confirmation", "Remove selected domains?");
+                "Removing NIS Domain",
+                "Are you sure?\n"+
+                        "The NIS domain information, Penrose partition, and the cache database will be removed.\n"+
+                        "The NIS information on the NIS server will not be affected."
+        );
 
         if (!confirm) return;
 
@@ -249,41 +263,200 @@ public class NISDomainNode extends Node {
     }
 
     public void createPartition() throws Exception {
-        nisTool.createPartitionConfig(domain);
-        nisTool.createPartition(domain);
+
+        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+
+        TreeViewer treeViewer = view.getTreeViewer();
+        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
+
+        boolean confirm = MessageDialog.openQuestion(shell,
+                "Creating Partition", "Are you sure?"
+        );
+
+        if (!confirm) return;
 
         Project project = projectNode.getProject();
-        project.upload("partitions/"+domain.getPartition());
+
+        for (Iterator i=selection.iterator(); i.hasNext(); ) {
+            Node node = (Node)i.next();
+            if (!(node instanceof NISDomainNode)) continue;
+
+            NISDomainNode domainNode = (NISDomainNode)node;
+            NISDomain domain = domainNode.getDomain();
+
+            nisTool.createPartitionConfig(domain);
+            project.upload("partitions/"+domain.getPartition());
+        }
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
+    }
+
+    public void initPartition() throws Exception {
+
+        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+
+        TreeViewer treeViewer = view.getTreeViewer();
+        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
+
+        boolean confirm = MessageDialog.openQuestion(shell,
+                "Initializing Partition", "Are you sure?"
+        );
+
+        if (!confirm) return;
+
+        for (Iterator i=selection.iterator(); i.hasNext(); ) {
+            Node node = (Node)i.next();
+            if (!(node instanceof NISDomainNode)) continue;
+
+            NISDomainNode domainNode = (NISDomainNode)node;
+            NISDomain domain = domainNode.getDomain();
+
+            nisTool.initPartition(domain);
+        }
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
 
     public void removePartition() throws Exception {
-        nisTool.removePartition(domain);
-        nisTool.removePartitionConfig(domain);
+
+        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+
+        TreeViewer treeViewer = view.getTreeViewer();
+        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
+
+        boolean confirm = MessageDialog.openQuestion(shell,
+                "Removing Partition", "Are you sure?"
+        );
+
+        if (!confirm) return;
 
         Project project = projectNode.getProject();
-        project.removeDirectory("partitions/"+domain.getPartition());
+
+        for (Iterator i=selection.iterator(); i.hasNext(); ) {
+            Node node = (Node)i.next();
+            if (!(node instanceof NISDomainNode)) continue;
+
+            NISDomainNode domainNode = (NISDomainNode)node;
+            NISDomain domain = domainNode.getDomain();
+
+            nisTool.removePartition(domain);
+            nisTool.removePartitionConfig(domain);
+
+            project.removeDirectory("partitions/"+domain.getPartition());
+        }
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
 
     public void createDatabase() throws Exception {
-        nisTool.createDatabase(domain);
+
+        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+
+        TreeViewer treeViewer = view.getTreeViewer();
+        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
+
+        boolean confirm = MessageDialog.openQuestion(shell,
+                "Creating Database", "Are you sure?"
+        );
+
+        if (!confirm) return;
+
+        for (Iterator i=selection.iterator(); i.hasNext(); ) {
+            Node node = (Node)i.next();
+            if (!(node instanceof NISDomainNode)) continue;
+
+            NISDomainNode domainNode = (NISDomainNode)node;
+            NISDomain domain = domainNode.getDomain();
+
+            nisTool.createDatabase(domain);
+        }
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public void loadDatabase() throws Exception {
-        nisTool.loadDatabase(domain);
+
+        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+
+        TreeViewer treeViewer = view.getTreeViewer();
+        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
+
+        boolean confirm = MessageDialog.openQuestion(shell,
+                "Loading Database", "Are you sure?"
+        );
+
+        if (!confirm) return;
+
+        for (Iterator i=selection.iterator(); i.hasNext(); ) {
+            Node node = (Node)i.next();
+            if (!(node instanceof NISDomainNode)) continue;
+
+            NISDomainNode domainNode = (NISDomainNode)node;
+            NISDomain domain = domainNode.getDomain();
+
+            nisTool.loadDatabase(domain);
+        }
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public void cleanDatabase() throws Exception {
-        nisTool.cleanDatabase(domain);
+
+        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+
+        TreeViewer treeViewer = view.getTreeViewer();
+        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
+
+        boolean confirm = MessageDialog.openQuestion(shell,
+                "Cleaning Database", "Are you sure?"
+        );
+
+        if (!confirm) return;
+
+        for (Iterator i=selection.iterator(); i.hasNext(); ) {
+            Node node = (Node)i.next();
+            if (!(node instanceof NISDomainNode)) continue;
+
+            NISDomainNode domainNode = (NISDomainNode)node;
+            NISDomain domain = domainNode.getDomain();
+
+            nisTool.cleanDatabase(domain);
+        }
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public void removeDatabase() throws Exception {
-        nisTool.removeDatabase(domain);
+
+        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+
+        TreeViewer treeViewer = view.getTreeViewer();
+        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
+
+        boolean confirm = MessageDialog.openQuestion(shell,
+                "Removing Database", "Are you sure?"
+        );
+
+        if (!confirm) return;
+
+        for (Iterator i=selection.iterator(); i.hasNext(); ) {
+            Node node = (Node)i.next();
+            if (!(node instanceof NISDomainNode)) continue;
+
+            NISDomainNode domainNode = (NISDomainNode)node;
+            NISDomain domain = domainNode.getDomain();
+
+            nisTool.removeDatabase(domain);
+        }
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public NISDomain getDomain() {

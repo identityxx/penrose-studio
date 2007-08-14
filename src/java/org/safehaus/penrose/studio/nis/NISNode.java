@@ -7,7 +7,7 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.nis.wizard.NewNISDomainWizard;
+import org.safehaus.penrose.studio.nis.wizard.NISDomainWizard;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.naming.PenroseContext;
@@ -105,6 +105,10 @@ public class NISNode extends Node {
 
     public void open() throws Exception {
         if (!started) start();
+        view.open(this);
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public void close() throws Exception {
@@ -130,9 +134,6 @@ public class NISNode extends Node {
         }
 
         started = true;
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public void addNisDomain(NISDomain nisDomain) {
@@ -153,14 +154,11 @@ public class NISNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-
-        if (!started) return false;
-
-        Map<String,NISDomain> domains = nisTool.getNisDomains();
-        return domains.size() > 0;
+        return true;
     }
 
     public Collection<Node> getChildren() throws Exception {
+        if (!started) start();
         return children.values();
     }
 
@@ -168,23 +166,11 @@ public class NISNode extends Node {
 
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 
-        NewNISDomainWizard wizard = new NewNISDomainWizard();
+        NISDomainWizard wizard = new NISDomainWizard(this);
         WizardDialog dialog = new WizardDialog(shell, wizard);
         dialog.setPageSize(600, 300);
         dialog.open();
-
-        NISDomain domain = wizard.getDomain();
-
-        nisTool.createDomain(domain);
-        nisTool.createPartitionConfig(domain);
-        nisTool.createDatabase(domain);
-        nisTool.createPartition(domain);
-
-        Project project = projectNode.getProject();
-        project.upload("partitions/"+domain.getPartition());
-
-        addNisDomain(domain);
-
+        
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
