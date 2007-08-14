@@ -121,7 +121,7 @@ public class NISDomainWizard extends Wizard {
 
         if (databasePage.isLoad()) {
             try {
-                nisTool.loadDatabase(domain);
+                nisTool.loadCache(domain);
 
             } catch (Exception e) {
                 MessageDialog.openError(getShell(), "Failed loading database.", e.getMessage());

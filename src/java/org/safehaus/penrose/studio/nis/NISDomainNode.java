@@ -107,7 +107,7 @@ public class NISDomainNode extends Node {
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        manager.add(new Action("Create Database") {
+        manager.add(new Action("Create Cache") {
             public void run() {
                 try {
                     createDatabase();
@@ -117,7 +117,7 @@ public class NISDomainNode extends Node {
             }
         });
 
-        manager.add(new Action("Load Database") {
+        manager.add(new Action("Load Cache") {
             public void run() {
                 try {
                     loadDatabase();
@@ -127,7 +127,7 @@ public class NISDomainNode extends Node {
             }
         });
 
-        manager.add(new Action("Clean Database") {
+        manager.add(new Action("Clear Cache") {
             public void run() {
                 try {
                     cleanDatabase();
@@ -137,7 +137,7 @@ public class NISDomainNode extends Node {
             }
         });
 
-        manager.add(new Action("Remove Database") {
+        manager.add(new Action("Remove Cache") {
             public void run() {
                 try {
                     removeDatabase();
@@ -238,7 +238,7 @@ public class NISDomainNode extends Node {
             NISDomain domain = domainNode.getDomain();
 
             nisTool.removePartition(domain);
-            nisTool.removeDatabase(domain);
+            nisTool.removeCache(domain);
             nisTool.removePartitionConfig(domain);
             nisTool.removeDomain(domain);
 
@@ -348,7 +348,7 @@ public class NISDomainNode extends Node {
         IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
 
         boolean confirm = MessageDialog.openQuestion(shell,
-                "Creating Database", "Are you sure?"
+                "Creating Cache Database", "Are you sure?"
         );
 
         if (!confirm) return;
@@ -375,7 +375,7 @@ public class NISDomainNode extends Node {
         IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
 
         boolean confirm = MessageDialog.openQuestion(shell,
-                "Loading Database", "Are you sure?"
+                "Loading Cache Database", "Are you sure?"
         );
 
         if (!confirm) return;
@@ -387,7 +387,7 @@ public class NISDomainNode extends Node {
             NISDomainNode domainNode = (NISDomainNode)node;
             NISDomain domain = domainNode.getDomain();
 
-            nisTool.loadDatabase(domain);
+            nisTool.loadCache(domain);
         }
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -402,7 +402,7 @@ public class NISDomainNode extends Node {
         IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
 
         boolean confirm = MessageDialog.openQuestion(shell,
-                "Cleaning Database", "Are you sure?"
+                "Clearing Cache Database", "Are you sure?"
         );
 
         if (!confirm) return;
@@ -414,7 +414,7 @@ public class NISDomainNode extends Node {
             NISDomainNode domainNode = (NISDomainNode)node;
             NISDomain domain = domainNode.getDomain();
 
-            nisTool.cleanDatabase(domain);
+            nisTool.clearCache(domain);
         }
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -429,7 +429,7 @@ public class NISDomainNode extends Node {
         IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
 
         boolean confirm = MessageDialog.openQuestion(shell,
-                "Removing Database", "Are you sure?"
+                "Removing Cache Database", "Are you sure?"
         );
 
         if (!confirm) return;
@@ -441,7 +441,7 @@ public class NISDomainNode extends Node {
             NISDomainNode domainNode = (NISDomainNode)node;
             NISDomain domain = domainNode.getDomain();
 
-            nisTool.removeDatabase(domain);
+            nisTool.removeCache(domain);
         }
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();

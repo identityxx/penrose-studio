@@ -16,17 +16,9 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.source.Source;
-import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
-import org.safehaus.penrose.jdbc.JDBCClient;
-import org.safehaus.penrose.jdbc.Assignment;
-import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.studio.nis.NISTool;
 
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.TreeMap;
-import java.sql.ResultSet;
+import java.util.*;
 
 /**
  * @author Endi S. Dewata
@@ -52,21 +44,21 @@ public class NISCachePage extends FormPage {
         this.domain = editor.getDomain();
         this.nisTool = editor.getNisTool();
 
-        sourceNames.put("Users", "cache_users");
-        sourceNames.put("Shadows", "cache_shadow");
-        sourceNames.put("Hosts", "cache_hosts");
-        sourceNames.put("Groups", "cache_groups");
-        sourceNames.put("Services", "cache_services");
-        sourceNames.put("RPCs", "cache_rpcs");
-        sourceNames.put("NetIDs", "cache_netids");
-        sourceNames.put("Protocols", "cache_protocols");
-        sourceNames.put("Aliases", "cache_aliases");
-        sourceNames.put("Netgroups", "cache_netgroups");
-        sourceNames.put("Ethernets", "cache_ethers");
-        sourceNames.put("BootParams", "cache_bootparams");
-        sourceNames.put("Networks", "cache_networks");
-        sourceNames.put("AutomountMaps", "cache_automountMap");
-        sourceNames.put("Automounts", "cache_automount");
+        sourceNames.put("Users", "nis_users");
+        sourceNames.put("Shadows", "nis_shadow");
+        sourceNames.put("Hosts", "nis_hosts");
+        sourceNames.put("Groups", "nis_groups");
+        sourceNames.put("Services", "nis_services");
+        sourceNames.put("RPCs", "nis_rpcs");
+        sourceNames.put("NetIDs", "nis_netids");
+        sourceNames.put("Protocols", "nis_protocols");
+        sourceNames.put("Aliases", "nis_aliases");
+        sourceNames.put("Netgroups", "nis_netgroups");
+        sourceNames.put("Ethernets", "nis_ethers");
+        sourceNames.put("BootParams", "nis_bootparams");
+        sourceNames.put("Networks", "nis_networks");
+        sourceNames.put("AutomountMaps", "nis_automountMap");
+        sourceNames.put("Automounts", "nis_automount");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -120,6 +112,96 @@ public class NISCachePage extends FormPage {
         gd.widthHint = 120;
         buttons.setLayoutData(gd);
 
+        Button createButton = new Button(buttons, SWT.PUSH);
+        createButton.setText("Create Cache");
+        createButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        createButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    TableItem[] items = cacheTable.getSelection();
+                    if (items == null || items.length == 0) return;
+
+                    for (TableItem item : items) {
+                        Source source = (Source)item.getData();
+                        nisTool.createCache(domain, source);
+                    }
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                }
+            }
+        });
+
+        Button loadButton = new Button(buttons, SWT.PUSH);
+        loadButton.setText("Load Cache");
+        loadButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        loadButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    TableItem[] items = cacheTable.getSelection();
+                    if (items == null || items.length == 0) return;
+
+                    for (TableItem item : items) {
+                        Source source = (Source)item.getData();
+                        nisTool.loadCache(domain, source);
+                    }
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                }
+            }
+        });
+
+        Button clearButton = new Button(buttons, SWT.PUSH);
+        clearButton.setText("Clear Cache");
+        clearButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        clearButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    TableItem[] items = cacheTable.getSelection();
+                    if (items == null || items.length == 0) return;
+
+                    for (TableItem item : items) {
+                        Source source = (Source)item.getData();
+                        nisTool.clearCache(domain, source);
+                    }
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                }
+            }
+        });
+
+        Button removeButton = new Button(buttons, SWT.PUSH);
+        removeButton.setText("Remove Cache");
+        removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        removeButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    TableItem[] items = cacheTable.getSelection();
+                    if (items == null || items.length == 0) return;
+
+                    for (TableItem item : items) {
+                        Source source = (Source)item.getData();
+                        nisTool.removeCache(domain, source);
+                    }
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                }
+            }
+        });
+
+        new Label(buttons, SWT.NONE);
+        
         Button refreshButton = new Button(buttons, SWT.PUSH);
         refreshButton.setText("Refresh");
         refreshButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -136,41 +218,37 @@ public class NISCachePage extends FormPage {
     public void refresh() {
         try {
             cacheTable.removeAll();
-            
+
             Partition partition = nisTool.getPartitions().getPartition(domain.getPartition());
 
             for (final String label : sourceNames.keySet()) {
-                String sourceName = sourceNames.get(label);
-                log.debug("Checking cache "+label+" ("+sourceName+").");
+                final String sourceName = sourceNames.get(label);
+                log.debug("Checking cache for "+label+" ("+sourceName+").");
 
                 Source source = partition.getSource(sourceName);
                 if (source == null) continue;
 
-                JDBCAdapter adapter = (JDBCAdapter)source.getConnection().getAdapter();
-                JDBCClient client = adapter.getClient();
+                Collection<Source> caches = nisTool.getCaches(partition, source);
+                if (caches.isEmpty()) continue;
 
-                String table = client.getTableName(source);
-                String sql = "select count(*) from "+table;
+                Source cacheSource = caches.iterator().next();
 
-                Collection<Assignment> assignments = new ArrayList<Assignment>();
+                TableItem ti = new TableItem(cacheTable, SWT.NONE);
+                ti.setText(0, label);
+                ti.setData(source);
 
-                QueryResponse queryResponse = new QueryResponse() {
-                    public void add(Object object) throws Exception {
-                        ResultSet rs = (ResultSet)object;
-                        Integer count = rs.getInt(1);
+                try {
+                    Long count = cacheSource.getCount();
+                    ti.setText(1, count.toString());
 
-                        TableItem ti = new TableItem(cacheTable, SWT.NONE);
-                        ti.setText(0, label);
-                        ti.setText(1, count.toString());
-                    }
-                };
-
-                client.executeQuery(sql, assignments, queryResponse);
+                } catch (Exception e) {
+                    ti.setText(1, "N/A");
+                }
             }
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(editor.getSite().getShell(), "Refresh Failed", e.getMessage());
+            MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
         }
     }
 
