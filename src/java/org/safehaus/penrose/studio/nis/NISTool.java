@@ -8,12 +8,10 @@ import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.studio.util.FileUtil;
-import org.safehaus.penrose.config.PenroseConfig;
-import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.jdbc.JDBCClient;
-import org.apache.tools.ant.Project;
 import org.apache.tools.ant.filters.ExpandProperties;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.FilterChain;
@@ -30,9 +28,7 @@ public class NISTool {
 
     public Logger log = Logger.getLogger(getClass());
 
-    File workDir;
-    PenroseConfig penroseConfig;
-    PenroseContext penroseContext;
+    Project project;
 
     protected Partition nisPartition;
 
@@ -49,24 +45,21 @@ public class NISTool {
     protected PartitionConfigs partitionConfigs = new PartitionConfigs();
     protected Partitions partitions = new Partitions();
 
-    public void init(
-            PenroseConfig penroseConfig,
-            PenroseContext penroseContext,
-            File workDir
-    ) throws Exception {
+    public NISTool() {
+    }
 
-        this.penroseConfig = penroseConfig;
-        this.penroseContext = penroseContext;
-        this.workDir = workDir;
+    public void init(Project project) throws Exception {
+        this.project = project;
 
-        File partitionDir = new File(workDir, "partitions"+File.separator+"nis");
+        File partitionDir = new File(project.getWorkDir(), "partitions"+File.separator+"nis");
+        //PartitionConfig partitionConfig = partitionConfigs.load(partitionDir);
 
-        PartitionConfig partitionConfig = partitionConfigs.load(partitionDir);
+        PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig("nis");
 
         PartitionContext partitionContext = new PartitionContext();
         partitionContext.setPath(partitionDir);
-        partitionContext.setPenroseConfig(penroseConfig);
-        partitionContext.setPenroseContext(penroseContext);
+        partitionContext.setPenroseConfig(project.getPenroseConfig());
+        partitionContext.setPenroseContext(project.getPenroseContext());
 
         nisPartition = new Partition();
         nisPartition.init(partitionConfig, partitionContext);
@@ -106,18 +99,10 @@ public class NISTool {
 
             nisDomains.put(domainName, domain);
 
-            File partitionDir = new File(workDir, "partitions"+File.separator+partitionName);
+            PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(partitionName);
+            partitionConfigs.addPartitionConfig(partitionConfig);
 
-            PartitionConfig partitionConfig = partitionConfigs.load(partitionDir);
-
-            PartitionContext partitionContext = new PartitionContext();
-            partitionContext.setPath(partitionDir);
-            partitionContext.setPenroseConfig(penroseConfig);
-            partitionContext.setPenroseContext(penroseContext);
-
-            Partition partition = new Partition();
-            partition.init(partitionConfig, partitionContext);
-            partitions.addPartition(partition);
+            initPartition(domain);
         }
     }
 
@@ -133,11 +118,11 @@ public class NISTool {
         log.debug(" - server: "+server);
         log.debug(" - suffix: "+suffix);
 
-        File oldDir = new File(workDir, "partitions"+File.separator+"nis_cache");
-        File newDir = new File(workDir, "partitions"+File.separator+ partitionName);
+        File oldDir = new File(project.getWorkDir(), "partitions"+File.separator+"nis_cache");
+        File newDir = new File(project.getWorkDir(), "partitions"+File.separator+ partitionName);
         FileUtil.copy(oldDir, newDir);
 
-        Project project = new Project();
+        org.apache.tools.ant.Project project = new org.apache.tools.ant.Project();
 
         project.setProperty("nis.server", server);
         project.setProperty("nis.domain", domainName);
@@ -175,14 +160,14 @@ public class NISTool {
         String partitionName = domain.getPartition();
         log.debug("Initializing partition "+partitionName+".");
 
-        File newDir = new File(workDir, "partitions"+File.separator+ partitionName);
+        File newDir = new File(project.getWorkDir(), "partitions"+File.separator+ partitionName);
 
-        PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getPartition());
+        PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(partitionName);
 
         PartitionContext partitionContext = new PartitionContext();
         partitionContext.setPath(newDir);
-        partitionContext.setPenroseConfig(penroseConfig);
-        partitionContext.setPenroseContext(penroseContext);
+        partitionContext.setPenroseConfig(project.getPenroseConfig());
+        partitionContext.setPenroseContext(project.getPenroseContext());
 
         Partition partition = new Partition();
         partition.init(partitionConfig, partitionContext);
@@ -255,7 +240,7 @@ public class NISTool {
 
         partitionConfigs.removePartitionConfig(partitionName);
 
-        File partitionDir = new File(workDir, "partitions"+File.separator+ partitionName);
+        File partitionDir = new File(project.getWorkDir(), "partitions"+File.separator+ partitionName);
         FileUtil.delete(partitionDir);
     }
 
@@ -274,7 +259,7 @@ public class NISTool {
 
         nisDomains.remove(domainName);
 
-        File dir = new File(workDir, "partitions"+File.separator+ domain.getPartition());
+        File dir = new File(project.getWorkDir(), "partitions"+File.separator+ domain.getPartition());
         FileUtil.delete(dir);
 
         RDNBuilder rb = new RDNBuilder();

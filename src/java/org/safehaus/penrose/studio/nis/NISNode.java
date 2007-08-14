@@ -122,12 +122,9 @@ public class NISNode extends Node {
 
     public void start() throws Exception {
         Project project = projectNode.getProject();
-        PenroseConfig penroseConfig = project.getPenroseConfig();
-        PenroseContext penroseContext = project.getPenroseContext();
-        File workDir = project.getWorkDir();
 
         nisTool = new NISTool();
-        nisTool.init(penroseConfig, penroseContext, workDir);
+        nisTool.init(project);
 
         for (NISDomain nisDomain : nisTool.getNisDomains().values()) {
             addNisDomain(nisDomain);
