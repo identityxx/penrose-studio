@@ -30,6 +30,7 @@ public class NISGroupsEditor extends FormEditor {
     public void addPages() {
         try {
             addPage(new NISGroupsPage(this));
+            addPage(new NISGroupScriptsPage(this));
             addPage(new NISGroupChangesPage(this));
 
         } catch (Exception e) {
