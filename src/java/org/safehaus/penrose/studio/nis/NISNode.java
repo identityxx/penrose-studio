@@ -8,9 +8,9 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.nis.wizard.NISDomainWizard;
+import org.safehaus.penrose.studio.nis.editor.NISEditorInput;
+import org.safehaus.penrose.studio.nis.editor.NISEditor;
 import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.config.PenroseConfig;
-import org.safehaus.penrose.naming.PenroseContext;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.IMenuManager;
@@ -19,11 +19,12 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkbenchPage;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
-import java.io.File;
 
 /**
  * @author Endi S. Dewata
@@ -105,7 +106,15 @@ public class NISNode extends Node {
 
     public void open() throws Exception {
         if (!started) start();
+
         view.open(this);
+
+        NISEditorInput ei = new NISEditorInput();
+        ei.setNisTool(nisTool);
+
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        IWorkbenchPage page = window.getActivePage();
+        page.openEditor(ei, NISEditor.class.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();

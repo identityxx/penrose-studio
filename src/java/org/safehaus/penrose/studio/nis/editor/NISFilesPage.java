@@ -23,7 +23,6 @@ import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.filter.OrFilter;
 import org.safehaus.penrose.filter.SimpleFilter;
 import org.safehaus.penrose.filter.AndFilter;
-import org.safehaus.penrose.studio.nis.editor.NISEditor;
 import org.safehaus.penrose.studio.nis.NISTool;
 
 /**

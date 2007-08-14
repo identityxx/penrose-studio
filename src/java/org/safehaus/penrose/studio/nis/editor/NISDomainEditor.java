@@ -5,12 +5,12 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.studio.nis.NISTool;
 import org.safehaus.penrose.nis.NISDomain;
-import org.slf4j.Logger;
+import org.safehaus.penrose.studio.nis.*;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
-public class NISGroupsEditor extends FormEditor {
+public class NISDomainEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
@@ -18,20 +18,19 @@ public class NISGroupsEditor extends FormEditor {
     NISDomain domain;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        NISGroupsEditorInput ei = (NISGroupsEditorInput)input;
+        NISDomainEditorInput ei = (NISDomainEditorInput)input;
         nisTool = ei.getNisTool();
         domain = ei.getDomain();
 
         setSite(site);
         setInput(input);
-        setPartName("NIS Groups - "+domain.getName());
+        setPartName("NIS - "+domain.getName());
     }
 
     public void addPages() {
         try {
-            addPage(new NISGroupsPage(this));
-            addPage(new NISGroupScriptsPage(this));
-            addPage(new NISGroupChangesPage(this, domain, nisTool));
+            addPage(new NISDomainPage(this));
+            addPage(new NISCachePage(this));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

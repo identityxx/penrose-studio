@@ -31,7 +31,7 @@ public class NISUsersEditor extends FormEditor {
         try {
             addPage(new NISUsersPage(this));
             addPage(new NISUserScriptsPage(this));
-            addPage(new NISUserChangesPage(this));
+            addPage(new NISUserChangesPage(this, domain, nisTool));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

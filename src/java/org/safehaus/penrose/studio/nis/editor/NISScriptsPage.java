@@ -24,7 +24,6 @@ import org.safehaus.penrose.ldap.SearchResponse;
 import org.safehaus.penrose.ldap.Attributes;
 import org.safehaus.penrose.agent.client.FindClient;
 import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.studio.nis.editor.NISEditor;
 import org.safehaus.penrose.studio.nis.NISTool;
 
 import java.util.*;

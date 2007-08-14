@@ -5,8 +5,8 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.*;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.nis.editor.NISEditorInput;
-import org.safehaus.penrose.studio.nis.editor.NISEditor;
+import org.safehaus.penrose.studio.nis.editor.NISDomainEditorInput;
+import org.safehaus.penrose.studio.nis.editor.NISDomainEditor;
 import org.safehaus.penrose.studio.nis.editor.NISDomainDialog;
 import org.safehaus.penrose.studio.nis.editor.NISUserDialog;
 import org.safehaus.penrose.nis.NISDomain;
@@ -182,42 +182,31 @@ public class NISDomainNode extends Node {
 
     public void open() throws Exception {
 
-        NISEditorInput ei = new NISEditorInput();
+        NISDomainEditorInput ei = new NISDomainEditorInput();
         ei.setNisTool(nisTool);
         ei.setDomain(domain);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
-        page.openEditor(ei, NISEditor.class.getName());
+        page.openEditor(ei, NISDomainEditor.class.getName());
     }
 
     public void edit() throws Exception {
 
+        String domainName = domain.getName();
+
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
         NISDomainDialog dialog = new NISDomainDialog(shell, SWT.NONE);
-        dialog.setName(domain.getName());
-        dialog.setPartition(domain.getPartition());
-        dialog.setServer(domain.getServer());
-        dialog.setSuffix(domain.getSuffix());
+        dialog.setDomain(domain);
         dialog.open();
 
         int action = dialog.getAction();
         if (action == NISUserDialog.CANCEL) return;
 
-        String domainName = dialog.getName();
-        String partitionName = dialog.getPartition();
-        String server = dialog.getServer();
-        String suffix = dialog.getSuffix();
+        nisTool.updateDomain(domainName, domain);
 
-        NISDomain newDomain = new NISDomain();
-        newDomain.setName(domainName);
-        newDomain.setPartition(partitionName);
-        newDomain.setServer(server);
-        newDomain.setSuffix(suffix);
-
-        nisTool.updateDomain(domain, newDomain);
-
-        domain = newDomain;
+        nisNode.removeNisDomain(domainName);
+        nisNode.addNisDomain(domain);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();

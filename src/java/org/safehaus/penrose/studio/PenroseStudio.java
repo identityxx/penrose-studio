@@ -39,6 +39,7 @@ import org.safehaus.penrose.log4j.Log4jConfig;
 import org.safehaus.penrose.log4j.Log4jConfigWriter;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.apache.log4j.xml.DOMConfigurator;
 
 import javax.crypto.Cipher;
 
@@ -52,7 +53,7 @@ public class PenroseStudio implements IPlatformRunnable {
     public static String VENDOR_NAME;
 
     public final static DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
-    public final static String RELEASE_DATE    = "12/01/2006";
+    public final static String RELEASE_DATE    = "12/01/2007";
 
     public final static String FEATURE_NOT_AVAILABLE = "This feature is only available in the commercial version.";
 
@@ -88,7 +89,26 @@ public class PenroseStudio implements IPlatformRunnable {
 
     public PenroseStudio() throws Exception {
 
+        File dir = new File(System.getProperty("user.dir"));
+        File log4jXml = new File(dir, "conf"+File.separator+"log4j.xml");
+
+        if (log4jXml.exists()) {
+            DOMConfigurator.configure(log4jXml.getAbsolutePath());
+        }
+
         log.warn("Starting "+PRODUCT_NAME+" "+PRODUCT_VERSION+".");
+
+        String javaVersion = System.getProperty("java.version");
+        log.info("Java version: "+javaVersion);
+
+        String javaVendor = System.getProperty("java.vendor");
+        log.info("Java vendor: "+javaVendor);
+
+        String javaHome = System.getProperty("java.home");
+        log.info("Java home: "+javaHome);
+
+        String userDir = System.getProperty("user.dir");
+        log.info("Current directory: "+userDir);
 
         File userHome = new File(System.getProperty("user.home"));
 

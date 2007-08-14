@@ -1,6 +1,7 @@
 package org.safehaus.penrose.studio.nis.editor;
 
 import org.eclipse.ui.forms.editor.FormPage;
+import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
@@ -33,23 +34,34 @@ public class NISGroupChangesPage extends FormPage {
     Text messageText;
     Button activateButton;
 
-    NISGroupsEditor editor;
+    FormEditor editor;
     NISDomain domain;
     NISTool nisTool;
 
-    public NISGroupChangesPage(NISGroupsEditor editor) throws Exception {
-        super(editor, "CHANGES", "  Changes ");
+    String title;
+
+    public NISGroupChangesPage(FormEditor editor, NISTool nisTool) throws Exception {
+        super(editor, "GROUPS", "  Groups ");
+        title = "Groups";
 
         this.editor = editor;
-        domain = editor.getDomain();
-        nisTool = editor.getNisTool();
+        this.nisTool = nisTool;
+    }
+
+    public NISGroupChangesPage(FormEditor editor, NISDomain domain, NISTool nisTool) throws Exception {
+        super(editor, "CHANGES", "  Changes ");
+        title = "Changes";
+
+        this.editor = editor;
+        this.domain = domain;
+        this.nisTool = nisTool;
     }
 
     public void createFormContent(IManagedForm managedForm) {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Changes");
+        form.setText(title);
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
@@ -75,22 +87,32 @@ public class NISGroupChangesPage extends FormPage {
             changesTable.removeAll();
 
             SearchRequest request = new SearchRequest();
-            request.setFilter("(domain="+domain.getName()+")");
+            if (domain != null) {
+                request.setFilter("(domain="+domain.getName()+")");
+            }
 
             SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
                 public void add(SearchResult result) throws Exception {
                     Attributes attributes = result.getAttributes();
 
+                    String domainName = (String)attributes.getValue("domain");
                     String cn = (String)attributes.getValue("cn");
                     Integer origGidNumber = (Integer)attributes.getValue("origGidNumber");
                     Integer gidNumber = (Integer)attributes.getValue("gidNumber");
                     String active = (String)attributes.getValue("active");
 
                     TableItem ti = new TableItem(changesTable, SWT.NONE);
-                    ti.setText(0, cn);
-                    ti.setText(1, ""+origGidNumber);
-                    ti.setText(2, ""+ gidNumber);
-                    ti.setText(3, "1".equals(active) ? "Yes" : "");
+
+                    int i = 0;
+                    if (domain == null) {
+                        ti.setText(i++, domainName);
+                    }
+
+                    ti.setText(i++, cn);
+                    ti.setText(i++, ""+origGidNumber);
+                    ti.setText(i++, ""+ gidNumber);
+                    ti.setText(i++, "1".equals(active) ? "Yes" : "");
+
                     ti.setData(result);
                 }
             };
@@ -101,11 +123,7 @@ public class NISGroupChangesPage extends FormPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            String message = e.toString();
-            if (message.length() > 500) {
-                message = message.substring(0, 500) + "...";
-            }
-            MessageDialog.openError(editor.getSite().getShell(), "Refresh Failed", message);
+            MessageDialog.openError(editor.getSite().getShell(), "Refresh Failed", e.getMessage());
         }
 
         update();
@@ -136,11 +154,7 @@ public class NISGroupChangesPage extends FormPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            String message = e.toString();
-            if (message.length() > 500) {
-                message = message.substring(0, 500) + "...";
-            }
-            MessageDialog.openError(editor.getSite().getShell(), "Update Failed", message);
+            MessageDialog.openError(editor.getSite().getShell(), "Update Failed", e.getMessage());
         }
     }
 
@@ -157,6 +171,12 @@ public class NISGroupChangesPage extends FormPage {
         changesTable.setLayoutData(new GridData(GridData.FILL_BOTH));
         changesTable.setHeaderVisible(true);
         changesTable.setLinesVisible(true);
+
+        if (domain == null) {
+            TableColumn tc = new TableColumn(changesTable, SWT.NONE);
+            tc.setWidth(150);
+            tc.setText("Domain");
+        }
 
         TableColumn tc = new TableColumn(changesTable, SWT.NONE);
         tc.setWidth(100);
@@ -202,12 +222,14 @@ public class NISGroupChangesPage extends FormPage {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
                     NISChangeDialog dialog = new NISChangeDialog(getSite().getShell(), SWT.NONE);
-
+                    dialog.setTargetName("Group");
+                    dialog.setOldValueName("Old GID Number");
+                    dialog.setNewValueName("New GID Number");
                     dialog.open();
 
                     int action = dialog.getAction();
                     if (action == NISChangeDialog.CANCEL) return;
-
+/*
                     RDNBuilder rb = new RDNBuilder();
                     rb.set("domain", domain.getName());
                     rb.set("cn", dialog.getTarget());
@@ -221,14 +243,10 @@ public class NISGroupChangesPage extends FormPage {
                     attributes.setValue("message", dialog.getMessage());
 
                     nisTool.getGroups().add(dn, attributes);
-
+*/
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    String message = e.toString();
-                    if (message.length() > 500) {
-                        message = message.substring(0, 500) + "...";
-                    }
-                    MessageDialog.openError(editor.getSite().getShell(), "Edit Failed", message);
+                    MessageDialog.openError(editor.getSite().getShell(), "Edit Failed", e.getMessage());
                 }
 
                 refresh();
@@ -254,6 +272,9 @@ public class NISGroupChangesPage extends FormPage {
                     String message = (String)attributes.getValue("message");
 
                     NISChangeDialog dialog = new NISChangeDialog(getSite().getShell(), SWT.NONE);
+                    dialog.setTargetName("Group");
+                    dialog.setOldValueName("Old GID Number");
+                    dialog.setNewValueName("New GID Number");
                     dialog.setTarget(cn);
                     dialog.setOldValue(""+ origGidNumber);
                     dialog.setNewValue(""+ gidNumber);
@@ -278,11 +299,7 @@ public class NISGroupChangesPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    String message = e.toString();
-                    if (message.length() > 500) {
-                        message = message.substring(0, 500) + "...";
-                    }
-                    MessageDialog.openError(editor.getSite().getShell(), "Edit Failed", message);
+                    MessageDialog.openError(editor.getSite().getShell(), "Edit Failed", e.getMessage());
                 }
 
                 refresh();
@@ -311,11 +328,7 @@ public class NISGroupChangesPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    String message = e.toString();
-                    if (message.length() > 500) {
-                        message = message.substring(0, 500) + "...";
-                    }
-                    MessageDialog.openError(editor.getSite().getShell(), "Delete Failed", message);
+                    MessageDialog.openError(editor.getSite().getShell(), "Delete Failed", e.getMessage());
                 }
 
                 refresh();
@@ -346,11 +359,7 @@ public class NISGroupChangesPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    String message = e.toString();
-                    if (message.length() > 500) {
-                        message = message.substring(0, 500) + "...";
-                    }
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", message);
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
                 }
             }
         });
@@ -380,11 +389,7 @@ public class NISGroupChangesPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    String message = e.toString();
-                    if (message.length() > 500) {
-                        message = message.substring(0, 500) + "...";
-                    }
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", message);
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
                 }
             }
         });
@@ -414,11 +419,7 @@ public class NISGroupChangesPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    String message = e.toString();
-                    if (message.length() > 500) {
-                        message = message.substring(0, 500) + "...";
-                    }
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", message);
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
                 }
             }
         });
@@ -450,11 +451,7 @@ public class NISGroupChangesPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    String message = e.toString();
-                    if (message.length() > 500) {
-                        message = message.substring(0, 500) + "...";
-                    }
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", message);
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
                 }
 
                 refresh();

@@ -31,6 +31,10 @@ public class NISChangeDialog extends Dialog {
 
     int action;
 
+    private String targetName = "Target";
+    private String oldValueName = "Old value";
+    private String newValueName = "New value";
+
     private String target;
     private String oldValue;
     private String newValue;
@@ -42,7 +46,7 @@ public class NISChangeDialog extends Dialog {
 
     public void open() {
 
-        setText("NIS Change Editor");
+        setText("NIS "+targetName+" Change Editor");
         shell = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
 
         init();
@@ -98,23 +102,23 @@ public class NISChangeDialog extends Dialog {
         composite.setLayout(new GridLayout(2, false));
 
         Label targetLabel = new Label(composite, SWT.NONE);
-        targetLabel.setText("Target:");
+        targetLabel.setText(targetName+":");
         GridData gd = new GridData();
-        gd.widthHint = 100;
+        gd.widthHint = 150;
         targetLabel.setLayoutData(gd);
 
         targetText = new Text(composite, SWT.BORDER);
         targetText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label oldValueLabel = new Label(composite, SWT.NONE);
-        oldValueLabel.setText("Old value:");
+        oldValueLabel.setText(oldValueName+":");
         oldValueLabel.setLayoutData(new GridData());
 
         oldValueText = new Text(composite, SWT.BORDER);
         oldValueText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label newValueLabel = new Label(composite, SWT.NONE);
-        newValueLabel.setText("New value:");
+        newValueLabel.setText(newValueName+":");
         newValueLabel.setLayoutData(new GridData());
 
         newValueText = new Text(composite, SWT.BORDER);
@@ -208,5 +212,29 @@ public class NISChangeDialog extends Dialog {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getTargetName() {
+        return targetName;
+    }
+
+    public void setTargetName(String targetName) {
+        this.targetName = targetName;
+    }
+
+    public String getOldValueName() {
+        return oldValueName;
+    }
+
+    public void setOldValueName(String oldValueName) {
+        this.oldValueName = oldValueName;
+    }
+
+    public String getNewValueName() {
+        return newValueName;
+    }
+
+    public void setNewValueName(String newValueName) {
+        this.newValueName = newValueName;
     }
 }

@@ -11,6 +11,7 @@ import org.eclipse.swt.graphics.Point;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.nis.NISDomain;
 
 /**
  * @author Endi S. Dewata
@@ -25,16 +26,12 @@ public class NISDomainDialog extends Dialog {
     Shell shell;
 
     Text nameText;
-    Text partitionText;
     Text serverText;
     Text suffixText;
 
     int action;
 
-    private String name;
-    private String partition;
-    private String server;
-    private String suffix;
+    private NISDomain domain;
 
     public NISDomainDialog(Shell parent, int style) {
 		super(parent, style);
@@ -71,9 +68,13 @@ public class NISDomainDialog extends Dialog {
     }
 
     public void reset() {
+        String name = domain.getName();
         nameText.setText(name == null ? "" : name);
-        partitionText.setText(partition == null ? "" : partition);
+
+        String server = domain.getServer();
         serverText.setText(server == null ? "" : server);
+
+        String suffix = domain.getSuffix();
         suffixText.setText(suffix == null ? "" : suffix);
     }
 
@@ -102,13 +103,6 @@ public class NISDomainDialog extends Dialog {
 
         nameText = new Text(composite, SWT.BORDER);
         nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        Label nameLabel = new Label(composite, SWT.NONE);
-        nameLabel.setText("Partition:");
-        nameLabel.setLayoutData(new GridData());
-
-        partitionText = new Text(composite, SWT.BORDER);
-        partitionText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label serverLabel = new Label(composite, SWT.NONE);
         serverLabel.setText("Server:");
@@ -147,10 +141,16 @@ public class NISDomainDialog extends Dialog {
 
         okButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                name = nameText.getText().equals("") ? null : nameText.getText();
-                partition = partitionText.getText().equals("") ? null : partitionText.getText();
-                server = serverText.getText().equals("") ? null : serverText.getText();
-                suffix = suffixText.getText().equals("") ? null : suffixText.getText();
+
+                String name = nameText.getText();
+                domain.setName("".equals(name) ? null : name);
+
+                String server = serverText.getText();
+                domain.setServer("".equals(server) ? null : server);
+
+                String suffix = suffixText.getText();
+                domain.setSuffix("".equals(suffix) ? null : suffix);
+
                 action = OK;
                 shell.close();
             }
@@ -167,35 +167,11 @@ public class NISDomainDialog extends Dialog {
         this.action = action;
     }
 
-    public String getName() {
-        return name;
+    public void setDomain(NISDomain domain) {
+        this.domain = domain;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPartition() {
-        return partition;
-    }
-
-    public void setPartition(String partition) {
-        this.partition = partition;
-    }
-
-    public String getServer() {
-        return server;
-    }
-
-    public void setServer(String server) {
-        this.server = server;
-    }
-
-    public String getSuffix() {
-        return suffix;
-    }
-
-    public void setSuffix(String suffix) {
-        this.suffix = suffix;
+    public NISDomain getDomain() {
+        return domain;
     }
 }

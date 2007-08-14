@@ -23,6 +23,7 @@ import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.BundleContext;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.xml.DOMConfigurator;
 
 import java.util.*;
 import java.io.File;
@@ -40,14 +41,9 @@ public class PenrosePlugin extends AbstractUIPlugin {
 	
 	public PenrosePlugin() {
 
-        String dir = System.getProperty("user.dir");
-        File log4jProperties = new File(dir+File.separator+"conf"+File.separator+"log4j.properties");
-        if (log4jProperties.exists()) {
-            PropertyConfigurator.configure(log4jProperties.getAbsolutePath());
-        }
-
 		instance = this;
-		try {
+
+        try {
 			resourceBundle = ResourceBundle.getBundle("org.safehaus.penrose.rcp.PenrosePluginResources");
 		} catch (MissingResourceException x) {
 			resourceBundle = null;
@@ -55,16 +51,13 @@ public class PenrosePlugin extends AbstractUIPlugin {
 	}
 
     public BundleContext getBundleContext(){
-        return this.bundleContext;
+        return bundleContext;
     }
 	
-	/**
-	 * This method is called upon plug-in activation
-	 */
-	public void start(BundleContext context) throws Exception {
+	public void start(BundleContext bundleContext) throws Exception {
         //log.debug("Starting PenrosePlugin");
-        super.start(context);
-        this.bundleContext = context;
+        super.start(bundleContext);
+        this.bundleContext = bundleContext;
         
         try {
             //IWorkbench workbench = PlatformUI.getWorkbench();
@@ -79,12 +72,9 @@ public class PenrosePlugin extends AbstractUIPlugin {
         }
 	}
 
-	/**
-	 * This method is called when the plug-in is stopped
-	 */
-	public void stop(BundleContext context) throws Exception {
+	public void stop(BundleContext bundleContext) throws Exception {
         //log.debug("Stopping PenrosePlugin");
-		super.stop(context);
+		super.stop(bundleContext);
 	}
 
 	public static PenrosePlugin getInstance() {

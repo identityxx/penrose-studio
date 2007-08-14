@@ -194,18 +194,23 @@ public class NISTool {
         nisDomains.put(domainName, domain);
     }
 
-    public void updateDomain(NISDomain oldDomain, NISDomain newDomain) throws Exception {
+    public void updateDomain(String oldDomainName, NISDomain domain) throws Exception {
+
+        String newDomainName = domain.getName();
 
         RDNBuilder rb = new RDNBuilder();
-        rb.set("name", oldDomain.getName());
+        rb.set("name", oldDomainName);
         RDN rdn = rb.toRdn();
         DN dn = new DN(rdn);
 
-        rb.set("name", newDomain.getName());
+        rb.set("name", newDomainName);
         RDN newRdn = rb.toRdn();
 
         if (!dn.getRdn().equals(newRdn)) {
             domains.modrdn(dn, newRdn, true);
+
+            nisDomains.remove(oldDomainName);
+            nisDomains.put(newDomainName, domain);
         }
 
         DNBuilder db = new DNBuilder();
@@ -217,17 +222,12 @@ public class NISTool {
 
         modifications.add(new Modification(
                 Modification.REPLACE,
-                new Attribute("partition", newDomain.getPartition())
+                new Attribute("server", domain.getServer())
         ));
 
         modifications.add(new Modification(
                 Modification.REPLACE,
-                new Attribute("server", newDomain.getServer())
-        ));
-
-        modifications.add(new Modification(
-                Modification.REPLACE,
-                new Attribute("suffix", newDomain.getSuffix())
+                new Attribute("suffix", domain.getSuffix())
         ));
 
         domains.modify(newDn, modifications);

@@ -154,6 +154,11 @@
            icon="images/object.gif"
            class="org.safehaus.penrose.studio.nis.editor.NISEditor"/>
        <editor
+           id="org.safehaus.penrose.studio.nis.editor.NISDomainEditor"
+           name="NIS Domain"
+           icon="images/object.gif"
+           class="org.safehaus.penrose.studio.nis.editor.NISDomainEditor"/>
+       <editor
            id="org.safehaus.penrose.studio.nis.editor.NISUsersEditor"
            name="NIS Users"
            icon="images/object.gif"

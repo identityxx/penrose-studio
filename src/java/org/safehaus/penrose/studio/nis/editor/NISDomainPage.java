@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.studio.nis.editor.NISEditor;
+import org.safehaus.penrose.studio.nis.editor.NISDomainEditor;
 
 /**
  * @author Endi S. Dewata
@@ -21,10 +21,10 @@ public class NISDomainPage extends FormPage {
 
     FormToolkit toolkit;
 
-    NISEditor editor;
+    NISDomainEditor editor;
     NISDomain domain;
 
-    public NISDomainPage(NISEditor editor) {
+    public NISDomainPage(NISDomainEditor editor) {
         super(editor, "DOMAIN", "  Domain  ");
 
         this.editor = editor;

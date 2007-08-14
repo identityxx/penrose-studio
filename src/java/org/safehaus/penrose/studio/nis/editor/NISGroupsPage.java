@@ -101,7 +101,7 @@ public class NISGroupsPage extends FormPage {
     public Composite createSummarySection(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
-        composite.setLayout(new GridLayout(3, false));
+        composite.setLayout(new GridLayout(2, false));
 
         Label entriesLabel = toolkit.createLabel(composite, "Entries:");
         GridData gd = new GridData();
