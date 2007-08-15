@@ -1,11 +1,11 @@
 package org.safehaus.penrose.studio.plugin;
 
-import org.safehaus.penrose.studio.source.editor.JNDISourceEditorInput;
-import org.safehaus.penrose.studio.source.editor.JNDISourceEditor;
+import org.safehaus.penrose.studio.jndi.source.JNDISourceEditorInput;
+import org.safehaus.penrose.studio.jndi.source.JNDISourceEditor;
 import org.safehaus.penrose.studio.source.editor.SourceEditorInput;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorInput;
-import org.safehaus.penrose.studio.connection.editor.JNDIConnectionEditorInput;
-import org.safehaus.penrose.studio.connection.editor.JNDIConnectionEditor;
+import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionEditorInput;
+import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionEditor;
 
 /**
  * @author Endi S. Dewata

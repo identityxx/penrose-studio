@@ -53,9 +53,10 @@ public class WelcomeEditorInput implements IEditorInput {
         return null;
     }
 
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (!(o instanceof WelcomeEditorInput)) return false;
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null) return false;
+        if (object.getClass() != this.getClass()) return false;
 
         return true;
     }

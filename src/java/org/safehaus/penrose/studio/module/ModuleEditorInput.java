@@ -61,11 +61,12 @@ public class ModuleEditorInput implements IEditorInput {
         return null;
     }
 
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (!(o instanceof ModuleEditorInput)) return false;
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null) return false;
+        if (object.getClass() != this.getClass()) return false;
 
-        ModuleEditorInput cei = (ModuleEditorInput)o;
+        ModuleEditorInput cei = (ModuleEditorInput)object;
         return moduleConfig.equals(cei.moduleConfig);
     }
 

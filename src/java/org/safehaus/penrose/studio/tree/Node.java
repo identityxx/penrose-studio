@@ -99,15 +99,16 @@ public class Node {
         return o2.equals(o1);
     }
 
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if((o == null) || (o.getClass() != this.getClass())) return false;
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null) return false;
+        if (object.getClass() != this.getClass()) return false;
 
-        Node node = (Node)o;
+        Node node = (Node)object;
         if (!equals(name, node.name)) return false;
         if (!equals(type, node.type)) return false;
         if (!equals(image, node.image)) return false;
-        if (!equals(object, node.object)) return false;
+        if (!equals(this.object, node.object)) return false;
         if (!equals(parent, node.parent)) return false;
 
         return true;

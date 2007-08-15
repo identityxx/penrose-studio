@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.nis.NISNode;
 import org.safehaus.penrose.studio.nis.NISTool;
 
@@ -18,15 +17,18 @@ public class NISDomainWizard extends Wizard {
     
     public Logger log = LoggerFactory.getLogger(getClass());
 
+    Project project;
+
     NISDomainWizardPage domainPage;
     NISPartitionWizardPage partitionPage;
     NISDatabaseWizardPage databasePage;
 
     NISNode nisNode;
 
-    public NISDomainWizard(NISNode nisNode) {
+    public NISDomainWizard(Project project, NISNode nisNode) {
         setWindowTitle("New NIS Domain");
 
+        this.project = project;
         this.nisNode = nisNode;
 
         domainPage = new NISDomainWizardPage();
@@ -87,8 +89,6 @@ public class NISDomainWizard extends Wizard {
         try {
             nisTool.createPartitionConfig(domain);
 
-            ProjectNode projectNode = nisNode.getProjectNode();
-            Project project = projectNode.getProject();
             project.upload("partitions/"+domain.getPartition());
 
         } catch (Exception e) {

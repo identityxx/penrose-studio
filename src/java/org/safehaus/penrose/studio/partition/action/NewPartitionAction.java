@@ -46,7 +46,7 @@ public class NewPartitionAction extends Action {
 
             Shell shell = window.getShell();
 
-            CreatePartitionWizard wizard = new CreatePartitionWizard(projectNode);
+            CreatePartitionWizard wizard = new CreatePartitionWizard(projectNode.getProject());
             WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.setPageSize(600, 300);
             dialog.open();

@@ -11,7 +11,7 @@ import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.mapping.SourceMapping;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.apache.log4j.Logger;
 
 /**
@@ -23,7 +23,7 @@ public abstract class SourceEditor extends FormEditor {
 
     protected boolean dirty;
 
-    protected ProjectNode projectNode;
+    protected Project project;
     protected PartitionConfig partitionConfig;
     protected SourceConfig sourceConfig;
     protected SourceConfig origSourceConfig;
@@ -38,7 +38,7 @@ public abstract class SourceEditor extends FormEditor {
 
         SourceEditorInput ei = (SourceEditorInput)input;
 
-        projectNode = ei.getProjectNode();
+        project = ei.getProject();
         setPartitionConfig(ei.getPartitionConfig());
         origSourceConfig = ei.getSourceConfig();
 
@@ -117,12 +117,12 @@ public abstract class SourceEditor extends FormEditor {
         }
     }
 
-    public ProjectNode getProjectNode() {
-        return projectNode;
+    public Project getProject() {
+        return project;
     }
 
-    public void setProjectNode(ProjectNode projectNode) {
-        this.projectNode = projectNode;
+    public void setProject(Project project) {
+        this.project = project;
     }
 
     public PartitionConfig getPartitionConfig() {

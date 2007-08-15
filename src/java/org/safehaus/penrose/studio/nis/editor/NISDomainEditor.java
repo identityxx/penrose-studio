@@ -29,7 +29,7 @@ public class NISDomainEditor extends FormEditor {
 
     public void addPages() {
         try {
-            addPage(new NISDomainPage(this));
+            addPage(new NISDomainMainPage(this));
             addPage(new NISCachePage(this));
 
         } catch (Exception e) {

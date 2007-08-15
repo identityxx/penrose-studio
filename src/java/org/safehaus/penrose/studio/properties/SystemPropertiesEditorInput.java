@@ -20,14 +20,14 @@ package org.safehaus.penrose.studio.properties;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.config.PenroseConfig;
+import org.safehaus.penrose.studio.project.Project;
 
 /**
  * @author Endi S. Dewata
  */
 public class SystemPropertiesEditorInput implements IEditorInput {
 
-    private PenroseConfig penroseConfig;
+    private Project project;
 
     public SystemPropertiesEditorInput() {
     }
@@ -56,6 +56,10 @@ public class SystemPropertiesEditorInput implements IEditorInput {
         return null;
     }
 
+    public int hashCode() {
+        return project == null ? 0 : project.hashCode();
+    }
+
     boolean equals(Object o1, Object o2) {
         if (o1 == null && o2 == null) return true;
         if (o1 != null) return o1.equals(o2);
@@ -63,16 +67,21 @@ public class SystemPropertiesEditorInput implements IEditorInput {
     }
 
     public boolean equals(Object object) {
-        if((object == null) || (object.getClass() != getClass())) return false;
+        if (this == object) return true;
+        if (object == null) return false;
+        if (object.getClass() != this.getClass()) return false;
+
+        SystemPropertiesEditorInput ei = (SystemPropertiesEditorInput)object;
+        if (!equals(project, ei.project)) return false;
 
         return true;
     }
 
-    public PenroseConfig getPenroseConfig() {
-        return penroseConfig;
+    public Project getProject() {
+        return project;
     }
 
-    public void setPenroseConfig(PenroseConfig penroseConfig) {
-        this.penroseConfig = penroseConfig;
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

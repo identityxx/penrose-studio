@@ -52,7 +52,7 @@ public class NewStaticEntryAction extends Action {
 
             Shell shell = window.getShell();
 
-            StaticEntryWizard wizard = new StaticEntryWizard(projectNode, node.getPartitionConfig(), node.getEntryMapping());
+            StaticEntryWizard wizard = new StaticEntryWizard(projectNode.getProject(), node.getPartitionConfig(), node.getEntryMapping());
             WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.setPageSize(600, 300);
             dialog.open();

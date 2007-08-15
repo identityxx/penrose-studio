@@ -28,7 +28,6 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.ArrayList;
 
 /**
@@ -40,7 +39,7 @@ public class ObjectClassSelectionDialog extends Dialog {
 
     Table table;
 
-    private Collection selections = new ArrayList();
+    private Collection<String> selections = new ArrayList<String>();
 
 	public ObjectClassSelectionDialog(Shell parent, int style) {
 		super(parent, style);
@@ -70,13 +69,11 @@ public class ObjectClassSelectionDialog extends Dialog {
         }
     }
 
-    public void setObjectClasses(Collection list) {
+    public void setObjectClasses(Collection<String> list) {
         table.removeAll();
         if (list == null) return;
 
-        for (Iterator i=list.iterator(); i.hasNext(); ) {
-            String text = (String)i.next();
-
+        for (String text : list) {
             TableItem item = new TableItem(table, SWT.NONE);
             item.setText(text);
         }
@@ -100,8 +97,7 @@ public class ObjectClassSelectionDialog extends Dialog {
 		saveButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
                 TableItem items[] = table.getSelection();
-                for (int i=0; i<items.length; i++) {
-                    TableItem item = items[i];
+                for (TableItem item : items) {
                     selections.add(item.getText());
                 }
                 shell.close();
@@ -117,7 +113,7 @@ public class ObjectClassSelectionDialog extends Dialog {
 		});
 	}
 
-    public Collection getSelections() {
+    public Collection<String> getSelections() {
         return selections;
     }
 }

@@ -130,7 +130,7 @@ public class SourceNode extends Node {
         Plugin plugin = pluginManager.getPlugin(con.getAdapterName());
 
         SourceEditorInput sei = plugin.createSourceEditorInput();
-        sei.setProjectNode(projectNode);
+        sei.setProject(projectNode.getProject());
         sei.setPartitionConfig(this.partitionConfig);
         sei.setSourceConfig(sourceConfig);
 

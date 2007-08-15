@@ -7,7 +7,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 
 /**
  * @author Endi Sukma Dewata
@@ -20,7 +20,7 @@ public class SourceEditorPage extends FormPage {
 
     protected SourceEditor editor;
 
-    protected ProjectNode projectNode;
+    protected Project project;
     protected PartitionConfig partitionConfig;
     protected SourceConfig sourceConfig;
 
@@ -29,7 +29,7 @@ public class SourceEditorPage extends FormPage {
 
         this.editor = editor;
 
-        projectNode = editor.getProjectNode();
+        project = editor.getProject();
         partitionConfig = editor.getPartitionConfig();
         sourceConfig = editor.getSourceConfig();
     }
@@ -66,12 +66,12 @@ public class SourceEditorPage extends FormPage {
         this.partitionConfig = partitionConfig;
     }
 
-    public ProjectNode getProjectNode() {
-        return projectNode;
+    public Project getProject() {
+        return project;
     }
 
-    public void setProjectNode(ProjectNode projectNode) {
-        this.projectNode = projectNode;
+    public void setProject(Project project) {
+        this.project = project;
     }
 
     public SourceConfig getSourceConfig() {

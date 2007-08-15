@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 
 /**
  * @author Endi S. Dewata
@@ -21,7 +21,7 @@ public class ConnectionEditorPage extends FormPage {
 
     protected ConnectionEditor editor;
 
-    protected ProjectNode projectNode;
+    protected Project project;
     protected PartitionConfig partitionConfig;
     protected ConnectionConfig connectionConfig;
 
@@ -30,7 +30,7 @@ public class ConnectionEditorPage extends FormPage {
 
         this.editor = editor;
 
-        projectNode = editor.getProjectNode();
+        project = editor.getProject();
         partitionConfig = editor.getPartitionConfig();
         connectionConfig = editor.getConnectionConfig();
     }
@@ -75,12 +75,12 @@ public class ConnectionEditorPage extends FormPage {
         this.connectionConfig = connectionConfig;
     }
 
-    public ProjectNode getProjectNode() {
-        return projectNode;
+    public Project getProject() {
+        return project;
     }
 
-    public void setProjectNode(ProjectNode projectNode) {
-        this.projectNode = projectNode;
+    public void setProject(Project project) {
+        this.project = project;
     }
 
     public void checkDirty() {

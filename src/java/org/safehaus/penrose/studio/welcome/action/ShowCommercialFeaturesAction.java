@@ -20,9 +20,9 @@ package org.safehaus.penrose.studio.welcome.action;
 import org.eclipse.jface.action.Action;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenroseWorkbenchAdvisor;
-import org.safehaus.penrose.studio.PenroseWorkbenchWindowAdvisor;
-import org.safehaus.penrose.studio.PenroseActionBarAdvisor;
+import org.safehaus.penrose.studio.PenroseStudioWorkbenchAdvisor;
+import org.safehaus.penrose.studio.PenroseStudioWorkbenchWindowAdvisor;
+import org.safehaus.penrose.studio.PenroseStudioActionBarAdvisor;
 
 /**
  * @author Endi S. Dewata
@@ -40,9 +40,9 @@ public class ShowCommercialFeaturesAction extends Action {
 	public void run() {
         try {
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            PenroseWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
-            PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
-            PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
+            PenroseStudioWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
+            PenroseStudioWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
+            PenroseStudioActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
             actionBarAdvisor.fillPartitionMenu();
 

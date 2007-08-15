@@ -61,8 +61,4 @@ public class ExportPartitionAction extends Action {
             log.error(e.getMessage(), e);
         }
 	}
-	
-    public boolean isEnabled() {
-        return partitionNode.getPartitionConfig() != null;
-    }
 }

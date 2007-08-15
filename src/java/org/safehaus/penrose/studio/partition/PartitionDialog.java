@@ -32,8 +32,7 @@ public class PartitionDialog extends Dialog {
 	public PartitionDialog(Shell parent, int style) {
 		super(parent, style);
 
-        shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
-
+        shell = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
         createControl(shell);
     }
 
@@ -49,6 +48,9 @@ public class PartitionDialog extends Dialog {
 
         shell.setText(getText());
         shell.setImage(PenrosePlugin.getImage(PenroseImage.LOGO16));
+
+        reset();
+
         shell.open();
 
         Display display = getParent().getDisplay();
@@ -72,8 +74,6 @@ public class PartitionDialog extends Dialog {
         nameLabel.setLayoutData(gd);
 
         nameText = new Text(composite, SWT.BORDER);
-        nameText.setText(name == null ? "" : name);
-
         gd = new GridData(GridData.FILL_HORIZONTAL);
         nameText.setLayoutData(gd);
 
@@ -103,6 +103,10 @@ public class PartitionDialog extends Dialog {
 			}
 		});
 	}
+
+    public void reset() {
+        nameText.setText(name == null ? "" : name);
+    }
 
     public String getName() {
         return name;

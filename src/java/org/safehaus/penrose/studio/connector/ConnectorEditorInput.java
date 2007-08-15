@@ -21,12 +21,14 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.connector.ConnectorConfig;
+import org.safehaus.penrose.studio.project.Project;
 
 /**
  * @author Endi S. Dewata
  */
 public class ConnectorEditorInput implements IEditorInput {
 
+    private Project project;
     private ConnectorConfig connectorConfig;
 
     public ConnectorEditorInput(ConnectorConfig sourceDefinition) {
@@ -57,12 +59,26 @@ public class ConnectorEditorInput implements IEditorInput {
         return null;
     }
 
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (!(o instanceof ConnectorEditorInput)) return false;
+    public int hashCode() {
+        return project == null ? 0 : project.hashCode();
+    }
 
-        ConnectorEditorInput cei = (ConnectorEditorInput)o;
-        return connectorConfig.equals(cei.connectorConfig);
+    boolean equals(Object o1, Object o2) {
+        if (o1 == null && o2 == null) return true;
+        if (o1 != null) return o1.equals(o2);
+        return o2.equals(o1);
+    }
+
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null) return false;
+        if (object.getClass() != this.getClass()) return false;
+
+        ConnectorEditorInput ei = (ConnectorEditorInput)object;
+        if (!equals(project, ei.project)) return false;
+        if (!equals(connectorConfig, ei.connectorConfig)) return false;
+
+        return true;
     }
 
     public ConnectorConfig getConnectorConfig() {
@@ -71,5 +87,13 @@ public class ConnectorEditorInput implements IEditorInput {
 
     public void setConnectorConfig(ConnectorConfig connectorConfig) {
         this.connectorConfig = connectorConfig;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

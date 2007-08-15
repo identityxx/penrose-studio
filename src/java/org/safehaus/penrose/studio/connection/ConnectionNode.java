@@ -130,9 +130,9 @@ public class ConnectionNode extends Node {
         Plugin plugin = pluginManager.getPlugin(connectionConfig.getAdapterName());
 
         ConnectionEditorInput ei = plugin.createConnectionEditorInput();
+        ei.setProject(projectNode.getProject());
         ei.setPartitionConfig(partitionConfig);
         ei.setConnectionConfig(connectionConfig);
-        ei.setProjectNode(projectNode);
 
         String connectionEditorClass = plugin.getConnectionEditorClass();
 

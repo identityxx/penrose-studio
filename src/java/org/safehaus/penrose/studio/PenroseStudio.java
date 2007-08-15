@@ -33,6 +33,7 @@ import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.license.LicenseDialog;
 import org.safehaus.penrose.studio.welcome.action.EnterLicenseKeyAction;
 import org.safehaus.penrose.studio.plugin.*;
+import org.safehaus.penrose.studio.nis.NISPlugin;
 import com.identyx.license.*;
 import org.safehaus.penrose.log4j.Log4jConfigReader;
 import org.safehaus.penrose.log4j.Log4jConfig;
@@ -59,14 +60,12 @@ public class PenroseStudio implements IPlatformRunnable {
 
     public static PenroseStudio instance;
 
-    File workDir;
     File homeDir;
 
     ApplicationConfig applicationConfig = new ApplicationConfig();
-
     PluginManager pluginManager = new PluginManager();
 
-    PenroseWorkbenchAdvisor workbenchAdvisor;
+    PenroseStudioWorkbenchAdvisor workbenchAdvisor;
     ArrayList<ChangeListener> changeListeners = new ArrayList<ChangeListener>();
 
     License license;
@@ -115,9 +114,7 @@ public class PenroseStudio implements IPlatformRunnable {
         homeDir = new File(userHome, ".penrose");
         homeDir.mkdirs();
 
-        workDir = new File(homeDir, "work");
-
-        workbenchAdvisor = new PenroseWorkbenchAdvisor();
+        workbenchAdvisor = new PenroseStudioWorkbenchAdvisor();
 
         instance = this;
 
@@ -372,7 +369,7 @@ public class PenroseStudio implements IPlatformRunnable {
         this.license = license;
     }
 
-    public PenroseWorkbenchAdvisor getWorkbenchAdvisor() {
+    public PenroseStudioWorkbenchAdvisor getWorkbenchAdvisor() {
         return workbenchAdvisor;
     }
 

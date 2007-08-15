@@ -21,16 +21,17 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.service.ServiceConfig;
+import org.safehaus.penrose.studio.project.Project;
 
 /**
  * @author Endi S. Dewata
  */
 public class ServiceEditorInput implements IEditorInput {
 
+    private Project project;
     private ServiceConfig serviceConfig;
 
-    public ServiceEditorInput(ServiceConfig userConfig) {
-        this.serviceConfig = userConfig;
+    public ServiceEditorInput() {
     }
 
     public boolean exists() {
@@ -57,6 +58,11 @@ public class ServiceEditorInput implements IEditorInput {
         return null;
     }
 
+    public int hashCode() {
+        return (project == null ? 0 : project.hashCode()) +
+                (serviceConfig == null ? 0 : serviceConfig.hashCode());
+    }
+
     boolean equals(Object o1, Object o2) {
         if (o1 == null && o2 == null) return true;
         if (o1 != null) return o1.equals(o2);
@@ -64,10 +70,13 @@ public class ServiceEditorInput implements IEditorInput {
     }
 
     public boolean equals(Object object) {
-        if((object == null) || (object.getClass() != getClass())) return false;
+        if (this == object) return true;
+        if (object == null) return false;
+        if (object.getClass() != this.getClass()) return false;
 
-        ServiceEditorInput serviceEditorInput = (ServiceEditorInput)object;
-        if (!serviceConfig.equals(serviceEditorInput.serviceConfig)) return false;
+        ServiceEditorInput ei = (ServiceEditorInput)object;
+        if (!equals(project, ei.project)) return false;
+        if (!equals(serviceConfig, ei.serviceConfig)) return false;
 
         return true;
     }
@@ -78,5 +87,13 @@ public class ServiceEditorInput implements IEditorInput {
 
     public void setServiceConfig(ServiceConfig serviceConfig) {
         this.serviceConfig = serviceConfig;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

@@ -24,6 +24,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.user.UserConfig;
 import org.apache.log4j.Logger;
 
@@ -34,6 +35,7 @@ public class UserEditor extends MultiPageEditorPart {
 
     Logger log = Logger.getLogger(getClass());
 
+    Project project;
     UserConfig origUserConfig;
     UserConfig userConfig;
 
@@ -43,7 +45,7 @@ public class UserEditor extends MultiPageEditorPart {
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         UserEditorInput ei = (UserEditorInput)input;
-
+        project = ei.getProject();
         origUserConfig = ei.getUserConfig();
 
         try {

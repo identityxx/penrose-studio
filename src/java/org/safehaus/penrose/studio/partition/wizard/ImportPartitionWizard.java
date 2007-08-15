@@ -19,7 +19,6 @@ package org.safehaus.penrose.studio.partition.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.apache.log4j.Logger;
@@ -33,12 +32,12 @@ public class ImportPartitionWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    ProjectNode projectNode;
+    Project project;
     public PartitionNamePage namePage = new PartitionNamePage();
     public PartitionLocationPage locationPage = new PartitionLocationPage();
 
-    public ImportPartitionWizard(ProjectNode projectNode) {
-        this.projectNode = projectNode;
+    public ImportPartitionWizard(Project project) {
+        this.project = project;
         setWindowTitle("Import Partition");
         locationPage.setDescription("Enter the location from which the partition will be imported.");
     }
@@ -59,7 +58,6 @@ public class ImportPartitionWizard extends Wizard {
             File dir = new File(directory);
             if (!dir.isDirectory()) return false;
 
-            Project project = projectNode.getProject();
             PartitionConfigs partitionConfigs = project.getPartitionConfigs();
             partitionConfigs.load(dir);
 

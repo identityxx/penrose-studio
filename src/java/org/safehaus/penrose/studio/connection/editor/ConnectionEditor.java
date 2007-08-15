@@ -7,7 +7,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.source.SourceConfig;
 import org.apache.log4j.Logger;
@@ -20,7 +20,7 @@ public abstract class ConnectionEditor extends FormEditor {
     public Logger log = Logger.getLogger(getClass());
 
     protected boolean dirty;
-    protected ProjectNode projectNode;
+    protected Project project;
     protected PartitionConfig partitionConfig;
     protected ConnectionConfig origConnectionConfig;
     protected ConnectionConfig connectionConfig;
@@ -35,7 +35,7 @@ public abstract class ConnectionEditor extends FormEditor {
 
         ConnectionEditorInput cei = (ConnectionEditorInput)input;
 
-        projectNode = cei.getProjectNode();
+        project = cei.getProject();
         partitionConfig = cei.getPartitionConfig();
         origConnectionConfig = cei.getConnectionConfig();
 
@@ -64,12 +64,12 @@ public abstract class ConnectionEditor extends FormEditor {
         this.connectionConfig = connectionConfig;
     }
 
-    public ProjectNode getProjectNode() {
-        return projectNode;
+    public Project getProject() {
+        return project;
     }
 
-    public void setProjectNode(ProjectNode projectNode) {
-        this.projectNode = projectNode;
+    public void setProject(Project project) {
+        this.project = project;
     }
 
     public void doSave(IProgressMonitor iProgressMonitor) {

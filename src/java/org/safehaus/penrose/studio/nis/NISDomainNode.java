@@ -183,6 +183,7 @@ public class NISDomainNode extends Node {
     public void open() throws Exception {
 
         NISDomainEditorInput ei = new NISDomainEditorInput();
+        ei.setProject(projectNode.getProject());
         ei.setNisTool(nisTool);
         ei.setDomain(domain);
 
@@ -204,9 +205,6 @@ public class NISDomainNode extends Node {
         if (action == NISUserDialog.CANCEL) return;
 
         nisTool.updateDomain(domainName, domain);
-
-        nisNode.removeNisDomain(domainName);
-        nisNode.addNisDomain(domain);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
@@ -244,7 +242,7 @@ public class NISDomainNode extends Node {
 
             project.removeDirectory("partitions/"+domain.getPartition());
 
-            nisNode.removeNisDomain(domain.getName());
+            nisNode.removeNisDomain(domain.getPartition());
         }
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();

@@ -43,7 +43,7 @@ public class BrowserEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "Browser";
+        return "Browser - "+hostname;
     }
 
     public IPersistableElement getPersistable() {
@@ -51,18 +51,11 @@ public class BrowserEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return "Browser";
+        return "Browser - "+hostname;
     }
 
     public Object getAdapter(Class aClass) {
         return null;
-    }
-
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (!(o instanceof BrowserEditorInput)) return false;
-
-        return true;
     }
 
     public String getHostname() {

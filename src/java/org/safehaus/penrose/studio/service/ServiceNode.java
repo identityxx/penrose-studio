@@ -26,7 +26,6 @@ import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.safehaus.penrose.service.ServiceConfigs;
-import org.safehaus.penrose.management.PenroseClient;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.IMenuManager;
@@ -93,7 +92,9 @@ public class ServiceNode extends Node {
             load();
         }
 
-        ServiceEditorInput ei = new ServiceEditorInput(serviceConfig);
+        ServiceEditorInput ei = new ServiceEditorInput();
+        ei.setProject(projectNode.getProject());
+        ei.setServiceConfig(serviceConfig);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();

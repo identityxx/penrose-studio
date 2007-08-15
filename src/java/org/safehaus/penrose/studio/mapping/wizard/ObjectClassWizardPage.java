@@ -24,8 +24,6 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.FillLayout;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;
@@ -51,14 +49,14 @@ public class ObjectClassWizardPage extends WizardPage {
     Button addAllButton;
     Button removeAllButton;
 
-    ProjectNode projectNode;
+    Project project;
     Collection<String> availableOCs = new TreeSet<String>();
     Collection<String> selectedOCs = new TreeSet<String>();
 
-    public ObjectClassWizardPage(ProjectNode projectNode) {
+    public ObjectClassWizardPage(Project project) {
         super(NAME);
 
-        this.projectNode = projectNode;
+        this.project = project;
         setDescription("Select object classes.");
     }
 
@@ -83,7 +81,6 @@ public class ObjectClassWizardPage extends WizardPage {
             public void widgetSelected(SelectionEvent event) {
                 if (availableTable.getSelectionCount() == 0) return;
 
-                Project project = projectNode.getProject();
                 SchemaManager schemaManager = project.getSchemaManager();
 
                 TableItem items[] = availableTable.getSelection();
@@ -107,25 +104,22 @@ public class ObjectClassWizardPage extends WizardPage {
             public void widgetSelected(SelectionEvent event) {
                 if (selectedTable.getSelectionCount() == 0) return;
 
-                Project project = projectNode.getProject();
                 SchemaManager schemaManager = project.getSchemaManager();
 
                 TableItem items[] = selectedTable.getSelection();
-                for (int i=0; i<items.length; i++) {
-                    String objectClass = (String)items[i].getData();
+                for (TableItem item : items) {
+                    String objectClass = (String) item.getData();
                     selectedOCs.remove(objectClass);
                     availableOCs.add(objectClass);
                 }
 
-                Collection list = new ArrayList();
+                Collection<String> list = new ArrayList<String>();
 
-                for (Iterator i=selectedOCs.iterator(); i.hasNext(); ) {
-                    String objectClass = (String)i.next();
+                for (String objectClass : selectedOCs) {
 
                     boolean missingSuperclass = false;
-                    Collection ocNames = schemaManager.getAllObjectClassNames(objectClass);
-                    for (Iterator j=ocNames.iterator(); j.hasNext(); ) {
-                        String ocName = (String)j.next();
+                    Collection<String> ocNames = schemaManager.getAllObjectClassNames(objectClass);
+                    for (String ocName : ocNames) {
                         if (selectedOCs.contains(ocName)) continue;
                         missingSuperclass = true;
                         break;
@@ -136,8 +130,7 @@ public class ObjectClassWizardPage extends WizardPage {
                     list.add(objectClass);
                 }
 
-                for (Iterator i=list.iterator(); i.hasNext(); ) {
-                    String objectClass = (String)i.next();
+                for (String objectClass : list) {
                     selectedOCs.remove(objectClass);
                     availableOCs.add(objectClass);
                 }
@@ -150,8 +143,7 @@ public class ObjectClassWizardPage extends WizardPage {
         addAllButton.setText(">>");
         addAllButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                for (Iterator i=availableOCs.iterator(); i.hasNext(); ) {
-                    String objectClass = (String)i.next();
+                for (String objectClass : availableOCs) {
                     selectedOCs.add(objectClass);
                 }
                 availableOCs.clear();
@@ -164,8 +156,7 @@ public class ObjectClassWizardPage extends WizardPage {
         removeAllButton.setText("<<");
         removeAllButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                for (Iterator i=selectedOCs.iterator(); i.hasNext(); ) {
-                    String objectClass = (String)i.next();
+                for (String objectClass : selectedOCs) {
                     availableOCs.add(objectClass);
                 }
                 selectedOCs.clear();
@@ -188,15 +179,13 @@ public class ObjectClassWizardPage extends WizardPage {
 
     public void init() {
         try {
-            Project project = projectNode.getProject();
             Schema schema = project.getSchemaManager().getAllSchema();
 
-            Collection ocNames = new ArrayList();
-            for (Iterator i=schema.getObjectClasses().iterator(); i.hasNext(); ) {
-                ObjectClass objectClass = (ObjectClass)i.next();
+            Collection<String> ocNames = new ArrayList<String>();
+            for (ObjectClass objectClass : schema.getObjectClasses()) {
                 ocNames.add(objectClass.getName());
             }
-            
+
             availableOCs.addAll(ocNames);
             availableOCs.removeAll(selectedOCs);
 
@@ -211,18 +200,15 @@ public class ObjectClassWizardPage extends WizardPage {
         availableTable.removeAll();
         selectedTable.removeAll();
 
-        for (Iterator i=availableOCs.iterator(); i.hasNext(); ) {
-            String objectClass = (String)i.next();
-
+        for (String objectClass : availableOCs) {
             TableItem item = new TableItem(availableTable, SWT.NONE);
             item.setText(objectClass);
             item.setData(objectClass);
         }
 
         log.debug("Object classes:");
-        for (Iterator i=selectedOCs.iterator(); i.hasNext(); ) {
-            String objectClass = (String)i.next();
-            log.debug(" - "+objectClass);
+        for (String objectClass : selectedOCs) {
+            log.debug(" - " + objectClass);
 
             TableItem item = new TableItem(selectedTable, SWT.NONE);
             item.setText(objectClass);
@@ -236,7 +222,7 @@ public class ObjectClassWizardPage extends WizardPage {
         return !selectedOCs.isEmpty();
     }
 
-    public void setSelecteObjectClasses(Collection list) {
+    public void setSelecteObjectClasses(Collection<String> list) {
         selectedOCs.addAll(list);
     }
 

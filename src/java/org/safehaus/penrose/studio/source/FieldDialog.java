@@ -43,18 +43,18 @@ public class FieldDialog extends Dialog {
     public final static int CANCEL = 0;
     public final static int OK     = 1;
 
-    Shell shell;
+    protected Shell shell;
 
-    Text aliasText;
+    protected Text aliasText;
 
-    Combo typeCombo;
-    Text lengthText;
-    Text precisionText;
-    Button uniqueCheckbox;
-    Button caseSensitiveCheckbox;
+    protected Combo typeCombo;
+    protected Text lengthText;
+    protected Text precisionText;
+    protected Button uniqueCheckbox;
+    protected Button caseSensitiveCheckbox;
 
-    FieldConfig fieldConfig;
-    int action;
+    protected FieldConfig fieldConfig;
+    protected int action;
 
 	public FieldDialog(Shell parent, int style) {
 		super(parent, style);
@@ -172,13 +172,11 @@ public class FieldDialog extends Dialog {
 
         typeCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
         Field fields[] = Types.class.getFields();
-        Collection names = new TreeSet();
-        for (int i=0; i<fields.length; i++) {
-            Field field = fields[i];
+        Collection<String> names = new TreeSet<String>();
+        for (Field field : fields) {
             names.add(field.getName());
         }
-        for (Iterator i=names.iterator(); i.hasNext(); ) {
-            String name = (String)i.next();
+        for (String name : names) {
             typeCombo.add(name);
         }
         typeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));

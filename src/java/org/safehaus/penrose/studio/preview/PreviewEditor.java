@@ -41,6 +41,7 @@ import org.safehaus.penrose.session.Session;
 import org.safehaus.penrose.session.SessionManager;
 import org.safehaus.penrose.session.SessionContext;
 import org.safehaus.penrose.studio.project.ProjectConfig;
+import org.safehaus.penrose.studio.project.Project;
 
 import java.io.File;
 
@@ -48,6 +49,7 @@ public class PreviewEditor extends EditorPart {
 
     private Logger log = Logger.getLogger(getClass());
 
+    Project project;
     ProjectConfig projectConfig;
     PenroseConfig penroseConfig;
     File workDir;
@@ -64,9 +66,10 @@ public class PreviewEditor extends EditorPart {
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         PreviewEditorInput ei = (PreviewEditorInput)input;
-        projectConfig = ei.getProject();
-        workDir = ei.getWorkDir();
-        penroseConfig = ei.getPenroseConfig();
+        project = ei.getProject();
+        projectConfig = project.getProjectConfig();
+        workDir = project.getWorkDir();
+        penroseConfig = project.getPenroseConfig();
 
         setSite(site);
         setInput(input);

@@ -18,10 +18,7 @@
 package org.safehaus.penrose.studio.schema.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.schema.SchemaConfig;
 import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.schema.SchemaWriter;
@@ -37,14 +34,14 @@ public class NewSchemaWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private ProjectNode projectNode;
+    private Project project;
 
     public SchemaNameWizardPage namePage = new SchemaNameWizardPage();
 
-    public NewSchemaWizard(ProjectNode projectNode) {
+    public NewSchemaWizard(Project project) {
         setWindowTitle("New Schema");
 
-        this.projectNode = projectNode;
+        this.project = project;
     }
 
     public boolean canFinish() {
@@ -82,8 +79,6 @@ public class NewSchemaWizard extends Wizard {
             schemaConfig.setName(name);
             schemaConfig.setPath(path);
 
-            Project project = projectNode.getProject();
-
             Schema schema = new Schema(schemaConfig);
 
             SchemaWriter schemaWriter = new SchemaWriter(project.getWorkDir());
@@ -110,11 +105,11 @@ public class NewSchemaWizard extends Wizard {
         return true;
     }
 
-    public ProjectNode getProjectNode() {
-        return projectNode;
+    public Project getProject() {
+        return project;
     }
 
-    public void setProjectNode(ProjectNode projectNode) {
-        this.projectNode = projectNode;
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

@@ -46,7 +46,7 @@ public class ImportPartitionAction extends Action {
 
             Shell shell = window.getShell();
 
-            ImportPartitionWizard wizard = new ImportPartitionWizard(projectNode);
+            ImportPartitionWizard wizard = new ImportPartitionWizard(projectNode.getProject());
             WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.setPageSize(600, 300);
             dialog.open();

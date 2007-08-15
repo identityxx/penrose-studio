@@ -22,11 +22,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.BundleContext;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.xml.DOMConfigurator;
 
 import java.util.*;
-import java.io.File;
 
 public class PenrosePlugin extends AbstractUIPlugin {
 
@@ -62,7 +59,7 @@ public class PenrosePlugin extends AbstractUIPlugin {
         try {
             //IWorkbench workbench = PlatformUI.getWorkbench();
             //IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-            //workbench.showPerspective(PenrosePerspective.class.getName(), window);
+            //workbench.showPerspective(PenroseStudioPerspective.class.getName(), window);
 
             //IWorkbenchPage page = window.getActivePage();
             //page.openEditor(new WelcomeEditorInput(), WelcomeEditor.class.getName());

@@ -57,11 +57,12 @@ public class AttributeTypeEditorInput implements IEditorInput {
         return null;
     }
 
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (!(o instanceof AttributeTypeEditorInput)) return false;
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null) return false;
+        if (object.getClass() != this.getClass()) return false;
 
-        AttributeTypeEditorInput cei = (AttributeTypeEditorInput)o;
+        AttributeTypeEditorInput cei = (AttributeTypeEditorInput)object;
         return attributeType.equals(cei.attributeType);
     }
 

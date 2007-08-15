@@ -155,9 +155,9 @@ public class EntryNode extends Node {
     public void showCommercialMenu(IMenuManager manager) throws Exception {
 
         //PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        //PenroseWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
-        //PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
-        //PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
+        //PenroseStudioWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
+        //PenroseStudioWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
+        //PenroseStudioActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
         //if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
             manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -170,7 +170,7 @@ public class EntryNode extends Node {
     public void open() throws Exception {
 
         MappingEditorInput mei = new MappingEditorInput(partitionConfig, entryMapping);
-        mei.setProjectNode(projectNode);
+        mei.setProject(projectNode.getProject());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -181,7 +181,7 @@ public class EntryNode extends Node {
     public void editSources() throws Exception {
 
         MappingEditorInput mei = new MappingEditorInput(partitionConfig, entryMapping);
-        mei.setProjectNode(projectNode);
+        mei.setProject(projectNode.getProject());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -193,7 +193,7 @@ public class EntryNode extends Node {
     public void editACL() throws Exception {
 
         MappingEditorInput mei = new MappingEditorInput(partitionConfig, entryMapping);
-        mei.setProjectNode(projectNode);
+        mei.setProject(projectNode.getProject());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();

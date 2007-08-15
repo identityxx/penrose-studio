@@ -57,9 +57,7 @@ public class PreviewAction extends Action {
             //page.showView(ConsoleView.class.getName());
 
             PreviewEditorInput ei = new PreviewEditorInput();
-            ei.setProject(project.getProjectConfig());
-            ei.setWorkDir(project.getWorkDir());
-            ei.setPenroseConfig(project.getPenroseConfig());
+            ei.setProject(project);
             
             page.openEditor(ei, PreviewEditor.class.getName());
 

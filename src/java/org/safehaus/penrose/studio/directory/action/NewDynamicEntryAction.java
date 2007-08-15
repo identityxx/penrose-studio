@@ -52,7 +52,7 @@ public class NewDynamicEntryAction extends Action {
 
             Shell shell = window.getShell();
 
-            DynamicEntryWizard wizard = new DynamicEntryWizard(projectNode, node.getPartitionConfig(), node.getEntryMapping());
+            DynamicEntryWizard wizard = new DynamicEntryWizard(projectNode.getProject(), node.getPartitionConfig(), node.getEntryMapping());
             WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.setPageSize(600, 300);
             dialog.open();

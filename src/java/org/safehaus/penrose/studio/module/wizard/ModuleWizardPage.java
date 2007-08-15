@@ -43,7 +43,6 @@ public class ModuleWizardPage extends WizardPage implements SelectionListener, M
     }
 
     public void createControl(Composite parent) {
-        System.out.println("[ModuleWizardPage] createControl");
 
         Composite composite = new Composite(parent, SWT.NONE);
         setControl(composite);

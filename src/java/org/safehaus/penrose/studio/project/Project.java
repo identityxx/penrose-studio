@@ -45,6 +45,10 @@ public class Project {
         this.projectConfig = projectConfig;
     }
 
+    public String getName() {
+        return projectConfig.getName();
+    }
+
     public void connect() throws Exception {
 
         log.debug("-------------------------------------------------------------------------------------");
@@ -57,13 +61,13 @@ public class Project {
         File homeDir = new File(userHome, ".penrose");
         homeDir.mkdirs();
 
-        workDir = new File(homeDir, projectConfig.getName());
+        workDir = new File(homeDir, "Servers"+File.separator+projectConfig.getName());
         FileUtil.delete(workDir);
 
         client.download(workDir, "conf");
         client.download(workDir, "schema");
 
-        PenroseConfigReader penroseConfigReader = new PenroseConfigReader(new File(workDir, "conf/server.xml"));
+        PenroseConfigReader penroseConfigReader = new PenroseConfigReader(new File(workDir, "conf"+File.separator+"server.xml"));
         penroseConfig = penroseConfigReader.read();
 
         penroseContext = new PenroseContext(workDir);
@@ -246,5 +250,26 @@ public class Project {
 
     public void removeDirectory(String path) throws Exception {
         client.removeDirectory(path);
+    }
+
+    public int hashCode() {
+        return projectConfig == null ? 0 : projectConfig.hashCode();
+    }
+
+    boolean equals(Object o1, Object o2) {
+        if (o1 == null && o2 == null) return true;
+        if (o1 != null) return o1.equals(o2);
+        return o2.equals(o1);
+    }
+
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null) return false;
+        if (object.getClass() != this.getClass()) return false;
+
+        Project ei = (Project)object;
+        if (!equals(projectConfig, ei.projectConfig)) return false;
+
+        return true;
     }
 }

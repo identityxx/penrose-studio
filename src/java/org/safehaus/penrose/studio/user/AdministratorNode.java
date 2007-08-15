@@ -18,12 +18,8 @@
 package org.safehaus.penrose.studio.user;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.config.PenroseConfig;
-import org.safehaus.penrose.user.UserConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
@@ -39,13 +35,11 @@ public class AdministratorNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ServersView view;
     ProjectNode projectNode;
 
-    public AdministratorNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
+    public AdministratorNode(String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
         projectNode = (ProjectNode)parent;
-        this.view = projectNode.getView();
     }
 
     public void showMenu(IMenuManager manager) {
@@ -63,10 +57,10 @@ public class AdministratorNode extends Node {
 
     public void open() throws Exception {
         Project project = projectNode.getProject();
-        PenroseConfig penroseConfig = project.getPenroseConfig();
-        UserConfig userConfig = penroseConfig.getRootUserConfig();
 
-        UserEditorInput ei = new UserEditorInput(userConfig);
+        UserEditorInput ei = new UserEditorInput();
+        ei.setProject(project);
+        ei.setUserConfig(project.getPenroseConfig().getRootUserConfig());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();

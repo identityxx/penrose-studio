@@ -19,8 +19,8 @@ package org.safehaus.penrose.studio.partition.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionInfoWizardPage;
-import org.safehaus.penrose.studio.connection.wizard.JNDIConnectionParametersWizardPage;
+import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionParametersWizardPage;
+import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionInfoWizardPage;
 import org.safehaus.penrose.studio.util.SnapshotUtil;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.ldap.LDAPClient;

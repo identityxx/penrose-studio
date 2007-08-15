@@ -51,7 +51,7 @@ public class NewSchemaAction extends Action {
 
             Shell shell = window.getShell();
 
-            NewSchemaWizard wizard = new NewSchemaWizard(projectNode);
+            NewSchemaWizard wizard = new NewSchemaWizard(projectNode.getProject());
 
             WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.setPageSize(600, 300);

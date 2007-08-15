@@ -1,6 +1,5 @@
 package org.safehaus.penrose.studio.plugin;
 
-import org.safehaus.penrose.studio.source.editor.JDBCSourceEditor;
 import org.safehaus.penrose.studio.source.editor.SourceEditorInput;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorInput;
 

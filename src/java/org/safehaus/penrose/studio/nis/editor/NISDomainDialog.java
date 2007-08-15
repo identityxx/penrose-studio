@@ -25,7 +25,7 @@ public class NISDomainDialog extends Dialog {
 
     Shell shell;
 
-    Text nameText;
+    Text domainText;
     Text serverText;
     Text suffixText;
 
@@ -69,7 +69,7 @@ public class NISDomainDialog extends Dialog {
 
     public void reset() {
         String name = domain.getName();
-        nameText.setText(name == null ? "" : name);
+        domainText.setText(name == null ? "" : name);
 
         String server = domain.getServer();
         serverText.setText(server == null ? "" : server);
@@ -96,13 +96,13 @@ public class NISDomainDialog extends Dialog {
         composite.setLayout(new GridLayout(2, false));
 
         Label domainLabel = new Label(composite, SWT.NONE);
-        domainLabel.setText("Name:");
+        domainLabel.setText("Domain:");
         GridData gd = new GridData();
         gd.widthHint = 100;
         domainLabel.setLayoutData(gd);
 
-        nameText = new Text(composite, SWT.BORDER);
-        nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        domainText = new Text(composite, SWT.BORDER);
+        domainText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label serverLabel = new Label(composite, SWT.NONE);
         serverLabel.setText("Server:");
@@ -142,7 +142,7 @@ public class NISDomainDialog extends Dialog {
         okButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
 
-                String name = nameText.getText();
+                String name = domainText.getText();
                 domain.setName("".equals(name) ? null : name);
 
                 String server = serverText.getText();

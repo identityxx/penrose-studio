@@ -57,11 +57,12 @@ public class EngineEditorInput implements IEditorInput {
         return null;
     }
 
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (!(o instanceof EngineEditorInput)) return false;
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null) return false;
+        if (object.getClass() != this.getClass()) return false;
 
-        EngineEditorInput cei = (EngineEditorInput)o;
+        EngineEditorInput cei = (EngineEditorInput)object;
         return engineConfig.equals(cei.engineConfig);
     }
 

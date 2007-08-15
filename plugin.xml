@@ -54,35 +54,15 @@
             icon="images/penrose16.ico"
             class="org.safehaus.penrose.studio.welcome.WelcomeEditor"/>
        <editor
-            id="org.safehaus.penrose.studio.connection.editor.JDBCConnectionEditor"
-            name="JDBC Connection"
+            id="org.safehaus.penrose.studio.connection.editor.ConnectionEditor"
+            name="Connection"
             icon="images/server.png"
-            class="org.safehaus.penrose.studio.connection.editor.JDBCConnectionEditor"/>
+            class="org.safehaus.penrose.studio.connection.editor.ConnectionEditor"/>
        <editor
-            id="org.safehaus.penrose.studio.connection.editor.JNDIConnectionEditor"
-            name="JNDI Connection"
-            icon="images/server.png"
-            class="org.safehaus.penrose.studio.connection.editor.JNDIConnectionEditor"/>
-       <editor
-            id="org.safehaus.penrose.studio.connection.editor.NISConnectionEditor"
-            name="NIS Connection"
-            icon="images/server.png"
-            class="org.safehaus.penrose.studio.connection.editor.NISConnectionEditor"/>
-       <editor
-            id="org.safehaus.penrose.studio.source.editor.JDBCSourceEditor"
+            id="org.safehaus.penrose.studio.source.editor.SourceEditor"
             name="Source"
             icon="images/source.gif"
-            class="org.safehaus.penrose.studio.source.editor.JDBCSourceEditor"/>
-       <editor
-            id="org.safehaus.penrose.studio.source.editor.JNDISourceEditor"
-            name="Source"
-            icon="images/source.gif"
-            class="org.safehaus.penrose.studio.source.editor.JNDISourceEditor"/>
-       <editor
-            id="org.safehaus.penrose.studio.source.editor.NISSourceEditor"
-            name="Source"
-            icon="images/source.gif"
-            class="org.safehaus.penrose.studio.source.editor.NISSourceEditor"/>
+            class="org.safehaus.penrose.studio.source.editor.SourceEditor"/>
        <editor
             id="org.safehaus.penrose.studio.mapping.editor.MappingEditor"
             name="Mapping"
@@ -185,10 +165,10 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="org.safehaus.penrose.studio.PenrosePerspective"
+            class="org.safehaus.penrose.studio.PenroseStudioPerspective"
             fixed="false"
             name="Penrose Studio"
-            id="org.safehaus.penrose.studio.PenrosePerspective"/>
+            id="org.safehaus.penrose.studio.PenroseStudioPerspective"/>
    </extension>
     <extension
             point="org.eclipse.core.runtime.products"

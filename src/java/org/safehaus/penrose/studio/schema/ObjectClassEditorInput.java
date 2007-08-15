@@ -57,11 +57,12 @@ public class ObjectClassEditorInput implements IEditorInput {
         return null;
     }
 
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (!(o instanceof ObjectClassEditorInput)) return false;
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null) return false;
+        if (object.getClass() != this.getClass()) return false;
 
-        ObjectClassEditorInput cei = (ObjectClassEditorInput)o;
+        ObjectClassEditorInput cei = (ObjectClassEditorInput)object;
         return objectClass.equals(cei.objectClass);
     }
 

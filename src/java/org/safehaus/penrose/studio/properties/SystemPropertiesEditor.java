@@ -24,6 +24,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.apache.log4j.Logger;
 
@@ -39,7 +40,7 @@ public class SystemPropertiesEditor extends MultiPageEditorPart {
 
     boolean dirty;
 
-    PenroseConfig penroseConfig;
+    Project project;
 
     Map<String,String> origProperties;
     Map<String,String> properties = new TreeMap<String,String>();
@@ -48,13 +49,13 @@ public class SystemPropertiesEditor extends MultiPageEditorPart {
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         SystemPropertiesEditorInput ei = (SystemPropertiesEditorInput)input;
-        penroseConfig = ei.getPenroseConfig();
+        project = ei.getProject();
 
         setSite(site);
         setInput(input);
         setPartName("System Properties");
 
-        origProperties = penroseConfig.getSystemProperties();
+        origProperties = project.getPenroseConfig().getSystemProperties();
         properties.putAll(origProperties);
     }
 

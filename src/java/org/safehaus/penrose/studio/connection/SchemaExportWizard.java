@@ -19,13 +19,10 @@ package org.safehaus.penrose.studio.connection;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.schema.*;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -35,14 +32,14 @@ public class SchemaExportWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private ProjectNode projectNode;
+    private Project project;
     private Schema schema;
 
     public SchemaExportPage page = new SchemaExportPage();
     public SchemaSyntaxMappingPage syntaxMappingPage;
 
-    public SchemaExportWizard(ProjectNode projectNode, Schema schema) {
-        this.projectNode = projectNode;
+    public SchemaExportWizard(Project project, Schema schema) {
+        this.project = project;
         this.schema = schema;
 
         syntaxMappingPage = new SchemaSyntaxMappingPage(schema);
@@ -81,43 +78,40 @@ public class SchemaExportWizard extends Wizard {
 
     public void removeDuplicates() {
 
-        Project project = projectNode.getProject();
         SchemaManager schemaManager = project.getSchemaManager();
 
-        Collection attributeTypes = schemaManager.getAttributeTypes();
-        for (Iterator i=attributeTypes.iterator(); i.hasNext(); ) {
-            AttributeType at = (AttributeType)i.next();
+        Collection<AttributeType> attributeTypes = schemaManager.getAttributeTypes();
+        for (AttributeType at : attributeTypes) {
             String oid = at.getOid();
             String name = at.getName();
 
             AttributeType newAt = schema.getAttributeType(oid);
             if (newAt != null) {
-                log.debug("Removing attribute type "+oid);
+                log.debug("Removing attribute type " + oid);
                 schema.removeAttributeType(oid);
             }
 
             newAt = schema.getAttributeType(name);
             if (newAt != null) {
-                log.debug("Removing attribute type "+name);
+                log.debug("Removing attribute type " + name);
                 schema.removeAttributeType(name);
             }
         }
 
-        Collection objectClasses = schemaManager.getObjectClasses();
-        for (Iterator i=objectClasses.iterator(); i.hasNext(); ) {
-            ObjectClass oc = (ObjectClass)i.next();
+        Collection<ObjectClass> objectClasses = schemaManager.getObjectClasses();
+        for (ObjectClass oc : objectClasses) {
             String oid = oc.getOid();
             String name = oc.getName();
 
             ObjectClass newOc = schema.getObjectClass(oid);
             if (newOc != null) {
-                log.debug("Removing object class "+oid);
+                log.debug("Removing object class " + oid);
                 schema.removeObjectClass(oid);
             }
 
             newOc = schema.getObjectClass(name);
             if (newOc == null) {
-                log.debug("Removing object class "+name);
+                log.debug("Removing object class " + name);
                 schema.removeObjectClass(name);
             }
         }
@@ -125,14 +119,13 @@ public class SchemaExportWizard extends Wizard {
 
     public void mapSyntaxes() {
         Map syntaxMapping = syntaxMappingPage.getSyntaxMapping();
-        Collection attributeTypes = schema.getAttributeTypes();
-        for (Iterator i=attributeTypes.iterator(); i.hasNext(); ) {
-            AttributeType at = (AttributeType)i.next();
+        Collection<AttributeType> attributeTypes = schema.getAttributeTypes();
+        for (AttributeType at : attributeTypes) {
             String oldSyntax = at.getSyntax();
-            String newSyntax = (String)syntaxMapping.get(oldSyntax);
+            String newSyntax = (String) syntaxMapping.get(oldSyntax);
 
             if (newSyntax == null) {
-                log.debug("Can't find mapping for "+oldSyntax);
+                log.debug("Can't find mapping for " + oldSyntax);
             } else {
                 at.setSyntax(newSyntax);
                 //log.debug("Mapping "+oldSyntax+" to "+newSyntax);

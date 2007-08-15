@@ -3,17 +3,16 @@ package org.safehaus.penrose.studio.connection.editor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 
 /**
  * @author Endi S. Dewata
  */
 public class ConnectionEditorInput implements IEditorInput {
 
-    private ProjectNode projectNode;
+    private Project project;
     private PartitionConfig partitionConfig;
     private ConnectionConfig connectionConfig;
 
@@ -50,7 +49,8 @@ public class ConnectionEditorInput implements IEditorInput {
     }
 
     public int hashCode() {
-        return (partitionConfig == null ? 0 : partitionConfig.hashCode()) +
+        return (project == null ? 0 : project.hashCode()) +
+                (partitionConfig == null ? 0 : partitionConfig.hashCode()) +
                 (connectionConfig == null ? 0 : connectionConfig.hashCode());
     }
 
@@ -60,14 +60,15 @@ public class ConnectionEditorInput implements IEditorInput {
         return o2.equals(o1);
     }
 
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (!(o instanceof ConnectionEditorInput)) return false;
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null) return false;
+        if (object.getClass() != this.getClass()) return false;
 
-        ConnectionEditorInput cei = (ConnectionEditorInput)o;
-
-        if (!equals(partitionConfig, cei.partitionConfig)) return false;
-        if (!equals(connectionConfig, cei.connectionConfig)) return false;
+        ConnectionEditorInput ei = (ConnectionEditorInput)object;
+        if (!equals(project, ei.project)) return false;
+        if (!equals(partitionConfig, ei.partitionConfig)) return false;
+        if (!equals(connectionConfig, ei.connectionConfig)) return false;
 
         return true;
     }
@@ -88,11 +89,11 @@ public class ConnectionEditorInput implements IEditorInput {
         this.partitionConfig = partitionConfig;
     }
 
-    public ProjectNode getProjectNode() {
-        return projectNode;
+    public Project getProject() {
+        return project;
     }
 
-    public void setProjectNode(ProjectNode projectNode) {
-        this.projectNode = projectNode;
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

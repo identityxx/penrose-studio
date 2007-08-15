@@ -25,7 +25,7 @@ import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.StaticEntryRDNWizardPage;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDN;
 import org.apache.log4j.Logger;
@@ -39,7 +39,6 @@ public class StaticEntryWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private ProjectNode projectNode;
     private PartitionConfig partitionConfig;
     private EntryMapping parentMapping;
     private EntryMapping entryMapping;
@@ -48,15 +47,14 @@ public class StaticEntryWizard extends Wizard {
     public ObjectClassWizardPage ocPage;
     public AttributeValueWizardPage attrPage;
 
-    public StaticEntryWizard(ProjectNode projectNode, PartitionConfig partitionConfig, EntryMapping parentMapping) {
-        this.projectNode = projectNode;
+    public StaticEntryWizard(Project project, PartitionConfig partitionConfig, EntryMapping parentMapping) {
         this.partitionConfig = partitionConfig;
         this.parentMapping = parentMapping;
         setWindowTitle("Adding static entry");
 
         rdnPage = new StaticEntryRDNWizardPage(partitionConfig, parentMapping);
-        ocPage = new ObjectClassWizardPage(projectNode);
-        attrPage = new AttributeValueWizardPage(projectNode, partitionConfig);
+        ocPage = new ObjectClassWizardPage(project);
+        attrPage = new AttributeValueWizardPage(project, partitionConfig);
     }
 
     public boolean canFinish() {

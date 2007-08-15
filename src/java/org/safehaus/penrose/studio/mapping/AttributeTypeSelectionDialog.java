@@ -49,7 +49,7 @@ public class AttributeTypeSelectionDialog extends Dialog implements SelectionLis
     Table attributeTable;
 
     private SchemaManager schemaManager;
-    private Collection selections = new ArrayList();
+    private Collection<String> selections = new ArrayList<String>();
 
     private int action = CANCEL;
 
@@ -121,8 +121,7 @@ public class AttributeTypeSelectionDialog extends Dialog implements SelectionLis
 		saveButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
                 TableItem items[] = attributeTable.getSelection();
-                for (int i=0; i<items.length; i++) {
-                    TableItem item = items[i];
+                for (TableItem item : items) {
                     selections.add(item.getText());
                 }
                 action = OK;
@@ -139,11 +138,11 @@ public class AttributeTypeSelectionDialog extends Dialog implements SelectionLis
 		});
 	}
 
-    public Collection getSelections() {
+    public Collection<String> getSelections() {
         return selections;
     }
 
-    public void setSelections(Collection selections) {
+    public void setSelections(Collection<String> selections) {
         this.selections = selections;
     }
 
@@ -156,9 +155,8 @@ public class AttributeTypeSelectionDialog extends Dialog implements SelectionLis
 
         objectClassCombo.add("");
 
-        Collection list = sortObjectClasses(schemaManager.getObjectClasses());
-        for (Iterator i=list.iterator(); i.hasNext(); ) {
-            ObjectClass oc = (ObjectClass)i.next();
+        Collection<ObjectClass> list = sortObjectClasses(schemaManager.getObjectClasses());
+        for (ObjectClass oc : list) {
             objectClassCombo.add(oc.getName());
         }
 
@@ -171,10 +169,8 @@ public class AttributeTypeSelectionDialog extends Dialog implements SelectionLis
 
         if ("".equals(ocName)) {
 
-            Collection list = sortAttributeTypes(schemaManager.getAttributeTypes());
-            for (Iterator i=list.iterator(); i.hasNext(); ) {
-                AttributeType at = (AttributeType)i.next();
-
+            Collection<AttributeType> list = sortAttributeTypes(schemaManager.getAttributeTypes());
+            for (AttributeType at : list) {
                 TableItem item = new TableItem(attributeTable, SWT.NONE);
                 item.setText(0, at.getName());
                 item.setText(1, "");
@@ -184,11 +180,9 @@ public class AttributeTypeSelectionDialog extends Dialog implements SelectionLis
         }
 
         ObjectClass oc = schemaManager.getObjectClass(ocName);
-        Collection atNames = oc.getRequiredAttributes();
+        Collection<String> atNames = oc.getRequiredAttributes();
 
-        for (Iterator i=atNames.iterator(); i.hasNext(); ) {
-            String atName = (String)i.next();
-
+        for (String atName : atNames) {
             TableItem item = new TableItem(attributeTable, SWT.NONE);
             item.setText(0, atName);
             item.setText(1, "yes");
@@ -196,9 +190,7 @@ public class AttributeTypeSelectionDialog extends Dialog implements SelectionLis
 
         atNames = oc.getOptionalAttributes();
 
-        for (Iterator i=atNames.iterator(); i.hasNext(); ) {
-            String atName = (String)i.next();
-
+        for (String atName : atNames) {
             TableItem item = new TableItem(attributeTable, SWT.NONE);
             item.setText(0, atName);
             item.setText(1, "");
@@ -225,19 +217,17 @@ public class AttributeTypeSelectionDialog extends Dialog implements SelectionLis
         this.action = action;
     }
 
-    public Collection sortAttributeTypes(Collection list) {
-        Map map = new TreeMap();
-        for (Iterator i=list.iterator(); i.hasNext(); ) {
-            AttributeType at = (AttributeType)i.next();
+    public Collection<AttributeType> sortAttributeTypes(Collection<AttributeType> list) {
+        Map<String,AttributeType> map = new TreeMap<String,AttributeType>();
+        for (AttributeType at : list) {
             map.put(at.getName(), at);
         }
         return map.values();
     }
 
-    public Collection sortObjectClasses(Collection list) {
-        Map map = new TreeMap();
-        for (Iterator i=list.iterator(); i.hasNext(); ) {
-            ObjectClass oc = (ObjectClass)i.next();
+    public Collection<ObjectClass> sortObjectClasses(Collection<ObjectClass> list) {
+        Map<String,ObjectClass> map = new TreeMap<String,ObjectClass>();
+        for (ObjectClass oc : list) {
             map.put(oc.getName(), oc);
         }
         return map.values();

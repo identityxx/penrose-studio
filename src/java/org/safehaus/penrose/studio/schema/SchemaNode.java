@@ -98,7 +98,7 @@ public class SchemaNode extends Node {
         Schema schema = schemaManager.getSchema(schemaConfig.getName());
 
         SchemaEditorInput ei = new SchemaEditorInput(schemaConfig, schema);
-        ei.setProjectNode(projectNode);
+        ei.setProject(project);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();

@@ -40,11 +40,12 @@ public class HandlerEditorInput implements IEditorInput {
         return null;
     }
 
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (!(o instanceof HandlerEditorInput)) return false;
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null) return false;
+        if (object.getClass() != this.getClass()) return false;
 
-        HandlerEditorInput cei = (HandlerEditorInput)o;
+        HandlerEditorInput cei = (HandlerEditorInput)object;
         return handlerConfig.equals(cei.handlerConfig);
     }
 

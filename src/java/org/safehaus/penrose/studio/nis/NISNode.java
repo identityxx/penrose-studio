@@ -55,22 +55,6 @@ public class NISNode extends Node {
                     log.error(e.getMessage(), e);
                 }
             }
-            public boolean isEnabled() {
-                return !started;
-            }
-        });
-
-        manager.add(new Action("Close") {
-            public void run() {
-                try {
-                    close();
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-            public boolean isEnabled() {
-                return started;
-            }
         });
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -107,24 +91,13 @@ public class NISNode extends Node {
     public void open() throws Exception {
         if (!started) start();
 
-        view.open(this);
-
         NISEditorInput ei = new NISEditorInput();
+        ei.setProject(projectNode.getProject());
         ei.setNisTool(nisTool);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
         page.openEditor(ei, NISEditor.class.getName());
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
-    }
-
-    public void close() throws Exception {
-        view.close(this);
-        children.clear();
-        started = false;
-        nisTool = null;
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
@@ -146,18 +119,18 @@ public class NISNode extends Node {
     public void addNisDomain(NISDomain nisDomain) {
 
         NISDomainNode node = new NISDomainNode(
-                nisDomain.getName(),
+                nisDomain.getPartition(),
                 ServersView.ENTRY,
                 PenrosePlugin.getImage(PenroseImage.NODE),
                 nisDomain,
                 this
         );
 
-        children.put(nisDomain.getName(), node);
+        children.put(nisDomain.getPartition(), node);
     }
 
-    public void removeNisDomain(String name) {
-        children.remove(name);
+    public void removeNisDomain(String partitionName) {
+        children.remove(partitionName);
     }
 
     public boolean hasChildren() throws Exception {
@@ -173,7 +146,7 @@ public class NISNode extends Node {
 
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 
-        NISDomainWizard wizard = new NISDomainWizard(this);
+        NISDomainWizard wizard = new NISDomainWizard(projectNode.getProject(), this);
         WizardDialog dialog = new WizardDialog(shell, wizard);
         dialog.setPageSize(600, 300);
         dialog.open();

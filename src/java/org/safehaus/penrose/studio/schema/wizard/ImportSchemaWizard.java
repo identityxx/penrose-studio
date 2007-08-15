@@ -18,7 +18,6 @@
 package org.safehaus.penrose.studio.schema.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.schema.SchemaConfig;
@@ -34,15 +33,15 @@ public class ImportSchemaWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private ProjectNode projectNode;
+    private Project project;
 
     public SchemaNameWizardPage namePage = new SchemaNameWizardPage();
     public SchemaFileWizardPage filePage = new SchemaFileWizardPage();
 
-    public ImportSchemaWizard(ProjectNode projectNode) {
+    public ImportSchemaWizard(Project project) {
         setWindowTitle("Import Schema");
 
-        this.projectNode = projectNode;
+        this.project = project;
     }
 
     public boolean canFinish() {
@@ -55,8 +54,6 @@ public class ImportSchemaWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            Project project = projectNode.getProject();
-
             String schemaExtDir = "schema/ext";
             
             String name = namePage.getSchemaName();
@@ -92,11 +89,11 @@ public class ImportSchemaWizard extends Wizard {
         return true;
     }
 
-    public ProjectNode getProjectNode() {
-        return projectNode;
+    public Project getProject() {
+        return project;
     }
 
-    public void setProjectNode(ProjectNode projectNode) {
-        this.projectNode = projectNode;
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

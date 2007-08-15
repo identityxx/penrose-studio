@@ -24,7 +24,6 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.studio.partition.action.*;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.eclipse.swt.graphics.Image;
@@ -53,12 +52,17 @@ public class PartitionsNode extends Node {
     protected ServersView view;
     protected ProjectNode projectNode;
 
-    protected Map<String,Node> children;
+    protected Map<String,Node> partitions = new TreeMap<String,Node>();
 
     public PartitionsNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
         this.view = view;
         projectNode = (ProjectNode)parent;
+
+        Project project = projectNode.getProject();
+        for (PartitionConfig partitionConfig : project.getPartitionConfigs().getPartitionConfigs()) {
+            addPartitionConfig(partitionConfig);
+        }
     }
 
     public void showMenu(IMenuManager manager) {
@@ -66,9 +70,9 @@ public class PartitionsNode extends Node {
         manager.add(new ImportPartitionAction());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PenroseWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
-        PenroseWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
-        PenroseActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
+        PenroseStudioWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
+        PenroseStudioWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
+        PenroseStudioActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
 
         //if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
             manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -88,110 +92,95 @@ public class PartitionsNode extends Node {
             }
             public boolean isEnabled() {
                 Object object = view.getClipboard();
-                return object != null && object instanceof PartitionConfig;
+                return object != null && object instanceof PartitionNode;
             }
         });
-
+/*
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
         manager.add(new RefreshAction(this));
+*/
     }
 
     public void refresh() throws Exception {
-        Project project = projectNode.getProject();
-        PenroseClient client = project.getClient();
-
-        children = new TreeMap<String,Node>();
-
-        for (PartitionConfig partitionConfig : project.getPartitionConfigs().getPartitionConfigs()) {
-
-            PartitionNode partitionNode = new PartitionNode(
-                    partitionConfig.getName(),
-                    ServersView.PARTITION,
-                    PenrosePlugin.getImage(PenroseImage.PARTITION),
-                    partitionConfig,
-                    this
-            );
-
-            children.put(partitionConfig.getName(), partitionNode);
-        }
-
-        for (String name : client.getPartitionNames()) {
-
-            if (children.containsKey(name)) continue;
-
-            PartitionNode partitionNode = new PartitionNode(
-                    name,
-                    ServersView.PARTITION,
-                    PenrosePlugin.getImage(PenroseImage.PARTITION),
-                    null,
-                    this
-            );
-
-            children.put(name, partitionNode);
-        }
     }
 
     public void paste() throws Exception {
 
         Object object = view.getClipboard();
-        if (!(object instanceof PartitionConfig)) return;
+        if (!(object instanceof PartitionNode)) return;
 
-        PartitionConfig oldPartition = (PartitionConfig)object;
-        //PartitionConfig newPartition = (PartitionConfig)oldPartition.clone();
+        PartitionNode oldPartitionNode = (PartitionNode)object;
+        PartitionConfig oldPartitionConfig = oldPartitionNode.getPartitionConfig();
 
-        String oldName = oldPartition.getName();
+        Project oldProject = oldPartitionNode.getProjectNode().getProject();
+        Project project = projectNode.getProject();
+        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+
+        String oldPartitionName = oldPartitionConfig.getName();
+        String partitionName = oldPartitionName;
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         Shell shell = window.getShell();
 
-        PartitionDialog dialog = new PartitionDialog(shell, SWT.NONE);
-        dialog.setName(oldName);
-        dialog.setText("New Partition");
+        while (partitionConfigs.getPartitionConfig(partitionName) != null) {
 
-        dialog.open();
+            PartitionDialog dialog = new PartitionDialog(shell, SWT.NONE);
+            dialog.setName(partitionName);
+            dialog.setText("New Partition");
+            dialog.open();
 
-        if (dialog.getAction() == PartitionDialog.CANCEL) return;
+            if (dialog.getAction() == PartitionDialog.CANCEL) return;
 
-        String newName = dialog.getName();
+            partitionName = dialog.getName();
+        }
 
-        log.debug("Pasting "+oldName+" partition into "+newName+".");
+        log.debug("Pasting "+oldPartitionName+" partition into "+partitionName+".");
 
-        Project project = projectNode.getProject();
-        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-        File workDir = project.getWorkDir();
-
-        File oldDir = new File(workDir, "partitions"+File.separator+oldName);
-        File newDir = new File(workDir, "partitions"+File.separator+newName);
+        File oldDir = new File(oldProject.getWorkDir(), "partitions"+File.separator+oldPartitionName);
+        File newDir = new File(project.getWorkDir(), "partitions"+File.separator+partitionName);
         FileUtil.copy(oldDir, newDir);
 
-        PartitionConfig newPartition = partitionConfigs.load(newDir);
-        partitionConfigs.addPartitionConfig(newPartition);
+        project.upload("partitions/"+partitionName);
 
-        view.setClipboard(null);
+        PartitionConfig partitionConfig = partitionConfigs.load(newDir);
+        partitionConfigs.addPartitionConfig(partitionConfig);
 
-        refresh();
+        addPartitionConfig(partitionConfig);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
 
+    public void addPartitionConfig(PartitionConfig partitionConfig) {
+
+        PartitionNode partitionNode = new PartitionNode(
+                partitionConfig.getName(),
+                ServersView.PARTITION,
+                PenrosePlugin.getImage(PenroseImage.PARTITION),
+                partitionConfig,
+                this
+        );
+
+        partitions.put(partitionConfig.getName(), partitionNode);
+    }
+
+    public void removePartitionConfig(String name) throws Exception {
+        Project project = projectNode.getProject();
+        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+        partitionConfigs.removePartitionConfig(name);
+
+        project.removeDirectory("partitions/"+name);
+
+        partitions.remove(name);
+    }
+
     public boolean hasChildren() throws Exception {
-
-        if (children == null) {
-            refresh();
-        }
-
-        return !children.isEmpty();
+        return !partitions.isEmpty();
     }
 
     public Collection<Node> getChildren() throws Exception {
-
-        if (children == null) {
-            refresh();
-        }
-
-        return children.values();
+        return partitions.values();
     }
 
     public ProjectNode getProjectNode() {

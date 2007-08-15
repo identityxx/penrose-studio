@@ -47,7 +47,7 @@ public class ImportSchemaAction extends Action {
 
             Shell shell = window.getShell();
 
-            ImportSchemaWizard wizard = new ImportSchemaWizard(projectNode);
+            ImportSchemaWizard wizard = new ImportSchemaWizard(projectNode.getProject());
 
             WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.setPageSize(600, 300);

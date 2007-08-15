@@ -144,8 +144,9 @@ public class Parameter {
     }
 
     public boolean equals(Object object) {
+        if (this == object) return true;
         if (object == null) return false;
-        if (!(object instanceof Parameter)) return false;
+        if (object.getClass() != this.getClass()) return false;
 
         Parameter p = (Parameter)object;
         if (!compare(name, p.name)) return false;

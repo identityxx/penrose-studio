@@ -25,11 +25,9 @@ import org.eclipse.swt.events.*;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
-import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.mapping.editor.MappingEditor;
 import org.safehaus.penrose.studio.mapping.EntrySelectionDialog;
 import org.safehaus.penrose.studio.mapping.ObjectClassSelectionDialog;
 import org.safehaus.penrose.studio.mapping.AttributeTypeSelectionDialog;
@@ -187,20 +185,18 @@ public class LDAPPage extends FormPage {
                     ObjectClassSelectionDialog dialog = new ObjectClassSelectionDialog(editor.getParent().getShell(), SWT.NONE);
                     dialog.setText("Add object classes...");
 
-                    Project project = editor.getProjectNode().getProject();
+                    Project project = editor.getProject();
                     SchemaManager schemaManager = project.getSchemaManager();
 
                     Collection<String> ocNames = new TreeSet<String>();
-                    for (Iterator i=schemaManager.getObjectClasses().iterator(); i.hasNext(); ) {
-                        ObjectClass objectClass = (ObjectClass)i.next();
+                    for (ObjectClass objectClass : schemaManager.getObjectClasses()) {
                         ocNames.add(objectClass.getName());
                     }
                     dialog.setObjectClasses(ocNames);
 
                     dialog.open();
 
-                    for (Iterator i=dialog.getSelections().iterator(); i.hasNext(); ) {
-                        String objectClass = (String)i.next();
+                    for (String objectClass : dialog.getSelections()) {
                         entry.addObjectClass(objectClass);
                     }
 
@@ -221,8 +217,8 @@ public class LDAPPage extends FormPage {
                 if (objectClassTable.getSelectionCount() == 0) return;
 
                 TableItem items[] = objectClassTable.getSelection();
-                for (int i=0; i<items.length; i++) {
-                    String objectClass = (String)items[i].getData();
+                for (TableItem item : items) {
+                    String objectClass = (String) item.getData();
                     entry.removeObjectClass(objectClass);
                 }
 
@@ -333,14 +329,13 @@ public class LDAPPage extends FormPage {
                     AttributeTypeSelectionDialog dialog = new AttributeTypeSelectionDialog(editor.getParent().getShell(), SWT.NONE);
                     dialog.setText("Add attributes...");
 
-                    Project project = editor.getProjectNode().getProject();
+                    Project project = editor.getProject();
                     dialog.setSchemaManager(project.getSchemaManager());
 
                     dialog.open();
                     if (dialog.getAction() == AttributeTypeSelectionDialog.CANCEL) return;
 
-                    for (Iterator i=dialog.getSelections().iterator(); i.hasNext(); ) {
-                        String name = (String)i.next();
+                    for (String name : dialog.getSelections()) {
                         AttributeMapping ad = new AttributeMapping();
                         ad.setName(name);
                         entry.addAttributeMapping(ad);
@@ -377,8 +372,8 @@ public class LDAPPage extends FormPage {
                 if (attributeTable.getSelectionCount() == 0) return;
 
                 TableItem items[] = attributeTable.getSelection();
-                for (int i=0; i<items.length; i++) {
-                    AttributeMapping ad = (AttributeMapping)items[i].getData();
+                for (TableItem item : items) {
+                    AttributeMapping ad = (AttributeMapping) item.getData();
                     entry.removeAttributeMapping(ad);
                 }
 
@@ -399,17 +394,14 @@ public class LDAPPage extends FormPage {
         ExpressionDialog dialog = new ExpressionDialog(editor.getParent().getShell(), SWT.NONE);
         dialog.setText("Edit attribute value/expression...");
 
-        Collection sources = entry.getSourceMappings();
-        for (Iterator i=sources.iterator(); i.hasNext(); ) {
-            SourceMapping source = (SourceMapping)i.next();
-
+        Collection<SourceMapping> sources = entry.getSourceMappings();
+        for (SourceMapping source : sources) {
             PartitionConfig partitionConfig = editor.getPartitionConfig();
             SourceConfig sourceConfig = partitionConfig.getSourceConfigs().getSourceConfig(source.getSourceName());
             dialog.addVariable(source.getName());
 
-            for (Iterator j=sourceConfig.getFieldConfigs().iterator(); j.hasNext(); ) {
-                FieldConfig fieldDefinition = (FieldConfig)j.next();
-                dialog.addVariable(source.getName()+"."+fieldDefinition.getName());
+            for (FieldConfig fieldDefinition : sourceConfig.getFieldConfigs()) {
+                dialog.addVariable(source.getName() + "." + fieldDefinition.getName());
             }
         }
 
@@ -437,25 +429,22 @@ public class LDAPPage extends FormPage {
             attributes.put(ad.getName(), ad);
         }
 */
-        Map objectClasses = getObjectClasses(entry.getObjectClasses());
+        Map<String,ObjectClass> objectClasses = getObjectClasses(entry.getObjectClasses());
         //completeAttributeTypes(objectClasses, attributes);
 
-        for (Iterator i=objectClasses.values().iterator(); i.hasNext(); ) {
-            ObjectClass objectClass = (ObjectClass)i.next();
+        for (ObjectClass objectClass : objectClasses.values()) {
             String ocName = objectClass.getName();
             entry.addObjectClass(ocName);
         }
 
-        for (Iterator i=entry.getObjectClasses().iterator(); i.hasNext(); ) {
-            String ocName = (String)i.next();
-        
+        for (String ocName : entry.getObjectClasses()) {
+
             TableItem item = new TableItem(objectClassTable, SWT.CHECK);
             item.setText(ocName);
             item.setData(ocName);
         }
 
-        for (Iterator i=entry.getAttributeMappings().iterator(); i.hasNext(); ) {
-            AttributeMapping ad = (AttributeMapping)i.next();
+        for (AttributeMapping ad : entry.getAttributeMappings()) {
 
             String value;
 
@@ -464,7 +453,7 @@ public class LDAPPage extends FormPage {
                 if (constant instanceof byte[]) {
                     value = "(binary)";
                 } else {
-                    value = "\""+constant+"\"";
+                    value = "\"" + constant + "\"";
                 }
 
             } else {
@@ -489,9 +478,9 @@ public class LDAPPage extends FormPage {
         editor.checkDirty();
     }
 
-    public Map getObjectClasses(Collection<String> ocNames) {
+    public Map<String,ObjectClass> getObjectClasses(Collection<String> ocNames) {
 
-        Project project = editor.getProjectNode().getProject();
+        Project project = editor.getProject();
         SchemaManager schemaManager = project.getSchemaManager();
 
         Map<String,ObjectClass> objectClasses = new TreeMap<String,ObjectClass>();
@@ -507,17 +496,15 @@ public class LDAPPage extends FormPage {
         return objectClasses;
     }
 
-    public void completeAttributeTypes(Map objectClasses, Map attributes) {
+    public void completeAttributeTypes(Map<String,ObjectClass> objectClasses, Map<String,AttributeMapping> attributes) {
 
-        for (Iterator i=objectClasses.values().iterator(); i.hasNext(); ) {
-            ObjectClass oc = (ObjectClass)i.next();
+        for (ObjectClass oc : objectClasses.values()) {
 
-            Collection attrs = new TreeSet();
+            Collection<String> attrs = new TreeSet<String>();
             attrs.addAll(oc.getRequiredAttributes());
             //attrs.addAll(oc.getOptionalAttributes());
 
-            for (Iterator j=attrs.iterator(); j.hasNext(); ) {
-                String atName = (String)j.next();
+            for (String atName : attrs) {
                 //System.out.println(" - "+atName);
 
                 if (attributes.containsKey(atName)) continue;
@@ -534,8 +521,7 @@ public class LDAPPage extends FormPage {
         //log.debug("Rdn:");
 
         RDNBuilder rb = new RDNBuilder();
-        for (Iterator i=entry.getAttributeMappings().iterator(); i.hasNext(); ) {
-            AttributeMapping ad = (AttributeMapping)i.next();
+        for (AttributeMapping ad : entry.getAttributeMappings()) {
             if (!ad.isRdn()) continue;
             String name = ad.getName();
             Object constant = ad.getConstant();
@@ -554,7 +540,6 @@ public class LDAPPage extends FormPage {
 
             //log.debug(" - expression "+name+": "+ad.getExpression());
             rb.set(name, "...");
-            continue;
         }
 
         RDN rdn = rb.toRdn();

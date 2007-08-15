@@ -20,19 +20,14 @@ package org.safehaus.penrose.studio.preview;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.studio.project.ProjectConfig;
-import org.safehaus.penrose.config.PenroseConfig;
-
-import java.io.File;
+import org.safehaus.penrose.studio.project.Project;
 
 /**
  * @author Endi S. Dewata
  */
 public class PreviewEditorInput implements IEditorInput {
 
-    private ProjectConfig projectConfig;
-    private File workDir;
-    private PenroseConfig penroseConfig;
+    private Project project;
 
     public PreviewEditorInput() {
     }
@@ -61,34 +56,32 @@ public class PreviewEditorInput implements IEditorInput {
         return null;
     }
 
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (!(o instanceof PreviewEditorInput)) return false;
+    public int hashCode() {
+        return project == null ? 0 : project.hashCode();
+    }
+
+    boolean equals(Object o1, Object o2) {
+        if (o1 == null && o2 == null) return true;
+        if (o1 != null) return o1.equals(o2);
+        return o2.equals(o1);
+    }
+
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null) return false;
+        if (object.getClass() != this.getClass()) return false;
+
+        PreviewEditorInput ei = (PreviewEditorInput)object;
+        if (!equals(project, ei.project)) return false;
 
         return true;
     }
 
-    public File getWorkDir() {
-        return workDir;
+    public Project getProject() {
+        return project;
     }
 
-    public void setWorkDir(File workDir) {
-        this.workDir = workDir;
-    }
-
-    public ProjectConfig getProject() {
-        return projectConfig;
-    }
-
-    public void setProject(ProjectConfig projectConfig) {
-        this.projectConfig = projectConfig;
-    }
-
-    public PenroseConfig getPenroseConfig() {
-        return penroseConfig;
-    }
-
-    public void setPenroseConfig(PenroseConfig penroseConfig) {
-        this.penroseConfig = penroseConfig;
+    public void setProject(Project project) {
+        this.project = project;
     }
 }
