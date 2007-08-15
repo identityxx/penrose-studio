@@ -31,7 +31,7 @@ public class NISChangeDialog extends Dialog {
 
     int action;
 
-    private String targetName = "Target";
+    private String targetName   = "Target";
     private String oldValueName = "Old value";
     private String newValueName = "New value";
 

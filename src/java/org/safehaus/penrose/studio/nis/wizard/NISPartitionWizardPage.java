@@ -29,7 +29,7 @@ public class NISPartitionWizardPage extends WizardPage implements ModifyListener
     public NISPartitionWizardPage() {
         super(NAME);
 
-        setDescription("Enter a partition name and an LDAP suffix.");
+        setDescription("Enter an ID for this domain (usually the short version of the NIS domain name) and an LDAP suffix.");
     }
 
     public void createControl(final Composite parent) {
@@ -40,19 +40,19 @@ public class NISPartitionWizardPage extends WizardPage implements ModifyListener
         sectionLayout.numColumns = 2;
         composite.setLayout(sectionLayout);
 
-        Label domainLabel = new Label(composite, SWT.NONE);
-        domainLabel.setText("Partition:");
+        Label partitionLabel = new Label(composite, SWT.NONE);
+        partitionLabel.setText("ID:");
         GridData gd = new GridData();
         gd.widthHint = 100;
-        domainLabel.setLayoutData(gd);
+        partitionLabel.setLayoutData(gd);
 
         partitionText = new Text(composite, SWT.BORDER);
         partitionText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         partitionText.addModifyListener(this);
 
-        Label serverLabel = new Label(composite, SWT.NONE);
-        serverLabel.setText("Suffix:");
-        serverLabel.setLayoutData(new GridData());
+        Label suffixLabel = new Label(composite, SWT.NONE);
+        suffixLabel.setText("LDAP Suffix:");
+        suffixLabel.setLayoutData(new GridData());
 
         suffixText = new Text(composite, SWT.BORDER);
         suffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));

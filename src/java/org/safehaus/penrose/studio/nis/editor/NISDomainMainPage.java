@@ -10,7 +10,6 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.studio.nis.editor.NISDomainEditor;
 
 /**
  * @author Endi S. Dewata
@@ -53,19 +52,19 @@ public class NISDomainMainPage extends FormPage {
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
 
-        Label nameLabel = toolkit.createLabel(composite, "Name:");
+        Label partitionLabel = toolkit.createLabel(composite, "ID:");
         GridData gd = new GridData();
         gd.widthHint = 100;
-        nameLabel.setLayoutData(gd);
-
-        Label nameText = toolkit.createLabel(composite, domain.getName());
-        nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        Label partitionLabel = toolkit.createLabel(composite, "Partition:");
-        partitionLabel.setLayoutData(new GridData());
+        partitionLabel.setLayoutData(gd);
 
         Label partitionText = toolkit.createLabel(composite, domain.getPartition());
         partitionText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label domainLabel = toolkit.createLabel(composite, "Domain:");
+        domainLabel.setLayoutData(new GridData());
+
+        Label domainText = toolkit.createLabel(composite, domain.getName());
+        domainText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label serverLabel = toolkit.createLabel(composite, "Server:");
         serverLabel.setLayoutData(new GridData());

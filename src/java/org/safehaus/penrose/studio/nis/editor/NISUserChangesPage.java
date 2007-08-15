@@ -215,44 +215,46 @@ public class NISUserChangesPage extends FormPage {
         gd.widthHint = 120;
         buttons.setLayoutData(gd);
 
-        Button addButton = new Button(buttons, SWT.PUSH);
-        addButton.setText("Add");
-        addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        if (domain != null) {
+            Button addButton = new Button(buttons, SWT.PUSH);
+            addButton.setText("Add");
+            addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        addButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                try {
-                    NISChangeDialog dialog = new NISChangeDialog(getSite().getShell(), SWT.NONE);
-                    dialog.setTargetName("User");
-                    dialog.setOldValueName("Old UID Number");
-                    dialog.setNewValueName("New UID Number");
-                    dialog.open();
+            addButton.addSelectionListener(new SelectionAdapter() {
+                public void widgetSelected(SelectionEvent selectionEvent) {
+                    try {
+                        NISChangeDialog dialog = new NISChangeDialog(getSite().getShell(), SWT.NONE);
+                        dialog.setTargetName("User");
+                        dialog.setOldValueName("Old UID Number");
+                        dialog.setNewValueName("New UID Number");
+                        dialog.open();
 
-                    int action = dialog.getAction();
-                    if (action == NISChangeDialog.CANCEL) return;
-/*
-                    RDNBuilder rb = new RDNBuilder();
-                    rb.set("domain", domain.getName());
-                    rb.set("uid", dialog.getTarget());
-                    DN dn = new DN(rb.toRdn());
+                        int action = dialog.getAction();
+                        if (action == NISChangeDialog.CANCEL) return;
 
-                    Attributes attributes = new Attributes();
-                    attributes.setValue("domain", domain.getName());
-                    attributes.setValue("uid", dialog.getTarget());
-                    attributes.setValue("origUidNumber", dialog.getOldValue());
-                    attributes.setValue("uidNumber", dialog.getNewValue());
-                    attributes.setValue("message", dialog.getMessage());
+                        RDNBuilder rb = new RDNBuilder();
+                        rb.set("domain", domain.getName());
+                        rb.set("uid", dialog.getTarget());
+                        DN dn = new DN(rb.toRdn());
 
-                    nisTool.getUsers().add(dn, attributes);
-*/
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Edit Failed", e.getMessage());
+                        Attributes attributes = new Attributes();
+                        attributes.setValue("domain", domain.getName());
+                        attributes.setValue("uid", dialog.getTarget());
+                        attributes.setValue("origUidNumber", dialog.getOldValue());
+                        attributes.setValue("uidNumber", dialog.getNewValue());
+                        attributes.setValue("message", dialog.getMessage());
+
+                        nisTool.getUsers().add(dn, attributes);
+
+                    } catch (Exception e) {
+                        log.error(e.getMessage(), e);
+                        MessageDialog.openError(editor.getSite().getShell(), "Edit Failed", e.getMessage());
+                    }
+
+                    refresh();
                 }
-
-                refresh();
-            }
-        });
+            });
+        }
 
         Button editButton = new Button(buttons, SWT.PUSH);
         editButton.setText("Edit");

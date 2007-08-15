@@ -59,10 +59,40 @@
             icon="images/server.png"
             class="org.safehaus.penrose.studio.connection.editor.ConnectionEditor"/>
        <editor
+            id="org.safehaus.penrose.studio.jdbc.connection.JDBCConnectionEditor"
+            name="JDBC Connection"
+            icon="images/server.png"
+            class="org.safehaus.penrose.studio.jdbc.connection.JDBCConnectionEditor"/>
+       <editor
+            id="org.safehaus.penrose.studio.jndi.connection.JNDIConnectionEditor"
+            name="JNDI Connection"
+            icon="images/server.png"
+            class="org.safehaus.penrose.studio.jndi.connection.JNDIConnectionEditor"/>
+       <editor
+            id="org.safehaus.penrose.studio.nis.connection.NISConnectionEditor"
+            name="NIS Connection"
+            icon="images/server.png"
+            class="org.safehaus.penrose.studio.nis.connection.NISConnectionEditor"/>
+       <editor
             id="org.safehaus.penrose.studio.source.editor.SourceEditor"
             name="Source"
             icon="images/source.gif"
             class="org.safehaus.penrose.studio.source.editor.SourceEditor"/>
+       <editor
+            id="org.safehaus.penrose.studio.jdbc.source.JDBCSourceEditor"
+            name="JDBC Source"
+            icon="images/source.gif"
+            class="org.safehaus.penrose.studio.jdbc.source.JDBCSourceEditor"/>
+       <editor
+            id="org.safehaus.penrose.studio.jndi.source.JNDISourceEditor"
+            name="JNDI Source"
+            icon="images/source.gif"
+            class="org.safehaus.penrose.studio.jndi.source.JNDISourceEditor"/>
+       <editor
+            id="org.safehaus.penrose.studio.nis.source.NISSourceEditor"
+            name="NIS Source"
+            icon="images/source.gif"
+            class="org.safehaus.penrose.studio.nis.source.NISSourceEditor"/>
        <editor
             id="org.safehaus.penrose.studio.mapping.editor.MappingEditor"
             name="Mapping"
