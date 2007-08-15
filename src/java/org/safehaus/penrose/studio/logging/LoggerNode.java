@@ -73,8 +73,7 @@ public class LoggerNode extends Node {
 
     public void open() throws Exception {
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-        LoggerDialog dialog = new LoggerDialog(shell, SWT.NONE);
+        LoggerDialog dialog = new LoggerDialog(view.getSite().getShell(), SWT.NONE);
         dialog.setText("Edit Logger");
         dialog.setLoggerConfig(loggerConfig);
         dialog.open();

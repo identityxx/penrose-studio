@@ -142,10 +142,8 @@ public class ConnectionNode extends Node {
 
     public void remove() throws Exception {
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
         boolean confirm = MessageDialog.openQuestion(
-                shell,
+                view.getSite().getShell(),
                 "Confirmation",
                 "Remove Connection \""+connectionConfig.getName()+"\"?");
 

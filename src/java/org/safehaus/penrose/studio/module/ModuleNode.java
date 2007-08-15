@@ -113,10 +113,10 @@ public class ModuleNode extends Node {
 
     public void remove() {
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
-        boolean confirm = MessageDialog.openQuestion(shell,
-                "Confirmation", "Remove Module \""+moduleConfig.getName()+"\"?");
+        boolean confirm = MessageDialog.openQuestion(
+                view.getSite().getShell(),
+                "Confirmation", "Remove Module \""+moduleConfig.getName()+"\"?"
+        );
 
         if (!confirm) return;
 

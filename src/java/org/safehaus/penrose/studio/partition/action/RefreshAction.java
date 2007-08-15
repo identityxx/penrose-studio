@@ -1,9 +1,6 @@
 package org.safehaus.penrose.studio.partition.action;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchPage;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
@@ -27,9 +24,7 @@ public class RefreshAction extends Action {
         try {
             partitionsNode.refresh();
 
-            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-            IWorkbenchPage page = window.getActivePage();
-            ServersView serversView = (ServersView)page.showView(ServersView.class.getName());
+            ServersView serversView = ServersView.getInstance();
 
             ProjectNode projectNode = serversView.getSelectedProjectNode();
             serversView.open(projectNode.getPartitionsNode());

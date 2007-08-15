@@ -144,10 +144,8 @@ public class NISNode extends Node {
 
     public void newDomain() throws Exception {
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
         NISDomainWizard wizard = new NISDomainWizard(projectNode.getProject(), this);
-        WizardDialog dialog = new WizardDialog(shell, wizard);
+        WizardDialog dialog = new WizardDialog(view.getSite().getShell(), wizard);
         dialog.setPageSize(600, 300);
         dialog.open();
         

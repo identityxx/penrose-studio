@@ -196,8 +196,7 @@ public class NISDomainNode extends Node {
 
         String domainName = domain.getName();
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-        NISDomainDialog dialog = new NISDomainDialog(shell, SWT.NONE);
+        NISDomainDialog dialog = new NISDomainDialog(view.getSite().getShell(), SWT.NONE);
         dialog.setDomain(domain);
         dialog.open();
 
@@ -212,12 +211,8 @@ public class NISDomainNode extends Node {
 
     public void remove() throws Exception {
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
-        TreeViewer treeViewer = view.getTreeViewer();
-        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
-
-        boolean confirm = MessageDialog.openQuestion(shell,
+        boolean confirm = MessageDialog.openQuestion(
+                view.getSite().getShell(),
                 "Removing NIS Domain",
                 "Are you sure?\n"+
                         "The NIS domain information, Penrose partition, and the cache database will be removed.\n"+
@@ -228,8 +223,7 @@ public class NISDomainNode extends Node {
 
         Project project = projectNode.getProject();
 
-        for (Iterator i=selection.iterator(); i.hasNext(); ) {
-            Node node = (Node)i.next();
+        for (Node node : view.getSelectedNodes()) {
             if (!(node instanceof NISDomainNode)) continue;
 
             NISDomainNode domainNode = (NISDomainNode)node;
@@ -251,12 +245,8 @@ public class NISDomainNode extends Node {
 
     public void createPartition() throws Exception {
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
-        TreeViewer treeViewer = view.getTreeViewer();
-        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
-
-        boolean confirm = MessageDialog.openQuestion(shell,
+        boolean confirm = MessageDialog.openQuestion(
+                view.getSite().getShell(),
                 "Creating Partition", "Are you sure?"
         );
 
@@ -264,8 +254,7 @@ public class NISDomainNode extends Node {
 
         Project project = projectNode.getProject();
 
-        for (Iterator i=selection.iterator(); i.hasNext(); ) {
-            Node node = (Node)i.next();
+        for (Node node : view.getSelectedNodes()) {
             if (!(node instanceof NISDomainNode)) continue;
 
             NISDomainNode domainNode = (NISDomainNode)node;
@@ -281,19 +270,14 @@ public class NISDomainNode extends Node {
 
     public void initPartition() throws Exception {
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
-        TreeViewer treeViewer = view.getTreeViewer();
-        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
-
-        boolean confirm = MessageDialog.openQuestion(shell,
+        boolean confirm = MessageDialog.openQuestion(
+                view.getSite().getShell(),
                 "Initializing Partition", "Are you sure?"
         );
 
         if (!confirm) return;
 
-        for (Iterator i=selection.iterator(); i.hasNext(); ) {
-            Node node = (Node)i.next();
+        for (Node node : view.getSelectedNodes()) {
             if (!(node instanceof NISDomainNode)) continue;
 
             NISDomainNode domainNode = (NISDomainNode)node;
@@ -308,12 +292,8 @@ public class NISDomainNode extends Node {
 
     public void removePartition() throws Exception {
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
-        TreeViewer treeViewer = view.getTreeViewer();
-        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
-
-        boolean confirm = MessageDialog.openQuestion(shell,
+        boolean confirm = MessageDialog.openQuestion(
+                view.getSite().getShell(),
                 "Removing Partition", "Are you sure?"
         );
 
@@ -321,8 +301,7 @@ public class NISDomainNode extends Node {
 
         Project project = projectNode.getProject();
 
-        for (Iterator i=selection.iterator(); i.hasNext(); ) {
-            Node node = (Node)i.next();
+        for (Node node : view.getSelectedNodes()) {
             if (!(node instanceof NISDomainNode)) continue;
 
             NISDomainNode domainNode = (NISDomainNode)node;
@@ -340,19 +319,14 @@ public class NISDomainNode extends Node {
 
     public void createDatabase() throws Exception {
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
-        TreeViewer treeViewer = view.getTreeViewer();
-        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
-
-        boolean confirm = MessageDialog.openQuestion(shell,
+        boolean confirm = MessageDialog.openQuestion(
+                view.getSite().getShell(),
                 "Creating Cache Database", "Are you sure?"
         );
 
         if (!confirm) return;
 
-        for (Iterator i=selection.iterator(); i.hasNext(); ) {
-            Node node = (Node)i.next();
+        for (Node node : view.getSelectedNodes()) {
             if (!(node instanceof NISDomainNode)) continue;
 
             NISDomainNode domainNode = (NISDomainNode)node;
@@ -367,19 +341,14 @@ public class NISDomainNode extends Node {
 
     public void loadDatabase() throws Exception {
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
-        TreeViewer treeViewer = view.getTreeViewer();
-        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
-
-        boolean confirm = MessageDialog.openQuestion(shell,
+        boolean confirm = MessageDialog.openQuestion(
+                view.getSite().getShell(),
                 "Loading Cache Database", "Are you sure?"
         );
 
         if (!confirm) return;
 
-        for (Iterator i=selection.iterator(); i.hasNext(); ) {
-            Node node = (Node)i.next();
+        for (Node node : view.getSelectedNodes()) {
             if (!(node instanceof NISDomainNode)) continue;
 
             NISDomainNode domainNode = (NISDomainNode)node;
@@ -394,19 +363,14 @@ public class NISDomainNode extends Node {
 
     public void cleanDatabase() throws Exception {
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
-        TreeViewer treeViewer = view.getTreeViewer();
-        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
-
-        boolean confirm = MessageDialog.openQuestion(shell,
+        boolean confirm = MessageDialog.openQuestion(
+                view.getSite().getShell(),
                 "Clearing Cache Database", "Are you sure?"
         );
 
         if (!confirm) return;
 
-        for (Iterator i=selection.iterator(); i.hasNext(); ) {
-            Node node = (Node)i.next();
+        for (Node node : view.getSelectedNodes()) {
             if (!(node instanceof NISDomainNode)) continue;
 
             NISDomainNode domainNode = (NISDomainNode)node;
@@ -421,19 +385,14 @@ public class NISDomainNode extends Node {
 
     public void removeDatabase() throws Exception {
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
-        TreeViewer treeViewer = view.getTreeViewer();
-        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
-
-        boolean confirm = MessageDialog.openQuestion(shell,
+        boolean confirm = MessageDialog.openQuestion(
+                view.getSite().getShell(),
                 "Removing Cache Database", "Are you sure?"
         );
 
         if (!confirm) return;
 
-        for (Iterator i=selection.iterator(); i.hasNext(); ) {
-            Node node = (Node)i.next();
+        for (Node node : view.getSelectedNodes()) {
             if (!(node instanceof NISDomainNode)) continue;
 
             NISDomainNode domainNode = (NISDomainNode)node;

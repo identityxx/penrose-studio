@@ -41,6 +41,7 @@ import org.safehaus.penrose.studio.tree.Node;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 public class ServersView extends ViewPart implements ChangeListener, ISelectionChangedListener {
 
@@ -205,6 +206,16 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
         }
 
         return null;
+    }
+
+    public Collection<Node> getSelectedNodes() {
+        Collection<Node> list = new ArrayList<Node>();
+        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
+        for (Iterator i=selection.iterator(); i.hasNext(); ) {
+            Node node = (Node)i.next();
+            list.add(node);
+        }
+        return list;
     }
 
     public static ServersView getInstance() throws Exception {

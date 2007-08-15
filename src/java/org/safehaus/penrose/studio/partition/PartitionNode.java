@@ -21,7 +21,6 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.graphics.Image;
@@ -168,7 +167,7 @@ public class PartitionNode extends Node {
             }
             public boolean isEnabled() {
                 Object object = view.getClipboard();
-                return object != null && object instanceof PartitionNode;
+                return object != null && object instanceof PartitionNode[];
             }
         });
 
@@ -205,7 +204,7 @@ public class PartitionNode extends Node {
 
     public void remove() throws Exception {
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+        Shell shell = view.getSite().getShell();
 
         boolean confirm = MessageDialog.openQuestion(
                 shell,
@@ -214,7 +213,12 @@ public class PartitionNode extends Node {
 
         if (!confirm) return;
 
-        partitionsNode.removePartitionConfig(partitionConfig.getName());
+        for (Node node : view.getSelectedNodes()) {
+            if (!(node instanceof PartitionNode)) continue;
+
+            PartitionConfig partitionConfig = ((PartitionNode)node).getPartitionConfig();
+            partitionsNode.removePartitionConfig(partitionConfig.getName());
+        }
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
@@ -222,7 +226,12 @@ public class PartitionNode extends Node {
 
     public void copy() throws Exception {
         log.debug("Copying "+name+" partition.");
-        view.setClipboard(this);
+
+        Collection<PartitionNode> nodes = new ArrayList<PartitionNode>();
+        for (Node node : view.getSelectedNodes()) {
+            nodes.add((PartitionNode)node);
+        }
+        view.setClipboard(nodes.toArray(new PartitionNode[nodes.size()]));
     }
 
     public void paste() throws Exception {

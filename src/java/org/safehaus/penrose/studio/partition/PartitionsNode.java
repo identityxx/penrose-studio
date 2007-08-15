@@ -28,13 +28,10 @@ import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -92,7 +89,7 @@ public class PartitionsNode extends Node {
             }
             public boolean isEnabled() {
                 Object object = view.getClipboard();
-                return object != null && object instanceof PartitionNode;
+                return object != null && object instanceof PartitionNode[];
             }
         });
 /*
@@ -108,45 +105,46 @@ public class PartitionsNode extends Node {
     public void paste() throws Exception {
 
         Object object = view.getClipboard();
-        if (!(object instanceof PartitionNode)) return;
+        if (!(object instanceof PartitionNode[])) return;
 
-        PartitionNode oldPartitionNode = (PartitionNode)object;
-        PartitionConfig oldPartitionConfig = oldPartitionNode.getPartitionConfig();
-
-        Project oldProject = oldPartitionNode.getProjectNode().getProject();
         Project project = projectNode.getProject();
         PartitionConfigs partitionConfigs = project.getPartitionConfigs();
 
-        String oldPartitionName = oldPartitionConfig.getName();
-        String partitionName = oldPartitionName;
+        for (PartitionNode oldPartitionNode : (PartitionNode[])object) {
 
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        Shell shell = window.getShell();
+            PartitionConfig oldPartitionConfig = oldPartitionNode.getPartitionConfig();
+            Project oldProject = oldPartitionNode.getProjectNode().getProject();
 
-        while (partitionConfigs.getPartitionConfig(partitionName) != null) {
+            String oldPartitionName = oldPartitionConfig.getName();
+            String newPartitionName = oldPartitionName;
 
-            PartitionDialog dialog = new PartitionDialog(shell, SWT.NONE);
-            dialog.setName(partitionName);
-            dialog.setText("New Partition");
-            dialog.open();
+            while (partitionConfigs.getPartitionConfig(newPartitionName) != null) {
 
-            if (dialog.getAction() == PartitionDialog.CANCEL) return;
+                PartitionDialog dialog = new PartitionDialog(view.getSite().getShell(), SWT.NONE);
+                dialog.setName(newPartitionName);
+                dialog.setText("New Partition Name");
+                dialog.open();
 
-            partitionName = dialog.getName();
+                if (dialog.getAction() == PartitionDialog.CANCEL) return;
+
+                newPartitionName = dialog.getName();
+            }
+
+            log.debug("Copying "+oldPartitionName+" partition into "+newPartitionName+".");
+
+            File oldDir = new File(oldProject.getWorkDir(), "partitions"+File.separator+oldPartitionName);
+            File newDir = new File(project.getWorkDir(), "partitions"+File.separator+newPartitionName);
+            FileUtil.copy(oldDir, newDir);
+
+            project.upload("partitions/"+newPartitionName);
+
+            PartitionConfig newPartitionConfig = partitionConfigs.load(newDir);
+            partitionConfigs.addPartitionConfig(newPartitionConfig);
+
+            addPartitionConfig(newPartitionConfig);
         }
 
-        log.debug("Pasting "+oldPartitionName+" partition into "+partitionName+".");
-
-        File oldDir = new File(oldProject.getWorkDir(), "partitions"+File.separator+oldPartitionName);
-        File newDir = new File(project.getWorkDir(), "partitions"+File.separator+partitionName);
-        FileUtil.copy(oldDir, newDir);
-
-        project.upload("partitions/"+partitionName);
-
-        PartitionConfig partitionConfig = partitionConfigs.load(newDir);
-        partitionConfigs.addPartitionConfig(partitionConfig);
-
-        addPartitionConfig(partitionConfig);
+        view.setClipboard(null);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();

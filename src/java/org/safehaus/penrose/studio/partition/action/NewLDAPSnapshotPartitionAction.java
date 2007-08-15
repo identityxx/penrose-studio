@@ -17,15 +17,10 @@
  */
 package org.safehaus.penrose.studio.partition.action;
 
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.partition.wizard.CreateLDAPSnapshotWizard;
 import org.apache.log4j.Logger;
@@ -41,18 +36,11 @@ public class NewLDAPSnapshotPartitionAction extends Action {
 	
 	public void run() {
         try {
-            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-            IWorkbenchPage page = window.getActivePage();
-            ServersView serversView = (ServersView)page.showView(ServersView.class.getName());
-
-            Shell shell = window.getShell();
-
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            //if (!penroseStudio.isCommercial()) return;
+            ServersView serversView = ServersView.getInstance();
 
             Wizard wizard = new CreateLDAPSnapshotWizard();
 
-            WizardDialog dialog = new WizardDialog(shell, wizard);
+            WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
             dialog.open();
 

@@ -52,8 +52,7 @@ public class AppendersNode extends Node {
 
         AppenderConfig appenderConfig = new AppenderConfig();
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-        AppenderDialog dialog = new AppenderDialog(shell, SWT.NONE);
+        AppenderDialog dialog = new AppenderDialog(view.getSite().getShell(), SWT.NONE);
         dialog.setText("Add Appender");
         dialog.setAppenderConfig(appenderConfig);
         dialog.open();

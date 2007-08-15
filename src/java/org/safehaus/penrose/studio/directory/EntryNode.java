@@ -204,21 +204,17 @@ public class EntryNode extends Node {
 
     public void remove() throws Exception {
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
-        TreeViewer treeViewer = view.getTreeViewer();
-        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
-
-        boolean confirm = MessageDialog.openQuestion(shell,
-                "Confirmation", "Remove selected entries?");
+        boolean confirm = MessageDialog.openQuestion(
+                view.getSite().getShell(),
+                "Confirmation", "Remove selected entries?"
+        );
 
         if (!confirm) return;
 
-        for (Iterator i=selection.iterator(); i.hasNext(); ) {
-            Node node = (Node)i.next();
+        for (Node node : view.getSelectedNodes()) {
             if (!(node instanceof EntryNode)) continue;
 
-            EntryNode entryNode = (EntryNode)node;
+            EntryNode entryNode = (EntryNode) node;
 
             EntryMapping entryMapping = entryNode.getEntryMapping();
             partitionConfig.getDirectoryConfigs().removeEntryMapping(entryMapping);

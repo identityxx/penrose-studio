@@ -17,10 +17,6 @@
  */
 package org.safehaus.penrose.studio.connection.action;
 
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.server.ServersView;
@@ -44,14 +40,10 @@ public class NewConnectionAction extends Action {
 	
 	public void run() {
         try {
-            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-            IWorkbenchPage page = window.getActivePage();
-            ServersView serversView = (ServersView)page.showView(ServersView.class.getName());
-
-            Shell shell = window.getShell();
+            ServersView serversView = ServersView.getInstance();
 
             ConnectionWizard wizard = new ConnectionWizard(node.getPartitionConfig());
-            WizardDialog dialog = new WizardDialog(shell, wizard);
+            WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
             dialog.open();
 

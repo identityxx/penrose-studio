@@ -56,8 +56,7 @@ public class AppenderNode extends Node {
 
     public void open() throws Exception {
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-        AppenderDialog dialog = new AppenderDialog(shell, SWT.NONE);
+        AppenderDialog dialog = new AppenderDialog(view.getSite().getShell(), SWT.NONE);
         dialog.setText("Edit Appender");
         dialog.setAppenderConfig(appenderConfig);
         dialog.open();

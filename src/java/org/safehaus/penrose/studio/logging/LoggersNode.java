@@ -81,8 +81,7 @@ public class LoggersNode extends Node {
         RootConfig rootConfig = loggingConfig.getRootConfig();
         if (rootConfig == null) rootConfig = new RootConfig();
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-        LoggerDialog dialog = new LoggerDialog(shell, SWT.NONE);
+        LoggerDialog dialog = new LoggerDialog(view.getSite().getShell(), SWT.NONE);
         dialog.setText("Edit Logger");
         dialog.setRootConfig(rootConfig);
         dialog.open();
@@ -103,8 +102,7 @@ public class LoggersNode extends Node {
 
         LoggerConfig loggerConfig = new LoggerConfig();
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-        LoggerDialog dialog = new LoggerDialog(shell, SWT.NONE);
+        LoggerDialog dialog = new LoggerDialog(view.getSite().getShell(), SWT.NONE);
         dialog.setText("Add Logger");
         dialog.setLoggerConfig(loggerConfig);
         dialog.open();

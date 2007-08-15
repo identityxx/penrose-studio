@@ -17,10 +17,6 @@
  */
 package org.safehaus.penrose.studio.directory.action;
 
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
 import org.eclipse.jface.action.Action;
 import org.safehaus.penrose.studio.server.ServersView;
@@ -40,7 +36,6 @@ import org.safehaus.penrose.ldap.RDNBuilder;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.io.StringReader;
 
 public class NewEntryFromSourceAction extends Action {
@@ -58,11 +53,7 @@ public class NewEntryFromSourceAction extends Action {
 	
 	public void run() {
         try {
-            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-            IWorkbenchPage page = window.getActivePage();
-            ServersView serversView = (ServersView)page.showView(ServersView.class.getName());
-
-            Shell shell = window.getShell();
+            ServersView serversView = ServersView.getInstance();
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             //if (!penroseStudio.isCommercial()) return;
@@ -77,7 +68,7 @@ public class NewEntryFromSourceAction extends Action {
             }
 
             SourceMapping sourceMapping = new SourceMapping();
-            SourceDialog dialog = new SourceDialog(shell, SWT.NONE);
+            SourceDialog dialog = new SourceDialog(serversView.getSite().getShell(), SWT.NONE);
             dialog.setSourceConfigs(sourceConfigs);
             dialog.setSourceMapping(sourceMapping);
             dialog.setText("Select source...");
@@ -93,9 +84,8 @@ public class NewEntryFromSourceAction extends Action {
             DNBuilder db = new DNBuilder();
             RDNBuilder rb = new RDNBuilder();
 
-            Collection pkNames = sourceConfig.getPrimaryKeyNames();
-            for (Iterator i=pkNames.iterator(); i.hasNext(); ) {
-                String pkName = (String)i.next();
+            Collection<String> pkNames = sourceConfig.getPrimaryKeyNames();
+            for (String pkName : pkNames) {
                 rb.set(pkName, "...");
             }
 
@@ -132,14 +122,13 @@ public class NewEntryFromSourceAction extends Action {
             }
 
             String sourceAlias = sourceMapping.getName();
-            for (Iterator i=sourceConfig.getFieldConfigs().iterator(); i.hasNext(); ) {
-                FieldConfig fieldConfig = (FieldConfig)i.next();
+            for (FieldConfig fieldConfig : sourceConfig.getFieldConfigs()) {
                 String fieldName = fieldConfig.getName();
 
                 AttributeMapping attributeMapping = new AttributeMapping(
                         fieldName,
                         AttributeMapping.VARIABLE,
-                        sourceAlias+"."+fieldName,
+                        sourceAlias + "." + fieldName,
                         pkNames.contains(fieldName)
                 );
 

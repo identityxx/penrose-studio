@@ -142,18 +142,13 @@ public class SourceNode extends Node {
 
     public void remove() throws Exception {
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
-        TreeViewer treeViewer = view.getTreeViewer();
-        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
-
-        boolean confirm = MessageDialog.openQuestion(shell,
+        boolean confirm = MessageDialog.openQuestion(
+                view.getSite().getShell(),
                 "Confirmation", "Remove selected sources?");
 
         if (!confirm) return;
 
-        for (Iterator i=selection.iterator(); i.hasNext(); ) {
-            Node node = (Node)i.next();
+        for (Node node : view.getSelectedNodes()) {
             if (!(node instanceof SourceNode)) continue;
 
             SourceNode sourceNode = (SourceNode)node;

@@ -31,10 +31,7 @@ import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.util.ApplicationConfig;
-import org.safehaus.penrose.studio.util.FileUtil;
 import org.apache.log4j.Logger;
-
-import java.io.File;
 
 public class SaveAction extends Action {
 
@@ -58,7 +55,7 @@ public class SaveAction extends Action {
         ApplicationConfig applicationConfig = penroseStudio.getApplicationConfig();
 
         try {
-            ServersView serversView = (ServersView)page.showView(ServersView.class.getName());
+            ServersView serversView = ServersView.getInstance();
             ProjectNode projectNode = serversView.getSelectedProjectNode();
             Project project = projectNode.getProject();
 
