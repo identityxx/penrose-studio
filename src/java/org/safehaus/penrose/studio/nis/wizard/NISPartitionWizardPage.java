@@ -21,7 +21,7 @@ public class NISPartitionWizardPage extends WizardPage implements ModifyListener
 
     public final static String NAME = "NIS Partition";
 
-    Text partitionText;
+    Text nameText;
     Text suffixText;
 
     boolean visited;
@@ -29,7 +29,7 @@ public class NISPartitionWizardPage extends WizardPage implements ModifyListener
     public NISPartitionWizardPage() {
         super(NAME);
 
-        setDescription("Enter an ID for this domain (usually the short version of the NIS domain name) and an LDAP suffix.");
+        setDescription("Enter a short name for this domain and an LDAP suffix.");
     }
 
     public void createControl(final Composite parent) {
@@ -41,14 +41,14 @@ public class NISPartitionWizardPage extends WizardPage implements ModifyListener
         composite.setLayout(sectionLayout);
 
         Label partitionLabel = new Label(composite, SWT.NONE);
-        partitionLabel.setText("ID:");
+        partitionLabel.setText("Name:");
         GridData gd = new GridData();
         gd.widthHint = 100;
         partitionLabel.setLayoutData(gd);
 
-        partitionText = new Text(composite, SWT.BORDER);
-        partitionText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        partitionText.addModifyListener(this);
+        nameText = new Text(composite, SWT.BORDER);
+        nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        nameText.addModifyListener(this);
 
         Label suffixLabel = new Label(composite, SWT.NONE);
         suffixLabel.setText("LDAP Suffix:");
@@ -62,7 +62,7 @@ public class NISPartitionWizardPage extends WizardPage implements ModifyListener
     }
 
     public boolean validatePage() {
-        if ("".equals(getPartition())) return false;
+        if ("".equals(getShortName())) return false;
         if ("".equals(getSuffix())) return false;
         return visited;
     }
@@ -75,12 +75,12 @@ public class NISPartitionWizardPage extends WizardPage implements ModifyListener
         }
     }
     
-    public void setPartition(String partition) {
-        partitionText.setText(partition);
+    public void setShortName(String name) {
+        nameText.setText(name);
     }
 
-    public String getPartition() {
-        return partitionText.getText();
+    public String getShortName() {
+        return nameText.getText();
     }
 
     public void setSuffix(String suffix) {

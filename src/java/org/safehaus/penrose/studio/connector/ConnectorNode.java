@@ -25,7 +25,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.connector.ConnectorConfig;
@@ -44,7 +43,7 @@ public class ConnectorNode extends Node {
     public ConnectorNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
         projectNode = (ProjectNode)parent;
-        this.view = projectNode.getView();
+        this.view = projectNode.getServersView();
     }
 
     public void showMenu(IMenuManager manager) {

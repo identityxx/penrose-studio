@@ -26,7 +26,7 @@ public class NISDomainWizard extends Wizard {
     NISNode nisNode;
 
     public NISDomainWizard(Project project, NISNode nisNode) {
-        setWindowTitle("New NIS Domain");
+        setWindowTitle("Add NIS Domain");
 
         this.project = project;
         this.nisNode = nisNode;
@@ -51,11 +51,11 @@ public class NISDomainWizard extends Wizard {
 
     public IWizardPage getNextPage(IWizardPage page) {
         if (domainPage == page) {
-            String partition = domainPage.getDomain();
-            int i = partition.indexOf('.');
-            if (i >= 0) partition = partition.substring(0, i);
+            String domainName = domainPage.getDomain();
+            int i = domainName.indexOf('.');
+            if (i >= 0) domainName = domainName.substring(0, i);
 
-            partitionPage.setPartition(partition);
+            partitionPage.setShortName(domainName);
 
             String suffix = domainPage.getDomain();
             suffix = "dc="+suffix.replaceAll("\\.", ",dc=");
@@ -70,9 +70,9 @@ public class NISDomainWizard extends Wizard {
 
         NISDomain domain = new NISDomain();
 
-        domain.setName(domainPage.getDomain());
+        domain.setName(partitionPage.getShortName());
+        domain.setFullName(domainPage.getDomain());
         domain.setServer(domainPage.getServer());
-        domain.setPartition(partitionPage.getPartition());
         domain.setSuffix(partitionPage.getSuffix());
 
         NISTool nisTool = nisNode.getNisTool();
@@ -89,7 +89,7 @@ public class NISDomainWizard extends Wizard {
         try {
             nisTool.createPartitionConfig(domain);
 
-            project.upload("partitions/"+domain.getPartition());
+            project.upload("partitions/"+domain.getName());
 
         } catch (Exception e) {
             MessageDialog.openError(getShell(), "Failed creating partition.", e.getMessage());
@@ -107,7 +107,7 @@ public class NISDomainWizard extends Wizard {
         }
 
         try {
-            nisTool.initPartition(domain);
+            nisTool.loadPartition(domain);
 
         } catch (Exception e) {
             MessageDialog.openError(

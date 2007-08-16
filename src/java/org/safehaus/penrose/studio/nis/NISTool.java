@@ -25,11 +25,11 @@ public class NISTool {
 
     public Logger log = Logger.getLogger(getClass());
 
-    public final static String NIS_CONNECTION_NAME = "MySQL";
-    public final static String NIS_SOURCE_NAME     = "nis";
+    public final static String NIS_PARTITION_NAME  = "nis_cache";
+    public final static String NIS_CONNECTION_NAME = "NIS";
 
-    public final static String CACHE_CONNECTION_NAME = "Cache";
-    public final static String CACHE_PARTITION_NAME  = "nis_cache";
+    public final static String CACHE_USERS  = "cache_users";
+    public final static String CACHE_GROUPS = "cache_groups";
 
     Project project;
 
@@ -45,7 +45,6 @@ public class NISTool {
 
     protected Map<String,NISDomain> nisDomains = new TreeMap<String,NISDomain>();
 
-    protected PartitionConfigs partitionConfigs = new PartitionConfigs();
     protected Partitions partitions = new Partitions();
 
     public NISTool() {
@@ -54,8 +53,8 @@ public class NISTool {
     public void init(Project project) throws Exception {
         this.project = project;
 
-        File partitionDir = new File(project.getWorkDir(), "partitions"+File.separator+NIS_SOURCE_NAME);
-        PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(NIS_SOURCE_NAME);
+        File partitionDir = new File(project.getWorkDir(), "partitions"+File.separator+NIS_PARTITION_NAME);
+        PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(NIS_PARTITION_NAME);
 
         PartitionContext partitionContext = new PartitionContext();
         partitionContext.setPath(partitionDir);
@@ -88,55 +87,52 @@ public class NISTool {
             Attributes attributes = searchResult.getAttributes();
 
             String domainName = (String)attributes.getValue("name");
-            String partitionName = (String)attributes.getValue("partition");
+            String fullName = (String)attributes.getValue("fullName");
             String server = (String)attributes.getValue("server");
             String suffix = (String)attributes.getValue("suffix");
 
             NISDomain domain = new NISDomain();
             domain.setName(domainName);
-            domain.setPartition(partitionName);
+            domain.setFullName(fullName);
             domain.setServer(server);
             domain.setSuffix(suffix);
 
             nisDomains.put(domainName, domain);
 
-            PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(partitionName);
-            partitionConfigs.addPartitionConfig(partitionConfig);
+            PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(domainName);
+            if (partitionConfig == null) continue;
 
-            initPartition(domain);
+            loadPartition(domain);
         }
     }
 
     public void createPartitionConfig(NISDomain domain) throws Exception {
 
         String domainName = domain.getName();
-        String partitionName = domain.getPartition();
+        String fullName = domain.getFullName();
         String server = domain.getServer();
         String suffix = domain.getSuffix();
 
-        log.debug("Creating partition config "+partitionName+".");
-        log.debug(" - domain: "+domainName);
+        log.debug("Creating partition "+domainName+".");
+        log.debug(" - domain: "+fullName);
         log.debug(" - server: "+server);
         log.debug(" - suffix: "+suffix);
 
-        File oldDir = new File(project.getWorkDir(), "partitions"+File.separator+CACHE_PARTITION_NAME);
-        File newDir = new File(project.getWorkDir(), "partitions"+File.separator+ partitionName);
+        File oldDir = new File(project.getWorkDir(), "partitions"+File.separator+ NIS_PARTITION_NAME);
+        File newDir = new File(project.getWorkDir(), "partitions"+File.separator+ domainName);
         FileUtil.copy(oldDir, newDir);
 
-        org.apache.tools.ant.Project project = new org.apache.tools.ant.Project();
+        org.apache.tools.ant.Project antProject = new org.apache.tools.ant.Project();
 
-        project.setProperty("nis.server", server);
-        project.setProperty("nis.domain", domainName);
+        antProject.setProperty("nis.server", server);
+        antProject.setProperty("nis.domain", fullName);
 
-        project.setProperty("cache.database", partitionName);
-
-        project.setProperty("enabled", "true");
-        project.setProperty("partition", partitionName);
-        project.setProperty("suffix", suffix);
+        antProject.setProperty("domain", domainName);
+        antProject.setProperty("suffix", suffix);
 
         Copy copy = new Copy();
         copy.setOverwrite(true);
-        copy.setProject(project);
+        copy.setProject(antProject);
 
         FileSet fs = new FileSet();
         fs.setDir(new File(newDir, "template"));
@@ -147,23 +143,23 @@ public class NISTool {
 
         FilterChain filterChain = copy.createFilterChain();
         ExpandProperties expandProperties = new ExpandProperties();
-        expandProperties.setProject(project);
+        expandProperties.setProject(antProject);
         filterChain.addExpandProperties(expandProperties);
 
         copy.execute();
 
-        PartitionConfig partitionConfig = partitionConfigs.load(newDir);
-        partitionConfigs.addPartitionConfig(partitionConfig);
+        PartitionConfig partitionConfig = project.getPartitionConfigs().load(newDir);
+        project.getPartitionConfigs().addPartitionConfig(partitionConfig);
     }
 
-    public void initPartition(NISDomain domain) throws Exception {
+    public void loadPartition(NISDomain domain) throws Exception {
 
-        String partitionName = domain.getPartition();
-        log.debug("Initializing partition "+partitionName+".");
+        String domainName = domain.getName();
+        log.debug("Loading partition "+domainName+".");
 
-        File newDir = new File(project.getWorkDir(), "partitions"+File.separator+ partitionName);
+        File newDir = new File(project.getWorkDir(), "partitions"+File.separator+ domainName);
 
-        PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(partitionName);
+        PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(domainName);
 
         PartitionContext partitionContext = new PartitionContext();
         partitionContext.setPath(newDir);
@@ -173,6 +169,10 @@ public class NISTool {
         Partition partition = new Partition();
         partition.init(partitionConfig, partitionContext);
         partitions.addPartition(partition);
+    }
+
+    public void unloadPartition(String domainName) throws Exception {
+        partitions.removePartition(domainName);
     }
 
     public void createDomain(NISDomain domain) throws Exception {
@@ -186,7 +186,7 @@ public class NISTool {
 
         Attributes attributes = new Attributes();
         attributes.setValue("name", domainName);
-        attributes.setValue("partition", domain.getPartition());
+        attributes.setValue("fullName", domain.getFullName());
         attributes.setValue("server", domain.getServer());
         attributes.setValue("suffix", domain.getSuffix());
 
@@ -197,29 +197,17 @@ public class NISTool {
 
     public void updateDomain(String oldDomainName, NISDomain domain) throws Exception {
 
-        String newDomainName = domain.getName();
-
         RDNBuilder rb = new RDNBuilder();
-        rb.set("name", oldDomainName);
+        rb.set("name", domain.getName());
         RDN rdn = rb.toRdn();
         DN dn = new DN(rdn);
 
-        rb.set("name", newDomainName);
-        RDN newRdn = rb.toRdn();
-
-        if (!dn.getRdn().equals(newRdn)) {
-            domains.modrdn(dn, newRdn, true);
-
-            nisDomains.remove(oldDomainName);
-            nisDomains.put(newDomainName, domain);
-        }
-
-        DNBuilder db = new DNBuilder();
-        db.append(newRdn);
-        db.append(dn.getParentDn());
-        DN newDn = db.toDn();
-
         Collection<Modification> modifications = new ArrayList<Modification>();
+
+        modifications.add(new Modification(
+                Modification.REPLACE,
+                new Attribute("fullName", domain.getFullName())
+        ));
 
         modifications.add(new Modification(
                 Modification.REPLACE,
@@ -231,26 +219,26 @@ public class NISTool {
                 new Attribute("suffix", domain.getSuffix())
         ));
 
-        domains.modify(newDn, modifications);
+        domains.modify(dn, modifications);
     }
 
     public void removePartitionConfig(NISDomain domain) throws Exception {
 
-        String partitionName = domain.getPartition();
-        log.debug("Removing partition "+partitionName+".");
+        String domainName = domain.getName();
+        log.debug("Removing partition "+domainName+".");
 
-        partitionConfigs.removePartitionConfig(partitionName);
+        project.getPartitionConfigs().removePartitionConfig(domainName);
 
-        File partitionDir = new File(project.getWorkDir(), "partitions"+File.separator+ partitionName);
+        File partitionDir = new File(project.getWorkDir(), "partitions"+File.separator+ domainName);
         FileUtil.delete(partitionDir);
     }
 
     public void removePartition(NISDomain domain) throws Exception {
 
-        String partitionName = domain.getPartition();
-        log.debug("Removing partition config "+partitionName+".");
+        String domainName = domain.getName();
+        log.debug("Removing partition config "+domainName+".");
 
-        partitions.removePartition(partitionName);
+        partitions.removePartition(domainName);
     }
 
     public void removeDomain(NISDomain domain) throws Exception {
@@ -260,7 +248,7 @@ public class NISTool {
 
         nisDomains.remove(domainName);
 
-        File dir = new File(project.getWorkDir(), "partitions"+File.separator+ domain.getPartition());
+        File dir = new File(project.getWorkDir(), "partitions"+File.separator+ domain.getName());
         FileUtil.delete(dir);
 
         RDNBuilder rb = new RDNBuilder();
@@ -384,14 +372,14 @@ public class NISTool {
 
     public void createDatabase(NISDomain domain) throws Exception {
 
-        log.debug("Creating database "+domain.getPartition()+".");
+        log.debug("Creating database "+domain.getName()+".");
 
         Connection connection = nisPartition.getConnection(NIS_CONNECTION_NAME);
         JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
         JDBCClient client = adapter.getClient();
-        client.createDatabase(domain.getPartition());
+        client.createDatabase(domain.getName());
 
-        PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getPartition());
+        PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(domain.getName());
         SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
         for (SourceConfig sourceConfig : sourceConfigs.getSourceConfigs()) {
             for (SourceConfig cache : getCacheConfigs(sourceConfigs, sourceConfig)) {
@@ -412,9 +400,9 @@ public class NISTool {
 
     public void loadCache(NISDomain domain) throws Exception {
 
-        log.debug("Loading cache "+domain.getPartition()+".");
+        log.debug("Loading cache "+domain.getName()+".");
 
-        Partition partition = partitions.getPartition(domain.getPartition());
+        Partition partition = partitions.getPartition(domain.getName());
         Collection<SourceSync> sourceSyncs = partition.getSourceSyncs();
         for (SourceSync sourceSync : sourceSyncs) {
             sourceSync.load();
@@ -432,9 +420,9 @@ public class NISTool {
 
     public void clearCache(NISDomain domain) throws Exception {
 
-        log.debug("Clearing cache "+domain.getPartition()+".");
+        log.debug("Clearing cache "+domain.getName()+".");
 
-        Partition partition = partitions.getPartition(domain.getPartition());
+        Partition partition = partitions.getPartition(domain.getName());
         Collection<SourceSync> caches = partition.getSourceSyncs();
         for (SourceSync sourceSync : caches) {
             sourceSync.clean();
@@ -452,12 +440,12 @@ public class NISTool {
 
     public void removeCache(NISDomain domain) throws Exception {
 
-        log.debug("Removing cache "+domain.getPartition()+".");
+        log.debug("Removing cache "+domain.getName()+".");
 
         Connection connection = nisPartition.getConnection(NIS_CONNECTION_NAME);
         JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
         JDBCClient client = adapter.getClient();
-        client.dropDatabase(domain.getPartition());
+        client.dropDatabase(domain.getName());
     }
 
     public void removeCache(NISDomain domain, Source source) throws Exception {

@@ -52,27 +52,27 @@ public class NISDomainMainPage extends FormPage {
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
 
-        Label partitionLabel = toolkit.createLabel(composite, "ID:");
+        Label partitionLabel = toolkit.createLabel(composite, "Name:");
         GridData gd = new GridData();
         gd.widthHint = 100;
         partitionLabel.setLayoutData(gd);
 
-        Label partitionText = toolkit.createLabel(composite, domain.getPartition());
+        Label partitionText = toolkit.createLabel(composite, domain.getName());
         partitionText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Label domainLabel = toolkit.createLabel(composite, "Domain:");
+        Label domainLabel = toolkit.createLabel(composite, "NIS Domain:");
         domainLabel.setLayoutData(new GridData());
 
-        Label domainText = toolkit.createLabel(composite, domain.getName());
+        Label domainText = toolkit.createLabel(composite, domain.getFullName());
         domainText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Label serverLabel = toolkit.createLabel(composite, "Server:");
+        Label serverLabel = toolkit.createLabel(composite, "NIS Server:");
         serverLabel.setLayoutData(new GridData());
 
         Label serverText = toolkit.createLabel(composite, domain.getServer());
         serverText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Label suffixLabel = toolkit.createLabel(composite, "Suffix:");
+        Label suffixLabel = toolkit.createLabel(composite, "LDAP Suffix:");
         suffixLabel.setLayoutData(new GridData());
 
         Label suffixText = toolkit.createLabel(composite, domain.getSuffix());

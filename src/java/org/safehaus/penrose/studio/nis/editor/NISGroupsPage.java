@@ -72,7 +72,7 @@ public class NISGroupsPage extends FormPage {
 
     public void refresh() {
         try {
-            Partition partition = nisTool.getPartitions().getPartition(domain.getPartition());
+            Partition partition = nisTool.getPartitions().getPartition(domain.getName());
             Source source = partition.getSource(SOURCE_NAME);
 
             JDBCAdapter adapter = (JDBCAdapter)source.getConnection().getAdapter();

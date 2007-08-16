@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -42,7 +43,7 @@ import java.util.ArrayList;
  */
 public class ProjectNode extends Node {
 
-    protected ServersView view;
+    protected ServersView serversView;
 
     protected ProjectConfig projectConfig;
     protected Project project;
@@ -54,10 +55,10 @@ public class ProjectNode extends Node {
     protected ServicesNode   servicesNode;
     protected LoggingNode    loggingNode;
 
-    public ProjectNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
+    public ProjectNode(ServersView serversView, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
 
-        this.view = view;
+        this.serversView = serversView;
 
         projectConfig = (ProjectConfig)object;
         project = new Project(projectConfig);
@@ -65,7 +66,7 @@ public class ProjectNode extends Node {
 
     public void showMenu(IMenuManager manager) {
 
-        manager.add(new Action("Open") {
+        manager.add(new Action("Connect") {
             public void run() {
                 try {
                     open();
@@ -78,7 +79,7 @@ public class ProjectNode extends Node {
             }
         });
 
-        manager.add(new Action("Close") {
+        manager.add(new Action("Disconnect") {
             public void run() {
                 try {
                     close();
@@ -147,16 +148,13 @@ public class ProjectNode extends Node {
             }
         });
 
-        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
+        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.SIZE_16x16, PenroseImage.DELETE)) {
             public void run() {
                 try {
                     remove();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
-            }
-            public boolean isEnabled() {
-                return !project.isConnected();
             }
         });
 
@@ -179,7 +177,7 @@ public class ProjectNode extends Node {
     public void open() throws Exception {
         if (!project.isConnected()) connect();
 
-        view.open(this);
+        serversView.open(this);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
@@ -187,7 +185,7 @@ public class ProjectNode extends Node {
 
     public void close() throws Exception {
         disconnect();
-        view.close(this);
+        serversView.close(this);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
@@ -197,7 +195,7 @@ public class ProjectNode extends Node {
         project.connect();
 
         partitionsNode = new PartitionsNode(
-                view,
+                serversView,
                 "Partitions",
                 "Partitions",
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
@@ -222,7 +220,7 @@ public class ProjectNode extends Node {
         children.add(servicesNode);
 
         loggingNode = new LoggingNode(
-                view,
+                serversView,
                 "Logging",
                 "Logging",
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
@@ -231,7 +229,7 @@ public class ProjectNode extends Node {
         children.add(loggingNode);
 
         children.add(new HandlersNode(
-                view,
+                serversView,
                 "Handlers",
                 "Handlers",
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
@@ -240,7 +238,7 @@ public class ProjectNode extends Node {
         ));
 
         children.add(new EnginesNode(
-                view,
+                serversView,
                 "Engines",
                 "Engines",
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
@@ -249,7 +247,7 @@ public class ProjectNode extends Node {
         ));
 
         children.add(new ConnectorNode(
-                view,
+                serversView,
                 "Connector",
                 "Connector",
                 PenrosePlugin.getImage(PenroseImage.CONNECTOR),
@@ -287,7 +285,6 @@ public class ProjectNode extends Node {
 
     public void disconnect() throws Exception {
         children.clear();
-
         project.close();
     }
 
@@ -295,7 +292,7 @@ public class ProjectNode extends Node {
 
         String oldProjectName = projectConfig.getName();
 
-        Shell shell = view.getSite().getShell();
+        Shell shell = serversView.getSite().getShell();
         ProjectEditorDialog dialog = new ProjectEditorDialog(shell, SWT.NONE);
         dialog.setProjectConfig(projectConfig);
         dialog.open();
@@ -314,8 +311,15 @@ public class ProjectNode extends Node {
     }
 
     public void remove() throws Exception {
-        ServersView view = ServersView.getInstance();
-        view.removeProjectConfig(projectConfig.getName());
+
+        boolean confirm = MessageDialog.openQuestion(
+                serversView.getSite().getShell(),
+                "Removing Server", "Are you sure?"
+        );
+
+        if (!confirm) return;
+
+        serversView.removeProjectConfig(projectConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
@@ -407,8 +411,8 @@ public class ProjectNode extends Node {
         this.projectConfig = projectConfig;
     }
 
-    public ServersView getView() {
-        return view;
+    public ServersView getServersView() {
+        return serversView;
     }
 
     public Project getProject() {

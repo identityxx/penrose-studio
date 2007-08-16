@@ -265,12 +265,11 @@ public class NISGroupScriptsPage extends FormPage {
                     TableItem item = groupsTable.getSelection()[0];
 
                     Attributes attributes = (Attributes)item.getData();
-                    String domain = (String)attributes.getValue("domain");
-                    String partition = (String)attributes.getValue("partition");
+                    String domainName = (String)attributes.getValue("domain");
                     String cn = (String)attributes.getValue("cn");
                     Integer origGidNumber = (Integer)attributes.getValue("origGidNumber");
 
-                    edit(domain, partition, cn, origGidNumber);
+                    edit(domainName, cn, origGidNumber);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -329,8 +328,7 @@ public class NISGroupScriptsPage extends FormPage {
             Attributes attrs = searchResults.getAttributes();
 
             final String domainName = (String) attrs.getValue("name");
-            String partitionName = (String) attrs.getValue("partition");
-            Partition partition = nisTool.getPartitions().getPartition(partitionName);
+            Partition partition = nisTool.getPartitions().getPartition(domainName);
 
             if (domain.getName().equals(domainName)) continue;
 
@@ -440,21 +438,20 @@ public class NISGroupScriptsPage extends FormPage {
     }
 
     public void edit(
-            String domain,
-            String partitionName,
+            String domainName,
             String cn,
             Integer origGidNumber
     ) throws Exception {
 
-        Partition partition = nisTool.getPartitions().getPartition(partitionName);
+        Partition partition = nisTool.getPartitions().getPartition(domainName);
 
         RDNBuilder rb = new RDNBuilder();
-        rb.set("domain", domain);
+        rb.set("domain", domainName);
         rb.set("cn", cn);
         DN dn = new DN(rb.toRdn());
 
         NISGroupDialog dialog = new NISGroupDialog(getSite().getShell(), SWT.NONE);
-        dialog.setDomain(domain);
+        dialog.setDomain(domainName);
         dialog.setName(cn);
         dialog.setOrigGidNumber(origGidNumber);
 
@@ -503,7 +500,7 @@ public class NISGroupScriptsPage extends FormPage {
             if (!origGidNumber.equals(newGidNumber)) checkGidNumber(cn, newGidNumber);
 
             Attributes attrs = new Attributes();
-            attrs.setValue("domain", domain);
+            attrs.setValue("domain", domainName);
             attrs.setValue("cn", cn);
             attrs.setValue("origGidNumber", origGidNumber);
             attrs.setValue("gidNumber", newGidNumber);
@@ -560,8 +557,7 @@ public class NISGroupScriptsPage extends FormPage {
             Attributes attributes = searchResults.getAttributes();
 
             String domainName = (String) attributes.getValue("name");
-            String partitionName = (String) attributes.getValue("partition");
-            Partition partition2 = nisTool.getPartitions().getPartition(partitionName);
+            Partition partition2 = nisTool.getPartitions().getPartition(domainName);
 
             response = new SearchResponse<SearchResult>();
 

@@ -68,8 +68,8 @@ public class NISDomainDialog extends Dialog {
     }
 
     public void reset() {
-        String name = domain.getName();
-        domainText.setText(name == null ? "" : name);
+        String fullName = domain.getFullName();
+        domainText.setText(fullName == null ? "" : fullName);
 
         String server = domain.getServer();
         serverText.setText(server == null ? "" : server);
@@ -96,7 +96,7 @@ public class NISDomainDialog extends Dialog {
         composite.setLayout(new GridLayout(2, false));
 
         Label domainLabel = new Label(composite, SWT.NONE);
-        domainLabel.setText("Domain:");
+        domainLabel.setText("NIS Domain:");
         GridData gd = new GridData();
         gd.widthHint = 100;
         domainLabel.setLayoutData(gd);
@@ -105,14 +105,14 @@ public class NISDomainDialog extends Dialog {
         domainText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label serverLabel = new Label(composite, SWT.NONE);
-        serverLabel.setText("Server:");
+        serverLabel.setText("NIS Server:");
         serverLabel.setLayoutData(new GridData());
 
         serverText = new Text(composite, SWT.BORDER);
         serverText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label suffixLabel = new Label(composite, SWT.NONE);
-        suffixLabel.setText("Suffix:");
+        suffixLabel.setText("LDAP Suffix:");
         suffixLabel.setLayoutData(new GridData());
 
         suffixText = new Text(composite, SWT.BORDER);
@@ -142,8 +142,8 @@ public class NISDomainDialog extends Dialog {
         okButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
 
-                String name = domainText.getText();
-                domain.setName("".equals(name) ? null : name);
+                String fullName = domainText.getText();
+                domain.setFullName("".equals(fullName) ? null : fullName);
 
                 String server = serverText.getText();
                 domain.setServer("".equals(server) ? null : server);

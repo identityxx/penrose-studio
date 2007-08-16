@@ -31,15 +31,15 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.apache.log4j.Logger;
 
-public class NewAction extends Action {
+public class NewProjectAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
-	public NewAction() {
-        setText("&New Connection...");
+	public NewProjectAction() {
+        setText("&New Server...");
         setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.NEW));
         setAccelerator(SWT.CTRL | 'N');
-        setToolTipText("New Connection...");
+        setToolTipText("New Server");
         setId(getClass().getName());
 	}
 	
@@ -60,21 +60,15 @@ public class NewAction extends Action {
 
             if (dialog.getAction() == ProjectEditorDialog.CANCEL) return;
 
-            ServersView view = ServersView.getInstance();
-            view.addProjectConfig(projectConfig);
+            ServersView serversView = ServersView.getInstance();
+            serversView.addProjectConfig(projectConfig);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-
-            MessageDialog.openError(
-                    shell,
-                    "ERROR",
-                    "Failed creating project.\n"+
-                            "See penrose-studio.log for details."
-            );
+            MessageDialog.openError(shell, "Action Failed.", e.getMessage());
         }
 	}
 	

@@ -25,7 +25,6 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -68,7 +67,7 @@ public class ConnectionNode extends Node {
         partitionNode = connectionsNode.getPartitionNode();
         partitionsNode = partitionNode.getPartitionsNode();
         projectNode = partitionsNode.getProjectNode();
-        this.view = projectNode.getView();
+        this.view = projectNode.getServersView();
     }
 
     public void showMenu(IMenuManager manager) {
@@ -109,7 +108,7 @@ public class ConnectionNode extends Node {
             }
         });
 
-        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
+        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.SIZE_16x16, PenroseImage.DELETE)) {
             public void run() {
                 try {
                     remove();

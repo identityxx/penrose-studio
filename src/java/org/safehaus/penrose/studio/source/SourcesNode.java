@@ -67,7 +67,7 @@ public class SourcesNode extends Node {
 
         partitionsNode = partitionNode.getPartitionsNode();
         projectNode = partitionsNode.getProjectNode();
-        view = projectNode.getView();
+        view = projectNode.getServersView();
     }
 
     public void showMenu(IMenuManager manager) {

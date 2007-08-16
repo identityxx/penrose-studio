@@ -19,26 +19,31 @@ package org.safehaus.penrose.studio;
 
 public class PenroseImage {
 
+    public final static String SIZE_16x16        = "16x16";
+    public final static String SIZE_22x22        = "22x22";
+
+    public final static String DELETE            = "delete.png";
+    public final static String CONNECT           = "connect.png";
+    public final static String DISCONNECT        = "disconnect.png";
+
     public final static String WELCOME           = "images/3steps.png";
 
     public final static String NEW               = "images/filenew.png";
-    public final static String CONNECT           = "images/connect_to_penrose.png";
     public final static String SAVE              = "images/save.png";
     public final static String UPLOAD            = "images/upload.png";
 
     public final static String EXIT              = "images/exit.png";
     public final static String REFRESH           = "images/refresh.png";
 	public final static String ADD               = "images/folder-add.gif";
-	public final static String DELETE            = "images/delete.gif";
 	public final static String KEY               = "images/key.gif";
 	public final static String NOKEY             = "images/nokey.gif";
 	public final static String SOURCE            = "images/source.gif";
     public final static String CONNECTION        = "images/server.png";
 	public final static String FOLDER            = "images/folder_yellow.png";
     public final static String OPEN_FOLDER       = "images/folder_yellow_open.png";
+    public final static String RED_FOLDER        = "images/folder_red.png";
 	public final static String HOME_NODE         = "images/home.gif";
 	public final static String DYNAMIC_NODE      = "images/folder-mapped.gif";
-	public final static String NODE              = "images/folder_yellow.png";
     public final static String HANDLER           = "images/engine.png";
     public final static String ENGINE            = "images/engine.png";
     public final static String CONNECTOR         = "images/connector.png";

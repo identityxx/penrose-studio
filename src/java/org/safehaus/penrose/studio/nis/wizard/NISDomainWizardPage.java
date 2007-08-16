@@ -27,7 +27,7 @@ public class NISDomainWizardPage extends WizardPage implements ModifyListener {
     public NISDomainWizardPage() {
         super(NAME);
 
-        setDescription("Enter NIS domain name and server name.");
+        setDescription("Enter NIS domain name and NIS server name.");
     }
 
     public void createControl(final Composite parent) {
@@ -39,7 +39,7 @@ public class NISDomainWizardPage extends WizardPage implements ModifyListener {
         composite.setLayout(sectionLayout);
 
         Label domainLabel = new Label(composite, SWT.NONE);
-        domainLabel.setText("Domain:");
+        domainLabel.setText("NIS Domain:");
         GridData gd = new GridData();
         gd.widthHint = 100;
         domainLabel.setLayoutData(gd);
@@ -49,7 +49,7 @@ public class NISDomainWizardPage extends WizardPage implements ModifyListener {
         domainText.addModifyListener(this);
 
         Label serverLabel = new Label(composite, SWT.NONE);
-        serverLabel.setText("Server:");
+        serverLabel.setText("NIS Server:");
         serverLabel.setLayoutData(new GridData());
 
         serverText = new Text(composite, SWT.BORDER);

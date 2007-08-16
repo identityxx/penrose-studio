@@ -266,11 +266,10 @@ public class NISUserScriptsPage extends FormPage {
 
                     Attributes attributes = (Attributes)item.getData();
                     String domain = (String)attributes.getValue("domain");
-                    String partition = (String)attributes.getValue("partition");
                     String uid = (String)attributes.getValue("uid");
                     Integer origUidNumber = (Integer)attributes.getValue("origUidNumber");
 
-                    edit(domain, partition, uid, origUidNumber);
+                    edit(domain, uid, origUidNumber);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -329,8 +328,7 @@ public class NISUserScriptsPage extends FormPage {
             Attributes attrs = searchResults.getAttributes();
 
             final String domainName = (String) attrs.getValue("name");
-            String partitionName = (String) attrs.getValue("partition");
-            Partition partition = nisTool.getPartitions().getPartition(partitionName);
+            Partition partition = nisTool.getPartitions().getPartition(domainName);
 
             if (domain.getName().equals(domainName)) continue;
 
@@ -440,21 +438,20 @@ public class NISUserScriptsPage extends FormPage {
     }
 
     public void edit(
-            String domain,
-            String partitionName,
+            String domainName,
             String uid,
             Integer origUidNumber
     ) throws Exception {
 
-        Partition partition = nisTool.getPartitions().getPartition(partitionName);
+        Partition partition = nisTool.getPartitions().getPartition(domainName);
 
         RDNBuilder rb = new RDNBuilder();
-        rb.set("domain", domain);
+        rb.set("domain", domainName);
         rb.set("uid", uid);
         DN dn = new DN(rb.toRdn());
 
         NISUserDialog dialog = new NISUserDialog(getSite().getShell(), SWT.NONE);
-        dialog.setDomain(domain);
+        dialog.setDomain(domainName);
         dialog.setUid(uid);
         dialog.setOrigUidNumber(origUidNumber);
 
@@ -487,7 +484,7 @@ public class NISUserScriptsPage extends FormPage {
             if (!origUidNumber.equals(uidNumber)) checkUidNumber(uid, uidNumber);
 
             Attributes attrs = new Attributes();
-            attrs.setValue("domain", domain);
+            attrs.setValue("domain", domainName);
             attrs.setValue("uid", uid);
             attrs.setValue("origUidNumber", origUidNumber);
             attrs.setValue("uidNumber", uidNumber);
@@ -544,8 +541,7 @@ public class NISUserScriptsPage extends FormPage {
             Attributes attributes = searchResults.getAttributes();
 
             String domainName = (String) attributes.getValue("name");
-            String partitionName = (String) attributes.getValue("partition");
-            Partition partition2 = nisTool.getPartitions().getPartition(partitionName);
+            Partition partition2 = nisTool.getPartitions().getPartition(domainName);
 
             response = new SearchResponse<SearchResult>();
 

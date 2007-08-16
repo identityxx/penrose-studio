@@ -68,7 +68,7 @@ public class PartitionNode extends Node {
 
         partitionsNode = (PartitionsNode)parent;
         projectNode = partitionsNode.getProjectNode();
-        view = projectNode.getView();
+        view = projectNode.getServersView();
 
         DirectoryNode directoryNode = new DirectoryNode(
                 ServersView.DIRECTORY,
@@ -173,7 +173,7 @@ public class PartitionNode extends Node {
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
+        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.SIZE_16x16, PenroseImage.DELETE)) {
             public void run() {
                 try {
                     remove();

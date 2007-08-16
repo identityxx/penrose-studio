@@ -219,7 +219,7 @@ public class NISCachePage extends FormPage {
         try {
             cacheTable.removeAll();
 
-            Partition partition = nisTool.getPartitions().getPartition(domain.getPartition());
+            Partition partition = nisTool.getPartitions().getPartition(domain.getName());
 
             for (final String label : sourceNames.keySet()) {
                 final String sourceName = sourceNames.get(label);

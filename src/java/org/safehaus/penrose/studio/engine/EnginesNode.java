@@ -41,7 +41,7 @@ public class EnginesNode extends Node {
     public EnginesNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
         projectNode = (ProjectNode)parent;
-        this.view = projectNode.getView();
+        this.view = projectNode.getServersView();
     }
 
     public boolean hasChildren() throws Exception {

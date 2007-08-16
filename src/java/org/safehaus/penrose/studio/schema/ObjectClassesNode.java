@@ -48,7 +48,7 @@ public class ObjectClassesNode extends Node {
         super(name, type, image, object, parent);
         schemaNode = (SchemaNode)parent;
         projectNode = schemaNode.getProjectNode();
-        this.view = projectNode.getView();
+        this.view = projectNode.getServersView();
     }
 
     public boolean hasChildren() throws Exception {

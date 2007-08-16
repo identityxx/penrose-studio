@@ -60,7 +60,7 @@ public class LoggerNode extends Node {
             }
         });
 
-        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
+        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.SIZE_16x16, PenroseImage.DELETE)) {
             public void run() {
                 try {
                     remove();

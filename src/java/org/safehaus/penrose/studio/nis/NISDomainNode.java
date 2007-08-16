@@ -10,21 +10,18 @@ import org.safehaus.penrose.studio.nis.editor.NISDomainEditor;
 import org.safehaus.penrose.studio.nis.editor.NISDomainDialog;
 import org.safehaus.penrose.studio.nis.editor.NISUserDialog;
 import org.safehaus.penrose.nis.NISDomain;
+import org.safehaus.penrose.partition.Partition;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 
-import java.util.Iterator;
 import java.util.Collection;
 import java.util.ArrayList;
 
@@ -44,11 +41,17 @@ public class NISDomainNode extends Node {
         super(name, type, image, object, parent);
 
         domain = (NISDomain)object;
+        
         nisNode = (NISNode)parent;
         projectNode = nisNode.getProjectNode();
-        view = projectNode.getView();
+        view = projectNode.getServersView();
 
         nisTool = nisNode.getNisTool();
+    }
+
+    public Image getImage() {
+        Partition partition = nisTool.getPartitions().getPartition(domain.getName());
+        return PenrosePlugin.getImage(partition == null ? PenroseImage.RED_FOLDER : PenroseImage.FOLDER);
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -85,10 +88,20 @@ public class NISDomainNode extends Node {
             }
         });
 
-        manager.add(new Action("Initialize Partition") {
+        manager.add(new Action("Load Partition") {
             public void run() {
                 try {
-                    initPartition();
+                    loadPartition();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Action("Unload Partition") {
+            public void run() {
+                try {
+                    unloadPartition();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
@@ -169,7 +182,7 @@ public class NISDomainNode extends Node {
             }
         });
 */
-        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
+        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.SIZE_16x16, PenroseImage.DELETE)) {
             public void run() {
                 try {
                     remove();
@@ -234,9 +247,9 @@ public class NISDomainNode extends Node {
             nisTool.removePartitionConfig(domain);
             nisTool.removeDomain(domain);
 
-            project.removeDirectory("partitions/"+domain.getPartition());
+            project.removeDirectory("partitions/"+domain.getName());
 
-            nisNode.removeNisDomain(domain.getPartition());
+            nisNode.removeNisDomain(domain.getName());
         }
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -261,18 +274,18 @@ public class NISDomainNode extends Node {
             NISDomain domain = domainNode.getDomain();
 
             nisTool.createPartitionConfig(domain);
-            project.upload("partitions/"+domain.getPartition());
+            project.upload("partitions/"+domain.getName());
         }
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
 
-    public void initPartition() throws Exception {
+    public void loadPartition() throws Exception {
 
         boolean confirm = MessageDialog.openQuestion(
                 view.getSite().getShell(),
-                "Initializing Partition", "Are you sure?"
+                "Loading Partition", "Are you sure?"
         );
 
         if (!confirm) return;
@@ -283,7 +296,29 @@ public class NISDomainNode extends Node {
             NISDomainNode domainNode = (NISDomainNode)node;
             NISDomain domain = domainNode.getDomain();
 
-            nisTool.initPartition(domain);
+            nisTool.loadPartition(domain);
+        }
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
+    }
+
+    public void unloadPartition() throws Exception {
+
+        boolean confirm = MessageDialog.openQuestion(
+                view.getSite().getShell(),
+                "Unloading Partition", "Are you sure?"
+        );
+
+        if (!confirm) return;
+
+        for (Node node : view.getSelectedNodes()) {
+            if (!(node instanceof NISDomainNode)) continue;
+
+            NISDomainNode domainNode = (NISDomainNode)node;
+            NISDomain domain = domainNode.getDomain();
+
+            nisTool.unloadPartition(domain.getName());
         }
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -310,7 +345,7 @@ public class NISDomainNode extends Node {
             nisTool.removePartition(domain);
             nisTool.removePartitionConfig(domain);
 
-            project.removeDirectory("partitions/"+domain.getPartition());
+            project.removeDirectory("partitions/"+domain.getName());
         }
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -424,7 +459,7 @@ public class NISDomainNode extends Node {
                 view,
                 "Users",
                 "Users",
-                PenrosePlugin.getImage(PenroseImage.NODE),
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
                 null,
                 this
         );
@@ -438,7 +473,7 @@ public class NISDomainNode extends Node {
                 view,
                 "Groups",
                 "Groups",
-                PenrosePlugin.getImage(PenroseImage.NODE),
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
                 null,
                 this
         );
@@ -452,7 +487,7 @@ public class NISDomainNode extends Node {
                 view,
                 "Alignment Tool",
                 "Alignment Tool",
-                PenrosePlugin.getImage(PenroseImage.NODE),
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
                 null,
                 this
         );

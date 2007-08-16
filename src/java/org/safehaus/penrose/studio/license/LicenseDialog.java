@@ -64,8 +64,8 @@ public class LicenseDialog extends Dialog {
         super(parent);
 
         penroseImage = PenrosePlugin.getImage(PenroseImage.LOGO16);
-        connectImage = PenrosePlugin.getImage(PenroseImage.CONNECT);
-        deleteImage = PenrosePlugin.getImage(PenroseImage.DELETE);
+        connectImage = PenrosePlugin.getImage(PenroseImage.SIZE_16x16, PenroseImage.CONNECT);
+        deleteImage = PenrosePlugin.getImage(PenroseImage.SIZE_16x16, PenroseImage.DELETE);
 
         shell = parent;
 

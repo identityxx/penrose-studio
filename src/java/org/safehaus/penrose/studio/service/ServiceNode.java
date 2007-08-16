@@ -27,7 +27,6 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.safehaus.penrose.service.ServiceConfigs;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
@@ -58,7 +57,7 @@ public class ServiceNode extends Node {
         serviceConfig = (ServiceConfig)object;
         servicesNode = (ServicesNode)parent;
         projectNode = servicesNode.getProjectNode();
-        view = projectNode.getView();
+        view = projectNode.getServersView();
     }
 
     public void showMenu(IMenuManager manager) {
@@ -76,7 +75,7 @@ public class ServiceNode extends Node {
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
+        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.SIZE_16x16, PenroseImage.DELETE)) {
             public void run() {
                 try {
                     remove();

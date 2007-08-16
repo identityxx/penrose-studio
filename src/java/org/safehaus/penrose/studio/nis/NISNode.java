@@ -12,7 +12,6 @@ import org.safehaus.penrose.studio.nis.editor.NISEditorInput;
 import org.safehaus.penrose.studio.nis.editor.NISEditor;
 import org.safehaus.penrose.nis.NISDomain;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
@@ -42,7 +41,7 @@ public class NISNode extends Node {
     public NISNode(String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
         projectNode = (ProjectNode)parent;
-        view = projectNode.getView();
+        view = projectNode.getServersView();
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -59,10 +58,10 @@ public class NISNode extends Node {
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        manager.add(new Action("New Domain...") {
+        manager.add(new Action("Add Domain...") {
             public void run() {
                 try {
-                    newDomain();
+                    addDomain();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
@@ -116,21 +115,23 @@ public class NISNode extends Node {
         started = true;
     }
 
-    public void addNisDomain(NISDomain nisDomain) {
+    public void addNisDomain(NISDomain domain) {
+
+        String domainName = domain.getName();
 
         NISDomainNode node = new NISDomainNode(
-                nisDomain.getPartition(),
+                domainName,
                 ServersView.ENTRY,
-                PenrosePlugin.getImage(PenroseImage.NODE),
-                nisDomain,
+                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                domain,
                 this
         );
 
-        children.put(nisDomain.getPartition(), node);
+        children.put(domainName, node);
     }
 
-    public void removeNisDomain(String partitionName) {
-        children.remove(partitionName);
+    public void removeNisDomain(String domainName) {
+        children.remove(domainName);
     }
 
     public boolean hasChildren() throws Exception {
@@ -142,7 +143,7 @@ public class NISNode extends Node {
         return children.values();
     }
 
-    public void newDomain() throws Exception {
+    public void addDomain() throws Exception {
 
         NISDomainWizard wizard = new NISDomainWizard(projectNode.getProject(), this);
         WizardDialog dialog = new WizardDialog(view.getSite().getShell(), wizard);

@@ -91,6 +91,11 @@ public class PenrosePlugin extends AbstractUIPlugin {
 		return resourceBundle;
 	}
 
+    public static ImageDescriptor getImageDescriptor(String size, String name) {
+        String path = "images/"+size+"/"+name;
+        return getImageDescriptor(path);
+    }
+
     public static ImageDescriptor getImageDescriptor(String path) {
         return AbstractUIPlugin.imageDescriptorFromPlugin("org.safehaus.penrose", path);
     }
@@ -104,4 +109,15 @@ public class PenrosePlugin extends AbstractUIPlugin {
         }
         return image;
 	}
+
+    public static Image getImage(String size, String name) {
+        String path = "images/"+size+"/"+name;
+        Image image = images.get(path);
+        if (image == null) {
+            ImageDescriptor descriptor = PenrosePlugin.getImageDescriptor(path);
+            image = descriptor.createImage();
+            images.put(path, image);
+        }
+        return image;
+    }
 }

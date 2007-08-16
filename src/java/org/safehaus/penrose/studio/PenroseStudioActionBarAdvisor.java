@@ -37,9 +37,7 @@ import org.safehaus.penrose.studio.partition.action.ImportPartitionAction;
 import org.safehaus.penrose.studio.partition.action.NewLDAPSnapshotPartitionAction;
 import org.safehaus.penrose.studio.partition.action.NewLDAPProxyPartitionAction;
 import org.safehaus.penrose.studio.service.action.NewServiceAction;
-import org.safehaus.penrose.studio.project.action.NewAction;
-import org.safehaus.penrose.studio.project.action.SaveAction;
-import org.safehaus.penrose.studio.project.action.UploadAction;
+import org.safehaus.penrose.studio.project.action.*;
 import org.safehaus.penrose.studio.schema.action.ImportSchemaAction;
 import org.safehaus.penrose.studio.schema.action.NewSchemaAction;
 import org.safehaus.penrose.studio.browser.action.BrowserAction;
@@ -49,8 +47,12 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
 
     Logger log = Logger.getLogger(getClass());
 
-    NewAction newAction;
-    SaveAction saveAction;
+    NewProjectAction newProjectAction;
+    DeleteProjectAction deleteProjectAction;
+
+    ConnectAction connectAction;
+    DisconnectAction disconnectAction;
+
     UploadAction uploadAction;
     IAction quitAction;
 
@@ -90,11 +92,17 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
         super.makeActions(window);
 
         try {
-            newAction = new NewAction();
-            register(newAction);
+            newProjectAction = new NewProjectAction();
+            register(newProjectAction);
 
-            saveAction = new SaveAction();
-            register(saveAction);
+            deleteProjectAction = new DeleteProjectAction();
+            register(deleteProjectAction);
+
+            connectAction = new ConnectAction();
+            register(connectAction);
+
+            disconnectAction = new DisconnectAction();
+            register(disconnectAction);
 
             uploadAction = new UploadAction();
             register(uploadAction);
@@ -166,10 +174,16 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
             MenuManager fileMenu = new MenuManager("&File", "file");
             menuBar.add(fileMenu);
 
-            fileMenu.add(newAction);
+            fileMenu.add(newProjectAction);
+            fileMenu.add(deleteProjectAction);
+
             fileMenu.add(new Separator());
-            fileMenu.add(saveAction);
+
+            fileMenu.add(connectAction);
+            fileMenu.add(disconnectAction);
+
             fileMenu.add(new Separator());
+
             fileMenu.add(uploadAction);
             fileMenu.add(restartAction);
 
@@ -222,28 +236,24 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
             IToolBarManager standardToolBar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
             coolBar.add(new ToolBarContributionItem(standardToolBar, "standard"));
             
-            ActionContributionItem connectCI = new ActionContributionItem(newAction);
-            standardToolBar.add(connectCI);
-
-            ActionContributionItem saveCI = new ActionContributionItem(saveAction);
-            standardToolBar.add(saveCI);
+            standardToolBar.add(new ActionContributionItem(newProjectAction));
+            standardToolBar.add(new ActionContributionItem(deleteProjectAction));
             
             standardToolBar.add(new Separator());
-            
-            ActionContributionItem uploadCI = new ActionContributionItem(uploadAction);
-            standardToolBar.add(uploadCI);
 
-            ActionContributionItem restartCI = new ActionContributionItem(restartAction);
-            standardToolBar.add(restartCI);
+            standardToolBar.add(new ActionContributionItem(connectAction));
+            standardToolBar.add(new ActionContributionItem(disconnectAction));
+
+            standardToolBar.add(new Separator());
+
+            standardToolBar.add(new ActionContributionItem(uploadAction));
+            standardToolBar.add(new ActionContributionItem(restartAction));
 
             IToolBarManager previewToolBar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
             coolBar.add(new ToolBarContributionItem(previewToolBar, "preview"));
 
-            ActionContributionItem previewCI = new ActionContributionItem(previewAction);
-            previewToolBar.add(previewCI);
-
-            ActionContributionItem browserCI = new ActionContributionItem(browserAction);
-            previewToolBar.add(browserCI);
+            previewToolBar.add(new ActionContributionItem(previewAction));
+            previewToolBar.add(new ActionContributionItem(browserAction));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

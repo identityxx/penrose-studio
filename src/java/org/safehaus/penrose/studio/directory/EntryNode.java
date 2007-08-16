@@ -21,9 +21,6 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -47,7 +44,6 @@ import org.apache.log4j.Logger;
 
 import java.util.Collection;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
@@ -77,7 +73,7 @@ public class EntryNode extends Node {
         partitionNode = directoryNode.getPartitionNode();
         partitionsNode = partitionNode.getPartitionsNode();
         projectNode = partitionsNode.getProjectNode();
-        view = projectNode.getView();
+        view = projectNode.getServersView();
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -141,7 +137,7 @@ public class EntryNode extends Node {
             }
         });
 
-        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
+        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.SIZE_16x16, PenroseImage.DELETE)) {
             public void run() {
                 try {
                     remove();
@@ -238,7 +234,7 @@ public class EntryNode extends Node {
             EntryNode entryNode = new EntryNode(
                     childMapping.getRdn().toString(),
                     ServersView.ENTRY,
-                    PenrosePlugin.getImage(PenroseImage.NODE),
+                    PenrosePlugin.getImage(PenroseImage.FOLDER),
                     childMapping,
                     this
             );

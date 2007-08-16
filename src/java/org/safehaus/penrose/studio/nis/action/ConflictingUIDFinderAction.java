@@ -8,6 +8,7 @@ import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.ldap.Attributes;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.nis.NISDomain;
+import org.safehaus.penrose.studio.nis.NISTool;
 
 import java.util.*;
 import java.sql.ResultSet;
@@ -16,8 +17,6 @@ import java.sql.ResultSet;
  * @author Endi S. Dewata
  */
 public class ConflictingUIDFinderAction extends NISAction {
-
-    public final static String CACHE_USERS = "cache_users";
 
     public ConflictingUIDFinderAction() throws Exception {
         setName("Conflicting UID Finder");
@@ -50,11 +49,11 @@ public class ConflictingUIDFinderAction extends NISAction {
 
         log.debug("Checking conflicts between "+domain1.getName()+" and "+domain2.getName()+".");
 
-        final Partition partition1 = nisTool.getPartitions().getPartition(domain1.getPartition());
-        final Source source1 = partition1.getSource(CACHE_USERS);
+        final Partition partition1 = nisTool.getPartitions().getPartition(domain1.getName());
+        final Source source1 = partition1.getSource(NISTool.CACHE_USERS);
 
-        final Partition partition2 = nisTool.getPartitions().getPartition(domain2.getPartition());
-        final Source source2 = partition2.getSource(CACHE_USERS);
+        final Partition partition2 = nisTool.getPartitions().getPartition(domain2.getName());
+        final Source source2 = partition2.getSource(NISTool.CACHE_USERS);
 
         JDBCAdapter adapter1 = (JDBCAdapter)source1.getConnection().getAdapter();
         JDBCClient client1 = adapter1.getClient();
@@ -91,14 +90,12 @@ public class ConflictingUIDFinderAction extends NISAction {
 
                 Attributes attributes1 = new Attributes();
                 attributes1.setValue("domain", domain1.getName());
-                attributes1.setValue("partition", domain1.getPartition());
                 attributes1.setValue("uid", uid1);
                 attributes1.setValue("origUidNumber", origUidNumber1);
                 attributes1.setValue("uidNumber", uidNumber1);
 
                 Attributes attributes2 = new Attributes();
                 attributes2.setValue("domain", domain2.getName());
-                attributes2.setValue("partition", domain2.getPartition());
                 attributes2.setValue("uid", uid2);
                 attributes2.setValue("origUidNumber", origUidNumber2);
                 attributes2.setValue("uidNumber", uidNumber2);

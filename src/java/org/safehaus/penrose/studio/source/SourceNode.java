@@ -21,13 +21,10 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -44,8 +41,6 @@ import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
-
-import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
@@ -70,7 +65,7 @@ public class SourceNode extends Node {
         partitionNode = sourcesNode.getPartitionNode();
         partitionsNode = partitionNode.getPartitionsNode();
         projectNode = partitionsNode.getProjectNode();
-        view = projectNode.getView();
+        view = projectNode.getServersView();
     }
 
     public void showMenu(IMenuManager manager) {
@@ -107,7 +102,7 @@ public class SourceNode extends Node {
             }
         });
 
-        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
+        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.SIZE_16x16, PenroseImage.DELETE)) {
             public void run() {
                 try {
                     remove();

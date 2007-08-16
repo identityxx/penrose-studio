@@ -29,7 +29,6 @@ import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -55,7 +54,7 @@ public class SchemaNode extends Node {
         super(name, type, image, object, parent);
         schemasNode = (SchemasNode)parent;
         projectNode = schemasNode.getProjectNode();
-        view = projectNode.getView();
+        view = projectNode.getServersView();
     }
 
     public void showMenu(IMenuManager manager) {
@@ -80,7 +79,7 @@ public class SchemaNode extends Node {
             }
         });
 */
-        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.DELETE)) {
+        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.SIZE_16x16, PenroseImage.DELETE)) {
             public void run() {
                 try {
                     remove();

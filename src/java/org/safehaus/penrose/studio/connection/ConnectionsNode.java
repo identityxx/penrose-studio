@@ -58,7 +58,7 @@ public class ConnectionsNode extends Node {
         partitionNode = (PartitionNode)parent;
         partitionsNode = partitionNode.getPartitionsNode();
         projectNode = partitionsNode.getProjectNode();
-        view = projectNode.getView();
+        view = projectNode.getServersView();
     }
 
     public void showMenu(IMenuManager manager) {

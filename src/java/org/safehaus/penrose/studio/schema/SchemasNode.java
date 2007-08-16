@@ -47,7 +47,7 @@ public class SchemasNode extends Node {
     public SchemasNode(String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
         projectNode = (ProjectNode)parent;
-        view = projectNode.getView();
+        view = projectNode.getServersView();
     }
 
     public void showMenu(IMenuManager manager) {
