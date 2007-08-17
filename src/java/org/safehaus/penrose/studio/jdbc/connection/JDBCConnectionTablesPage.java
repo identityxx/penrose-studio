@@ -225,30 +225,20 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
             PenroseConfig penroseConfig = project.getPenroseConfig();
             PenroseContext penroseContext = project.getPenroseContext();
 
-            Partitions partitions = new Partitions();
-
             PartitionContext partitionContext = new PartitionContext();
             partitionContext.setPenroseConfig(penroseConfig);
             partitionContext.setPenroseContext(penroseContext);
 
             Partition partition = new Partition();
             partition.init(partitionConfig, partitionContext);
-            partitions.addPartition(partition);
 
             Connection connection = partition.createConnection(connectionConfig);
+            connection.start();
 
             JDBCAdapter jdbcAdapter = (JDBCAdapter)connection.getAdapter();
             JDBCClient client = jdbcAdapter.getClient();
 
-            //JDBCClient client = new JDBCClient(connectionConfig.getParameters());
-            //client.connect();
-
             Collection<String> catalogs = client.getCatalogs();
-            Collection<String> schemas = client.getSchemas();
-            Collection<TableConfig> tables = client.getTables(getCatalog(), getSchema());
-
-            //client.close();
-            connection.stop();
 
             catalogCombo.add("");
             for (String catalogName : catalogs) {
@@ -261,6 +251,8 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
                 catalogCombo.select(0);
             }
 
+            Collection<String> schemas = client.getSchemas();
+
             schemaCombo.add("");
             for (String schemaName : schemas) {
                 schemaCombo.add(schemaName);
@@ -272,11 +264,21 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
                 schemaCombo.select(0);
             }
 
-            for (TableConfig tableConfig : tables) {
-                TableItem item = new TableItem(tablesTable, SWT.NONE);
-                item.setText(tableConfig.getName());
-                item.setData(tableConfig);
+            try {
+                Collection<TableConfig> tables = client.getTables(getCatalog(), getSchema());
+
+                for (TableConfig tableConfig : tables) {
+                    TableItem item = new TableItem(tablesTable, SWT.NONE);
+                    item.setText(tableConfig.getName());
+                    item.setData(tableConfig);
+                }
+
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
             }
+
+            connection.stop();
+            partition.stop();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -309,34 +311,34 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
             PenroseConfig penroseConfig = project.getPenroseConfig();
             PenroseContext penroseContext = project.getPenroseContext();
 
-            Partitions partitions = new Partitions();
-
             PartitionContext partitionContext = new PartitionContext();
             partitionContext.setPenroseConfig(penroseConfig);
             partitionContext.setPenroseContext(penroseContext);
 
             Partition partition = new Partition();
             partition.init(partitionConfig, partitionContext);
-            partitions.addPartition(partition);
 
             Connection connection = partition.createConnection(connectionConfig);
+            connection.start();
 
             JDBCAdapter jdbcAdapter = (JDBCAdapter)connection.getAdapter();
             JDBCClient client = jdbcAdapter.getClient();
 
-            //JDBCClient client = new JDBCClient(connectionConfig.getParameters());
-            //client.connect();
+            try {
+                Collection<TableConfig> tables = client.getTables(getCatalog(), getSchema());
 
-            Collection<TableConfig> tables = client.getTables(getCatalog(), getSchema());
-
-            //client.close();
-            connection.stop();
-
-            for (TableConfig tableConfig : tables) {
-                TableItem item = new TableItem(tablesTable, SWT.NONE);
-                item.setText(tableConfig.getName());
-                item.setData(tableConfig);
+                for (TableConfig tableConfig : tables) {
+                    TableItem item = new TableItem(tablesTable, SWT.NONE);
+                    item.setText(tableConfig.getName());
+                    item.setData(tableConfig);
+                }
+                    
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
             }
+
+            connection.stop();
+            partition.stop();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

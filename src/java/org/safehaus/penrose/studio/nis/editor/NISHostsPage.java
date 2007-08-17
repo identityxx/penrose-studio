@@ -31,13 +31,13 @@ public class NISHostsPage extends FormPage {
 
     FormToolkit toolkit;
 
-    NISAlignmentToolEditor editor;
+    NISFilesEditor editor;
     NISDomain domain;
     NISTool nisTool;
 
     Table hostsTable;
 
-    public NISHostsPage(NISAlignmentToolEditor editor) {
+    public NISHostsPage(NISFilesEditor editor) {
         super(editor, "HOSTS", "  Hosts ");
 
         this.editor = editor;

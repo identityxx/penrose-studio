@@ -54,7 +54,7 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
     Table tableTable;
     Table fieldTable;
 
-    Collection fields;
+    Collection<FieldConfig> fields;
     ConnectionConfig connectionConfig;
 
     public JDBCTableWizardPage() {
@@ -232,20 +232,19 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
 
         JDBCClient client = new JDBCClient(connectionConfig.getParameters());
 
-        Collection catalogs = client.getCatalogs();
-        Collection schemas = client.getSchemas();
+        Collection<String> catalogs = client.getCatalogs();
 
-        client.close();
-
-        for (Iterator i=catalogs.iterator(); i.hasNext(); ) {
-            String catalog = (String)i.next();
+        for (String catalog : catalogs) {
             catalogCombo.add(catalog);
         }
 
-        for (Iterator i=schemas.iterator(); i.hasNext(); ) {
-            String schema = (String)i.next();
+        Collection<String> schemas = client.getSchemas();
+
+        for (String schema : schemas) {
             schemaCombo.add(schema);
         }
+
+        client.close();
     }
 
     public void showTableNames() throws Exception {
@@ -253,15 +252,19 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
 
         JDBCClient client = new JDBCClient(connectionConfig.getParameters());
 
-        Collection tables = client.getTables(getCatalog(), getSchema());
+        try {
+            Collection<TableConfig> tables = client.getTables(getCatalog(), getSchema());
 
-        for (Iterator i=tables.iterator(); i.hasNext(); ) {
-            TableConfig tableConfig = (TableConfig)i.next();
-            String tableName = tableConfig.getName();
+            for (TableConfig tableConfig : tables) {
+                String tableName = tableConfig.getName();
 
-            TableItem item = new TableItem(tableTable, SWT.NONE);
-            item.setText(tableName);
-            item.setData(tableConfig);
+                TableItem item = new TableItem(tableTable, SWT.NONE);
+                item.setText(tableName);
+                item.setData(tableConfig);
+            }
+            
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
 
         client.close();
@@ -276,9 +279,7 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
 
         fields = client.getColumns(getCatalog(), getSchema(), getTableName());
 
-        for (Iterator i=fields.iterator(); i.hasNext(); ) {
-            FieldConfig field = (FieldConfig)i.next();
-
+        for (FieldConfig field : fields) {
             TableItem it = new TableItem(fieldTable, SWT.NONE);
             it.setImage(PenrosePlugin.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
             it.setText(0, field.getName());
@@ -348,7 +349,7 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
         return fields;
     }
 
-    public void setFields(Collection fields) {
+    public void setFields(Collection<FieldConfig> fields) {
         this.fields = fields;
     }
 

@@ -179,10 +179,10 @@
            icon="images/object.gif"
            class="org.safehaus.penrose.studio.nis.editor.NISGroupsEditor"/>
        <editor
-           id="org.safehaus.penrose.studio.nis.editor.NISAlignmentToolEditor"
+           id="org.safehaus.penrose.studio.nis.editor.NISFilesEditor"
            name="NIS Alignment Tool"
            icon="images/object.gif"
-           class="org.safehaus.penrose.studio.nis.editor.NISAlignmentToolEditor"/>
+           class="org.safehaus.penrose.studio.nis.editor.NISFilesEditor"/>
    </extension>
    <extension
          id="application"

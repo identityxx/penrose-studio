@@ -159,12 +159,8 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
             DN dn = new DN(rdn);
             Attributes attributes = dialog.getAttributes();
 
-            ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
-
             PenroseConfig penroseConfig = project.getPenroseConfig();
             PenroseContext penroseContext = project.getPenroseContext();
-
-            Partitions partitions = new Partitions();
 
             PartitionContext partitionContext = new PartitionContext();
             partitionContext.setPenroseConfig(penroseConfig);
@@ -172,15 +168,14 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
 
             Partition partition = new Partition();
             partition.init(partitionConfig, partitionContext);
-            partitions.addPartition(partition);
 
-            Connection connection = partition.createConnection(connectionConfig);
+            Connection connection = partition.getConnection(sourceConfig.getConnectionName());
 
             Source source = partition.createSource(sourceConfig, connection);
 
             source.add(dn, attributes);
 
-            connection.stop();
+            partition.stop();
 
             refresh();
 
@@ -220,12 +215,8 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
                     dialog.getAttributes()
             );
 
-            ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
-
             PenroseConfig penroseConfig = project.getPenroseConfig();
             PenroseContext penroseContext = project.getPenroseContext();
-
-            Partitions partitions = new Partitions();
 
             PartitionContext partitionContext = new PartitionContext();
             partitionContext.setPenroseConfig(penroseConfig);
@@ -233,9 +224,8 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
 
             Partition partition = new Partition();
             partition.init(partitionConfig, partitionContext);
-            partitions.addPartition(partition);
 
-            Connection connection = partition.createConnection(connectionConfig);
+            Connection connection = partition.getConnection(sourceConfig.getConnectionName());
 
             Source source = partition.createSource(sourceConfig, connection);
 
@@ -250,7 +240,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
 
             source.modify(dn, modifications);
 
-            connection.stop();
+            partition.stop();
 
             refresh();
 
@@ -274,12 +264,8 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
 
             DN dn = searchResult.getDn();
 
-            ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
-
             PenroseConfig penroseConfig = project.getPenroseConfig();
             PenroseContext penroseContext = project.getPenroseContext();
-
-            Partitions partitions = new Partitions();
 
             PartitionContext partitionContext = new PartitionContext();
             partitionContext.setPenroseConfig(penroseConfig);
@@ -287,15 +273,14 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
 
             Partition partition = new Partition();
             partition.init(partitionConfig, partitionContext);
-            partitions.addPartition(partition);
 
-            Connection connection = partition.createConnection(connectionConfig);
+            Connection connection = partition.getConnection(sourceConfig.getConnectionName());
 
             Source source = partition.createSource(sourceConfig, connection);
 
             source.delete(dn);
 
-            connection.stop();
+            partition.stop();
 
             refresh();
 
@@ -356,24 +341,20 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
             PenroseConfig penroseConfig = project.getPenroseConfig();
             PenroseContext penroseContext = project.getPenroseContext();
 
-            Partitions partitions = new Partitions();
-
             PartitionContext partitionContext = new PartitionContext();
             partitionContext.setPenroseConfig(penroseConfig);
             partitionContext.setPenroseContext(penroseContext);
 
             Partition partition = new Partition();
             partition.init(partitionConfig, partitionContext);
-            partitions.addPartition(partition);
 
-            ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
-            Connection connection = partition.createConnection(connectionConfig);
+            Connection connection = partition.getConnection(sourceConfig.getConnectionName());
 
             Source source = partition.createSource(sourceConfig, connection);
 
             source.search(request, response);
 
-            connection.stop();
+            partition.stop();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

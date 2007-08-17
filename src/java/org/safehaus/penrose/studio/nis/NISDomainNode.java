@@ -227,9 +227,7 @@ public class NISDomainNode extends Node {
         boolean confirm = MessageDialog.openQuestion(
                 view.getSite().getShell(),
                 "Removing NIS Domain",
-                "Are you sure?\n"+
-                        "The NIS domain information, Penrose partition, and the cache database will be removed.\n"+
-                        "The NIS information on the NIS server will not be affected."
+                "Are you sure?"
         );
 
         if (!confirm) return;
@@ -501,10 +499,10 @@ public class NISDomainNode extends Node {
 
         children.add(groupsNode);
 
-        NISAlignmentToolNode filesNode = new NISAlignmentToolNode(
+        NISFilesNode filesNode = new NISFilesNode(
                 view,
-                "Alignment Tool",
-                "Alignment Tool",
+                "Files",
+                "Files",
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
                 null,
                 this

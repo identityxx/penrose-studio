@@ -10,7 +10,7 @@ import org.safehaus.penrose.nis.NISDomain;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-public class NISAlignmentToolEditor extends FormEditor {
+public class NISFilesEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
@@ -18,7 +18,7 @@ public class NISAlignmentToolEditor extends FormEditor {
     NISDomain domain;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        NISAlignmentToolEditorInput ei = (NISAlignmentToolEditorInput)input;
+        NISFilesEditorInput ei = (NISFilesEditorInput)input;
         nisTool = ei.getNisTool();
         domain = ei.getDomain();
 

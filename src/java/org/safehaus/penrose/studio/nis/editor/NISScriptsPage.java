@@ -45,13 +45,13 @@ public class NISScriptsPage extends FormPage {
     Label messageLabel;
     Table table;
 
-    NISAlignmentToolEditor editor;
+    NISFilesEditor editor;
     NISDomain domain;
     NISTool nisTool;
 
     Map<String,String> actions = new LinkedHashMap<String,String>();
 
-    public NISScriptsPage(NISAlignmentToolEditor editor) {
+    public NISScriptsPage(NISFilesEditor editor) {
         super(editor, "SCRIPTS", "  Scripts  ");
 
         this.editor = editor;

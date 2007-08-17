@@ -15,10 +15,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.studio.nis.NISTool;
-import org.safehaus.penrose.studio.nis.action.Conflict;
-import org.safehaus.penrose.studio.nis.action.NISAction;
-import org.safehaus.penrose.studio.nis.action.NISActionRequest;
-import org.safehaus.penrose.studio.nis.action.NISActionResponse;
+import org.safehaus.penrose.studio.nis.action.*;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.source.Source;
@@ -95,6 +92,12 @@ public class NISGroupScriptsPage extends FormPage {
         try {
             actionCombo.removeAll();
 
+            actionCombo.add("Conflicting GID Finder");
+            actionCombo.setData("Conflicting GID Finder", ConflictingGIDFinderAction.class.getName());
+
+            actionCombo.add("Inconsistent GID Finder");
+            actionCombo.setData("Inconsistent GID Finder", InconsistentGIDFinderAction.class.getName());
+/*
             SearchRequest request = new SearchRequest();
             request.setFilter("(type=groups)");
 
@@ -110,7 +113,7 @@ public class NISGroupScriptsPage extends FormPage {
             };
 
             nisTool.getActions().search(request, response);
-
+*/
             actionCombo.select(0);
 
         } catch (Exception e) {

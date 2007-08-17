@@ -10,13 +10,13 @@ import org.safehaus.penrose.nis.NISDomain;
 /**
  * @author Endi S. Dewata
  */
-public class NISAlignmentToolEditorInput implements IEditorInput {
+public class NISFilesEditorInput implements IEditorInput {
 
     private Project project;
     private NISTool nisTool;
     private NISDomain domain;
 
-    public NISAlignmentToolEditorInput() {
+    public NISFilesEditorInput() {
     }
 
     public boolean exists() {
@@ -59,7 +59,7 @@ public class NISAlignmentToolEditorInput implements IEditorInput {
         if (object == null) return false;
         if (object.getClass() != this.getClass()) return false;
 
-        NISAlignmentToolEditorInput ei = (NISAlignmentToolEditorInput)object;
+        NISFilesEditorInput ei = (NISFilesEditorInput)object;
         if (!equals(project, ei.project)) return false;
         if (!equals(domain, ei.domain)) return false;
 

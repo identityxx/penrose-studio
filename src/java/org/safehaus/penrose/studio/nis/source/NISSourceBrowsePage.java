@@ -144,25 +144,21 @@ public class NISSourceBrowsePage extends SourceEditorPage {
             PenroseConfig penroseConfig = project.getPenroseConfig();
             PenroseContext penroseContext = project.getPenroseContext();
 
-            Partitions partitions = new Partitions();
-
             PartitionContext partitionContext = new PartitionContext();
             partitionContext.setPenroseConfig(penroseConfig);
             partitionContext.setPenroseContext(penroseContext);
 
             Partition partition = new Partition();
             partition.init(partitionConfig, partitionContext);
-            partitions.addPartition(partition);
 
-            ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
-            Connection connection = partition.createConnection(connectionConfig);
+            Connection connection = partition.getConnection(sourceConfig.getConnectionName());
 
             Source source = partition.createSource(sourceConfig, connection);
 
             source.search(sc, sr);
 
-            connection.stop();
-            
+            partition.stop();
+
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             String message = e.toString();
