@@ -24,6 +24,7 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.studio.directory.wizard.CreateLDAPSnapshotWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.Project;
 import org.apache.log4j.Logger;
 
 public class CreateLDAPSnapshotEntryAction extends Action {
@@ -42,11 +43,14 @@ public class CreateLDAPSnapshotEntryAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
+            Project project = node.getProjectNode().getProject();
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             //if (!penroseStudio.isCommercial()) return;
 
-            Wizard wizard = new CreateLDAPSnapshotWizard(node.getPartitionConfig());
+            CreateLDAPSnapshotWizard wizard = new CreateLDAPSnapshotWizard();
+            wizard.setProject(project);
+            wizard.setPartitionConfig(node.getPartitionConfig());
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);

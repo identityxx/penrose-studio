@@ -23,10 +23,12 @@ import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.studio.source.wizard.SourceWizardPage;
 import org.safehaus.penrose.studio.jdbc.source.JDBCPrimaryKeyWizardPage;
 import org.safehaus.penrose.studio.jdbc.source.JDBCFieldWizardPage;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.TableConfig;
+import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
@@ -39,6 +41,7 @@ public class JDBCSourceWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
+    private Project project;
     private PartitionConfig partitionConfig;
     private ConnectionConfig connectionConfig;
     private TableConfig tableConfig;
@@ -97,7 +100,9 @@ public class JDBCSourceWizard extends Wizard {
                 sourceConfig.addFieldConfig(field);
             }
 
-            partitionConfig.getSourceConfigs().addSourceConfig(sourceConfig);
+            SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
+            sourceConfigs.addSourceConfig(sourceConfig);
+            project.save(partitionConfig, sourceConfigs);
 
             return true;
 
@@ -151,5 +156,13 @@ public class JDBCSourceWizard extends Wizard {
 
     public void setPartitionConfig(PartitionConfig partitionConfig) {
         this.partitionConfig = partitionConfig;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

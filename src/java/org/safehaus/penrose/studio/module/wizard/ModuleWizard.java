@@ -20,7 +20,9 @@ package org.safehaus.penrose.studio.module.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
+import org.safehaus.penrose.module.ModuleConfigs;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.apache.log4j.Logger;
 
@@ -35,15 +37,15 @@ public class ModuleWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    PartitionConfig partitionConfig;
+    private Project project;
+    private PartitionConfig partitionConfig;
     ModuleConfig module;
 
     public ModuleWizardPage propertyPage = new ModuleWizardPage();
     public ModuleParameterWizardPage parameterPage = new ModuleParameterWizardPage();
     public ModuleMappingWizardPage mappingPage = new ModuleMappingWizardPage();
 
-    public ModuleWizard(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public ModuleWizard() {
         setWindowTitle("New Module");
     }
 
@@ -57,7 +59,7 @@ public class ModuleWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            System.out.println("[ModuleWizard] performFinish");
+            ModuleConfigs moduleConfigs = partitionConfig.getModuleConfigs();
 
             module = new ModuleConfig();
             module.setName(propertyPage.getModuleName());
@@ -69,15 +71,17 @@ public class ModuleWizard extends Wizard {
                 module.setParameter(name, (String)parameters.get(name));
             }
 
-            partitionConfig.getModuleConfigs().addModuleConfig(module);
+            moduleConfigs.addModuleConfig(module);
 
             Collection mappings = mappingPage.getMappings();
             for (Iterator i=mappings.iterator(); i.hasNext(); ) {
                 ModuleMapping mapping = (ModuleMapping)i.next();
                 mapping.setModuleName(propertyPage.getModuleName());
-                partitionConfig.getModuleConfigs().addModuleMapping(mapping);
+                moduleConfigs.addModuleMapping(mapping);
             }
 
+            project.save(partitionConfig, moduleConfigs);
+            
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 
@@ -99,4 +103,19 @@ public class ModuleWizard extends Wizard {
         return true;
     }
 
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
+    }
+
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
+    }
 }

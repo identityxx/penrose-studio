@@ -23,6 +23,7 @@ import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
 import org.safehaus.penrose.studio.schema.wizard.SelectSchemaWizardPage;
 import org.safehaus.penrose.studio.util.ADUtil;
 import org.safehaus.penrose.studio.util.SchemaUtil;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.acl.ACI;
@@ -39,16 +40,11 @@ public class CreateADSchemaProxyWizard extends Wizard {
     SelectConnectionWizardPage connectionPage;
     SelectSchemaWizardPage schemaPage;
 
-    PartitionConfig partitionConfig;
-    EntryMapping parentMapping;
+    private Project project;
+    private PartitionConfig partitionConfig;
 
-    public CreateADSchemaProxyWizard(PartitionConfig partitionConfig) {
-        this(partitionConfig, null);
-    }
-
-    public CreateADSchemaProxyWizard(PartitionConfig partitionConfig, EntryMapping parentMapping) {
-        this.partitionConfig = partitionConfig;
-        this.parentMapping = parentMapping;
+    public CreateADSchemaProxyWizard() {
+        setWindowTitle("New Active Directory Schema Proxy");
 
         connectionPage = new SelectConnectionWizardPage(partitionConfig, "LDAP");
         connectionPage.setDescription(
@@ -57,8 +53,6 @@ public class CreateADSchemaProxyWizard extends Wizard {
         );
 
         schemaPage = new SelectSchemaWizardPage();
-
-        setWindowTitle("New Active Directory Schema Proxy");
     }
 
     public boolean canFinish() {
@@ -101,6 +95,8 @@ public class CreateADSchemaProxyWizard extends Wizard {
 
             schemaMapping.addACI(new ACI("rs"));
 
+            project.save(partitionConfig);
+
             return true;
 
         } catch (Exception e) {
@@ -111,5 +107,21 @@ public class CreateADSchemaProxyWizard extends Wizard {
 
     public boolean needsPreviousAndNextButtons() {
         return true;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
+    }
+
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

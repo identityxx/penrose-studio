@@ -30,6 +30,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.Project;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;
@@ -46,7 +47,8 @@ public class SelectConnectionWizardPage extends WizardPage {
     Table connectionTable;
     Table infoTable;
 
-    PartitionConfig partitionConfig;
+    private Project project;
+    private PartitionConfig partitionConfig;
     String adapterType;
 
     public SelectConnectionWizardPage(PartitionConfig partitionConfig) {
@@ -145,6 +147,8 @@ public class SelectConnectionWizardPage extends WizardPage {
             public void widgetSelected(SelectionEvent event) {
 
                 ConnectionWizard wizard = new ConnectionWizard(partitionConfig);
+                wizard.setProject(project);
+
                 WizardDialog dialog = new WizardDialog(parent.getShell(), wizard);
                 dialog.setPageSize(600, 300);
                 dialog.open();
@@ -208,5 +212,21 @@ public class SelectConnectionWizardPage extends WizardPage {
 
     public boolean validatePage() {
         return getConnectionConfig() != null;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
+    }
+
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

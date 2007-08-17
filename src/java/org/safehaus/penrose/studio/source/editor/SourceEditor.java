@@ -14,6 +14,8 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.apache.log4j.Logger;
 
+import java.io.File;
+
 /**
  * @author Endi Sukma Dewata
  */
@@ -48,7 +50,7 @@ public abstract class SourceEditor extends FormEditor {
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        setPartName(getPartitionConfig().getName()+"/"+ getSourceConfig().getName());
+        setPartName(partitionConfig.getName()+"/"+ sourceConfig.getName());
     }
 
     public void doSave(IProgressMonitor iProgressMonitor) {
@@ -64,23 +66,25 @@ public abstract class SourceEditor extends FormEditor {
 
     public void store() throws Exception {
 
-        SourceConfigs sources = getPartitionConfig().getSourceConfigs();
-        if (!origSourceConfig.getName().equals(getSourceConfig().getName())) {
+        SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
+        if (!origSourceConfig.getName().equals(sourceConfig.getName())) {
 
-            sources.renameSourceConfig(origSourceConfig, getSourceConfig().getName());
+            sourceConfigs.renameSourceConfig(origSourceConfig, sourceConfig.getName());
 
-            for (EntryMapping entryMapping : getPartitionConfig().getDirectoryConfigs().getEntryMappings()) {
+            for (EntryMapping entryMapping : partitionConfig.getDirectoryConfigs().getEntryMappings()) {
 
                 for (SourceMapping sourceMapping : entryMapping.getSourceMappings()) {
                     if (!sourceMapping.getSourceName().equals(origSourceConfig.getName())) continue;
-                    sourceMapping.setSourceName(getSourceConfig().getName());
+                    sourceMapping.setSourceName(sourceConfig.getName());
                 }
             }
         }
 
-        sources.modifySourceConfig(getSourceConfig().getName(), getSourceConfig());
+        sourceConfigs.modifySourceConfig(sourceConfig.getName(), sourceConfig);
 
-        setPartName(this.getPartitionConfig().getName()+"/"+ getSourceConfig().getName());
+        project.save(partitionConfig, sourceConfigs);
+
+        setPartName(partitionConfig.getName()+"/"+sourceConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
@@ -104,7 +108,7 @@ public abstract class SourceEditor extends FormEditor {
         try {
             dirty = false;
 
-            if (!origSourceConfig.equals(getSourceConfig())) {
+            if (!origSourceConfig.equals(sourceConfig)) {
                 dirty = true;
                 return;
             }

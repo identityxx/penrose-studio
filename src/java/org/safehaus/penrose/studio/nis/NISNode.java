@@ -5,17 +5,34 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.nis.wizard.NISDomainWizard;
+import org.safehaus.penrose.studio.nis.wizard.NISDatabaseWizard;
 import org.safehaus.penrose.studio.nis.editor.NISEditorInput;
 import org.safehaus.penrose.studio.nis.editor.NISEditor;
 import org.safehaus.penrose.nis.NISDomain;
+import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.partition.PartitionContext;
+import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.connection.ConnectionConfigs;
+import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.connection.Connection;
+import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
+import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.source.SourceConfigs;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.config.PenroseConfig;
+import org.safehaus.penrose.naming.PenroseContext;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -24,6 +41,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
+import java.io.File;
 
 /**
  * @author Endi S. Dewata
@@ -73,10 +91,10 @@ public class NISNode extends Node {
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        manager.add(new Action("Refresh") {
+        manager.add(new Action("Properties") {
             public void run() {
                 try {
-                    refresh();
+                    edit();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
@@ -88,6 +106,15 @@ public class NISNode extends Node {
     }
 
     public void open() throws Exception {
+
+        Project project = projectNode.getProject();
+        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+
+        if (partitionConfigs.getPartitionConfig(NISTool.NIS_PARTITION_NAME) == null) {
+            boolean b = createNisPartition();
+            if (!b) return;
+        }
+
         if (!started) start();
 
         NISEditorInput ei = new NISEditorInput();
@@ -100,6 +127,37 @@ public class NISNode extends Node {
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
+    }
+
+    public void edit() throws Exception {
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
+    }
+
+    public boolean createNisPartition() throws Exception {
+        Project project = projectNode.getProject();
+        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+
+        PenroseClient penroseClient = project.getClient();
+        File workDir = project.getWorkDir();
+
+        penroseClient.download(workDir, "samples/"+NISTool.NIS_PARTITION_NAME);
+
+        File sampleDir = new File(workDir, "samples/"+NISTool.NIS_PARTITION_NAME);
+        PartitionConfig partitionConfig = partitionConfigs.load(sampleDir);
+
+        ConnectionConfigs connectionConfigs = partitionConfig.getConnectionConfigs();
+        ConnectionConfig connectionConfig = connectionConfigs.getConnectionConfig(NISTool.NIS_CONNECTION_NAME);
+
+        NISDatabaseWizard wizard = new NISDatabaseWizard();
+        wizard.setProject(project);
+        wizard.setPartitionConfig(partitionConfig);
+        wizard.setConnectionConfig(connectionConfig);
+
+        WizardDialog dialog = new WizardDialog(view.getSite().getShell(), wizard);
+        dialog.setPageSize(600, 300);
+
+        return dialog.open() == Window.OK;
     }
 
     public void start() throws Exception {
@@ -135,7 +193,10 @@ public class NISNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        return true;
+        Project project = projectNode.getProject();
+        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+
+        return (partitionConfigs.getPartitionConfig(NISTool.NIS_PARTITION_NAME) != null);
     }
 
     public Collection<Node> getChildren() throws Exception {
@@ -150,11 +211,6 @@ public class NISNode extends Node {
         dialog.setPageSize(600, 300);
         dialog.open();
         
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
-    }
-
-    public void refresh() throws Exception {
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }

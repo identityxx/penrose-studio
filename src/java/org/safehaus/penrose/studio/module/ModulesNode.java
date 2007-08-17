@@ -22,9 +22,14 @@ import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.partition.PartitionNode;
+import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.module.action.NewModuleAction;
 import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
+import org.safehaus.penrose.module.ModuleConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
@@ -35,7 +40,6 @@ import org.apache.log4j.Logger;
 
 import java.util.Collection;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
@@ -44,13 +48,20 @@ public class ModulesNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ServersView view;
+    private ServersView serversView;
+    private ProjectNode projectNode;
+    private PartitionsNode partitionsNode;
+    private PartitionNode partitionNode;
 
     private PartitionConfig partitionConfig;
 
-    public ModulesNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
+    public ModulesNode(String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
-        this.view = view;
+
+        partitionNode = (PartitionNode)parent;
+        partitionsNode = partitionNode.getPartitionsNode();
+        projectNode = partitionsNode.getProjectNode();
+        serversView = projectNode.getServersView();
     }
 
     public void showMenu(IMenuManager manager) {
@@ -72,34 +83,39 @@ public class ModulesNode extends Node {
 
     public void paste() throws Exception {
 
-        Object newObject = view.getClipboard();
+        Object newObject = serversView.getClipboard();
 
         if (!(newObject instanceof ModuleConfig)) return;
+
+        ModuleConfigs moduleConfigs = partitionConfig.getModuleConfigs();
 
         ModuleConfig newModuleConfig = (ModuleConfig)((ModuleConfig)newObject).clone();
         String oldName = newModuleConfig.getName();
 
         int counter = 1;
         String name = oldName;
-        while (partitionConfig.getModuleConfigs().getModuleConfig(name) != null) {
+        while (moduleConfigs.getModuleConfig(name) != null) {
             counter++;
             name = oldName+" ("+counter+")";
         }
 
         newModuleConfig.setName(name);
-        partitionConfig.getModuleConfigs().addModuleConfig(newModuleConfig);
+        moduleConfigs.addModuleConfig(newModuleConfig);
 
-        Collection mappings = partitionConfig.getModuleConfigs().getModuleMappings(oldName);
+        Collection<ModuleMapping> mappings = moduleConfigs.getModuleMappings(oldName);
         if (mappings != null) {
-            for (Iterator i=mappings.iterator(); i.hasNext(); ) {
-                ModuleMapping mapping = (ModuleMapping)((ModuleMapping)i.next()).clone();
-                mapping.setModuleName(name);
-                mapping.setModuleConfig(newModuleConfig);
-                partitionConfig.getModuleConfigs().addModuleMapping(mapping);
+            for (ModuleMapping mapping : mappings) {
+                ModuleMapping newMapping = (ModuleMapping) ((ModuleMapping) mapping).clone();
+                newMapping.setModuleName(name);
+                newMapping.setModuleConfig(newModuleConfig);
+                moduleConfigs.addModuleMapping(newMapping);
             }
         }
 
-        view.setClipboard(null);
+        serversView.setClipboard(null);
+
+        Project project = projectNode.getProject();
+        project.save(partitionConfig, moduleConfigs);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
@@ -113,12 +129,10 @@ public class ModulesNode extends Node {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        Collection modules = partitionConfig.getModuleConfigs().getModuleConfigs();
-        for (Iterator i=modules.iterator(); i.hasNext(); ) {
-            ModuleConfig moduleConfig = (ModuleConfig)i.next();
+        Collection<ModuleConfig> modules = partitionConfig.getModuleConfigs().getModuleConfigs();
+        for (ModuleConfig moduleConfig : modules) {
 
             ModuleNode moduleNode = new ModuleNode(
-                    view,
                     moduleConfig.getName(),
                     ServersView.MODULE,
                     PenrosePlugin.getImage(PenroseImage.MODULE),
@@ -141,5 +155,37 @@ public class ModulesNode extends Node {
 
     public void setPartitionConfig(PartitionConfig partitionConfig) {
         this.partitionConfig = partitionConfig;
+    }
+
+    public ServersView getServersView() {
+        return serversView;
+    }
+
+    public void setServersView(ServersView serversView) {
+        this.serversView = serversView;
+    }
+
+    public ProjectNode getProjectNode() {
+        return projectNode;
+    }
+
+    public void setProjectNode(ProjectNode projectNode) {
+        this.projectNode = projectNode;
+    }
+
+    public PartitionsNode getPartitionsNode() {
+        return partitionsNode;
+    }
+
+    public void setPartitionsNode(PartitionsNode partitionsNode) {
+        this.partitionsNode = partitionsNode;
+    }
+
+    public PartitionNode getPartitionNode() {
+        return partitionNode;
+    }
+
+    public void setPartitionNode(PartitionNode partitionNode) {
+        this.partitionNode = partitionNode;
     }
 }

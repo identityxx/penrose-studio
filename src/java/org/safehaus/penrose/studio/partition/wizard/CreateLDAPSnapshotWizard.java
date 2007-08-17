@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.partition.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionParametersWizardPage;
 import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionInfoWizardPage;
 import org.safehaus.penrose.studio.util.SnapshotUtil;
@@ -38,6 +39,8 @@ import java.util.TreeMap;
 public class CreateLDAPSnapshotWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
+
+    private Project project;
 
     public PartitionNamePage namePage = new PartitionNamePage();
     public JNDIConnectionInfoWizardPage connectionInfoPage = new JNDIConnectionInfoWizardPage();
@@ -97,6 +100,8 @@ public class CreateLDAPSnapshotWizard extends Wizard {
             SnapshotUtil snapshotUtil = new SnapshotUtil();
             snapshotUtil.createSnapshot(partitionConfig, client);
 
+            project.save(partitionConfig);
+            
             penroseStudio.notifyChangeListeners();
 
             return true;
@@ -105,5 +110,13 @@ public class CreateLDAPSnapshotWizard extends Wizard {
             log.error(e.getMessage(), e);
             return false;
         }
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

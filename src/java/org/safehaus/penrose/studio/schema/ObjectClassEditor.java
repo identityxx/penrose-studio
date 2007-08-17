@@ -34,7 +34,7 @@ import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.module.ModuleMappingDialog;
+import org.safehaus.penrose.studio.module.editor.ModuleMappingDialog;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.apache.log4j.Logger;

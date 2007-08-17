@@ -24,7 +24,7 @@ import java.util.LinkedHashMap;
 /**
  * @author Endi S. Dewata
  */
-public class Driver {
+public class Driver implements Cloneable {
 
     private String name;
     private String adapterName;
@@ -50,6 +50,10 @@ public class Driver {
         parameters.put(parameter.getName(), parameter);
     }
 
+    public Parameter removeParameter(String name) {
+        return parameters.remove(name);
+    }
+
     public void removeParameters() {
         parameters.clear();
     }
@@ -68,5 +72,18 @@ public class Driver {
 
     public void setAdapterName(String adapterName) {
         this.adapterName = adapterName;
+    }
+
+    public Object clone() throws CloneNotSupportedException {
+
+        Driver driver = (Driver)super.clone();
+
+        driver.parameters = new LinkedHashMap<String,Parameter>();
+        for (String key : parameters.keySet()) {
+            Parameter parameter = parameters.get(key);
+            driver.parameters.put(key, (Parameter)parameter.clone());
+        }
+
+        return driver;
     }
 }

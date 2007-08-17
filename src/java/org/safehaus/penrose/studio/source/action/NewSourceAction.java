@@ -21,6 +21,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.source.wizard.SourceWizard;
 import org.safehaus.penrose.studio.source.SourcesNode;
 import org.apache.log4j.Logger;
@@ -29,10 +30,10 @@ public class NewSourceAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
-    SourcesNode node;
+    SourcesNode sourcesNode;
 
 	public NewSourceAction(SourcesNode node) {
-        this.node = node;
+        this.sourcesNode = node;
 
         setText("New Source...");
         setId(getClass().getName());
@@ -41,8 +42,11 @@ public class NewSourceAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
+            Project project = sourcesNode.getProjectNode().getProject();
 
-            SourceWizard wizard = new SourceWizard(node.getPartitionConfig());
+            SourceWizard wizard = new SourceWizard(sourcesNode.getPartitionConfig());
+            wizard.setProject(project);
+
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
             dialog.open();
@@ -50,7 +54,7 @@ public class NewSourceAction extends Action {
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 
-            serversView.open(node);
+            serversView.open(sourcesNode);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

@@ -49,7 +49,7 @@ public class PartitionsNode extends Node {
     protected ServersView view;
     protected ProjectNode projectNode;
 
-    protected Map<String,Node> partitions = new TreeMap<String,Node>();
+    protected Map<String,Node> partitionNodes = new TreeMap<String,Node>();
 
     public PartitionsNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
@@ -160,7 +160,7 @@ public class PartitionsNode extends Node {
                 this
         );
 
-        partitions.put(partitionConfig.getName(), partitionNode);
+        partitionNodes.put(partitionConfig.getName(), partitionNode);
     }
 
     public void removePartitionConfig(String name) throws Exception {
@@ -170,15 +170,15 @@ public class PartitionsNode extends Node {
 
         project.removeDirectory("partitions/"+name);
 
-        partitions.remove(name);
+        partitionNodes.remove(name);
     }
 
     public boolean hasChildren() throws Exception {
-        return !partitions.isEmpty();
+        return !partitionNodes.isEmpty();
     }
 
     public Collection<Node> getChildren() throws Exception {
-        return partitions.values();
+        return partitionNodes.values();
     }
 
     public ProjectNode getProjectNode() {

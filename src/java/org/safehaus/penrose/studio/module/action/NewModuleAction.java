@@ -21,6 +21,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.module.wizard.ModuleWizard;
 import org.safehaus.penrose.studio.module.ModulesNode;
 import org.apache.log4j.Logger;
@@ -41,8 +42,12 @@ public class NewModuleAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
+            Project project = node.getProjectNode().getProject();
 
-            ModuleWizard wizard = new ModuleWizard(node.getPartitionConfig());
+            ModuleWizard wizard = new ModuleWizard();
+            wizard.setProject(project);
+            wizard.setPartitionConfig(node.getPartitionConfig());
+
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
             dialog.open();

@@ -48,7 +48,7 @@ public class Helper {
             int j = sb.indexOf("}", i+2);
             String name = sb.substring(i+2, j);
             String value = (String)values.get(name);
-            if (value == null) continue;
+            if (value == null) value = "";
 
             sb.replace(i, j+1, value);
 
@@ -64,18 +64,21 @@ public class Helper {
 			Class.forName(driver);
 			con = DriverManager.getConnection(url, username, password);
 			MessageDialog.openInformation(shell, "Test Connection Result", "Connection successful!");
-		} catch (ClassNotFoundException ex) {
-            log.debug(ex.getMessage(), ex);
-			MessageDialog.openError(shell, "Test Connection Result", "Error: "+ex.getMessage());
-		} catch (SQLException ex) {
-            log.debug(ex.getMessage(), ex);
-			String message = ex.toString();
+
+        } catch (ClassNotFoundException e) {
+            log.debug(e.getMessage(), e);
+			MessageDialog.openError(shell, "Test Connection Result", "Error: "+e.getMessage());
+
+        } catch (SQLException e) {
+            log.debug(e.getMessage(), e);
+			String message = e.toString();
 			if (message.length() > 500) {
 				message = message.substring(0, 500) + "...";
 			}
-			MessageDialog.openError(shell, "Test Connection Result", "Error: "+ex.getSQLState()+"\n"+message);
-		} finally {
-			try { if (con != null) con.close(); } catch (Exception ex) {}
+			MessageDialog.openError(shell, "Test Connection Result", "Error: "+e.getSQLState()+"\n"+message);
+
+        } finally {
+			try { if (con != null) con.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
 		}
 	}
 	
@@ -89,18 +92,20 @@ public class Helper {
 			env.put(Context.SECURITY_CREDENTIALS, credentials);
 			ic = new InitialDirContext(env);
 			MessageDialog.openInformation(shell, "Test Connection Result", "Connection successful!");
-		} catch (NamingException ex) {
-            log.debug(ex.getMessage(), ex);
+
+        } catch (NamingException e) {
+            log.debug(e.getMessage(), e);
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
-			ex.printStackTrace(pw);
+			e.printStackTrace(pw);
 			String message = sw.toString();
 			if (message.length() > 500) {
 				message = message.substring(0, 500) + "...";
 			}
 			MessageDialog.openError(shell, "Test Connection Result", "Error: "+message);
-		} finally {
-			try { if (ic != null) ic.close(); } catch (Exception ex) {}
+
+        } finally {
+			try { if (ic != null) ic.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
 		}
 	}
 

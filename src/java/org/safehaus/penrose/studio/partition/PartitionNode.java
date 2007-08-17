@@ -38,6 +38,7 @@ import org.safehaus.penrose.studio.source.SourcesNode;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.management.PenroseClient;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -107,7 +108,6 @@ public class PartitionNode extends Node {
         children.add(sourcesNode);
 
         ModulesNode modulesNode = new ModulesNode(
-                view,
                 ServersView.MODULES,
                 ServersView.MODULES,
                 PenrosePlugin.getImage(PenroseImage.FOLDER),
@@ -122,6 +122,28 @@ public class PartitionNode extends Node {
 
     public void showMenu(IMenuManager manager) {
 
+        manager.add(new Action("Start") {
+            public void run() {
+                try {
+                    start();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Action("Stop") {
+            public void run() {
+                try {
+                    stop();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+/*
         manager.add(new Action("Save") {
             public void run() {
                 try {
@@ -141,11 +163,10 @@ public class PartitionNode extends Node {
                 }
             }
         });
-
+*/
         manager.add(new ExportPartitionAction(this));
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-
 
         manager.add(new Action("Copy") {
             public void run() {
@@ -184,15 +205,29 @@ public class PartitionNode extends Node {
         });
     }
 
+    public void start() throws Exception {
+        log.debug("Starting "+name+" partition.");
+
+        Project project = projectNode.getProject();
+        PenroseClient client = project.getClient();
+
+        client.startPartition(name);
+    }
+
+    public void stop() throws Exception {
+        log.debug("Stopping "+name+" partition.");
+
+        Project project = projectNode.getProject();
+        PenroseClient client = project.getClient();
+
+        client.stopPartition(name);
+    }
+
     public void save() throws Exception {
         log.debug("Saving "+name+" partition.");
 
         Project project = projectNode.getProject();
-
-        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-        File workDir = project.getWorkDir();
-
-        partitionConfigs.store(workDir, partitionConfig);
+        project.save(partitionConfig);
     }
 
     public void upload() throws Exception {

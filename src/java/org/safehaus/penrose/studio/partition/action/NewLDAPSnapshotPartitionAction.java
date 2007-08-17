@@ -22,6 +22,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.partition.wizard.CreateLDAPSnapshotWizard;
 import org.apache.log4j.Logger;
 
@@ -37,8 +38,10 @@ public class NewLDAPSnapshotPartitionAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
+            Project project = serversView.getSelectedProjectNode().getProject();
 
-            Wizard wizard = new CreateLDAPSnapshotWizard();
+            CreateLDAPSnapshotWizard wizard = new CreateLDAPSnapshotWizard();
+            wizard.setProject(project);
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);

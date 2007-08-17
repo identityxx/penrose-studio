@@ -55,6 +55,8 @@ public class CreatePartitionWizard extends Wizard {
             PartitionConfigs partitionConfigs = project.getPartitionConfigs();
             partitionConfigs.addPartitionConfig(partitionConfig);
 
+            project.save(partitionConfig);
+            
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 

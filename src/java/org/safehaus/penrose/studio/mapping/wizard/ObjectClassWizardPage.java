@@ -226,7 +226,7 @@ public class ObjectClassWizardPage extends WizardPage {
         selectedOCs.addAll(list);
     }
 
-    public Collection getSelectedObjectClasses() {
+    public Collection<String> getSelectedObjectClasses() {
         return selectedOCs;
     }
 }

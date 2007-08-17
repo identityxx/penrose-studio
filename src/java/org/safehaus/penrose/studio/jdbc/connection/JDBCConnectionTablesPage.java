@@ -35,7 +35,6 @@ import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.jdbc.connection.JDBCSourceWizard;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
 import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.partition.Partitions;
@@ -45,7 +44,6 @@ import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.naming.PenroseContext;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.io.StringWriter;
 import java.io.PrintWriter;
 
@@ -184,6 +182,8 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
                     TableConfig tableConfig = (TableConfig)ti.getData();
 
                     JDBCSourceWizard wizard = new JDBCSourceWizard(partitionConfig, connectionConfig, tableConfig);
+                    wizard.setProject(editor.getProject());
+
                     WizardDialog dialog = new WizardDialog(getEditor().getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
                     dialog.open();
@@ -243,16 +243,15 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
             //JDBCClient client = new JDBCClient(connectionConfig.getParameters());
             //client.connect();
 
-            Collection catalogs = client.getCatalogs();
-            Collection schemas = client.getSchemas();
-            Collection tables = client.getTables(getCatalog(), getSchema());
+            Collection<String> catalogs = client.getCatalogs();
+            Collection<String> schemas = client.getSchemas();
+            Collection<TableConfig> tables = client.getTables(getCatalog(), getSchema());
 
             //client.close();
             connection.stop();
 
             catalogCombo.add("");
-            for (Iterator i=catalogs.iterator(); i.hasNext(); ) {
-                String catalogName = (String)i.next();
+            for (String catalogName : catalogs) {
                 catalogCombo.add(catalogName);
             }
 
@@ -263,8 +262,7 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
             }
 
             schemaCombo.add("");
-            for (Iterator i=schemas.iterator(); i.hasNext(); ) {
-                String schemaName = (String)i.next();
+            for (String schemaName : schemas) {
                 schemaCombo.add(schemaName);
             }
 
@@ -274,9 +272,7 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
                 schemaCombo.select(0);
             }
 
-            for (Iterator i=tables.iterator(); i.hasNext(); ) {
-                TableConfig tableConfig = (TableConfig)i.next();
-
+            for (TableConfig tableConfig : tables) {
                 TableItem item = new TableItem(tablesTable, SWT.NONE);
                 item.setText(tableConfig.getName());
                 item.setData(tableConfig);
@@ -331,14 +327,12 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
             //JDBCClient client = new JDBCClient(connectionConfig.getParameters());
             //client.connect();
 
-            Collection tables = client.getTables(getCatalog(), getSchema());
+            Collection<TableConfig> tables = client.getTables(getCatalog(), getSchema());
 
             //client.close();
             connection.stop();
 
-            for (Iterator i=tables.iterator(); i.hasNext(); ) {
-                TableConfig tableConfig = (TableConfig)i.next();
-
+            for (TableConfig tableConfig : tables) {
                 TableItem item = new TableItem(tablesTable, SWT.NONE);
                 item.setText(tableConfig.getName());
                 item.setData(tableConfig);
@@ -371,13 +365,11 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
 
             JDBCClient client = new JDBCClient(connectionConfig.getParameters());
 
-            Collection fields = client.getColumns(getCatalog(), getSchema(), tableConfig.getName());
+            Collection<FieldConfig> fields = client.getColumns(getCatalog(), getSchema(), tableConfig.getName());
 
             client.close();
 
-            for (Iterator i=fields.iterator(); i.hasNext(); ) {
-                FieldConfig field = (FieldConfig)i.next();
-
+            for (FieldConfig field : fields) {
                 TableItem it = new TableItem(fieldsTable, SWT.NONE);
                 it.setImage(PenrosePlugin.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
                 it.setText(0, field.getName());

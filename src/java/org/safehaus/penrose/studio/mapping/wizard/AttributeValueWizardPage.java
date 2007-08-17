@@ -57,10 +57,10 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
     PartitionConfig partitionConfig;
     Table attributeTable;
 
-    private Collection sourceMappings;
+    private Collection<SourceMapping> sourceMappings;
 
-    private Collection objectClasses;
-    private Map attributeMappings = new TreeMap();
+    private Collection<String> objectClasses;
+    private Map<String,Collection<AttributeMapping>> attributeMappings = new TreeMap<String,Collection<AttributeMapping>>();
 
     private int defaultType = CONSTANT;
 
@@ -103,15 +103,13 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                     if (defaultType == VARIABLE) {
 
                         if (sourceMappings != null) {
-                            for (Iterator i=sourceMappings.iterator(); i.hasNext(); ) {
-                                SourceMapping sourceMapping = (SourceMapping)i.next();
+                            for (SourceMapping sourceMapping : sourceMappings) {
                                 SourceConfig sourceConfig = partitionConfig.getSourceConfigs().getSourceConfig(sourceMapping.getSourceName());
                                 dialog.addVariable(sourceMapping.getName());
 
-                                Collection fields = sourceConfig.getFieldConfigs();
-                                for (Iterator j=fields.iterator(); j.hasNext(); ) {
-                                    FieldConfig field = (FieldConfig)j.next();
-                                    dialog.addVariable(sourceMapping.getName()+"."+field.getName());
+                                Collection<FieldConfig> fields = sourceConfig.getFieldConfigs();
+                                for (FieldConfig field : fields) {
+                                    dialog.addVariable(sourceMapping.getName() + "." + field.getName());
                                 }
                             }
                         }
@@ -172,8 +170,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                     dialog.open();
                     if (dialog.getAction() == AttributeTypeSelectionDialog.CANCEL) return;
 
-                    for (Iterator i=dialog.getSelections().iterator(); i.hasNext(); ) {
-                        String name = (String)i.next();
+                    for (String name : dialog.getSelections()) {
                         AttributeMapping ad = new AttributeMapping();
                         ad.setName(name);
                         addAttributeMapping(ad);
@@ -195,8 +192,8 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                 if (attributeTable.getSelectionCount() == 0) return;
 
                 TableItem items[] = attributeTable.getSelection();
-                for (int i=0; i<items.length; i++) {
-                    AttributeMapping ad = (AttributeMapping)items[i].getData();
+                for (TableItem item : items) {
+                    AttributeMapping ad = (AttributeMapping) item.getData();
                     removeAttributeMapping(ad);
                 }
 
@@ -209,9 +206,9 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
     public void addAttributeMapping(AttributeMapping attributeMapping) {
         String name = attributeMapping.getName().toLowerCase();
-        Collection list = (Collection)attributeMappings.get(name);
+        Collection<AttributeMapping> list = attributeMappings.get(name);
         if (list == null) {
-            list = new ArrayList();
+            list = new ArrayList<AttributeMapping>();
             attributeMappings.put(name, list);
         }
         list.add(attributeMapping);
@@ -219,7 +216,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
     public void removeAttributeMapping(AttributeMapping attributeMapping) {
         String name = attributeMapping.getName().toLowerCase();
-        Collection list = (Collection)attributeMappings.get(name);
+        Collection<AttributeMapping> list = attributeMappings.get(name);
         if (list == null) return;
 
         list.remove(attributeMapping);
@@ -231,9 +228,8 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
         attributeMappings.clear();
 
-        for (Iterator i=rdn.getNames().iterator(); i.hasNext(); ) {
-            String name = (String)i.next();
-            String value = (String)rdn.get(name);
+        for (String name : rdn.getNames()) {
+            String value = (String) rdn.get(name);
 
             AttributeMapping ad = new AttributeMapping();
             ad.setName(name);
@@ -257,18 +253,15 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
             SchemaManager schemaManager = project.getSchemaManager();
 
             System.out.println("Object classes:");
-            for (Iterator i=objectClasses.iterator(); i.hasNext(); ) {
-                String objectClass = (String)i.next();
+            for (String objectClass : objectClasses) {
 
-                Collection allOcs = schemaManager.getAllObjectClasses(objectClass);
-                for (Iterator j=allOcs.iterator(); j.hasNext(); ) {
-                    ObjectClass oc = (ObjectClass)j.next();
-                    System.out.println(" - "+oc.getName());
+                Collection<ObjectClass> allOcs = schemaManager.getAllObjectClasses(objectClass);
+                for (ObjectClass oc : allOcs) {
+                    System.out.println(" - " + oc.getName());
 
-                    Collection reqAttrs = oc.getRequiredAttributes();
-                    for (Iterator k=reqAttrs.iterator(); k.hasNext(); ) {
-                        String attrName = (String)k.next();
-                        System.out.println("   - (req): "+attrName);
+                    Collection<String> reqAttrs = oc.getRequiredAttributes();
+                    for (String attrName : reqAttrs) {
+                        System.out.println("   - (req): " + attrName);
 
                         if (attributeMappings.containsKey(attrName.toLowerCase())) continue;
 
@@ -320,11 +313,9 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
         attributeTable.removeAll();
 
         log.debug("Attributes:");
-        for (Iterator i=attributeMappings.values().iterator(); i.hasNext(); ) {
-            Collection list = (Collection)i.next();
+        for (Collection<AttributeMapping> list : attributeMappings.values()) {
 
-            for (Iterator j=list.iterator(); j.hasNext(); ) {
-                AttributeMapping ad = (AttributeMapping)j.next();
+            for (AttributeMapping ad : list) {
 
                 String value;
 
@@ -333,7 +324,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                     if (constant instanceof byte[]) {
                         value = "(binary)";
                     } else {
-                        value = "\""+constant+"\"";
+                        value = "\"" + constant + "\"";
                     }
 
                 } else {
@@ -345,7 +336,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                     value = expression == null ? null : expression.getScript();
                 }
 
-                log.debug(" - "+ad.getName()+": "+value);
+                log.debug(" - " + ad.getName() + ": " + value);
 
                 TableItem it = new TableItem(attributeTable, SWT.CHECK);
                 it.setImage(PenrosePlugin.getImage(ad.isRdn() ? PenroseImage.KEY : PenroseImage.NOKEY));
@@ -365,11 +356,9 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
         boolean rdn = false;
 
-        for (Iterator i=attributeMappings.values().iterator(); i.hasNext(); ) {
-            Collection list = (Collection)i.next();
+        for (Collection<AttributeMapping> list : attributeMappings.values()) {
 
-            for (Iterator j=list.iterator(); j.hasNext(); ) {
-                AttributeMapping ad = (AttributeMapping)j.next();
+            for (AttributeMapping ad : list) {
                 if (ad.isRdn()) rdn = true;
 
                 if (ad.getConstant() != null) continue;
@@ -377,7 +366,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                 if (ad.getVariable() != null) continue;
                 if (ad.getExpression() != null) continue;
 
-                log.debug("Attribute "+ad.getName()+" not set.");
+                log.debug("Attribute " + ad.getName() + " not set.");
                 return false;
             }
         }
@@ -392,9 +381,8 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
     public void updateImages() {
         TableItem items[] = attributeTable.getItems();
-        for (int i=0; i<items.length; i++) {
-            TableItem item = items[i];
-            AttributeMapping ad = (AttributeMapping)item.getData();
+        for (TableItem item : items) {
+            AttributeMapping ad = (AttributeMapping) item.getData();
             ad.setRdn(item.getChecked());
             item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
         }
@@ -416,24 +404,23 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
         this.defaultType = defaultType;
     }
 
-    public Collection getSourceMappings() {
+    public Collection<SourceMapping> getSourceMappings() {
         return sourceMappings;
     }
 
-    public void setSourceMappings(Collection sourceMappings) {
+    public void setSourceMappings(Collection<SourceMapping> sourceMappings) {
         this.sourceMappings = sourceMappings;
     }
 
-    public Collection getAttributeMappings() {
-        Collection results = new ArrayList();
-        for (Iterator i=attributeMappings.values().iterator(); i.hasNext(); ) {
-            Collection list = (Collection)i.next();
+    public Collection<AttributeMapping> getAttributeMappings() {
+        Collection<AttributeMapping> results = new ArrayList<AttributeMapping>();
+        for (Collection<AttributeMapping> list : attributeMappings.values()) {
             results.addAll(list);
         }
         return results;
     }
 
-    public void setAttributeMappings(Map attributeMappings) {
+    public void setAttributeMappings(Map<String,Collection<AttributeMapping>> attributeMappings) {
         this.attributeMappings = attributeMappings;
     }
 
@@ -441,7 +428,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
         return objectClasses;
     }
 
-    public void setObjectClasses(Collection objectClasses) {
+    public void setObjectClasses(Collection<String> objectClasses) {
         this.objectClasses = objectClasses;
     }
 

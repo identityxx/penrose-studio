@@ -20,6 +20,7 @@ package org.safehaus.penrose.studio.directory.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
 import org.safehaus.penrose.studio.util.SnapshotUtil;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.connection.ConnectionConfig;
@@ -32,13 +33,14 @@ public class CreateLDAPSnapshotWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    PartitionConfig partitionConfig;
+    private Project project;
+    private PartitionConfig partitionConfig;
     SelectConnectionWizardPage connectionPage;
 
-    public CreateLDAPSnapshotWizard(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
-        this.connectionPage = new SelectConnectionWizardPage(partitionConfig, "LDAP");
+    public CreateLDAPSnapshotWizard() {
         setWindowTitle("Create LDAP Snapshot");
+
+        connectionPage = new SelectConnectionWizardPage(partitionConfig, "LDAP");
     }
 
     public boolean canFinish() {
@@ -54,6 +56,8 @@ public class CreateLDAPSnapshotWizard extends Wizard {
 
             SnapshotUtil snapshotUtil = new SnapshotUtil();
             snapshotUtil.createSnapshot(partitionConfig, client);
+
+            project.save(partitionConfig);
             
             return true;
 
@@ -69,5 +73,21 @@ public class CreateLDAPSnapshotWizard extends Wizard {
 
     public boolean needsPreviousAndNextButtons() {
         return true;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
+    }
+
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

@@ -19,11 +19,11 @@ package org.safehaus.penrose.studio.directory.action;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.studio.directory.wizard.CreateLDAPProxyWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.Project;
 import org.apache.log4j.Logger;
 
 public class MapLDAPTreeFromTopAction extends Action {
@@ -42,11 +42,13 @@ public class MapLDAPTreeFromTopAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
+            Project project = node.getProjectNode().getProject();
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             //if (!penroseStudio.isCommercial()) return;
 
-            Wizard wizard = new CreateLDAPProxyWizard(node.getPartitionConfig());
+            CreateLDAPProxyWizard wizard = new CreateLDAPProxyWizard(node.getPartitionConfig());
+            wizard.setProject(project);
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);

@@ -341,7 +341,7 @@ public class NISGroupScriptsPage extends FormPage {
 
             String sql = "select a.cn, a.gidNumber, b.gidNumber" +
                     " from "+table+" a"+
-                    " left join nis.groups b on b.domain=? and a.cn=b.cn"+
+                    " left join nis_cache.groups b on b.domain=? and a.cn=b.cn"+
                     " where a.cn = ? and (b.gidNumber is null and a.gidNumber = ? or b.gidNumber = ?)"+
                     " order by a.cn";
 

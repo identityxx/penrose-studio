@@ -23,6 +23,7 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.partition.PartitionNode;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.source.action.NewSourceAction;
 import org.safehaus.penrose.studio.tree.Node;
@@ -93,20 +94,24 @@ public class SourcesNode extends Node {
 
         if (!(newObject instanceof SourceConfig)) return;
 
+        SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
+
         SourceConfig newSourceDefinition = (SourceConfig)((SourceConfig)newObject).clone();
 
         int counter = 1;
         String name = newSourceDefinition.getName();
-        SourceConfigs sources = partitionConfig.getSourceConfigs();
-        while (sources.getSourceConfig(name) != null) {
+        while (sourceConfigs.getSourceConfig(name) != null) {
             counter++;
             name = newSourceDefinition.getName()+" ("+counter+")";
         }
 
         newSourceDefinition.setName(name);
-        sources.addSourceConfig(newSourceDefinition);
+        sourceConfigs.addSourceConfig(newSourceDefinition);
 
         view.setClipboard(null);
+
+        Project project = projectNode.getProject();
+        project.save(partitionConfig, sourceConfigs);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();

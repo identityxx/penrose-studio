@@ -341,7 +341,7 @@ public class NISUserScriptsPage extends FormPage {
 
             String sql = "select a.uid, a.uidNumber, b.uidNumber" +
                     " from "+table+" a"+
-                    " left join nis.users b on b.domain=? and a.uid=b.uid"+
+                    " left join nis_cache.users b on b.domain=? and a.uid=b.uid"+
                     " where a.uid = ? and (b.uidNumber is null and a.uidNumber = ? or b.uidNumber = ?)"+
                     " order by a.uid";
 

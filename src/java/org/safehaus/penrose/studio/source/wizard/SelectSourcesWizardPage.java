@@ -107,8 +107,7 @@ public class SelectSourcesWizardPage extends WizardPage implements SelectionList
         removeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 TableItem items[] = sourceTable.getSelection();
-                for (int i=0; i<items.length; i++) {
-                    TableItem item = items[i];
+                for (TableItem item : items) {
                     item.dispose();
                 }
             }
@@ -117,12 +116,11 @@ public class SelectSourcesWizardPage extends WizardPage implements SelectionList
         setPageComplete(validatePage());
     }
 
-    public Collection getSourceMappings() {
-        Collection results = new ArrayList();
+    public Collection<SourceMapping> getSourceMappings() {
+        Collection<SourceMapping> results = new ArrayList<SourceMapping>();
         TableItem items[] = sourceTable.getItems();
-        for (int i=0; i<items.length; i++) {
-            TableItem item = items[i];
-            SourceMapping sourceMapping = (SourceMapping)item.getData();
+        for (TableItem item : items) {
+            SourceMapping sourceMapping = (SourceMapping) item.getData();
             results.add(sourceMapping);
         }
         return results;

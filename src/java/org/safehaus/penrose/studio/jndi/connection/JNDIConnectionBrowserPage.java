@@ -169,6 +169,7 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
                             "OBJECT",
                             attributeNames
                     );
+                    wizard.setProject(editor.getProject());
 
                     WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
@@ -204,6 +205,7 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
                             "ONELEVEL",
                             new ArrayList()
                     );
+                    wizard.setProject(editor.getProject());
 
                     WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
@@ -262,6 +264,7 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
                             "ONELEVEL",
                             attributeNames
                     );
+                    wizard.setProject(editor.getProject());
 
                     WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);

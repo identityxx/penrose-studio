@@ -21,6 +21,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.jndi.source.JNDISourceWizard;
 import org.safehaus.penrose.studio.jdbc.source.JDBCSourceWizard;
 import org.safehaus.penrose.studio.connection.ConnectionNode;
@@ -44,6 +45,7 @@ public class NewSourceAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
+            Project project = node.getProjectNode().getProject();
 
             PartitionConfig partitionConfig = node.getPartitionConfig();
             ConnectionConfig connectionConfig = node.getConnectionConfig();
@@ -51,12 +53,16 @@ public class NewSourceAction extends Action {
 
             if ("JDBC".equals(adapterName)) {
                 JDBCSourceWizard wizard = new JDBCSourceWizard(partitionConfig, connectionConfig);
+                wizard.setProject(project);
+                
                 WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
                 dialog.setPageSize(600, 300);
                 dialog.open();
 
             } else if ("LDAP".equals(adapterName)) {
                 JNDISourceWizard wizard = new JNDISourceWizard(partitionConfig, connectionConfig);
+                wizard.setProject(project);
+
                 WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
                 dialog.setPageSize(600, 300);
                 dialog.open();

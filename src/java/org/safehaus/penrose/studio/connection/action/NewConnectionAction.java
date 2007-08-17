@@ -19,8 +19,10 @@ package org.safehaus.penrose.studio.connection.action;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.connection.wizard.ConnectionWizard;
 import org.safehaus.penrose.studio.connection.ConnectionsNode;
 import org.apache.log4j.Logger;
@@ -29,10 +31,10 @@ public class NewConnectionAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
-    ConnectionsNode node;
+    ConnectionsNode connectionsNode;
 
 	public NewConnectionAction(ConnectionsNode node) {
-        this.node = node;
+        this.connectionsNode = node;
 
         setText("New Connection...");
         setId(getClass().getName());
@@ -41,16 +43,21 @@ public class NewConnectionAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
+            Project project = connectionsNode.getProjectNode().getProject();
 
-            ConnectionWizard wizard = new ConnectionWizard(node.getPartitionConfig());
+            ConnectionWizard wizard = new ConnectionWizard(connectionsNode.getPartitionConfig());
+            wizard.setProject(project);
+
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
-            dialog.open();
+            int rc = dialog.open();
+
+            if (rc == Window.CANCEL) return;
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 
-            serversView.open(node);
+            serversView.open(connectionsNode);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

@@ -30,6 +30,7 @@ import org.safehaus.penrose.studio.source.wizard.SelectSourcesWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDNBuilder;
+import org.safehaus.penrose.directory.DirectoryConfigs;
 import org.apache.log4j.Logger;
 
 import java.util.Iterator;
@@ -42,6 +43,7 @@ public class DynamicEntryFromSourceWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
+    private Project project;
     private PartitionConfig partitionConfig;
     private EntryMapping parentMapping;
     private EntryMapping entryMapping = new EntryMapping();
@@ -50,19 +52,26 @@ public class DynamicEntryFromSourceWizard extends Wizard {
     public ObjectClassWizardPage ocPage;
     public AttributeValueWizardPage attrPage;
 
-    public DynamicEntryFromSourceWizard(Project project, PartitionConfig partition, EntryMapping parentMapping) {
-        this.partitionConfig = partition;
+    public DynamicEntryFromSourceWizard(PartitionConfig partitionConfig, EntryMapping parentMapping) {
+        this.partitionConfig = partitionConfig;
         this.parentMapping = parentMapping;
         setWindowTitle("Mapping Active Directory Users");
+    }
 
-        sourcesPage = new SelectSourcesWizardPage(partition);
+    public void addPages() {
+
+        sourcesPage = new SelectSourcesWizardPage(partitionConfig);
         sourcesPage.setDescription("Select a source.");
 
         ocPage = new ObjectClassWizardPage(project);
         //ocPage.setSelecteObjectClasses(entryMapping.getObjectClasses());
 
-        attrPage = new AttributeValueWizardPage(project, partition);
+        attrPage = new AttributeValueWizardPage(project, partitionConfig);
         attrPage.setDefaultType(AttributeValueWizardPage.VARIABLE);
+
+        addPage(sourcesPage);
+        addPage(ocPage);
+        addPage(attrPage);
     }
 
     public boolean canFinish() {
@@ -71,12 +80,6 @@ public class DynamicEntryFromSourceWizard extends Wizard {
         if (!attrPage.isPageComplete()) return false;
 
         return true;
-    }
-
-    public void addPages() {
-        addPage(sourcesPage);
-        addPage(ocPage);
-        addPage(attrPage);
     }
 
     public IWizardPage getNextPage(IWizardPage page) {
@@ -136,7 +139,10 @@ public class DynamicEntryFromSourceWizard extends Wizard {
                 sourceMapping.addFieldMapping(fieldMapping);
             }
 
-            partitionConfig.getDirectoryConfigs().addEntryMapping(entryMapping);
+            DirectoryConfigs directoryConfigs = partitionConfig.getDirectoryConfigs();
+            directoryConfigs.addEntryMapping(entryMapping);
+
+            project.save(partitionConfig, directoryConfigs);
 
             return true;
 
@@ -172,5 +178,13 @@ public class DynamicEntryFromSourceWizard extends Wizard {
 
     public void setPartitionConfig(PartitionConfig partitionConfig) {
         this.partitionConfig = partitionConfig;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

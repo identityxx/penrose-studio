@@ -32,6 +32,7 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.partition.PartitionNode;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.plugin.PluginManager;
 import org.safehaus.penrose.studio.plugin.Plugin;
 import org.safehaus.penrose.studio.server.ServersView;
@@ -40,6 +41,7 @@ import org.safehaus.penrose.studio.connection.editor.*;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionConfigs;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -52,11 +54,11 @@ public class ConnectionNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ServersView view;
-    ProjectNode projectNode;
-    PartitionsNode partitionsNode;
-    PartitionNode partitionNode;
-    ConnectionsNode connectionsNode;
+    private ServersView view;
+    private ProjectNode projectNode;
+    private PartitionsNode partitionsNode;
+    private PartitionNode partitionNode;
+    private ConnectionsNode connectionsNode;
 
     private PartitionConfig partitionConfig;
     private ConnectionConfig connectionConfig;
@@ -148,8 +150,12 @@ public class ConnectionNode extends Node {
 
         if (!confirm) return;
 
-        partitionConfig.getConnectionConfigs().removeConnectionConfig(connectionConfig.getName());
+        ConnectionConfigs connectionConfigs = partitionConfig.getConnectionConfigs();
+        connectionConfigs.removeConnectionConfig(connectionConfig.getName());
 
+        Project project = projectNode.getProject();
+        project.save(partitionConfig, connectionConfigs);
+        
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
@@ -164,19 +170,24 @@ public class ConnectionNode extends Node {
 
         if (!(newObject instanceof ConnectionConfig)) return;
 
+        ConnectionConfigs connectionConfigs = partitionConfig.getConnectionConfigs();
+
         ConnectionConfig newConnectionConfig = (ConnectionConfig)((ConnectionConfig)newObject).clone();
 
         int counter = 1;
         String name = newConnectionConfig.getName();
-        while (partitionConfig.getConnectionConfigs().getConnectionConfig(name) != null) {
+        while (connectionConfigs.getConnectionConfig(name) != null) {
             counter++;
             name = newConnectionConfig.getName()+" ("+counter+")";
         }
 
         newConnectionConfig.setName(name);
-        partitionConfig.getConnectionConfigs().addConnectionConfig(newConnectionConfig);
+        connectionConfigs.addConnectionConfig(newConnectionConfig);
 
         view.setClipboard(null);
+
+        Project project = projectNode.getProject();
+        project.save(partitionConfig, connectionConfigs);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
@@ -207,5 +218,45 @@ public class ConnectionNode extends Node {
 
     public void setConnectionConfig(ConnectionConfig connectionConfig) {
         this.connectionConfig = connectionConfig;
+    }
+
+    public ServersView getView() {
+        return view;
+    }
+
+    public void setView(ServersView view) {
+        this.view = view;
+    }
+
+    public ProjectNode getProjectNode() {
+        return projectNode;
+    }
+
+    public void setProjectNode(ProjectNode projectNode) {
+        this.projectNode = projectNode;
+    }
+
+    public PartitionsNode getPartitionsNode() {
+        return partitionsNode;
+    }
+
+    public void setPartitionsNode(PartitionsNode partitionsNode) {
+        this.partitionsNode = partitionsNode;
+    }
+
+    public PartitionNode getPartitionNode() {
+        return partitionNode;
+    }
+
+    public void setPartitionNode(PartitionNode partitionNode) {
+        this.partitionNode = partitionNode;
+    }
+
+    public ConnectionsNode getConnectionsNode() {
+        return connectionsNode;
+    }
+
+    public void setConnectionsNode(ConnectionsNode connectionsNode) {
+        this.connectionsNode = connectionsNode;
     }
 }

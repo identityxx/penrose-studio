@@ -28,6 +28,7 @@ import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.StaticEntryDNWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.acl.ACI;
+import org.safehaus.penrose.directory.DirectoryConfigs;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -39,6 +40,7 @@ public class RootEntryWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
+    private Project project;
     private PartitionConfig partitionConfig;
     private EntryMapping entryMapping;
 
@@ -47,6 +49,7 @@ public class RootEntryWizard extends Wizard {
     public AttributeValueWizardPage attrPage;
 
     public RootEntryWizard(Project project, PartitionConfig partition) {
+        this.project = project;
         this.partitionConfig = partition;
 
         dnPage = new StaticEntryDNWizardPage(partition);
@@ -93,7 +96,9 @@ public class RootEntryWizard extends Wizard {
 
             entryMapping.addACI(new ACI("rs"));
 
-            partitionConfig.getDirectoryConfigs().addEntryMapping(entryMapping);
+            DirectoryConfigs directoryConfigs = partitionConfig.getDirectoryConfigs();
+            directoryConfigs.addEntryMapping(entryMapping);
+            project.save(partitionConfig, directoryConfigs);
 
             return true;
 
@@ -121,5 +126,13 @@ public class RootEntryWizard extends Wizard {
 
     public void setPartitionConfig(PartitionConfig partitionConfig) {
         this.partitionConfig = partitionConfig;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

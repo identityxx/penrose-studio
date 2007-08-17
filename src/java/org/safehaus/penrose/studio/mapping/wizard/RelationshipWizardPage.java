@@ -116,12 +116,11 @@ public class RelationshipWizardPage extends WizardPage implements SelectionListe
         setPageComplete(validatePage());
     }
 
-    public Collection getRelationships() {
-        Collection results = new ArrayList();
+    public Collection<Relationship> getRelationships() {
+        Collection<Relationship> results = new ArrayList<Relationship>();
         TableItem items[] = relationshipTable.getItems();
-        for (int i=0; i<items.length; i++) {
-            TableItem item = items[i];
-            Relationship relationship = (Relationship)item.getData();
+        for (TableItem item : items) {
+            Relationship relationship = (Relationship) item.getData();
             results.add(relationship);
         }
         return results;

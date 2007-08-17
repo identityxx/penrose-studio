@@ -63,9 +63,9 @@ public class ConflictingUIDFinderAction extends NISAction {
 
         String sql = "select a.uid, a.uidNumber, b.uidNumber, c.uid, c.uidNumber, d.uidNumber" +
                 " from "+table1+" a"+
-                " left join nis.users b on b.domain=? and a.uid=b.uid"+
+                " left join nis_cache.users b on b.domain=? and a.uid=b.uid"+
                 " join "+table2+" c on a.uid <> c.uid "+
-                " left join nis.users d on d.domain=? and c.uid=d.uid"+
+                " left join nis_cache.users d on d.domain=? and c.uid=d.uid"+
                 " where b.uidNumber is null and d.uidNumber is null and a.uidNumber = c.uidNumber"+
                     " or b.uidNumber is null and a.uidNumber = d.uidNumber"+
                     " or d.uidNumber is null and b.uidNumber = c.uidNumber"+

@@ -20,11 +20,13 @@ package org.safehaus.penrose.studio.connection.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionConfigs;
 import org.safehaus.penrose.studio.driver.Driver;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.jdbc.connection.JDBCConnectionWizardPage;
 import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionParametersWizardPage;
 import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionInfoWizardPage;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.apache.log4j.Logger;
@@ -41,6 +43,7 @@ public class ConnectionWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
+    private Project project;
     private PartitionConfig partitionConfig;
     private ConnectionConfig connectionConfig;
 
@@ -53,12 +56,12 @@ public class ConnectionWizard extends Wizard {
 
     public ConnectionWizard(PartitionConfig partitionConfig) {
         this.partitionConfig = partitionConfig;
+        setWindowTitle("New Connection");
 
         Map<String,Object> parameters = new TreeMap<String,Object>();
         parameters.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         jndiParametersPage.setParameters(parameters);
 
-        setWindowTitle("New Connection");
     }
 
     public boolean canFinish() {
@@ -91,8 +94,10 @@ public class ConnectionWizard extends Wizard {
     public IWizardPage getNextPage(IWizardPage page) {
         if (page == driverPage) {
 
-            String adapter = driverPage.getDriver().getAdapterName();
+            Driver driver = driverPage.getDriver();
+            String adapter = driver.getAdapterName();
             if ("JDBC".equals(adapter)) {
+                jdbcPage.setDriver(driver);
                 return jdbcPage;
 
             } else if ("LDAP".equals(adapter)) {
@@ -159,7 +164,10 @@ public class ConnectionWizard extends Wizard {
                 }
             }
 
-            partitionConfig.getConnectionConfigs().addConnectionConfig(connectionConfig);
+            ConnectionConfigs connectionConfigs = partitionConfig.getConnectionConfigs();
+            connectionConfigs.addConnectionConfig(connectionConfig);
+
+            project.save(partitionConfig, connectionConfigs);
 
             return true;
 
@@ -187,5 +195,13 @@ public class ConnectionWizard extends Wizard {
 
     public void setPartitionConfig(PartitionConfig partitionConfig) {
         this.partitionConfig = partitionConfig;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

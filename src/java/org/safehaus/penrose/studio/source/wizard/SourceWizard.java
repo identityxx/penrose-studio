@@ -27,15 +27,17 @@ import org.safehaus.penrose.studio.jdbc.source.JDBCFieldWizardPage;
 import org.safehaus.penrose.studio.jndi.source.JNDITreeWizardPage;
 import org.safehaus.penrose.studio.jndi.source.JNDIAttributeWizardPage;
 import org.safehaus.penrose.studio.jndi.source.JNDIFieldWizardPage;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.TableConfig;
+import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.schema.AttributeType;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
@@ -44,6 +46,7 @@ public class SourceWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
+    private Project project;
     private PartitionConfig partitionConfig;
     private SourceConfig sourceConfig;
 
@@ -58,11 +61,18 @@ public class SourceWizard extends Wizard {
     public JNDIAttributeWizardPage jndiAttributesPage;
     public JNDIFieldWizardPage jndiFieldsPage;
 
-    public SourceWizard(PartitionConfig partition) throws Exception {
-        this.partitionConfig = partition;
+    public SourceWizard(PartitionConfig partitionConfig) throws Exception {
+        this.partitionConfig = partitionConfig;
+
+        setWindowTitle("New Source");
+    }
+
+    public void addPages() {
 
         propertyPage = new SourceWizardPage();
-        connectionPage = new SelectConnectionWizardPage(partition);
+
+        connectionPage = new SelectConnectionWizardPage(partitionConfig);
+        connectionPage.setProject(project);
 
         jdbcTablePage = new JDBCTableWizardPage();
         jdbcFieldsPage = new JDBCFieldWizardPage();
@@ -72,7 +82,16 @@ public class SourceWizard extends Wizard {
         jndiAttributesPage = new JNDIAttributeWizardPage();
         jndiFieldsPage = new JNDIFieldWizardPage();
 
-        setWindowTitle("New Source");
+        addPage(propertyPage);
+        addPage(connectionPage);
+
+        addPage(jdbcTablePage);
+        addPage(jdbcFieldsPage);
+        addPage(jdbcPrimaryKeyPage);
+
+        addPage(jndiTreePage);
+        addPage(jndiAttributesPage);
+        addPage(jndiFieldsPage);
     }
 
     public boolean canFinish() {
@@ -97,19 +116,6 @@ public class SourceWizard extends Wizard {
         }
 
         return true;
-    }
-
-    public void addPages() {
-        addPage(propertyPage);
-        addPage(connectionPage);
-
-        addPage(jdbcTablePage);
-        addPage(jdbcFieldsPage);
-        addPage(jdbcPrimaryKeyPage);
-
-        addPage(jndiTreePage);
-        addPage(jndiAttributesPage);
-        addPage(jndiFieldsPage);
     }
 
     public IWizardPage getNextPage(IWizardPage page) {
@@ -137,7 +143,7 @@ public class SourceWizard extends Wizard {
             jdbcFieldsPage.setTableConfig(connectionConfig, tableConfig);
 
         } else if (jdbcFieldsPage == page) {
-            Collection selectedFields = jdbcFieldsPage.getSelectedFieldConfigs();
+            Collection<FieldConfig> selectedFields = jdbcFieldsPage.getSelectedFieldConfigs();
             jdbcPrimaryKeyPage.setFieldConfigs(selectedFields);
 
         } else if (jdbcPrimaryKeyPage == page) {
@@ -148,7 +154,7 @@ public class SourceWizard extends Wizard {
             jndiAttributesPage.setConnectionConfig(connectionConfig);
 
         } else if (jndiAttributesPage == page) {
-            Collection attributeTypes = jndiAttributesPage.getAttributeTypes();
+            Collection<AttributeType> attributeTypes = jndiAttributesPage.getAttributeTypes();
             jndiFieldsPage.setAttributeTypes(attributeTypes);
         }
 
@@ -189,14 +195,13 @@ public class SourceWizard extends Wizard {
                     sourceConfig.setParameter(JDBCClient.FILTER, filter);
                 }
 
-                Collection fields = jdbcPrimaryKeyPage.getFields();
+                Collection<FieldConfig> fields = jdbcPrimaryKeyPage.getFields();
                 if (fields.isEmpty()) {
                     fields = jdbcFieldsPage.getSelectedFieldConfigs();
                 }
 
-                for (Iterator i=fields.iterator(); i.hasNext(); ) {
-                    FieldConfig field = (FieldConfig)i.next();
-                    sourceConfig.addFieldConfig(field);
+                for (FieldConfig fieldConfig : fields) {
+                    sourceConfig.addFieldConfig(fieldConfig);
                 }
 
             } else if ("LDAP".equals(adapterName)) {
@@ -205,15 +210,16 @@ public class SourceWizard extends Wizard {
                 sourceConfig.setParameter("scope", jndiTreePage.getScope());
                 sourceConfig.setParameter("objectClasses", jndiTreePage.getObjectClasses());
 
-                Collection fields = jndiFieldsPage.getFields();
-                for (Iterator i=fields.iterator(); i.hasNext(); ) {
-                    FieldConfig field = (FieldConfig)i.next();
-                    sourceConfig.addFieldConfig(field);
+                Collection<FieldConfig> fields = jndiFieldsPage.getFields();
+                for (FieldConfig fieldConfig : fields) {
+                    sourceConfig.addFieldConfig(fieldConfig);
                 }
 
             }
 
-            partitionConfig.getSourceConfigs().addSourceConfig(sourceConfig);
+            SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
+            sourceConfigs.addSourceConfig(sourceConfig);
+            project.save(partitionConfig, sourceConfigs);
 
             return true;
 
@@ -241,5 +247,13 @@ public class SourceWizard extends Wizard {
 
     public void setPartitionConfig(PartitionConfig partitionConfig) {
         this.partitionConfig = partitionConfig;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

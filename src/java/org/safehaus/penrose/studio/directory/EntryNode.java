@@ -30,6 +30,7 @@ import org.safehaus.penrose.studio.*;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.partition.PartitionNode;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.mapping.editor.MappingEditor;
@@ -40,6 +41,7 @@ import org.safehaus.penrose.studio.directory.action.MapLDAPTreeAction;
 import org.safehaus.penrose.studio.directory.action.NewEntryFromSourceAction;
 import org.safehaus.penrose.mapping.EntryMapping;
 import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.directory.DirectoryConfigs;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -207,14 +209,19 @@ public class EntryNode extends Node {
 
         if (!confirm) return;
 
+        DirectoryConfigs directoryConfigs = partitionConfig.getDirectoryConfigs();
+
         for (Node node : view.getSelectedNodes()) {
             if (!(node instanceof EntryNode)) continue;
 
             EntryNode entryNode = (EntryNode) node;
 
             EntryMapping entryMapping = entryNode.getEntryMapping();
-            partitionConfig.getDirectoryConfigs().removeEntryMapping(entryMapping);
+            directoryConfigs.removeEntryMapping(entryMapping);
         }
+
+        Project project = projectNode.getProject();
+        project.save(partitionConfig, directoryConfigs);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();

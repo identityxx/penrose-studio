@@ -22,16 +22,18 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.source.FieldConfig;
+import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.jndi.source.JNDIFieldWizardPage;
 import org.safehaus.penrose.studio.jndi.source.JNDIAttributeWizardPage;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.ldap.DN;
+import org.safehaus.penrose.schema.AttributeType;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.ArrayList;
 
 /**
@@ -41,6 +43,7 @@ public class JNDISourceWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
+    private Project project;
     private LDAPClient client;
     private PartitionConfig partitionConfig;
     private ConnectionConfig connectionConfig;
@@ -55,7 +58,7 @@ public class JNDISourceWizard extends Wizard {
     public JNDIFieldWizardPage fieldsPage = new JNDIFieldWizardPage();
 
     public JNDISourceWizard(LDAPClient client, PartitionConfig partition, ConnectionConfig connectionConfig, String baseDn) throws Exception {
-        this(client, partition, connectionConfig, baseDn, "(objectClass=*)", "OBJECT", new ArrayList());
+        this(client, partition, connectionConfig, baseDn, "(objectClass=*)", "OBJECT", new ArrayList<String>());
     }
     
     public JNDISourceWizard(
@@ -65,7 +68,7 @@ public class JNDISourceWizard extends Wizard {
             String baseDn,
             String filter,
             String scope,
-            Collection attributeNames) throws Exception {
+            Collection<String> attributeNames) throws Exception {
 
         this.client = client;
         this.partitionConfig = partition;
@@ -81,7 +84,7 @@ public class JNDISourceWizard extends Wizard {
         } else {
             rdn = new DN(baseDn).getRdn();
         }
-        String rdnAttr = (String)rdn.getNames().iterator().next();
+        String rdnAttr = rdn.getNames().iterator().next();
         String rdnValue = (String)rdn.get(rdnAttr);
         String name = rdnValue.replaceAll("\\s", "").toLowerCase();
 
@@ -111,13 +114,14 @@ public class JNDISourceWizard extends Wizard {
             sourceConfig.setParameter("filter", propertyPage.getFilter());
             sourceConfig.setParameter("scope", propertyPage.getScope());
 
-            Collection fields = fieldsPage.getFields();
-            for (Iterator i=fields.iterator(); i.hasNext(); ) {
-                FieldConfig field = (FieldConfig)i.next();
+            Collection<FieldConfig> fields = fieldsPage.getFields();
+            for (FieldConfig field : fields) {
                 sourceConfig.addFieldConfig(field);
             }
 
-            partitionConfig.getSourceConfigs().addSourceConfig(sourceConfig);
+            SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
+            sourceConfigs.addSourceConfig(sourceConfig);
+            project.save(partitionConfig, sourceConfigs);
 
             return true;
 
@@ -144,12 +148,11 @@ public class JNDISourceWizard extends Wizard {
     public IWizardPage getNextPage(IWizardPage page) {
         if (attributesPage == page) {
             RDN rdn = new DN(baseDn).getRdn();
-            Collection names = new ArrayList();
-            for (Iterator i=rdn.getNames().iterator(); i.hasNext(); ) {
-                String name = (String)i.next();
+            Collection<String> names = new ArrayList<String>();
+            for (String name : rdn.getNames()) {
                 names.add(name.toLowerCase());
             }
-            Collection attributeTypes = attributesPage.getAttributeTypes();
+            Collection<AttributeType> attributeTypes = attributesPage.getAttributeTypes();
             fieldsPage.setAttributeTypes(attributeTypes, names);
         }
 
@@ -174,5 +177,13 @@ public class JNDISourceWizard extends Wizard {
 
     public void setPartitionConfig(PartitionConfig partitionConfig) {
         this.partitionConfig = partitionConfig;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

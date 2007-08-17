@@ -23,11 +23,13 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.partition.PartitionNode;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.connection.action.NewConnectionAction;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionConfigs;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
@@ -85,19 +87,24 @@ public class ConnectionsNode extends Node {
 
         if (!(newObject instanceof ConnectionConfig)) return;
 
+        ConnectionConfigs connectionConfigs = partitionConfig.getConnectionConfigs();
+
         ConnectionConfig newConnectionConfig = (ConnectionConfig)((ConnectionConfig)newObject).clone();
 
         int counter = 1;
         String name = newConnectionConfig.getName();
-        while (partitionConfig.getConnectionConfigs().getConnectionConfig(name) != null) {
+        while (connectionConfigs.getConnectionConfig(name) != null) {
             counter++;
             name = newConnectionConfig.getName()+" ("+counter+")";
         }
 
         newConnectionConfig.setName(name);
-        partitionConfig.getConnectionConfigs().addConnectionConfig(newConnectionConfig);
+        connectionConfigs.addConnectionConfig(newConnectionConfig);
 
         view.setClipboard(null);
+
+        Project project = projectNode.getProject();
+        project.save(partitionConfig, connectionConfigs);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();

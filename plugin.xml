@@ -129,10 +129,10 @@
            icon="images/connector.png"
            class="org.safehaus.penrose.studio.connector.ConnectorEditor"/>
        <editor
-           id="org.safehaus.penrose.studio.module.ModuleEditor"
+           id="org.safehaus.penrose.studio.module.editor.ModuleEditor"
            name="Module"
            icon="images/object.gif"
-           class="org.safehaus.penrose.studio.module.ModuleEditor"/>
+           class="org.safehaus.penrose.studio.module.editor.ModuleEditor"/>
        <editor
            id="org.safehaus.penrose.studio.schema.SchemaEditor"
            name="Schema"

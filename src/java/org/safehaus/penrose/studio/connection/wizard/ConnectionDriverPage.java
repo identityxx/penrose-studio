@@ -67,108 +67,18 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
         setDescription("Select the type of the connection.");
 
         try {
-            
-        	
         	DriverReader reader = new DriverReader("conf/drivers.xml");
             Collection<Driver> list = reader.getDrivers();
             
-            //TODO: actually get the loaded bundles and put on the list as a driver
-            //list.addAll(loadLibraries());
-
             for (Driver driver : list) {
                 addDriver(driver);
             }
-
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             MessageDialog.openError(getShell(), "Error", e.getMessage());
             
         }
-/*
-        Driver jndi = new Driver("LDAP");
-        jndi.setAdapterName("LDAP");
-        jndi.addParameter(new HiddenParameter("java.naming.factory.initial", "Driver", "com.sun.jndi.ldap.LdapCtxFactory"));
-        jndi.addParameter(new HiddenParameter("java.naming.provider.url", "URL", "ldap://${host}:${port}/${baseDn}"));
-        jndi.addParameter(new RequiredParameter("host", "Host", "localhost"));
-        jndi.addParameter(new RequiredParameter("port", "Port", "389"));
-        jndi.addParameter(new RequiredParameter("baseDn", "Base DN"));
-        jndi.addParameter(new Parameter("java.naming.security.principal", "User"));
-        jndi.addParameter(new PasswordParameter("java.naming.security.credentials", "Password"));
-        addDriver(jndi);
-
-        Driver jdbc = new Driver("JDBC");
-        jdbc.setAdapterName("JDBC");
-        jdbc.addParameter(new RequiredParameter("driver", "Driver"));
-        jdbc.addParameter(new RequiredParameter("url", "URL"));
-        jdbc.addParameter(new Parameter("user", "User"));
-        jdbc.addParameter(new PasswordParameter("password", "Password"));
-        addDriver(jdbc);
-
-        Driver odbc = new Driver("ODBC");
-        odbc.setAdapterName("JDBC");
-        odbc.addParameter(new HiddenParameter("driver", "Driver", "sun.jdbc.odbc.JdbcOdbcDriver"));
-        odbc.addParameter(new HiddenParameter("url", "URL", "jdbc:odbc:${datasource}"));
-        odbc.addParameter(new RequiredParameter("datasource", "Data Source"));
-        odbc.addParameter(new Parameter("user", "Username"));
-        odbc.addParameter(new PasswordParameter("password", "Password"));
-        addDriver(odbc);
-
-        Driver mysql = new Driver("MySQL");
-        mysql.setAdapterName("JDBC");
-        mysql.addParameter(new HiddenParameter("driver", "Driver", "com.mysql.jdbc.Driver"));
-        mysql.addParameter(new HiddenParameter("url", "URL", "jdbc:mysql://${host}:${port}/${database}?autoReconnect=true"));
-        mysql.addParameter(new RequiredParameter("host", "Host", "localhost"));
-        mysql.addParameter(new RequiredParameter("port", "Port", "3306"));
-        mysql.addParameter(new RequiredParameter("database", "Database"));
-        mysql.addParameter(new Parameter("user", "Username"));
-        mysql.addParameter(new PasswordParameter("password", "Password"));
-        addDriver(mysql);
-
-        Driver oracle = new Driver("Oracle");
-        oracle.setAdapterName("JDBC");
-        oracle.addParameter(new HiddenParameter("driver", "Driver", "oracle.jdbc.driver.OracleDriver"));
-        oracle.addParameter(new HiddenParameter("url", "URL", "jdbc:oracle:thin:@${host}:${port}:${sid}"));
-        oracle.addParameter(new RequiredParameter("host", "Host", "localhost"));
-        oracle.addParameter(new RequiredParameter("port", "Port", "1521"));
-        oracle.addParameter(new RequiredParameter("sid", "SID"));
-        oracle.addParameter(new Parameter("user", "Username"));
-        oracle.addParameter(new PasswordParameter("password", "Password"));
-        addDriver(oracle);
-
-        Driver postgres = new Driver("PostgreSQL");
-        postgres.setAdapterName("JDBC");
-        postgres.addParameter(new HiddenParameter("driver", "Driver", "org.postgresql.Driver"));
-        postgres.addParameter(new HiddenParameter("url", "URL", "jdbc:postgresql://${host}:${port}/${database}"));
-        postgres.addParameter(new RequiredParameter("host", "Host", "localhost"));
-        postgres.addParameter(new RequiredParameter("port", "Port", "5432"));
-        postgres.addParameter(new RequiredParameter("database", "Database"));
-        postgres.addParameter(new Parameter("user", "Username"));
-        postgres.addParameter(new PasswordParameter("password", "Password"));
-        addDriver(postgres);
-
-        Driver mssql = new Driver("Microsoft SQL Server");
-        mssql.setAdapterName("JDBC");
-        mssql.addParameter(new HiddenParameter("driver", "Driver", "com.microsoft.jdbc.sqlserver.SQLServerDriver"));
-        mssql.addParameter(new HiddenParameter("url", "URL", "jdbc:microsoft:sqlserver://${host}:${port};databasename=${database}"));
-        mssql.addParameter(new RequiredParameter("host", "Host", "localhost"));
-        mssql.addParameter(new RequiredParameter("port", "Port", "1433"));
-        mssql.addParameter(new RequiredParameter("database", "Database"));
-        mssql.addParameter(new Parameter("user", "Username"));
-        mssql.addParameter(new PasswordParameter("password", "Password"));
-        addDriver(mssql);
-
-        Driver sybase = new Driver("Sybase");
-        sybase.setAdapterName("JDBC");
-        sybase.addParameter(new HiddenParameter("driver", "Driver", "com.sybase.jdbc2.jdbc.SybDriver"));
-        sybase.addParameter(new HiddenParameter("url", "URL", "jdbc:sybase:Tds:${host}:${port}/${database}"));
-        sybase.addParameter(new RequiredParameter("host", "Host", "localhost"));
-        sybase.addParameter(new RequiredParameter("port", "Port", "1403"));
-        sybase.addParameter(new RequiredParameter("database", "Database"));
-        sybase.addParameter(new Parameter("user", "Username"));
-        sybase.addParameter(new PasswordParameter("password", "Password"));
-        addDriver(sybase);
-*/
     }
 
     
@@ -352,6 +262,10 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
             item.setText(name);
             item.setData(driver);
         }
+    }
+
+    public Collection<Driver> getDrivers() {
+        return drivers.values();
     }
 
     public void addDriver(Driver type) {

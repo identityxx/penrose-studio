@@ -19,11 +19,14 @@ package org.safehaus.penrose.studio.directory.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.directory.DirectoryConfigs;
 import org.apache.log4j.Logger;
 
 /**
@@ -35,20 +38,19 @@ public class CreateRootDSEProxyWizard extends Wizard {
 
     public SelectConnectionWizardPage connectionPage;
 
-    PartitionConfig partitionConfig;
-    EntryMapping parentMapping;
+    private Project project;
+    private PartitionConfig partitionConfig;
 
-    public CreateRootDSEProxyWizard(PartitionConfig partitionConfig) {
-        this(partitionConfig, null);
+    public CreateRootDSEProxyWizard() {
+        setWindowTitle("New Root DSE Proxy");
     }
 
-    public CreateRootDSEProxyWizard(PartitionConfig partitionConfig, EntryMapping parentMapping) {
-        this.partitionConfig = partitionConfig;
-        this.parentMapping = parentMapping;
+    public void addPages() {
 
         connectionPage = new SelectConnectionWizardPage(partitionConfig);
+        connectionPage.setProject(project);
 
-        setWindowTitle("New Root DSE Proxy");
+        addPage(connectionPage);
     }
 
     public boolean canFinish() {
@@ -66,7 +68,8 @@ public class CreateRootDSEProxyWizard extends Wizard {
             sourceConfig.setParameter("scope", "OBJECT");
             sourceConfig.setParameter("filter", "objectClass=*");
 
-            partitionConfig.getSourceConfigs().addSourceConfig(sourceConfig);
+            SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
+            sourceConfigs.addSourceConfig(sourceConfig);
 
             EntryMapping entryMapping = new EntryMapping();
 
@@ -77,7 +80,11 @@ public class CreateRootDSEProxyWizard extends Wizard {
 
             entryMapping.addACI(new ACI("rs"));
 
-            partitionConfig.getDirectoryConfigs().addEntryMapping(entryMapping);
+            DirectoryConfigs directoryConfigs = partitionConfig.getDirectoryConfigs();
+            directoryConfigs.addEntryMapping(entryMapping);
+
+            project.save(partitionConfig, sourceConfigs);
+            project.save(partitionConfig, directoryConfigs);
 
             return true;
 
@@ -87,11 +94,23 @@ public class CreateRootDSEProxyWizard extends Wizard {
         }
     }
 
-    public void addPages() {
-        addPage(connectionPage);
-    }
-
     public boolean needsPreviousAndNextButtons() {
         return true;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
+    }
+
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

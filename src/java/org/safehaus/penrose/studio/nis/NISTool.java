@@ -148,8 +148,9 @@ public class NISTool {
 
         copy.execute();
 
-        PartitionConfig partitionConfig = project.getPartitionConfigs().load(newDir);
-        project.getPartitionConfigs().addPartitionConfig(partitionConfig);
+        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+        PartitionConfig partitionConfig = partitionConfigs.load(newDir);
+        partitionConfigs.addPartitionConfig(partitionConfig);
     }
 
     public void loadPartition(NISDomain domain) throws Exception {

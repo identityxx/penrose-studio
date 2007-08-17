@@ -28,6 +28,7 @@ import org.safehaus.penrose.studio.mapping.wizard.StaticEntryRDNWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDN;
+import org.safehaus.penrose.directory.DirectoryConfigs;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -39,6 +40,7 @@ public class StaticEntryWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
+    private Project project;
     private PartitionConfig partitionConfig;
     private EntryMapping parentMapping;
     private EntryMapping entryMapping;
@@ -48,6 +50,7 @@ public class StaticEntryWizard extends Wizard {
     public AttributeValueWizardPage attrPage;
 
     public StaticEntryWizard(Project project, PartitionConfig partitionConfig, EntryMapping parentMapping) {
+        this.project = project;
         this.partitionConfig = partitionConfig;
         this.parentMapping = parentMapping;
         setWindowTitle("Adding static entry");
@@ -95,7 +98,9 @@ public class StaticEntryWizard extends Wizard {
             entryMapping.addObjectClasses(ocPage.getSelectedObjectClasses());
             entryMapping.addAttributeMappings(attrPage.getAttributeMappings());
 
-            partitionConfig.getDirectoryConfigs().addEntryMapping(entryMapping);
+            DirectoryConfigs directoryConfigs = partitionConfig.getDirectoryConfigs();
+            directoryConfigs.addEntryMapping(entryMapping);
+            project.save(partitionConfig, directoryConfigs);
 
             return true;
 
@@ -131,5 +136,13 @@ public class StaticEntryWizard extends Wizard {
 
     public void setParentMapping(EntryMapping parentMapping) {
         this.parentMapping = parentMapping;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

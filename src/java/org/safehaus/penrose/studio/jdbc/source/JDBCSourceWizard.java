@@ -24,12 +24,13 @@ import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.TableConfig;
+import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.studio.source.wizard.SourceWizardPage;
+import org.safehaus.penrose.studio.project.Project;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
@@ -38,6 +39,7 @@ public class JDBCSourceWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
+    private Project project;
     private PartitionConfig partitionConfig;
     private ConnectionConfig connectionConfig;
     private SourceConfig sourceConfig;
@@ -51,12 +53,19 @@ public class JDBCSourceWizard extends Wizard {
         this.partitionConfig = partition;
         this.connectionConfig = connectionConfig;
 
+        setWindowTitle(connectionConfig.getName()+" - New Source");
+    }
+
+    public void addPages() {
         propertyPage = new SourceWizardPage();
         jdbcTablePage = new JDBCTableWizardPage();
         jdbcFieldsPage = new JDBCFieldWizardPage();
         jdbcPrimaryKeyPage = new JDBCPrimaryKeyWizardPage();
 
-        setWindowTitle(connectionConfig.getName()+" - New Source");
+        addPage(propertyPage);
+        addPage(jdbcTablePage);
+        addPage(jdbcFieldsPage);
+        addPage(jdbcPrimaryKeyPage);
     }
 
     public boolean canFinish() {
@@ -68,13 +77,6 @@ public class JDBCSourceWizard extends Wizard {
         return true;
     }
 
-    public void addPages() {
-        addPage(propertyPage);
-        addPage(jdbcTablePage);
-        addPage(jdbcFieldsPage);
-        addPage(jdbcPrimaryKeyPage);
-    }
-
     public IWizardPage getNextPage(IWizardPage page) {
         if (propertyPage == page) {
             jdbcTablePage.setConnectionConfig(connectionConfig);
@@ -84,7 +86,7 @@ public class JDBCSourceWizard extends Wizard {
             jdbcFieldsPage.setTableConfig(connectionConfig, tableConfig);
 
         } else if (jdbcFieldsPage == page) {
-            Collection selectedFields = jdbcFieldsPage.getSelectedFieldConfigs();
+            Collection<FieldConfig> selectedFields = jdbcFieldsPage.getSelectedFieldConfigs();
             jdbcPrimaryKeyPage.setFieldConfigs(selectedFields);
         }
 
@@ -113,18 +115,19 @@ public class JDBCSourceWizard extends Wizard {
             }
 
             System.out.println("Saving fields :");
-            Collection fields = jdbcPrimaryKeyPage.getFields();
+            Collection<FieldConfig> fields = jdbcPrimaryKeyPage.getFields();
             if (fields.isEmpty()) {
                 fields = jdbcFieldsPage.getSelectedFieldConfigs();
             }
 
-            for (Iterator i=fields.iterator(); i.hasNext(); ) {
-                FieldConfig field = (FieldConfig)i.next();
-                System.out.println(" - "+field.getName()+" "+field.isPrimaryKey());
+            for (FieldConfig field : fields) {
+                System.out.println(" - " + field.getName() + " " + field.isPrimaryKey());
                 sourceConfig.addFieldConfig(field);
             }
 
-            partitionConfig.getSourceConfigs().addSourceConfig(sourceConfig);
+            SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
+            sourceConfigs.addSourceConfig(sourceConfig);
+            project.save(partitionConfig, sourceConfigs);
 
             return true;
 
@@ -160,5 +163,13 @@ public class JDBCSourceWizard extends Wizard {
 
     public void setPartitionConfig(PartitionConfig partitionConfig) {
         this.partitionConfig = partitionConfig;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

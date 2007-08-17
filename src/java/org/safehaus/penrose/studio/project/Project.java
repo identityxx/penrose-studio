@@ -13,6 +13,14 @@ import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.safehaus.penrose.log4j.Log4jConfigReader;
 import org.safehaus.penrose.schema.SchemaManager;
+import org.safehaus.penrose.directory.DirectoryConfigs;
+import org.safehaus.penrose.mapping.MappingWriter;
+import org.safehaus.penrose.source.SourceWriter;
+import org.safehaus.penrose.source.SourceConfigs;
+import org.safehaus.penrose.connection.ConnectionWriter;
+import org.safehaus.penrose.connection.ConnectionConfigs;
+import org.safehaus.penrose.module.ModuleWriter;
+import org.safehaus.penrose.module.ModuleConfigs;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -85,7 +93,8 @@ public class Project {
 
                 if (debug) log.debug("----------------------------------------------------------------------------------");
 
-                partitionConfigs.load(dir);
+                PartitionConfig partitionConfig = partitionConfigs.load(dir);
+                partitionConfigs.addPartitionConfig(partitionConfig);
             }
         }
 
@@ -119,24 +128,58 @@ public class Project {
         log.debug("-------------------------------------------------------------------------------------");
         log.debug("Saving "+ projectConfig.getName()+".");
 
-        File tmpDir = new File(workDir, ".tmp");
-        File backupDir = new File(workDir, ".bak");
+        File file = new File(workDir, "conf/server.xml");
 
-        FileUtil.delete(tmpDir);
-        FileUtil.copy(workDir, tmpDir);
-
-        tmpDir.mkdirs();
-
-        PenroseConfigWriter serverConfigWriter = new PenroseConfigWriter(tmpDir+"/conf/server.xml");
-        serverConfigWriter.write(penroseConfig);
+        PenroseConfigWriter serverConfigWriter = new PenroseConfigWriter();
+        serverConfigWriter.write(file, penroseConfig);
 
         for (PartitionConfig partitionConfig : partitionConfigs.getPartitionConfigs()) {
-            partitionConfigs.store(tmpDir, partitionConfig);
+            File partitionDir = new File(workDir, "partitions/"+partitionConfig.getName());
+            partitionConfigs.store(partitionDir, partitionConfig);
         }
+    }
 
-        FileUtil.delete(backupDir);
-        workDir.renameTo(backupDir);
-        tmpDir.renameTo(workDir);
+    public void save(PartitionConfig partitionConfig) throws Exception {
+        File partitionDir = new File(workDir, "partitions/"+partitionConfig.getName());
+        partitionConfigs.store(partitionDir, partitionConfig);
+
+        upload("partitions/"+partitionConfig.getName());
+    }
+
+    public void save(PartitionConfig partitionConfig, ConnectionConfigs connectionConfigs) throws Exception {
+        ConnectionWriter connectionWriter = new ConnectionWriter();
+
+        File file = new File(workDir, "partitions/"+partitionConfig.getName()+"/DIR-INF/connections.xml");
+        connectionWriter.write(file, connectionConfigs);
+
+        upload("partitions/"+partitionConfig.getName()+"/DIR-INF/connections.xml");
+    }
+
+    public void save(PartitionConfig partitionConfig, SourceConfigs sourceConfigs) throws Exception {
+        SourceWriter sourceWriter = new SourceWriter();
+
+        File file = new File(workDir, "partitions/"+partitionConfig.getName()+"/DIR-INF/sources.xml");
+        sourceWriter.write(file, sourceConfigs);
+
+        upload("partitions/"+partitionConfig.getName()+"/DIR-INF/sources.xml");
+    }
+
+    public void save(PartitionConfig partitionConfig, DirectoryConfigs directoryConfigs) throws Exception {
+        MappingWriter mappingWriter = new MappingWriter();
+
+        File file = new File(workDir, "partitions/"+partitionConfig.getName()+"/DIR-INF/mapping.xml");
+        mappingWriter.write(file, directoryConfigs);
+
+        upload("partitions/"+partitionConfig.getName()+"/DIR-INF/mapping.xml");
+    }
+
+    public void save(PartitionConfig partitionConfig, ModuleConfigs moduleConfigs) throws Exception {
+        ModuleWriter moduleWriter = new ModuleWriter();
+
+        File file = new File(workDir, "partitions/"+partitionConfig.getName()+"/DIR-INF/modules.xml");
+        moduleWriter.write(file, moduleConfigs);
+
+        upload("partitions/"+partitionConfig.getName()+"/DIR-INF/modules.xml");
     }
 
     public void close() throws Exception {

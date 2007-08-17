@@ -32,6 +32,7 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.partition.PartitionNode;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.plugin.PluginManager;
 import org.safehaus.penrose.studio.plugin.Plugin;
 import org.safehaus.penrose.studio.source.editor.*;
@@ -39,6 +40,7 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
@@ -143,13 +145,18 @@ public class SourceNode extends Node {
 
         if (!confirm) return;
 
+        SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
+
         for (Node node : view.getSelectedNodes()) {
             if (!(node instanceof SourceNode)) continue;
 
             SourceNode sourceNode = (SourceNode)node;
             SourceConfig sourceConfig = sourceNode.getSourceConfig();
-            partitionConfig.getSourceConfigs().removeSourceConfig(sourceConfig.getName());
+            sourceConfigs.removeSourceConfig(sourceConfig.getName());
         }
+
+        Project project = projectNode.getProject();
+        project.save(partitionConfig, sourceConfigs);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
@@ -165,19 +172,24 @@ public class SourceNode extends Node {
 
         if (!(newObject instanceof SourceConfig)) return;
 
+        SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
+
         SourceConfig newSourceDefinition = (SourceConfig)((SourceConfig)newObject).clone();
 
         int counter = 1;
         String name = newSourceDefinition.getName();
-        while (partitionConfig.getSourceConfigs().getSourceConfig(name) != null) {
+        while (sourceConfigs.getSourceConfig(name) != null) {
             counter++;
             name = newSourceDefinition.getName()+" ("+counter+")";
         }
 
         newSourceDefinition.setName(name);
-        partitionConfig.getSourceConfigs().addSourceConfig(newSourceDefinition);
+        sourceConfigs.addSourceConfig(newSourceDefinition);
 
         view.setClipboard(null);
+
+        Project project = projectNode.getProject();
+        project.save(partitionConfig, sourceConfigs);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();

@@ -44,7 +44,11 @@ public class NewDynamicEntryAction extends Action {
             ServersView serversView = ServersView.getInstance();
             ProjectNode projectNode = node.getProjectNode();
 
-            DynamicEntryWizard wizard = new DynamicEntryWizard(projectNode.getProject(), node.getPartitionConfig(), node.getEntryMapping());
+            DynamicEntryWizard wizard = new DynamicEntryWizard();
+            wizard.setProject(projectNode.getProject());
+            wizard.setPartitionConfig(node.getPartitionConfig());
+            wizard.setParentMapping(node.getEntryMapping());
+
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
             dialog.open();

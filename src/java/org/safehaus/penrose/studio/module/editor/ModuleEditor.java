@@ -15,10 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.module;
+package org.safehaus.penrose.studio.module.editor;
 
-import java.util.Iterator;
 import java.util.Collection;
+import java.io.File;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
@@ -33,7 +33,10 @@ import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
+import org.safehaus.penrose.module.ModuleWriter;
+import org.safehaus.penrose.module.ModuleConfigs;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.apache.log4j.Logger;
@@ -42,6 +45,7 @@ public class ModuleEditor extends EditorPart {
 
     Logger log = Logger.getLogger(getClass());
 
+    Project project;
     ModuleConfig origModuleConfig;
     ModuleConfig moduleConfig;
 
@@ -58,6 +62,8 @@ public class ModuleEditor extends EditorPart {
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         ModuleEditorInput ei = (ModuleEditorInput)input;
+
+        project = ei.getProject();
 
         partitionConfig = ei.getPartitionConfig();
         origModuleConfig = ei.getModuleConfig();
@@ -305,8 +311,8 @@ public class ModuleEditor extends EditorPart {
                     if (parametersTable.getSelectionCount() == 0) return;
 
                     TableItem items[] = parametersTable.getSelection();
-                    for (int i=0; i<items.length; i++) {
-                        String name = items[i].getText(0);
+                    for (TableItem item : items) {
+                        String name = item.getText(0);
                         moduleConfig.removeParameter(name);
                     }
 
@@ -327,8 +333,7 @@ public class ModuleEditor extends EditorPart {
     public void refresh() {
         parametersTable.removeAll();
 
-        for (Iterator i=moduleConfig.getParameterNames().iterator(); i.hasNext(); ) {
-            String name = (String)i.next();
+        for (String name : moduleConfig.getParameterNames()) {
             String value = moduleConfig.getParameter(name);
 
             TableItem item = new TableItem(parametersTable, SWT.CHECK);
@@ -364,17 +369,15 @@ public class ModuleEditor extends EditorPart {
         tc.setText("Filter");
         tc.setWidth(200);
 
-        Collection mappings = partitionConfig.getModuleConfigs().getModuleMappings(moduleConfig.getName());
+        Collection<ModuleMapping> mappings = partitionConfig.getModuleConfigs().getModuleMappings(moduleConfig.getName());
         if (mappings != null) {
-	        for (Iterator i=mappings.iterator(); i.hasNext(); ) {
-	            ModuleMapping mapping = (ModuleMapping)i.next();
-	
-	            TableItem tableItem = new TableItem(mappingsTable, SWT.NONE);
-	            tableItem.setText(0, mapping.getBaseDn().toString());
-	            tableItem.setText(1, mapping.getScope());
-	            tableItem.setText(2, mapping.getFilter());
-	            tableItem.setData(mapping);
-	        }
+            for (ModuleMapping mapping : mappings) {
+                TableItem tableItem = new TableItem(mappingsTable, SWT.NONE);
+                tableItem.setText(0, mapping.getBaseDn().toString());
+                tableItem.setText(1, mapping.getScope());
+                tableItem.setText(2, mapping.getFilter());
+                tableItem.setData(mapping);
+            }
         }
 
         mappingsTable.redraw();
@@ -445,27 +448,31 @@ public class ModuleEditor extends EditorPart {
 
     public void store() throws Exception {
 
+        ModuleConfigs moduleConfigs = partitionConfig.getModuleConfigs();
+
         boolean rename = !origModuleConfig.getName().equals(moduleConfig.getName());
         if (rename) {
-            partitionConfig.getModuleConfigs().removeModuleConfig(origModuleConfig.getName());
+            moduleConfigs.removeModuleConfig(origModuleConfig.getName());
         }
 
         origModuleConfig.copy(moduleConfig);
 
         if (rename) {
-            partitionConfig.getModuleConfigs().addModuleConfig(origModuleConfig);
+            moduleConfigs.addModuleConfig(origModuleConfig);
         }
 
-        partitionConfig.getModuleConfigs().removeModuleMapping(moduleConfig.getName());
+        moduleConfigs.removeModuleMapping(moduleConfig.getName());
 
         Item items[] = mappingsTable.getItems();
-        for (int i=0; i<items.length; i++) {
-            ModuleMapping mapping = (ModuleMapping)items[i].getData();
+        for (Item item : items) {
+            ModuleMapping mapping = (ModuleMapping) item.getData();
             mapping.setModuleName(moduleConfig.getName());
-            partitionConfig.getModuleConfigs().addModuleMapping(mapping);
+            moduleConfigs.addModuleMapping(mapping);
         }
 
-        setPartName(this.partitionConfig.getName()+"/"+moduleConfig.getName());
+        project.save(partitionConfig, moduleConfigs);
+        
+        setPartName(partitionConfig.getName()+"/"+moduleConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();

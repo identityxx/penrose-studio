@@ -1,9 +1,7 @@
 package org.safehaus.penrose.studio.nis.wizard;
 
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
@@ -18,11 +16,12 @@ public class NISDatabaseWizardPage extends WizardPage {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    public final static String NAME = "NIS Database";
+    public final static String NAME = "NIS Database Actions";
 
     Button createCheckbox;
     Button loadCheckbox;
 
+    private boolean showLoadOption = true;
     boolean visited;
 
     public NISDatabaseWizardPage() {
@@ -40,13 +39,15 @@ public class NISDatabaseWizardPage extends WizardPage {
 
         createCheckbox = new Button(composite, SWT.CHECK);
         createCheckbox.setSelection(true);
-        createCheckbox.setText("Create cache database.");
+        createCheckbox.setText("Create database.");
         createCheckbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        loadCheckbox = new Button(composite, SWT.CHECK);
-        loadCheckbox.setSelection(true);
-        loadCheckbox.setText("Load NIS data into cache database.");
-        loadCheckbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        if (showLoadOption) {
+            loadCheckbox = new Button(composite, SWT.CHECK);
+            loadCheckbox.setSelection(true);
+            loadCheckbox.setText("Load database.");
+            loadCheckbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        }
     }
 
     public boolean validatePage() {
@@ -75,5 +76,13 @@ public class NISDatabaseWizardPage extends WizardPage {
 
     public boolean isLoad() {
         return loadCheckbox.getSelection();
+    }
+
+    public boolean isShowLoadOption() {
+        return showLoadOption;
+    }
+
+    public void setShowLoadOption(boolean showLoadOption) {
+        this.showLoadOption = showLoadOption;
     }
 }

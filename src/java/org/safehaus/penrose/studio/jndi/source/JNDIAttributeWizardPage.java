@@ -28,7 +28,6 @@ import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.apache.log4j.Logger;
 
@@ -53,15 +52,15 @@ public class JNDIAttributeWizardPage extends WizardPage {
 
     Combo objectClassCombo;
 
-    ConnectionConfig xconnectionConfig;
-    Collection attributeNames;
+    ConnectionConfig connectionConfig;
+    Collection<String> attributeNames;
     Schema schema;
 
-    public JNDIAttributeWizardPage() throws Exception {
-        this(new ArrayList());
+    public JNDIAttributeWizardPage() {
+        this(new ArrayList<String>());
     }
 
-    public JNDIAttributeWizardPage(Collection attributeNames) throws Exception {
+    public JNDIAttributeWizardPage(Collection<String> attributeNames) {
         super(NAME);
 
         this.attributeNames = attributeNames;
@@ -124,23 +123,22 @@ public class JNDIAttributeWizardPage extends WizardPage {
             public void widgetSelected(SelectionEvent event) {
                 if (availableAttrTable.getSelectionCount() == 0) return;
 
-                Map map = new TreeMap();
+                Map<String,AttributeType> map = new TreeMap<String,AttributeType>();
                 TableItem items[] = selectedAttrTable.getItems();
-                for (int i=0; i<items.length; i++) {
-                    AttributeType attrType = (AttributeType)items[i].getData();
+                for (TableItem item : items) {
+                    AttributeType attrType = (AttributeType) item.getData();
                     map.put(attrType.getName(), attrType);
                 }
 
                 items = availableAttrTable.getSelection();
-                for (int i=0; i<items.length; i++) {
-                    AttributeType attrType = (AttributeType)items[i].getData();
+                for (TableItem item : items) {
+                    AttributeType attrType = (AttributeType) item.getData();
                     map.put(attrType.getName(), attrType);
-                    items[i].dispose();
+                    item.dispose();
                 }
 
                 selectedAttrTable.removeAll();
-                for (Iterator i=map.values().iterator(); i.hasNext(); ) {
-                    AttributeType attrType = (AttributeType)i.next();
+                for (AttributeType attrType : map.values()) {
                     TableItem item = new TableItem(selectedAttrTable, SWT.NONE);
                     item.setText(attrType.getName());
                     item.setData(attrType);
@@ -156,23 +154,22 @@ public class JNDIAttributeWizardPage extends WizardPage {
             public void widgetSelected(SelectionEvent event) {
                 if (selectedAttrTable.getSelectionCount() == 0) return;
 
-                Map map = new TreeMap();
+                Map<String,AttributeType> map = new TreeMap<String,AttributeType>();
                 TableItem items[] = availableAttrTable.getItems();
-                for (int i=0; i<items.length; i++) {
-                    AttributeType attrType = (AttributeType)items[i].getData();
+                for (TableItem item : items) {
+                    AttributeType attrType = (AttributeType) item.getData();
                     map.put(attrType.getName(), attrType);
                 }
 
                 items = selectedAttrTable.getSelection();
-                for (int i=0; i<items.length; i++) {
-                    AttributeType attrType = (AttributeType)items[i].getData();
+                for (TableItem item : items) {
+                    AttributeType attrType = (AttributeType) item.getData();
                     map.put(attrType.getName(), attrType);
-                    items[i].dispose();
+                    item.dispose();
                 }
 
                 availableAttrTable.removeAll();
-                for (Iterator i=map.values().iterator(); i.hasNext(); ) {
-                    AttributeType attrType = (AttributeType)i.next();
+                for (AttributeType attrType : map.values()) {
                     TableItem item = new TableItem(availableAttrTable, SWT.NONE);
                     item.setText(attrType.getName());
                     item.setData(attrType);
@@ -265,8 +262,7 @@ public class JNDIAttributeWizardPage extends WizardPage {
 
     public void init() {
         try {
-            for (Iterator i=attributeNames.iterator(); i.hasNext(); ) {
-                String atName = (String)i.next();
+            for (String atName : attributeNames) {
                 AttributeType attrType = schema.getAttributeType(atName);
 
                 TableItem item = new TableItem(selectedAttrTable, SWT.NONE);
@@ -274,9 +270,8 @@ public class JNDIAttributeWizardPage extends WizardPage {
                 item.setData(attrType);
             }
 
-            Collection ocNames = schema.getObjectClassNames();
-            for (Iterator i=ocNames.iterator(); i.hasNext(); ) {
-                String ocName = (String)i.next();
+            Collection<String> ocNames = schema.getObjectClassNames();
+            for (String ocName : ocNames) {
                 objectClassCombo.add(ocName);
             }
 
@@ -291,27 +286,24 @@ public class JNDIAttributeWizardPage extends WizardPage {
     public void showAllAttributes() {
         objectClassCombo.select(0);
 
-        Map map = new TreeMap();
+        Map<String,AttributeType> map = new TreeMap<String,AttributeType>();
 
         // add attribute types from schema
-        Collection attributeTypes = schema.getAttributeTypes();
-        for (Iterator i=attributeTypes.iterator(); i.hasNext(); ) {
-            AttributeType attrType = (AttributeType)i.next();
+        Collection<AttributeType> attributeTypes = schema.getAttributeTypes();
+        for (AttributeType attrType : attributeTypes) {
             map.put(attrType.getName(), attrType);
         }
 
         // remove attribute types already selected
         TableItem items[] = selectedAttrTable.getItems();
-        for (int i=0; i<items.length; i++) {
-            AttributeType attrType = (AttributeType)items[i].getData();
+        for (TableItem item : items) {
+            AttributeType attrType = (AttributeType) item.getData();
             map.remove(attrType.getName());
         }
 
         // update attribute types table
         availableAttrTable.removeAll();
-        for (Iterator i=map.values().iterator(); i.hasNext(); ) {
-            AttributeType attrType = (AttributeType)i.next();
-
+        for (AttributeType attrType : map.values()) {
             TableItem item = new TableItem(availableAttrTable, SWT.NONE);
             item.setText(attrType.getName());
             item.setData(attrType);
@@ -319,25 +311,22 @@ public class JNDIAttributeWizardPage extends WizardPage {
     }
 
     public void showObjectClassAttributes(String ocName) {
-        Map map = new TreeMap();
+        Map<String,AttributeType> map = new TreeMap<String,AttributeType>();
 
         // get all parent object classes
-        Collection ocs = schema.getAllObjectClasses(ocName);
-        for (Iterator i=ocs.iterator(); i.hasNext(); ) {
-            ObjectClass objectClass = (ObjectClass)i.next();
+        Collection<ObjectClass> ocs = schema.getAllObjectClasses(ocName);
+        for (ObjectClass objectClass : ocs) {
 
             // add required attributes
-            Collection reqAttrs = objectClass.getRequiredAttributes();
-            for (Iterator j=reqAttrs.iterator(); j.hasNext(); ) {
-                String atName = (String)j.next();
+            Collection<String> reqAttrs = objectClass.getRequiredAttributes();
+            for (String atName : reqAttrs) {
                 AttributeType attrType = schema.getAttributeType(atName);
                 map.put(attrType.getName(), attrType);
             }
 
             // add optional attributes
-            Collection optAttrs = objectClass.getOptionalAttributes();
-            for (Iterator j=optAttrs.iterator(); j.hasNext(); ) {
-                String atName = (String)j.next();
+            Collection<String> optAttrs = objectClass.getOptionalAttributes();
+            for (String atName : optAttrs) {
                 AttributeType attrType = schema.getAttributeType(atName);
                 map.put(attrType.getName(), attrType);
             }
@@ -345,27 +334,25 @@ public class JNDIAttributeWizardPage extends WizardPage {
 
         // remove attribute types already selected
         TableItem items[] = selectedAttrTable.getItems();
-        for (int i=0; i<items.length; i++) {
-            AttributeType attrType = (AttributeType)items[i].getData();
+        for (TableItem item : items) {
+            AttributeType attrType = (AttributeType) item.getData();
             map.remove(attrType.getName());
         }
 
         // update attribute types table
         availableAttrTable.removeAll();
-        for (Iterator i=map.values().iterator(); i.hasNext(); ) {
-            AttributeType attrType = (AttributeType)i.next();
-
+        for (AttributeType attrType : map.values()) {
             TableItem item = new TableItem(availableAttrTable, SWT.NONE);
             item.setText(attrType.getName());
             item.setData(attrType);
         }
     }
 
-    public Collection getAttributeTypes() {
-        Collection result = new ArrayList();
+    public Collection<AttributeType> getAttributeTypes() {
+        Collection<AttributeType> result = new ArrayList<AttributeType>();
         TableItem items[] = selectedAttrTable.getItems();
-        for (int i=0; i<items.length; i++) {
-            AttributeType attrType = (AttributeType)items[i].getData();
+        for (TableItem item : items) {
+            AttributeType attrType = (AttributeType) item.getData();
             result.add(attrType);
         }
         return result;

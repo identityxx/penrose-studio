@@ -7,10 +7,13 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionConfigs;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.source.SourceConfig;
 import org.apache.log4j.Logger;
+
+import java.io.File;
 
 /**
  * @author Endi Sukma Dewata
@@ -85,8 +88,9 @@ public abstract class ConnectionEditor extends FormEditor {
 
     public void store() throws Exception {
 
+        ConnectionConfigs connectionConfigs = partitionConfig.getConnectionConfigs();
         if (!origConnectionConfig.getName().equals(connectionConfig.getName())) {
-            partitionConfig.getConnectionConfigs().renameConnectionConfig(origConnectionConfig, connectionConfig.getName());
+            connectionConfigs.renameConnectionConfig(origConnectionConfig, connectionConfig.getName());
 
             for (SourceConfig sourceConfig : partitionConfig.getSourceConfigs().getSourceConfigs()) {
                 if (!sourceConfig.getConnectionName().equals(origConnectionConfig.getName())) continue;
@@ -94,9 +98,11 @@ public abstract class ConnectionEditor extends FormEditor {
             }
         }
 
-        partitionConfig.getConnectionConfigs().modifyConnectionConfig(connectionConfig.getName(), connectionConfig);
+        connectionConfigs.modifyConnectionConfig(connectionConfig.getName(), connectionConfig);
 
-        setPartName(this.partitionConfig.getName()+"/"+connectionConfig.getName());
+        project.save(partitionConfig, connectionConfigs);
+
+        setPartName(partitionConfig.getName()+"/"+connectionConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();

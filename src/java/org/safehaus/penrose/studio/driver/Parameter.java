@@ -20,7 +20,7 @@ package org.safehaus.penrose.studio.driver;
 /**
  * @author Endi S. Dewata
  */
-public class Parameter {
+public class Parameter implements Cloneable {
 
     public final static int TYPE_NORMAL   = 0;
     public final static int TYPE_REQUIRED = 1;
@@ -155,6 +155,10 @@ public class Parameter {
         if (type != p.type) return false;
 
         return true;
+    }
+
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 
     public String toString() {

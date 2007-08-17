@@ -31,6 +31,7 @@ import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.Project;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;
@@ -49,6 +50,7 @@ public class SelectSourceWizardPage extends WizardPage {
     Table sourceTable;
     Table infoTable;
 
+    Project project;
     PartitionConfig partitionConfig;
 
     public SelectSourceWizardPage(PartitionConfig partitionConfig) {
@@ -135,6 +137,8 @@ public class SelectSourceWizardPage extends WizardPage {
             public void widgetSelected(SelectionEvent event) {
                 try {
                     SourceWizard wizard = new SourceWizard(partitionConfig);
+                    wizard.setProject(project);
+
                     WizardDialog dialog = new WizardDialog(parent.getShell(), wizard);
                     dialog.setPageSize(600, 300);
                     dialog.open();

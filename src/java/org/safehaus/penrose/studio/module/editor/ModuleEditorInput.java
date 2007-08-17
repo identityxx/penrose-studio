@@ -15,26 +15,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.module;
+package org.safehaus.penrose.studio.module.editor;
 
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.module.ModuleConfig;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.studio.project.Project;
 
 /**
  * @author Endi S. Dewata
  */
 public class ModuleEditorInput implements IEditorInput {
 
+    private Project project;
     private PartitionConfig partitionConfig;
     private ModuleConfig moduleConfig;
 
-    public ModuleEditorInput(PartitionConfig partitionConfig, ModuleConfig moduleConfig) {
-        this.partitionConfig = partitionConfig;
-        this.moduleConfig = moduleConfig;
+    public ModuleEditorInput() {
     }
 
     public boolean exists() {
@@ -84,5 +83,13 @@ public class ModuleEditorInput implements IEditorInput {
 
     public void setPartitionConfig(PartitionConfig partitionConfig) {
         this.partitionConfig = partitionConfig;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

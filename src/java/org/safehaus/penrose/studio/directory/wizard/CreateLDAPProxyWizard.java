@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.directory.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.source.wizard.SelectSourceWizardPage;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.ldap.RDN;
@@ -26,6 +27,7 @@ import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.directory.DirectoryConfigs;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;
@@ -39,20 +41,25 @@ public class CreateLDAPProxyWizard extends Wizard {
 
     public SelectSourceWizardPage sourcePage;
 
-    PartitionConfig partitionConfig;
+    private Project project;
+    private PartitionConfig partitionConfig;
     EntryMapping parentMapping;
 
-    public CreateLDAPProxyWizard(PartitionConfig partition) {
-        this(partition, null);
+    public CreateLDAPProxyWizard(PartitionConfig partitionConfig) {
+        this(partitionConfig, null);
     }
 
-    public CreateLDAPProxyWizard(PartitionConfig partition, EntryMapping parentMapping) {
-        this.partitionConfig = partition;
+    public CreateLDAPProxyWizard(PartitionConfig partitionConfig, EntryMapping parentMapping) {
+        this.partitionConfig = partitionConfig;
         this.parentMapping = parentMapping;
 
-        sourcePage = new SelectSourceWizardPage(partition);
-
         setWindowTitle("New LDAP Proxy");
+    }
+
+    public void addPages() {
+        sourcePage = new SelectSourceWizardPage(partitionConfig);
+
+        addPage(sourcePage);
     }
 
     public boolean canFinish() {
@@ -103,7 +110,9 @@ public class CreateLDAPProxyWizard extends Wizard {
 
             entryMapping.setHandlerName("PROXY");
 
-            partitionConfig.getDirectoryConfigs().addEntryMapping(entryMapping);
+            DirectoryConfigs directoryConfigs = partitionConfig.getDirectoryConfigs();
+            directoryConfigs.addEntryMapping(entryMapping);
+            project.save(partitionConfig, directoryConfigs);
 
             return true;
 
@@ -113,11 +122,23 @@ public class CreateLDAPProxyWizard extends Wizard {
         }
     }
 
-    public void addPages() {
-        addPage(sourcePage);
-    }
-
     public boolean needsPreviousAndNextButtons() {
         return true;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
+    }
+
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

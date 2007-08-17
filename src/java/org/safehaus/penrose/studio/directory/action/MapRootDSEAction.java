@@ -23,6 +23,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.studio.directory.wizard.CreateRootDSEProxyWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.apache.log4j.Logger;
 
@@ -30,10 +31,10 @@ public class MapRootDSEAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
-    DirectoryNode node;
+    DirectoryNode directoryNode;
 
 	public MapRootDSEAction(DirectoryNode node) {
-        this.node = node;
+        this.directoryNode = node;
 
         setText("Map Root DSE...");
         setId(getClass().getName());
@@ -42,11 +43,12 @@ public class MapRootDSEAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-
+            Project project = directoryNode.getProjectNode().getProject();
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            //if (!penroseStudio.isCommercial()) return;
 
-            Wizard wizard = new CreateRootDSEProxyWizard(node.getPartitionConfig());
+            CreateRootDSEProxyWizard wizard = new CreateRootDSEProxyWizard();
+            wizard.setProject(project);
+            wizard.setPartitionConfig(directoryNode.getPartitionConfig());
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
@@ -54,7 +56,7 @@ public class MapRootDSEAction extends Action {
 
             penroseStudio.notifyChangeListeners();
 
-            serversView.open(node);
+            serversView.open(directoryNode);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

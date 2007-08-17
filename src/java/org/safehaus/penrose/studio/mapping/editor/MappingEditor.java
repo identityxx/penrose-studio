@@ -28,6 +28,7 @@ import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.directory.DirectoryConfigs;
 import org.apache.log4j.Logger;
 
 public class MappingEditor extends FormEditor implements ModifyListener {
@@ -104,8 +105,9 @@ public class MappingEditor extends FormEditor implements ModifyListener {
 
 	public void store() throws Exception {
 
+        DirectoryConfigs directoryConfigs = partitionConfig.getDirectoryConfigs();
         if (!origEntry.getDn().matches(entry.getDn())) {
-            partitionConfig.getDirectoryConfigs().renameEntryMapping(origEntry, entry.getDn());
+            directoryConfigs.renameEntryMapping(origEntry, entry.getDn());
         }
 
         origEntry.copy(entry);
@@ -116,6 +118,9 @@ public class MappingEditor extends FormEditor implements ModifyListener {
         } else {
             dn = entry.getDn().toString();
         }
+
+        project.save(partitionConfig, directoryConfigs);
+
         setPartName(dn);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();

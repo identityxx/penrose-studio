@@ -242,12 +242,30 @@ public class NISDomainNode extends Node {
             NISDomainNode domainNode = (NISDomainNode)node;
             NISDomain domain = domainNode.getDomain();
 
-            nisTool.removePartition(domain);
-            nisTool.removeCache(domain);
-            nisTool.removePartitionConfig(domain);
-            nisTool.removeDomain(domain);
+            try {
+                nisTool.removePartition(domain);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
 
-            project.removeDirectory("partitions/"+domain.getName());
+            try {
+                nisTool.removeCache(domain);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+
+            try {
+                nisTool.removePartitionConfig(domain);
+                project.removeDirectory("partitions/"+domain.getName());
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+
+            try {
+                nisTool.removeDomain(domain);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
 
             nisNode.removeNisDomain(domain.getName());
         }

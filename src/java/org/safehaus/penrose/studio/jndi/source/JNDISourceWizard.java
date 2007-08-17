@@ -22,13 +22,14 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.source.FieldConfig;
+import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.studio.jndi.source.JNDITreeWizardPage;
 import org.safehaus.penrose.studio.source.wizard.SourceWizardPage;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.schema.AttributeType;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
@@ -37,6 +38,7 @@ public class JNDISourceWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
+    private Project project;
     private PartitionConfig partitionConfig;
     private ConnectionConfig connectionConfig;
     private SourceConfig sourceConfig;
@@ -84,7 +86,7 @@ public class JNDISourceWizard extends Wizard {
             jndiAttributesPage.setConnectionConfig(connectionConfig);
 
         } else if (jndiAttributesPage == page) {
-            Collection attributeTypes = jndiAttributesPage.getAttributeTypes();
+            Collection<AttributeType> attributeTypes = jndiAttributesPage.getAttributeTypes();
             jndiFieldsPage.setAttributeTypes(attributeTypes);
         }
 
@@ -103,12 +105,13 @@ public class JNDISourceWizard extends Wizard {
             sourceConfig.setParameter("objectClasses", jndiTreePage.getObjectClasses());
 
             Collection<FieldConfig> fields = jndiFieldsPage.getFields();
-            for (Iterator i=fields.iterator(); i.hasNext(); ) {
-                FieldConfig field = (FieldConfig)i.next();
+            for (FieldConfig field : fields) {
                 sourceConfig.addFieldConfig(field);
             }
 
-            partitionConfig.getSourceConfigs().addSourceConfig(sourceConfig);
+            SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
+            sourceConfigs.addSourceConfig(sourceConfig);
+            project.save(partitionConfig, sourceConfigs);
 
             return true;
 
@@ -144,5 +147,13 @@ public class JNDISourceWizard extends Wizard {
 
     public void setPartitionConfig(PartitionConfig partitionConfig) {
         this.partitionConfig = partitionConfig;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

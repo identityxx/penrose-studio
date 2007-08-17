@@ -20,7 +20,6 @@ package org.safehaus.penrose.studio.directory.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.mapping.*;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.source.wizard.SelectSourcesWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.RelationshipWizardPage;
@@ -29,9 +28,9 @@ import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.ldap.RDNBuilder;
 import org.safehaus.penrose.ldap.DNBuilder;
+import org.safehaus.penrose.directory.DirectoryConfigs;
 import org.apache.log4j.Logger;
 
-import java.util.Iterator;
 import java.util.Collection;
 
 /**
@@ -41,6 +40,7 @@ public class DynamicEntryWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
+    private Project project;
     private PartitionConfig partitionConfig;
     private EntryMapping parentMapping;
     private EntryMapping entryMapping = new EntryMapping();
@@ -50,21 +50,27 @@ public class DynamicEntryWizard extends Wizard {
     public ObjectClassWizardPage ocPage;
     public AttributeValueWizardPage attrPage;
 
-    public DynamicEntryWizard(Project project, PartitionConfig partition, EntryMapping parentMapping) {
-        this.partitionConfig = partition;
-        this.parentMapping = parentMapping;
+    public DynamicEntryWizard() {
         setWindowTitle("Adding dynamic entry");
+    }
 
-        sourcesPage = new SelectSourcesWizardPage(partition);
+    public void addPages() {
+
+        sourcesPage = new SelectSourcesWizardPage(partitionConfig);
         sourcesPage.setDescription("Add data sources. This step is optional.");
-        
-        relationshipPage = new RelationshipWizardPage(partition);
+
+        relationshipPage = new RelationshipWizardPage(partitionConfig);
 
         ocPage = new ObjectClassWizardPage(project);
         //ocPage.setSelecteObjectClasses(entryMapping.getObjectClasses());
 
-        attrPage = new AttributeValueWizardPage(project, partition);
+        attrPage = new AttributeValueWizardPage(project, partitionConfig);
         attrPage.setDefaultType(AttributeValueWizardPage.VARIABLE);
+
+        addPage(sourcesPage);
+        addPage(relationshipPage);
+        addPage(ocPage);
+        addPage(attrPage);
     }
 
     public boolean canFinish() {
@@ -78,12 +84,12 @@ public class DynamicEntryWizard extends Wizard {
 
     public IWizardPage getNextPage(IWizardPage page) {
         if (sourcesPage == page) {
-            Collection sourceMappings = sourcesPage.getSourceMappings();
+            Collection<SourceMapping> sourceMappings = sourcesPage.getSourceMappings();
             relationshipPage.setSourceMappings(sourceMappings);
             attrPage.setSourceMappings(sourceMappings);
 
         } else if (ocPage == page) {
-            Collection objectClasses = ocPage.getSelectedObjectClasses();
+            Collection<String> objectClasses = ocPage.getSelectedObjectClasses();
             attrPage.setObjectClasses(objectClasses);
         }
 
@@ -92,15 +98,13 @@ public class DynamicEntryWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            Collection sourceMappings = sourcesPage.getSourceMappings();
-            for (Iterator i=sourceMappings.iterator(); i.hasNext(); ) {
-                SourceMapping sourceMapping = (SourceMapping)i.next();
+            Collection<SourceMapping> sourceMappings = sourcesPage.getSourceMappings();
+            for (SourceMapping sourceMapping : sourceMappings) {
                 entryMapping.addSourceMapping(sourceMapping);
             }
 
-            Collection relationships = relationshipPage.getRelationships();
-            for (Iterator i=relationships.iterator(); i.hasNext(); ) {
-                Relationship relationship = (Relationship)i.next();
+            Collection<Relationship> relationships = relationshipPage.getRelationships();
+            for (Relationship relationship : relationships) {
 
                 String lfield = relationship.getLeftField();
                 SourceMapping lsource = entryMapping.getSourceMapping(relationship.getLeftSource());
@@ -120,16 +124,14 @@ public class DynamicEntryWizard extends Wizard {
             entryMapping.addObjectClasses(ocPage.getSelectedObjectClasses());
 
             log.debug("Attribute mappings:");
-            Collection attributeMappings = attrPage.getAttributeMappings();
-            for (Iterator i=attributeMappings.iterator(); i.hasNext(); ) {
-                AttributeMapping attributeMapping = (AttributeMapping)i.next();
-                log.debug(" - "+attributeMapping.getName()+" <= "+attributeMapping.getVariable());
+            Collection<AttributeMapping> attributeMappings = attrPage.getAttributeMappings();
+            for (AttributeMapping attributeMapping : attributeMappings) {
+                log.debug(" - " + attributeMapping.getName() + " <= " + attributeMapping.getVariable());
                 entryMapping.addAttributeMapping(attributeMapping);
             }
 
             RDNBuilder rb = new RDNBuilder();
-            for (Iterator i=attributeMappings.iterator(); i.hasNext(); ) {
-                AttributeMapping attributeMapping = (AttributeMapping)i.next();
+            for (AttributeMapping attributeMapping : attributeMappings) {
                 if (!attributeMapping.isRdn()) continue;
 
                 rb.set(attributeMapping.getName(), "...");
@@ -141,34 +143,35 @@ public class DynamicEntryWizard extends Wizard {
             entryMapping.setDn(db.toDn());
 
             log.debug("Reverse mappings:");
-            for (Iterator i=entryMapping.getAttributeMappings().iterator(); i.hasNext(); ) {
-                AttributeMapping attributeMapping = (AttributeMapping)i.next();
+            for (AttributeMapping attributeMapping : entryMapping.getAttributeMappings()) {
                 String name = attributeMapping.getName();
 
                 String variable = attributeMapping.getVariable();
                 if (variable == null) {
-                    log.debug("Attribute "+name+" can't be reverse mapped.");
+                    log.debug("Attribute " + name + " can't be reverse mapped.");
                     continue;
                 }
 
                 int j = variable.indexOf(".");
                 String sourceName = variable.substring(0, j);
-                String fieldName = variable.substring(j+1);
+                String fieldName = variable.substring(j + 1);
 
                 SourceMapping sourceMapping = entryMapping.getSourceMapping(sourceName);
                 Collection fieldMappings = sourceMapping.getFieldMappings(fieldName);
                 if (fieldMappings != null && !fieldMappings.isEmpty()) {
-                    log.debug("Attribute "+name+" has been reverse mapped.");
+                    log.debug("Attribute " + name + " has been reverse mapped.");
                     continue;
                 }
 
-                log.debug(" - "+sourceName+"."+fieldName+" <= "+name);
+                log.debug(" - " + sourceName + "." + fieldName + " <= " + name);
 
                 FieldMapping fieldMapping = new FieldMapping(fieldName, FieldMapping.VARIABLE, attributeMapping.getName());
                 sourceMapping.addFieldMapping(fieldMapping);
             }
 
-            partitionConfig.getDirectoryConfigs().addEntryMapping(entryMapping);
+            DirectoryConfigs directoryConfigs = partitionConfig.getDirectoryConfigs();
+            directoryConfigs.addEntryMapping(entryMapping);
+            project.save(partitionConfig, directoryConfigs);
 
             return true;
 
@@ -176,13 +179,6 @@ public class DynamicEntryWizard extends Wizard {
             log.error(e.getMessage(), e);
             return false;
         }
-    }
-
-    public void addPages() {
-        addPage(sourcesPage);
-        addPage(relationshipPage);
-        addPage(ocPage);
-        addPage(attrPage);
     }
 
     public boolean needsPreviousAndNextButtons() {
@@ -211,5 +207,13 @@ public class DynamicEntryWizard extends Wizard {
 
     public void setPartitionConfig(PartitionConfig partitionConfig) {
         this.partitionConfig = partitionConfig;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }
