@@ -132,7 +132,7 @@ public class NISTool {
         int j = dbUrl.indexOf("/", i+3);
         if (j < 0) j = dbUrl.length();
 
-        String dbServer = dbUrl.substring(i, j);
+        String dbServer = dbUrl.substring(i+3, j);
         String dbUser = connection.getParameter("user");
         String dbPassword = connection.getParameter("password");
 
