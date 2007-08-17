@@ -109,26 +109,49 @@ public class NISTool {
     public void createPartitionConfig(NISDomain domain) throws Exception {
 
         String domainName = domain.getName();
-        String fullName = domain.getFullName();
-        String server = domain.getServer();
-        String suffix = domain.getSuffix();
-
         log.debug("Creating partition "+domainName+".");
-        log.debug(" - domain: "+fullName);
-        log.debug(" - server: "+server);
-        log.debug(" - suffix: "+suffix);
 
         File oldDir = new File(project.getWorkDir(), "partitions"+File.separator+ NIS_PARTITION_NAME);
         File newDir = new File(project.getWorkDir(), "partitions"+File.separator+ domainName);
         FileUtil.copy(oldDir, newDir);
 
+        log.debug("Replacing parameter values.");
+
+        String nisDomain  = domain.getFullName();
+        String nisServer  = domain.getServer();
+        String ldapSuffix = domain.getSuffix();
+
+        log.debug(" - NIS Domain: "+nisDomain);
+        log.debug(" - NIS Server: "+ nisServer);
+        log.debug(" - LDAP Suffix: "+ldapSuffix);
+
+        Connection connection = nisPartition.getConnection(NISTool.NIS_CONNECTION_NAME);
+
+        String dbUrl = connection.getParameter("url");
+        int i = dbUrl.indexOf("://");
+        int j = dbUrl.indexOf("/", i+3);
+        if (j < 0) j = dbUrl.length();
+
+        String dbServer = dbUrl.substring(i, j);
+        String dbUser = connection.getParameter("user");
+        String dbPassword = connection.getParameter("password");
+
+        log.debug(" - DB Server: "+dbServer);
+        log.debug(" - DB User: "+dbUser);
+        log.debug(" - DB Password: "+dbPassword);
+
         org.apache.tools.ant.Project antProject = new org.apache.tools.ant.Project();
 
-        antProject.setProperty("nis.server", server);
-        antProject.setProperty("nis.domain", fullName);
+        antProject.setProperty("NIS_SERVER",  nisServer);
+        antProject.setProperty("NIS_DOMAIN",  nisDomain);
 
-        antProject.setProperty("domain", domainName);
-        antProject.setProperty("suffix", suffix);
+        antProject.setProperty("DOMAIN",      domainName);
+
+        antProject.setProperty("LDAP_BASE",   ldapSuffix);
+
+        antProject.setProperty("DB_SERVER",   dbServer);
+        antProject.setProperty("DB_USER",     dbUser);
+        antProject.setProperty("DB_PASSWORD", dbPassword);
 
         Copy copy = new Copy();
         copy.setOverwrite(true);
