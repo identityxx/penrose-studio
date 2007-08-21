@@ -6,6 +6,8 @@ import org.safehaus.penrose.source.*;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.nis.event.NISEventListener;
+import org.safehaus.penrose.studio.nis.event.NISEvent;
 import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.jdbc.JDBCClient;
@@ -31,7 +33,7 @@ public class NISTool {
     public final static String CACHE_USERS  = "cache_users";
     public final static String CACHE_GROUPS = "cache_groups";
 
-    Project project;
+    private Project project;
 
     protected Partition nisPartition;
 
@@ -46,6 +48,8 @@ public class NISTool {
     protected Map<String,NISDomain> nisDomains = new TreeMap<String,NISDomain>();
 
     protected Partitions partitions = new Partitions();
+
+    protected Collection<NISEventListener> listeners = new ArrayList<NISEventListener>();
 
     public NISTool() {
     }
@@ -217,6 +221,13 @@ public class NISTool {
         domains.add(dn, attributes);
 
         nisDomains.put(domainName, domain);
+
+        NISEvent event = new NISEvent();
+        event.setDomain(domain);
+        
+        for (NISEventListener listener : listeners) {
+            listener.domainAdded(event);
+        }
     }
 
     public void updateDomain(String oldDomainName, NISDomain domain) throws Exception {
@@ -244,6 +255,13 @@ public class NISTool {
         ));
 
         domains.modify(dn, modifications);
+
+        NISEvent event = new NISEvent();
+        event.setDomain(domain);
+
+        for (NISEventListener listener : listeners) {
+            listener.domainModified(event);
+        }
     }
 
     public void removePartitionConfig(NISDomain domain) throws Exception {
@@ -281,6 +299,13 @@ public class NISTool {
         DN dn = new DN(rdn);
 
         domains.delete(dn);
+
+        NISEvent event = new NISEvent();
+        event.setDomain(domain);
+
+        for (NISEventListener listener : listeners) {
+            listener.domainRemoved(event);
+        }
     }
 
     public Source getDomains() {
@@ -480,5 +505,21 @@ public class NISTool {
         for (Source cache : getCaches(partition, source)) {
             cache.drop();
         }
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public void addNISListener(NISEventListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeNISListener(NISEventListener listener) {
+        listeners.remove(listener);
     }
 }

@@ -6,7 +6,7 @@
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false"> 
 
   <appender name="debug" class="org.apache.log4j.RollingFileAppender">
-    <param name="File" value="penrose-studio.log"/>
+    <param name="File" value="logs/debug.log"/>
     <param name="MaxFileSize" value="10MB"/>
     <param name="MaxBackupIndex" value="100"/>
     <layout class="org.apache.log4j.PatternLayout">

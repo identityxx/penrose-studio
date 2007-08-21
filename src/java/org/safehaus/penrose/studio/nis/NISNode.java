@@ -5,28 +5,20 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenrosePlugin;
-import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.nis.wizard.NISDomainWizard;
 import org.safehaus.penrose.studio.nis.wizard.NISDatabaseWizard;
 import org.safehaus.penrose.studio.nis.editor.NISEditorInput;
 import org.safehaus.penrose.studio.nis.editor.NISEditor;
+import org.safehaus.penrose.studio.nis.event.NISEventAdapter;
+import org.safehaus.penrose.studio.nis.event.NISEvent;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.partition.PartitionContext;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.connection.ConnectionConfigs;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
-import org.safehaus.penrose.jdbc.JDBCClient;
-import org.safehaus.penrose.source.SourceConfigs;
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.config.PenroseConfig;
-import org.safehaus.penrose.naming.PenroseContext;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
@@ -166,6 +158,23 @@ public class NISNode extends Node {
         nisTool = new NISTool();
         nisTool.init(project);
 
+        nisTool.addNISListener(new NISEventAdapter() {
+            public void domainAdded(NISEvent event) {
+                NISDomain domain = event.getDomain();
+                addNisDomain(domain);
+
+                PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                penroseStudio.notifyChangeListeners();
+            }
+            public void domainRemoved(NISEvent event) {
+                NISDomain domain = event.getDomain();
+                removeNisDomain(domain.getName());
+
+                PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                penroseStudio.notifyChangeListeners();
+            }
+        });
+
         for (NISDomain nisDomain : nisTool.getNisDomains().values()) {
             addNisDomain(nisDomain);
         }
@@ -206,7 +215,7 @@ public class NISNode extends Node {
 
     public void addDomain() throws Exception {
 
-        NISDomainWizard wizard = new NISDomainWizard(projectNode.getProject(), this);
+        NISDomainWizard wizard = new NISDomainWizard(nisTool);
         WizardDialog dialog = new WizardDialog(view.getSite().getShell(), wizard);
         dialog.setPageSize(600, 300);
         dialog.open();

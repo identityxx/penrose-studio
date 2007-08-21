@@ -18,10 +18,10 @@ public class DisconnectAction extends Action {
     Logger log = Logger.getLogger(getClass());
 
     public DisconnectAction() {
-        setText("&Disconnect from Server");
+        setText("&Disconnect");
         setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.SIZE_22x22, PenroseImage.DISCONNECT));
         setAccelerator(SWT.CTRL | 'D');
-        setToolTipText("Disconnect from Server");
+        setToolTipText("Disconnect");
         setId(getClass().getName());
     }
 

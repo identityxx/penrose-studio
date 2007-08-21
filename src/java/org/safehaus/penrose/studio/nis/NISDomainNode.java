@@ -264,8 +264,6 @@ public class NISDomainNode extends Node {
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
-
-            nisNode.removeNisDomain(domain.getName());
         }
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();

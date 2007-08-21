@@ -41,7 +41,7 @@ public class NISPartitionWizardPage extends WizardPage implements ModifyListener
         composite.setLayout(sectionLayout);
 
         Label partitionLabel = new Label(composite, SWT.NONE);
-        partitionLabel.setText("Name:");
+        partitionLabel.setText("Short Name:");
         GridData gd = new GridData();
         gd.widthHint = 100;
         partitionLabel.setLayoutData(gd);

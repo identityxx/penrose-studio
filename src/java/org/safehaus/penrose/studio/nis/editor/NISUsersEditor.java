@@ -29,7 +29,7 @@ public class NISUsersEditor extends FormEditor {
 
     public void addPages() {
         try {
-            addPage(new NISUsersPage(this));
+            //addPage(new NISUsersPage(this));
             addPage(new NISUserScriptsPage(this));
             addPage(new NISUserChangesPage(this, domain, nisTool));
 

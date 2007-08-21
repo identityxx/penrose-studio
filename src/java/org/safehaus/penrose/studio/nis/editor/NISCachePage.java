@@ -113,19 +113,23 @@ public class NISCachePage extends FormPage {
         buttons.setLayoutData(gd);
 
         Button createButton = new Button(buttons, SWT.PUSH);
-        createButton.setText("Create Cache");
+        createButton.setText("Create");
         createButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
                     TableItem[] items = cacheTable.getSelection();
-                    if (items == null || items.length == 0) return;
+                    if (items == null || items.length == 0) {
+                        items = cacheTable.getItems();
+                    }
 
                     for (TableItem item : items) {
                         Source source = (Source)item.getData();
                         nisTool.createCache(domain, source);
                     }
+
+                    refresh();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -135,19 +139,23 @@ public class NISCachePage extends FormPage {
         });
 
         Button loadButton = new Button(buttons, SWT.PUSH);
-        loadButton.setText("Load Cache");
+        loadButton.setText("Load");
         loadButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         loadButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
                     TableItem[] items = cacheTable.getSelection();
-                    if (items == null || items.length == 0) return;
+                    if (items == null || items.length == 0) {
+                        items = cacheTable.getItems();
+                    }
 
                     for (TableItem item : items) {
                         Source source = (Source)item.getData();
                         nisTool.loadCache(domain, source);
                     }
+
+                    refresh();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -157,19 +165,23 @@ public class NISCachePage extends FormPage {
         });
 
         Button clearButton = new Button(buttons, SWT.PUSH);
-        clearButton.setText("Clear Cache");
+        clearButton.setText("Clear");
         clearButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         clearButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
                     TableItem[] items = cacheTable.getSelection();
-                    if (items == null || items.length == 0) return;
+                    if (items == null || items.length == 0) {
+                        items = cacheTable.getItems();
+                    }
 
                     for (TableItem item : items) {
                         Source source = (Source)item.getData();
                         nisTool.clearCache(domain, source);
                     }
+
+                    refresh();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -179,19 +191,23 @@ public class NISCachePage extends FormPage {
         });
 
         Button removeButton = new Button(buttons, SWT.PUSH);
-        removeButton.setText("Remove Cache");
+        removeButton.setText("Remove");
         removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         removeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
                     TableItem[] items = cacheTable.getSelection();
-                    if (items == null || items.length == 0) return;
+                    if (items == null || items.length == 0) {
+                        items = cacheTable.getItems();
+                    }
 
                     for (TableItem item : items) {
                         Source source = (Source)item.getData();
                         nisTool.removeCache(domain, source);
                     }
+
+                    refresh();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);

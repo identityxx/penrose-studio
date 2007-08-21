@@ -18,10 +18,10 @@ public class ConnectAction extends Action {
     Logger log = Logger.getLogger(getClass());
 
     public ConnectAction() {
-        setText("&Connect to Server");
+        setText("&Connect");
         setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.SIZE_22x22, PenroseImage.CONNECT));
         setAccelerator(SWT.CTRL | 'C');
-        setToolTipText("Connect to Server");
+        setToolTipText("Connect");
         setId(getClass().getName());
     }
 

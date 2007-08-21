@@ -162,6 +162,7 @@
                 <exclude name=".svn/**"/>
             </fileset>
         </copy>
+        <mkdir dir="target/${dist.name}/logs"/>
         <mkdir dir="${plugin.path}"/>
         <copy todir="target/${dist.name}/plugins">
             <fileset dir="lib/plugins">

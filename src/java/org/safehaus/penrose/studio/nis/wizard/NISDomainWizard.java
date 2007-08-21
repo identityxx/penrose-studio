@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.nis.NISNode;
 import org.safehaus.penrose.studio.nis.NISTool;
 
 /**
@@ -17,19 +16,16 @@ public class NISDomainWizard extends Wizard {
     
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    Project project;
-
     NISDomainWizardPage domainPage;
     NISPartitionWizardPage partitionPage;
     NISDatabaseWizardPage databasePage;
 
-    NISNode nisNode;
+    NISTool nisTool;
 
-    public NISDomainWizard(Project project, NISNode nisNode) {
+    public NISDomainWizard(NISTool nisTool) {
         setWindowTitle("Add NIS Domain");
 
-        this.project = project;
-        this.nisNode = nisNode;
+        this.nisTool = nisTool;
 
         domainPage = new NISDomainWizardPage();
         partitionPage = new NISPartitionWizardPage();
@@ -75,11 +71,8 @@ public class NISDomainWizard extends Wizard {
         domain.setServer(domainPage.getServer());
         domain.setSuffix(partitionPage.getSuffix());
 
-        NISTool nisTool = nisNode.getNisTool();
-
         try {
             nisTool.createDomain(domain);
-            nisNode.addNisDomain(domain);
 
         } catch (Exception e) {
             MessageDialog.openError(getShell(), "Failed creating domain.", e.getMessage());
@@ -89,6 +82,7 @@ public class NISDomainWizard extends Wizard {
         try {
             nisTool.createPartitionConfig(domain);
 
+            Project project = nisTool.getProject();
             project.upload("partitions/"+domain.getName());
 
         } catch (Exception e) {
