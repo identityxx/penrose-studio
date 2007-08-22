@@ -57,7 +57,7 @@ public class NISDomainWizard extends Wizard {
             partitionPage.setShortName(domainName);
 
             String suffix = domainPage.getDomain();
-            suffix = "dc="+suffix.replaceAll("\\.", ",dc=");
+            suffix = "ou="+suffix.replaceAll("\\.", ",dc=");
 
             partitionPage.setSuffix(suffix);
         }
