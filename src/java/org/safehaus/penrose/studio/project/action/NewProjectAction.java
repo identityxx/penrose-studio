@@ -23,8 +23,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.studio.project.ProjectEditorDialog;
 import org.safehaus.penrose.studio.project.ProjectConfig;
+import org.safehaus.penrose.studio.project.ProjectDialog;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -54,11 +54,12 @@ public class NewProjectAction extends Action {
             projectConfig.setHost("localhost");
             projectConfig.setPort(1099);
 
-            ProjectEditorDialog dialog = new ProjectEditorDialog(shell, SWT.NONE);
+            ProjectDialog dialog = new ProjectDialog(shell, SWT.NONE);
+            dialog.setText("New Server");
             dialog.setProjectConfig(projectConfig);
             dialog.open();
 
-            if (dialog.getAction() == ProjectEditorDialog.CANCEL) return;
+            if (dialog.getAction() == ProjectDialog.CANCEL) return;
 
             ServersView serversView = ServersView.getInstance();
             serversView.addProjectConfig(projectConfig);

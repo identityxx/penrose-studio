@@ -293,11 +293,12 @@ public class ProjectNode extends Node {
         String oldProjectName = projectConfig.getName();
 
         Shell shell = serversView.getSite().getShell();
-        ProjectEditorDialog dialog = new ProjectEditorDialog(shell, SWT.NONE);
+        ProjectDialog dialog = new ProjectDialog(shell, SWT.NONE);
+        dialog.setText("Edit Server");
         dialog.setProjectConfig(projectConfig);
         dialog.open();
 
-        if (dialog.getAction() == ProjectEditorDialog.CANCEL) return;
+        if (dialog.getAction() == ProjectDialog.CANCEL) return;
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
 
