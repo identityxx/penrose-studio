@@ -39,7 +39,7 @@ public class NISDatabasePage extends FormPage {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("NIS Database");
+        form.setText("Database");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());

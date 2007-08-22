@@ -199,10 +199,6 @@ public class NISTool {
         partitions.addPartition(partition);
     }
 
-    public void unloadPartition(String domainName) throws Exception {
-        partitions.removePartition(domainName);
-    }
-
     public void createDomain(NISDomain domain) throws Exception {
 
         String domainName = domain.getName();
@@ -437,16 +433,6 @@ public class NISTool {
         }
     }
 
-    public void createCache(NISDomain domain, Source source) throws Exception {
-
-        log.debug("Creating cache for "+source.getName()+".");
-        
-        Partition partition = source.getPartition();
-        for (Source cache : getCaches(partition, source)) {
-            cache.create();
-        }
-    }
-
     public void loadCache(NISDomain domain) throws Exception {
 
         log.debug("Loading cache "+domain.getName()+".");
@@ -456,15 +442,6 @@ public class NISTool {
         for (SourceSync sourceSync : sourceSyncs) {
             sourceSync.load();
         }
-    }
-
-    public void loadCache(NISDomain domain, Source source) throws Exception {
-
-        log.debug("Loading cache for "+source.getName()+".");
-
-        Partition partition = source.getPartition();
-        SourceSync sourceSync = partition.getSourceSync(source.getName());
-        sourceSync.load();
     }
 
     public void clearCache(NISDomain domain) throws Exception {
@@ -478,15 +455,6 @@ public class NISTool {
         }
     }
 
-    public void clearCache(NISDomain domain, Source source) throws Exception {
-
-        log.debug("Clearing cache for "+source.getName()+".");
-
-        Partition partition = source.getPartition();
-        SourceSync sourceSync = partition.getSourceSync(source.getName());
-        sourceSync.clean();
-    }
-
     public void removeCache(NISDomain domain) throws Exception {
 
         log.debug("Removing cache "+domain.getName()+".");
@@ -495,16 +463,6 @@ public class NISTool {
         JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
         JDBCClient client = adapter.getClient();
         client.dropDatabase(domain.getName());
-    }
-
-    public void removeCache(NISDomain domain, Source source) throws Exception {
-
-        log.debug("Removing cache for "+source.getName()+".");
-
-        Partition partition = source.getPartition();
-        for (Source cache : getCaches(partition, source)) {
-            cache.drop();
-        }
     }
 
     public Project getProject() {

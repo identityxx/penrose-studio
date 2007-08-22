@@ -17,6 +17,10 @@ import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.studio.nis.NISTool;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.management.SourceClient;
 
 import java.util.*;
 
@@ -35,14 +39,18 @@ public class NISCachePage extends FormPage {
     NISDomain domain;
     NISTool nisTool;
 
+    Project project;
+
     Map<String,String> sourceNames = new TreeMap<String,String>();
 
     public NISCachePage(NISDomainEditor editor) {
         super(editor, "CACHE", "  Cache  ");
 
         this.editor = editor;
-        this.domain = editor.getDomain();
-        this.nisTool = editor.getNisTool();
+
+        domain = editor.getDomain();
+        nisTool = editor.getNisTool();
+        project = nisTool.getProject();
 
         sourceNames.put("Users", "nis_users");
         sourceNames.put("Shadows", "nis_shadow");
@@ -124,9 +132,15 @@ public class NISCachePage extends FormPage {
                         items = cacheTable.getItems();
                     }
 
+                    PenroseClient penroseClient = project.getClient();
+                    PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
+
                     for (TableItem item : items) {
                         Source source = (Source)item.getData();
-                        nisTool.createCache(domain, source);
+                        String name = source.getName();
+
+                        SourceClient sourceClient = partitionClient.getSource(name);
+                        sourceClient.createCache();
                     }
 
                     refresh();
@@ -150,9 +164,15 @@ public class NISCachePage extends FormPage {
                         items = cacheTable.getItems();
                     }
 
+                    PenroseClient penroseClient = project.getClient();
+                    PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
+
                     for (TableItem item : items) {
                         Source source = (Source)item.getData();
-                        nisTool.loadCache(domain, source);
+                        String name = source.getName();
+
+                        SourceClient sourceClient = partitionClient.getSource(name);
+                        sourceClient.loadCache();
                     }
 
                     refresh();
@@ -176,9 +196,15 @@ public class NISCachePage extends FormPage {
                         items = cacheTable.getItems();
                     }
 
+                    PenroseClient penroseClient = project.getClient();
+                    PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
+
                     for (TableItem item : items) {
                         Source source = (Source)item.getData();
-                        nisTool.clearCache(domain, source);
+                        String name = source.getName();
+
+                        SourceClient sourceClient = partitionClient.getSource(name);
+                        sourceClient.cleanCache();
                     }
 
                     refresh();
@@ -202,9 +228,15 @@ public class NISCachePage extends FormPage {
                         items = cacheTable.getItems();
                     }
 
+                    PenroseClient penroseClient = project.getClient();
+                    PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
+
                     for (TableItem item : items) {
                         Source source = (Source)item.getData();
-                        nisTool.removeCache(domain, source);
+                        String name = source.getName();
+
+                        SourceClient sourceClient = partitionClient.getSource(name);
+                        sourceClient.dropCache();
                     }
 
                     refresh();

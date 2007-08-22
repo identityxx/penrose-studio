@@ -12,19 +12,18 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.nis.NISTool;
-import org.safehaus.penrose.studio.nis.wizard.NISDomainWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.nis.NISDomain;
+import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.management.PenroseClient;
 
 /**
  * @author Endi S. Dewata
  */
-public class NISDomainsPage extends FormPage {
+public class NISPartitionsPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -35,8 +34,8 @@ public class NISDomainsPage extends FormPage {
 
     Table table;
 
-    public NISDomainsPage(NISEditor editor, NISTool nisTool) {
-        super(editor, "DOMAINS", "  Domains  ");
+    public NISPartitionsPage(NISEditor editor, NISTool nisTool) {
+        super(editor, "PARTITONS", "  Partitions  ");
 
         this.editor = editor;
         this.nisTool = nisTool;
@@ -46,22 +45,22 @@ public class NISDomainsPage extends FormPage {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Domains");
+        form.setText("Partitions");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
         Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Domains");
+        section.setText("Partitions");
         section.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Control sourcesSection = createDomainsSection(section);
+        Control sourcesSection = createPartitionsSection(section);
         section.setClient(sourcesSection);
 
         refresh();
     }
 
-    public Composite createDomainsSection(Composite parent) {
+    public Composite createPartitionsSection(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
@@ -73,15 +72,11 @@ public class NISDomainsPage extends FormPage {
 
         TableColumn tc = new TableColumn(table, SWT.NONE);
         tc.setWidth(100);
-        tc.setText("Short Name");
+        tc.setText("Name");
 
         tc = new TableColumn(table, SWT.NONE);
-        tc.setWidth(150);
-        tc.setText("NIS Domain");
-
-        tc = new TableColumn(table, SWT.NONE);
-        tc.setWidth(250);
-        tc.setText("LDAP Suffix");
+        tc.setWidth(100);
+        tc.setText("Status");
 
         Composite buttons = toolkit.createComposite(composite);
         buttons.setLayout(new GridLayout());
@@ -90,52 +85,38 @@ public class NISDomainsPage extends FormPage {
         gd.widthHint = 120;
         buttons.setLayoutData(gd);
 
-        Button addButton = new Button(buttons, SWT.PUSH);
-        addButton.setText("Add");
-        addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Button createButton = new Button(buttons, SWT.PUSH);
+        createButton.setText("Create");
+        createButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        addButton.addSelectionListener(new SelectionAdapter() {
+        createButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
-                    NISDomainWizard wizard = new NISDomainWizard(nisTool);
-                    WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
-                    dialog.setPageSize(600, 300);
-                    dialog.open();
+                    boolean confirm = MessageDialog.openQuestion(
+                            editor.getSite().getShell(),
+                            "Creating Partition", "Are you sure?"
+                    );
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
+                    if (!confirm) return;
 
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
-                }
+                    TableItem[] items = table.getSelection();
 
-                refresh();
-            }
-        });
+                    if (items == null || items.length == 0) {
+                        items = table.getItems();
+                    }
 
-        Button editButton = new Button(buttons, SWT.PUSH);
-        editButton.setText("Edit");
-        editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+                    Project project = nisTool.getProject();
+                    PenroseClient client = project.getClient();
 
-        editButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                try {
-                    if (table.getSelectionCount() == 0) return;
+                    for (TableItem ti : items) {
+                        NISDomain domain = (NISDomain)ti.getData();
 
-                    TableItem item = table.getSelection()[0];
+                        nisTool.createPartitionConfig(domain);
+                        project.upload("partitions/"+domain.getName());
 
-                    NISDomain domain = (NISDomain)item.getData();
-                    String domainName = domain.getName();
-
-                    NISDomainDialog dialog = new NISDomainDialog(editor.getSite().getShell(), SWT.NONE);
-                    dialog.setDomain(domain);
-                    dialog.open();
-
-                    int action = dialog.getAction();
-                    if (action == NISUserDialog.CANCEL) return;
-
-                    nisTool.updateDomain(domainName, domain);
+                        client.startPartition(domain.getName());
+                        nisTool.loadPartition(domain);
+                    }
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
@@ -158,55 +139,32 @@ public class NISDomainsPage extends FormPage {
                 try {
                     boolean confirm = MessageDialog.openQuestion(
                             editor.getSite().getShell(),
-                            "Removing NIS Domain",
-                            "Are you sure?"
+                            "Removing Partition", "Are you sure?"
                     );
 
                     if (!confirm) return;
 
-                    if (table.getSelectionCount() == 0) return;
+                    TableItem[] items = table.getSelection();
+
+                    if (items == null || items.length == 0) {
+                        items = table.getItems();
+                    }
 
                     Project project = nisTool.getProject();
                     PenroseClient client = project.getClient();
 
-                    int index = table.getSelectionIndex();
-
-                    TableItem[] items = table.getSelection();
                     for (TableItem ti : items) {
                         NISDomain domain = (NISDomain)ti.getData();
 
-                        try {
-                            nisTool.removePartition(domain);
-                            client.stopPartition(domain.getName());
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
+                        client.stopPartition(domain.getName());
+                        nisTool.removePartition(domain);
 
-                        try {
-                            nisTool.removeCache(domain);
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-
-                        try {
-                            nisTool.removePartitionConfig(domain);
-
-                            project.removeDirectory("partitions/"+domain.getName());
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-
-                        try {
-                            nisTool.removeDomain(domain);
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
+                        nisTool.removePartitionConfig(domain);
+                        project.removeDirectory("partitions/"+domain.getName());
                     }
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
-
-                    table.select(index);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -237,12 +195,12 @@ public class NISDomainsPage extends FormPage {
             table.removeAll();
 
             for (NISDomain domain : nisTool.getNisDomains().values()) {
+                Partition partition = nisTool.getPartitions().getPartition(domain.getName());
 
                 TableItem ti = new TableItem(table, SWT.NONE);
 
                 ti.setText(0, domain.getName());
-                ti.setText(1, domain.getFullName());
-                ti.setText(2, domain.getSuffix());
+                ti.setText(1, partition == null ? "Missing" : "OK");
 
                 ti.setData(domain);
             }

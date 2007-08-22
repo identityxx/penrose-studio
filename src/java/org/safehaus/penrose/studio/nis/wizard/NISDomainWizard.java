@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.nis.NISTool;
+import org.safehaus.penrose.management.PenroseClient;
 
 /**
  * @author Endi Sukma Dewata
@@ -21,11 +22,13 @@ public class NISDomainWizard extends Wizard {
     NISDatabaseWizardPage databasePage;
 
     NISTool nisTool;
+    Project project;
 
     public NISDomainWizard(NISTool nisTool) {
         setWindowTitle("Add NIS Domain");
 
         this.nisTool = nisTool;
+        project = nisTool.getProject();
 
         domainPage = new NISDomainWizardPage();
         partitionPage = new NISPartitionWizardPage();
@@ -82,7 +85,6 @@ public class NISDomainWizard extends Wizard {
         try {
             nisTool.createPartitionConfig(domain);
 
-            Project project = nisTool.getProject();
             project.upload("partitions/"+domain.getName());
 
         } catch (Exception e) {
@@ -100,7 +102,10 @@ public class NISDomainWizard extends Wizard {
             }
         }
 
+        PenroseClient client = project.getClient();
+
         try {
+            client.startPartition(domain.getName());
             nisTool.loadPartition(domain);
 
         } catch (Exception e) {

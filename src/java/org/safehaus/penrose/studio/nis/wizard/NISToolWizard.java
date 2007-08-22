@@ -29,7 +29,7 @@ import java.io.File;
 /**
  * @author Endi S. Dewata
  */
-public class NISDatabaseWizard extends Wizard {
+public class NISToolWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -41,8 +41,8 @@ public class NISDatabaseWizard extends Wizard {
     public JDBCConnectionWizardPage jdbcPage;
     public NISDatabaseWizardPage databasePage;
 
-    public NISDatabaseWizard() {
-        setWindowTitle("NIS Database");
+    public NISToolWizard() {
+        setWindowTitle("NIS Tool");
     }
 
     public boolean canFinish() {
@@ -56,7 +56,7 @@ public class NISDatabaseWizard extends Wizard {
     public void addPages() {
 
         driverPage = new ConnectionDriverPage();
-        driverPage.setDescription("Select the type of database for storing NIS information.");
+        driverPage.setDescription("Select the type of the database.");
         driverPage.removeDriver("LDAP");
 
         jdbcPage = new JDBCConnectionWizardPage();

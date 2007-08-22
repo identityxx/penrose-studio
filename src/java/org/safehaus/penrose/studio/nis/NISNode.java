@@ -8,7 +8,7 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.nis.wizard.NISDomainWizard;
-import org.safehaus.penrose.studio.nis.wizard.NISDatabaseWizard;
+import org.safehaus.penrose.studio.nis.wizard.NISToolWizard;
 import org.safehaus.penrose.studio.nis.editor.NISEditorInput;
 import org.safehaus.penrose.studio.nis.editor.NISEditor;
 import org.safehaus.penrose.studio.nis.event.NISEventAdapter;
@@ -141,7 +141,7 @@ public class NISNode extends Node {
         ConnectionConfigs connectionConfigs = partitionConfig.getConnectionConfigs();
         ConnectionConfig connectionConfig = connectionConfigs.getConnectionConfig(NISTool.NIS_CONNECTION_NAME);
 
-        NISDatabaseWizard wizard = new NISDatabaseWizard();
+        NISToolWizard wizard = new NISToolWizard();
         wizard.setProject(project);
         wizard.setPartitionConfig(partitionConfig);
         wizard.setConnectionConfig(connectionConfig);
