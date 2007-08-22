@@ -70,18 +70,7 @@ public class PenroseStudioWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor 
             configurer.setTitle("Penrose Studio");
             //configurer.setShowCoolBar(true);
             //configurer.setShowStatusLine(true);
-/*
-            Shell shell = new Shell(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
 
-            ProjectDialog dialog = new ProjectDialog(shell);
-            dialog.open();
-
-            if (dialog.getAction() == ProjectDialog.CANCEL) System.exit(0);
-
-            Project project = dialog.getProjectConfig();
-
-            penroseStudio.getApplicationConfig().setCurrentProject(project);
-*/
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             System.exit(0);
