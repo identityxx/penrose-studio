@@ -11,6 +11,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.nis.NISDomain;
@@ -96,8 +98,8 @@ public class NISUserScriptsPage extends FormPage {
             actionCombo.add("Conflicting UID Finder");
             actionCombo.setData("Conflicting UID Finder", ConflictingUIDFinderAction.class.getName());
 
-            actionCombo.add("InconsistentUIDFinderAction");
-            actionCombo.setData("InconsistentUIDFinderAction", InconsistentUIDFinderAction.class.getName());
+            actionCombo.add("Inconsistent UID Finder");
+            actionCombo.setData("Inconsistent UID Finder", InconsistentUIDFinderAction.class.getName());
 
 /*
             SearchRequest request = new SearchRequest();
@@ -186,6 +188,13 @@ public class NISUserScriptsPage extends FormPage {
         usersTable.setHeaderVisible(true);
         usersTable.setLinesVisible(true);
 
+        usersTable.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent focusEvent) {
+                conflictsTable.deselectAll();
+                matchesTable.deselectAll();
+            }
+        });
+
         TableColumn tc = new TableColumn(usersTable, SWT.NONE);
         tc.setText("User");
         tc.setWidth(100);
@@ -223,6 +232,12 @@ public class NISUserScriptsPage extends FormPage {
         conflictsTable.setHeaderVisible(true);
         conflictsTable.setLinesVisible(true);
 
+        conflictsTable.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent focusEvent) {
+                matchesTable.deselectAll();
+            }
+        });
+
         tc = new TableColumn(conflictsTable, SWT.NONE);
         tc.setText("Domain");
         tc.setWidth(120);
@@ -243,6 +258,12 @@ public class NISUserScriptsPage extends FormPage {
 
         matchesTable.setHeaderVisible(true);
         matchesTable.setLinesVisible(true);
+
+        matchesTable.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent focusEvent) {
+                conflictsTable.deselectAll();
+            }
+        });
 
         tc = new TableColumn(matchesTable, SWT.NONE);
         tc.setText("Domain");
@@ -265,9 +286,20 @@ public class NISUserScriptsPage extends FormPage {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    if (usersTable.getSelectionCount() == 0) return;
+                    TableItem item;
 
-                    TableItem item = usersTable.getSelection()[0];
+                    if (conflictsTable.getSelectionCount() > 0) {
+                        item = conflictsTable.getSelection()[0];
+
+                    } else if (matchesTable.getSelectionCount() > 0) {
+                        item = matchesTable.getSelection()[0];
+
+                    } else if (usersTable.getSelectionCount() > 0) {
+                        item = usersTable.getSelection()[0];
+
+                    } else {
+                        return;
+                    }
 
                     Attributes attributes = (Attributes)item.getData();
                     String domain = (String)attributes.getValue("domain");
@@ -312,6 +344,8 @@ public class NISUserScriptsPage extends FormPage {
             ti.setText(0, domain2);
             ti.setText(1, "" + uid2);
             ti.setText(2, "" + uidNumber2);
+
+            ti.setData(attributes2);
         }
     }
 
@@ -361,13 +395,22 @@ public class NISUserScriptsPage extends FormPage {
                     ResultSet rs = (ResultSet)object;
 
                     String uid2 = rs.getString(1);
+                    Integer origUidNumber2 = (Integer)rs.getObject(2);
                     Integer uidNumber2 = (Integer)rs.getObject(3);
-                    if (uidNumber2 == null) uidNumber2 = (Integer)rs.getObject(2);
+                    if (uidNumber2 == null) uidNumber2 = origUidNumber2;
+
+                    Attributes attributes = new Attributes();
+                    attributes.setValue("domain", domainName);
+                    attributes.setValue("uid", uid2);
+                    attributes.setValue("origUidNumber", origUidNumber2);
+                    attributes.setValue("uidNumber", uidNumber2);
 
                     TableItem ti = new TableItem(matchesTable, SWT.NONE);
                     ti.setText(0, domainName);
                     ti.setText(1, "" + uid2);
                     ti.setText(2, "" + uidNumber2);
+
+                    ti.setData(attributes);
                 }
             };
 

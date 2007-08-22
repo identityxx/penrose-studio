@@ -11,6 +11,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.nis.NISDomain;
@@ -184,6 +186,13 @@ public class NISGroupScriptsPage extends FormPage {
         groupsTable.setHeaderVisible(true);
         groupsTable.setLinesVisible(true);
 
+        groupsTable.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent focusEvent) {
+                conflictsTable.deselectAll();
+                matchesTable.deselectAll();
+            }
+        });
+
         TableColumn tc = new TableColumn(groupsTable, SWT.NONE);
         tc.setText("Group");
         tc.setWidth(100);
@@ -221,6 +230,12 @@ public class NISGroupScriptsPage extends FormPage {
         conflictsTable.setHeaderVisible(true);
         conflictsTable.setLinesVisible(true);
 
+        conflictsTable.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent focusEvent) {
+                matchesTable.deselectAll();
+            }
+        });
+
         tc = new TableColumn(conflictsTable, SWT.NONE);
         tc.setText("Domain");
         tc.setWidth(120);
@@ -241,6 +256,12 @@ public class NISGroupScriptsPage extends FormPage {
 
         matchesTable.setHeaderVisible(true);
         matchesTable.setLinesVisible(true);
+
+        matchesTable.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent focusEvent) {
+                conflictsTable.deselectAll();
+            }
+        });
 
         tc = new TableColumn(matchesTable, SWT.NONE);
         tc.setText("Domain");
@@ -263,9 +284,20 @@ public class NISGroupScriptsPage extends FormPage {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    if (groupsTable.getSelectionCount() == 0) return;
+                    TableItem item;
 
-                    TableItem item = groupsTable.getSelection()[0];
+                    if (conflictsTable.getSelectionCount() > 0) {
+                        item = conflictsTable.getSelection()[0];
+
+                    } else if (matchesTable.getSelectionCount() > 0) {
+                        item = matchesTable.getSelection()[0];
+
+                    } else if (groupsTable.getSelectionCount() > 0) {
+                        item = groupsTable.getSelection()[0];
+
+                    } else {
+                        return;
+                    }
 
                     Attributes attributes = (Attributes)item.getData();
                     String domainName = (String)attributes.getValue("domain");
@@ -310,6 +342,8 @@ public class NISGroupScriptsPage extends FormPage {
             ti.setText(0, domain2);
             ti.setText(1, "" + cn2);
             ti.setText(2, "" + gidNumber2);
+
+            ti.setData(attributes2);
         }
     }
 
@@ -359,13 +393,22 @@ public class NISGroupScriptsPage extends FormPage {
                     ResultSet rs = (ResultSet)object;
 
                     String cn2 = rs.getString(1);
+                    Integer origGidNumber2 = (Integer)rs.getObject(2);
                     Integer gidNumber2 = (Integer)rs.getObject(3);
-                    if (gidNumber2 == null) gidNumber2 = (Integer)rs.getObject(2);
+                    if (gidNumber2 == null) gidNumber2 = origGidNumber2;
+
+                    Attributes attributes = new Attributes();
+                    attributes.setValue("domain", domainName);
+                    attributes.setValue("cn", cn2);
+                    attributes.setValue("origGidNumber", origGidNumber2);
+                    attributes.setValue("gidNumber", gidNumber2);
 
                     TableItem ti = new TableItem(matchesTable, SWT.NONE);
                     ti.setText(0, domainName);
                     ti.setText(1, "" + cn2);
                     ti.setText(2, "" + gidNumber2);
+
+                    ti.setData(attributes);
                 }
             };
 
