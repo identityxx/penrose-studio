@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Penrose Studio
 Bundle-SymbolicName: org.safehaus.penrose; singleton:=true
-Bundle-Version: ${product.version}
+Bundle-Version: ${plugin.version}
 Bundle-Vendor: Identyx
 Bundle-Activator: org.safehaus.penrose.studio.PenrosePlugin
 Bundle-Localization: plugin

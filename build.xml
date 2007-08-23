@@ -13,7 +13,7 @@
     <property name="project.dist" value="dist"/>
 
     <property name="prefix" value=""/>
-    <property name="penrose.studio.home" value="${prefix}/usr/local/${project.name}-${product.version}b1"/>
+    <property name="penrose.studio.home" value="${prefix}/usr/local/${project.name}-${product.version}"/>
 
     <property name="rcp.prefix" value="eclipse-RCP-3.2.2"/>
     <property name="iscc.path" value="ISCC.exe"/>
@@ -143,7 +143,7 @@
 
     <target name="build" depends="compile">
         <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>
-        <property name="plugin.path" value="target/${dist.name}/plugins/org.safehaus.penrose_${product.version}"/>
+        <property name="plugin.path" value="target/${dist.name}/plugins/org.safehaus.penrose_${plugin.version}"/>
         <copy todir="target" file="LICENSE.txt"/>
         <mkdir dir="target/${dist.name}"/>
         <copy todir="target/${dist.name}" file="LICENSE.txt"/>
