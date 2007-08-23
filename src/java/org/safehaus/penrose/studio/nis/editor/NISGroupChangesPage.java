@@ -99,7 +99,7 @@ public class NISGroupChangesPage extends FormPage {
                     String cn = (String)attributes.getValue("cn");
                     Integer origGidNumber = (Integer)attributes.getValue("origGidNumber");
                     Integer gidNumber = (Integer)attributes.getValue("gidNumber");
-                    String active = (String)attributes.getValue("active");
+                    Boolean active = (Boolean)attributes.getValue("active");
 
                     TableItem ti = new TableItem(changesTable, SWT.NONE);
 
@@ -111,7 +111,7 @@ public class NISGroupChangesPage extends FormPage {
                     ti.setText(i++, cn);
                     ti.setText(i++, ""+origGidNumber);
                     ti.setText(i++, ""+ gidNumber);
-                    ti.setText(i++, "1".equals(active) ? "Yes" : "");
+                    ti.setText(i++, (active != null) && active ? "Yes" : "");
 
                     ti.setData(result);
                 }
@@ -142,11 +142,11 @@ public class NISGroupChangesPage extends FormPage {
             Attributes attributes = result.getAttributes();
 
             String message = (String)attributes.getValue("message");
-            String active = (String)attributes.getValue("active");
+            Boolean active = (Boolean)attributes.getValue("active");
 
             messageText.setText(message == null ? "" : message);
 
-            if ("1".equals(active)) {
+            if ((active != null) && active) {
                 activateButton.setText("Deactivate");
             } else {
                 activateButton.setText("Activate");
@@ -437,14 +437,14 @@ public class NISGroupChangesPage extends FormPage {
                     SearchResult result = (SearchResult)ti.getData();
                     Attributes attributes = result.getAttributes();
 
-                    String active = (String)attributes.getValue("active");
+                    Boolean active = (Boolean)attributes.getValue("active");
 
                     Collection<Modification> modifications = new ArrayList<Modification>();
 
-                    if ("1".equals(active)) {
+                    if ((active != null) && active) {
                         modifications.add(new Modification(Modification.DELETE, new Attribute("active")));
                     } else {
-                        modifications.add(new Modification(Modification.REPLACE, new Attribute("active", "1")));
+                        modifications.add(new Modification(Modification.REPLACE, new Attribute("active", true)));
                     }
 
                     nisTool.getGroups().modify(result.getDn(), modifications);

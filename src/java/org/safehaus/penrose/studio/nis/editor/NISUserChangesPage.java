@@ -100,7 +100,7 @@ public class NISUserChangesPage extends FormPage {
                     String uid = (String)attributes.getValue("uid");
                     Integer origUidNumber = (Integer)attributes.getValue("origUidNumber");
                     Integer uidNumber = (Integer)attributes.getValue("uidNumber");
-                    String active = (String)attributes.getValue("active");
+                    Boolean active = (Boolean)attributes.getValue("active");
 
                     TableItem ti = new TableItem(changesTable, SWT.NONE);
 
@@ -112,7 +112,7 @@ public class NISUserChangesPage extends FormPage {
                     ti.setText(i++, uid);
                     ti.setText(i++, ""+origUidNumber);
                     ti.setText(i++, ""+uidNumber);
-                    ti.setText(i++, "1".equals(active) ? "Yes" : "");
+                    ti.setText(i++, (active != null) && active ? "Yes" : "");
                     
                     ti.setData(result);
                 }
@@ -143,11 +143,11 @@ public class NISUserChangesPage extends FormPage {
             Attributes attributes = result.getAttributes();
 
             String message = (String)attributes.getValue("message");
-            String active = (String)attributes.getValue("active");
+            Boolean active = (Boolean)attributes.getValue("active");
 
             messageText.setText(message == null ? "" : message);
 
-            if ("1".equals(active)) {
+            if ((active != null) && active) {
                 activateButton.setText("Deactivate");
             } else {
                 activateButton.setText("Activate");
@@ -440,14 +440,14 @@ public class NISUserChangesPage extends FormPage {
                     SearchResult result = (SearchResult)ti.getData();
                     Attributes attributes = result.getAttributes();
 
-                    String active = (String)attributes.getValue("active");
+                    Boolean active = (Boolean)attributes.getValue("active");
 
                     Collection<Modification> modifications = new ArrayList<Modification>();
 
-                    if ("1".equals(active)) {
+                    if ((active != null) && active) {
                         modifications.add(new Modification(Modification.DELETE, new Attribute("active")));
                     } else {
-                        modifications.add(new Modification(Modification.REPLACE, new Attribute("active", "1")));
+                        modifications.add(new Modification(Modification.REPLACE, new Attribute("active", true)));
                     }
 
                     nisTool.getUsers().modify(result.getDn(), modifications);
