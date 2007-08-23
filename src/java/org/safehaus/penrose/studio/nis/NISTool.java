@@ -11,6 +11,7 @@ import org.safehaus.penrose.studio.nis.event.NISEvent;
 import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.management.PenroseClient;
 import org.apache.tools.ant.filters.ExpandProperties;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.FilterChain;
@@ -104,7 +105,14 @@ public class NISTool {
             nisDomains.put(domainName, domain);
 
             PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(domainName);
-            if (partitionConfig == null) continue;
+
+            if (partitionConfig == null) {
+                createPartitionConfig(domain);
+                project.upload("partitions/"+domain.getName());
+
+                PenroseClient client = project.getClient();
+                client.startPartition(domain.getName());
+            }
 
             loadPartition(domain);
         }

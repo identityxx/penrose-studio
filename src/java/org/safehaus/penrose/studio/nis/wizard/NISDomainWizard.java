@@ -84,7 +84,6 @@ public class NISDomainWizard extends Wizard {
 
         try {
             nisTool.createPartitionConfig(domain);
-
             project.upload("partitions/"+domain.getName());
 
         } catch (Exception e) {
