@@ -65,8 +65,7 @@ public class NISCachePage extends FormPage {
         sourceNames.put("Ethernets", "nis_ethers");
         sourceNames.put("BootParams", "nis_bootparams");
         sourceNames.put("Networks", "nis_networks");
-        sourceNames.put("AutomountMaps", "nis_automountMap");
-        sourceNames.put("Automounts", "nis_automount");
+        sourceNames.put("Automounts", "nis_automounts");
     }
 
     public void createFormContent(IManagedForm managedForm) {

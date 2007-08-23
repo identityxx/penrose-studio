@@ -33,6 +33,7 @@
 
     <target name="init">
         <echo message="Operating System: ${os.name} ${os.version} (${os.arch})" />
+        <echo message="Java Version: ${java.version}" />
         <condition property="isWindows">
             <os family="windows"/>
         </condition>
@@ -312,6 +313,16 @@
         <antcall target="dist-win32"/>
     </target>
 
+    <target name="dist-linux" depends="build-linux" if="isLinux">
+    	<antcall target="rpm">
+            <param name="rpm.prefix" value=""/>
+            <param name="rpm.home" value="/usr/src/redhat"/>
+            <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
+            <param name="rpm.arch" value="i386"/>
+            <param name="rpm.name" value="${project.name}-${product.version}-1.i386.rpm"/>
+        </antcall>
+   </target>
+
     <target name="dist-linux-gtk-x86_64" depends="build-linux-gtk-x86_64" if="isLinux64">
         <antcall target="rpm">
             <param name="rpm.prefix" value=""/>
@@ -321,19 +332,6 @@
             <param name="rpm.name" value="${project.name}-${product.version}-1.x86_64.rpm"/>
         </antcall>
     </target>
-
-    <target name="dist-linux" depends="build-linux" if="isLinux">
-
-    	<antcall target="rpm">
-            <param name="rpm.prefix" value=""/>
-            <param name="rpm.home" value="/usr/src/redhat"/>
-            <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
-            <param name="rpm.arch" value="i386"/>
-            <param name="rpm.name" value="${project.name}-${product.version}-1.i386.rpm"/>
-        </antcall>
-
-    	
-   </target>
 
     <target name="dist-macosx" depends="build-macosx" if="isMac">
         <property name="app.name" value="Penrose Studio.app"/>
