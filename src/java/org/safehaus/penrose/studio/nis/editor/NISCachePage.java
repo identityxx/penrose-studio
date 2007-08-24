@@ -4,10 +4,14 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.forms.events.HyperlinkAdapter;
+import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -33,7 +37,7 @@ public class NISCachePage extends FormPage {
 
     FormToolkit toolkit;
 
-    Table cacheTable;
+    Table table;
 
     NISDomainEditor editor;
     NISDomain domain;
@@ -99,37 +103,64 @@ public class NISCachePage extends FormPage {
         leftPanel.setLayout(new GridLayout());
         leftPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        cacheTable = new Table(leftPanel, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
-        cacheTable.setLayoutData(new GridData(GridData.FILL_BOTH));
-        cacheTable.setHeaderVisible(true);
-        cacheTable.setLinesVisible(true);
+        table = new Table(leftPanel, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+        table.setLayoutData(new GridData(GridData.FILL_BOTH));
+        table.setHeaderVisible(true);
+        table.setLinesVisible(true);
 
-        TableColumn tc = new TableColumn(cacheTable, SWT.NONE);
+        TableColumn tc = new TableColumn(table, SWT.NONE);
         tc.setWidth(150);
         tc.setText("Name");
 
-        tc = new TableColumn(cacheTable, SWT.NONE);
+        tc = new TableColumn(table, SWT.NONE);
         tc.setWidth(100);
         tc.setText("Entries");
         tc.setAlignment(SWT.RIGHT);
 
-        Composite buttons = toolkit.createComposite(composite);
-        buttons.setLayout(new GridLayout());
+        Composite links = toolkit.createComposite(leftPanel);
+        links.setLayout(new RowLayout());
+        links.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Hyperlink selectAllLink = toolkit.createHyperlink(links, "Select All", SWT.NONE);
+
+        selectAllLink.addHyperlinkListener(new HyperlinkAdapter() {
+            public void linkActivated(HyperlinkEvent event) {
+                table.selectAll();
+            }
+        });
+
+        Hyperlink selectNoneLink = toolkit.createHyperlink(links, "Select None", SWT.NONE);
+
+        selectNoneLink.addHyperlinkListener(new HyperlinkAdapter() {
+            public void linkActivated(HyperlinkEvent event) {
+                table.deselectAll();
+            }
+        });
+
+        Composite rightPanel = toolkit.createComposite(composite);
+        rightPanel.setLayout(new GridLayout());
         GridData gd = new GridData(GridData.FILL_VERTICAL);
         gd.widthHint = 120;
-        buttons.setLayoutData(gd);
+        rightPanel.setLayoutData(gd);
 
-        Button createButton = new Button(buttons, SWT.PUSH);
+        Button createButton = new Button(rightPanel, SWT.PUSH);
         createButton.setText("Create");
         createButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
-                    TableItem[] items = cacheTable.getSelection();
-                    if (items == null || items.length == 0) {
-                        items = cacheTable.getItems();
-                    }
+                    if (table.getSelectionCount() == 0) return;
+
+                    boolean confirm = MessageDialog.openQuestion(
+                            editor.getSite().getShell(),
+                            "Creating Cache",
+                            "Are you sure?"
+                    );
+
+                    if (!confirm) return;
+
+                    TableItem[] items = table.getSelection();
 
                     PenroseClient penroseClient = project.getClient();
                     PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
@@ -155,17 +186,24 @@ public class NISCachePage extends FormPage {
             }
         });
 
-        Button loadButton = new Button(buttons, SWT.PUSH);
+        Button loadButton = new Button(rightPanel, SWT.PUSH);
         loadButton.setText("Load");
         loadButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         loadButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
-                    TableItem[] items = cacheTable.getSelection();
-                    if (items == null || items.length == 0) {
-                        items = cacheTable.getItems();
-                    }
+                    if (table.getSelectionCount() == 0) return;
+
+                    boolean confirm = MessageDialog.openQuestion(
+                            editor.getSite().getShell(),
+                            "Loading Cache",
+                            "Are you sure?"
+                    );
+
+                    if (!confirm) return;
+
+                    TableItem[] items = table.getSelection();
 
                     PenroseClient penroseClient = project.getClient();
                     PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
@@ -191,17 +229,24 @@ public class NISCachePage extends FormPage {
             }
         });
 
-        Button clearButton = new Button(buttons, SWT.PUSH);
+        Button clearButton = new Button(rightPanel, SWT.PUSH);
         clearButton.setText("Clear");
         clearButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         clearButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
-                    TableItem[] items = cacheTable.getSelection();
-                    if (items == null || items.length == 0) {
-                        items = cacheTable.getItems();
-                    }
+                    if (table.getSelectionCount() == 0) return;
+
+                    boolean confirm = MessageDialog.openQuestion(
+                            editor.getSite().getShell(),
+                            "Clearing Cache",
+                            "Are you sure?"
+                    );
+
+                    if (!confirm) return;
+
+                    TableItem[] items = table.getSelection();
 
                     PenroseClient penroseClient = project.getClient();
                     PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
@@ -227,17 +272,24 @@ public class NISCachePage extends FormPage {
             }
         });
 
-        Button removeButton = new Button(buttons, SWT.PUSH);
+        Button removeButton = new Button(rightPanel, SWT.PUSH);
         removeButton.setText("Remove");
         removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         removeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
-                    TableItem[] items = cacheTable.getSelection();
-                    if (items == null || items.length == 0) {
-                        items = cacheTable.getItems();
-                    }
+                    if (table.getSelectionCount() == 0) return;
+
+                    boolean confirm = MessageDialog.openQuestion(
+                            editor.getSite().getShell(),
+                            "Removing Cache",
+                            "Are you sure?"
+                    );
+
+                    if (!confirm) return;
+
+                    TableItem[] items = table.getSelection();
 
                     PenroseClient penroseClient = project.getClient();
                     PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
@@ -263,9 +315,9 @@ public class NISCachePage extends FormPage {
             }
         });
 
-        new Label(buttons, SWT.NONE);
+        new Label(rightPanel, SWT.NONE);
         
-        Button refreshButton = new Button(buttons, SWT.PUSH);
+        Button refreshButton = new Button(rightPanel, SWT.PUSH);
         refreshButton.setText("Refresh");
         refreshButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -280,7 +332,9 @@ public class NISCachePage extends FormPage {
 
     public void refresh() {
         try {
-            cacheTable.removeAll();
+            int[] indices = table.getSelectionIndices();
+
+            table.removeAll();
 
             Partition partition = nisTool.getPartitions().getPartition(domain.getName());
 
@@ -296,7 +350,7 @@ public class NISCachePage extends FormPage {
 
                 Source cacheSource = caches.iterator().next();
 
-                TableItem ti = new TableItem(cacheTable, SWT.NONE);
+                TableItem ti = new TableItem(table, SWT.NONE);
                 ti.setText(0, label);
                 ti.setData(source);
 
@@ -308,6 +362,8 @@ public class NISCachePage extends FormPage {
                     ti.setText(1, "N/A");
                 }
             }
+
+            table.select(indices);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

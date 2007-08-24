@@ -65,7 +65,6 @@ public class NISToolWizard extends Wizard {
         jdbcPage.setShowDatabase(false);
 
         databasePage = new NISDatabaseWizardPage();
-        databasePage.setShowLoadOption(false);
 
         addPage(driverPage);
         addPage(jdbcPage);

@@ -68,21 +68,6 @@ public class NISNode extends Node {
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        manager.add(new Action("Add Domain...") {
-            public void run() {
-                try {
-                    addDomain();
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-            public boolean isEnabled() {
-                return started;
-            }
-        });
-
-        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-
         manager.add(new Action("Properties") {
             public void run() {
                 try {
@@ -211,17 +196,6 @@ public class NISNode extends Node {
     public Collection<Node> getChildren() throws Exception {
         if (!started) start();
         return children.values();
-    }
-
-    public void addDomain() throws Exception {
-
-        NISDomainWizard wizard = new NISDomainWizard(nisTool);
-        WizardDialog dialog = new WizardDialog(view.getSite().getShell(), wizard);
-        dialog.setPageSize(600, 300);
-        dialog.open();
-        
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public NISTool getNisTool() {

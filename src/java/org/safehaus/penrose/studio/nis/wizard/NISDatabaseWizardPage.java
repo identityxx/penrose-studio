@@ -19,9 +19,7 @@ public class NISDatabaseWizardPage extends WizardPage {
     public final static String NAME = "NIS Database Actions";
 
     Button createCheckbox;
-    Button loadCheckbox;
 
-    private boolean showLoadOption = true;
     boolean visited;
 
     public NISDatabaseWizardPage() {
@@ -41,13 +39,6 @@ public class NISDatabaseWizardPage extends WizardPage {
         createCheckbox.setSelection(true);
         createCheckbox.setText("Create database.");
         createCheckbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        if (showLoadOption) {
-            loadCheckbox = new Button(composite, SWT.CHECK);
-            loadCheckbox.setSelection(true);
-            loadCheckbox.setText("Load database.");
-            loadCheckbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        }
     }
 
     public boolean validatePage() {
@@ -68,21 +59,5 @@ public class NISDatabaseWizardPage extends WizardPage {
 
     public boolean isCreate() {
         return createCheckbox.getSelection();
-    }
-
-    public void setLoad(boolean load) {
-        loadCheckbox.setSelection(load);
-    }
-
-    public boolean isLoad() {
-        return loadCheckbox.getSelection();
-    }
-
-    public boolean isShowLoadOption() {
-        return showLoadOption;
-    }
-
-    public void setShowLoadOption(boolean showLoadOption) {
-        this.showLoadOption = showLoadOption;
     }
 }

@@ -9,6 +9,12 @@ import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.nis.NISTool;
 import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.SourceClient;
+import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.source.SourceConfig;
 
 /**
  * @author Endi Sukma Dewata
@@ -115,16 +121,6 @@ public class NISDomainWizard extends Wizard {
             );
 
             return false;
-        }
-
-        if (databasePage.isLoad()) {
-            try {
-                nisTool.loadCache(domain);
-
-            } catch (Exception e) {
-                MessageDialog.openError(getShell(), "Failed loading database.", e.getMessage());
-                return false;
-            }
         }
 
         return true;

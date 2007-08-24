@@ -4,10 +4,14 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.forms.events.HyperlinkAdapter;
+import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -65,7 +69,11 @@ public class NISPartitionsPage extends FormPage {
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
 
-        table = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+        Composite leftPanel = toolkit.createComposite(composite);
+        leftPanel.setLayout(new GridLayout());
+        leftPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        table = new Table(leftPanel, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
         table.setLayoutData(new GridData(GridData.FILL_BOTH));
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
@@ -78,32 +86,51 @@ public class NISPartitionsPage extends FormPage {
         tc.setWidth(100);
         tc.setText("Status");
 
-        Composite buttons = toolkit.createComposite(composite);
-        buttons.setLayout(new GridLayout());
+        Composite links = toolkit.createComposite(leftPanel);
+        links.setLayout(new RowLayout());
+        links.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Hyperlink selectAllLink = toolkit.createHyperlink(links, "Select All", SWT.NONE);
+
+        selectAllLink.addHyperlinkListener(new HyperlinkAdapter() {
+            public void linkActivated(HyperlinkEvent event) {
+                table.selectAll();
+            }
+        });
+
+        Hyperlink selectNoneLink = toolkit.createHyperlink(links, "Select None", SWT.NONE);
+
+        selectNoneLink.addHyperlinkListener(new HyperlinkAdapter() {
+            public void linkActivated(HyperlinkEvent event) {
+                table.deselectAll();
+            }
+        });
+
+        Composite rightPanel = toolkit.createComposite(composite);
+        rightPanel.setLayout(new GridLayout());
         GridData gd = new GridData(GridData.FILL_VERTICAL);
         gd.verticalSpan = 2;
         gd.widthHint = 120;
-        buttons.setLayoutData(gd);
+        rightPanel.setLayoutData(gd);
 
-        Button createButton = new Button(buttons, SWT.PUSH);
+        Button createButton = new Button(rightPanel, SWT.PUSH);
         createButton.setText("Create");
         createButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
+                    if (table.getSelectionCount() == 0) return;
+
                     boolean confirm = MessageDialog.openQuestion(
                             editor.getSite().getShell(),
-                            "Creating Partition", "Are you sure?"
+                            "Creating Partition",
+                            "Are you sure?"
                     );
 
                     if (!confirm) return;
 
                     TableItem[] items = table.getSelection();
-
-                    if (items == null || items.length == 0) {
-                        items = table.getItems();
-                    }
 
                     Project project = nisTool.getProject();
                     PenroseClient client = project.getClient();
@@ -130,25 +157,24 @@ public class NISPartitionsPage extends FormPage {
             }
         });
 
-        Button removeButton = new Button(buttons, SWT.PUSH);
+        Button removeButton = new Button(rightPanel, SWT.PUSH);
         removeButton.setText("Remove");
         removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         removeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
+                    if (table.getSelectionCount() == 0) return;
+
                     boolean confirm = MessageDialog.openQuestion(
                             editor.getSite().getShell(),
-                            "Removing Partition", "Are you sure?"
+                            "Removing Partition",
+                            "Are you sure?"
                     );
 
                     if (!confirm) return;
 
                     TableItem[] items = table.getSelection();
-
-                    if (items == null || items.length == 0) {
-                        items = table.getItems();
-                    }
 
                     Project project = nisTool.getProject();
                     PenroseClient client = project.getClient();
@@ -175,9 +201,9 @@ public class NISPartitionsPage extends FormPage {
             }
         });
 
-        new Label(buttons, SWT.NONE);
+        new Label(rightPanel, SWT.NONE);
 
-        Button refreshButton = new Button(buttons, SWT.PUSH);
+        Button refreshButton = new Button(rightPanel, SWT.PUSH);
         refreshButton.setText("Refresh");
         refreshButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -192,6 +218,8 @@ public class NISPartitionsPage extends FormPage {
 
     public void refresh() {
         try {
+            int[] indices = table.getSelectionIndices();
+
             table.removeAll();
 
             for (NISDomain domain : nisTool.getNisDomains().values()) {
@@ -204,6 +232,8 @@ public class NISPartitionsPage extends FormPage {
 
                 ti.setData(domain);
             }
+
+            table.select(indices);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

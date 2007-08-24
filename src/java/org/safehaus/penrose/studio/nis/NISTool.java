@@ -441,28 +441,6 @@ public class NISTool {
         }
     }
 
-    public void loadCache(NISDomain domain) throws Exception {
-
-        log.debug("Loading cache "+domain.getName()+".");
-
-        Partition partition = partitions.getPartition(domain.getName());
-        Collection<SourceSync> sourceSyncs = partition.getSourceSyncs();
-        for (SourceSync sourceSync : sourceSyncs) {
-            sourceSync.load();
-        }
-    }
-
-    public void clearCache(NISDomain domain) throws Exception {
-
-        log.debug("Clearing cache "+domain.getName()+".");
-
-        Partition partition = partitions.getPartition(domain.getName());
-        Collection<SourceSync> caches = partition.getSourceSyncs();
-        for (SourceSync sourceSync : caches) {
-            sourceSync.clean();
-        }
-    }
-
     public void removeCache(NISDomain domain) throws Exception {
 
         log.debug("Removing cache "+domain.getName()+".");
