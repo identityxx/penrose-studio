@@ -138,8 +138,12 @@ public class NISCachePage extends FormPage {
                         Source source = (Source)item.getData();
                         String name = source.getName();
 
-                        SourceClient sourceClient = partitionClient.getSource(name);
-                        sourceClient.createCache();
+                        try {
+                            SourceClient sourceClient = partitionClient.getSource(name);
+                            sourceClient.createCache();
+                        } catch (Exception e) {
+                            log.error(e.getMessage(), e);
+                        }
                     }
 
                     refresh();
@@ -170,8 +174,12 @@ public class NISCachePage extends FormPage {
                         Source source = (Source)item.getData();
                         String name = source.getName();
 
-                        SourceClient sourceClient = partitionClient.getSource(name);
-                        sourceClient.loadCache();
+                        try {
+                            SourceClient sourceClient = partitionClient.getSource(name);
+                            sourceClient.loadCache();
+                        } catch (Exception e) {
+                            log.error(e.getMessage(), e);
+                        }
                     }
 
                     refresh();
@@ -202,8 +210,12 @@ public class NISCachePage extends FormPage {
                         Source source = (Source)item.getData();
                         String name = source.getName();
 
-                        SourceClient sourceClient = partitionClient.getSource(name);
-                        sourceClient.cleanCache();
+                        try {
+                            SourceClient sourceClient = partitionClient.getSource(name);
+                            sourceClient.cleanCache();
+                        } catch (Exception e) {
+                            log.error(e.getMessage(), e);
+                        }
                     }
 
                     refresh();
@@ -234,8 +246,12 @@ public class NISCachePage extends FormPage {
                         Source source = (Source)item.getData();
                         String name = source.getName();
 
-                        SourceClient sourceClient = partitionClient.getSource(name);
-                        sourceClient.dropCache();
+                        try {
+                            SourceClient sourceClient = partitionClient.getSource(name);
+                            sourceClient.dropCache();
+                        } catch (Exception e) {
+                            log.error(e.getMessage(), e);
+                        }
                     }
 
                     refresh();
