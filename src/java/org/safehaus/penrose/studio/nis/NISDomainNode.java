@@ -4,10 +4,13 @@ import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.*;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.nis.editor.NISDomainEditorInput;
 import org.safehaus.penrose.studio.nis.editor.NISDomainEditor;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
@@ -43,8 +46,13 @@ public class NISDomainNode extends Node {
     }
 
     public Image getImage() {
-        Partition partition = nisTool.getPartitions().getPartition(domain.getName());
-        return PenrosePlugin.getImage(partition == null ? PenroseImage.RED_FOLDER : PenroseImage.FOLDER);
+        Project project = nisTool.getProject();
+        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+        PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName());
+        return PenrosePlugin.getImage(partitionConfig == null ? PenroseImage.RED_FOLDER : PenroseImage.FOLDER);
+
+        //Partition partition = nisTool.getPartitions().getPartition(domain.getName());
+        //return PenrosePlugin.getImage(partition == null ? PenroseImage.RED_FOLDER : PenroseImage.FOLDER);
     }
 
     public void showMenu(IMenuManager manager) throws Exception {

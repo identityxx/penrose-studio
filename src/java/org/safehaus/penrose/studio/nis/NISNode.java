@@ -87,6 +87,14 @@ public class NISNode extends Node {
         Project project = projectNode.getProject();
         PartitionConfigs partitionConfigs = project.getPartitionConfigs();
 
+        File workDir = project.getWorkDir();
+        File sampleDir = new File(workDir, "samples/"+NISTool.NIS_PARTITION_NAME);
+
+        if (!sampleDir.exists()) {
+            PenroseClient penroseClient = project.getClient();
+            penroseClient.download(workDir, "samples/"+NISTool.NIS_PARTITION_NAME);
+        }
+
         if (partitionConfigs.getPartitionConfig(NISTool.NIS_PARTITION_NAME) == null) {
             boolean b = createNisPartition();
             if (!b) return;
@@ -115,10 +123,7 @@ public class NISNode extends Node {
         Project project = projectNode.getProject();
         PartitionConfigs partitionConfigs = project.getPartitionConfigs();
 
-        PenroseClient penroseClient = project.getClient();
         File workDir = project.getWorkDir();
-
-        penroseClient.download(workDir, "samples/"+NISTool.NIS_PARTITION_NAME);
 
         File sampleDir = new File(workDir, "samples/"+NISTool.NIS_PARTITION_NAME);
         PartitionConfig partitionConfig = partitionConfigs.load(sampleDir);

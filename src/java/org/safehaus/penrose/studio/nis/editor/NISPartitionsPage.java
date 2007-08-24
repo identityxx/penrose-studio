@@ -21,7 +21,8 @@ import org.safehaus.penrose.studio.nis.NISTool;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.management.PenroseClient;
 
 /**
@@ -222,13 +223,17 @@ public class NISPartitionsPage extends FormPage {
 
             table.removeAll();
 
+            Project project = nisTool.getProject();
+            PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+
             for (NISDomain domain : nisTool.getNisDomains().values()) {
-                Partition partition = nisTool.getPartitions().getPartition(domain.getName());
+                PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName());
+                //Partition partition = nisTool.getPartitions().getPartition(domain.getName());
 
                 TableItem ti = new TableItem(table, SWT.NONE);
 
                 ti.setText(0, domain.getName());
-                ti.setText(1, partition == null ? "Missing" : "OK");
+                ti.setText(1, partitionConfig == null ? "Missing" : "OK");
 
                 ti.setData(domain);
             }

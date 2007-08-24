@@ -18,15 +18,25 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.nis.NISDomain;
+import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.source.Source;
+import org.safehaus.penrose.source.SourceConfigs;
+import org.safehaus.penrose.source.SourceSyncConfig;
+import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.nis.NISTool;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.PartitionClient;
 import org.safehaus.penrose.management.SourceClient;
+import org.safehaus.penrose.connection.Connection;
+import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
+import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.jdbc.Assignment;
+import org.safehaus.penrose.jdbc.QueryResponse;
 
 import java.util.*;
+import java.sql.ResultSet;
 
 /**
  * @author Endi S. Dewata
@@ -44,10 +54,12 @@ public class NISCachePage extends FormPage {
     NISTool nisTool;
 
     Project project;
+    PenroseClient penroseClient;
+    PartitionClient partitionClient;
 
     Map<String,String> sourceNames = new TreeMap<String,String>();
 
-    public NISCachePage(NISDomainEditor editor) {
+    public NISCachePage(NISDomainEditor editor) throws Exception {
         super(editor, "CACHE", "  Cache  ");
 
         this.editor = editor;
@@ -55,6 +67,9 @@ public class NISCachePage extends FormPage {
         domain = editor.getDomain();
         nisTool = editor.getNisTool();
         project = nisTool.getProject();
+
+        penroseClient = project.getClient();
+        partitionClient = penroseClient.getPartitionClient(domain.getName());
 
         sourceNames.put("Users", "nis_users");
         sourceNames.put("Shadows", "nis_shadow");
@@ -162,15 +177,11 @@ public class NISCachePage extends FormPage {
 
                     TableItem[] items = table.getSelection();
 
-                    PenroseClient penroseClient = project.getClient();
-                    PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
-
                     for (TableItem item : items) {
-                        Source source = (Source)item.getData();
-                        String name = source.getName();
+                        String name = (String)item.getData();
 
                         try {
-                            SourceClient sourceClient = partitionClient.getSource(name);
+                            SourceClient sourceClient = partitionClient.getSourceClient(name);
                             sourceClient.createCache();
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
@@ -205,15 +216,11 @@ public class NISCachePage extends FormPage {
 
                     TableItem[] items = table.getSelection();
 
-                    PenroseClient penroseClient = project.getClient();
-                    PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
-
                     for (TableItem item : items) {
-                        Source source = (Source)item.getData();
-                        String name = source.getName();
+                        String name = (String)item.getData();
 
                         try {
-                            SourceClient sourceClient = partitionClient.getSource(name);
+                            SourceClient sourceClient = partitionClient.getSourceClient(name);
                             sourceClient.loadCache();
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
@@ -248,15 +255,11 @@ public class NISCachePage extends FormPage {
 
                     TableItem[] items = table.getSelection();
 
-                    PenroseClient penroseClient = project.getClient();
-                    PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
-
                     for (TableItem item : items) {
-                        Source source = (Source)item.getData();
-                        String name = source.getName();
+                        String name = (String)item.getData();
 
                         try {
-                            SourceClient sourceClient = partitionClient.getSource(name);
+                            SourceClient sourceClient = partitionClient.getSourceClient(name);
                             sourceClient.cleanCache();
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
@@ -291,15 +294,11 @@ public class NISCachePage extends FormPage {
 
                     TableItem[] items = table.getSelection();
 
-                    PenroseClient penroseClient = project.getClient();
-                    PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
-
                     for (TableItem item : items) {
-                        Source source = (Source)item.getData();
-                        String name = source.getName();
+                        String name = (String)item.getData();
 
                         try {
-                            SourceClient sourceClient = partitionClient.getSource(name);
+                            SourceClient sourceClient = partitionClient.getSourceClient(name);
                             sourceClient.dropCache();
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
@@ -336,29 +335,50 @@ public class NISCachePage extends FormPage {
 
             table.removeAll();
 
-            Partition partition = nisTool.getPartitions().getPartition(domain.getName());
+            Partition partition = nisTool.getNisPartition();
+            Connection connection = partition.getConnection(NISTool.NIS_CONNECTION_NAME);
+            JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
+            JDBCClient client = adapter.getClient();
+
+            PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+            PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName());
+            SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
 
             for (final String label : sourceNames.keySet()) {
                 final String sourceName = sourceNames.get(label);
                 log.debug("Checking cache for "+label+" ("+sourceName+").");
 
-                Source source = partition.getSource(sourceName);
-                if (source == null) continue;
+                SourceSyncConfig sourceSyncConfig = sourceConfigs.getSourceSyncConfig(sourceName);
+                if (sourceSyncConfig == null) continue;
 
-                Collection<Source> caches = nisTool.getCaches(partition, source);
-                if (caches.isEmpty()) continue;
+                Collection<String> destinations = sourceSyncConfig.getDestinations();
+                if (destinations.isEmpty()) continue;
 
-                Source cacheSource = caches.iterator().next();
+                String cacheName = destinations.iterator().next();
+                SourceConfig sourceConfig = sourceConfigs.getSourceConfig(cacheName);
 
-                TableItem ti = new TableItem(table, SWT.NONE);
+                final TableItem ti = new TableItem(table, SWT.NONE);
                 ti.setText(0, label);
-                ti.setData(source);
+                ti.setData(sourceName);
 
                 try {
-                    Long count = cacheSource.getCount();
-                    ti.setText(1, count.toString());
+                    String table = client.getTableName(sourceConfig);
+                    String sql = "select count(*) from "+table;
+
+                    Collection<Assignment> assignments = new ArrayList<Assignment>();
+
+                    QueryResponse queryResponse = new QueryResponse() {
+                        public void add(Object object) throws Exception {
+                            ResultSet rs = (ResultSet)object;
+                            Integer count = rs.getInt(1);
+                            ti.setText(1, count.toString());
+                        }
+                    };
+
+                    client.executeQuery(sql, assignments, queryResponse);
 
                 } catch (Exception e) {
+                    log.error(e.getMessage(), e);
                     ti.setText(1, "N/A");
                 }
             }

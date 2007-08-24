@@ -18,13 +18,18 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.studio.nis.NISTool;
 import org.safehaus.penrose.studio.nis.action.*;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.Source;
+import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.QueryResponse;
+import org.safehaus.penrose.connection.Connection;
 
 import java.util.Collection;
 import java.util.Map;
@@ -38,8 +43,6 @@ import java.sql.ResultSet;
 public class NISUserScriptsPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
-
-    public final static String CACHE_USERS = "cache_users";
 
     FormToolkit toolkit;
 
@@ -362,21 +365,25 @@ public class NISUserScriptsPage extends FormPage {
 
         nisTool.getDomains().search(searchRequest, searchResponse);
 
+        Project project = nisTool.getProject();
+        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+
+        Partition partition = nisTool.getNisPartition();
+        Connection connection = partition.getConnection(NISTool.NIS_CONNECTION_NAME);
+        JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
+        JDBCClient client = adapter.getClient();
+
         while (searchResponse.hasNext()) {
             SearchResult searchResults = searchResponse.next();
             Attributes attrs = searchResults.getAttributes();
 
             final String domainName = (String) attrs.getValue("name");
-            Partition partition = nisTool.getPartitions().getPartition(domainName);
-
             if (domain.getName().equals(domainName)) continue;
 
-            Source users = partition.getSource(CACHE_USERS);
+            PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domainName);
+            SourceConfig sourceConfig = partitionConfig.getSourceConfigs().getSourceConfig(NISTool.CACHE_USERS);
 
-            JDBCAdapter adapter = (JDBCAdapter)users.getConnection().getAdapter();
-            JDBCClient client = adapter.getClient();
-
-            String table = client.getTableName(users);
+            String table = client.getTableName(sourceConfig);
 
             String sql = "select a.uid, a.uidNumber, b.uidNumber" +
                     " from "+table+" a"+
@@ -503,7 +510,7 @@ public class NISUserScriptsPage extends FormPage {
         dialog.setUid(uid);
         dialog.setOrigUidNumber(origUidNumber);
 
-        Source penroseUsers = partition.getSource("penrose_users");
+        Source penroseUsers = partition.getSource(NISTool.PENROSE_USERS);
 
         SearchRequest request = new SearchRequest();
         request.setDn(dn);
@@ -565,7 +572,7 @@ public class NISUserScriptsPage extends FormPage {
 
         SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
 
-        Source users = partition.getSource("penrose_users");
+        Source users = partition.getSource(NISTool.PENROSE_USERS);
         users.search(request, response);
 
         while (response.hasNext()) {
@@ -593,7 +600,7 @@ public class NISUserScriptsPage extends FormPage {
 
             response = new SearchResponse<SearchResult>();
 
-            users = partition2.getSource(CACHE_USERS);
+            users = partition2.getSource(NISTool.CACHE_USERS);
             users.search(request, response);
 
             while (response.hasNext()) {

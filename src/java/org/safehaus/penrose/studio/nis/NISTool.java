@@ -34,6 +34,9 @@ public class NISTool {
     public final static String CACHE_USERS  = "cache_users";
     public final static String CACHE_GROUPS = "cache_groups";
 
+    public final static String PENROSE_USERS  = "penrose_users";
+    public final static String PENROSE_GROUPS = "penrose_groups";
+
     private Project project;
 
     protected Partition nisPartition;
@@ -123,9 +126,9 @@ public class NISTool {
         String domainName = domain.getName();
         log.debug("Creating partition "+domainName+".");
 
-        File oldDir = new File(project.getWorkDir(), "partitions"+File.separator+ NIS_PARTITION_NAME);
-        File newDir = new File(project.getWorkDir(), "partitions"+File.separator+ domainName);
-        FileUtil.copy(oldDir, newDir);
+        File sampleDir = new File(project.getWorkDir(), "samples/"+NISTool.NIS_PARTITION_NAME);
+        File partitionDir = new File(project.getWorkDir(), "partitions"+File.separator+ domainName);
+        FileUtil.copy(sampleDir, partitionDir);
 
         log.debug("Replacing parameter values.");
 
@@ -170,11 +173,11 @@ public class NISTool {
         copy.setProject(antProject);
 
         FileSet fs = new FileSet();
-        fs.setDir(new File(newDir, "template"));
+        fs.setDir(new File(partitionDir, "template"));
         fs.setIncludes("**/*");
         copy.addFileset(fs);
 
-        copy.setTodir(new File(newDir, "DIR-INF"));
+        copy.setTodir(new File(partitionDir, "DIR-INF"));
 
         FilterChain filterChain = copy.createFilterChain();
         ExpandProperties expandProperties = new ExpandProperties();
@@ -184,7 +187,7 @@ public class NISTool {
         copy.execute();
 
         PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-        PartitionConfig partitionConfig = partitionConfigs.load(newDir);
+        PartitionConfig partitionConfig = partitionConfigs.load(partitionDir);
         partitionConfigs.addPartitionConfig(partitionConfig);
     }
 

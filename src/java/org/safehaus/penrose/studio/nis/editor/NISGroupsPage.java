@@ -14,13 +14,17 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.nis.NISTool;
-import org.safehaus.penrose.source.Source;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.connection.Connection;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -72,13 +76,18 @@ public class NISGroupsPage extends FormPage {
 
     public void refresh() {
         try {
-            Partition partition = nisTool.getPartitions().getPartition(domain.getName());
-            Source source = partition.getSource(SOURCE_NAME);
+            Project project = nisTool.getProject();
+            PartitionConfigs partitionConfigs = project.getPartitionConfigs();
 
-            JDBCAdapter adapter = (JDBCAdapter)source.getConnection().getAdapter();
+            PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName());
+            SourceConfig sourceConfig = partitionConfig.getSourceConfigs().getSourceConfig(NISTool.CACHE_GROUPS);
+
+            Partition partition = nisTool.getNisPartition();
+            Connection connection = partition.getConnection(NISTool.NIS_CONNECTION_NAME);
+            JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
             JDBCClient client = adapter.getClient();
 
-            String table = client.getTableName(source);
+            String table = client.getTableName(sourceConfig);
             String sql = "select count(*) from "+table;
 
             Collection<Assignment> assignments = new ArrayList<Assignment>();

@@ -192,7 +192,14 @@ public class ProjectNode extends Node {
     }
 
     public void connect() throws Exception {
-        project.connect();
+        try {
+            project.connect();
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            MessageDialog.openError(serversView.getSite().getShell(), "Action Failed", e.getMessage());
+            return;
+        }
 
         partitionsNode = new PartitionsNode(
                 serversView,

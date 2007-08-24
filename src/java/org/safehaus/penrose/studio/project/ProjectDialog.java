@@ -44,8 +44,8 @@ public class ProjectDialog extends Dialog {
     Combo typeCombo;
 	Text hostText;
     Text portText;
-	Text usernameText;
-	Text passwordText;
+	Text bindDnText;
+	Text bindPasswordText;
 
 	private ProjectConfig projectConfig;
 	
@@ -128,16 +128,16 @@ public class ProjectDialog extends Dialog {
         portText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		Label usernameLabel = new Label(composite, SWT.NONE);
-        usernameLabel.setText("Username:");
+        usernameLabel.setText("Bind DN:");
 
-		usernameText = new Text(composite, SWT.BORDER);
-        usernameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		bindDnText = new Text(composite, SWT.BORDER);
+        bindDnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		Label passwordLabel = new Label(composite, SWT.NONE);
         passwordLabel.setText("Password:");
 
-		passwordText = new Text(composite, SWT.BORDER | SWT.PASSWORD);
-		passwordText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		bindPasswordText = new Text(composite, SWT.BORDER | SWT.PASSWORD);
+		bindPasswordText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		new Label(composite, SWT.NONE);
 
@@ -151,8 +151,8 @@ public class ProjectDialog extends Dialog {
                             typeCombo.getText(),
                             hostText.getText(),
                             "".equals(portText.getText()) ? 0 : Integer.parseInt(portText.getText()),
-                            usernameText.getText(),
-                            passwordText.getText());
+                            bindDnText.getText(),
+                            bindPasswordText.getText());
 					client.connect();
                     client.close();
 					MessageDialog.openInformation(shell, "Test Connection Result", "Connect Successful!");
@@ -209,10 +209,10 @@ public class ProjectDialog extends Dialog {
         s = portText.getText().trim();
         projectConfig.setPort("".equals(s) ? 0 : Integer.parseInt(s));
 
-        s = usernameText.getText().trim();
+        s = bindDnText.getText().trim();
         projectConfig.setUsername("".equals(s) ? null : s);
 
-        s = passwordText.getText().trim();
+        s = bindPasswordText.getText().trim();
         projectConfig.setPassword("".equals(s) ? null : s);
 	}
 
@@ -227,8 +227,8 @@ public class ProjectDialog extends Dialog {
         typeCombo.setText(projectConfig.getType() == null ? PenroseClient.PENROSE : projectConfig.getType());
         hostText.setText(projectConfig.getHost() == null ? "localhost" : projectConfig.getHost());
         portText.setText(projectConfig.getPort() == 0 ? "" : ""+ projectConfig.getPort());
-        usernameText.setText(projectConfig.getUsername() == null ? "" : projectConfig.getUsername());
-        passwordText.setText(projectConfig.getPassword() == null ? "" : projectConfig.getPassword());
+        bindDnText.setText(projectConfig.getUsername() == null ? "" : projectConfig.getUsername());
+        bindPasswordText.setText(projectConfig.getPassword() == null ? "" : projectConfig.getPassword());
     }
 
     public int getAction() {

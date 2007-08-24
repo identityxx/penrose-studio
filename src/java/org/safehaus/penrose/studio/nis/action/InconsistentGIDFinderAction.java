@@ -1,14 +1,18 @@
 package org.safehaus.penrose.studio.nis.action;
 
-import org.safehaus.penrose.source.Source;
+import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.ldap.Attributes;
 import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.studio.nis.NISTool;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.connection.Connection;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -50,17 +54,22 @@ public class InconsistentGIDFinderAction extends NISAction {
 
         log.debug("Checking conflicts between "+domain1.getName()+" and "+domain2.getName()+".");
 
-        final Partition partition1 = nisTool.getPartitions().getPartition(domain1.getName());
-        final Source source1 = partition1.getSource(NISTool.CACHE_GROUPS);
+        Project project = nisTool.getProject();
+        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
 
-        final Partition partition2 = nisTool.getPartitions().getPartition(domain2.getName());
-        final Source source2 = partition2.getSource(NISTool.CACHE_GROUPS);
+        PartitionConfig partitionConfig1 = partitionConfigs.getPartitionConfig(domain1.getName());
+        SourceConfig sourceConfig1 = partitionConfig1.getSourceConfigs().getSourceConfig(NISTool.CACHE_GROUPS);
 
-        JDBCAdapter adapter1 = (JDBCAdapter)source1.getConnection().getAdapter();
-        JDBCClient client1 = adapter1.getClient();
+        PartitionConfig partitionConfig2 = partitionConfigs.getPartitionConfig(domain2.getName());
+        SourceConfig sourceConfig2 = partitionConfig2.getSourceConfigs().getSourceConfig(NISTool.CACHE_GROUPS);
 
-        String table1 = client1.getTableName(source1);
-        String table2 = client1.getTableName(source2);
+        Partition partition = nisTool.getNisPartition();
+        Connection connection = partition.getConnection(NISTool.NIS_CONNECTION_NAME);
+        JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
+        JDBCClient client = adapter.getClient();
+
+        String table1 = client.getTableName(sourceConfig1);
+        String table2 = client.getTableName(sourceConfig2);
 
         String sql = "select a.cn, a.gidNumber, b.gidNumber, c.cn, c.gidNumber, d.gidNumber" +
                 " from "+table1+" a"+
@@ -105,6 +114,6 @@ public class InconsistentGIDFinderAction extends NISAction {
             }
         };
 
-        client1.executeQuery(sql, assignments, queryResponse);
+        client.executeQuery(sql, assignments, queryResponse);
     }
 }
