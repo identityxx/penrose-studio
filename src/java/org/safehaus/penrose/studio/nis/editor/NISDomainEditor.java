@@ -31,6 +31,7 @@ public class NISDomainEditor extends FormEditor {
         try {
             addPage(new NISDomainMainPage(this));
             addPage(new NISCachePage(this));
+            addPage(new NISTablesPage(this));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

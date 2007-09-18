@@ -115,13 +115,20 @@ public class NISTool {
             nisDomains.put(domainName, domain);
 
             PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(domainName);
+            boolean createPartitionConfig = partitionConfig == null;
 
-            if (partitionConfig == null) {
+            if (createPartitionConfig) {
                 createPartitionConfig(domain);
+            }
+
+            createDatabase(domain);
+
+            if (createPartitionConfig) {
                 project.upload("partitions/"+domain.getName());
 
                 PenroseClient penroseClient = project.getClient();
-                penroseClient.start();
+                //penroseClient.start();
+
                 PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
                 partitionClient.start();
             }
@@ -440,21 +447,31 @@ public class NISTool {
         return cacheConfigs;
     }
 
-    public void createDatabase(NISDomain domain) throws Exception {
+    public void  createDatabase(NISDomain domain) throws Exception {
 
         log.debug("Creating database "+domain.getName()+".");
 
         Connection connection = nisPartition.getConnection(NIS_CONNECTION_NAME);
         JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
         JDBCClient client = adapter.getClient();
-        client.createDatabase(domain.getName());
+
+        try {
+            client.createDatabase(domain.getName());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
 
         PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(domain.getName());
         SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
 
         for (SourceConfig sourceConfig : sourceConfigs.getSourceConfigs()) {
             if (!CACHE_CONNECTION_NAME.equals(sourceConfig.getConnectionName())) continue;
-            client.createTable(sourceConfig);
+
+            try {
+                client.createTable(sourceConfig);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
         }
     }
 
