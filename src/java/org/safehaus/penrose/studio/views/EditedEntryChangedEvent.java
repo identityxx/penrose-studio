@@ -17,7 +17,7 @@
  */
 package org.safehaus.penrose.studio.views;
 
-import org.safehaus.penrose.mapping.EntryMapping;
+import org.safehaus.penrose.directory.EntryMapping;
 
 public class EditedEntryChangedEvent {
 	

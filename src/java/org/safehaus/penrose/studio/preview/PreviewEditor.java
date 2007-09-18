@@ -245,7 +245,7 @@ public class PreviewEditor extends EditorPart {
             request.setScope(SearchRequest.SCOPE_BASE);
             request.setAttributes(new String[] { "*", "+" });
 
-            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
+            SearchResponse response = new SearchResponse();
 
             session.search(request, response);
 
@@ -271,7 +271,7 @@ public class PreviewEditor extends EditorPart {
             request.setScope(SearchRequest.SCOPE_ONE);
             request.setAttributes(new String[] { "*", "+" });
 
-            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
+            SearchResponse response = new SearchResponse();
 
             session.search(request, response);
 
@@ -305,7 +305,7 @@ public class PreviewEditor extends EditorPart {
         request.setScope(SearchRequest.SCOPE_BASE);
         request.setAttributes(new String[] { "*", "+" });
 
-        SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
+        SearchResponse response = new SearchResponse();
 
         session.search(request, response);
 

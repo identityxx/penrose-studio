@@ -168,9 +168,6 @@ public class ProjectNode extends Node {
                     log.error(e.getMessage(), e);
                 }
             }
-            public boolean isEnabled() {
-                return !project.isConnected();
-            }
         });
     }
 
@@ -298,8 +295,9 @@ public class ProjectNode extends Node {
     public void edit() throws Exception {
 
         String oldProjectName = projectConfig.getName();
-
+        
         Shell shell = serversView.getSite().getShell();
+
         ProjectDialog dialog = new ProjectDialog(shell, SWT.NONE);
         dialog.setText("Edit Server");
         dialog.setProjectConfig(projectConfig);

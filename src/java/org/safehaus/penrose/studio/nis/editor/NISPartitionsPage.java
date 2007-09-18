@@ -24,6 +24,7 @@ import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.PartitionClient;
 
 /**
  * @author Endi S. Dewata
@@ -134,7 +135,7 @@ public class NISPartitionsPage extends FormPage {
                     TableItem[] items = table.getSelection();
 
                     Project project = nisTool.getProject();
-                    PenroseClient client = project.getClient();
+                    PenroseClient penroseClient = project.getClient();
 
                     for (TableItem ti : items) {
                         NISDomain domain = (NISDomain)ti.getData();
@@ -142,7 +143,8 @@ public class NISPartitionsPage extends FormPage {
                         nisTool.createPartitionConfig(domain);
                         project.upload("partitions/"+domain.getName());
 
-                        client.startPartition(domain.getName());
+                        PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
+                        partitionClient.start();
                         nisTool.loadPartition(domain);
                     }
 
@@ -178,12 +180,13 @@ public class NISPartitionsPage extends FormPage {
                     TableItem[] items = table.getSelection();
 
                     Project project = nisTool.getProject();
-                    PenroseClient client = project.getClient();
+                    PenroseClient penroseClient = project.getClient();
 
                     for (TableItem ti : items) {
                         NISDomain domain = (NISDomain)ti.getData();
 
-                        client.stopPartition(domain.getName());
+                        PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
+                        partitionClient.stop();
                         nisTool.removePartition(domain);
 
                         nisTool.removePartitionConfig(domain);

@@ -24,11 +24,11 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.directory.DirectoryConfigs;
+import org.safehaus.penrose.directory.DirectoryConfig;
+import org.safehaus.penrose.directory.EntryMapping;
 import org.apache.log4j.Logger;
 
 public class MappingEditor extends FormEditor implements ModifyListener {
@@ -105,9 +105,9 @@ public class MappingEditor extends FormEditor implements ModifyListener {
 
 	public void store() throws Exception {
 
-        DirectoryConfigs directoryConfigs = partitionConfig.getDirectoryConfigs();
+        DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
         if (!origEntry.getDn().matches(entry.getDn())) {
-            directoryConfigs.renameEntryMapping(origEntry, entry.getDn());
+            directoryConfig.renameEntryMapping(origEntry, entry.getDn());
         }
 
         origEntry.copy(entry);
@@ -119,7 +119,7 @@ public class MappingEditor extends FormEditor implements ModifyListener {
             dn = entry.getDn().toString();
         }
 
-        project.save(partitionConfig, directoryConfigs);
+        project.save(partitionConfig, directoryConfig);
 
         setPartName(dn);
 

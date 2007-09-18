@@ -28,7 +28,10 @@ import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.ldap.RDNBuilder;
 import org.safehaus.penrose.ldap.DNBuilder;
-import org.safehaus.penrose.directory.DirectoryConfigs;
+import org.safehaus.penrose.directory.DirectoryConfig;
+import org.safehaus.penrose.directory.EntryMapping;
+import org.safehaus.penrose.directory.AttributeMapping;
+import org.safehaus.penrose.directory.FieldMapping;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -169,9 +172,9 @@ public class DynamicEntryWizard extends Wizard {
                 sourceMapping.addFieldMapping(fieldMapping);
             }
 
-            DirectoryConfigs directoryConfigs = partitionConfig.getDirectoryConfigs();
-            directoryConfigs.addEntryMapping(entryMapping);
-            project.save(partitionConfig, directoryConfigs);
+            DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
+            directoryConfig.addEntryMapping(entryMapping);
+            project.save(partitionConfig, directoryConfig);
 
             return true;
 

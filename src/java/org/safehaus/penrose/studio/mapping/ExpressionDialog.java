@@ -32,8 +32,8 @@ import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.safehaus.penrose.studio.views.CodeAssist;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.mapping.Expression;
-import org.safehaus.penrose.mapping.AttributeMapping;
-import org.safehaus.penrose.mapping.FieldMapping;
+import org.safehaus.penrose.directory.AttributeMapping;
+import org.safehaus.penrose.directory.FieldMapping;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.apache.log4j.Logger;
 

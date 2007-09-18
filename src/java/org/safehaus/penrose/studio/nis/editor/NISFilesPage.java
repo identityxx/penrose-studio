@@ -24,6 +24,10 @@ import org.safehaus.penrose.filter.OrFilter;
 import org.safehaus.penrose.filter.SimpleFilter;
 import org.safehaus.penrose.filter.AndFilter;
 import org.safehaus.penrose.studio.nis.NISTool;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.management.ModuleClient;
 
 /**
  * @author Endi S. Dewata
@@ -84,7 +88,7 @@ public class NISFilesPage extends FormPage implements Runnable {
            SearchRequest request = new SearchRequest();
            request.setFilter("(domain="+domain.getName()+")");
 
-           SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
+           SearchResponse response = new SearchResponse() {
                public void add(SearchResult result) throws Exception {
                    Attributes attributes = result.getAttributes();
                    String name = (String)attributes.getValue("name");
@@ -170,7 +174,6 @@ public class NISFilesPage extends FormPage implements Runnable {
 
         Button runButton = new Button(composite, SWT.PUSH);
         runButton.setText("  Search  ");
-        runButton.setEnabled(false);
         gd = new GridData();
         gd.horizontalAlignment = GridData.END;
         gd.widthHint = 80;
@@ -269,7 +272,7 @@ public class NISFilesPage extends FormPage implements Runnable {
         request.setFilter(filter);
         request.setSizeLimit(100);
 
-        SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
+        SearchResponse response = new SearchResponse() {
             public void add(SearchResult result) {
                 Attributes attributes = result.getAttributes();
 

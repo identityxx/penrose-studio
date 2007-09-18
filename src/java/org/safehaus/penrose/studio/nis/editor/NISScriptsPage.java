@@ -95,7 +95,7 @@ public class NISScriptsPage extends FormPage {
            SearchRequest request = new SearchRequest();
            request.setFilter("(domain="+domain.getName()+")");
 
-           SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
+           SearchResponse response = new SearchResponse() {
                public void add(SearchResult result) throws Exception {
                    Attributes attributes = result.getAttributes();
                    String name = (String)attributes.getValue("name");

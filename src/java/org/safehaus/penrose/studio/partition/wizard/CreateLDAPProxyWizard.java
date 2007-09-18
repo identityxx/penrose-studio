@@ -31,6 +31,7 @@ import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.ldap.LDAP;
+import org.safehaus.penrose.directory.EntryMapping;
 import org.apache.log4j.Logger;
 
 import javax.naming.InitialContext;
@@ -120,7 +121,7 @@ public class CreateLDAPProxyWizard extends Wizard {
 
             rootEntry.addACI(new ACI("rs"));
 
-            partitionConfig.getDirectoryConfigs().addEntryMapping(rootEntry);
+            partitionConfig.getDirectoryConfig().addEntryMapping(rootEntry);
 
             if (infoPage.getMapRootDse()) {
                 SourceConfig rootDseSourceConfig = new SourceConfig();
@@ -142,7 +143,7 @@ public class CreateLDAPProxyWizard extends Wizard {
 
                 rootDseEntryMapping.addACI(new ACI("rs"));
 
-                partitionConfig.getDirectoryConfigs().addEntryMapping(rootDseEntryMapping);
+                partitionConfig.getDirectoryConfig().addEntryMapping(rootDseEntryMapping);
             }
 
             if (infoPage.getMapADSchema()) {

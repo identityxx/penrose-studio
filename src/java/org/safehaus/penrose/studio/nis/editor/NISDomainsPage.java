@@ -24,6 +24,7 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.PartitionClient;
 
 /**
  * @author Endi S. Dewata
@@ -195,7 +196,7 @@ public class NISDomainsPage extends FormPage {
                     if (!confirm) return;
 
                     Project project = nisTool.getProject();
-                    PenroseClient client = project.getClient();
+                    PenroseClient penroseClient = project.getClient();
 
                     int index = table.getSelectionIndex();
 
@@ -205,7 +206,8 @@ public class NISDomainsPage extends FormPage {
 
                         try {
                             nisTool.removePartition(domain);
-                            client.stopPartition(domain.getName());
+                            PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
+                            partitionClient.stop();
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
                         }

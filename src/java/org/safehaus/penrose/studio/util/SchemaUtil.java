@@ -3,7 +3,7 @@ package org.safehaus.penrose.studio.util;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.mapping.EntryMapping;
+import org.safehaus.penrose.directory.EntryMapping;
 import org.safehaus.penrose.mapping.SourceMapping;
 
 /**
@@ -36,7 +36,7 @@ public class SchemaUtil {
 
         entryMapping.setHandlerName("PROXY");
 
-        partitionConfig.getDirectoryConfigs().addEntryMapping(entryMapping);
+        partitionConfig.getDirectoryConfig().addEntryMapping(entryMapping);
 
         return entryMapping;
     }

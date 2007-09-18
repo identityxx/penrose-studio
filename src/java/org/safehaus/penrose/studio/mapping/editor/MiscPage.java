@@ -11,7 +11,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.ModifyEvent;
-import org.safehaus.penrose.mapping.EntryMapping;
+import org.safehaus.penrose.directory.EntryMapping;
 import org.safehaus.penrose.mapping.Link;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.config.PenroseConfig;

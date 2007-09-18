@@ -106,10 +106,9 @@ public class ServiceNode extends Node {
         Project project = projectNode.getProject();
         project.download("services"+File.separator+name);
 
-        File dir = new File(project.getWorkDir(), "services"+File.separator+name);
-
         ServiceConfigs serviceConfigs = project.getServiceConfigs();
-        serviceConfig = serviceConfigs.load(dir);
+        serviceConfig = serviceConfigs.load(name);
+        serviceConfigs.addServiceConfig(serviceConfig);
     }
 
     public void save() throws Exception {

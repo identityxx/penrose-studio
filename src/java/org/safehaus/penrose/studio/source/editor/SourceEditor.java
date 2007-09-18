@@ -8,13 +8,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.mapping.EntryMapping;
+import org.safehaus.penrose.directory.EntryMapping;
 import org.safehaus.penrose.mapping.SourceMapping;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.apache.log4j.Logger;
-
-import java.io.File;
 
 /**
  * @author Endi Sukma Dewata
@@ -71,7 +69,7 @@ public abstract class SourceEditor extends FormEditor {
 
             sourceConfigs.renameSourceConfig(origSourceConfig, sourceConfig.getName());
 
-            for (EntryMapping entryMapping : partitionConfig.getDirectoryConfigs().getEntryMappings()) {
+            for (EntryMapping entryMapping : partitionConfig.getDirectoryConfig().getEntryMappings()) {
 
                 for (SourceMapping sourceMapping : entryMapping.getSourceMappings()) {
                     if (!sourceMapping.getSourceName().equals(origSourceConfig.getName())) continue;

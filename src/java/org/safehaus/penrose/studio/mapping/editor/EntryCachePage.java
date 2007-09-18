@@ -27,8 +27,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
-import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.studio.mapping.editor.MappingEditor;
+import org.safehaus.penrose.directory.EntryMapping;
 
 /**
  * @author Endi S. Dewata
@@ -121,7 +121,7 @@ public class EntryCachePage extends FormPage {
         filterCacheExpirationLabel.setLayoutData(gd);
 
         value = entry.getParameter(EntryMapping.QUERY_CACHE_EXPIRATION);
-        value = value == null ? ""+EntryMapping.DEFAULT_QUERY_CACHE_EXPIRATION : value;
+        value = value == null ? ""+ EntryMapping.DEFAULT_QUERY_CACHE_EXPIRATION : value;
         filterCacheExpirationText = toolkit.createText(composite, value, SWT.BORDER);
 
         gd = new GridData(GridData.FILL);

@@ -12,6 +12,9 @@ import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.config.PenroseConfig;
 import org.apache.tools.ant.filters.ExpandProperties;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.FilterChain;
@@ -29,13 +32,15 @@ public class NISTool {
     public Logger log = Logger.getLogger(getClass());
 
     public final static String NIS_PARTITION_NAME  = "nis_cache";
+    public final static String NIS_TEMPLATE_NAME   = "nis_template";
     public final static String NIS_CONNECTION_NAME = "NIS";
 
-    public final static String CACHE_USERS  = "cache_users";
-    public final static String CACHE_GROUPS = "cache_groups";
+    public final static String CACHE_USERS           = "cache_users";
+    public final static String CACHE_GROUPS          = "cache_groups";
+    public final static String CACHE_CONNECTION_NAME = "Cache";
 
-    public final static String PENROSE_USERS  = "penrose_users";
-    public final static String PENROSE_GROUPS = "penrose_groups";
+    public final static String CHANGE_USERS  = "change_users";
+    public final static String CHANGE_GROUPS = "change_groups";
 
     private Project project;
 
@@ -61,16 +66,18 @@ public class NISTool {
     public void init(Project project) throws Exception {
         this.project = project;
 
-        File partitionDir = new File(project.getWorkDir(), "partitions"+File.separator+NIS_PARTITION_NAME);
+        File partitionsDir = new File(project.getWorkDir(), "partitions");
+        PenroseConfig penroseConfig = project.getPenroseConfig();
+        PenroseContext penroseContext = project.getPenroseContext();
+
         PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(NIS_PARTITION_NAME);
 
-        PartitionContext partitionContext = new PartitionContext();
-        partitionContext.setPath(partitionDir);
-        partitionContext.setPenroseConfig(project.getPenroseConfig());
-        partitionContext.setPenroseContext(project.getPenroseContext());
+        PartitionFactory partitionFactory = new PartitionFactory();
+        partitionFactory.setPartitionsDir(partitionsDir);
+        partitionFactory.setPenroseConfig(penroseConfig);
+        partitionFactory.setPenroseContext(penroseContext);
 
-        nisPartition = new Partition();
-        nisPartition.init(partitionConfig, partitionContext);
+        nisPartition = partitionFactory.createPartition(partitionConfig);
 
         domains = nisPartition.getSource("penrose_domains");
         actions = nisPartition.getSource("penrose_actions");
@@ -86,7 +93,7 @@ public class NISTool {
     public void initNisDomains() throws Exception {
 
         SearchRequest searchRequest = new SearchRequest();
-        SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
+        SearchResponse searchResponse = new SearchResponse();
 
         domains.search(searchRequest, searchResponse);
 
@@ -113,8 +120,10 @@ public class NISTool {
                 createPartitionConfig(domain);
                 project.upload("partitions/"+domain.getName());
 
-                PenroseClient client = project.getClient();
-                client.startPartition(domain.getName());
+                PenroseClient penroseClient = project.getClient();
+                penroseClient.start();
+                PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
+                partitionClient.start();
             }
 
             loadPartition(domain);
@@ -126,7 +135,12 @@ public class NISTool {
         String domainName = domain.getName();
         log.debug("Creating partition "+domainName+".");
 
-        File sampleDir = new File(project.getWorkDir(), "samples/"+NISTool.NIS_PARTITION_NAME);
+        File sampleDir = new File(project.getWorkDir(), "samples/"+NISTool.NIS_TEMPLATE_NAME);
+
+        if (!sampleDir.exists()) {
+            project.download("samples/"+NISTool.NIS_TEMPLATE_NAME);
+        }
+
         File partitionDir = new File(project.getWorkDir(), "partitions"+File.separator+ domainName);
         FileUtil.copy(sampleDir, partitionDir);
 
@@ -157,16 +171,29 @@ public class NISTool {
 
         org.apache.tools.ant.Project antProject = new org.apache.tools.ant.Project();
 
-        antProject.setProperty("NIS_SERVER",  nisServer);
-        antProject.setProperty("NIS_DOMAIN",  nisDomain);
+        antProject.setProperty("DOMAIN",           domainName);
 
-        antProject.setProperty("DOMAIN",      domainName);
+        antProject.setProperty("NIS_SERVER",       nisServer);
+        antProject.setProperty("NIS_DOMAIN",       nisDomain);
 
-        antProject.setProperty("LDAP_BASE",   ldapSuffix);
+        antProject.setProperty("DB_SERVER",        dbServer);
+        antProject.setProperty("DB_PORT",          "3306");
+        antProject.setProperty("DB_USER",          dbUser);
+        antProject.setProperty("DB_PASSWORD",      dbPassword);
 
-        antProject.setProperty("DB_SERVER",   dbServer);
-        antProject.setProperty("DB_USER",     dbUser);
-        antProject.setProperty("DB_PASSWORD", dbPassword);
+        antProject.setProperty("PENROSE_PROTOCOL", "ldap");
+        antProject.setProperty("PENROSE_SERVER",   "localhost");
+        antProject.setProperty("PENROSE_PORT",     "10389");
+        antProject.setProperty("PENROSE_BASE",     ldapSuffix);
+        antProject.setProperty("PENROSE_USER",     "uid=admin,ou=system");
+        antProject.setProperty("PENROSE_PASSWORD", "secret");
+
+        antProject.setProperty("LDAP_PROTOCOL",    "ldap");
+        antProject.setProperty("LDAP_SERVER",      "localhost");
+        antProject.setProperty("LDAP_PORT",        "389");
+        antProject.setProperty("LDAP_BASE",        ldapSuffix);
+        antProject.setProperty("LDAP_USER",        "cn=Manager,dc=Example,dc=com");
+        antProject.setProperty("LDAP_PASSWORD",    "secret");
 
         Copy copy = new Copy();
         copy.setOverwrite(true);
@@ -196,17 +223,19 @@ public class NISTool {
         String domainName = domain.getName();
         log.debug("Loading partition "+domainName+".");
 
-        File newDir = new File(project.getWorkDir(), "partitions"+File.separator+ domainName);
+        File partitionsDir = new File(project.getWorkDir(), "partitions");
+        PenroseConfig penroseConfig = project.getPenroseConfig();
+        PenroseContext penroseContext = project.getPenroseContext();
 
         PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(domainName);
 
-        PartitionContext partitionContext = new PartitionContext();
-        partitionContext.setPath(newDir);
-        partitionContext.setPenroseConfig(project.getPenroseConfig());
-        partitionContext.setPenroseContext(project.getPenroseContext());
+        PartitionFactory partitionFactory = new PartitionFactory();
+        partitionFactory.setPartitionsDir(partitionsDir);
+        partitionFactory.setPenroseConfig(penroseConfig);
+        partitionFactory.setPenroseContext(penroseContext);
 
-        Partition partition = new Partition();
-        partition.init(partitionConfig, partitionContext);
+        Partition partition = partitionFactory.createPartition(partitionConfig);
+
         partitions.addPartition(partition);
     }
 
@@ -411,21 +440,6 @@ public class NISTool {
         return cacheConfigs;
     }
 
-    public Collection<Source> getCaches(Partition partition, Source source) {
-
-        Collection<Source> caches = new ArrayList<Source>();
-
-        PartitionConfig partitionConfig = partition.getPartitionConfig();
-        SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
-
-        for (SourceConfig cacheConfig : getCacheConfigs(sourceConfigs, source.getSourceConfig())) {
-            Source cache = partition.getSource(cacheConfig.getName());
-            caches.add(cache);
-        }
-
-        return caches;
-    }
-
     public void createDatabase(NISDomain domain) throws Exception {
 
         log.debug("Creating database "+domain.getName()+".");
@@ -437,10 +451,10 @@ public class NISTool {
 
         PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(domain.getName());
         SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
+
         for (SourceConfig sourceConfig : sourceConfigs.getSourceConfigs()) {
-            for (SourceConfig cache : getCacheConfigs(sourceConfigs, sourceConfig)) {
-                client.createTable(cache);
-            }
+            if (!CACHE_CONNECTION_NAME.equals(sourceConfig.getConnectionName())) continue;
+            client.createTable(sourceConfig);
         }
     }
 

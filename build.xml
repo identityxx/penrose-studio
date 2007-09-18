@@ -67,6 +67,7 @@
         <copy todir="lib" file="../penrose-pro-${product.specification}/agent/target/penrose-agent-client-${penrose.version}.jar"/>
         <copy todir="lib" file="../penrose-pro-${product.specification}/lib/penrose-${penrose.version}.jar"/>
         <copy todir="lib" file="../penrose-pro-${product.specification}/server/lib/penrose-server-${penrose.version}.jar"/>
+        <copy todir="lib" file="../penrose-pro-${product.specification}/services/JMX/SERVICE-INF/lib/penrose-jmx-service-${penrose.version}.jar"/>
         <copy todir="lib" file="../penrose-pro-${product.specification}/target/penrose-pro-${penrose.version}.jar"/>
     </target>
 

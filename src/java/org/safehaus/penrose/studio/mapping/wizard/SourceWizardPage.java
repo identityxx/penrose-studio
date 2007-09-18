@@ -27,6 +27,7 @@ import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.mapping.SourceDialog;
+import org.safehaus.penrose.directory.EntryMapping;
 
 import java.util.Collection;
 

@@ -27,7 +27,8 @@ import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.directory.DirectoryConfigs;
+import org.safehaus.penrose.directory.DirectoryConfig;
+import org.safehaus.penrose.directory.EntryMapping;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;
@@ -110,9 +111,9 @@ public class CreateLDAPProxyWizard extends Wizard {
 
             entryMapping.setHandlerName("PROXY");
 
-            DirectoryConfigs directoryConfigs = partitionConfig.getDirectoryConfigs();
-            directoryConfigs.addEntryMapping(entryMapping);
-            project.save(partitionConfig, directoryConfigs);
+            DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
+            directoryConfig.addEntryMapping(entryMapping);
+            project.save(partitionConfig, directoryConfig);
 
             return true;
 

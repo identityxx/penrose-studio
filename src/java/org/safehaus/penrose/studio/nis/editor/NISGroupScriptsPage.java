@@ -106,7 +106,7 @@ public class NISGroupScriptsPage extends FormPage {
             SearchRequest request = new SearchRequest();
             request.setFilter("(type=groups)");
 
-            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
+            SearchResponse response = new SearchResponse() {
                 public void add(SearchResult result) throws Exception {
                     Attributes attributes = result.getAttributes();
                     String actionName = (String) attributes.getValue("name");
@@ -359,7 +359,7 @@ public class NISGroupScriptsPage extends FormPage {
         if (gidNumber == null) gidNumber = (Integer) attributes.getValue("origGidNumber");
 
         SearchRequest searchRequest = new SearchRequest();
-        SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
+        SearchResponse searchResponse = new SearchResponse();
 
         nisTool.getDomains().search(searchRequest, searchResponse);
 
@@ -441,7 +441,7 @@ public class NISGroupScriptsPage extends FormPage {
         request.setDomain(domain.getName());
 
         SearchRequest searchRequest = new SearchRequest();
-        SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
+        SearchResponse searchResponse = new SearchResponse();
 
         nisTool.getDomains().search(searchRequest, searchResponse);
 
@@ -508,12 +508,12 @@ public class NISGroupScriptsPage extends FormPage {
         dialog.setName(cn);
         dialog.setOrigGidNumber(origGidNumber);
 
-        Source penroseGroups = partition.getSource(NISTool.PENROSE_GROUPS);
+        Source penroseGroups = partition.getSource(NISTool.CHANGE_GROUPS);
 
         SearchRequest request = new SearchRequest();
         request.setDn(dn);
 
-        SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
+        SearchResponse response = new SearchResponse();
 
         penroseGroups.search(request, response);
 
@@ -528,7 +528,7 @@ public class NISGroupScriptsPage extends FormPage {
         request = new SearchRequest();
         request.setFilter("(cn="+cn+")");
 
-        response = new SearchResponse<SearchResult>();
+        response = new SearchResponse();
 
         members.search(request, response);
 
@@ -584,9 +584,9 @@ public class NISGroupScriptsPage extends FormPage {
         SearchRequest request = new SearchRequest();
         request.setFilter("(gidNumber=" + gidNumber + ")");
 
-        SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
+        SearchResponse response = new SearchResponse();
 
-        Source groups = partition.getSource(NISTool.PENROSE_GROUPS);
+        Source groups = partition.getSource(NISTool.CHANGE_GROUPS);
         groups.search(request, response);
 
         while (response.hasNext()) {
@@ -601,7 +601,7 @@ public class NISGroupScriptsPage extends FormPage {
         }
 
         SearchRequest searchRequest = new SearchRequest();
-        SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
+        SearchResponse searchResponse = new SearchResponse();
 
         nisTool.getDomains().search(searchRequest, searchResponse);
 
@@ -612,7 +612,7 @@ public class NISGroupScriptsPage extends FormPage {
             String domainName = (String) attributes.getValue("name");
             Partition partition2 = nisTool.getPartitions().getPartition(domainName);
 
-            response = new SearchResponse<SearchResult>();
+            response = new SearchResponse();
 
             groups = partition2.getSource(NISTool.CACHE_GROUPS);
             groups.search(request, response);

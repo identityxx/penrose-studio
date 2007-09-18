@@ -16,10 +16,7 @@ import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.partition.PartitionContext;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.PartitionConfigs;
-import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.source.SourceConfig;
 
@@ -96,18 +93,17 @@ public class NISToolWizard extends Wizard {
             PenroseConfig penroseConfig = project.getPenroseConfig();
             PenroseContext penroseContext = project.getPenroseContext();
 
-            PartitionContext partitionContext = new PartitionContext();
-            partitionContext.setPenroseConfig(penroseConfig);
-            partitionContext.setPenroseContext(penroseContext);
+            PartitionFactory partitionFactory = new PartitionFactory();
+            partitionFactory.setPartitionsDir(partitionConfigs.getPartitionsDir());
+            partitionFactory.setPenroseConfig(penroseConfig);
+            partitionFactory.setPenroseContext(penroseContext);
 
-            Partition partition = new Partition();
-            partition.init(partitionConfig, partitionContext);
+            Partition partition = partitionFactory.createPartition(partitionConfig);
 
             if (databasePage.isCreate()) {
                 log.debug("Creating database tables in "+NISTool.NIS_PARTITION_NAME+".");
 
                 Connection connection = partition.getConnection(NISTool.NIS_CONNECTION_NAME);
-                connection.start();
 
                 JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
                 JDBCClient client = adapter.getClient();
@@ -117,8 +113,6 @@ public class NISToolWizard extends Wizard {
                 for (SourceConfig sourceConfig : sourceConfigs.getSourceConfigs()) {
                     client.createTable(sourceConfig);
                 }
-
-                connection.stop();
             }
 
             return true;

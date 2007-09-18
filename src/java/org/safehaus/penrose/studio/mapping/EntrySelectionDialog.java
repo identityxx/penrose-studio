@@ -26,7 +26,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.mapping.EntryMapping;
+import org.safehaus.penrose.directory.EntryMapping;
 import org.safehaus.penrose.partition.PartitionConfig;
 
 import java.util.Collection;
@@ -91,7 +91,7 @@ public class EntrySelectionDialog extends Dialog {
                     items[i].dispose();
                 }
 
-                Collection children = partitionConfig.getDirectoryConfigs().getChildren(entry);
+                Collection children = partitionConfig.getDirectoryConfig().getChildren(entry);
                 for (Iterator i=children.iterator(); i.hasNext(); ) {
                     EntryMapping child = (EntryMapping)i.next();
 
@@ -153,7 +153,7 @@ public class EntrySelectionDialog extends Dialog {
     public void setPartitionConfig(PartitionConfig partitionConfig) {
         this.partitionConfig = partitionConfig;
 
-        Collection rootEntries = partitionConfig.getDirectoryConfigs().getRootEntryMappings();
+        Collection rootEntries = partitionConfig.getDirectoryConfig().getRootEntryMappings();
         for (Iterator i=rootEntries.iterator(); i.hasNext(); ) {
             EntryMapping entry = (EntryMapping)i.next();
             String dn = entry.getDn().isEmpty() ? "Root DSE" : entry.getDn().toString();

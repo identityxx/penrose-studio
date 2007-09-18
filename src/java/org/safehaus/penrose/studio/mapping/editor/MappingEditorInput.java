@@ -20,7 +20,7 @@ package org.safehaus.penrose.studio.mapping.editor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.mapping.EntryMapping;
+import org.safehaus.penrose.directory.EntryMapping;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.project.Project;
 

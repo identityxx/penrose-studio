@@ -25,9 +25,9 @@ import org.safehaus.penrose.studio.util.ADUtil;
 import org.safehaus.penrose.studio.util.SchemaUtil;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.directory.EntryMapping;
 import org.apache.log4j.Logger;
 
 /**

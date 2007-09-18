@@ -39,9 +39,9 @@ import org.safehaus.penrose.studio.directory.action.NewStaticEntryAction;
 import org.safehaus.penrose.studio.directory.action.NewDynamicEntryAction;
 import org.safehaus.penrose.studio.directory.action.MapLDAPTreeAction;
 import org.safehaus.penrose.studio.directory.action.NewEntryFromSourceAction;
-import org.safehaus.penrose.mapping.EntryMapping;
+import org.safehaus.penrose.directory.EntryMapping;
 import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.directory.DirectoryConfigs;
+import org.safehaus.penrose.directory.DirectoryConfig;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -209,7 +209,7 @@ public class EntryNode extends Node {
 
         if (!confirm) return;
 
-        DirectoryConfigs directoryConfigs = partitionConfig.getDirectoryConfigs();
+        DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
 
         for (Node node : view.getSelectedNodes()) {
             if (!(node instanceof EntryNode)) continue;
@@ -217,18 +217,18 @@ public class EntryNode extends Node {
             EntryNode entryNode = (EntryNode) node;
 
             EntryMapping entryMapping = entryNode.getEntryMapping();
-            directoryConfigs.removeEntryMapping(entryMapping);
+            directoryConfig.removeEntryMapping(entryMapping);
         }
 
         Project project = projectNode.getProject();
-        project.save(partitionConfig, directoryConfigs);
+        project.save(partitionConfig, directoryConfig);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
 
     public boolean hasChildren() throws Exception {
-        Collection children = partitionConfig.getDirectoryConfigs().getChildren(entryMapping);
+        Collection children = partitionConfig.getDirectoryConfig().getChildren(entryMapping);
         return (children != null && children.size() > 0);
     }
 
@@ -236,7 +236,7 @@ public class EntryNode extends Node {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        for (EntryMapping childMapping : partitionConfig.getDirectoryConfigs().getChildren(entryMapping)) {
+        for (EntryMapping childMapping : partitionConfig.getDirectoryConfig().getChildren(entryMapping)) {
 
             EntryNode entryNode = new EntryNode(
                     childMapping.getRdn().toString(),

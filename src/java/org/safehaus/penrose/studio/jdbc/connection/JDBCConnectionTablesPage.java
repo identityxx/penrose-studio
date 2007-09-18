@@ -37,9 +37,10 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
 import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.partition.Partitions;
+import org.safehaus.penrose.connection.Connections;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionContext;
+import org.safehaus.penrose.partition.PartitionFactory;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.naming.PenroseContext;
 
@@ -225,15 +226,13 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
             PenroseConfig penroseConfig = project.getPenroseConfig();
             PenroseContext penroseContext = project.getPenroseContext();
 
-            PartitionContext partitionContext = new PartitionContext();
-            partitionContext.setPenroseConfig(penroseConfig);
-            partitionContext.setPenroseContext(penroseContext);
+            PartitionFactory partitionFactory = new PartitionFactory();
+            partitionFactory.setPenroseConfig(penroseConfig);
+            partitionFactory.setPenroseContext(penroseContext);
 
-            Partition partition = new Partition();
-            partition.init(partitionConfig, partitionContext);
-
-            Connection connection = partition.createConnection(connectionConfig);
-            connection.start();
+            Partition partition = partitionFactory.createPartition(partitionConfig);
+            Connections connections = partition.getConnections();
+            Connection connection = connections.createConnection(connectionConfig);
 
             JDBCAdapter jdbcAdapter = (JDBCAdapter)connection.getAdapter();
             JDBCClient client = jdbcAdapter.getClient();
@@ -277,8 +276,8 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
                 log.error(e.getMessage(), e);
             }
 
-            connection.stop();
-            partition.stop();
+            connection.destroy();
+            partition.destroy();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -311,15 +310,13 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
             PenroseConfig penroseConfig = project.getPenroseConfig();
             PenroseContext penroseContext = project.getPenroseContext();
 
-            PartitionContext partitionContext = new PartitionContext();
-            partitionContext.setPenroseConfig(penroseConfig);
-            partitionContext.setPenroseContext(penroseContext);
+            PartitionFactory partitionFactory = new PartitionFactory();
+            partitionFactory.setPenroseConfig(penroseConfig);
+            partitionFactory.setPenroseContext(penroseContext);
 
-            Partition partition = new Partition();
-            partition.init(partitionConfig, partitionContext);
-
-            Connection connection = partition.createConnection(connectionConfig);
-            connection.start();
+            Partition partition = partitionFactory.createPartition(partitionConfig);
+            Connections connections = partition.getConnections();
+            Connection connection = connections.createConnection(connectionConfig);
 
             JDBCAdapter jdbcAdapter = (JDBCAdapter)connection.getAdapter();
             JDBCClient client = jdbcAdapter.getClient();
@@ -337,8 +334,8 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
                 log.error(e.getMessage(), e);
             }
 
-            connection.stop();
-            partition.stop();
+            connection.destroy();
+            partition.destroy();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

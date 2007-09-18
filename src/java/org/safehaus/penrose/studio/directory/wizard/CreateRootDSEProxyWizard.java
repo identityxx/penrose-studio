@@ -26,7 +26,8 @@ import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.directory.DirectoryConfigs;
+import org.safehaus.penrose.directory.DirectoryConfig;
+import org.safehaus.penrose.directory.EntryMapping;
 import org.apache.log4j.Logger;
 
 /**
@@ -80,11 +81,11 @@ public class CreateRootDSEProxyWizard extends Wizard {
 
             entryMapping.addACI(new ACI("rs"));
 
-            DirectoryConfigs directoryConfigs = partitionConfig.getDirectoryConfigs();
-            directoryConfigs.addEntryMapping(entryMapping);
+            DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
+            directoryConfig.addEntryMapping(entryMapping);
 
             project.save(partitionConfig, sourceConfigs);
-            project.save(partitionConfig, directoryConfigs);
+            project.save(partitionConfig, directoryConfig);
 
             return true;
 

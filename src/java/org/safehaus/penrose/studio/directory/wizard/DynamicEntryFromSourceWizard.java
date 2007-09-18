@@ -19,9 +19,9 @@ package org.safehaus.penrose.studio.directory.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.safehaus.penrose.mapping.EntryMapping;
-import org.safehaus.penrose.mapping.AttributeMapping;
-import org.safehaus.penrose.mapping.FieldMapping;
+import org.safehaus.penrose.directory.EntryMapping;
+import org.safehaus.penrose.directory.AttributeMapping;
+import org.safehaus.penrose.directory.FieldMapping;
 import org.safehaus.penrose.mapping.SourceMapping;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
@@ -30,7 +30,7 @@ import org.safehaus.penrose.studio.source.wizard.SelectSourcesWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDNBuilder;
-import org.safehaus.penrose.directory.DirectoryConfigs;
+import org.safehaus.penrose.directory.DirectoryConfig;
 import org.apache.log4j.Logger;
 
 import java.util.Iterator;
@@ -139,10 +139,10 @@ public class DynamicEntryFromSourceWizard extends Wizard {
                 sourceMapping.addFieldMapping(fieldMapping);
             }
 
-            DirectoryConfigs directoryConfigs = partitionConfig.getDirectoryConfigs();
-            directoryConfigs.addEntryMapping(entryMapping);
+            DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
+            directoryConfig.addEntryMapping(entryMapping);
 
-            project.save(partitionConfig, directoryConfigs);
+            project.save(partitionConfig, directoryConfig);
 
             return true;
 

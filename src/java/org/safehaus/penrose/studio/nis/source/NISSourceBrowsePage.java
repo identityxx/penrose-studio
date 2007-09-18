@@ -12,7 +12,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.source.FieldConfig;
@@ -111,7 +110,7 @@ public class NISSourceBrowsePage extends SourceEditorPage {
         int size = Integer.parseInt(maxSizeText.getText());
         sc.setSizeLimit(size);
 
-        SearchResponse<SearchResult> sr = new SearchResponse<SearchResult>() {
+        SearchResponse sr = new SearchResponse() {
             public void add(SearchResult searchResult) {
                 Attributes attributes = searchResult.getAttributes();
                 //log.debug(" - "+av);
@@ -144,12 +143,11 @@ public class NISSourceBrowsePage extends SourceEditorPage {
             PenroseConfig penroseConfig = project.getPenroseConfig();
             PenroseContext penroseContext = project.getPenroseContext();
 
-            PartitionContext partitionContext = new PartitionContext();
-            partitionContext.setPenroseConfig(penroseConfig);
-            partitionContext.setPenroseContext(penroseContext);
+            PartitionFactory partitionFactory = new PartitionFactory();
+            partitionFactory.setPenroseConfig(penroseConfig);
+            partitionFactory.setPenroseContext(penroseContext);
 
-            Partition partition = new Partition();
-            partition.init(partitionConfig, partitionContext);
+            Partition partition = partitionFactory.createPartition(partitionConfig);
 
             Connection connection = partition.getConnection(sourceConfig.getConnectionName());
 
@@ -157,7 +155,7 @@ public class NISSourceBrowsePage extends SourceEditorPage {
 
             source.search(sc, sr);
 
-            partition.stop();
+            partition.destroy();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

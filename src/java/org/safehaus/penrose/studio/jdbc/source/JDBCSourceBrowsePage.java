@@ -15,7 +15,6 @@ import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.ldap.LDAP;
 import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
@@ -162,12 +161,11 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
             PenroseConfig penroseConfig = project.getPenroseConfig();
             PenroseContext penroseContext = project.getPenroseContext();
 
-            PartitionContext partitionContext = new PartitionContext();
-            partitionContext.setPenroseConfig(penroseConfig);
-            partitionContext.setPenroseContext(penroseContext);
+            PartitionFactory partitionFactory = new PartitionFactory();
+            partitionFactory.setPenroseConfig(penroseConfig);
+            partitionFactory.setPenroseContext(penroseContext);
 
-            Partition partition = new Partition();
-            partition.init(partitionConfig, partitionContext);
+            Partition partition = partitionFactory.createPartition(partitionConfig);
 
             Connection connection = partition.getConnection(sourceConfig.getConnectionName());
 
@@ -175,7 +173,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
 
             source.add(dn, attributes);
 
-            partition.stop();
+            partition.destroy();
 
             refresh();
 
@@ -218,12 +216,11 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
             PenroseConfig penroseConfig = project.getPenroseConfig();
             PenroseContext penroseContext = project.getPenroseContext();
 
-            PartitionContext partitionContext = new PartitionContext();
-            partitionContext.setPenroseConfig(penroseConfig);
-            partitionContext.setPenroseContext(penroseContext);
+            PartitionFactory partitionFactory = new PartitionFactory();
+            partitionFactory.setPenroseConfig(penroseConfig);
+            partitionFactory.setPenroseContext(penroseContext);
 
-            Partition partition = new Partition();
-            partition.init(partitionConfig, partitionContext);
+            Partition partition = partitionFactory.createPartition(partitionConfig);
 
             Connection connection = partition.getConnection(sourceConfig.getConnectionName());
 
@@ -240,7 +237,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
 
             source.modify(dn, modifications);
 
-            partition.stop();
+            partition.destroy();
 
             refresh();
 
@@ -267,12 +264,11 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
             PenroseConfig penroseConfig = project.getPenroseConfig();
             PenroseContext penroseContext = project.getPenroseContext();
 
-            PartitionContext partitionContext = new PartitionContext();
-            partitionContext.setPenroseConfig(penroseConfig);
-            partitionContext.setPenroseContext(penroseContext);
+            PartitionFactory partitionFactory = new PartitionFactory();
+            partitionFactory.setPenroseConfig(penroseConfig);
+            partitionFactory.setPenroseContext(penroseContext);
 
-            Partition partition = new Partition();
-            partition.init(partitionConfig, partitionContext);
+            Partition partition = partitionFactory.createPartition(partitionConfig);
 
             Connection connection = partition.getConnection(sourceConfig.getConnectionName());
 
@@ -280,7 +276,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
 
             source.delete(dn);
 
-            partition.stop();
+            partition.destroy();
 
             refresh();
 
@@ -304,7 +300,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
         int size = Integer.parseInt(maxSizeText.getText());
         request.setSizeLimit(size);
 
-        SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
+        SearchResponse response = new SearchResponse() {
             public void add(SearchResult searchResult) throws Exception {
                 super.add(searchResult);
 
@@ -341,12 +337,11 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
             PenroseConfig penroseConfig = project.getPenroseConfig();
             PenroseContext penroseContext = project.getPenroseContext();
 
-            PartitionContext partitionContext = new PartitionContext();
-            partitionContext.setPenroseConfig(penroseConfig);
-            partitionContext.setPenroseContext(penroseContext);
+            PartitionFactory partitionFactory = new PartitionFactory();
+            partitionFactory.setPenroseConfig(penroseConfig);
+            partitionFactory.setPenroseContext(penroseContext);
 
-            Partition partition = new Partition();
-            partition.init(partitionConfig, partitionContext);
+            Partition partition = partitionFactory.createPartition(partitionConfig);
 
             Connection connection = partition.getConnection(sourceConfig.getConnectionName());
 
@@ -354,7 +349,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
 
             source.search(request, response);
 
-            partition.stop();
+            partition.destroy();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

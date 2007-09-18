@@ -4,10 +4,10 @@ import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.schema.attributeSyntax.AttributeSyntax;
 import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.mapping.EntryMapping;
+import org.safehaus.penrose.directory.EntryMapping;
+import org.safehaus.penrose.directory.AttributeMapping;
 import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.ldap.DN;
-import org.safehaus.penrose.mapping.AttributeMapping;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,13 +35,13 @@ public class SnapshotUtil {
             if (entry == null) return;
             
             EntryMapping entryMapping = createMapping(client, entry);
-            partitionConfig.getDirectoryConfigs().addEntryMapping(entryMapping);
+            partitionConfig.getDirectoryConfig().addEntryMapping(entryMapping);
         }
 
         Collection<SearchResult> children = client.getChildren(baseDn);
         for (SearchResult entry : children) {
             EntryMapping entryMapping = createMapping(client, entry);
-            partitionConfig.getDirectoryConfigs().addEntryMapping(entryMapping);
+            partitionConfig.getDirectoryConfig().addEntryMapping(entryMapping);
 
             createEntries(partitionConfig, client, entry.getName());
         }

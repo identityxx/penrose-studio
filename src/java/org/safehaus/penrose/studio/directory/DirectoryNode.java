@@ -23,7 +23,7 @@ import org.safehaus.penrose.studio.partition.PartitionNode;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.directory.action.*;
-import org.safehaus.penrose.mapping.EntryMapping;
+import org.safehaus.penrose.directory.EntryMapping;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.eclipse.swt.graphics.Image;
@@ -77,14 +77,14 @@ public class DirectoryNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        return !partitionConfig.getDirectoryConfigs().getRootEntryMappings().isEmpty();
+        return !partitionConfig.getDirectoryConfig().getRootEntryMappings().isEmpty();
     }
 
     public Collection<Node> getChildren() throws Exception {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        Collection rootEntryMappings = partitionConfig.getDirectoryConfigs().getRootEntryMappings();
+        Collection rootEntryMappings = partitionConfig.getDirectoryConfig().getRootEntryMappings();
         for (Iterator i=rootEntryMappings.iterator(); i.hasNext(); ) {
             EntryMapping entryMapping = (EntryMapping)i.next();
 

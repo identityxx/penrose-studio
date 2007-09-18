@@ -17,7 +17,7 @@
  */
 package org.safehaus.penrose.studio.mapping.editor;
 
-import org.safehaus.penrose.mapping.EntryMapping;
+import org.safehaus.penrose.directory.EntryMapping;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.mapping.editor.MappingEditor;
@@ -404,7 +404,7 @@ public class ACLPage extends FormPage implements ModifyListener {
         tc.setWidth(120);
 
         PartitionConfig partitionConfig = editor.getPartitionConfig();
-        EntryMapping parentEntry = partitionConfig.getDirectoryConfigs().getParent(entry);
+        EntryMapping parentEntry = partitionConfig.getDirectoryConfig().getParent(entry);
         while (parentEntry != null) {
             Collection acl = parentEntry.getACL();
             for (Iterator i=acl.iterator(); i.hasNext(); ) {
@@ -422,7 +422,7 @@ public class ACLPage extends FormPage implements ModifyListener {
                 item.setText(7, parentEntry.getDn().toString());
                 item.setData(aci);
             }
-            parentEntry = partitionConfig.getDirectoryConfigs().getParent(parentEntry);
+            parentEntry = partitionConfig.getDirectoryConfig().getParent(parentEntry);
         }
 
         GridData gd = new GridData(GridData.FILL_BOTH);

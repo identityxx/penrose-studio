@@ -16,6 +16,10 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.studio.nis.NISTool;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.management.ModuleClient;
 
 import java.util.Date;
 import java.util.Collection;
@@ -77,7 +81,7 @@ public class NISHostsPage extends FormPage {
             SearchRequest request = new SearchRequest();
             request.setFilter("(domain="+domain.getName()+")");
             
-            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
+            SearchResponse response = new SearchResponse() {
                 public void add(SearchResult result) {
                     Attributes attributes = result.getAttributes();
                     String name = (String) attributes.getValue("name");
@@ -336,6 +340,11 @@ public class NISHostsPage extends FormPage {
     public void updateFiles() throws Exception {
         if (hostsTable.getSelectionCount() == 0) return;
 
+        Project project = nisTool.getProject();
+        PenroseClient client = project.getClient();
+        PartitionClient partitionClient = client.getPartitionClient(domain.getName());
+        ModuleClient moduleClient = partitionClient.getModuleClient("NISModule");
+
         TableItem items[] = hostsTable.getSelection();
 
         for (final TableItem ti : items) {
@@ -355,8 +364,18 @@ public class NISHostsPage extends FormPage {
 
             nisTool.getHosts().modify(result.getDn(), modifications);
 
-            Runnable runnable = new UpdateFilesRunnable(result, nisTool.getHosts(), nisTool.getFiles());
-            runnable.run();
+            Attributes attributes = result.getAttributes();
+            String hostname = (String)attributes.getValue("name");
+            String[] paths = ((String)attributes.getValue("paths")).split(",");
+
+            moduleClient.invoke(
+                    "scan",
+                    new Object[] { hostname, paths },
+                    new String[] { String.class.getName(), String[].class.getName() }
+            );
+
+            //Runnable runnable = new UpdateFilesRunnable(result, nisTool.getHosts(), nisTool.getFiles());
+            //runnable.run();
 
             //new Thread(runnable).start();
             

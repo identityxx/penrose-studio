@@ -13,7 +13,7 @@ import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.safehaus.penrose.log4j.Log4jConfigReader;
 import org.safehaus.penrose.schema.SchemaManager;
-import org.safehaus.penrose.directory.DirectoryConfigs;
+import org.safehaus.penrose.directory.DirectoryConfig;
 import org.safehaus.penrose.mapping.MappingWriter;
 import org.safehaus.penrose.source.SourceWriter;
 import org.safehaus.penrose.source.SourceConfigs;
@@ -72,7 +72,10 @@ public class Project {
         workDir = new File(homeDir, "Servers"+File.separator+projectConfig.getName());
         FileUtil.delete(workDir);
 
+        log.debug("----------------------------------------------------------------------------------------------");
         client.download(workDir, "conf");
+
+        log.debug("----------------------------------------------------------------------------------------------");
         client.download(workDir, "schema");
 
         PenroseConfigReader penroseConfigReader = new PenroseConfigReader(new File(workDir, "conf"+File.separator+"server.xml"));
@@ -80,25 +83,23 @@ public class Project {
 
         penroseContext = new PenroseContext(workDir);
         penroseContext.init(penroseConfig);
-        penroseContext.start();
 
-        partitionConfigs = new PartitionConfigs();
+        File partitionsDir = new File(workDir, "partitions");
+        partitionConfigs = new PartitionConfigs(partitionsDir);
 
+        log.debug("----------------------------------------------------------------------------------------------");
         client.download(workDir, "partitions");
-        File partitions = new File(workDir, "partitions");
 
-        if (partitions.isDirectory()) {
-            for (File dir : partitions.listFiles()) {
-                if (!dir.isDirectory()) continue;
+        for (String partitionName : partitionConfigs.getAvailablePartitionNames()) {
 
-                if (debug) log.debug("----------------------------------------------------------------------------------");
+            if (debug) log.debug("----------------------------------------------------------------------------------");
 
-                PartitionConfig partitionConfig = partitionConfigs.load(dir);
-                partitionConfigs.addPartitionConfig(partitionConfig);
-            }
+            PartitionConfig partitionConfig = partitionConfigs.load(partitionName);
+            partitionConfigs.addPartitionConfig(partitionConfig);
         }
 
-        serviceConfigs = new ServiceConfigs();
+        File servicesDir = new File(workDir, "services");
+        serviceConfigs = new ServiceConfigs(servicesDir);
 /*
         File servicesDir = new File(workDir, "services");
         if (!servicesDir.isDirectory()) return;
@@ -164,11 +165,11 @@ public class Project {
         upload("partitions/"+partitionConfig.getName()+"/DIR-INF/sources.xml");
     }
 
-    public void save(PartitionConfig partitionConfig, DirectoryConfigs directoryConfigs) throws Exception {
+    public void save(PartitionConfig partitionConfig, DirectoryConfig directoryConfig) throws Exception {
         MappingWriter mappingWriter = new MappingWriter();
 
         File file = new File(workDir, "partitions/"+partitionConfig.getName()+"/DIR-INF/mapping.xml");
-        mappingWriter.write(file, directoryConfigs);
+        mappingWriter.write(file, directoryConfig);
 
         upload("partitions/"+partitionConfig.getName()+"/DIR-INF/mapping.xml");
     }
@@ -284,11 +285,13 @@ public class Project {
     }
 
     public void upload(String path) throws Exception {
+        log.debug("----------------------------------------------------------------------------------------------");
         client.upload(workDir, path);
     }
 
     public void download(String path) throws Exception {
-        client.download(workDir, path);        
+        log.debug("----------------------------------------------------------------------------------------------");
+        client.download(workDir, path);
     }
 
     public void removeDirectory(String path) throws Exception {

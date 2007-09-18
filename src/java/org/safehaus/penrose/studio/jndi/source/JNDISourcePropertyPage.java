@@ -40,6 +40,7 @@ import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.directory.EntryMapping;
 
 public class JNDISourcePropertyPage extends SourceEditorPage {
 
@@ -437,7 +438,7 @@ public class JNDISourcePropertyPage extends SourceEditorPage {
             String oldName = sourceConfig.getName();
             String newName = sourceNameText.getText();
 
-            Collection<EntryMapping> entries = partitionConfig.getDirectoryConfigs().getEntryMappings();
+            Collection<EntryMapping> entries = partitionConfig.getDirectoryConfig().getEntryMappings();
             for (EntryMapping entry : entries) {
 
                 SourceMapping s = entry.removeSourceMapping(oldName);

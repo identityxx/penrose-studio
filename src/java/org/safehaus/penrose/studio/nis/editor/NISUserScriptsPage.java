@@ -30,6 +30,9 @@ import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.connection.Connection;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.management.SourceClient;
 
 import java.util.Collection;
 import java.util.Map;
@@ -108,7 +111,7 @@ public class NISUserScriptsPage extends FormPage {
             SearchRequest request = new SearchRequest();
             request.setFilter("(type=users)");
 
-            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
+            SearchResponse response = new SearchResponse() {
                 public void add(SearchResult result) throws Exception {
                     Attributes attributes = result.getAttributes();
                     String actionName = (String) attributes.getValue("name");
@@ -361,7 +364,7 @@ public class NISUserScriptsPage extends FormPage {
         if (uidNumber == null) uidNumber = (Integer) attributes.getValue("origUidNumber");
 
         SearchRequest searchRequest = new SearchRequest();
-        SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
+        SearchResponse searchResponse = new SearchResponse();
 
         nisTool.getDomains().search(searchRequest, searchResponse);
 
@@ -443,7 +446,7 @@ public class NISUserScriptsPage extends FormPage {
         request.setDomain(domain.getName());
 
         SearchRequest searchRequest = new SearchRequest();
-        SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
+        SearchResponse searchResponse = new SearchResponse();
 
         nisTool.getDomains().search(searchRequest, searchResponse);
 
@@ -498,6 +501,11 @@ public class NISUserScriptsPage extends FormPage {
             Integer origUidNumber
     ) throws Exception {
 
+        PenroseClient penroseClient = nisTool.getProject().getClient();
+
+        PartitionClient partitionClient = penroseClient.getPartitionClient(domainName);
+        SourceClient sourceClient = partitionClient.getSourceClient(NISTool.CHANGE_USERS);
+
         Partition partition = nisTool.getPartitions().getPartition(domainName);
 
         RDNBuilder rb = new RDNBuilder();
@@ -510,13 +518,14 @@ public class NISUserScriptsPage extends FormPage {
         dialog.setUid(uid);
         dialog.setOrigUidNumber(origUidNumber);
 
-        Source penroseUsers = partition.getSource(NISTool.PENROSE_USERS);
+        Source penroseUsers = partition.getSource(NISTool.CHANGE_USERS);
 
         SearchRequest request = new SearchRequest();
         request.setDn(dn);
 
-        SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
+        SearchResponse response = new SearchResponse();
 
+        sourceClient.search(request, response);
         penroseUsers.search(request, response);
 
         if (response.hasNext()) {
@@ -570,9 +579,9 @@ public class NISUserScriptsPage extends FormPage {
         SearchRequest request = new SearchRequest();
         request.setFilter("(uidNumber=" + uidNumber + ")");
 
-        SearchResponse<SearchResult> response = new SearchResponse<SearchResult>();
+        SearchResponse response = new SearchResponse();
 
-        Source users = partition.getSource(NISTool.PENROSE_USERS);
+        Source users = partition.getSource(NISTool.CHANGE_USERS);
         users.search(request, response);
 
         while (response.hasNext()) {
@@ -587,7 +596,7 @@ public class NISUserScriptsPage extends FormPage {
         }
 
         SearchRequest searchRequest = new SearchRequest();
-        SearchResponse<SearchResult> searchResponse = new SearchResponse<SearchResult>();
+        SearchResponse searchResponse = new SearchResponse();
 
         nisTool.getDomains().search(searchRequest, searchResponse);
 
@@ -598,7 +607,7 @@ public class NISUserScriptsPage extends FormPage {
             String domainName = (String) attributes.getValue("name");
             Partition partition2 = nisTool.getPartitions().getPartition(domainName);
 
-            response = new SearchResponse<SearchResult>();
+            response = new SearchResponse();
 
             users = partition2.getSource(NISTool.CACHE_USERS);
             users.search(request, response);

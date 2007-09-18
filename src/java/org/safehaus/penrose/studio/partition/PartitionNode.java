@@ -39,6 +39,7 @@ import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.PartitionClient;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -209,18 +210,20 @@ public class PartitionNode extends Node {
         log.debug("Starting "+name+" partition.");
 
         Project project = projectNode.getProject();
-        PenroseClient client = project.getClient();
+        PenroseClient penroseClient = project.getClient();
 
-        client.startPartition(name);
+        PartitionClient partitionClient = penroseClient.getPartitionClient(name);
+        partitionClient.start();
     }
 
     public void stop() throws Exception {
         log.debug("Stopping "+name+" partition.");
 
         Project project = projectNode.getProject();
-        PenroseClient client = project.getClient();
+        PenroseClient penroseClient = project.getClient();
 
-        client.stopPartition(name);
+        PartitionClient partitionClient = penroseClient.getPartitionClient(name);
+        partitionClient.stop();
     }
 
     public void save() throws Exception {

@@ -92,7 +92,7 @@ public class NISUserChangesPage extends FormPage {
                 request.setFilter("(domain="+domain.getName()+")");
             }
 
-            SearchResponse<SearchResult> response = new SearchResponse<SearchResult>() {
+            SearchResponse response = new SearchResponse() {
                 public void add(SearchResult result) throws Exception {
                     Attributes attributes = result.getAttributes();
 

@@ -24,9 +24,9 @@ import org.safehaus.penrose.studio.directory.EntryNode;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.mapping.SourceDialog;
 import org.safehaus.penrose.mapping.SourceMapping;
-import org.safehaus.penrose.mapping.EntryMapping;
-import org.safehaus.penrose.mapping.AttributeMapping;
-import org.safehaus.penrose.mapping.FieldMapping;
+import org.safehaus.penrose.directory.EntryMapping;
+import org.safehaus.penrose.directory.AttributeMapping;
+import org.safehaus.penrose.directory.FieldMapping;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.partition.PartitionConfig;
@@ -145,7 +145,7 @@ public class NewEntryFromSourceAction extends Action {
 
             entry.addSourceMapping(sourceMapping);
 
-            partitionConfig.getDirectoryConfigs().addEntryMapping(entry);
+            partitionConfig.getDirectoryConfig().addEntryMapping(entry);
 
             penroseStudio.notifyChangeListeners();
 

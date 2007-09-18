@@ -22,18 +22,20 @@ import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.source.SourceConfigs;
-import org.safehaus.penrose.source.SourceSyncConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.nis.NISTool;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.PartitionClient;
 import org.safehaus.penrose.management.SourceClient;
+import org.safehaus.penrose.management.SchedulerClient;
 import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.QueryResponse;
+import org.safehaus.penrose.scheduler.SchedulerConfig;
+import org.safehaus.penrose.scheduler.JobConfig;
 
 import java.util.*;
 import java.sql.ResultSet;
@@ -57,7 +59,8 @@ public class NISCachePage extends FormPage {
     PenroseClient penroseClient;
     PartitionClient partitionClient;
 
-    Map<String,String> sourceNames = new TreeMap<String,String>();
+    Map<String,String> sourceLabels = new TreeMap<String,String>();
+    Map<String,Collection<String>> sourceCaches = new TreeMap<String,Collection<String>>();
 
     public NISCachePage(NISDomainEditor editor) throws Exception {
         super(editor, "CACHE", "  Cache  ");
@@ -71,20 +74,39 @@ public class NISCachePage extends FormPage {
         penroseClient = project.getClient();
         partitionClient = penroseClient.getPartitionClient(domain.getName());
 
-        sourceNames.put("Users", "nis_users");
-        sourceNames.put("Shadows", "nis_shadow");
-        sourceNames.put("Hosts", "nis_hosts");
-        sourceNames.put("Groups", "nis_groups");
-        sourceNames.put("Services", "nis_services");
-        sourceNames.put("RPCs", "nis_rpcs");
-        sourceNames.put("NetIDs", "nis_netids");
-        sourceNames.put("Protocols", "nis_protocols");
-        sourceNames.put("Aliases", "nis_aliases");
-        sourceNames.put("Netgroups", "nis_netgroups");
-        sourceNames.put("Ethernets", "nis_ethers");
-        sourceNames.put("BootParams", "nis_bootparams");
-        sourceNames.put("Networks", "nis_networks");
-        sourceNames.put("Automounts", "nis_automounts");
+        sourceLabels.put("nis_users", "Users");
+        sourceLabels.put("nis_shadow", "Shadows");
+        sourceLabels.put("nis_groups", "Groups");
+        sourceLabels.put("nis_hosts", "Hosts");
+        sourceLabels.put("nis_services", "Services");
+        sourceLabels.put("nis_rpcs", "RPCs");
+        sourceLabels.put("nis_netids", "NetIDs");
+        sourceLabels.put("nis_protocols", "Protocols");
+        sourceLabels.put("nis_aliases", "Aliases");
+        sourceLabels.put("nis_netgroups", "Netgroups");
+        sourceLabels.put("nis_ethers", "Ethernets");
+        sourceLabels.put("nis_bootparams", "BootParams");
+        sourceLabels.put("nis_networks", "Networks");
+        sourceLabels.put("nis_automounts", "Automounts");
+
+        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+        PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName());
+        SchedulerConfig schedulerConfig = partitionConfig.getSchedulerConfig();
+
+        for (String sourceName : sourceLabels.keySet()) {
+
+            JobConfig jobConfig = schedulerConfig.getJobConfig(sourceName);
+            if (jobConfig == null) continue;
+
+            String target = jobConfig.getParameter("target");
+
+            StringTokenizer st = new StringTokenizer(target, ", ");
+
+            Collection<String> list = new ArrayList<String>();
+            while (st.hasMoreTokens()) list.add(st.nextToken());
+
+            sourceCaches.put(sourceName, list);
+        }
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -178,13 +200,18 @@ public class NISCachePage extends FormPage {
                     TableItem[] items = table.getSelection();
 
                     for (TableItem item : items) {
-                        String name = (String)item.getData();
+                        String sourceName = (String)item.getData();
 
-                        try {
-                            SourceClient sourceClient = partitionClient.getSourceClient(name);
-                            sourceClient.createCache();
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
+                        Collection<String> caches = sourceCaches.get(sourceName);
+                        if (caches == null) continue;
+
+                        for (String cacheName : caches) {
+                            try {
+                                SourceClient sourceClient = partitionClient.getSourceClient(cacheName);
+                                sourceClient.create();
+                            } catch (Exception e) {
+                                log.error(e.getMessage(), e);
+                            }
                         }
                     }
 
@@ -217,11 +244,12 @@ public class NISCachePage extends FormPage {
                     TableItem[] items = table.getSelection();
 
                     for (TableItem item : items) {
-                        String name = (String)item.getData();
+                        String sourceName = (String)item.getData();
 
                         try {
-                            SourceClient sourceClient = partitionClient.getSourceClient(name);
-                            sourceClient.loadCache();
+                            SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
+                            schedulerClient.executeJob(sourceName);
+                            
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
                         }
@@ -256,13 +284,18 @@ public class NISCachePage extends FormPage {
                     TableItem[] items = table.getSelection();
 
                     for (TableItem item : items) {
-                        String name = (String)item.getData();
+                        String sourceName = (String)item.getData();
 
-                        try {
-                            SourceClient sourceClient = partitionClient.getSourceClient(name);
-                            sourceClient.cleanCache();
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
+                        Collection<String> caches = sourceCaches.get(sourceName);
+                        if (caches == null) continue;
+
+                        for (String cacheName : caches) {
+                            try {
+                                SourceClient sourceClient = partitionClient.getSourceClient(cacheName);
+                                sourceClient.clean();
+                            } catch (Exception e) {
+                                log.error(e.getMessage(), e);
+                            }
                         }
                     }
 
@@ -295,13 +328,18 @@ public class NISCachePage extends FormPage {
                     TableItem[] items = table.getSelection();
 
                     for (TableItem item : items) {
-                        String name = (String)item.getData();
+                        String sourceName = (String)item.getData();
 
-                        try {
-                            SourceClient sourceClient = partitionClient.getSourceClient(name);
-                            sourceClient.dropCache();
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
+                        Collection<String> caches = sourceCaches.get(sourceName);
+                        if (caches == null) continue;
+
+                        for (String cacheName : caches) {
+                            try {
+                                SourceClient sourceClient = partitionClient.getSourceClient(cacheName);
+                                sourceClient.drop();
+                            } catch (Exception e) {
+                                log.error(e.getMessage(), e);
+                            }
                         }
                     }
 
@@ -342,19 +380,17 @@ public class NISCachePage extends FormPage {
 
             PartitionConfigs partitionConfigs = project.getPartitionConfigs();
             PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName());
+
             SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
 
-            for (final String label : sourceNames.keySet()) {
-                final String sourceName = sourceNames.get(label);
+            for (String sourceName : sourceLabels.keySet()) {
+                String label = sourceLabels.get(sourceName);
                 log.debug("Checking cache for "+label+" ("+sourceName+").");
 
-                SourceSyncConfig sourceSyncConfig = sourceConfigs.getSourceSyncConfig(sourceName);
-                if (sourceSyncConfig == null) continue;
+                Collection<String> caches = sourceCaches.get(sourceName);
+                if (caches == null) continue;
 
-                Collection<String> destinations = sourceSyncConfig.getDestinations();
-                if (destinations.isEmpty()) continue;
-
-                String cacheName = destinations.iterator().next();
+                String cacheName = caches.iterator().next();
                 SourceConfig sourceConfig = sourceConfigs.getSourceConfig(cacheName);
 
                 final TableItem ti = new TableItem(table, SWT.NONE);

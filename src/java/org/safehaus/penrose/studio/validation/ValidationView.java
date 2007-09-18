@@ -36,7 +36,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.part.*;
-import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.mapping.editor.MappingEditorInput;
@@ -50,6 +49,7 @@ import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.directory.EntryMapping;
 
 public class ValidationView extends ViewPart {
 
@@ -179,10 +179,10 @@ public class ValidationView extends ViewPart {
             page.openEditor(sei, sourceEditorClass);
 
 		} else if (object instanceof EntryMapping) {
-            EntryMapping entryDefinition = (EntryMapping)object;
-            PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(entryDefinition);
+            EntryMapping entryMapping = (EntryMapping)object;
+            PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(entryMapping);
 
-            MappingEditorInput mei = new MappingEditorInput(partitionConfig, entryDefinition);
+            MappingEditorInput mei = new MappingEditorInput(partitionConfig, entryMapping);
 
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();

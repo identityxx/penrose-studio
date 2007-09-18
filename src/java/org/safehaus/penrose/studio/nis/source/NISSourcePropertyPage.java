@@ -19,7 +19,7 @@ import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.source.SourceConfigs;
-import org.safehaus.penrose.mapping.EntryMapping;
+import org.safehaus.penrose.directory.EntryMapping;
 import org.safehaus.penrose.mapping.SourceMapping;
 import org.safehaus.penrose.nis.*;
 import org.safehaus.penrose.nis.adapter.NISAdapter;
@@ -384,7 +384,7 @@ public class NISSourcePropertyPage extends SourceEditorPage {
             String oldName = sourceConfig.getName();
             String newName = sourceNameText.getText();
 
-            Collection<EntryMapping> entries = partitionConfig.getDirectoryConfigs().getEntryMappings();
+            Collection<EntryMapping> entries = partitionConfig.getDirectoryConfig().getEntryMappings();
             for (EntryMapping entry : entries) {
 
                 SourceMapping s = entry.removeSourceMapping(oldName);

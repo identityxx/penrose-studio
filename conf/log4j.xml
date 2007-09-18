@@ -5,6 +5,24 @@
 
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false"> 
 
+  <appender name="access" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="logs/access.log"/>
+    <param name="MaxFileSize" value="10MB"/>
+    <param name="MaxBackupIndex" value="100"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="[%d{MM/dd/yyyy HH:mm:ss}] %m%n"/>
+    </layout>
+  </appender>
+
+  <appender name="error" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="logs/error.log"/>
+    <param name="MaxFileSize" value="10MB"/>
+    <param name="MaxBackupIndex" value="100"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="[%d{MM/dd/yyyy HH:mm:ss}] %m%n"/>
+    </layout>
+  </appender>
+
   <appender name="debug" class="org.apache.log4j.RollingFileAppender">
     <param name="File" value="logs/debug.log"/>
     <param name="MaxFileSize" value="10MB"/>
@@ -20,9 +38,18 @@
     </layout>
   </appender>
 
+  <logger name="org.safehaus.penrose.log.Access" additivity="false">
+    <level value="WARN"/>
+    <appender-ref ref="access"/>
+  </logger>
+
+  <logger name="org.safehaus.penrose.log.Error" additivity="false">
+    <level value="WARN"/>
+    <appender-ref ref="error"/>
+  </logger>
+
   <logger name="org.safehaus.penrose" additivity="false">
     <level value="DEBUG"/>
-    <appender-ref ref="console"/>
     <appender-ref ref="debug"/>
   </logger>
 
