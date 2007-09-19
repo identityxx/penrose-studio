@@ -35,10 +35,7 @@ import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.scheduler.SchedulerConfig;
 import org.safehaus.penrose.scheduler.JobConfig;
 import org.safehaus.penrose.scheduler.TriggerConfig;
-import org.safehaus.penrose.ldap.RDNBuilder;
-import org.safehaus.penrose.ldap.DN;
-import org.safehaus.penrose.ldap.Modification;
-import org.safehaus.penrose.ldap.Attribute;
+import org.safehaus.penrose.ldap.*;
 
 import java.util.*;
 import java.sql.ResultSet;
@@ -213,12 +210,14 @@ public class NISMapPage extends FormPage {
                     int action = dialog.getAction();
                     if (action == NISUserDialog.CANCEL) return;
 
-                    schedule = dialog.getSchedule();
-
                     RDNBuilder rb = new RDNBuilder();
                     rb.set("name", domain.getName());
 
                     DN dn = new DN(rb.toRdn());
+
+                    Source schedules = nisTool.getSchedules();
+
+                    schedule = dialog.getSchedule();
 
                     Collection<Modification> modifications = new ArrayList<Modification>();
 
@@ -227,14 +226,27 @@ public class NISMapPage extends FormPage {
                         modifications.add(modification);
                         triggerConfig.setParameter("expression", "");
 
-                    } else {
-                        Modification modification = new Modification(Modification.REPLACE, new Attribute(sourceName, schedule));
-                        modifications.add(modification);
-                        triggerConfig.setParameter("expression", schedule);
-                    }
+                        schedules.modify(dn, modifications);
 
-                    Source schedules = nisTool.getSchedules();
-                    schedules.modify(dn, modifications);
+                    } else {
+                        SearchResponse response = schedules.search(dn, null, SearchRequest.SCOPE_BASE);
+                        Attribute attribute = new Attribute(sourceName, schedule);
+
+                        if (response.hasNext()) {
+                            Modification modification = new Modification(Modification.REPLACE, attribute);
+                            modifications.add(modification);
+                            triggerConfig.setParameter("expression", schedule);
+
+                            schedules.modify(dn, modifications);
+
+                        } else {
+                            Attributes attributes = new Attributes();
+                            attributes.setValue("name", domain.getName());
+                            attributes.set(attribute);
+
+                            schedules.add(dn, attributes);
+                        }
+                    }
 
                     nisTool.createPartitionConfig(domain);
                     nisTool.loadPartition(domain);
