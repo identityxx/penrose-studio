@@ -244,19 +244,30 @@ public class NISTool {
         DN dn = new DN(rb.toRdn());
 
         SearchResponse response = schedules.search(dn, null, SearchRequest.SCOPE_BASE);
-        SearchResult result = response.next();
-        Attributes attributes = result.getAttributes();
+        if (response.hasNext()) {
+            SearchResult result = response.next();
+            Attributes attributes = result.getAttributes();
 
-        for (Field field : schedules.getFields()) {
-            String fieldName = field.getName();
-            if ("name".equals(fieldName)) continue;
+            for (Field field : schedules.getFields()) {
+                String fieldName = field.getName();
+                if ("name".equals(fieldName)) continue;
 
-            Object o = attributes.getValue(fieldName);
-            String schedule = o == null ? "" : o.toString();
-            String enabled = o == null ? "false" : "true";
+                Object o = attributes.getValue(fieldName);
+                String schedule = o == null ? "" : o.toString();
+                String enabled = o == null ? "false" : "true";
 
-            antProject.setProperty(fieldName+".schedule", schedule);
-            antProject.setProperty(fieldName+".enabled", enabled);
+                antProject.setProperty(fieldName+".schedule", schedule);
+                antProject.setProperty(fieldName+".enabled", enabled);
+            }
+
+        } else {
+            for (Field field : schedules.getFields()) {
+                String fieldName = field.getName();
+                if ("name".equals(fieldName)) continue;
+
+                antProject.setProperty(fieldName+".schedule", "");
+                antProject.setProperty(fieldName+".enabled", "false");
+            }
         }
 
         Copy copy = new Copy();
