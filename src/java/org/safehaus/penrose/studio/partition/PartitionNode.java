@@ -211,9 +211,7 @@ public class PartitionNode extends Node {
 
         Project project = projectNode.getProject();
         PenroseClient penroseClient = project.getClient();
-
-        PartitionClient partitionClient = penroseClient.getPartitionClient(name);
-        partitionClient.start();
+        penroseClient.startPartition(name);
     }
 
     public void stop() throws Exception {
@@ -221,9 +219,7 @@ public class PartitionNode extends Node {
 
         Project project = projectNode.getProject();
         PenroseClient penroseClient = project.getClient();
-
-        PartitionClient partitionClient = penroseClient.getPartitionClient(name);
-        partitionClient.stop();
+        penroseClient.stopPartition(name);
     }
 
     public void save() throws Exception {

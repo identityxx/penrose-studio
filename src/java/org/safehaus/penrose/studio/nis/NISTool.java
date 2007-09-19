@@ -51,6 +51,7 @@ public class NISTool {
     protected Partition nisPartition;
 
     protected Source domains;
+    private Source schedules;
     protected Source actions;
     protected Source hosts;
     protected Source files;
@@ -83,13 +84,14 @@ public class NISTool {
 
         nisPartition = partitionFactory.createPartition(partitionConfig);
 
-        domains = nisPartition.getSource("penrose_domains");
-        actions = nisPartition.getSource("penrose_actions");
-        hosts   = nisPartition.getSource("penrose_hosts");
-        files   = nisPartition.getSource("penrose_files");
-        changes = nisPartition.getSource("penrose_changes");
-        users   = nisPartition.getSource("penrose_users");
-        groups  = nisPartition.getSource("penrose_groups");
+        domains   = nisPartition.getSource("penrose_domains");
+        schedules = nisPartition.getSource("penrose_schedules");
+        actions   = nisPartition.getSource("penrose_actions");
+        hosts     = nisPartition.getSource("penrose_hosts");
+        files     = nisPartition.getSource("penrose_files");
+        changes   = nisPartition.getSource("penrose_changes");
+        users     = nisPartition.getSource("penrose_users");
+        groups    = nisPartition.getSource("penrose_groups");
 
         initNisDomains();
     }
@@ -121,20 +123,18 @@ public class NISTool {
             PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(domainName);
             boolean createPartitionConfig = partitionConfig == null;
 
-            if (createPartitionConfig) {
+            if (createPartitionConfig) { // create missing partition configs during start
                 createPartitionConfig(domain);
             }
 
+            // create missing databases/tables
             createDatabase(domain);
 
             if (createPartitionConfig) {
                 project.upload("partitions/"+domain.getName());
 
                 PenroseClient penroseClient = project.getClient();
-                //penroseClient.start();
-
-                PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
-                partitionClient.start();
+                penroseClient.startPartition(domain.getName());
             }
 
             loadPartition(domain);
@@ -238,6 +238,27 @@ public class NISTool {
         antProject.setProperty("LDAP_USER",        ldapBindDn);
         antProject.setProperty("LDAP_PASSWORD",    ldapBindPassword);
 
+        RDNBuilder rb = new RDNBuilder();
+        rb.set("name", domain.getName());
+
+        DN dn = new DN(rb.toRdn());
+
+        SearchResponse response = schedules.search(dn, null, SearchRequest.SCOPE_BASE);
+        SearchResult result = response.next();
+        Attributes attributes = result.getAttributes();
+
+        for (Field field : schedules.getFields()) {
+            String fieldName = field.getName();
+            if ("name".equals(fieldName)) continue;
+
+            Object o = attributes.getValue(fieldName);
+            String schedule = o == null ? "" : o.toString();
+            String enabled = o == null ? "false" : "true";
+
+            antProject.setProperty(fieldName+".schedule", schedule);
+            antProject.setProperty(fieldName+".enabled", enabled);
+        }
+
         Copy copy = new Copy();
         copy.setOverwrite(true);
         copy.setProject(antProject);
@@ -299,6 +320,11 @@ public class NISTool {
 
         domains.add(dn, attributes);
 
+        attributes = new Attributes();
+        attributes.setValue("name", domainName);
+        
+        schedules.add(dn, attributes);
+        
         nisDomains.put(domainName, domain);
 
         NISEvent event = new NISEvent();
@@ -377,6 +403,7 @@ public class NISTool {
         RDN rdn = rb.toRdn();
         DN dn = new DN(rdn);
 
+        schedules.delete(dn);
         domains.delete(dn);
 
         NISEvent event = new NISEvent();
@@ -535,5 +562,13 @@ public class NISTool {
 
     public void removeNISListener(NISEventListener listener) {
         listeners.remove(listener);
+    }
+
+    public Source getSchedules() {
+        return schedules;
+    }
+
+    public void setSchedules(Source schedules) {
+        this.schedules = schedules;
     }
 }

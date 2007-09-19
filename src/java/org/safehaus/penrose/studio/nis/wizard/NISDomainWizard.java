@@ -99,8 +99,7 @@ public class NISDomainWizard extends Wizard {
         PenroseClient penroseClient = project.getClient();
 
         try {
-            PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
-            partitionClient.start();
+            penroseClient.startPartition(domain.getName());
             nisTool.loadPartition(domain);
 
         } catch (Exception e) {

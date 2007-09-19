@@ -205,9 +205,8 @@ public class NISDomainsPage extends FormPage {
                         NISDomain domain = (NISDomain)ti.getData();
 
                         try {
+                            penroseClient.stopPartition(domain.getName());
                             nisTool.removePartition(domain);
-                            PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
-                            partitionClient.stop();
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
                         }

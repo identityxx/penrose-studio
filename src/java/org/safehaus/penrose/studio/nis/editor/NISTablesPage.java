@@ -117,7 +117,7 @@ public class NISTablesPage extends FormPage {
         table.setLinesVisible(true);
 
         TableColumn tc = new TableColumn(table, SWT.NONE);
-        tc.setWidth(150);
+        tc.setWidth(250);
         tc.setText("Name");
 
         tc = new TableColumn(table, SWT.NONE);
@@ -211,7 +211,7 @@ public class NISTablesPage extends FormPage {
                     for (TableItem item : items) {
                         String sourceName = (String)item.getData();
                         SourceClient sourceClient = partitionClient.getSourceClient(sourceName);
-                        sourceClient.clean();
+                        sourceClient.clear();
                     }
 
                     refresh();

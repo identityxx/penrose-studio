@@ -143,8 +143,7 @@ public class NISPartitionsPage extends FormPage {
                         nisTool.createPartitionConfig(domain);
                         project.upload("partitions/"+domain.getName());
 
-                        PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
-                        partitionClient.start();
+                        penroseClient.startPartition(domain.getName());
                         nisTool.loadPartition(domain);
                     }
 
@@ -185,8 +184,7 @@ public class NISPartitionsPage extends FormPage {
                     for (TableItem ti : items) {
                         NISDomain domain = (NISDomain)ti.getData();
 
-                        PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
-                        partitionClient.stop();
+                        penroseClient.stopPartition(domain.getName());
                         nisTool.removePartition(domain);
 
                         nisTool.removePartitionConfig(domain);

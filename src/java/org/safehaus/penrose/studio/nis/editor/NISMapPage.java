@@ -23,12 +23,10 @@ import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.studio.nis.NISTool;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.PartitionClient;
-import org.safehaus.penrose.management.SourceClient;
-import org.safehaus.penrose.management.SchedulerClient;
+import org.safehaus.penrose.management.*;
 import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.jdbc.JDBCClient;
@@ -37,6 +35,10 @@ import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.scheduler.SchedulerConfig;
 import org.safehaus.penrose.scheduler.JobConfig;
 import org.safehaus.penrose.scheduler.TriggerConfig;
+import org.safehaus.penrose.ldap.RDNBuilder;
+import org.safehaus.penrose.ldap.DN;
+import org.safehaus.penrose.ldap.Modification;
+import org.safehaus.penrose.ldap.Attribute;
 
 import java.util.*;
 import java.sql.ResultSet;
@@ -187,6 +189,71 @@ public class NISMapPage extends FormPage {
         gd.widthHint = 120;
         rightPanel.setLayoutData(gd);
 
+        Button editButton = new Button(rightPanel, SWT.PUSH);
+        editButton.setText("Edit");
+        editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        editButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    if (table.getSelectionCount() == 0) return;
+
+                    TableItem item = table.getSelection()[0];
+                    String label = item.getText(0);
+                    String schedule = item.getText(1);
+
+                    TriggerConfig triggerConfig = (TriggerConfig)item.getData();
+                    String sourceName = triggerConfig.getName();
+
+                    NISScheduleDialog dialog = new NISScheduleDialog(getSite().getShell(), SWT.NONE);
+                    dialog.setName(label);
+                    dialog.setSchedule(schedule);
+                    dialog.open();
+
+                    int action = dialog.getAction();
+                    if (action == NISUserDialog.CANCEL) return;
+
+                    schedule = dialog.getSchedule();
+
+                    RDNBuilder rb = new RDNBuilder();
+                    rb.set("name", domain.getName());
+
+                    DN dn = new DN(rb.toRdn());
+
+                    Collection<Modification> modifications = new ArrayList<Modification>();
+
+                    if (schedule == null) {
+                        Modification modification = new Modification(Modification.DELETE, new Attribute(sourceName));
+                        modifications.add(modification);
+                        triggerConfig.setParameter("expression", "");
+
+                    } else {
+                        Modification modification = new Modification(Modification.REPLACE, new Attribute(sourceName, schedule));
+                        modifications.add(modification);
+                        triggerConfig.setParameter("expression", schedule);
+                    }
+
+                    Source schedules = nisTool.getSchedules();
+                    schedules.modify(dn, modifications);
+
+                    nisTool.createPartitionConfig(domain);
+                    nisTool.loadPartition(domain);
+
+                    penroseClient.stopPartition(domain.getName());
+                    project.upload("partitions/"+domain.getName());
+                    penroseClient.startPartition(domain.getName());
+                    
+                    refresh();
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                }
+            }
+        });
+
+        new Label(rightPanel, SWT.NONE);
+
         Button createButton = new Button(rightPanel, SWT.PUSH);
         createButton.setText("Create");
         createButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -204,21 +271,17 @@ public class NISMapPage extends FormPage {
 
                     if (!confirm) return;
 
-                    TableItem[] items = table.getSelection();
+                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
 
-                    for (TableItem item : items) {
+                    for (TableItem item : table.getSelection()) {
                         String sourceName = (String)item.getData();
 
-                        Collection<String> caches = sourceCaches.get(sourceName);
-                        if (caches == null) continue;
+                        try {
+                            JobClient jobClient = schedulerClient.getJobClient(sourceName);
+                            jobClient.invoke("create", new Object[] {}, new String[] {});
 
-                        for (String cacheName : caches) {
-                            try {
-                                SourceClient sourceClient = partitionClient.getSourceClient(cacheName);
-                                sourceClient.create();
-                            } catch (Exception e) {
-                                log.error(e.getMessage(), e);
-                            }
+                        } catch (Exception e) {
+                            log.error(e.getMessage(), e);
                         }
                     }
 
@@ -231,31 +294,31 @@ public class NISMapPage extends FormPage {
             }
         });
 
-        Button loadButton = new Button(rightPanel, SWT.PUSH);
-        loadButton.setText("Load");
-        loadButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Button updateButton = new Button(rightPanel, SWT.PUSH);
+        updateButton.setText("Update");
+        updateButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        loadButton.addSelectionListener(new SelectionAdapter() {
+        updateButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
                     if (table.getSelectionCount() == 0) return;
 
                     boolean confirm = MessageDialog.openQuestion(
                             editor.getSite().getShell(),
-                            "Loading Cache",
+                            "Updating Cache",
                             "Are you sure?"
                     );
 
                     if (!confirm) return;
 
-                    TableItem[] items = table.getSelection();
+                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
 
-                    for (TableItem item : items) {
+                    for (TableItem item : table.getSelection()) {
                         String sourceName = (String)item.getData();
 
                         try {
-                            SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
-                            schedulerClient.executeJob(sourceName);
+                            JobClient jobClient = schedulerClient.getJobClient(sourceName);
+                            jobClient.invoke("update", new Object[] {}, new String[] {});
                             
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
@@ -288,21 +351,17 @@ public class NISMapPage extends FormPage {
 
                     if (!confirm) return;
 
-                    TableItem[] items = table.getSelection();
+                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
 
-                    for (TableItem item : items) {
+                    for (TableItem item : table.getSelection()) {
                         String sourceName = (String)item.getData();
 
-                        Collection<String> caches = sourceCaches.get(sourceName);
-                        if (caches == null) continue;
+                        try {
+                            JobClient jobClient = schedulerClient.getJobClient(sourceName);
+                            jobClient.invoke("clear", new Object[] {}, new String[] {});
 
-                        for (String cacheName : caches) {
-                            try {
-                                SourceClient sourceClient = partitionClient.getSourceClient(cacheName);
-                                sourceClient.clean();
-                            } catch (Exception e) {
-                                log.error(e.getMessage(), e);
-                            }
+                        } catch (Exception e) {
+                            log.error(e.getMessage(), e);
                         }
                     }
 
@@ -332,21 +391,17 @@ public class NISMapPage extends FormPage {
 
                     if (!confirm) return;
 
-                    TableItem[] items = table.getSelection();
+                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
 
-                    for (TableItem item : items) {
+                    for (TableItem item : table.getSelection()) {
                         String sourceName = (String)item.getData();
 
-                        Collection<String> caches = sourceCaches.get(sourceName);
-                        if (caches == null) continue;
+                        try {
+                            JobClient jobClient = schedulerClient.getJobClient(sourceName);
+                            jobClient.invoke("drop", new Object[] {}, new String[] {});
 
-                        for (String cacheName : caches) {
-                            try {
-                                SourceClient sourceClient = partitionClient.getSourceClient(cacheName);
-                                sourceClient.drop();
-                            } catch (Exception e) {
-                                log.error(e.getMessage(), e);
-                            }
+                        } catch (Exception e) {
+                            log.error(e.getMessage(), e);
                         }
                     }
 
@@ -408,7 +463,7 @@ public class NISMapPage extends FormPage {
                     String expression = triggerConfig.getParameter("expression");
                     ti.setText(1, expression == null ? "" : expression);
                 }
-                ti.setData(sourceName);
+                ti.setData(triggerConfig);
 
                 try {
                     String table = client.getTableName(sourceConfig);
