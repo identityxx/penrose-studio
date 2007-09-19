@@ -30,6 +30,7 @@ public class NISEditor extends FormEditor {
             addPage(new NISDomainsPage(this, nisTool));
             addPage(new NISDatabasesPage(this, nisTool));
             addPage(new NISPartitionsPage(this, nisTool));
+            addPage(new NISLDAPPage(this, nisTool));
             addPage(new NISUserChangesPage(this, nisTool));
             addPage(new NISGroupChangesPage(this, nisTool));
 
