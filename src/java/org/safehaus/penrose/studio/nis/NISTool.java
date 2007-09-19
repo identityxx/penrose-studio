@@ -6,16 +6,17 @@ import org.safehaus.penrose.source.*;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.project.ProjectConfig;
 import org.safehaus.penrose.studio.nis.event.NISEventListener;
 import org.safehaus.penrose.studio.nis.event.NISEvent;
 import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.management.ServiceClient;
 import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.config.PenroseConfig;
+import org.safehaus.penrose.service.ServiceConfig;
 import org.apache.tools.ant.filters.ExpandProperties;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.FilterChain;
@@ -186,6 +187,14 @@ public class NISTool {
         String dbUser = dbConnection.getParameter("user");
         String dbPassword = dbConnection.getParameter("password");
 
+        ProjectConfig projectConfig = project.getProjectConfig();
+        String penroseHost = projectConfig.getHost();
+
+        PenroseClient client = project.getClient();
+        ServiceClient serviceClient = client.getServiceClient("LDAP");
+        ServiceConfig serviceConfig = serviceClient.getServiceConfig();
+        String penrosePort = serviceConfig.getParameter("ldapPort");
+
         PenroseConfig penroseConfig = project.getPenroseConfig();
         String penroseBindDn = penroseConfig.getRootDn().toString();
         String penroseBindPassword = new String(penroseConfig.getRootPassword());
@@ -225,8 +234,8 @@ public class NISTool {
         antProject.setProperty("DB_PASSWORD",      dbPassword);
 
         antProject.setProperty("PENROSE_PROTOCOL", "ldap");
-        antProject.setProperty("PENROSE_SERVER",   "localhost");
-        antProject.setProperty("PENROSE_PORT",     "10389");
+        antProject.setProperty("PENROSE_SERVER",   penroseHost);
+        antProject.setProperty("PENROSE_PORT",     penrosePort);
         antProject.setProperty("PENROSE_BASE",     ldapSuffix);
         antProject.setProperty("PENROSE_USER",     penroseBindDn);
         antProject.setProperty("PENROSE_PASSWORD", penroseBindPassword);
@@ -549,7 +558,7 @@ public class NISTool {
         }
     }
 
-    public void removeCache(NISDomain domain) throws Exception {
+    public void removeDatabase(NISDomain domain) throws Exception {
 
         log.debug("Removing cache "+domain.getName()+".");
 
