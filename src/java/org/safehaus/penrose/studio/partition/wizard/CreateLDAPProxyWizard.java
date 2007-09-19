@@ -55,7 +55,7 @@ public class CreateLDAPProxyWizard extends Wizard {
 
     public CreateLDAPProxyWizard() {
 
-        Map parameters = new TreeMap();
+        Map<String,String> parameters = new TreeMap<String,String>();
         parameters.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         connectionParametersPage.setParameters(parameters);
 

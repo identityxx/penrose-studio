@@ -9,6 +9,7 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.nis.event.NISEventListener;
 import org.safehaus.penrose.studio.nis.event.NISEvent;
 import org.safehaus.penrose.connection.Connection;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.management.PenroseClient;
@@ -21,6 +22,7 @@ import org.apache.tools.ant.types.FilterChain;
 import org.apache.tools.ant.taskdefs.Copy;
 import org.apache.log4j.Logger;
 
+import javax.naming.Context;
 import java.util.*;
 import java.io.File;
 
@@ -31,16 +33,18 @@ public class NISTool {
 
     public Logger log = Logger.getLogger(getClass());
 
-    public final static String NIS_PARTITION_NAME  = "nis_cache";
-    public final static String NIS_TEMPLATE_NAME   = "nis_template";
-    public final static String NIS_CONNECTION_NAME = "NIS";
+    public final static String NIS_TOOL              = "nis_tool";
+    public final static String NIS_TEMPLATE          = "nis_template";
+    public final static String NIS_CONNECTION_NAME   = "NIS";
 
     public final static String CACHE_USERS           = "cache_users";
     public final static String CACHE_GROUPS          = "cache_groups";
     public final static String CACHE_CONNECTION_NAME = "Cache";
 
-    public final static String CHANGE_USERS  = "change_users";
-    public final static String CHANGE_GROUPS = "change_groups";
+    public final static String CHANGE_USERS          = "change_users";
+    public final static String CHANGE_GROUPS         = "change_groups";
+
+    public final static String LDAP_CONNECTION_NAME  = "LDAP";
 
     private Project project;
 
@@ -70,7 +74,7 @@ public class NISTool {
         PenroseConfig penroseConfig = project.getPenroseConfig();
         PenroseContext penroseContext = project.getPenroseContext();
 
-        PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(NIS_PARTITION_NAME);
+        PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(NIS_TOOL);
 
         PartitionFactory partitionFactory = new PartitionFactory();
         partitionFactory.setPartitionsDir(partitionsDir);
@@ -142,10 +146,10 @@ public class NISTool {
         String domainName = domain.getName();
         log.debug("Creating partition "+domainName+".");
 
-        File sampleDir = new File(project.getWorkDir(), "samples/"+NISTool.NIS_TEMPLATE_NAME);
+        File sampleDir = new File(project.getWorkDir(), "samples/"+NISTool.NIS_TEMPLATE);
 
         if (!sampleDir.exists()) {
-            project.download("samples/"+NISTool.NIS_TEMPLATE_NAME);
+            project.download("samples/"+NISTool.NIS_TEMPLATE);
         }
 
         File partitionDir = new File(project.getWorkDir(), "partitions"+File.separator+ domainName);
@@ -161,21 +165,53 @@ public class NISTool {
         log.debug(" - NIS Server: "+ nisServer);
         log.debug(" - LDAP Suffix: "+ldapSuffix);
 
-        Connection connection = nisPartition.getConnection(NISTool.NIS_CONNECTION_NAME);
+        Connection dbConnection = nisPartition.getConnection(NISTool.NIS_CONNECTION_NAME);
 
-        String dbUrl = connection.getParameter("url");
+        String dbUrl = dbConnection.getParameter("url");
         int i = dbUrl.indexOf("://");
         int j = dbUrl.indexOf("/", i+3);
         if (j < 0) j = dbUrl.length();
 
-        String dbServer = dbUrl.substring(i+3, j);
-        String dbUser = connection.getParameter("user");
-        String dbPassword = connection.getParameter("password");
+        String dbHostPort = dbUrl.substring(i+3, j);
+        int k = dbHostPort.indexOf(":");
+        String dbHostname, dbPort;
+        if (k < 0) {
+            dbHostname = dbHostPort;
+            dbPort = "3306";
+        } else {
+            dbHostname = dbHostPort.substring(0, k);
+            dbPort = dbHostPort.substring(k+1);
+        }
 
-        log.debug(" - DB Server: "+dbServer);
-        log.debug(" - DB User: "+dbUser);
-        log.debug(" - DB Password: "+dbPassword);
+        String dbUser = dbConnection.getParameter("user");
+        String dbPassword = dbConnection.getParameter("password");
 
+        PenroseConfig penroseConfig = project.getPenroseConfig();
+        String penroseBindDn = penroseConfig.getRootDn().toString();
+        String penroseBindPassword = new String(penroseConfig.getRootPassword());
+
+        Connection ldapConnection = nisPartition.getConnection(NISTool.LDAP_CONNECTION_NAME);
+        String url = ldapConnection.getParameter(Context.PROVIDER_URL);
+
+        i = url.indexOf("://");
+        String ldapProtocol = url.substring(0, i);
+
+        j = url.indexOf("/", i+3);
+        String ldapHostPort = url.substring(i+3, j);
+
+        k = ldapHostPort.indexOf(":");
+        String ldapHostname, ldapPort;
+        if (k < 0) {
+            ldapHostname = ldapHostPort;
+            ldapPort = "389";
+        } else {
+            ldapHostname = ldapHostPort.substring(0, k);
+            ldapPort = ldapHostPort.substring(k+1);
+        }
+
+        String ldapBindDn = ldapConnection.getParameter(Context.SECURITY_PRINCIPAL);
+        String ldapBindPassword = ldapConnection.getParameter(Context.SECURITY_CREDENTIALS);
+        
         org.apache.tools.ant.Project antProject = new org.apache.tools.ant.Project();
 
         antProject.setProperty("DOMAIN",           domainName);
@@ -183,8 +219,8 @@ public class NISTool {
         antProject.setProperty("NIS_SERVER",       nisServer);
         antProject.setProperty("NIS_DOMAIN",       nisDomain);
 
-        antProject.setProperty("DB_SERVER",        dbServer);
-        antProject.setProperty("DB_PORT",          "3306");
+        antProject.setProperty("DB_SERVER",        dbHostname);
+        antProject.setProperty("DB_PORT",          dbPort);
         antProject.setProperty("DB_USER",          dbUser);
         antProject.setProperty("DB_PASSWORD",      dbPassword);
 
@@ -192,15 +228,15 @@ public class NISTool {
         antProject.setProperty("PENROSE_SERVER",   "localhost");
         antProject.setProperty("PENROSE_PORT",     "10389");
         antProject.setProperty("PENROSE_BASE",     ldapSuffix);
-        antProject.setProperty("PENROSE_USER",     "uid=admin,ou=system");
-        antProject.setProperty("PENROSE_PASSWORD", "secret");
+        antProject.setProperty("PENROSE_USER",     penroseBindDn);
+        antProject.setProperty("PENROSE_PASSWORD", penroseBindPassword);
 
-        antProject.setProperty("LDAP_PROTOCOL",    "ldap");
-        antProject.setProperty("LDAP_SERVER",      "localhost");
-        antProject.setProperty("LDAP_PORT",        "389");
+        antProject.setProperty("LDAP_PROTOCOL",    ldapProtocol);
+        antProject.setProperty("LDAP_SERVER",      ldapHostname);
+        antProject.setProperty("LDAP_PORT",        ldapPort);
         antProject.setProperty("LDAP_BASE",        ldapSuffix);
-        antProject.setProperty("LDAP_USER",        "cn=Manager,dc=Example,dc=com");
-        antProject.setProperty("LDAP_PASSWORD",    "secret");
+        antProject.setProperty("LDAP_USER",        ldapBindDn);
+        antProject.setProperty("LDAP_PASSWORD",    ldapBindPassword);
 
         Copy copy = new Copy();
         copy.setOverwrite(true);
@@ -458,7 +494,7 @@ public class NISTool {
         try {
             client.createDatabase(domain.getName());
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.debug(e.getMessage());
         }
 
         PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(domain.getName());
@@ -470,7 +506,7 @@ public class NISTool {
             try {
                 client.createTable(sourceConfig);
             } catch (Exception e) {
-                log.error(e.getMessage(), e);
+                log.debug(e.getMessage());
             }
         }
     }

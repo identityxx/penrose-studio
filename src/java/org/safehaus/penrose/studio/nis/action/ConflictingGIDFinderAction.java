@@ -73,9 +73,9 @@ public class ConflictingGIDFinderAction extends NISAction {
 
         String sql = "select a.cn, a.gidNumber, b.gidNumber, c.cn, c.gidNumber, d.gidNumber" +
                 " from "+table1+" a"+
-                " left join nis_cache.groups b on b.domain=? and a.cn=b.cn"+
+                " left join "+NISTool.NIS_TOOL +".groups b on b.domain=? and a.cn=b.cn"+
                 " join "+table2+" c on a.cn <> c.cn "+
-                " left join nis_cache.groups d on d.domain=? and c.cn=d.cn"+
+                " left join "+NISTool.NIS_TOOL +".groups d on d.domain=? and c.cn=d.cn"+
                 " where b.gidNumber is null and d.gidNumber is null and a.gidNumber = c.gidNumber"+
                     " or b.gidNumber is null and a.gidNumber = d.gidNumber"+
                     " or d.gidNumber is null and b.gidNumber = c.gidNumber"+

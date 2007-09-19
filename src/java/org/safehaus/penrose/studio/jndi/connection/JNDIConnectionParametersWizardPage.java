@@ -40,7 +40,7 @@ public class JNDIConnectionParametersWizardPage extends WizardPage implements Mo
 
     Table parametersTable;
 
-    Map<String,Object> parameters = new TreeMap<String,Object>();
+    Map<String,String> parameters = new TreeMap<String,String>();
 
     public JNDIConnectionParametersWizardPage() {
         super(NAME);
@@ -112,11 +112,11 @@ public class JNDIConnectionParametersWizardPage extends WizardPage implements Mo
         setPageComplete(validatePage());
     }
 
-    public void setParameters(Map<String,Object> parameters) {
+    public void setParameters(Map<String,String> parameters) {
         this.parameters.putAll(parameters);
     }
 
-    public Map<String,Object> getParameters() {
+    public Map<String,String> getParameters() {
         return parameters;
     }
 

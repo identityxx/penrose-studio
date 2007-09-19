@@ -16,10 +16,12 @@ import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.connection.ConnectionConfig;
 
+import javax.naming.Context;
+
 /**
  * @author Endi S. Dewata
  */
-public class NISDatabasePage extends FormPage {
+public class NISToolPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -28,8 +30,8 @@ public class NISDatabasePage extends FormPage {
     NISEditor editor;
     NISTool nisTool;
 
-    public NISDatabasePage(NISEditor editor, NISTool nisTool) {
-        super(editor, "DATABASE", "  Database  ");
+    public NISToolPage(NISEditor editor, NISTool nisTool) {
+        super(editor, "SETTINGS", "  Settings  ");
 
         this.editor = editor;
         this.nisTool = nisTool;
@@ -39,20 +41,27 @@ public class NISDatabasePage extends FormPage {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Database");
+        form.setText("Settings");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-        Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Database");
-        section.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Section databaseSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        databaseSection.setText("Database");
+        databaseSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Control sourcesSection = createDomainsSection(section);
-        section.setClient(sourcesSection);
+        Control databaseControl = createDatabaseControl(databaseSection);
+        databaseSection.setClient(databaseControl);
+
+        Section ldapSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        ldapSection.setText("LDAP");
+        ldapSection.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        Control ldapControl = createLDAPControl(ldapSection);
+        ldapSection.setClient(ldapControl);
     }
 
-    public Composite createDomainsSection(Composite parent) {
+    public Composite createDatabaseControl(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
@@ -89,6 +98,40 @@ public class NISDatabasePage extends FormPage {
 
         Label suffixText = toolkit.createLabel(composite, "*****");
         suffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        return composite;
+    }
+
+    public Composite createLDAPControl(Composite parent) {
+
+        Composite composite = toolkit.createComposite(parent);
+        composite.setLayout(new GridLayout(2, false));
+
+        Partition partition = nisTool.getNisPartition();
+        Connection connection = partition.getConnection(NISTool.LDAP_CONNECTION_NAME);
+        ConnectionConfig connectionConfig = connection.getConnectionConfig();
+
+        Label urlLabel = toolkit.createLabel(composite, "URL:");
+        GridData gd = new GridData();
+        gd.widthHint = 100;
+        urlLabel.setLayoutData(gd);
+
+        String url = connectionConfig.getParameter(Context.PROVIDER_URL);
+        Label urlText = toolkit.createLabel(composite, url == null ? "" : url);
+        urlText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label bindDnLabel = toolkit.createLabel(composite, "Bind DN:");
+        bindDnLabel.setLayoutData(new GridData());
+
+        String bindDn = connectionConfig.getParameter(Context.SECURITY_PRINCIPAL);
+        Label serverText = toolkit.createLabel(composite, bindDn == null ? "" : bindDn);
+        serverText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label bindPasswordLabel = toolkit.createLabel(composite, "Password:");
+        bindPasswordLabel.setLayoutData(new GridData());
+
+        Label bindPassword = toolkit.createLabel(composite, "*****");
+        bindPassword.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         return composite;
     }

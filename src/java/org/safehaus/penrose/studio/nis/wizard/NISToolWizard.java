@@ -10,6 +10,7 @@ import org.safehaus.penrose.studio.driver.Driver;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.studio.nis.NISTool;
+import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionInfoWizardPage;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.connection.ConnectionConfig;
@@ -32,63 +33,70 @@ public class NISToolWizard extends Wizard {
 
     private Project project;
     private PartitionConfig partitionConfig;
-    private ConnectionConfig connectionConfig;
+    private ConnectionConfig dbConnectionConfig;
+    private ConnectionConfig ldapConnectionConfig;
 
-    public ConnectionDriverPage driverPage;
+    public ConnectionDriverPage dbDriverPage;
     public JDBCConnectionWizardPage jdbcPage;
-    public NISDatabaseWizardPage databasePage;
+    public JNDIConnectionInfoWizardPage ldapPage;
 
     public NISToolWizard() {
         setWindowTitle("NIS Tool");
     }
 
     public boolean canFinish() {
-        if (!driverPage.isPageComplete()) return false;
+        if (!dbDriverPage.isPageComplete()) return false;
         if (!jdbcPage.isPageComplete()) return false;
-        if (!databasePage.isPageComplete()) return false;
+        if (!ldapPage.isPageComplete()) return false;
 
         return true;
     }
 
     public void addPages() {
 
-        driverPage = new ConnectionDriverPage();
-        driverPage.setDescription("Select the type of the database.");
-        driverPage.removeDriver("LDAP");
+        dbDriverPage = new ConnectionDriverPage();
+        dbDriverPage.setDescription("Select the type of the database.");
+        dbDriverPage.removeDriver("LDAP");
 
         jdbcPage = new JDBCConnectionWizardPage();
         jdbcPage.setDescription("Enter database connection parameters.");
-        jdbcPage.setConnectionConfig(connectionConfig);
+        jdbcPage.setConnectionConfig(dbConnectionConfig);
         jdbcPage.setShowDatabase(false);
 
-        databasePage = new NISDatabaseWizardPage();
-
-        addPage(driverPage);
+        ldapPage = new JNDIConnectionInfoWizardPage();
+        ldapPage.setDescription("Enter LDAP connection parameters.");
+        ldapPage.setConnectionConfig(ldapConnectionConfig);
+        
+        addPage(dbDriverPage);
         addPage(jdbcPage);
-        addPage(databasePage);
+        addPage(ldapPage);
     }
 
     public boolean performFinish() {
         try {
-            Map<String,String> parameters = jdbcPage.getParameters();
-            connectionConfig.setParameters(parameters);
-
             Map<String,String> allParameters = jdbcPage.getAllParameters();
             String url = allParameters.get(JDBCClient.URL);
             url = Helper.replace(url, allParameters);
-            connectionConfig.setParameter(JDBCClient.URL, url);
 
-            log.debug("Creating partition "+ NISTool.NIS_PARTITION_NAME+".");
+            Map<String,String> parameters = jdbcPage.getParameters();
+            parameters.put(JDBCClient.URL, url);
+            dbConnectionConfig.setParameters(parameters);
 
-            File sampleDir = new File(project.getWorkDir(), "samples/"+NISTool.NIS_PARTITION_NAME);
-            File partitionDir = new File(project.getWorkDir(), "partitions/"+NISTool.NIS_PARTITION_NAME);
+            Map<String,String> map = ldapConnectionConfig.getParameters();
+            map.putAll(ldapPage.getParameters());
+            ldapConnectionConfig.setParameters(map);
+
+            log.debug("Creating partition "+ NISTool.NIS_TOOL +".");
+
+            File sampleDir = new File(project.getWorkDir(), "samples/"+NISTool.NIS_TOOL);
+            File partitionDir = new File(project.getWorkDir(), "partitions/"+NISTool.NIS_TOOL);
             FileUtil.copy(sampleDir, partitionDir);
 
             PartitionConfigs partitionConfigs = project.getPartitionConfigs();
             partitionConfigs.addPartitionConfig(partitionConfig);
             project.save(partitionConfig);
 
-            log.debug("Initializing partition "+NISTool.NIS_PARTITION_NAME+".");
+            log.debug("Initializing partition "+NISTool.NIS_TOOL +".");
 
             PenroseConfig penroseConfig = project.getPenroseConfig();
             PenroseContext penroseContext = project.getPenroseContext();
@@ -100,18 +108,24 @@ public class NISToolWizard extends Wizard {
 
             Partition partition = partitionFactory.createPartition(partitionConfig);
 
-            if (databasePage.isCreate()) {
-                log.debug("Creating database tables in "+NISTool.NIS_PARTITION_NAME+".");
+            log.debug("Creating database tables in "+NISTool.NIS_TOOL +".");
 
-                Connection connection = partition.getConnection(NISTool.NIS_CONNECTION_NAME);
+            Connection connection = partition.getConnection(NISTool.NIS_CONNECTION_NAME);
 
-                JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
-                JDBCClient client = adapter.getClient();
-                client.createDatabase(NISTool.NIS_PARTITION_NAME);
+            JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
+            JDBCClient client = adapter.getClient();
+            try {
+                client.createDatabase(NISTool.NIS_TOOL);
+            } catch (Exception e) {
+                log.debug(e.getMessage());
+            }
 
-                SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
-                for (SourceConfig sourceConfig : sourceConfigs.getSourceConfigs()) {
+            SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
+            for (SourceConfig sourceConfig : sourceConfigs.getSourceConfigs()) {
+                try {
                     client.createTable(sourceConfig);
+                } catch (Exception e) {
+                    log.debug(e.getMessage());
                 }
             }
 
@@ -125,8 +139,8 @@ public class NISToolWizard extends Wizard {
 
     public IWizardPage getNextPage(IWizardPage page) {
         try {
-            if (page == driverPage) {
-                Driver driver = (Driver)driverPage.getDriver().clone();
+            if (page == dbDriverPage) {
+                Driver driver = (Driver) dbDriverPage.getDriver().clone();
                 driver.removeParameter("database");
                 jdbcPage.setDriver(driver);
             }
@@ -149,12 +163,12 @@ public class NISToolWizard extends Wizard {
         this.project = project;
     }
 
-    public ConnectionConfig getConnectionConfig() {
-        return connectionConfig;
+    public ConnectionConfig getDbConnectionConfig() {
+        return dbConnectionConfig;
     }
 
-    public void setConnectionConfig(ConnectionConfig connectionConfig) {
-        this.connectionConfig = connectionConfig;
+    public void setDbConnectionConfig(ConnectionConfig dbConnectionConfig) {
+        this.dbConnectionConfig = dbConnectionConfig;
     }
 
     public PartitionConfig getPartitionConfig() {
@@ -163,5 +177,13 @@ public class NISToolWizard extends Wizard {
 
     public void setPartitionConfig(PartitionConfig partitionConfig) {
         this.partitionConfig = partitionConfig;
+    }
+
+    public ConnectionConfig getLdapConnectionConfig() {
+        return ldapConnectionConfig;
+    }
+
+    public void setLdapConnectionConfig(ConnectionConfig ldapConnectionConfig) {
+        this.ldapConnectionConfig = ldapConnectionConfig;
     }
 }

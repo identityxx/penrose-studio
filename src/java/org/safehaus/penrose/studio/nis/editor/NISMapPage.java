@@ -36,6 +36,7 @@ import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.scheduler.SchedulerConfig;
 import org.safehaus.penrose.scheduler.JobConfig;
+import org.safehaus.penrose.scheduler.TriggerConfig;
 
 import java.util.*;
 import java.sql.ResultSet;
@@ -43,7 +44,7 @@ import java.sql.ResultSet;
 /**
  * @author Endi S. Dewata
  */
-public class NISCachePage extends FormPage {
+public class NISMapPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -62,8 +63,8 @@ public class NISCachePage extends FormPage {
     Map<String,String> sourceLabels = new TreeMap<String,String>();
     Map<String,Collection<String>> sourceCaches = new TreeMap<String,Collection<String>>();
 
-    public NISCachePage(NISDomainEditor editor) throws Exception {
-        super(editor, "CACHE", "  Cache  ");
+    public NISMapPage(NISDomainEditor editor) throws Exception {
+        super(editor, "MAPS", "  Maps  ");
 
         this.editor = editor;
 
@@ -75,7 +76,6 @@ public class NISCachePage extends FormPage {
         partitionClient = penroseClient.getPartitionClient(domain.getName());
 
         sourceLabels.put("nis_users", "Users");
-        sourceLabels.put("nis_shadow", "Shadows");
         sourceLabels.put("nis_groups", "Groups");
         sourceLabels.put("nis_hosts", "Hosts");
         sourceLabels.put("nis_services", "Services");
@@ -93,6 +93,7 @@ public class NISCachePage extends FormPage {
         PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName());
         SchedulerConfig schedulerConfig = partitionConfig.getSchedulerConfig();
 
+        log.debug("Source caches:");
         for (String sourceName : sourceLabels.keySet()) {
 
             JobConfig jobConfig = schedulerConfig.getJobConfig(sourceName);
@@ -100,11 +101,13 @@ public class NISCachePage extends FormPage {
 
             String target = jobConfig.getParameter("target");
 
-            StringTokenizer st = new StringTokenizer(target, ", ");
+            StringTokenizer st = new StringTokenizer(target, ";, ");
 
             Collection<String> list = new ArrayList<String>();
             while (st.hasMoreTokens()) list.add(st.nextToken());
 
+            log.debug(" - "+sourceName+": "+list);
+            
             sourceCaches.put(sourceName, list);
         }
     }
@@ -113,13 +116,13 @@ public class NISCachePage extends FormPage {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Cache");
+        form.setText("Maps");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
         Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Cache");
+        section.setText("Maps");
         section.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         Control mainSection = createMainSection(section);
@@ -148,6 +151,10 @@ public class NISCachePage extends FormPage {
         TableColumn tc = new TableColumn(table, SWT.NONE);
         tc.setWidth(150);
         tc.setText("Name");
+
+        tc = new TableColumn(table, SWT.NONE);
+        tc.setWidth(150);
+        tc.setText("Schedule");
 
         tc = new TableColumn(table, SWT.NONE);
         tc.setWidth(100);
@@ -380,7 +387,7 @@ public class NISCachePage extends FormPage {
 
             PartitionConfigs partitionConfigs = project.getPartitionConfigs();
             PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName());
-
+            SchedulerConfig schedulerConfig = partitionConfig.getSchedulerConfig();
             SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
 
             for (String sourceName : sourceLabels.keySet()) {
@@ -393,8 +400,14 @@ public class NISCachePage extends FormPage {
                 String cacheName = caches.iterator().next();
                 SourceConfig sourceConfig = sourceConfigs.getSourceConfig(cacheName);
 
+                TriggerConfig triggerConfig = schedulerConfig.getTriggerConfig(sourceName);
+
                 final TableItem ti = new TableItem(table, SWT.NONE);
                 ti.setText(0, label);
+                if (triggerConfig != null) {
+                    String expression = triggerConfig.getParameter("expression");
+                    ti.setText(1, expression == null ? "" : expression);
+                }
                 ti.setData(sourceName);
 
                 try {
@@ -407,7 +420,7 @@ public class NISCachePage extends FormPage {
                         public void add(Object object) throws Exception {
                             ResultSet rs = (ResultSet)object;
                             Integer count = rs.getInt(1);
-                            ti.setText(1, count.toString());
+                            ti.setText(2, count.toString());
                         }
                     };
 
@@ -415,7 +428,7 @@ public class NISCachePage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    ti.setText(1, "N/A");
+                    ti.setText(2, "N/A");
                 }
             }
 

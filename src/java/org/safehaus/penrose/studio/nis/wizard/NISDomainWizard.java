@@ -9,12 +9,7 @@ import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.nis.NISTool;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.SourceClient;
 import org.safehaus.penrose.management.PartitionClient;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.PartitionConfigs;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.source.SourceConfig;
 
 /**
  * @author Endi Sukma Dewata
@@ -25,7 +20,6 @@ public class NISDomainWizard extends Wizard {
 
     NISDomainWizardPage domainPage;
     NISPartitionWizardPage partitionPage;
-    NISDatabaseWizardPage databasePage;
 
     NISTool nisTool;
     Project project;
@@ -38,20 +32,17 @@ public class NISDomainWizard extends Wizard {
 
         domainPage = new NISDomainWizardPage();
         partitionPage = new NISPartitionWizardPage();
-        databasePage = new NISDatabaseWizardPage();
     }
 
     public boolean canFinish() {
         if (!domainPage.isPageComplete()) return false;
         if (!partitionPage.isPageComplete()) return false;
-        if (!databasePage.isPageComplete()) return false;
         return true;
     }
 
     public void addPages() {
         addPage(domainPage);
         addPage(partitionPage);
-        addPage(databasePage);
     }
 
     public IWizardPage getNextPage(IWizardPage page) {
@@ -97,14 +88,12 @@ public class NISDomainWizard extends Wizard {
             return false;
         }
 
-        if (databasePage.isCreate()) {
-            try {
-                nisTool.createDatabase(domain);
+        try {
+            nisTool.createDatabase(domain);
 
-            } catch (Exception e) {
-                MessageDialog.openError(getShell(), "Failed creating database.", e.getMessage());
-                return false;
-            }
+        } catch (Exception e) {
+            MessageDialog.openError(getShell(), "Failed creating database.", e.getMessage());
+            return false;
         }
 
         PenroseClient penroseClient = project.getClient();

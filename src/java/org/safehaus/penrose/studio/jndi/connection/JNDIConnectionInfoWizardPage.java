@@ -28,6 +28,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;
@@ -54,6 +55,8 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
     Text bindDnText;
     Text passwordText;
 
+    private ConnectionConfig connectionConfig;
+
     public JNDIConnectionInfoWizardPage() {
         super(NAME);
         setDescription("Enter connection information.");
@@ -66,13 +69,37 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
 
         composite.setLayout(new GridLayout(4, false));
 
+        String url = connectionConfig.getParameter(Context.PROVIDER_URL);
+
+        int i = url.indexOf("://");
+        String protocol = url.substring(0, i);
+
+        int j = url.indexOf("/", i+3);
+        String hostPort = url.substring(i+3, j);
+
+        int k = hostPort.indexOf(":");
+        String hostname, port;
+        if (k < 0) {
+            hostname = hostPort;
+            port = "389";
+        } else {
+            hostname = hostPort.substring(0, k);
+            port = hostPort.substring(k+1);
+        }
+
+        String baseDn = url.substring(j+1);
+
+        String bindDn = connectionConfig.getParameter(Context.SECURITY_PRINCIPAL);
+        String bindPassword = connectionConfig.getParameter(Context.SECURITY_CREDENTIALS);
+
         Label protocolLabel = new Label(composite, SWT.NONE);
         protocolLabel.setText("Protocol:");
 
         protocolCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
         protocolCombo.add("ldap");
         protocolCombo.add("ldaps");
-        protocolCombo.select(0);
+        protocolCombo.setText(protocol);
+
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 3;
         protocolCombo.setLayoutData(gd);
@@ -82,7 +109,7 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
         hostLabel.setText("Host:");
 
         hostText = new Text(composite, SWT.BORDER);
-        hostText.setText("localhost");
+        hostText.setText(hostname);
         gd = new GridData(GridData.FILL_HORIZONTAL);
         hostText.setLayoutData(gd);
         hostText.addModifyListener(this);
@@ -94,7 +121,7 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
         portLabel.setLayoutData(gd);
 
         portText = new Text(composite, SWT.BORDER);
-        portText.setText("389");
+        portText.setText(port);
         gd = new GridData();
         gd.widthHint = 50;
         portText.setLayoutData(gd);
@@ -104,6 +131,8 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
         suffixLabel.setText("Suffix:");
 
         suffixCombo = new Combo(composite, SWT.BORDER);
+        if (baseDn != null) suffixCombo.setText(baseDn);
+
         gd = new GridData(GridData.FILL_HORIZONTAL);
         suffixCombo.setLayoutData(gd);
 
@@ -146,6 +175,7 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
         bindDnLabel.setText("Bind DN:");
 
         bindDnText = new Text(composite, SWT.BORDER);
+        bindDnText.setText(bindDn);
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 3;
         bindDnText.setLayoutData(gd);
@@ -156,7 +186,8 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
         passwordLabel.setText("Password:");
 
         passwordText = new Text(composite, SWT.BORDER  | SWT.PASSWORD);
-		
+        passwordText.setText(bindPassword);
+
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 3;
         passwordText.setLayoutData(gd);
@@ -248,11 +279,28 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
 
     public boolean validatePage() {
         if ("".equals(getHost())) return false;
-        if ("".equals(getSuffix())) return false;
         return true;
+    }
+
+    public Map<String,String> getParameters() {
+        Map<String,String> map = new HashMap<String,String>();
+
+        map.put(Context.PROVIDER_URL, getURL()+"/"+getSuffix());
+        map.put(Context.SECURITY_PRINCIPAL, getBindDN());
+        map.put(Context.SECURITY_CREDENTIALS, getPassword());
+
+        return map;
     }
 
     public void modifyText(ModifyEvent event) {
         setPageComplete(validatePage());
+    }
+
+    public ConnectionConfig getConnectionConfig() {
+        return connectionConfig;
+    }
+
+    public void setConnectionConfig(ConnectionConfig connectionConfig) {
+        this.connectionConfig = connectionConfig;
     }
 }

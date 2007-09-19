@@ -47,7 +47,7 @@ public class CreateLDAPSnapshotWizard extends Wizard {
     public JNDIConnectionParametersWizardPage connectionParametersPage = new JNDIConnectionParametersWizardPage();
 
     public CreateLDAPSnapshotWizard() {
-        Map parameters = new TreeMap();
+        Map<String,String> parameters = new TreeMap<String,String>();
         parameters.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         connectionParametersPage.setParameters(parameters);
         setWindowTitle("Create LDAP Snapshot");

@@ -58,7 +58,7 @@ public class ConnectionWizard extends Wizard {
         this.partitionConfig = partitionConfig;
         setWindowTitle("New Connection");
 
-        Map<String,Object> parameters = new TreeMap<String,Object>();
+        Map<String,String> parameters = new TreeMap<String,String>();
         parameters.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         jndiParametersPage.setParameters(parameters);
 
@@ -143,25 +143,18 @@ public class ConnectionWizard extends Wizard {
 
             if ("JDBC".equals(adapterName)) {
 
-                Map<String,String> parameters = jdbcPage.getParameters();
-                connectionConfig.setParameters(parameters);
-
                 Map<String,String> allParameters = jdbcPage.getAllParameters();
                 String url = allParameters.get(JDBCClient.URL);
                 url = Helper.replace(url, allParameters);
-                connectionConfig.setParameter(JDBCClient.URL, url);
+
+                Map<String,String> parameters = jdbcPage.getParameters();
+                parameters.put(JDBCClient.URL, url);
+                connectionConfig.setParameters(parameters);
 
             } else if ("LDAP".equals(adapterName)) {
-                connectionConfig.setParameter(InitialContext.PROVIDER_URL, jndiInfoPage.getURL()+"/"+jndiInfoPage.getSuffix());
-                connectionConfig.setParameter(InitialContext.SECURITY_PRINCIPAL, jndiInfoPage.getBindDN());
-                connectionConfig.setParameter(InitialContext.SECURITY_CREDENTIALS, jndiInfoPage.getPassword());
-
-                Map<String,Object> parameters = jndiParametersPage.getParameters();
-                for (String paramName : parameters.keySet()) {
-                    String paramValue = (String) parameters.get(paramName);
-
-                    connectionConfig.setParameter(paramName, paramValue);
-                }
+                Map<String,String> parameters = jndiInfoPage.getParameters();
+                parameters.putAll(jndiParametersPage.getParameters());
+                connectionConfig.setParameters(parameters);
             }
 
             ConnectionConfigs connectionConfigs = partitionConfig.getConnectionConfigs();

@@ -7,7 +7,6 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.nis.wizard.NISDomainWizard;
 import org.safehaus.penrose.studio.nis.wizard.NISToolWizard;
 import org.safehaus.penrose.studio.nis.editor.NISEditorInput;
 import org.safehaus.penrose.studio.nis.editor.NISEditor;
@@ -16,7 +15,6 @@ import org.safehaus.penrose.studio.nis.event.NISEvent;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.connection.ConnectionConfigs;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.eclipse.swt.graphics.Image;
@@ -88,13 +86,13 @@ public class NISNode extends Node {
         PartitionConfigs partitionConfigs = project.getPartitionConfigs();
 
         File workDir = project.getWorkDir();
-        File sampleDir = new File(workDir, "samples/"+NISTool.NIS_PARTITION_NAME);
+        File sampleDir = new File(workDir, "samples/"+NISTool.NIS_TOOL);
 
         if (!sampleDir.exists()) {
-            project.download("samples/"+NISTool.NIS_PARTITION_NAME);
+            project.download("samples/"+NISTool.NIS_TOOL);
         }
 
-        if (partitionConfigs.getPartitionConfig(NISTool.NIS_PARTITION_NAME) == null) {
+        if (partitionConfigs.getPartitionConfig(NISTool.NIS_TOOL) == null) {
             boolean b = createNisPartition();
             if (!b) return;
         }
@@ -127,16 +125,18 @@ public class NISNode extends Node {
 
         File workDir = project.getWorkDir();
 
-        File sampleDir = new File(workDir, "samples/"+NISTool.NIS_PARTITION_NAME);
+        File sampleDir = new File(workDir, "samples/"+NISTool.NIS_TOOL);
         PartitionConfig partitionConfig = partitionConfigs.load(sampleDir);
 
         ConnectionConfigs connectionConfigs = partitionConfig.getConnectionConfigs();
-        ConnectionConfig connectionConfig = connectionConfigs.getConnectionConfig(NISTool.NIS_CONNECTION_NAME);
+        ConnectionConfig nisToolConnectionConfig = connectionConfigs.getConnectionConfig(NISTool.NIS_CONNECTION_NAME);
+        ConnectionConfig ldapConnectionConfig = connectionConfigs.getConnectionConfig(NISTool.LDAP_CONNECTION_NAME);
 
         NISToolWizard wizard = new NISToolWizard();
         wizard.setProject(project);
         wizard.setPartitionConfig(partitionConfig);
-        wizard.setConnectionConfig(connectionConfig);
+        wizard.setDbConnectionConfig(nisToolConnectionConfig);
+        wizard.setLdapConnectionConfig(ldapConnectionConfig);
 
         WizardDialog dialog = new WizardDialog(view.getSite().getShell(), wizard);
         dialog.setPageSize(600, 300);
@@ -197,7 +197,7 @@ public class NISNode extends Node {
         Project project = projectNode.getProject();
         PartitionConfigs partitionConfigs = project.getPartitionConfigs();
 
-        return (partitionConfigs.getPartitionConfig(NISTool.NIS_PARTITION_NAME) != null);
+        return (partitionConfigs.getPartitionConfig(NISTool.NIS_TOOL) != null);
     }
 
     public Collection<Node> getChildren() throws Exception {
