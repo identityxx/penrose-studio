@@ -274,7 +274,8 @@ public class NISMapPage extends FormPage {
                     SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
 
                     for (TableItem item : table.getSelection()) {
-                        String sourceName = (String)item.getData();
+                        TriggerConfig triggerConfig = (TriggerConfig)item.getData();
+                        String sourceName = triggerConfig.getName();
 
                         try {
                             JobClient jobClient = schedulerClient.getJobClient(sourceName);
@@ -314,7 +315,8 @@ public class NISMapPage extends FormPage {
                     SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
 
                     for (TableItem item : table.getSelection()) {
-                        String sourceName = (String)item.getData();
+                        TriggerConfig triggerConfig = (TriggerConfig)item.getData();
+                        String sourceName = triggerConfig.getName();
 
                         try {
                             JobClient jobClient = schedulerClient.getJobClient(sourceName);
@@ -354,7 +356,8 @@ public class NISMapPage extends FormPage {
                     SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
 
                     for (TableItem item : table.getSelection()) {
-                        String sourceName = (String)item.getData();
+                        TriggerConfig triggerConfig = (TriggerConfig)item.getData();
+                        String sourceName = triggerConfig.getName();
 
                         try {
                             JobClient jobClient = schedulerClient.getJobClient(sourceName);
@@ -394,7 +397,8 @@ public class NISMapPage extends FormPage {
                     SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
 
                     for (TableItem item : table.getSelection()) {
-                        String sourceName = (String)item.getData();
+                        TriggerConfig triggerConfig = (TriggerConfig)item.getData();
+                        String sourceName = triggerConfig.getName();
 
                         try {
                             JobClient jobClient = schedulerClient.getJobClient(sourceName);
