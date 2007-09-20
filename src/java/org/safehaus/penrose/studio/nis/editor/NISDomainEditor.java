@@ -32,6 +32,7 @@ public class NISDomainEditor extends FormEditor {
             addPage(new NISDomainMainPage(this));
             addPage(new NISMapPage(this));
             addPage(new NISTablesPage(this));
+            addPage(new NISLDAPSubtreePage(this));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

@@ -307,6 +307,47 @@ public class NISMapPage extends FormPage {
             }
         });
 
+        Button loadButton = new Button(rightPanel, SWT.PUSH);
+        loadButton.setText("Load");
+        loadButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        loadButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    if (table.getSelectionCount() == 0) return;
+
+                    boolean confirm = MessageDialog.openQuestion(
+                            editor.getSite().getShell(),
+                            "Loading Cache",
+                            "Are you sure?"
+                    );
+
+                    if (!confirm) return;
+
+                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
+
+                    for (TableItem item : table.getSelection()) {
+                        TriggerConfig triggerConfig = (TriggerConfig)item.getData();
+                        String sourceName = triggerConfig.getName();
+
+                        try {
+                            JobClient jobClient = schedulerClient.getJobClient(sourceName);
+                            jobClient.invoke("load", new Object[] {}, new String[] {});
+
+                        } catch (Exception e) {
+                            log.error(e.getMessage(), e);
+                        }
+                    }
+
+                    refresh();
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                }
+            }
+        });
+
         Button updateButton = new Button(rightPanel, SWT.PUSH);
         updateButton.setText("Update");
         updateButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));

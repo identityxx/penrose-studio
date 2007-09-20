@@ -19,30 +19,26 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.nis.NISTool;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.Partitions;
-import org.safehaus.penrose.source.Source;
+import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.ldap.*;
+import org.safehaus.penrose.nis.NISDomain;
+import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.PartitionClient;
 import org.safehaus.penrose.management.SchedulerClient;
 import org.safehaus.penrose.management.JobClient;
-import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
-import org.safehaus.penrose.jdbc.JDBCClient;
-import org.safehaus.penrose.jdbc.QueryResponse;
+import org.safehaus.penrose.directory.Directory;
+import org.safehaus.penrose.directory.Entry;
 
-import java.util.ArrayList;
-import java.sql.ResultSet;
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
  */
-public class NISLDAPPage extends FormPage {
+public class NISLDAPSubtreePage extends FormPage {
 
     public DateFormat df = new SimpleDateFormat("yyyy-MM-DD HH:mm:ss");
 
@@ -50,16 +46,18 @@ public class NISLDAPPage extends FormPage {
 
     FormToolkit toolkit;
 
-    NISEditor editor;
+    NISDomainEditor editor;
     NISTool nisTool;
+    NISDomain domain;
 
     Table table;
 
-    public NISLDAPPage(NISEditor editor, NISTool nisTool) {
+    public NISLDAPSubtreePage(NISDomainEditor editor) {
         super(editor, "LDAP", "  LDAP  ");
 
         this.editor = editor;
-        this.nisTool = nisTool;
+        this.nisTool = editor.getNisTool();
+        this.domain = editor.getDomain();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -102,14 +100,6 @@ public class NISLDAPPage extends FormPage {
         tc = new TableColumn(table, SWT.NONE);
         tc.setWidth(100);
         tc.setText("Status");
-
-        tc = new TableColumn(table, SWT.NONE);
-        tc.setWidth(150);
-        tc.setText("Last Change Number");
-
-        tc = new TableColumn(table, SWT.NONE);
-        tc.setWidth(150);
-        tc.setText("Last Updated");
 
         Composite links = toolkit.createComposite(leftPanel);
         links.setLayout(new RowLayout());
@@ -158,17 +148,17 @@ public class NISLDAPPage extends FormPage {
                     TableItem[] items = table.getSelection();
 
                     Partitions partitions = nisTool.getPartitions();
+                    Partition partition = partitions.getPartition(domain.getName());
+                    final Source penrose = partition.getSource("Penrose");
+                    final Source ldap = partition.getSource("LDAP");
 
                     for (TableItem ti : items) {
-                        NISDomain domain = (NISDomain)ti.getData();
-
-                        Partition partition = partitions.getPartition(domain.getName());
-
-                        final Source penrose = partition.getSource("Penrose");
-                        final Source ldap = partition.getSource("LDAP");
+                        Entry entry = (Entry)ti.getData();
 
                         try {
                             SearchRequest request = new SearchRequest();
+                            request.setDn(entry.getDn().getRdn());
+
                             SearchResponse response = new SearchResponse() {
                                 public void add(SearchResult result) throws Exception {
 
@@ -263,17 +253,18 @@ public class NISLDAPPage extends FormPage {
                     TableItem[] items = table.getSelection();
 
                     Partitions partitions = nisTool.getPartitions();
+                    Partition partition = partitions.getPartition(domain.getName());
+                    final Source ldap = partition.getSource("LDAP");
 
                     for (TableItem ti : items) {
-                        NISDomain domain = (NISDomain)ti.getData();
-
-                        Partition partition = partitions.getPartition(domain.getName());
+                        Entry entry = (Entry)ti.getData();
 
                         final ArrayList<DN> dns = new ArrayList<DN>();
-                        final Source ldap = partition.getSource("LDAP");
 
                         try {
                             SearchRequest request = new SearchRequest();
+                            request.setDn(entry.getDn().getRdn());
+                            
                             SearchResponse response = new SearchResponse() {
                                 public void add(SearchResult result) throws Exception {
                                     dns.add(result.getDn());
@@ -326,64 +317,40 @@ public class NISLDAPPage extends FormPage {
             table.removeAll();
 
             Partitions partitions = nisTool.getPartitions();
+            Partition partition = partitions.getPartition(domain.getName());
+            Directory directory = partition.getDirectory();
+            Entry entry = directory.getRootEntries().iterator().next();
 
-            for (NISDomain domain : nisTool.getNisDomains().values()) {
-                Partition partition = partitions.getPartition(domain.getName());
+            for (Entry child : entry.getChildren()) {
                 Source ldap = partition.getSource("LDAP");
 
                 boolean exists;
 
                 try {
                     SearchRequest request = new SearchRequest();
+                    request.setDn(child.getDn().getRdn());
                     request.setScope(SearchRequest.SCOPE_BASE);
-                    
+
                     SearchResponse response = new SearchResponse();
 
                     ldap.search(request, response);
 
                     exists = response.hasNext();
-                    
+
                 } catch (Exception e) {
                     exists = false;
                 }
 
-                Source tracker = partition.getSource("tracker");
-                Connection connection = tracker.getConnection();
-                JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
-                JDBCClient client = adapter.getClient();
-
-                QueryResponse response = new QueryResponse() {
-                    public void add(Object object) throws Exception {
-                        ResultSet rs = (ResultSet)object;
-                        super.add(new Object[] { rs.getObject(1), rs.getTimestamp(2) });
-                    }
-                };
-
-                client.executeQuery(
-                        "select max(changeNumber), max(changeTimestamp) from "+client.getTableName(tracker), response
-                );
-
-                String lastChangeNumber;
-                String lastChangeTimestamp;
-
-                if (response.hasNext()) {
-                    Object[] objects = (Object[])response.next();
-                    lastChangeNumber = objects[0] == null ? "" : ""+objects[0];
-                    lastChangeTimestamp = objects[1] == null ? "" : df.format((Timestamp)objects[1]);
-
-                } else {
-                    lastChangeNumber = "";
-                    lastChangeTimestamp = "";
-                }
-
                 TableItem ti = new TableItem(table, SWT.NONE);
 
-                ti.setText(0, domain.getName());
-                ti.setText(1, exists ? "OK" : "Missing");
-                ti.setText(2, lastChangeNumber);
-                ti.setText(3, lastChangeTimestamp);
+                DN dn = child.getDn();
+                RDN rdn = dn.getRdn();
+                String label = (String)rdn.get("ou");
 
-                ti.setData(domain);
+                ti.setText(0, label);
+                ti.setText(1, exists ? "OK" : "Missing");
+
+                ti.setData(child);
             }
 
             table.select(indices);
