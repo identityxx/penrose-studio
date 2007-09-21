@@ -141,15 +141,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/mx4j-tools.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/xercesImpl-2.8.0.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -169,15 +160,6 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/hibernate3.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/mx4j.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
