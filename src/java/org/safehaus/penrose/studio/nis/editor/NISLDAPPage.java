@@ -201,48 +201,6 @@ public class NISLDAPPage extends FormPage {
             }
         });
 
-        Button updateButton = new Button(rightPanel, SWT.PUSH);
-        updateButton.setText("Update");
-        updateButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        updateButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                try {
-                    if (table.getSelectionCount() == 0) return;
-
-                    boolean confirm = MessageDialog.openQuestion(
-                            editor.getSite().getShell(),
-                            "Creating LDAP",
-                            "Are you sure?"
-                    );
-
-                    if (!confirm) return;
-
-                    TableItem[] items = table.getSelection();
-
-                    PenroseClient client = nisTool.getProject().getClient();
-
-                    for (TableItem ti : items) {
-                        NISDomain domain = (NISDomain)ti.getData();
-
-                        PartitionClient partitionClient = client.getPartitionClient(domain.getName());
-                        SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
-                        JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
-                        jobClient.invoke("execute", new Object[] {}, new String[] {});
-                    }
-
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
-                }
-
-                refresh();
-            }
-        });
-
         Button clearButton = new Button(rightPanel, SWT.PUSH);
         clearButton.setText("Clear");
         clearButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -290,6 +248,50 @@ public class NISLDAPPage extends FormPage {
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
                         }
+                    }
+
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    penroseStudio.notifyChangeListeners();
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                }
+
+                refresh();
+            }
+        });
+
+        new Label(rightPanel, SWT.NONE);
+
+        Button synchronizeButton = new Button(rightPanel, SWT.PUSH);
+        synchronizeButton.setText("Synchronize");
+        synchronizeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        synchronizeButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    if (table.getSelectionCount() == 0) return;
+
+                    boolean confirm = MessageDialog.openQuestion(
+                            editor.getSite().getShell(),
+                            "Creating LDAP",
+                            "Are you sure?"
+                    );
+
+                    if (!confirm) return;
+
+                    TableItem[] items = table.getSelection();
+
+                    PenroseClient client = nisTool.getProject().getClient();
+
+                    for (TableItem ti : items) {
+                        NISDomain domain = (NISDomain)ti.getData();
+
+                        PartitionClient partitionClient = client.getPartitionClient(domain.getName());
+                        SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
+                        JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
+                        jobClient.invoke("synchronize", new Object[] {}, new String[] {});
                     }
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();

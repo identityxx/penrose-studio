@@ -335,47 +335,6 @@ public class NISDomainDatabasePage extends FormPage {
             }
         });
 
-        Button updateButton = new Button(rightPanel, SWT.PUSH);
-        updateButton.setText("Update");
-        updateButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        updateButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                try {
-                    if (table.getSelectionCount() == 0) return;
-
-                    boolean confirm = MessageDialog.openQuestion(
-                            editor.getSite().getShell(),
-                            "Updating Cache",
-                            "Are you sure?"
-                    );
-
-                    if (!confirm) return;
-
-                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
-
-                    for (TableItem item : table.getSelection()) {
-                        TriggerConfig triggerConfig = (TriggerConfig)item.getData();
-                        String sourceName = triggerConfig.getName();
-
-                        try {
-                            JobClient jobClient = schedulerClient.getJobClient(sourceName);
-                            jobClient.invoke("update", new Object[] {}, new String[] {});
-                            
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-                    }
-
-                    refresh();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
-                }
-            }
-        });
-
         Button clearButton = new Button(rightPanel, SWT.PUSH);
         clearButton.setText("Clear");
         clearButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -443,6 +402,49 @@ public class NISDomainDatabasePage extends FormPage {
                         try {
                             JobClient jobClient = schedulerClient.getJobClient(sourceName);
                             jobClient.invoke("drop", new Object[] {}, new String[] {});
+
+                        } catch (Exception e) {
+                            log.error(e.getMessage(), e);
+                        }
+                    }
+
+                    refresh();
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                }
+            }
+        });
+
+        new Label(rightPanel, SWT.NONE);
+
+        Button synchronizeButton = new Button(rightPanel, SWT.PUSH);
+        synchronizeButton.setText("Synchronize");
+        synchronizeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        synchronizeButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    if (table.getSelectionCount() == 0) return;
+
+                    boolean confirm = MessageDialog.openQuestion(
+                            editor.getSite().getShell(),
+                            "Updating Cache",
+                            "Are you sure?"
+                    );
+
+                    if (!confirm) return;
+
+                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
+
+                    for (TableItem item : table.getSelection()) {
+                        TriggerConfig triggerConfig = (TriggerConfig)item.getData();
+                        String sourceName = triggerConfig.getName();
+
+                        try {
+                            JobClient jobClient = schedulerClient.getJobClient(sourceName);
+                            jobClient.invoke("synchronize", new Object[] {}, new String[] {});
 
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);

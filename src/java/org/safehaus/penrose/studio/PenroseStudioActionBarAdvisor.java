@@ -71,7 +71,6 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
     ConsoleAction consoleAction;
 
     BrowserAction browserAction;
-    PreviewAction previewAction;
     RestartAction restartAction;
 
     WelcomeAction welcomeAction;
@@ -126,7 +125,6 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
             consoleAction = new ConsoleAction();
 
             browserAction = new BrowserAction();
-            previewAction = new PreviewAction();
             restartAction = new RestartAction();
 
             welcomeAction = new WelcomeAction();
@@ -209,7 +207,6 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
             MenuManager toolsMenu = new MenuManager("&Tools", "tools");
             menuBar.add(toolsMenu);
 
-            toolsMenu.add(previewAction);
             toolsMenu.add(browserAction);
 
             MenuManager windowMenu = new MenuManager("&Window", "window");
@@ -252,7 +249,6 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
             IToolBarManager previewToolBar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
             coolBar.add(new ToolBarContributionItem(previewToolBar, "preview"));
 
-            previewToolBar.add(new ActionContributionItem(previewAction));
             previewToolBar.add(new ActionContributionItem(browserAction));
 
         } catch (Exception e) {

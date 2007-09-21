@@ -4,7 +4,10 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.forms.events.HyperlinkAdapter;
+import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
@@ -123,8 +126,6 @@ public class NISDomainLDAPPage extends FormPage {
         createBaseButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
-                    if (ldapTable.getSelectionCount() == 0) return;
-
                     boolean confirm = MessageDialog.openQuestion(
                             editor.getSite().getShell(),
                             "Creating base LDAP entry",
@@ -132,8 +133,6 @@ public class NISDomainLDAPPage extends FormPage {
                     );
 
                     if (!confirm) return;
-
-                    TableItem[] items = ldapTable.getSelection();
 
                     Project project = nisTool.getProject();
                     PenroseClient client = project.getClient();
@@ -167,8 +166,6 @@ public class NISDomainLDAPPage extends FormPage {
         removeBaseButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
-                    if (ldapTable.getSelectionCount() == 0) return;
-
                     boolean confirm = MessageDialog.openQuestion(
                             editor.getSite().getShell(),
                             "Removing base LDAP entry",
@@ -176,8 +173,6 @@ public class NISDomainLDAPPage extends FormPage {
                     );
 
                     if (!confirm) return;
-
-                    TableItem[] items = ldapTable.getSelection();
 
                     Project project = nisTool.getProject();
                     PenroseClient client = project.getClient();
@@ -426,6 +421,22 @@ public class NISDomainLDAPPage extends FormPage {
         refreshButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 refreshLDAP();
+            }
+        });
+
+        Hyperlink selectAllLink = toolkit.createHyperlink(rightPanel, "Select All", SWT.NONE);
+
+        selectAllLink.addHyperlinkListener(new HyperlinkAdapter() {
+            public void linkActivated(HyperlinkEvent event) {
+                ldapTable.selectAll();
+            }
+        });
+
+        Hyperlink selectNoneLink = toolkit.createHyperlink(rightPanel, "Select None", SWT.NONE);
+
+        selectNoneLink.addHyperlinkListener(new HyperlinkAdapter() {
+            public void linkActivated(HyperlinkEvent event) {
+                ldapTable.deselectAll();
             }
         });
 
