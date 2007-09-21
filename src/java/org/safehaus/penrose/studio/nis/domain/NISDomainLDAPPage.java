@@ -144,28 +144,17 @@ public class NISDomainLDAPPage extends FormPage {
                     for (TableItem ti : items) {
                         Entry entry = (Entry)ti.getData();
 
-                        try {
-                            SearchRequest request = new SearchRequest();
-                            request.setDn(entry.getDn().getRdn());
+                        SearchRequest request = new SearchRequest();
+                        request.setDn(entry.getDn().getRdn());
 
-                            SearchResponse response = new SearchResponse() {
-                                public void add(SearchResult result) throws Exception {
+                        SearchResponse response = new SearchResponse() {
+                            public void add(SearchResult result) throws Exception {
+                                log.debug("Adding "+result.getDn());
+                                ldap.add(result.getDn(), result.getAttributes());
+                            }
+                        };
 
-                                    log.debug("Adding "+result.getDn());
-
-                                    try {
-                                        ldap.add(result.getDn(), result.getAttributes());
-                                    } catch (Exception e) {
-                                        log.error(e.getMessage());
-                                    }
-                                }
-                            };
-
-                            penrose.search(request, response);
-
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
+                        penrose.search(request, response);
                     }
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -208,25 +197,20 @@ public class NISDomainLDAPPage extends FormPage {
 
                         final ArrayList<DN> dns = new ArrayList<DN>();
 
-                        try {
-                            SearchRequest request = new SearchRequest();
-                            request.setDn(entry.getDn().getRdn());
-                            
-                            SearchResponse response = new SearchResponse() {
-                                public void add(SearchResult result) throws Exception {
-                                    dns.add(result.getDn());
-                                }
-                            };
+                        SearchRequest request = new SearchRequest();
+                        request.setDn(entry.getDn().getRdn());
 
-                            ldap.search(request, response);
-
-                            for (int i=dns.size()-1; i>=0; i--) {
-                                DN dn = dns.get(i);
-                                ldap.delete(dn);
+                        SearchResponse response = new SearchResponse() {
+                            public void add(SearchResult result) throws Exception {
+                                dns.add(result.getDn());
                             }
+                        };
 
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
+                        ldap.search(request, response);
+
+                        for (int i=dns.size()-1; i>=0; i--) {
+                            DN dn = dns.get(i);
+                            ldap.delete(dn);
                         }
                     }
 
@@ -340,10 +324,6 @@ public class NISDomainLDAPPage extends FormPage {
 
                     TableItem[] items = trackerTable.getSelection();
 
-                    //Partitions partitions = nisTool.getPartitions();
-                    //Partition partition = partitions.getPartition(domain.getName());
-                    //Source tracker = partition.getSource("tracker");
-
                     Project project = nisTool.getProject();
                     PenroseClient client = project.getClient();
                     PartitionClient partitionClient = client.getPartitionClient(domain.getName());
@@ -356,13 +336,7 @@ public class NISDomainLDAPPage extends FormPage {
                         Attributes attributes = searchResult.getAttributes();
                         Long changeNumber = Long.parseLong(attributes.getValue("changeNumber").toString());
 
-                        try {
-                            jobClient.invoke("removeTracker", new Object[] { changeNumber }, new String[] { Long.class.getName() });
-                            //tracker.delete(searchResult.getDn());
-
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
+                        jobClient.invoke("removeTracker", new Object[] { changeNumber }, new String[] { Long.class.getName() });
                     }
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
