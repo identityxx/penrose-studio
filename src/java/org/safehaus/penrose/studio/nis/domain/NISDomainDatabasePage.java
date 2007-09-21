@@ -25,7 +25,6 @@ import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.studio.nis.NISTool;
-import org.safehaus.penrose.studio.nis.domain.NISDomainEditor;
 import org.safehaus.penrose.studio.nis.dialog.NISUserDialog;
 import org.safehaus.penrose.studio.nis.dialog.NISScheduleDialog;
 import org.safehaus.penrose.studio.project.Project;
@@ -62,7 +61,6 @@ public class NISDomainDatabasePage extends FormPage {
     PenroseClient penroseClient;
     PartitionClient partitionClient;
 
-    Map<String,String> sourceLabels = new TreeMap<String,String>();
     Map<String,Collection<String>> sourceCaches = new TreeMap<String,Collection<String>>();
 
     public NISDomainDatabasePage(NISDomainEditor editor) throws Exception {
@@ -77,26 +75,12 @@ public class NISDomainDatabasePage extends FormPage {
         penroseClient = project.getClient();
         partitionClient = penroseClient.getPartitionClient(domain.getName());
 
-        sourceLabels.put("nis_users", "Users");
-        sourceLabels.put("nis_groups", "Groups");
-        sourceLabels.put("nis_hosts", "Hosts");
-        sourceLabels.put("nis_services", "Services");
-        sourceLabels.put("nis_rpcs", "RPCs");
-        sourceLabels.put("nis_netids", "NetIDs");
-        sourceLabels.put("nis_protocols", "Protocols");
-        sourceLabels.put("nis_aliases", "Aliases");
-        sourceLabels.put("nis_netgroups", "Netgroups");
-        sourceLabels.put("nis_ethers", "Ethernets");
-        sourceLabels.put("nis_bootparams", "BootParams");
-        sourceLabels.put("nis_networks", "Networks");
-        sourceLabels.put("nis_automounts", "Automounts");
-
         PartitionConfigs partitionConfigs = project.getPartitionConfigs();
         PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName());
         SchedulerConfig schedulerConfig = partitionConfig.getSchedulerConfig();
 
         log.debug("Source caches:");
-        for (String sourceName : sourceLabels.keySet()) {
+        for (String sourceName : nisTool.getSourceNames()) {
 
             JobConfig jobConfig = schedulerConfig.getJobConfig(sourceName);
             if (jobConfig == null) continue;
@@ -505,8 +489,8 @@ public class NISDomainDatabasePage extends FormPage {
             SchedulerConfig schedulerConfig = partitionConfig.getSchedulerConfig();
             SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
 
-            for (String sourceName : sourceLabels.keySet()) {
-                String label = sourceLabels.get(sourceName);
+            for (String sourceName : nisTool.getSourceNames()) {
+                String label = nisTool.getSourceLabel(sourceName);
                 log.debug("Checking cache for "+label+" ("+sourceName+").");
 
                 Collection<String> caches = sourceCaches.get(sourceName);

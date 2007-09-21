@@ -52,7 +52,7 @@ public class NISTool {
     protected Partition nisPartition;
 
     protected Source domains;
-    private Source schedules;
+    protected Source schedules;
     protected Source actions;
     protected Source hosts;
     protected Source files;
@@ -66,7 +66,22 @@ public class NISTool {
 
     protected Collection<NISEventListener> listeners = new ArrayList<NISEventListener>();
 
+    Map<String,String> sourceLabels = new TreeMap<String,String>();
+
     public NISTool() {
+        sourceLabels.put("nis_users", "Users");
+        sourceLabels.put("nis_groups", "Groups");
+        sourceLabels.put("nis_hosts", "Hosts");
+        sourceLabels.put("nis_services", "Services");
+        sourceLabels.put("nis_rpcs", "RPCs");
+        sourceLabels.put("nis_netids", "NetIDs");
+        sourceLabels.put("nis_protocols", "Protocols");
+        sourceLabels.put("nis_aliases", "Aliases");
+        sourceLabels.put("nis_netgroups", "Netgroups");
+        sourceLabels.put("nis_ethers", "Ethers");
+        sourceLabels.put("nis_bootparams", "BootParams");
+        sourceLabels.put("nis_networks", "Networks");
+        sourceLabels.put("nis_automounts", "Automounts");
     }
 
     public void init(Project project) throws Exception {
@@ -590,5 +605,13 @@ public class NISTool {
 
     public void setSchedules(Source schedules) {
         this.schedules = schedules;
+    }
+
+    public Collection<String> getSourceNames() {
+        return sourceLabels.keySet();
+    }
+
+    public String getSourceLabel(String sourceName) {
+        return sourceLabels.get(sourceName);
     }
 }

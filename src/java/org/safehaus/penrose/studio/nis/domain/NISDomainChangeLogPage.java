@@ -93,11 +93,11 @@ public class NISDomainChangeLogPage extends FormPage {
         tc.setText("Number");
 
         tc = new TableColumn(table, SWT.NONE);
-        tc.setWidth(300);
+        tc.setWidth(350);
         tc.setText("Target DN");
 
         tc = new TableColumn(table, SWT.NONE);
-        tc.setWidth(100);
+        tc.setWidth(50);
         tc.setText("Type");
 
         table.addSelectionListener(new SelectionAdapter() {

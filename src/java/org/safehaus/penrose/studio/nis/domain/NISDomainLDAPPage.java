@@ -107,7 +107,7 @@ public class NISDomainLDAPPage extends FormPage {
 
         tc = new TableColumn(ldapTable, SWT.NONE);
         tc.setWidth(100);
-        tc.setText("Status");
+        tc.setText("Entries");
 
         Composite rightPanel = toolkit.createComposite(composite);
         rightPanel.setLayout(new GridLayout());
@@ -116,18 +116,18 @@ public class NISDomainLDAPPage extends FormPage {
         gd.widthHint = 120;
         rightPanel.setLayoutData(gd);
 
-        Button loadButton = new Button(rightPanel, SWT.PUSH);
-        loadButton.setText("Load");
-        loadButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Button createBaseButton = new Button(rightPanel, SWT.PUSH);
+        createBaseButton.setText("Create Base");
+        createBaseButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        loadButton.addSelectionListener(new SelectionAdapter() {
+        createBaseButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
                     if (ldapTable.getSelectionCount() == 0) return;
 
                     boolean confirm = MessageDialog.openQuestion(
                             editor.getSite().getShell(),
-                            "Creating LDAP Entries",
+                            "Creating base LDAP entry",
                             "Are you sure?"
                     );
 
@@ -141,13 +141,222 @@ public class NISDomainLDAPPage extends FormPage {
                     SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
                     JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
 
+                    Partitions partitions = nisTool.getPartitions();
+                    Partition partition = partitions.getPartition(domain.getName());
+
+                    Directory directory = partition.getDirectory();
+                    Entry suffix = directory.getRootEntries().iterator().next();
+
+                    jobClient.invoke(
+                            "create",
+                            new Object[] { suffix.getDn() },
+                            new String[] { DN.class.getName() }
+                    );
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                }
+            }
+        });
+
+        Button removeBaseButton = new Button(rightPanel, SWT.PUSH);
+        removeBaseButton.setText("Remove Base");
+        removeBaseButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        removeBaseButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    if (ldapTable.getSelectionCount() == 0) return;
+
+                    boolean confirm = MessageDialog.openQuestion(
+                            editor.getSite().getShell(),
+                            "Removing base LDAP entry",
+                            "Are you sure?"
+                    );
+
+                    if (!confirm) return;
+
+                    TableItem[] items = ldapTable.getSelection();
+
+                    Project project = nisTool.getProject();
+                    PenroseClient client = project.getClient();
+                    PartitionClient partitionClient = client.getPartitionClient(domain.getName());
+                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
+                    JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
+
+                    Partitions partitions = nisTool.getPartitions();
+                    Partition partition = partitions.getPartition(domain.getName());
+
+                    Directory directory = partition.getDirectory();
+                    Entry suffix = directory.getRootEntries().iterator().next();
+
+                    jobClient.invoke(
+                            "remove",
+                            new Object[] { suffix.getDn() },
+                            new String[] { DN.class.getName() }
+                    );
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                }
+            }
+        });
+
+        new Label(rightPanel, SWT.NONE);
+
+        Button createButton = new Button(rightPanel, SWT.PUSH);
+        createButton.setText("Create");
+        createButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        createButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    if (ldapTable.getSelectionCount() == 0) return;
+
+                    boolean confirm = MessageDialog.openQuestion(
+                            editor.getSite().getShell(),
+                            "Creating LDAP Subtree",
+                            "Are you sure?"
+                    );
+
+                    if (!confirm) return;
+
+                    TableItem[] items = ldapTable.getSelection();
+
+                    Project project = nisTool.getProject();
+                    PenroseClient client = project.getClient();
+                    PartitionClient partitionClient = client.getPartitionClient(domain.getName());
+                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
+                    JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
+
+                    Partitions partitions = nisTool.getPartitions();
+                    Partition partition = partitions.getPartition(domain.getName());
+
+                    Directory directory = partition.getDirectory();
+                    Entry suffix = directory.getRootEntries().iterator().next();
+                    Source ldap = partition.getSource("LDAP");
+
                     for (TableItem ti : items) {
                         Entry entry = (Entry)ti.getData();
 
-                        jobClient.invoke("load", new Object[] { new DN(entry.getDn().getRdn()) }, new String[] { DN.class.getName() });
+                        try {
+                            jobClient.invoke(
+                                    "create",
+                                    new Object[] { entry.getDn().toString() },
+                                    new String[] { String.class.getName() }
+                            );
+                        } catch (Exception e) {
+                        }
+
+                        Long count = getCount(ldap, entry.getDn());
+                        ti.setText(1, count == null ? "N/A" : ""+count);
                     }
 
-                    refreshLDAP();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                }
+            }
+        });
+
+        Button loadButton = new Button(rightPanel, SWT.PUSH);
+        loadButton.setText("Load");
+        loadButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        loadButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    if (ldapTable.getSelectionCount() == 0) return;
+
+                    boolean confirm = MessageDialog.openQuestion(
+                            editor.getSite().getShell(),
+                            "Loading LDAP Subtree",
+                            "Are you sure?"
+                    );
+
+                    if (!confirm) return;
+
+                    TableItem[] items = ldapTable.getSelection();
+
+                    Project project = nisTool.getProject();
+                    PenroseClient client = project.getClient();
+                    PartitionClient partitionClient = client.getPartitionClient(domain.getName());
+                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
+                    JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
+
+                    Partitions partitions = nisTool.getPartitions();
+                    Partition partition = partitions.getPartition(domain.getName());
+                    Source ldap = partition.getSource("LDAP");
+
+                    for (TableItem ti : items) {
+                        Entry entry = (Entry)ti.getData();
+
+                        try {
+                            jobClient.invoke(
+                                    "load",
+                                    new Object[] { entry.getDn().toString() },
+                                    new String[] { String.class.getName() }
+                            );
+                        } catch (Exception e) {
+                        }
+
+                        Long count = getCount(ldap, entry.getDn());
+                        ti.setText(1, count == null ? "N/A" : ""+count);
+                    }
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                }
+            }
+        });
+
+        Button clearButton = new Button(rightPanel, SWT.PUSH);
+        clearButton.setText("Clear");
+        clearButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        clearButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    if (ldapTable.getSelectionCount() == 0) return;
+
+                    boolean confirm = MessageDialog.openQuestion(
+                            editor.getSite().getShell(),
+                            "Clearing LDAP Subtree",
+                            "Are you sure?"
+                    );
+
+                    if (!confirm) return;
+
+                    TableItem[] items = ldapTable.getSelection();
+
+                    Project project = nisTool.getProject();
+                    PenroseClient client = project.getClient();
+                    PartitionClient partitionClient = client.getPartitionClient(domain.getName());
+                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
+                    JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
+
+                    Partitions partitions = nisTool.getPartitions();
+                    Partition partition = partitions.getPartition(domain.getName());
+                    Source ldap = partition.getSource("LDAP");
+
+                    for (TableItem ti : items) {
+                        Entry entry = (Entry)ti.getData();
+
+                        try {
+                            jobClient.invoke(
+                                    "clear",
+                                    new Object[] { entry.getDn().toString() },
+                                    new String[] { String.class.getName() }
+                            );
+                        } catch (Exception e) {
+                        }
+
+                        Long count = getCount(ldap, entry.getDn());
+                        ti.setText(1, count == null ? "N/A" : ""+count);
+                    }
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -167,7 +376,7 @@ public class NISDomainLDAPPage extends FormPage {
 
                     boolean confirm = MessageDialog.openQuestion(
                             editor.getSite().getShell(),
-                            "Removing LDAP Entries",
+                            "Removing LDAP Subtree",
                             "Are you sure?"
                     );
 
@@ -181,13 +390,25 @@ public class NISDomainLDAPPage extends FormPage {
                     SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
                     JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
 
+                    Partitions partitions = nisTool.getPartitions();
+                    Partition partition = partitions.getPartition(domain.getName());
+                    Source ldap = partition.getSource("LDAP");
+
                     for (TableItem ti : items) {
                         Entry entry = (Entry)ti.getData();
 
-                        jobClient.invoke("clear", new Object[] { new DN(entry.getDn().getRdn()) }, new String[] { DN.class.getName() });
-                    }
+                        try {
+                            jobClient.invoke(
+                                    "remove",
+                                    new Object[] { entry.getDn().toString() },
+                                    new String[] { String.class.getName() }
+                            );
+                        } catch (Exception e) {
+                        }
 
-                    refreshLDAP();
+                        Long count = getCount(ldap, entry.getDn());
+                        ti.setText(1, count == null ? "N/A" : ""+count);
+                    }
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -344,37 +565,29 @@ public class NISDomainLDAPPage extends FormPage {
             Source ldap = partition.getSource("LDAP");
 
             Directory directory = partition.getDirectory();
-            Entry entry = directory.getRootEntries().iterator().next();
+            Entry suffix = directory.getRootEntries().iterator().next();
 
-            for (Entry child : entry.getChildren()) {
+            for (String sourceName : nisTool.getSourceNames()) {
+                String sourceLabel = nisTool.getSourceLabel(sourceName);
 
-                boolean exists;
+                RDNBuilder rb = new RDNBuilder();
+                rb.set("ou", sourceLabel);
+                RDN rdn = rb.toRdn();
 
-                try {
-                    SearchRequest request = new SearchRequest();
-                    request.setDn(child.getDn().getRdn());
-                    request.setScope(SearchRequest.SCOPE_BASE);
+                DNBuilder db = new DNBuilder();
+                db.append(rdn);
+                db.append(suffix.getDn());
 
-                    SearchResponse response = new SearchResponse();
+                DN dn = db.toDn();
 
-                    ldap.search(request, response);
-
-                    exists = response.hasNext();
-
-                } catch (Exception e) {
-                    exists = false;
-                }
+                Long count = getCount(ldap, dn);
 
                 TableItem ti = new TableItem(ldapTable, SWT.NONE);
+                ti.setText(0, sourceLabel);
+                ti.setText(1, count == null ? "N/A" : ""+count);
 
-                DN dn = child.getDn();
-                RDN rdn = dn.getRdn();
-                String label = (String)rdn.get("ou");
-
-                ti.setText(0, label);
-                ti.setText(1, exists ? "OK" : "Missing");
-
-                ti.setData(child);
+                Entry entry = suffix.getChildren(rdn).iterator().next();
+                ti.setData(entry);
             }
 
             ldapTable.select(indices);
@@ -382,6 +595,25 @@ public class NISDomainLDAPPage extends FormPage {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+        }
+    }
+
+    public Long getCount(Source source, DN baseDn) {
+        try {
+            SearchRequest request = new SearchRequest();
+            request.setDn(baseDn);
+            request.setScope(SearchRequest.SCOPE_ONE);
+            request.setAttributes(new String[] { "dn" });
+            request.setTypesOnly(true);
+
+            SearchResponse response = new SearchResponse();
+
+            source.search(request, response);
+
+            return response.getTotalCount();
+
+        } catch (Exception e) {
+            return null;
         }
     }
 
@@ -394,7 +626,6 @@ public class NISDomainLDAPPage extends FormPage {
             Partitions partitions = nisTool.getPartitions();
             Partition partition = partitions.getPartition(domain.getName());
             Source tracker = partition.getSource("tracker");
-
 
             SearchRequest request = new SearchRequest();
             SearchResponse response = new SearchResponse() {
