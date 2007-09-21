@@ -30,7 +30,6 @@ import org.safehaus.penrose.directory.Entry;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.sql.Timestamp;
 
 /**
@@ -136,36 +135,24 @@ public class NISDomainLDAPPage extends FormPage {
 
                     TableItem[] items = ldapTable.getSelection();
 
-                    Partitions partitions = nisTool.getPartitions();
-                    Partition partition = partitions.getPartition(domain.getName());
-                    final Source penrose = partition.getSource("Penrose");
-                    final Source ldap = partition.getSource("LDAP");
+                    Project project = nisTool.getProject();
+                    PenroseClient client = project.getClient();
+                    PartitionClient partitionClient = client.getPartitionClient(domain.getName());
+                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
+                    JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
 
                     for (TableItem ti : items) {
                         Entry entry = (Entry)ti.getData();
 
-                        SearchRequest request = new SearchRequest();
-                        request.setDn(entry.getDn().getRdn());
-
-                        SearchResponse response = new SearchResponse() {
-                            public void add(SearchResult result) throws Exception {
-                                log.debug("Adding "+result.getDn());
-                                ldap.add(result.getDn(), result.getAttributes());
-                            }
-                        };
-
-                        penrose.search(request, response);
+                        jobClient.invoke("load", new Object[] { new DN(entry.getDn().getRdn()) }, new String[] { DN.class.getName() });
                     }
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
+                    refreshLDAP();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
                 }
-
-                refreshLDAP();
             }
         });
 
@@ -188,41 +175,24 @@ public class NISDomainLDAPPage extends FormPage {
 
                     TableItem[] items = ldapTable.getSelection();
 
-                    Partitions partitions = nisTool.getPartitions();
-                    Partition partition = partitions.getPartition(domain.getName());
-                    final Source ldap = partition.getSource("LDAP");
+                    Project project = nisTool.getProject();
+                    PenroseClient client = project.getClient();
+                    PartitionClient partitionClient = client.getPartitionClient(domain.getName());
+                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
+                    JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
 
                     for (TableItem ti : items) {
                         Entry entry = (Entry)ti.getData();
 
-                        final ArrayList<DN> dns = new ArrayList<DN>();
-
-                        SearchRequest request = new SearchRequest();
-                        request.setDn(entry.getDn().getRdn());
-
-                        SearchResponse response = new SearchResponse() {
-                            public void add(SearchResult result) throws Exception {
-                                dns.add(result.getDn());
-                            }
-                        };
-
-                        ldap.search(request, response);
-
-                        for (int i=dns.size()-1; i>=0; i--) {
-                            DN dn = dns.get(i);
-                            ldap.delete(dn);
-                        }
+                        jobClient.invoke("clear", new Object[] { new DN(entry.getDn().getRdn()) }, new String[] { DN.class.getName() });
                     }
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
+                    refreshLDAP();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
                 }
-
-                refreshLDAP();
             }
         });
 
@@ -293,15 +263,12 @@ public class NISDomainLDAPPage extends FormPage {
                     JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
                     jobClient.invoke("synchronize", new Object[] {}, new String[] {});
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
+                    refreshTracker();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
                 }
-
-                refreshTracker();
             }
         });
 

@@ -4,35 +4,34 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.forms.events.HyperlinkAdapter;
-import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.nis.NISTool;
-import org.safehaus.penrose.studio.nis.domain.NISDomainEditor;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.partition.Partitions;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.source.Source;
-import org.safehaus.penrose.ldap.*;
+import org.safehaus.penrose.ldap.SearchResult;
+import org.safehaus.penrose.ldap.SearchRequest;
+import org.safehaus.penrose.ldap.SearchResponse;
+import org.safehaus.penrose.ldap.Attributes;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.sql.Timestamp;
 
 /**
  * @author Endi S. Dewata
  */
-public class NISDomainChangeLogPage extends FormPage {
+public class NISDomainErrorsPage extends FormPage {
 
     public DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -45,36 +44,45 @@ public class NISDomainChangeLogPage extends FormPage {
     NISDomain domain;
 
     Table table;
-    Text changesText;
+    Text descriptionText;
+    Text noteText;
 
-    public NISDomainChangeLogPage(NISDomainEditor editor) {
-        super(editor, "CHANGE_LOG", "  Change Log  ");
+    Partition partition;
+    Source errors;
+
+    public NISDomainErrorsPage(NISDomainEditor editor) {
+        super(editor, "ERRORS", "  Errors  ");
 
         this.editor = editor;
         this.nisTool = editor.getNisTool();
         this.domain = editor.getDomain();
+
+        Partitions partitions = nisTool.getPartitions();
+        partition = partitions.getPartition(domain.getName());
+
+        errors = partition.getSource("errors");
     }
 
     public void createFormContent(IManagedForm managedForm) {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Change Log");
+        form.setText("Errors");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-        Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Change Log");
-        section.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Section errorsSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        errorsSection.setText("Errors");
+        errorsSection.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Control sourcesSection = createPartitionsSection(section);
-        section.setClient(sourcesSection);
+        Control errorsControl = createErrorsControl(errorsSection);
+        errorsSection.setClient(errorsControl);
 
         refresh();
     }
 
-    public Composite createPartitionsSection(Composite parent) {
+    public Composite createErrorsControl(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
@@ -93,45 +101,32 @@ public class NISDomainChangeLogPage extends FormPage {
         tc.setText("Number");
 
         tc = new TableColumn(table, SWT.NONE);
-        tc.setWidth(300);
-        tc.setText("Target DN");
+        tc.setWidth(150);
+        tc.setText("Time");
 
         tc = new TableColumn(table, SWT.NONE);
-        tc.setWidth(100);
-        tc.setText("Type");
+        tc.setWidth(300);
+        tc.setText("Title");
 
         table.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
-                showChanges();
+                showError();
             }
         });
 
-        Composite links = toolkit.createComposite(leftPanel);
-        links.setLayout(new RowLayout());
-        links.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.createLabel(leftPanel, "Description:");
 
-        Hyperlink selectAllLink = toolkit.createHyperlink(links, "Select All", SWT.NONE);
-
-        selectAllLink.addHyperlinkListener(new HyperlinkAdapter() {
-            public void linkActivated(HyperlinkEvent event) {
-                table.selectAll();
-                showChanges();
-            }
-        });
-
-        Hyperlink selectNoneLink = toolkit.createHyperlink(links, "Select None", SWT.NONE);
-
-        selectNoneLink.addHyperlinkListener(new HyperlinkAdapter() {
-            public void linkActivated(HyperlinkEvent event) {
-                table.deselectAll();
-                showChanges();
-            }
-        });
-
-        changesText = toolkit.createText(leftPanel, "", SWT.BORDER | SWT.READ_ONLY  | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+        descriptionText = toolkit.createText(leftPanel, "", SWT.BORDER | SWT.READ_ONLY  | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 150;
-        changesText.setLayoutData(gd);
+        descriptionText.setLayoutData(gd);
+
+        toolkit.createLabel(leftPanel, "Note:");
+
+        noteText = toolkit.createText(leftPanel, "", SWT.BORDER | SWT.READ_ONLY  | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+        gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.heightHint = 150;
+        noteText.setLayoutData(gd);
 
         Composite rightPanel = toolkit.createComposite(composite);
         rightPanel.setLayout(new GridLayout());
@@ -151,7 +146,7 @@ public class NISDomainChangeLogPage extends FormPage {
 
                     boolean confirm = MessageDialog.openQuestion(
                             editor.getSite().getShell(),
-                            "Removing Change Log",
+                            "Removing Error",
                             "Are you sure?"
                     );
 
@@ -159,16 +154,11 @@ public class NISDomainChangeLogPage extends FormPage {
 
                     TableItem[] items = table.getSelection();
 
-                    Partitions partitions = nisTool.getPartitions();
-                    Partition partition = partitions.getPartition(domain.getName());
-
-                    Source changelog = partition.getSource("changelog");
-
                     for (TableItem ti : items) {
                         SearchResult result = (SearchResult)ti.getData();
                         try {
-                            changelog.delete(result.getDn());
-                            
+                            errors.delete(result.getDn());
+
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
                         }
@@ -207,36 +197,31 @@ public class NISDomainChangeLogPage extends FormPage {
 
             table.removeAll();
 
-            Partitions partitions = nisTool.getPartitions();
-            Partition partition = partitions.getPartition(domain.getName());
-
-            Source changelog = partition.getSource("changelog");
-
             SearchRequest request = new SearchRequest();
 
             SearchResponse response = new SearchResponse() {
                 public void add(SearchResult result) {
 
                     Attributes attributes = result.getAttributes();
-                    String changeNumber = attributes.getValue("changeNumber").toString();
-                    String targetDn = (String)attributes.getValue("targetDN");
-                    String changeType = (String)attributes.getValue("changeType");
+                    String id = attributes.getValue("id").toString();
+                    Timestamp time = (Timestamp)attributes.getValue("time");
+                    String title = (String)attributes.getValue("title");
 
                     TableItem ti = new TableItem(table, SWT.NONE);
 
-                    ti.setText(0, changeNumber);
-                    ti.setText(1, targetDn);
-                    ti.setText(2, changeType);
+                    ti.setText(0, id);
+                    ti.setText(1, df.format(time));
+                    ti.setText(2, title);
 
                     ti.setData(result);
                 }
             };
 
-            changelog.search(request, response);
+            errors.search(request, response);
 
             table.select(indices);
 
-            showChanges();
+            showError();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -244,10 +229,11 @@ public class NISDomainChangeLogPage extends FormPage {
         }
     }
 
-    public void showChanges() {
-        
+    public void showError() {
+
         if (table.getSelectionCount() !=  1) {
-            changesText.setText("");
+            descriptionText.setText("");
+            noteText.setText("");
             return;
         }
 
@@ -256,28 +242,10 @@ public class NISDomainChangeLogPage extends FormPage {
         SearchResult result = (SearchResult)ti.getData();
         Attributes attributes = result.getAttributes();
 
-        String changeType = (String)attributes.getValue("changeType");
-        if ("add".equals(changeType)) {
-            String changes = (String)attributes.getValue("changes");
-            changesText.setText(changes);
+        String description = (String)attributes.getValue("description");
+        descriptionText.setText(description == null ? "" : description);
 
-        } else if ("modify".equals(changeType)) {
-            String changes = (String)attributes.getValue("changes");
-            changesText.setText(changes);
-
-        } else if ("modrdn".equals(changeType)) {
-            String newRdn = (String)attributes.getValue("newRDN");
-            boolean deleteOldRdn = Boolean.parseBoolean((String)attributes.getValue("deleteOldRDN"));
-
-            StringBuilder sb = new StringBuilder();
-            sb.append("newRDN: ");
-            sb.append(newRdn);
-            sb.append("\n");
-            sb.append("deleteOldRdn: ");
-            sb.append(deleteOldRdn);
-
-        } else if ("delete".equals(changeType)) {
-            changesText.setText("");
-        }
+        String note = (String)attributes.getValue("note");
+        noteText.setText(note == null ? "" : note);
     }
 }
