@@ -11,6 +11,7 @@ import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -48,7 +49,7 @@ public class NISDomainLDAPPage extends FormPage {
     NISTool nisTool;
     NISDomain domain;
 
-    Table ldapTable;
+    Table table;
 
     public NISDomainLDAPPage(NISDomainEditor editor) {
         super(editor, "LDAP", "  LDAP  ");
@@ -86,18 +87,38 @@ public class NISDomainLDAPPage extends FormPage {
         leftPanel.setLayout(new GridLayout());
         leftPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        ldapTable = new Table(leftPanel, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
-        ldapTable.setLayoutData(new GridData(GridData.FILL_BOTH));
-        ldapTable.setHeaderVisible(true);
-        ldapTable.setLinesVisible(true);
+        table = new Table(leftPanel, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+        table.setLayoutData(new GridData(GridData.FILL_BOTH));
+        table.setHeaderVisible(true);
+        table.setLinesVisible(true);
 
-        TableColumn tc = new TableColumn(ldapTable, SWT.NONE);
+        TableColumn tc = new TableColumn(table, SWT.NONE);
         tc.setWidth(100);
         tc.setText("Name");
 
-        tc = new TableColumn(ldapTable, SWT.NONE);
+        tc = new TableColumn(table, SWT.NONE);
         tc.setWidth(100);
         tc.setText("Entries");
+
+        Composite links = toolkit.createComposite(leftPanel);
+        links.setLayout(new RowLayout());
+        links.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Hyperlink selectAllLink = toolkit.createHyperlink(links, "Select All", SWT.NONE);
+
+        selectAllLink.addHyperlinkListener(new HyperlinkAdapter() {
+            public void linkActivated(HyperlinkEvent event) {
+                table.selectAll();
+            }
+        });
+
+        Hyperlink selectNoneLink = toolkit.createHyperlink(links, "Select None", SWT.NONE);
+
+        selectNoneLink.addHyperlinkListener(new HyperlinkAdapter() {
+            public void linkActivated(HyperlinkEvent event) {
+                table.deselectAll();
+            }
+        });
 
         Composite rightPanel = toolkit.createComposite(composite);
         rightPanel.setLayout(new GridLayout());
@@ -195,7 +216,7 @@ public class NISDomainLDAPPage extends FormPage {
         createButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
-                    if (ldapTable.getSelectionCount() == 0) return;
+                    if (table.getSelectionCount() == 0) return;
 
                     boolean confirm = MessageDialog.openQuestion(
                             editor.getSite().getShell(),
@@ -205,7 +226,7 @@ public class NISDomainLDAPPage extends FormPage {
 
                     if (!confirm) return;
 
-                    TableItem[] items = ldapTable.getSelection();
+                    TableItem[] items = table.getSelection();
 
                     Project project = nisTool.getProject();
                     PenroseClient client = project.getClient();
@@ -249,7 +270,7 @@ public class NISDomainLDAPPage extends FormPage {
         loadButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
-                    if (ldapTable.getSelectionCount() == 0) return;
+                    if (table.getSelectionCount() == 0) return;
 
                     boolean confirm = MessageDialog.openQuestion(
                             editor.getSite().getShell(),
@@ -259,7 +280,7 @@ public class NISDomainLDAPPage extends FormPage {
 
                     if (!confirm) return;
 
-                    TableItem[] items = ldapTable.getSelection();
+                    TableItem[] items = table.getSelection();
 
                     Project project = nisTool.getProject();
                     PenroseClient client = project.getClient();
@@ -302,7 +323,7 @@ public class NISDomainLDAPPage extends FormPage {
         clearButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
-                    if (ldapTable.getSelectionCount() == 0) return;
+                    if (table.getSelectionCount() == 0) return;
 
                     boolean confirm = MessageDialog.openQuestion(
                             editor.getSite().getShell(),
@@ -312,7 +333,7 @@ public class NISDomainLDAPPage extends FormPage {
 
                     if (!confirm) return;
 
-                    TableItem[] items = ldapTable.getSelection();
+                    TableItem[] items = table.getSelection();
 
                     Project project = nisTool.getProject();
                     PenroseClient client = project.getClient();
@@ -355,7 +376,7 @@ public class NISDomainLDAPPage extends FormPage {
         removeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
-                    if (ldapTable.getSelectionCount() == 0) return;
+                    if (table.getSelectionCount() == 0) return;
 
                     boolean confirm = MessageDialog.openQuestion(
                             editor.getSite().getShell(),
@@ -365,7 +386,7 @@ public class NISDomainLDAPPage extends FormPage {
 
                     if (!confirm) return;
 
-                    TableItem[] items = ldapTable.getSelection();
+                    TableItem[] items = table.getSelection();
 
                     Project project = nisTool.getProject();
                     PenroseClient client = project.getClient();
@@ -445,30 +466,14 @@ public class NISDomainLDAPPage extends FormPage {
             }
         });
 
-        Hyperlink selectAllLink = toolkit.createHyperlink(rightPanel, "Select All", SWT.NONE);
-
-        selectAllLink.addHyperlinkListener(new HyperlinkAdapter() {
-            public void linkActivated(HyperlinkEvent event) {
-                ldapTable.selectAll();
-            }
-        });
-
-        Hyperlink selectNoneLink = toolkit.createHyperlink(rightPanel, "Select None", SWT.NONE);
-
-        selectNoneLink.addHyperlinkListener(new HyperlinkAdapter() {
-            public void linkActivated(HyperlinkEvent event) {
-                ldapTable.deselectAll();
-            }
-        });
-
         return composite;
     }
 
     public void refreshLDAP() {
         try {
-            int[] indices = ldapTable.getSelectionIndices();
+            int[] indices = table.getSelectionIndices();
 
-            ldapTable.removeAll();
+            table.removeAll();
 
             Partitions partitions = nisTool.getPartitions();
             Partition partition = partitions.getPartition(domain.getName());
@@ -492,7 +497,7 @@ public class NISDomainLDAPPage extends FormPage {
 
                 Long count = getCount(ldap, dn);
 
-                TableItem ti = new TableItem(ldapTable, SWT.NONE);
+                TableItem ti = new TableItem(table, SWT.NONE);
                 ti.setText(0, sourceLabel);
                 ti.setText(1, count == null ? "N/A" : ""+count);
 
@@ -500,7 +505,7 @@ public class NISDomainLDAPPage extends FormPage {
                 ti.setData(entry);
             }
 
-            ldapTable.select(indices);
+            table.select(indices);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
