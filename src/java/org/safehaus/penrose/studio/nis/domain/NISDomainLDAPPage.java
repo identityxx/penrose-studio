@@ -447,6 +447,8 @@ public class NISDomainLDAPPage extends FormPage {
                     JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
                     jobClient.invoke("synchronize", new Object[] {}, new String[] {});
 
+                    refreshLDAP();
+                    
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());

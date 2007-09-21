@@ -23,10 +23,7 @@ import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.studio.nis.NISTool;
-import org.safehaus.penrose.studio.nis.dialog.NISUserDialog;
-import org.safehaus.penrose.studio.nis.dialog.NISScheduleDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.*;
 import org.safehaus.penrose.connection.Connection;
@@ -36,8 +33,6 @@ import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.scheduler.SchedulerConfig;
 import org.safehaus.penrose.scheduler.JobConfig;
-import org.safehaus.penrose.scheduler.TriggerConfig;
-import org.safehaus.penrose.ldap.*;
 
 import java.util.*;
 import java.sql.ResultSet;
@@ -139,10 +134,6 @@ public class NISDomainDatabasePage extends FormPage {
         tc.setText("Name");
 
         tc = new TableColumn(table, SWT.NONE);
-        tc.setWidth(150);
-        tc.setText("Schedule");
-
-        tc = new TableColumn(table, SWT.NONE);
         tc.setWidth(100);
         tc.setText("Entries");
         tc.setAlignment(SWT.RIGHT);
@@ -173,86 +164,6 @@ public class NISDomainDatabasePage extends FormPage {
         gd.widthHint = 120;
         rightPanel.setLayoutData(gd);
 
-        Button editButton = new Button(rightPanel, SWT.PUSH);
-        editButton.setText("Edit");
-        editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        editButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                try {
-                    if (table.getSelectionCount() == 0) return;
-
-                    TableItem item = table.getSelection()[0];
-                    String label = item.getText(0);
-                    String schedule = item.getText(1);
-
-                    TriggerConfig triggerConfig = (TriggerConfig)item.getData();
-                    String sourceName = triggerConfig.getName();
-
-                    NISScheduleDialog dialog = new NISScheduleDialog(getSite().getShell(), SWT.NONE);
-                    dialog.setName(label);
-                    dialog.setSchedule(schedule);
-                    dialog.open();
-
-                    int action = dialog.getAction();
-                    if (action == NISUserDialog.CANCEL) return;
-
-                    RDNBuilder rb = new RDNBuilder();
-                    rb.set("name", domain.getName());
-
-                    DN dn = new DN(rb.toRdn());
-
-                    Source schedules = nisTool.getSchedules();
-
-                    schedule = dialog.getSchedule();
-
-                    Collection<Modification> modifications = new ArrayList<Modification>();
-
-                    if (schedule == null) {
-                        Modification modification = new Modification(Modification.DELETE, new Attribute(sourceName));
-                        modifications.add(modification);
-                        triggerConfig.setParameter("expression", "");
-
-                        schedules.modify(dn, modifications);
-
-                    } else {
-                        SearchResponse response = schedules.search(dn, null, SearchRequest.SCOPE_BASE);
-                        Attribute attribute = new Attribute(sourceName, schedule);
-
-                        if (response.hasNext()) {
-                            Modification modification = new Modification(Modification.REPLACE, attribute);
-                            modifications.add(modification);
-                            triggerConfig.setParameter("expression", schedule);
-
-                            schedules.modify(dn, modifications);
-
-                        } else {
-                            Attributes attributes = new Attributes();
-                            attributes.setValue("name", domain.getName());
-                            attributes.set(attribute);
-
-                            schedules.add(dn, attributes);
-                        }
-                    }
-
-                    nisTool.createPartitionConfig(domain);
-                    nisTool.loadPartition(domain);
-
-                    penroseClient.stopPartition(domain.getName());
-                    project.upload("partitions/"+domain.getName());
-                    penroseClient.startPartition(domain.getName());
-                    
-                    refresh();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
-                }
-            }
-        });
-
-        new Label(rightPanel, SWT.NONE);
-
         Button createButton = new Button(rightPanel, SWT.PUSH);
         createButton.setText("Create");
         createButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -273,8 +184,7 @@ public class NISDomainDatabasePage extends FormPage {
                     SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
 
                     for (TableItem item : table.getSelection()) {
-                        TriggerConfig triggerConfig = (TriggerConfig)item.getData();
-                        String sourceName = triggerConfig.getName();
+                        String sourceName = (String)item.getData();
 
                         try {
                             JobClient jobClient = schedulerClient.getJobClient(sourceName);
@@ -314,8 +224,7 @@ public class NISDomainDatabasePage extends FormPage {
                     SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
 
                     for (TableItem item : table.getSelection()) {
-                        TriggerConfig triggerConfig = (TriggerConfig)item.getData();
-                        String sourceName = triggerConfig.getName();
+                        String sourceName = (String)item.getData();
 
                         try {
                             JobClient jobClient = schedulerClient.getJobClient(sourceName);
@@ -355,8 +264,7 @@ public class NISDomainDatabasePage extends FormPage {
                     SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
 
                     for (TableItem item : table.getSelection()) {
-                        TriggerConfig triggerConfig = (TriggerConfig)item.getData();
-                        String sourceName = triggerConfig.getName();
+                        String sourceName = (String)item.getData();
 
                         try {
                             JobClient jobClient = schedulerClient.getJobClient(sourceName);
@@ -396,8 +304,7 @@ public class NISDomainDatabasePage extends FormPage {
                     SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
 
                     for (TableItem item : table.getSelection()) {
-                        TriggerConfig triggerConfig = (TriggerConfig)item.getData();
-                        String sourceName = triggerConfig.getName();
+                        String sourceName = (String)item.getData();
 
                         try {
                             JobClient jobClient = schedulerClient.getJobClient(sourceName);
@@ -439,8 +346,7 @@ public class NISDomainDatabasePage extends FormPage {
                     SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
 
                     for (TableItem item : table.getSelection()) {
-                        TriggerConfig triggerConfig = (TriggerConfig)item.getData();
-                        String sourceName = triggerConfig.getName();
+                        String sourceName = (String)item.getData();
 
                         try {
                             JobClient jobClient = schedulerClient.getJobClient(sourceName);
@@ -501,15 +407,9 @@ public class NISDomainDatabasePage extends FormPage {
                 String cacheName = caches.iterator().next();
                 SourceConfig sourceConfig = sourceConfigs.getSourceConfig(cacheName);
 
-                TriggerConfig triggerConfig = schedulerConfig.getTriggerConfig(sourceName);
-
                 final TableItem ti = new TableItem(table, SWT.NONE);
                 ti.setText(0, label);
-                if (triggerConfig != null) {
-                    String expression = triggerConfig.getParameter("expression");
-                    ti.setText(1, expression == null ? "" : expression);
-                }
-                ti.setData(triggerConfig);
+                ti.setData(sourceName);
 
                 try {
                     String table = client.getTableName(sourceConfig);
@@ -521,7 +421,7 @@ public class NISDomainDatabasePage extends FormPage {
                         public void add(Object object) throws Exception {
                             ResultSet rs = (ResultSet)object;
                             Integer count = rs.getInt(1);
-                            ti.setText(2, count.toString());
+                            ti.setText(1, count.toString());
                         }
                     };
 
@@ -529,7 +429,7 @@ public class NISDomainDatabasePage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    ti.setText(2, "N/A");
+                    ti.setText(1, "N/A");
                 }
             }
 

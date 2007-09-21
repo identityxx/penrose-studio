@@ -89,11 +89,11 @@ public class NISDomainTrackerPage extends FormPage {
         trackerTable.setLinesVisible(true);
 
         TableColumn tc = new TableColumn(trackerTable, SWT.NONE);
-        tc.setWidth(100);
+        tc.setWidth(150);
         tc.setText("Change Number");
 
         tc = new TableColumn(trackerTable, SWT.NONE);
-        tc.setWidth(300);
+        tc.setWidth(350);
         tc.setText("Change Time");
 
         Composite rightPanel = toolkit.createComposite(composite);
@@ -102,38 +102,6 @@ public class NISDomainTrackerPage extends FormPage {
         gd.verticalSpan = 2;
         gd.widthHint = 120;
         rightPanel.setLayoutData(gd);
-
-        Button synchronizeButton = new Button(rightPanel, SWT.PUSH);
-        synchronizeButton.setText("Synchronize");
-        synchronizeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        synchronizeButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                try {
-                    boolean confirm = MessageDialog.openQuestion(
-                            editor.getSite().getShell(),
-                            "Synchronize LDAP",
-                            "Are you sure?"
-                    );
-
-                    if (!confirm) return;
-
-                    Project project = nisTool.getProject();
-                    PenroseClient client = project.getClient();
-                    PartitionClient partitionClient = client.getPartitionClient(domain.getName());
-                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
-
-                    JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
-                    jobClient.invoke("synchronize", new Object[] {}, new String[] {});
-
-                    refreshTracker();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
-                }
-            }
-        });
 
         Button removeButton = new Button(rightPanel, SWT.PUSH);
         removeButton.setText("Remove");
