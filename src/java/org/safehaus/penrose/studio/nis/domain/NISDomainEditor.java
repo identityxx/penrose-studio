@@ -34,6 +34,7 @@ public class NISDomainEditor extends FormEditor {
             addPage(new NISDomainChangeLogPage(this));
             addPage(new NISDomainTablesPage(this));
             addPage(new NISDomainLDAPPage(this));
+            addPage(new NISDomainTrackerPage(this));
             addPage(new NISDomainErrorsPage(this));
 
         } catch (Exception e) {

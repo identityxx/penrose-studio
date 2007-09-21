@@ -17,7 +17,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.nis.NISTool;
-import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.partition.Partitions;
 import org.safehaus.penrose.partition.Partition;
@@ -33,7 +32,6 @@ import org.safehaus.penrose.directory.Entry;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.sql.Timestamp;
 
 /**
  * @author Endi S. Dewata
@@ -51,7 +49,6 @@ public class NISDomainLDAPPage extends FormPage {
     NISDomain domain;
 
     Table ldapTable;
-    Table trackerTable;
 
     public NISDomainLDAPPage(NISDomainEditor editor) {
         super(editor, "LDAP", "  LDAP  ");
@@ -77,17 +74,7 @@ public class NISDomainLDAPPage extends FormPage {
         Control ldapControl = createLDAPControl(ldapSection);
         ldapSection.setClient(ldapControl);
 
-        Section trackerSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        trackerSection.setText("Change Log Tracker");
-        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.heightHint = 300;
-        trackerSection.setLayoutData(gd);
-
-        Control trackerControl = createTrackerControl(trackerSection);
-        trackerSection.setClient(trackerControl);
-
         refreshLDAP();
-        refreshTracker();
     }
 
     public Composite createLDAPControl(Composite parent) {
@@ -229,8 +216,6 @@ public class NISDomainLDAPPage extends FormPage {
                     Partitions partitions = nisTool.getPartitions();
                     Partition partition = partitions.getPartition(domain.getName());
 
-                    Directory directory = partition.getDirectory();
-                    Entry suffix = directory.getRootEntries().iterator().next();
                     Source ldap = partition.getSource("LDAP");
 
                     for (TableItem ti : items) {
@@ -243,6 +228,7 @@ public class NISDomainLDAPPage extends FormPage {
                                     new String[] { String.class.getName() }
                             );
                         } catch (Exception e) {
+                            log.error(e.getMessage(), e);
                         }
 
                         Long count = getCount(ldap, entry.getDn());
@@ -295,6 +281,7 @@ public class NISDomainLDAPPage extends FormPage {
                                     new String[] { String.class.getName() }
                             );
                         } catch (Exception e) {
+                            log.error(e.getMessage(), e);
                         }
 
                         Long count = getCount(ldap, entry.getDn());
@@ -347,6 +334,7 @@ public class NISDomainLDAPPage extends FormPage {
                                     new String[] { String.class.getName() }
                             );
                         } catch (Exception e) {
+                            log.error(e.getMessage(), e);
                         }
 
                         Long count = getCount(ldap, entry.getDn());
@@ -399,11 +387,44 @@ public class NISDomainLDAPPage extends FormPage {
                                     new String[] { String.class.getName() }
                             );
                         } catch (Exception e) {
+                            log.error(e.getMessage(), e);
                         }
 
                         Long count = getCount(ldap, entry.getDn());
                         ti.setText(1, count == null ? "N/A" : ""+count);
                     }
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                }
+            }
+        });
+
+        new Label(rightPanel, SWT.NONE);
+
+        Button synchronizeButton = new Button(rightPanel, SWT.PUSH);
+        synchronizeButton.setText("Synchronize");
+        synchronizeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        synchronizeButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    boolean confirm = MessageDialog.openQuestion(
+                            editor.getSite().getShell(),
+                            "Synchronize LDAP",
+                            "Are you sure?"
+                    );
+
+                    if (!confirm) return;
+
+                    Project project = nisTool.getProject();
+                    PenroseClient client = project.getClient();
+                    PartitionClient partitionClient = client.getPartitionClient(domain.getName());
+                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
+
+                    JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
+                    jobClient.invoke("synchronize", new Object[] {}, new String[] {});
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -437,128 +458,6 @@ public class NISDomainLDAPPage extends FormPage {
         selectNoneLink.addHyperlinkListener(new HyperlinkAdapter() {
             public void linkActivated(HyperlinkEvent event) {
                 ldapTable.deselectAll();
-            }
-        });
-
-        return composite;
-    }
-
-    public Composite createTrackerControl(Composite parent) {
-
-        Composite composite = toolkit.createComposite(parent);
-        composite.setLayout(new GridLayout(2, false));
-
-        Composite leftPanel = toolkit.createComposite(composite);
-        leftPanel.setLayout(new GridLayout());
-        leftPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-        trackerTable = new Table(leftPanel, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
-        trackerTable.setLayoutData(new GridData(GridData.FILL_BOTH));
-        trackerTable.setHeaderVisible(true);
-        trackerTable.setLinesVisible(true);
-
-        TableColumn tc = new TableColumn(trackerTable, SWT.NONE);
-        tc.setWidth(100);
-        tc.setText("Change Number");
-
-        tc = new TableColumn(trackerTable, SWT.NONE);
-        tc.setWidth(300);
-        tc.setText("Change Time");
-
-        Composite rightPanel = toolkit.createComposite(composite);
-        rightPanel.setLayout(new GridLayout());
-        GridData gd = new GridData(GridData.FILL_VERTICAL);
-        gd.verticalSpan = 2;
-        gd.widthHint = 120;
-        rightPanel.setLayoutData(gd);
-
-        Button synchronizeButton = new Button(rightPanel, SWT.PUSH);
-        synchronizeButton.setText("Synchronize");
-        synchronizeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        synchronizeButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                try {
-                    boolean confirm = MessageDialog.openQuestion(
-                            editor.getSite().getShell(),
-                            "Synchronize LDAP",
-                            "Are you sure?"
-                    );
-
-                    if (!confirm) return;
-
-                    Project project = nisTool.getProject();
-                    PenroseClient client = project.getClient();
-                    PartitionClient partitionClient = client.getPartitionClient(domain.getName());
-                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
-                    
-                    JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
-                    jobClient.invoke("synchronize", new Object[] {}, new String[] {});
-
-                    refreshTracker();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
-                }
-            }
-        });
-
-        Button removeButton = new Button(rightPanel, SWT.PUSH);
-        removeButton.setText("Remove");
-        removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        removeButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                try {
-                    if (trackerTable.getSelectionCount() == 0) return;
-
-                    boolean confirm = MessageDialog.openQuestion(
-                            editor.getSite().getShell(),
-                            "Removing Tracker",
-                            "Are you sure?"
-                    );
-
-                    if (!confirm) return;
-
-                    TableItem[] items = trackerTable.getSelection();
-
-                    Project project = nisTool.getProject();
-                    PenroseClient client = project.getClient();
-                    PartitionClient partitionClient = client.getPartitionClient(domain.getName());
-                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
-
-                    JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
-
-                    for (TableItem ti : items) {
-                        SearchResult searchResult = (SearchResult)ti.getData();
-                        Attributes attributes = searchResult.getAttributes();
-                        Long changeNumber = Long.parseLong(attributes.getValue("changeNumber").toString());
-
-                        jobClient.invoke("removeTracker", new Object[] { changeNumber }, new String[] { Long.class.getName() });
-                    }
-
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
-                }
-
-                refreshTracker();
-            }
-        });
-
-        new Label(rightPanel, SWT.NONE);
-
-        Button refreshButton = new Button(rightPanel, SWT.PUSH);
-        refreshButton.setText("Refresh");
-        refreshButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        refreshButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                refreshTracker();
             }
         });
 
@@ -625,43 +524,6 @@ public class NISDomainLDAPPage extends FormPage {
 
         } catch (Exception e) {
             return null;
-        }
-    }
-
-    public void refreshTracker() {
-        try {
-            int[] indices = trackerTable.getSelectionIndices();
-
-            trackerTable.removeAll();
-
-            Partitions partitions = nisTool.getPartitions();
-            Partition partition = partitions.getPartition(domain.getName());
-            Source tracker = partition.getSource("tracker");
-
-            SearchRequest request = new SearchRequest();
-            SearchResponse response = new SearchResponse() {
-                public void add(SearchResult result) {
-
-                    Attributes attributes = result.getAttributes();
-                    String changeNumber = attributes.getValue("changeNumber").toString();
-                    String changeTimestamp = df.format((Timestamp)attributes.getValue("changeTimestamp"));
-
-                    TableItem ti = new TableItem(trackerTable, SWT.NONE);
-
-                    ti.setText(0, changeNumber);
-                    ti.setText(1, changeTimestamp);
-
-                    ti.setData(result);
-                }
-            };
-
-            tracker.search(request, response);
-
-            trackerTable.select(indices);
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
         }
     }
 }
