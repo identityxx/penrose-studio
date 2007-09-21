@@ -503,8 +503,11 @@
 
     <target name="install-dist" depends="pre-install,copy-penrose-conf">
         <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>
-        <delete failonerror="false">
-            <fileset dir="${penrose.studio.home}" includes="lib/*"/>
+        <delete failonerror="false" includeemptydirs="true">
+            <fileset dir="${penrose.studio.home}">
+                <include name="configuration/**/*"/>
+                <include name="lib/*"/>
+            </fileset>
         </delete>
         <copy todir="${penrose.studio.home}">
             <fileset dir="target/${dist.name}">

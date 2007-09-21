@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.nis.editor;
+package org.safehaus.penrose.studio.nis.domain;
 
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;

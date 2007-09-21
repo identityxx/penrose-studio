@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.nis.editor;
+package org.safehaus.penrose.studio.nis.domain;
 
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -19,6 +19,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.studio.nis.NISTool;
+import org.safehaus.penrose.studio.nis.domain.NISDomainEditor;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.PartitionClient;
@@ -40,7 +41,7 @@ import java.sql.ResultSet;
 /**
  * @author Endi S. Dewata
  */
-public class NISTablesPage extends FormPage {
+public class NISDomainTablesPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -58,7 +59,7 @@ public class NISTablesPage extends FormPage {
 
     Collection<String> sources = new ArrayList<String>();
 
-    public NISTablesPage(NISDomainEditor editor) throws Exception {
+    public NISDomainTablesPage(NISDomainEditor editor) throws Exception {
         super(editor, "TABLES", "  Tables  ");
 
         this.editor = editor;

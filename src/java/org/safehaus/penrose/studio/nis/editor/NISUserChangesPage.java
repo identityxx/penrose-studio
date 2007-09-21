@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.studio.nis.NISTool;
+import org.safehaus.penrose.studio.nis.dialog.NISChangeDialog;
 
 import java.util.Collection;
 import java.util.ArrayList;

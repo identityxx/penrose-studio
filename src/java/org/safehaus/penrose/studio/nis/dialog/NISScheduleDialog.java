@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.nis.editor;
+package org.safehaus.penrose.studio.nis.dialog;
 
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;

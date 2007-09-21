@@ -164,10 +164,10 @@
            icon="images/object.gif"
            class="org.safehaus.penrose.studio.nis.editor.NISEditor"/>
        <editor
-           id="org.safehaus.penrose.studio.nis.editor.NISDomainEditor"
+           id="org.safehaus.penrose.studio.nis.domain.NISDomainEditor"
            name="NIS Domain"
            icon="images/object.gif"
-           class="org.safehaus.penrose.studio.nis.editor.NISDomainEditor"/>
+           class="org.safehaus.penrose.studio.nis.domain.NISDomainEditor"/>
        <editor
            id="org.safehaus.penrose.studio.nis.editor.NISUsersEditor"
            name="NIS Users"

@@ -17,6 +17,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.studio.nis.NISTool;
+import org.safehaus.penrose.studio.nis.dialog.NISGroupDialog;
+import org.safehaus.penrose.studio.nis.dialog.NISUserDialog;
 import org.safehaus.penrose.studio.nis.action.*;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.ldap.*;

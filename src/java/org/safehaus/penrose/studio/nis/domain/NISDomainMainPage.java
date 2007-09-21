@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.nis.editor;
+package org.safehaus.penrose.studio.nis.domain;
 
 import org.apache.log4j.Logger;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.nis.NISDomain;
+import org.safehaus.penrose.studio.nis.domain.NISDomainEditor;
 
 /**
  * @author Endi S. Dewata

@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.nis.editor;
+package org.safehaus.penrose.studio.nis.domain;
 
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.IEditorSite;
@@ -30,9 +30,10 @@ public class NISDomainEditor extends FormEditor {
     public void addPages() {
         try {
             addPage(new NISDomainMainPage(this));
-            addPage(new NISMapPage(this));
-            addPage(new NISTablesPage(this));
-            addPage(new NISLDAPSubtreePage(this));
+            addPage(new NISDomainDatabasePage(this));
+            addPage(new NISDomainChangeLogPage(this));
+            addPage(new NISDomainTablesPage(this));
+            addPage(new NISDomainLDAPPage(this));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

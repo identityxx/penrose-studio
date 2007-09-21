@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.nis.editor;
+package org.safehaus.penrose.studio.nis.domain;
 
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -25,6 +25,9 @@ import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.studio.nis.NISTool;
+import org.safehaus.penrose.studio.nis.domain.NISDomainEditor;
+import org.safehaus.penrose.studio.nis.dialog.NISUserDialog;
+import org.safehaus.penrose.studio.nis.dialog.NISScheduleDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.*;
 import org.safehaus.penrose.connection.Connection;
@@ -43,7 +46,7 @@ import java.sql.ResultSet;
 /**
  * @author Endi S. Dewata
  */
-public class NISMapPage extends FormPage {
+public class NISDomainDatabasePage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -62,8 +65,8 @@ public class NISMapPage extends FormPage {
     Map<String,String> sourceLabels = new TreeMap<String,String>();
     Map<String,Collection<String>> sourceCaches = new TreeMap<String,Collection<String>>();
 
-    public NISMapPage(NISDomainEditor editor) throws Exception {
-        super(editor, "MAPS", "  Maps  ");
+    public NISDomainDatabasePage(NISDomainEditor editor) throws Exception {
+        super(editor, "DATABASE", "  Database  ");
 
         this.editor = editor;
 
@@ -115,13 +118,13 @@ public class NISMapPage extends FormPage {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Maps");
+        form.setText("Database");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
         Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Maps");
+        section.setText("Database");
         section.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         Control mainSection = createMainSection(section);

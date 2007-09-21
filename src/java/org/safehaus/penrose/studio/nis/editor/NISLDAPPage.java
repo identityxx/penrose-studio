@@ -44,7 +44,7 @@ import java.text.SimpleDateFormat;
  */
 public class NISLDAPPage extends FormPage {
 
-    public DateFormat df = new SimpleDateFormat("yyyy-MM-DD HH:mm:ss");
+    public DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     Logger log = Logger.getLogger(getClass());
 

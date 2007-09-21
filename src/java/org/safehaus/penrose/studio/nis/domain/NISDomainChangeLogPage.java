@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.nis.editor;
+package org.safehaus.penrose.studio.nis.domain;
 
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -16,58 +16,65 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.nis.NISTool;
-import org.safehaus.penrose.studio.nis.dialog.NISUserDialog;
-import org.safehaus.penrose.studio.nis.dialog.NISDomainDialog;
-import org.safehaus.penrose.studio.nis.wizard.NISDomainWizard;
+import org.safehaus.penrose.studio.nis.domain.NISDomainEditor;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.partition.Partitions;
+import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.source.Source;
+import org.safehaus.penrose.ldap.*;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 /**
  * @author Endi S. Dewata
  */
-public class NISDomainsPage extends FormPage {
+public class NISDomainChangeLogPage extends FormPage {
+
+    public DateFormat df = new SimpleDateFormat("yyyy-MM-DD HH:mm:ss");
 
     Logger log = Logger.getLogger(getClass());
 
     FormToolkit toolkit;
 
-    NISEditor editor;
+    NISDomainEditor editor;
     NISTool nisTool;
+    NISDomain domain;
 
     Table table;
+    Text changesText;
 
-    public NISDomainsPage(NISEditor editor, NISTool nisTool) {
-        super(editor, "DOMAINS", "  Domains  ");
+    public NISDomainChangeLogPage(NISDomainEditor editor) {
+        super(editor, "CHANGE_LOG", "  Change Log  ");
 
         this.editor = editor;
-        this.nisTool = nisTool;
+        this.nisTool = editor.getNisTool();
+        this.domain = editor.getDomain();
     }
 
     public void createFormContent(IManagedForm managedForm) {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Domains");
+        form.setText("Change Log");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
         Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Domains");
+        section.setText("Change Log");
         section.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Control sourcesSection = createDomainsSection(section);
+        Control sourcesSection = createPartitionsSection(section);
         section.setClient(sourcesSection);
 
         refresh();
     }
 
-    public Composite createDomainsSection(Composite parent) {
+    public Composite createPartitionsSection(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
@@ -83,15 +90,21 @@ public class NISDomainsPage extends FormPage {
 
         TableColumn tc = new TableColumn(table, SWT.NONE);
         tc.setWidth(100);
-        tc.setText("Short Name");
+        tc.setText("Number");
 
         tc = new TableColumn(table, SWT.NONE);
-        tc.setWidth(150);
-        tc.setText("NIS Domain");
+        tc.setWidth(300);
+        tc.setText("Target DN");
 
         tc = new TableColumn(table, SWT.NONE);
-        tc.setWidth(250);
-        tc.setText("LDAP Suffix");
+        tc.setWidth(100);
+        tc.setText("Type");
+
+        table.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                showChanges();
+            }
+        });
 
         Composite links = toolkit.createComposite(leftPanel);
         links.setLayout(new RowLayout());
@@ -102,6 +115,7 @@ public class NISDomainsPage extends FormPage {
         selectAllLink.addHyperlinkListener(new HyperlinkAdapter() {
             public void linkActivated(HyperlinkEvent event) {
                 table.selectAll();
+                showChanges();
             }
         });
 
@@ -110,74 +124,21 @@ public class NISDomainsPage extends FormPage {
         selectNoneLink.addHyperlinkListener(new HyperlinkAdapter() {
             public void linkActivated(HyperlinkEvent event) {
                 table.deselectAll();
+                showChanges();
             }
         });
+
+        changesText = toolkit.createText(leftPanel, "", SWT.BORDER | SWT.READ_ONLY  | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.heightHint = 150;
+        changesText.setLayoutData(gd);
 
         Composite rightPanel = toolkit.createComposite(composite);
         rightPanel.setLayout(new GridLayout());
-        GridData gd = new GridData(GridData.FILL_VERTICAL);
+        gd = new GridData(GridData.FILL_VERTICAL);
         gd.verticalSpan = 2;
         gd.widthHint = 120;
         rightPanel.setLayoutData(gd);
-
-        Button addButton = new Button(rightPanel, SWT.PUSH);
-        addButton.setText("Add");
-        addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        addButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                try {
-                    NISDomainWizard wizard = new NISDomainWizard(nisTool);
-                    WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
-                    dialog.setPageSize(600, 300);
-                    dialog.open();
-
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
-                }
-
-                refresh();
-            }
-        });
-
-        Button editButton = new Button(rightPanel, SWT.PUSH);
-        editButton.setText("Edit");
-        editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        editButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                try {
-                    if (table.getSelectionCount() == 0) return;
-
-                    TableItem item = table.getSelection()[0];
-
-                    NISDomain domain = (NISDomain)item.getData();
-                    String domainName = domain.getName();
-
-                    NISDomainDialog dialog = new NISDomainDialog(editor.getSite().getShell(), SWT.NONE);
-                    dialog.setDomain(domain);
-                    dialog.open();
-
-                    int action = dialog.getAction();
-                    if (action == NISUserDialog.CANCEL) return;
-
-                    nisTool.updateDomain(domainName, domain);
-
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
-                }
-
-                refresh();
-            }
-        });
 
         Button removeButton = new Button(rightPanel, SWT.PUSH);
         removeButton.setText("Remove");
@@ -190,44 +151,24 @@ public class NISDomainsPage extends FormPage {
 
                     boolean confirm = MessageDialog.openQuestion(
                             editor.getSite().getShell(),
-                            "Removing NIS Domain",
+                            "Removing Change Log",
                             "Are you sure?"
                     );
 
                     if (!confirm) return;
 
-                    Project project = nisTool.getProject();
-                    PenroseClient penroseClient = project.getClient();
-
-                    int index = table.getSelectionIndex();
-
                     TableItem[] items = table.getSelection();
+
+                    Partitions partitions = nisTool.getPartitions();
+                    Partition partition = partitions.getPartition(domain.getName());
+
+                    Source changelog = partition.getSource("changelog");
+
                     for (TableItem ti : items) {
-                        NISDomain domain = (NISDomain)ti.getData();
-
+                        SearchResult result = (SearchResult)ti.getData();
                         try {
-                            penroseClient.stopPartition(domain.getName());
-                            nisTool.removePartition(domain);
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-
-                        try {
-                            nisTool.removeDatabase(domain);
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-
-                        try {
-                            nisTool.removePartitionConfig(domain);
-
-                            project.removeDirectory("partitions/"+domain.getName());
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-
-                        try {
-                            nisTool.removeDomain(domain);
+                            changelog.delete(result.getDn());
+                            
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
                         }
@@ -235,8 +176,6 @@ public class NISDomainsPage extends FormPage {
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
-
-                    table.select(index);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -268,18 +207,36 @@ public class NISDomainsPage extends FormPage {
 
             table.removeAll();
 
-            for (NISDomain domain : nisTool.getNisDomains().values()) {
+            Partitions partitions = nisTool.getPartitions();
+            Partition partition = partitions.getPartition(domain.getName());
 
-                TableItem ti = new TableItem(table, SWT.NONE);
+            Source changelog = partition.getSource("changelog");
 
-                ti.setText(0, domain.getName());
-                ti.setText(1, domain.getFullName());
-                ti.setText(2, domain.getSuffix());
+            SearchRequest request = new SearchRequest();
 
-                ti.setData(domain);
-            }
+            SearchResponse response = new SearchResponse() {
+                public void add(SearchResult result) {
+
+                    Attributes attributes = result.getAttributes();
+                    String changeNumber = attributes.getValue("changeNumber").toString();
+                    String targetDn = (String)attributes.getValue("targetDN");
+                    String changeType = (String)attributes.getValue("changeType");
+
+                    TableItem ti = new TableItem(table, SWT.NONE);
+
+                    ti.setText(0, changeNumber);
+                    ti.setText(1, targetDn);
+                    ti.setText(2, changeType);
+
+                    ti.setData(result);
+                }
+            };
+
+            changelog.search(request, response);
 
             table.select(indices);
+
+            showChanges();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -287,4 +244,40 @@ public class NISDomainsPage extends FormPage {
         }
     }
 
+    public void showChanges() {
+        
+        if (table.getSelectionCount() !=  1) {
+            changesText.setText("");
+            return;
+        }
+
+        TableItem ti = table.getSelection()[0];
+
+        SearchResult result = (SearchResult)ti.getData();
+        Attributes attributes = result.getAttributes();
+
+        String changeType = (String)attributes.getValue("changeType");
+        if ("add".equals(changeType)) {
+            String changes = (String)attributes.getValue("changes");
+            changesText.setText(changes);
+
+        } else if ("modify".equals(changeType)) {
+            String changes = (String)attributes.getValue("changes");
+            changesText.setText(changes);
+
+        } else if ("modrdn".equals(changeType)) {
+            String newRdn = (String)attributes.getValue("newRDN");
+            boolean deleteOldRdn = Boolean.parseBoolean((String)attributes.getValue("deleteOldRDN"));
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("newRDN: ");
+            sb.append(newRdn);
+            sb.append("\n");
+            sb.append("deleteOldRdn: ");
+            sb.append(deleteOldRdn);
+
+        } else if ("delete".equals(changeType)) {
+            changesText.setText("");
+        }
+    }
 }
