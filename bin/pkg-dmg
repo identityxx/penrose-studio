@@ -62,6 +62,7 @@ B<--target> I<target-image>
 [B<--sourcefile>]
 [B<--verbosity> I<level>]
 [B<--dry-run>]
+[B<--symlink > I<absolute-filename>
 
 =head1 DESCRIPTION
 
@@ -174,6 +175,13 @@ be placed in the trash with IDME disabled.
 If this option is present, I<source-folder> is treated as a file, and is
 placed as a file within the volume's root folder.  Without this option,
 I<source-folder> is treated as the volume root itself.
+
+=item B<--symlink>
+
+When this option is present, a symbolic link is placed at the top
+level of the disk image refering to the I<absolute-filename>
+specified after the command.  This is to be used for creating a
+link to the /Applications folder as an example.
 
 =item B<--verbosity> I<level>
 
@@ -404,7 +412,7 @@ else {
 }
 
 # Non-global variables used in Getopt
-my(@attributes, @copyFiles, $iconFile, $idme, $licenseFile, @makeDirs,
+my(@attributes, @copyFiles, $iconFile, $symlinkFile, $idme, $licenseFile, @makeDirs,
  $outputFormat, @resourceFiles, $sourceFile, $sourceFolder, $targetImage,
  $tempDir, $volumeName);
 
@@ -441,6 +449,7 @@ GetOptions('source=s'    => \$sourceFolder,
            'sourcefile'  => \$sourceFile,
            'verbosity=i' => \$gVerbosity,
            'dry-run'     => \$gDryRun,
+		   'symlink=s'   => \$symlinkFile,
            'config=s'    => \%gConfig); # "hidden" option not in usage()
 
 if(@ARGV) {
@@ -608,6 +617,12 @@ if(defined($iconFile)) {
   if($outputFormat eq 'UDZO' &&
    (command($gConfig{'cmd_SetFile'}, '-a', 'C', $tempRoot) != 0)) {
     cleanupDie('SetFile failed');
+  }
+}
+
+if(defined($symlinkFile)) {
+  if((symlink($symlinkFile,$tempRoot.'/'.simple_basename($symlinkFile))) != 1) {
+    cleanupDie('symlink creation failed');
   }
 }
 
@@ -1426,6 +1441,12 @@ sub trapSignal($) {
   cleanupDie('exiting on SIG'.$signalName);
 }
 
+sub simple_basename {
+  my $name = shift @_ ;
+  $name =~ s/^.*\/// ;
+  return $name ;
+}
+
 sub usage() {
   print STDERR (
 "usage: pkg-dmg --source <source-folder>\n".
@@ -1441,6 +1462,7 @@ sub usage() {
 "              [--attribute <a>:<file>]   (set file attributes)\n".
 "              [--idme]                   (make an Internet-enabled image)\n".
 "              [--sourcefile]             (treat --source as a file)\n".
+"              [--symlink <file>]         (a file to link to)\n".
 "              [--verbosity <level>]      (0, 1, 2; default=2)\n".
 "              [--dry-run]                (print what would be done)\n");
   return;
