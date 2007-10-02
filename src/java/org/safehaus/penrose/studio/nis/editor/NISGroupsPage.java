@@ -14,6 +14,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.nis.NISTool;
+import org.safehaus.penrose.studio.nis.conflict.NISGroupsEditor;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.nis.NISDomain;

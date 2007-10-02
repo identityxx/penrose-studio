@@ -36,6 +36,7 @@ import org.safehaus.penrose.ldap.RDNBuilder;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
+import java.util.Stack;
 import java.io.StringReader;
 
 public class NewEntryFromSourceAction extends Action {
@@ -101,11 +102,12 @@ public class NewEntryFromSourceAction extends Action {
                 FilterParser parser = new FilterParser(new StringReader(s));
                 Filter filter = parser.parse();
 
-                FilterIterator fi = new FilterIterator(filter, new FilterVisitor() {
-                    public void preVisit(Collection parents, Filter filter) {
-                        log.debug("Filter: "+filter.getClass().getName());
-
-                        if (!(filter instanceof SimpleFilter)) return;
+                FilterProcessor fp = new FilterProcessor() {
+                    public void process(Stack<Filter> path, Filter filter) throws Exception {
+                        if (!(filter instanceof SimpleFilter)) {
+                            super.process(path, filter);
+                            return;
+                        }
 
                         SimpleFilter sf = (SimpleFilter)filter;
 
@@ -117,8 +119,9 @@ public class NewEntryFromSourceAction extends Action {
 
                         entry.addObjectClass(value.toString());
                     }
-                });
-                fi.run();
+                };
+                
+                fp.process(filter);
             }
 
             String sourceAlias = sourceMapping.getName();

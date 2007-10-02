@@ -114,21 +114,6 @@
            icon="images/properties.png"
            class="org.safehaus.penrose.studio.properties.SystemPropertiesEditor"/>
        <editor
-           id="org.safehaus.penrose.studio.handler.HandlerEditor"
-           name="Handler"
-           icon="images/engine.png"
-           class="org.safehaus.penrose.studio.handler.HandlerEditor"/>
-       <editor
-           id="org.safehaus.penrose.studio.engine.EngineEditor"
-           name="Engine"
-           icon="images/engine.png"
-           class="org.safehaus.penrose.studio.engine.EngineEditor"/>
-       <editor
-           id="org.safehaus.penrose.studio.connector.ConnectorEditor"
-           name="Connector"
-           icon="images/connector.png"
-           class="org.safehaus.penrose.studio.connector.ConnectorEditor"/>
-       <editor
            id="org.safehaus.penrose.studio.module.editor.ModuleEditor"
            name="Module"
            icon="images/object.gif"
@@ -169,20 +154,35 @@
            icon="images/object.gif"
            class="org.safehaus.penrose.studio.nis.domain.NISDomainEditor"/>
        <editor
-           id="org.safehaus.penrose.studio.nis.editor.NISUsersEditor"
+           id="org.safehaus.penrose.studio.nis.database.NISDatabaseEditor"
+           name="NIS Database"
+           icon="images/object.gif"
+           class="org.safehaus.penrose.studio.nis.database.NISDatabaseEditor"/>
+       <editor
+           id="org.safehaus.penrose.studio.nis.ldap.NISLDAPEditor"
+           name="NIS LDAP"
+           icon="images/object.gif"
+           class="org.safehaus.penrose.studio.nis.ldap.NISLDAPEditor"/>
+       <editor
+           id="org.safehaus.penrose.studio.nis.linking.NISLinkEditor"
            name="NIS Users"
            icon="images/object.gif"
-           class="org.safehaus.penrose.studio.nis.editor.NISUsersEditor"/>
+           class="org.safehaus.penrose.studio.nis.linking.NISLinkEditor"/>
        <editor
-           id="org.safehaus.penrose.studio.nis.editor.NISGroupsEditor"
+           id="org.safehaus.penrose.studio.nis.conflict.NISUsersEditor"
            name="NIS Users"
            icon="images/object.gif"
-           class="org.safehaus.penrose.studio.nis.editor.NISGroupsEditor"/>
+           class="org.safehaus.penrose.studio.nis.conflict.NISUsersEditor"/>
        <editor
-           id="org.safehaus.penrose.studio.nis.editor.NISFilesEditor"
+           id="org.safehaus.penrose.studio.nis.conflict.NISGroupsEditor"
+           name="NIS Users"
+           icon="images/object.gif"
+           class="org.safehaus.penrose.studio.nis.conflict.NISGroupsEditor"/>
+       <editor
+           id="org.safehaus.penrose.studio.nis.ownership.NISFilesEditor"
            name="NIS Alignment Tool"
            icon="images/object.gif"
-           class="org.safehaus.penrose.studio.nis.editor.NISFilesEditor"/>
+           class="org.safehaus.penrose.studio.nis.ownership.NISFilesEditor"/>
    </extension>
    <extension
          id="application"

@@ -13,9 +13,6 @@ import org.safehaus.penrose.studio.preview.PreviewEditor;
 import org.safehaus.penrose.studio.nis.NISNode;
 import org.safehaus.penrose.studio.properties.SystemPropertiesNode;
 import org.safehaus.penrose.studio.user.AdministratorNode;
-import org.safehaus.penrose.studio.connector.ConnectorNode;
-import org.safehaus.penrose.studio.engine.EnginesNode;
-import org.safehaus.penrose.studio.handler.HandlersNode;
 import org.safehaus.penrose.studio.logging.LoggingNode;
 import org.safehaus.penrose.studio.service.ServicesNode;
 import org.safehaus.penrose.studio.schema.SchemasNode;
@@ -231,33 +228,6 @@ public class ProjectNode extends Node {
                 "Logging",
                 this);
         children.add(loggingNode);
-
-        children.add(new HandlersNode(
-                serversView,
-                "Handlers",
-                "Handlers",
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
-                "Handlers",
-                this
-        ));
-
-        children.add(new EnginesNode(
-                serversView,
-                "Engines",
-                "Engines",
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
-                "Engines",
-                this
-        ));
-
-        children.add(new ConnectorNode(
-                serversView,
-                "Connector",
-                "Connector",
-                PenrosePlugin.getImage(PenroseImage.CONNECTOR),
-                "Connector",
-                this
-        ));
 
         children.add(new AdministratorNode(
                 "Administrator",

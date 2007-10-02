@@ -1,16 +1,16 @@
-package org.safehaus.penrose.studio.nis.domain;
+package org.safehaus.penrose.studio.nis.conflict;
 
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.safehaus.penrose.studio.nis.NISTool;
 import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.studio.nis.*;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class NISDomainEditor extends FormEditor {
+public class NISGroupsEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
@@ -18,18 +18,20 @@ public class NISDomainEditor extends FormEditor {
     NISDomain domain;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        NISDomainEditorInput ei = (NISDomainEditorInput)input;
+        NISGroupsEditorInput ei = (NISGroupsEditorInput)input;
         nisTool = ei.getNisTool();
         domain = ei.getDomain();
 
         setSite(site);
         setInput(input);
-        setPartName("NIS - "+domain.getName());
+        setPartName("NIS Groups - "+domain.getName());
     }
 
     public void addPages() {
         try {
-            addPage(new NISDomainMainPage(this));
+            //addPage(new NISGroupsPage(this));
+            addPage(new NISGroupScriptsPage(this));
+            addPage(new NISGroupChangesPage(this, domain, nisTool));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

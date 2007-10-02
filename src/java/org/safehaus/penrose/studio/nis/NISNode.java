@@ -3,20 +3,22 @@ package org.safehaus.penrose.studio.nis;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.nis.wizard.NISToolWizard;
 import org.safehaus.penrose.studio.nis.editor.NISEditorInput;
 import org.safehaus.penrose.studio.nis.editor.NISEditor;
+import org.safehaus.penrose.studio.nis.domain.NISDomainNode;
+import org.safehaus.penrose.studio.nis.ownership.NISOwnershipNode;
+import org.safehaus.penrose.studio.nis.linking.NISLinkingNode;
+import org.safehaus.penrose.studio.nis.conflict.NISConflictsNode;
 import org.safehaus.penrose.studio.nis.event.NISEventAdapter;
 import org.safehaus.penrose.studio.nis.event.NISEvent;
-import org.safehaus.penrose.nis.NISDomain;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfigs;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.nis.NISDomain;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
@@ -45,6 +47,10 @@ public class NISNode extends Node {
     protected boolean started;
 
     Map<String,Node> children = new TreeMap<String,Node>();
+
+    NISLinkingNode linkingNode;
+    NISConflictsNode conflictsNode;
+    NISOwnershipNode ownershipNode;
 
     public NISNode(String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
@@ -145,6 +151,9 @@ public class NISNode extends Node {
     }
 
     public void start() throws Exception {
+
+        log.debug("Starting NIS Tool");
+
         Project project = projectNode.getProject();
 
         nisTool = new NISTool();
@@ -181,7 +190,6 @@ public class NISNode extends Node {
         NISDomainNode node = new NISDomainNode(
                 domainName,
                 ServersView.ENTRY,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
                 domain,
                 this
         );
@@ -194,10 +202,7 @@ public class NISNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        Project project = projectNode.getProject();
-        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-
-        return (partitionConfigs.getPartitionConfig(NISTool.NIS_TOOL) != null);
+        return true;
     }
 
     public Collection<Node> getChildren() throws Exception {

@@ -8,6 +8,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.studio.nis.NISTool;
+import org.safehaus.penrose.studio.nis.conflict.NISUserChangesPage;
+import org.safehaus.penrose.studio.nis.conflict.NISGroupChangesPage;
 
 public class NISEditor extends FormEditor {
 
