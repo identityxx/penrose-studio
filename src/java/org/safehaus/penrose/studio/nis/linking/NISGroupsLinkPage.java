@@ -289,14 +289,6 @@ public class NISGroupsLinkPage extends FormPage {
 
                     TableItem item = localTable.getSelection()[0];
 
-                    boolean confirm = MessageDialog.openQuestion(
-                            editor.getSite().getShell(),
-                            "Create",
-                            "Are you sure?"
-                    );
-
-                    if (!confirm) return;
-
                     RDNBuilder rb = new RDNBuilder();
                     rb.set("cn", groupText.getText());
 
@@ -373,15 +365,6 @@ public class NISGroupsLinkPage extends FormPage {
                         createLink(cn, newLink);
 
                     } else {
-
-                        boolean confirm = MessageDialog.openQuestion(
-                                editor.getSite().getShell(),
-                                "Overwrite existing link",
-                                "Are you sure?"
-                        );
-
-                        if (!confirm) return;
-
                         updateLink(cn, newLink);
                     }
 

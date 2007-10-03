@@ -310,14 +310,6 @@ public class NISUsersLinkPage extends FormPage {
 
                     TableItem item = localTable.getSelection()[0];
 
-                    boolean confirm = MessageDialog.openQuestion(
-                            editor.getSite().getShell(),
-                            "Create",
-                            "Are you sure?"
-                    );
-
-                    if (!confirm) return;
-
                     RDNBuilder rb = new RDNBuilder();
                     rb.set("uid", userText.getText());
 
@@ -407,15 +399,6 @@ public class NISUsersLinkPage extends FormPage {
                         createLink(uid, newLink);
                         
                     } else {
-
-                        boolean confirm = MessageDialog.openQuestion(
-                                editor.getSite().getShell(),
-                                "Overwrite existing link",
-                                "Are you sure?"
-                        );
-
-                        if (!confirm) return;
-
                         updateLink(uid, newLink);
                     }
 
