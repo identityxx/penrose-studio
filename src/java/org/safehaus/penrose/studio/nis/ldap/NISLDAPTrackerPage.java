@@ -34,7 +34,7 @@ import java.sql.Timestamp;
 /**
  * @author Endi S. Dewata
  */
-public class NISDomainTrackerPage extends FormPage {
+public class NISLDAPTrackerPage extends FormPage {
 
     public DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -48,7 +48,7 @@ public class NISDomainTrackerPage extends FormPage {
 
     Table trackerTable;
 
-    public NISDomainTrackerPage(NISLDAPEditor editor) {
+    public NISLDAPTrackerPage(NISLDAPEditor editor) {
         super(editor, "TRACKER", "  Tracker  ");
 
         this.editor = editor;

@@ -29,9 +29,9 @@ public class NISLDAPEditor extends FormEditor {
 
     public void addPages() {
         try {
-            addPage(new NISDomainLDAPPage(this));
-            addPage(new NISDomainTrackerPage(this));
-            addPage(new NISDomainErrorsPage(this));
+            addPage(new NISLDAPPage(this));
+            addPage(new NISLDAPTrackerPage(this));
+            addPage(new NISLDAPErrorsPage(this));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

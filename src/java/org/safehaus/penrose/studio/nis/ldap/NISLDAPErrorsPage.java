@@ -32,7 +32,7 @@ import java.sql.Timestamp;
 /**
  * @author Endi S. Dewata
  */
-public class NISDomainErrorsPage extends FormPage {
+public class NISLDAPErrorsPage extends FormPage {
 
     public DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -51,7 +51,7 @@ public class NISDomainErrorsPage extends FormPage {
     Partition partition;
     Source errors;
 
-    public NISDomainErrorsPage(NISLDAPEditor editor) {
+    public NISLDAPErrorsPage(NISLDAPEditor editor) {
         super(editor, "ERRORS", "  Errors  ");
 
         this.editor = editor;

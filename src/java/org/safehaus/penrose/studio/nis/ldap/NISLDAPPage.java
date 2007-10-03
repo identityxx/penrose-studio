@@ -38,7 +38,7 @@ import java.text.SimpleDateFormat;
 /**
  * @author Endi S. Dewata
  */
-public class NISDomainLDAPPage extends FormPage {
+public class NISLDAPPage extends FormPage {
 
     public DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -52,7 +52,7 @@ public class NISDomainLDAPPage extends FormPage {
 
     Table table;
 
-    public NISDomainLDAPPage(NISLDAPEditor editor) {
+    public NISLDAPPage(NISLDAPEditor editor) {
         super(editor, "LDAP", "  LDAP  ");
 
         this.editor = editor;
@@ -94,12 +94,13 @@ public class NISDomainLDAPPage extends FormPage {
         table.setLinesVisible(true);
 
         TableColumn tc = new TableColumn(table, SWT.NONE);
-        tc.setWidth(100);
+        tc.setWidth(150);
         tc.setText("Name");
 
         tc = new TableColumn(table, SWT.NONE);
         tc.setWidth(100);
         tc.setText("Entries");
+        tc.setAlignment(SWT.RIGHT);
 
         Composite links = toolkit.createComposite(leftPanel);
         links.setLayout(new RowLayout());

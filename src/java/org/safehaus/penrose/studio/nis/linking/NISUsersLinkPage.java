@@ -10,6 +10,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -30,7 +31,6 @@ import org.safehaus.penrose.filter.SubstringFilter;
 
 import java.util.Collection;
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 import java.sql.ResultSet;
 
 /**
@@ -40,7 +40,17 @@ public class NISUsersLinkPage extends FormPage {
 
     public Logger log = Logger.getLogger(getClass());
 
+    public final static String LINKED           = "Linked";
+    public final static String MISSING_LINK     = "Missing Link";
+    public final static String NOT_FOUND        = "Not Found";
+    public final static String POSSIBLE_MATCH   = "Possible Match";
+    public final static String MULTIPLE_RESULTS = "Multiple Results";
+
     FormToolkit toolkit;
+
+    Color red;
+    Color green;
+    Color blue;
 
     Table localTable;
     Table globalTable;
@@ -80,6 +90,12 @@ public class NISUsersLinkPage extends FormPage {
         localUsers = partition.getSource("local_users");
         globalUsers = partition.getSource("global_users");
         usersLink = partition.getSource("cache_users_link");
+
+        Display display = Display.getDefault();
+
+        red = display.getSystemColor(SWT.COLOR_RED);
+        green = display.getSystemColor(SWT.COLOR_GREEN);
+        blue = display.getSystemColor(SWT.COLOR_BLUE);
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -93,7 +109,7 @@ public class NISUsersLinkPage extends FormPage {
 
         Section localSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
         localSection.setText("Local Users");
-        localSection.setLayoutData(new GridData(GridData.FILL_BOTH));
+        localSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Control localControl = createLocalControl(localSection);
         localSection.setClient(localControl);
@@ -118,7 +134,9 @@ public class NISUsersLinkPage extends FormPage {
         leftColumn.setLayout(new GridLayout());
 
         localTable = new Table(leftColumn, SWT.BORDER | SWT.FULL_SELECTION);
-        localTable.setLayoutData(new GridData(GridData.FILL_BOTH));
+        GridData gd = new GridData();
+        gd.heightHint = 200;
+        localTable.setLayoutData(gd);
 
         localTable.setHeaderVisible(true);
         localTable.setLinesVisible(true);
@@ -131,30 +149,23 @@ public class NISUsersLinkPage extends FormPage {
         tc.setText("Global");
         tc.setWidth(100);
 
+        tc = new TableColumn(localTable, SWT.NONE);
+        tc.setText("Status");
+        tc.setWidth(100);
+
         localTable.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
                     if (localTable.getSelectionCount() == 0) return;
 
-                    globalTable.removeAll();
-
                     TableItem item = localTable.getSelection()[0];
 
-                    SearchResult result = (SearchResult)item.getData();
-                    Attributes attributes = result.getAttributes();
-                    String uid = (String)attributes.getValue("uid");
-                    String cn = (String)attributes.getValue("cn");
-                    String uidNumber = (String)attributes.getValue("uidNumber");
-                    String gidNumber = (String)attributes.getValue("gidNumber");
-                    String homeDirectory = (String)attributes.getValue("homeDirectory");
-                    String loginShell = (String)attributes.getValue("loginShell");
+                    updateLocal(item);
 
-                    userText.setText(uid == null ? "" : uid);
-                    nameText.setText(cn == null ? "" : cn);
-                    uidText.setText(uidNumber == null ? "" : uidNumber);
-                    gidText.setText(gidNumber == null ? "" : gidNumber);
-                    homeText.setText(homeDirectory == null ? "" : homeDirectory);
-                    shellText.setText(loginShell == null ? "" : loginShell);
+                    Collection<SearchResult> results = getGlobal(item);
+
+                    updateStatus(item, results);
+                    updateGlobal(results);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -192,14 +203,19 @@ public class NISUsersLinkPage extends FormPage {
 
                     if (!confirm) return;
 
-                    TableItem localItem = localTable.getSelection()[0];
-                    SearchResult localResult = (SearchResult)localItem.getData();
+                    TableItem item = localTable.getSelection()[0];
+
+                    SearchResult localResult = (SearchResult)item.getData("local");
                     Attributes localAttributes = localResult.getAttributes();
-                    String localUid = (String)localAttributes.getValue("uid");
+                    String uid = (String)localAttributes.getValue("uid");
 
-                    unlink(localUid);
+                    removeLink(uid);
+                    item.setData("link", null);
 
-                    localItem.setText(1, "");
+                    Collection<SearchResult> results = getGlobal(item);
+
+                    updateStatus(item, results);
+                    updateGlobal(results);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -214,7 +230,7 @@ public class NISUsersLinkPage extends FormPage {
 
         Label uidLabel = new Label(rightColumn, SWT.NONE);
         uidLabel.setText("User:");
-        GridData gd = new GridData();
+        gd = new GridData();
         gd.widthHint = 80;
         uidLabel.setLayoutData(gd);
 
@@ -232,34 +248,38 @@ public class NISUsersLinkPage extends FormPage {
         uidNumberLabel.setText("UID:");
         uidNumberLabel.setLayoutData(new GridData());
 
-        uidText = new Text(rightColumn, SWT.BORDER | SWT.READ_ONLY);
+        uidText = new Text(rightColumn, SWT.BORDER);
+        uidText.setEnabled(false);
         uidText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label gidNumberLabel = new Label(rightColumn, SWT.NONE);
         gidNumberLabel.setText("GID:");
         gidNumberLabel.setLayoutData(new GridData());
 
-        gidText = new Text(rightColumn, SWT.BORDER | SWT.READ_ONLY);
+        gidText = new Text(rightColumn, SWT.BORDER);
+        gidText.setEnabled(false);
         gidText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label homeDirectoryLabel = new Label(rightColumn, SWT.NONE);
         homeDirectoryLabel.setText("Home:");
         homeDirectoryLabel.setLayoutData(new GridData());
 
-        homeText = new Text(rightColumn, SWT.BORDER | SWT.READ_ONLY);
+        homeText = new Text(rightColumn, SWT.BORDER);
+        homeText.setEnabled(false);
         homeText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label loginShellLabel = new Label(rightColumn, SWT.NONE);
         loginShellLabel.setText("Shell:");
         loginShellLabel.setLayoutData(new GridData());
 
-        shellText = new Text(rightColumn, SWT.BORDER | SWT.READ_ONLY);
+        shellText = new Text(rightColumn, SWT.BORDER);
+        shellText.setEnabled(false);
         shellText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         new Label(rightColumn, SWT.NONE);
 
         Composite rightButtons = toolkit.createComposite(rightColumn);
-        rightButtons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
+        rightButtons.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         rightButtons.setLayout(new RowLayout());
 
         Button searchButton = new Button(rightButtons, SWT.PUSH);
@@ -268,7 +288,11 @@ public class NISUsersLinkPage extends FormPage {
         searchButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    search();
+                    if (localTable.getSelectionCount() == 0) return;
+
+                    Collection<SearchResult> results = searchGlobal(userText.getText(), nameText.getText());
+                    updateGlobal(results);
+
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
@@ -284,8 +308,7 @@ public class NISUsersLinkPage extends FormPage {
                 try {
                     if (localTable.getSelectionCount() == 0) return;
 
-                    TableItem ti = localTable.getSelection()[0];
-                    SearchResult result = (SearchResult)ti.getData();
+                    TableItem item = localTable.getSelection()[0];
 
                     boolean confirm = MessageDialog.openQuestion(
                             editor.getSite().getShell(),
@@ -298,13 +321,17 @@ public class NISUsersLinkPage extends FormPage {
                     RDNBuilder rb = new RDNBuilder();
                     rb.set("uid", userText.getText());
 
+                    SearchResult result = (SearchResult)item.getData("local");
                     Attributes attributes = (Attributes)result.getAttributes().clone();
                     attributes.setValue("uid", userText.getText());
                     attributes.setValue("cn", nameText.getText());
 
                     globalUsers.add(rb.toRdn(), attributes);
 
-                    search();
+                    Collection<SearchResult> results = searchGlobal(userText.getText(), nameText.getText());
+
+                    updateStatus(item, results);
+                    updateGlobal(results);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -326,20 +353,6 @@ public class NISUsersLinkPage extends FormPage {
 
         globalTable.setHeaderVisible(true);
         globalTable.setLinesVisible(true);
-
-        globalTable.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                try {
-                    if (globalTable.getSelectionCount() == 0) return;
-
-                    TableItem item = globalTable.getSelection()[0];
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
-                }
-            }
-        });
 
         TableColumn tc = new TableColumn(globalTable, SWT.NONE);
         tc.setText("User");
@@ -376,36 +389,43 @@ public class NISUsersLinkPage extends FormPage {
             public void widgetSelected(SelectionEvent event) {
                 try {
                     if (localTable.getSelectionCount() == 0) return;
-
-                    TableItem localItem = localTable.getSelection()[0];
-                    SearchResult localResult = (SearchResult)localItem.getData();
-                    Attributes localAttributes = localResult.getAttributes();
-                    String localUid = (String)localAttributes.getValue("uid");
-                    String link = localItem.getText(1);
-
                     if (globalTable.getSelectionCount() == 0) return;
 
+                    TableItem item = localTable.getSelection()[0];
                     TableItem globalItem = globalTable.getSelection()[0];
-                    SearchResult globalResult = (SearchResult)globalItem.getData();
+
+                    SearchResult localResult = (SearchResult)item.getData("local");
+                    Attributes localAttributes = localResult.getAttributes();
+                    String uid = (String)localAttributes.getValue("uid");
+
+                    SearchResult globalResult = (SearchResult)globalItem.getData("global");
                     Attributes globalAttributes = globalResult.getAttributes();
-                    String globalUid = (String)globalAttributes.getValue("uid");
+                    String newLink = (String)globalAttributes.getValue("uid");
 
-                    boolean confirm = MessageDialog.openQuestion(
-                            editor.getSite().getShell(),
-                            "Link",
-                            "Are you sure?"
-                    );
-
-                    if (!confirm) return;
-
-                    if ("".equals(link)) {
-                        createLink(localUid, globalUid);
+                    String link = (String)item.getData("link");
+                    if (link == null) {
+                        createLink(uid, newLink);
+                        
                     } else {
-                        updateLink(localUid, globalUid);
+
+                        boolean confirm = MessageDialog.openQuestion(
+                                editor.getSite().getShell(),
+                                "Overwrite existing link",
+                                "Are you sure?"
+                        );
+
+                        if (!confirm) return;
+
+                        updateLink(uid, newLink);
                     }
 
-                    localItem.setText(1, globalUid);
-                    
+                    item.setData("link", newLink);
+
+                    Collection<SearchResult> results = getGlobal(item);
+
+                    updateStatus(item, results);
+                    updateGlobal(results);
+
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
@@ -419,10 +439,13 @@ public class NISUsersLinkPage extends FormPage {
         deleteButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
+                    if (localTable.getSelectionCount() == 0) return;
                     if (globalTable.getSelectionCount() == 0) return;
 
-                    TableItem ti = globalTable.getSelection()[0];
-                    SearchResult result = (SearchResult)ti.getData();
+                    TableItem item = localTable.getSelection()[0];
+                    TableItem globalItem = globalTable.getSelection()[0];
+
+                    SearchResult result = (SearchResult)globalItem.getData("global");
 
                     boolean confirm = MessageDialog.openQuestion(
                             editor.getSite().getShell(),
@@ -434,7 +457,10 @@ public class NISUsersLinkPage extends FormPage {
 
                     globalUsers.delete(result.getDn().getRdn());
 
-                    search();
+                    Collection<SearchResult> results = searchGlobal(userText.getText(), nameText.getText());
+
+                    updateStatus(item, results);
+                    updateGlobal(results);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -447,59 +473,172 @@ public class NISUsersLinkPage extends FormPage {
         return composite;
     }
 
-    public SubstringFilter createFilter(String name, String s) {
+    public Filter createFilter(String name, String s) {
+        if (s == null) return null;
+
         Collection<Object> substrings = new ArrayList<Object>();
         substrings.add(SubstringFilter.STAR);
 
-        StringTokenizer st = new StringTokenizer(s, " ");
-        while (st.hasMoreTokens()) {
-            substrings.add(st.nextToken());
+        StringBuilder sb = null;
+
+        for (char c : s.toCharArray()) {
+            if (Character.isLetter(c)) {
+                if (sb == null) sb = new StringBuilder();
+                sb.append(c);
+
+            } else if (sb != null) {
+                if (sb.length() >= 2) {
+                    substrings.add(sb.toString());
+                    substrings.add(SubstringFilter.STAR);
+                }
+                sb = null;
+            }
+        }
+
+        if (sb != null) {
+            substrings.add(sb.toString());
             substrings.add(SubstringFilter.STAR);
         }
 
         return new SubstringFilter(name, substrings);
     }
 
-    public void search() throws Exception {
+    public void updateGlobal(Collection<SearchResult> results) throws Exception {
+
         globalTable.removeAll();
 
-        if (localTable.getSelectionCount() == 0) return;
+        for (SearchResult result : results) {
+            Attributes attributes = result.getAttributes();
+            String globalUid = (String)attributes.getValue("uid");
+            String globalCn = (String)attributes.getValue("cn");
+            String globalUidNumber = (String)attributes.getValue("uidNumber");
+            String globalGidNumber = (String)attributes.getValue("gidNumber");
+            String globalHomeDirectory = (String)attributes.getValue("homeDirectory");
+            String globalLoginShell = (String)attributes.getValue("loginShell");
+
+            TableItem ti = new TableItem(globalTable, SWT.NONE);
+            ti.setText(0, globalUid == null ? "" : globalUid);
+            ti.setText(1, globalCn == null ? "" : globalCn);
+            ti.setText(2, globalUidNumber == null ? "" : globalUidNumber);
+            ti.setText(3, globalGidNumber == null ? "" : globalGidNumber);
+            ti.setText(4, globalHomeDirectory == null ? "" : globalHomeDirectory);
+            ti.setText(5, globalLoginShell == null ? "" : globalLoginShell);
+            ti.setData("global", result);
+        }
+
+        globalTable.setSelection(0);
+    }
+
+    public Collection<SearchResult> getGlobal(TableItem item) throws Exception {
+        SearchResult result = (SearchResult)item.getData("local");
+        Attributes attributes = result.getAttributes();
+        String uid = (String)attributes.getValue("uid");
+        String cn = (String)attributes.getValue("cn");
+
+        String link = (String)item.getData("link");
+
+        if (link == null) {
+            return searchGlobal(uid, cn);
+
+        } else {
+            return findGlobal(link);
+        }
+    }
+
+    public Collection<SearchResult> searchGlobal(String uid, String cn) throws Exception {
 
         Filter filter = null;
-
-        if (! "".equals(userText.getText())) {
-            filter = FilterTool.appendAndFilter(filter, createFilter("uid", userText.getText()));
-        }
-
-        if (! "".equals(nameText.getText())) {
-            filter = FilterTool.appendAndFilter(filter, createFilter("cn", nameText.getText()));
-        }
+        filter = FilterTool.appendOrFilter(filter, createFilter("uid", uid));
+        filter = FilterTool.appendOrFilter(filter, createFilter("cn", cn));
 
         SearchRequest request = new SearchRequest();
         request.setFilter(filter);
 
-        SearchResponse response = new SearchResponse() {
-            public void add(SearchResult result) throws Exception {
-                Attributes attributes = result.getAttributes();
-                String globalUid = (String)attributes.getValue("uid");
-                String globalCn = (String)attributes.getValue("cn");
-                String globalUidNumber = (String)attributes.getValue("uidNumber");
-                String globalGidNumber = (String)attributes.getValue("gidNumber");
-                String globalHomeDirectory = (String)attributes.getValue("homeDirectory");
-                String globalLoginShell = (String)attributes.getValue("loginShell");
-
-                TableItem ti = new TableItem(globalTable, SWT.NONE);
-                ti.setText(0, globalUid == null ? "" : globalUid);
-                ti.setText(1, globalCn == null ? "" : globalCn);
-                ti.setText(2, globalUidNumber == null ? "" : globalUidNumber);
-                ti.setText(3, globalGidNumber == null ? "" : globalGidNumber);
-                ti.setText(4, globalHomeDirectory == null ? "" : globalHomeDirectory);
-                ti.setText(5, globalLoginShell == null ? "" : globalLoginShell);
-                ti.setData(result);
-            }
-        };
+        SearchResponse response = new SearchResponse();
 
         globalUsers.search(request, response);
+
+        return response.getAll();
+    }
+
+    public Collection<SearchResult> findGlobal(String uid) throws Exception {
+
+        RDNBuilder rb = new RDNBuilder();
+        rb.set("uid", uid);
+
+        SearchRequest request = new SearchRequest();
+        request.setDn(rb.toRdn());
+
+        SearchResponse response = new SearchResponse();
+
+        try {
+            globalUsers.search(request, response);
+            return response.getAll();
+
+        } catch (Exception e) {
+            return new ArrayList<SearchResult>();
+        }
+    }
+
+    public void updateLocal(TableItem item) throws Exception {
+        SearchResult result = (SearchResult)item.getData("local");
+        Attributes attributes = result.getAttributes();
+        String uid = (String)attributes.getValue("uid");
+        String cn = (String)attributes.getValue("cn");
+        String uidNumber = (String)attributes.getValue("uidNumber");
+        String gidNumber = (String)attributes.getValue("gidNumber");
+        String homeDirectory = (String)attributes.getValue("homeDirectory");
+        String loginShell = (String)attributes.getValue("loginShell");
+
+        userText.setText(uid == null ? "" : uid);
+        nameText.setText(cn == null ? "" : cn);
+        uidText.setText(uidNumber == null ? "" : uidNumber);
+        gidText.setText(gidNumber == null ? "" : gidNumber);
+        homeText.setText(homeDirectory == null ? "" : homeDirectory);
+        shellText.setText(loginShell == null ? "" : loginShell);
+    }
+
+    public void updateStatus(TableItem item, Collection<SearchResult> results) throws Exception {
+        String link = (String)item.getData("link");
+        if (link != null) {
+
+            if (results.size() == 1) {
+
+                SearchResult r = results.iterator().next();
+                Attributes attrs = r.getAttributes();
+                String uid = (String)attrs.getValue("uid");
+
+                if (link.equals(uid)) {
+                    item.setText(1, link);
+                    item.setText(2, LINKED);
+                    item.setForeground(2, green);
+                    return;
+                }
+            }
+
+            item.setText(1, link);
+            item.setText(2, MISSING_LINK);
+            item.setForeground(2, red);
+
+        } else if (results.size() > 1) {
+            item.setText(1, "");
+            item.setText(2, MULTIPLE_RESULTS);
+            item.setForeground(2, red);
+
+        } else if (results.size() == 1) {
+            SearchResult r = results.iterator().next();
+            Attributes attrs = r.getAttributes();
+            String uid = (String)attrs.getValue("uid");
+
+            item.setText(1, uid);
+            item.setText(2, POSSIBLE_MATCH);
+            item.setForeground(2, blue);
+
+        } else {
+            item.setText(1, "");
+            item.setText(2, NOT_FOUND);
+            item.setForeground(2, red);
+        }
     }
 
     public void refresh() {
@@ -513,40 +652,47 @@ public class NISUsersLinkPage extends FormPage {
                     Attributes attributes = result.getAttributes();
                     String uid = (String)attributes.getValue("uid");
 
-                    Collection<Assignment> assignments = new ArrayList<Assignment>();
-                    assignments.add(new Assignment(uid));
+                    TableItem item = new TableItem(localTable, SWT.NONE);
+                    item.setText(0, uid == null ? "" : uid);
+                    item.setData("local", result);
 
-                    QueryResponse queryResponse = new QueryResponse() {
-                        public void add(Object object) throws Exception {
-                            ResultSet rs = (ResultSet)object;
-                            String globalUid = rs.getString(1);
-                            super.add(globalUid);
-                        }
-                    };
+                    String link = getLink(uid);
+                    item.setData("link", link);
 
-                    client.executeQuery(
-                            "select globalUid from "+client.getTableName(usersLink)+" where uid=?",
-                            assignments,
-                            queryResponse
-                    );
-
-                    String globalUid = queryResponse.hasNext() ? (String)queryResponse.next() : null;
-
-                    TableItem ti = new TableItem(localTable, SWT.NONE);
-                    ti.setText(0, uid == null ? "" : uid);
-                    ti.setText(1, globalUid == null ? "" : globalUid);
-                    ti.setData(result);
+                    Collection<SearchResult> results = getGlobal(item);
+                    updateStatus(item, results);
                 }
             };
 
             localUsers.search(request, response);
 
             localTable.setSelection(selection);
-            
+
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
         }
+    }
+
+    public String getLink(String uid) throws Exception {
+        Collection<Assignment> assignments = new ArrayList<Assignment>();
+        assignments.add(new Assignment(uid));
+
+        QueryResponse queryResponse = new QueryResponse() {
+            public void add(Object object) throws Exception {
+                ResultSet rs = (ResultSet)object;
+                String globalUid = rs.getString(1);
+                super.add(globalUid);
+            }
+        };
+
+        client.executeQuery(
+                "select globalUid from "+client.getTableName(usersLink)+" where uid=?",
+                assignments,
+                queryResponse
+        );
+
+        return queryResponse.hasNext() ? (String)queryResponse.next() : null;
     }
 
     public void createLink(String uid, String globalUid) throws Exception {
@@ -573,7 +719,7 @@ public class NISUsersLinkPage extends FormPage {
         );
     }
 
-    public void unlink(String uid) throws Exception {
+    public void removeLink(String uid) throws Exception {
 
         Collection<Assignment> assignments = new ArrayList<Assignment>();
         assignments.add(new Assignment(uid));
