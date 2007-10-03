@@ -88,32 +88,30 @@ public class NISGroupsLinkPage extends FormPage {
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-        Section localGroupsSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        localGroupsSection.setText("Local Groups");
-        localGroupsSection.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Section localSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        localSection.setText("Local Groups");
+        localSection.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Control localGroupsControl = createLocalGroupsControl(localGroupsSection);
-        localGroupsSection.setClient(localGroupsControl);
+        Control localControl = createLocalControl(localSection);
+        localSection.setClient(localControl);
 
-        Section globalGroupsSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        globalGroupsSection.setText("Global Groups");
-        globalGroupsSection.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Section globalSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        globalSection.setText("Global Groups");
+        globalSection.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Control globalGroupsControl = createGlobalGroupsControl(globalGroupsSection);
-        globalGroupsSection.setClient(globalGroupsControl);
+        Control globalControl = createGlobalControl(globalSection);
+        globalSection.setClient(globalControl);
 
         refresh();
     }
 
-    public Composite createLocalGroupsControl(Composite parent) {
+    public Composite createLocalControl(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
 
         Composite leftColumn = toolkit.createComposite(composite);
-        GridData gd = new GridData(GridData.FILL_VERTICAL);
-        gd.widthHint = 250;
-        leftColumn.setLayoutData(gd);
+        leftColumn.setLayoutData(new GridData(GridData.FILL_VERTICAL));
         leftColumn.setLayout(new GridLayout());
 
         localTable = new Table(leftColumn, SWT.BORDER | SWT.FULL_SELECTION);
@@ -214,7 +212,7 @@ public class NISGroupsLinkPage extends FormPage {
 
         Label groupLabel = new Label(rightColumn, SWT.NONE);
         groupLabel.setText("Group:");
-        gd = new GridData();
+        GridData gd = new GridData();
         gd.widthHint = 80;
         groupLabel.setLayoutData(gd);
 
@@ -298,7 +296,7 @@ public class NISGroupsLinkPage extends FormPage {
         return composite;
     }
 
-    public Composite createGlobalGroupsControl(Composite parent) {
+    public Composite createGlobalControl(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout());

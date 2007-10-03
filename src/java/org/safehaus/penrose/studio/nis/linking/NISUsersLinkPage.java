@@ -91,32 +91,30 @@ public class NISUsersLinkPage extends FormPage {
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-        Section localUsersSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        localUsersSection.setText("Local Users");
-        localUsersSection.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Section localSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        localSection.setText("Local Users");
+        localSection.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Control localUsersControl = createLocalUsersControl(localUsersSection);
-        localUsersSection.setClient(localUsersControl);
+        Control localControl = createLocalControl(localSection);
+        localSection.setClient(localControl);
 
-        Section globalUsersSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        globalUsersSection.setText("Global Users");
-        globalUsersSection.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Section globalSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        globalSection.setText("Global Users");
+        globalSection.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Control globalUsersControl = createGlobalUsersControl(globalUsersSection);
-        globalUsersSection.setClient(globalUsersControl);
+        Control globalControl = createGlobalControl(globalSection);
+        globalSection.setClient(globalControl);
 
         refresh();
     }
 
-    public Composite createLocalUsersControl(Composite parent) {
+    public Composite createLocalControl(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
 
         Composite leftColumn = toolkit.createComposite(composite);
-        GridData gd = new GridData(GridData.FILL_VERTICAL);
-        gd.widthHint = 250;
-        leftColumn.setLayoutData(gd);
+        leftColumn.setLayoutData(new GridData(GridData.FILL_VERTICAL));
         leftColumn.setLayout(new GridLayout());
 
         localTable = new Table(leftColumn, SWT.BORDER | SWT.FULL_SELECTION);
@@ -216,7 +214,7 @@ public class NISUsersLinkPage extends FormPage {
 
         Label uidLabel = new Label(rightColumn, SWT.NONE);
         uidLabel.setText("User:");
-        gd = new GridData();
+        GridData gd = new GridData();
         gd.widthHint = 80;
         uidLabel.setLayoutData(gd);
 
@@ -318,7 +316,7 @@ public class NISUsersLinkPage extends FormPage {
         return composite;
     }
 
-    public Composite createGlobalUsersControl(Composite parent) {
+    public Composite createGlobalControl(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout());
