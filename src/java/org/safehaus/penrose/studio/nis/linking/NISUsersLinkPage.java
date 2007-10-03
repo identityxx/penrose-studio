@@ -547,7 +547,7 @@ public class NISUsersLinkPage extends FormPage {
     }
 
     public Filter createFilter(String name, String s) {
-        if (s == null) return null;
+        if (s == null || "".equals(s)) return null;
 
         Collection<Object> substrings = new ArrayList<Object>();
         substrings.add(SubstringFilter.STAR);
