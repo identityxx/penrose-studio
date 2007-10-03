@@ -310,17 +310,32 @@ public class NISUsersLinkPage extends FormPage {
 
                     TableItem item = localTable.getSelection()[0];
 
-                    RDNBuilder rb = new RDNBuilder();
-                    rb.set("uid", userText.getText());
-
                     SearchResult result = (SearchResult)item.getData("local");
-                    Attributes attributes = (Attributes)result.getAttributes().clone();
-                    attributes.setValue("uid", userText.getText());
-                    attributes.setValue("cn", nameText.getText());
+                    Attributes attributes = result.getAttributes();
+                    String uid = (String)attributes.getValue("uid");
 
-                    globalUsers.add(rb.toRdn(), attributes);
+                    String newLink = userText.getText();
 
-                    Collection<SearchResult> results = searchGlobal(userText.getText(), nameText.getText());
+                    RDNBuilder rb = new RDNBuilder();
+                    rb.set("uid", newLink);
+
+                    Attributes globalAttributes = (Attributes)attributes.clone();
+                    globalAttributes.setValue("uid", newLink);
+                    globalAttributes.setValue("cn", nameText.getText());
+
+                    globalUsers.add(rb.toRdn(), globalAttributes);
+
+                    String link = (String)item.getData("link");
+                    if (link == null) {
+                        createLink(uid, newLink);
+
+                    } else {
+                        updateLink(uid, newLink);
+                    }
+
+                    item.setData("link", newLink);
+
+                    Collection<SearchResult> results = getGlobal(item);
 
                     updateStatus(item, results);
                     updateGlobal(results);
@@ -438,7 +453,19 @@ public class NISUsersLinkPage extends FormPage {
 
                     if (!confirm) return;
 
-                    globalUsers.delete(result.getDn().getRdn());
+                    RDN rdn = result.getDn().getRdn();
+                    String globalUid = (String)rdn.get("uid");
+
+                    globalUsers.delete(rdn);
+
+                    SearchResult localResult = (SearchResult)item.getData("local");
+                    Attributes localAttributes = localResult.getAttributes();
+                    String uid = (String)localAttributes.getValue("uid");
+
+                    if (uid.equals(globalUid)) {
+                        removeLink(uid);
+                        item.setData("link", null);
+                    }
 
                     Collection<SearchResult> results = searchGlobal(userText.getText(), nameText.getText());
 
