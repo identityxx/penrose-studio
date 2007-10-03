@@ -133,7 +133,7 @@ public class NISUsersLinkPage extends FormPage {
         leftColumn.setLayoutData(new GridData(GridData.FILL_VERTICAL));
         leftColumn.setLayout(new GridLayout());
 
-        localTable = new Table(leftColumn, SWT.BORDER | SWT.FULL_SELECTION);
+        localTable = new Table(leftColumn, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
         GridData gd = new GridData();
         gd.heightHint = 200;
         localTable.setLayoutData(gd);
@@ -156,15 +156,18 @@ public class NISUsersLinkPage extends FormPage {
         localTable.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    if (localTable.getSelectionCount() == 0) return;
+                    if (localTable.getSelectionCount() != 1) {
+                        clearLocal();
+                        clearGlobal();
+                        return;
+                    }
 
                     TableItem item = localTable.getSelection()[0];
 
-                    updateLocal(item);
-
                     Collection<SearchResult> results = getGlobal(item);
-
                     updateStatus(item, results);
+
+                    updateLocal(item);
                     updateGlobal(results);
 
                 } catch (Exception e) {
@@ -193,7 +196,8 @@ public class NISUsersLinkPage extends FormPage {
         unlinkButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    if (localTable.getSelectionCount() == 0) return;
+                    int count = localTable.getSelectionCount();
+                    if (count == 0) return;
 
                     boolean confirm = MessageDialog.openQuestion(
                             editor.getSite().getShell(),
@@ -203,19 +207,21 @@ public class NISUsersLinkPage extends FormPage {
 
                     if (!confirm) return;
 
-                    TableItem item = localTable.getSelection()[0];
+                    for (TableItem item : localTable.getSelection()) {
+                        SearchResult localResult = (SearchResult)item.getData("local");
+                        Attributes localAttributes = localResult.getAttributes();
+                        String uid = (String)localAttributes.getValue("uid");
 
-                    SearchResult localResult = (SearchResult)item.getData("local");
-                    Attributes localAttributes = localResult.getAttributes();
-                    String uid = (String)localAttributes.getValue("uid");
+                        removeLink(uid);
+                        item.setData("link", null);
 
-                    removeLink(uid);
-                    item.setData("link", null);
+                        Collection<SearchResult> results = getGlobal(item);
+                        updateStatus(item, results);
 
-                    Collection<SearchResult> results = getGlobal(item);
-
-                    updateStatus(item, results);
-                    updateGlobal(results);
+                        if (count == 1) {
+                            updateGlobal(results);
+                        }
+                    }
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -306,39 +312,68 @@ public class NISUsersLinkPage extends FormPage {
         createButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    if (localTable.getSelectionCount() == 0) return;
+                    int count = localTable.getSelectionCount();
+                    if (count == 0) return;
 
-                    TableItem item = localTable.getSelection()[0];
+                    if (count == 1) {
+                        TableItem item = localTable.getSelection()[0];
 
-                    SearchResult result = (SearchResult)item.getData("local");
-                    Attributes attributes = result.getAttributes();
-                    String uid = (String)attributes.getValue("uid");
+                        SearchResult result = (SearchResult)item.getData("local");
+                        Attributes attributes = result.getAttributes();
+                        String uid = (String)attributes.getValue("uid");
 
-                    String newLink = userText.getText();
+                        String newLink = userText.getText();
 
-                    RDNBuilder rb = new RDNBuilder();
-                    rb.set("uid", newLink);
+                        RDNBuilder rb = new RDNBuilder();
+                        rb.set("uid", newLink);
 
-                    Attributes globalAttributes = (Attributes)attributes.clone();
-                    globalAttributes.setValue("uid", newLink);
-                    globalAttributes.setValue("cn", nameText.getText());
+                        Attributes globalAttributes = (Attributes)attributes.clone();
+                        globalAttributes.setValue("uid", newLink);
+                        globalAttributes.setValue("cn", nameText.getText());
 
-                    globalUsers.add(rb.toRdn(), globalAttributes);
+                        globalUsers.add(rb.toRdn(), globalAttributes);
 
-                    String link = (String)item.getData("link");
-                    if (link == null) {
-                        createLink(uid, newLink);
+                        String link = (String)item.getData("link");
+                        if (link == null) {
+                            createLink(uid, newLink);
 
-                    } else {
-                        updateLink(uid, newLink);
+                        } else {
+                            updateLink(uid, newLink);
+                        }
+
+                        item.setData("link", newLink);
+
+                        Collection<SearchResult> results = getGlobal(item);
+
+                        updateStatus(item, results);
+                        updateGlobal(results);
+
+                        return;
                     }
 
-                    item.setData("link", newLink);
+                    for (TableItem item : localTable.getSelection()) {
+                        String status = item.getText(2);
+                        if (!NOT_FOUND.equals(status)) continue;
+                        
+                        SearchResult result = (SearchResult)item.getData("local");
+                        Attributes attributes = result.getAttributes();
+                        String uid = (String)attributes.getValue("uid");
 
-                    Collection<SearchResult> results = getGlobal(item);
+                        globalUsers.add(result.getDn().getRdn(), result.getAttributes());
 
-                    updateStatus(item, results);
-                    updateGlobal(results);
+                        String link = (String)item.getData("link");
+                        if (link == null) {
+                            createLink(uid, uid);
+
+                        } else {
+                            updateLink(uid, uid);
+                        }
+
+                        item.setData("link", uid);
+
+                        Collection<SearchResult> results = getGlobal(item);
+                        updateStatus(item, results);
+                    }
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -395,34 +430,61 @@ public class NISUsersLinkPage extends FormPage {
         linkButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    if (localTable.getSelectionCount() == 0) return;
-                    if (globalTable.getSelectionCount() == 0) return;
+                    int count = localTable.getSelectionCount();
+                    if (count == 0) return;
 
-                    TableItem item = localTable.getSelection()[0];
-                    TableItem globalItem = globalTable.getSelection()[0];
+                    if (count == 1) {
+                        if (globalTable.getSelectionCount() == 0) return;
 
-                    SearchResult localResult = (SearchResult)item.getData("local");
-                    Attributes localAttributes = localResult.getAttributes();
-                    String uid = (String)localAttributes.getValue("uid");
+                        TableItem item = localTable.getSelection()[0];
+                        TableItem globalItem = globalTable.getSelection()[0];
 
-                    SearchResult globalResult = (SearchResult)globalItem.getData("global");
-                    Attributes globalAttributes = globalResult.getAttributes();
-                    String newLink = (String)globalAttributes.getValue("uid");
+                        SearchResult localResult = (SearchResult)item.getData("local");
+                        Attributes localAttributes = localResult.getAttributes();
+                        String uid = (String)localAttributes.getValue("uid");
 
-                    String link = (String)item.getData("link");
-                    if (link == null) {
-                        createLink(uid, newLink);
-                        
-                    } else {
-                        updateLink(uid, newLink);
+                        SearchResult globalResult = (SearchResult)globalItem.getData("global");
+                        Attributes globalAttributes = globalResult.getAttributes();
+                        String newLink = (String)globalAttributes.getValue("uid");
+
+                        String link = (String)item.getData("link");
+                        if (link == null) {
+                            createLink(uid, newLink);
+
+                        } else {
+                            updateLink(uid, newLink);
+                        }
+
+                        item.setData("link", newLink);
+
+                        Collection<SearchResult> results = getGlobal(item);
+
+                        updateStatus(item, results);
+                        updateGlobal(results);
+
+                        return;
                     }
 
-                    item.setData("link", newLink);
+                    for (TableItem item : localTable.getSelection()) {
+                        String uid = item.getText(0);
+                        String newLink = item.getText(1);
+                        String status = item.getText(2);
+                        if (!POSSIBLE_MATCH.equals(status)) continue;
 
-                    Collection<SearchResult> results = getGlobal(item);
+                        String link = (String)item.getData("link");
+                        if (link == null) {
+                            createLink(uid, newLink);
 
-                    updateStatus(item, results);
-                    updateGlobal(results);
+                        } else {
+                            updateLink(uid, newLink);
+                        }
+
+                        item.setData("link", newLink);
+
+                        Collection<SearchResult> results = getGlobal(item);
+
+                        updateStatus(item, results);
+                    }
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -441,36 +503,37 @@ public class NISUsersLinkPage extends FormPage {
                     if (globalTable.getSelectionCount() == 0) return;
 
                     TableItem item = localTable.getSelection()[0];
-                    TableItem globalItem = globalTable.getSelection()[0];
 
-                    SearchResult result = (SearchResult)globalItem.getData("global");
+                    for (TableItem globalItem : globalTable.getSelection()) {
+                        SearchResult result = (SearchResult)globalItem.getData("global");
 
-                    boolean confirm = MessageDialog.openQuestion(
-                            editor.getSite().getShell(),
-                            "Delete",
-                            "Are you sure?"
-                    );
+                        boolean confirm = MessageDialog.openQuestion(
+                                editor.getSite().getShell(),
+                                "Delete",
+                                "Are you sure?"
+                        );
 
-                    if (!confirm) return;
+                        if (!confirm) return;
 
-                    RDN rdn = result.getDn().getRdn();
-                    String globalUid = (String)rdn.get("uid");
+                        RDN rdn = result.getDn().getRdn();
+                        String globalUid = (String)rdn.get("uid");
 
-                    globalUsers.delete(rdn);
+                        globalUsers.delete(rdn);
 
-                    SearchResult localResult = (SearchResult)item.getData("local");
-                    Attributes localAttributes = localResult.getAttributes();
-                    String uid = (String)localAttributes.getValue("uid");
+                        SearchResult localResult = (SearchResult)item.getData("local");
+                        Attributes localAttributes = localResult.getAttributes();
+                        String uid = (String)localAttributes.getValue("uid");
 
-                    if (uid.equals(globalUid)) {
-                        removeLink(uid);
-                        item.setData("link", null);
+                        if (uid.equals(globalUid)) {
+                            removeLink(uid);
+                            item.setData("link", null);
+                        }
+
+                        Collection<SearchResult> results = searchGlobal(userText.getText(), nameText.getText());
+
+                        updateStatus(item, results);
+                        updateGlobal(results);
                     }
-
-                    Collection<SearchResult> results = searchGlobal(userText.getText(), nameText.getText());
-
-                    updateStatus(item, results);
-                    updateGlobal(results);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -537,6 +600,10 @@ public class NISUsersLinkPage extends FormPage {
         }
 
         globalTable.setSelection(0);
+    }
+
+    public void clearGlobal() {
+        globalTable.removeAll();
     }
 
     public Collection<SearchResult> getGlobal(TableItem item) throws Exception {
@@ -606,6 +673,15 @@ public class NISUsersLinkPage extends FormPage {
         gidText.setText(gidNumber == null ? "" : gidNumber);
         homeText.setText(homeDirectory == null ? "" : homeDirectory);
         shellText.setText(loginShell == null ? "" : loginShell);
+    }
+
+    public void clearLocal() throws Exception {
+        userText.setText("");
+        nameText.setText("");
+        uidText.setText("");
+        gidText.setText("");
+        homeText.setText("");
+        shellText.setText("");
     }
 
     public void updateStatus(TableItem item, Collection<SearchResult> results) throws Exception {

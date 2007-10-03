@@ -131,7 +131,7 @@ public class NISGroupsLinkPage extends FormPage {
         leftColumn.setLayoutData(new GridData(GridData.FILL_VERTICAL));
         leftColumn.setLayout(new GridLayout());
 
-        localTable = new Table(leftColumn, SWT.BORDER | SWT.FULL_SELECTION);
+        localTable = new Table(leftColumn, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
         GridData gd = new GridData();
         gd.heightHint = 200;
         localTable.setLayoutData(gd);
@@ -154,15 +154,18 @@ public class NISGroupsLinkPage extends FormPage {
         localTable.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    if (localTable.getSelectionCount() == 0) return;
+                    if (localTable.getSelectionCount() != 1) {
+                        clearLocal();
+                        clearGlobal();
+                        return;
+                    }
 
                     TableItem item = localTable.getSelection()[0];
 
-                    updateLocal(item);
-
                     Collection<SearchResult> results = getGlobal(item);
-
                     updateStatus(item, results);
+
+                    updateLocal(item);
                     updateGlobal(results);
 
                 } catch (Exception e) {
@@ -191,7 +194,8 @@ public class NISGroupsLinkPage extends FormPage {
         unlinkButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    if (localTable.getSelectionCount() == 0) return;
+                    int count = localTable.getSelectionCount();
+                    if (count == 0) return;
 
                     boolean confirm = MessageDialog.openQuestion(
                             editor.getSite().getShell(),
@@ -201,19 +205,22 @@ public class NISGroupsLinkPage extends FormPage {
 
                     if (!confirm) return;
 
-                    TableItem item = localTable.getSelection()[0];
+                    for (TableItem item : localTable.getSelection()) {
+                        SearchResult localResult = (SearchResult)item.getData("local");
+                        Attributes localAttributes = localResult.getAttributes();
+                        String cn = (String)localAttributes.getValue("cn");
 
-                    SearchResult localResult = (SearchResult)item.getData("local");
-                    Attributes localAttributes = localResult.getAttributes();
-                    String cn = (String)localAttributes.getValue("cn");
+                        removeLink(cn);
+                        item.setData("link", null);
 
-                    removeLink(cn);
-                    item.setData("link", null);
+                        Collection<SearchResult> results = getGlobal(item);
 
-                    Collection<SearchResult> results = getGlobal(item);
+                        updateStatus(item, results);
 
-                    updateStatus(item, results);
-                    updateGlobal(results);
+                        if (count == 1) {
+                            updateGlobal(results);
+                        }
+                    }
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -285,38 +292,67 @@ public class NISGroupsLinkPage extends FormPage {
         createButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    if (localTable.getSelectionCount() == 0) return;
+                    int count = localTable.getSelectionCount();
+                    if (count == 0) return;
 
-                    TableItem item = localTable.getSelection()[0];
+                    if (count == 1) {
+                        TableItem item = localTable.getSelection()[0];
 
-                    SearchResult result = (SearchResult)item.getData("local");
-                    Attributes attributes = result.getAttributes();
-                    String cn = (String)attributes.getValue("cn");
+                        SearchResult result = (SearchResult)item.getData("local");
+                        Attributes attributes = result.getAttributes();
+                        String cn = (String)attributes.getValue("cn");
 
-                    String newLink = groupText.getText();
+                        String newLink = groupText.getText();
 
-                    RDNBuilder rb = new RDNBuilder();
-                    rb.set("cn", newLink);
+                        RDNBuilder rb = new RDNBuilder();
+                        rb.set("cn", newLink);
 
-                    Attributes globalAttributes = (Attributes)attributes.clone();
-                    globalAttributes.setValue("cn", newLink);
+                        Attributes globalAttributes = (Attributes)attributes.clone();
+                        globalAttributes.setValue("cn", newLink);
 
-                    globalGroups.add(rb.toRdn(), globalAttributes);
+                        globalGroups.add(rb.toRdn(), globalAttributes);
 
-                    String link = (String)item.getData("link");
-                    if (link == null) {
-                        createLink(cn, newLink);
+                        String link = (String)item.getData("link");
+                        if (link == null) {
+                            createLink(cn, newLink);
 
-                    } else {
-                        updateLink(cn, newLink);
+                        } else {
+                            updateLink(cn, newLink);
+                        }
+
+                        item.setData("link", newLink);
+
+                        Collection<SearchResult> results = getGlobal(item);
+
+                        updateStatus(item, results);
+                        updateGlobal(results);
+
+                        return;
                     }
 
-                    item.setData("link", newLink);
+                    for (TableItem item : localTable.getSelection()) {
+                        String status = item.getText(2);
+                        if (!NOT_FOUND.equals(status)) continue;
 
-                    Collection<SearchResult> results = getGlobal(item);
+                        SearchResult result = (SearchResult)item.getData("local");
+                        Attributes attributes = result.getAttributes();
+                        String cn = (String)attributes.getValue("cn");
 
-                    updateStatus(item, results);
-                    updateGlobal(results);
+                        globalGroups.add(result.getDn().getRdn(), result.getAttributes());
+
+                        String link = (String)item.getData("link");
+                        if (link == null) {
+                            createLink(cn, cn);
+
+                        } else {
+                            updateLink(cn, cn);
+                        }
+
+                        item.setData("link", cn);
+
+                        Collection<SearchResult> results = getGlobal(item);
+                        updateStatus(item, results);
+                    }
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -361,34 +397,61 @@ public class NISGroupsLinkPage extends FormPage {
         linkButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    if (localTable.getSelectionCount() == 0) return;
-                    if (globalTable.getSelectionCount() == 0) return;
+                    int count = localTable.getSelectionCount();
+                    if (count == 0) return;
 
-                    TableItem item = localTable.getSelection()[0];
-                    TableItem globalItem = globalTable.getSelection()[0];
+                    if (count == 1) {
+                        if (globalTable.getSelectionCount() == 0) return;
 
-                    SearchResult localResult = (SearchResult)item.getData("local");
-                    Attributes localAttributes = localResult.getAttributes();
-                    String cn = (String)localAttributes.getValue("cn");
+                        TableItem item = localTable.getSelection()[0];
+                        TableItem globalItem = globalTable.getSelection()[0];
 
-                    SearchResult globalResult = (SearchResult)globalItem.getData("global");
-                    Attributes globalAttributes = globalResult.getAttributes();
-                    String newLink = (String)globalAttributes.getValue("cn");
+                        SearchResult localResult = (SearchResult)item.getData("local");
+                        Attributes localAttributes = localResult.getAttributes();
+                        String cn = (String)localAttributes.getValue("cn");
 
-                    String link = (String)item.getData("link");
-                    if (link == null) {
-                        createLink(cn, newLink);
+                        SearchResult globalResult = (SearchResult)globalItem.getData("global");
+                        Attributes globalAttributes = globalResult.getAttributes();
+                        String newLink = (String)globalAttributes.getValue("cn");
 
-                    } else {
-                        updateLink(cn, newLink);
+                        String link = (String)item.getData("link");
+                        if (link == null) {
+                            createLink(cn, newLink);
+
+                        } else {
+                            updateLink(cn, newLink);
+                        }
+
+                        item.setData("link", newLink);
+
+                        Collection<SearchResult> results = getGlobal(item);
+
+                        updateStatus(item, results);
+                        updateGlobal(results);
+
+                        return;
                     }
 
-                    item.setData("link", newLink);
+                    for (TableItem item : localTable.getSelection()) {
+                        String cn = item.getText(0);
+                        String newLink = item.getText(1);
+                        String status = item.getText(2);
+                        if (!POSSIBLE_MATCH.equals(status)) continue;
 
-                    Collection<SearchResult> results = getGlobal(item);
+                        String link = (String)item.getData("link");
+                        if (link == null) {
+                            createLink(cn, newLink);
 
-                    updateStatus(item, results);
-                    updateGlobal(results);
+                        } else {
+                            updateLink(cn, newLink);
+                        }
+
+                        item.setData("link", newLink);
+
+                        Collection<SearchResult> results = getGlobal(item);
+
+                        updateStatus(item, results);
+                    }
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -407,36 +470,37 @@ public class NISGroupsLinkPage extends FormPage {
                     if (globalTable.getSelectionCount() == 0) return;
 
                     TableItem item = localTable.getSelection()[0];
-                    TableItem globalItem = globalTable.getSelection()[0];
 
-                    SearchResult result = (SearchResult)globalItem.getData("global");
+                    for (TableItem globalItem : globalTable.getSelection()) {
+                        SearchResult result = (SearchResult)globalItem.getData("global");
 
-                    boolean confirm = MessageDialog.openQuestion(
-                            editor.getSite().getShell(),
-                            "Delete",
-                            "Are you sure?"
-                    );
+                        boolean confirm = MessageDialog.openQuestion(
+                                editor.getSite().getShell(),
+                                "Delete",
+                                "Are you sure?"
+                        );
 
-                    if (!confirm) return;
+                        if (!confirm) return;
 
-                    RDN rdn = result.getDn().getRdn();
-                    String globalCn = (String)rdn.get("cn");
+                        RDN rdn = result.getDn().getRdn();
+                        String globalCn = (String)rdn.get("cn");
 
-                    globalGroups.delete(rdn);
+                        globalGroups.delete(rdn);
 
-                    SearchResult localResult = (SearchResult)item.getData("local");
-                    Attributes localAttributes = localResult.getAttributes();
-                    String cn = (String)localAttributes.getValue("cn");
+                        SearchResult localResult = (SearchResult)item.getData("local");
+                        Attributes localAttributes = localResult.getAttributes();
+                        String cn = (String)localAttributes.getValue("cn");
 
-                    if (cn.equals(globalCn)) {
-                        removeLink(cn);
-                        item.setData("link", null);
+                        if (cn.equals(globalCn)) {
+                            removeLink(cn);
+                            item.setData("link", null);
+                        }
+
+                        Collection<SearchResult> results = searchGlobal(groupText.getText());
+
+                        updateStatus(item, results);
+                        updateGlobal(results);
                     }
-
-                    Collection<SearchResult> results = searchGlobal(groupText.getText());
-
-                    updateStatus(item, results);
-                    updateGlobal(results);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -506,6 +570,10 @@ public class NISGroupsLinkPage extends FormPage {
         globalTable.setSelection(0);
     }
 
+    public void clearGlobal() {
+        globalTable.removeAll();
+    }
+
     public Collection<SearchResult> getGlobal(TableItem item) throws Exception {
         SearchResult result = (SearchResult)item.getData("local");
         Attributes attributes = result.getAttributes();
@@ -572,6 +640,12 @@ public class NISGroupsLinkPage extends FormPage {
         groupText.setText(cn == null ? "" : cn);
         gidText.setText(gidNumber == null ? "" : gidNumber);
         membersText.setText(sb.toString());
+    }
+
+    public void clearLocal() throws Exception {
+        groupText.setText("");
+        gidText.setText("");
+        membersText.setText("");
     }
 
     public void updateStatus(TableItem item, Collection<SearchResult> results) throws Exception {
