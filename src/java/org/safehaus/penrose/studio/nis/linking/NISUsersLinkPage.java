@@ -58,6 +58,8 @@ public class NISUsersLinkPage extends FormPage {
 
     Partition partition;
 
+    JDBCClient client;
+
     Source localUsers;
     Source globalUsers;
     Source usersLink;
@@ -70,6 +72,10 @@ public class NISUsersLinkPage extends FormPage {
         nisTool = editor.getNisTool();
 
         partition = nisTool.getPartitions().getPartition(domain.getName());
+
+        Connection connection = partition.getConnection(NISTool.CACHE_CONNECTION_NAME);
+        JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
+        client = adapter.getClient();
 
         localUsers = partition.getSource("local_users");
         globalUsers = partition.getSource("global_users");
@@ -443,11 +449,6 @@ public class NISUsersLinkPage extends FormPage {
         return composite;
     }
 
-    public void setActive(boolean b) {
-        if (b) refresh();
-        super.setActive(b);
-    }
-
     public SubstringFilter createFilter(String name, String s) {
         Collection<Object> substrings = new ArrayList<Object>();
         substrings.add(SubstringFilter.STAR);
@@ -508,10 +509,6 @@ public class NISUsersLinkPage extends FormPage {
             int[] selection = localTable.getSelectionIndices();
             localTable.removeAll();
 
-            Connection connection = partition.getConnection(NISTool.CACHE_CONNECTION_NAME);
-            JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
-            final JDBCClient client = adapter.getClient();
-
             SearchRequest request = new SearchRequest();
             SearchResponse response = new SearchResponse() {
                 public void add(SearchResult result) throws Exception {
@@ -556,10 +553,6 @@ public class NISUsersLinkPage extends FormPage {
 
     public void createLink(String uid, String globalUid) throws Exception {
 
-        Connection connection = partition.getConnection(NISTool.CACHE_CONNECTION_NAME);
-        JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
-        final JDBCClient client = adapter.getClient();
-
         Collection<Assignment> assignments = new ArrayList<Assignment>();
         assignments.add(new Assignment(uid));
         assignments.add(new Assignment(globalUid));
@@ -572,10 +565,6 @@ public class NISUsersLinkPage extends FormPage {
 
     public void updateLink(String uid, String globalUid) throws Exception {
 
-        Connection connection = partition.getConnection(NISTool.CACHE_CONNECTION_NAME);
-        JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
-        final JDBCClient client = adapter.getClient();
-
         Collection<Assignment> assignments = new ArrayList<Assignment>();
         assignments.add(new Assignment(globalUid));
         assignments.add(new Assignment(uid));
@@ -587,10 +576,6 @@ public class NISUsersLinkPage extends FormPage {
     }
 
     public void unlink(String uid) throws Exception {
-
-        Connection connection = partition.getConnection(NISTool.CACHE_CONNECTION_NAME);
-        JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
-        final JDBCClient client = adapter.getClient();
 
         Collection<Assignment> assignments = new ArrayList<Assignment>();
         assignments.add(new Assignment(uid));
