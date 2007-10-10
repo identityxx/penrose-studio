@@ -9,12 +9,12 @@ import org.safehaus.penrose.partition.Partition;
 /**
  * @author Endi S. Dewata
  */
-public class AccountLinkingEditorInput implements IEditorInput {
+public class LinkingEditorInput implements IEditorInput {
 
     private Project project;
     private Partition partition;
 
-    public AccountLinkingEditorInput() {
+    public LinkingEditorInput() {
     }
 
     public boolean exists() {
@@ -26,7 +26,7 @@ public class AccountLinkingEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "Account Linking - "+ partition.getName();
+        return "Identity Linking - "+ partition.getName();
     }
 
     public IPersistableElement getPersistable() {
@@ -57,7 +57,7 @@ public class AccountLinkingEditorInput implements IEditorInput {
         if (object == null) return false;
         if (object.getClass() != this.getClass()) return false;
 
-        AccountLinkingEditorInput ei = (AccountLinkingEditorInput)object;
+        LinkingEditorInput ei = (LinkingEditorInput)object;
         if (!equals(project, ei.project)) return false;
         if (!equals(partition, ei.partition)) return false;
 

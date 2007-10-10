@@ -29,7 +29,7 @@ public class GlobalRepositoryWizard extends Wizard {
     private Map<String,String> parameters = new LinkedHashMap<String,String>();
 
     public GlobalRepositoryWizard() {
-        setWindowTitle("Setup Wizard");
+        setWindowTitle("Global Repository Setup Wizard");
     }
 
     public void init(Federation federation) throws Exception {

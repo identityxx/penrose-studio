@@ -42,7 +42,7 @@ public class LDAPRepositoryNode extends Node {
         projectNode = ldapNode.getProjectNode();
 
         linkingNode = new LDAPLinkingNode(
-                "Account Linking",
+                "Identity Linking",
                 this
         );
 

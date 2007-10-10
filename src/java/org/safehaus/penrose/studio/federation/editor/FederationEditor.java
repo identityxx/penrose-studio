@@ -27,7 +27,7 @@ public class FederationEditor extends FormEditor {
     public void addPages() {
         try {
             addPage(new FederationDatabasePage(this, federation));
-            addPage(new FederationLDAPPage(this, federation));
+            addPage(new FederationGlobalRepositoryPage(this, federation));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

@@ -23,9 +23,6 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.federation.GlobalRepository;
 import org.safehaus.penrose.studio.federation.wizard.GlobalRepositoryWizard;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.connection.ConnectionConfig;
 
 import javax.naming.Context;
 import java.util.Map;
@@ -34,7 +31,7 @@ import java.util.LinkedHashMap;
 /**
  * @author Endi S. Dewata
  */
-public class FederationLDAPPage extends FormPage {
+public class FederationGlobalRepositoryPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -45,9 +42,10 @@ public class FederationLDAPPage extends FormPage {
 
     Label urlText;
     Label bindDnText;
+    Label bindPasswordText;
 
-    public FederationLDAPPage(FederationEditor editor, Federation federation) {
-        super(editor, "LDAP", "  LDAP  ");
+    public FederationGlobalRepositoryPage(FederationEditor editor, Federation federation) {
+        super(editor, "GLOBAL_REPOSITORY", "  Global Repository  ");
 
         this.editor = editor;
         this.federation = federation;
@@ -57,13 +55,13 @@ public class FederationLDAPPage extends FormPage {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("LDAP");
+        form.setText("Global Repository");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
         Section ldapSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        ldapSection.setText("LDAP");
+        ldapSection.setText("Global Repository");
         ldapSection.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         Control ldapControl = createLDAPControl(ldapSection);
@@ -92,11 +90,15 @@ public class FederationLDAPPage extends FormPage {
         try {
             GlobalRepository globalRepository = federation.getGlobalRepository();
 
-            String url = globalRepository.getUrl()+globalRepository.getSuffix();
+            String url = globalRepository.getUrl();
+            if (url != null) url = url+globalRepository.getSuffix();
             urlText.setText(url == null ? "" : url);
 
             String bindDn = globalRepository.getUser();
             bindDnText.setText(bindDn == null ? "" : bindDn);
+
+            String bindPassword = globalRepository.getPassword();
+            bindPasswordText.setText(bindPassword == null ? "" : "*****");
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -128,8 +130,8 @@ public class FederationLDAPPage extends FormPage {
         Label bindPasswordLabel = toolkit.createLabel(composite, "Password:");
         bindPasswordLabel.setLayoutData(new GridData());
 
-        Label bindPassword = toolkit.createLabel(composite, "*****");
-        bindPassword.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        bindPasswordText = toolkit.createLabel(composite, "");
+        bindPasswordText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         return composite;
     }
@@ -150,7 +152,11 @@ public class FederationLDAPPage extends FormPage {
                     GlobalRepository globalRepository = federation.getGlobalRepository();
 
                     Map<String,String> parameters = new LinkedHashMap<String,String>();
-                    parameters.put(Context.PROVIDER_URL, globalRepository.getUrl()+globalRepository.getSuffix());
+
+                    String url = globalRepository.getUrl();
+                    if (url != null) url = url+globalRepository.getSuffix();
+
+                    parameters.put(Context.PROVIDER_URL, url);
                     parameters.put(Context.SECURITY_PRINCIPAL, globalRepository.getUser());
                     parameters.put(Context.SECURITY_CREDENTIALS, globalRepository.getPassword());
 

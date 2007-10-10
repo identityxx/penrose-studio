@@ -42,7 +42,7 @@ public class NISRepositoriesPage extends FormPage {
     Table table;
 
     public NISRepositoriesPage(NISEditor editor, NISFederation nisFederation) {
-        super(editor, "REPOSITORIES", "  Repositories  ");
+        super(editor, "DOMAINS", "  Domains  ");
 
         this.editor = editor;
         this.nisFederation = nisFederation;
@@ -52,13 +52,13 @@ public class NISRepositoriesPage extends FormPage {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Repositories");
+        form.setText("Domains");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
         Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Repositories");
+        section.setText("Domains");
         section.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         Control sourcesSection = createDomainsSection(section);

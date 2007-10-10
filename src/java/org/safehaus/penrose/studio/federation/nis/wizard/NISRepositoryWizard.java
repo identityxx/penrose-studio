@@ -24,7 +24,7 @@ public class NISRepositoryWizard extends Wizard {
     Project project;
 
     public NISRepositoryWizard(NISFederation nisFederation) {
-        setWindowTitle("Add NIS Repository");
+        setWindowTitle("Add NIS Domain");
 
         this.nisFederation = nisFederation;
         project = nisFederation.getProject();

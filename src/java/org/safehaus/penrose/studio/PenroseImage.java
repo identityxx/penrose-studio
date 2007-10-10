@@ -33,7 +33,7 @@ public class PenroseImage {
     public final static String UPLOAD            = "images/upload.png";
 
     public final static String EXIT              = "images/exit.png";
-    public final static String REFRESH           = "images/efresh.png";
+    public final static String REFRESH           = "images/refresh.png";
 	public final static String ADD               = "images/folder-add.gif";
 	public final static String KEY               = "images/key.gif";
 	public final static String NOKEY             = "images/nokey.gif";

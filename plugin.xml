@@ -157,10 +157,10 @@
            icon="images/object.gif"
            class="org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditor"/>
        <editor
-           id="org.safehaus.penrose.studio.federation.linking.AccountLinkingEditor"
-           name="Account Linking"
+           id="org.safehaus.penrose.studio.federation.linking.LinkingEditor"
+           name="Identity Linking"
            icon="images/object.gif"
-           class="org.safehaus.penrose.studio.federation.linking.AccountLinkingEditor"/>
+           class="org.safehaus.penrose.studio.federation.linking.LinkingEditor"/>
        <editor
            id="org.safehaus.penrose.studio.federation.nis.editor.NISEditor"
            name="NIS"

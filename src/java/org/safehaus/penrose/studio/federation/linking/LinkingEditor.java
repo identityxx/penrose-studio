@@ -9,14 +9,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.partition.Partition;
 
-public class AccountLinkingEditor extends FormEditor {
+public class LinkingEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
     private Partition partition;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        AccountLinkingEditorInput ei = (AccountLinkingEditorInput)input;
+        LinkingEditorInput ei = (LinkingEditorInput)input;
         partition = ei.getPartition();
 
         setSite(site);
@@ -26,7 +26,7 @@ public class AccountLinkingEditor extends FormEditor {
 
     public void addPages() {
         try {
-            addPage(new AccountLinkingPage(this));
+            addPage(new LinkingPage(this));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

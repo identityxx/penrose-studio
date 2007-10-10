@@ -71,7 +71,7 @@ public class NISDomainNode extends Node {
         children.add(ldapNode);
 
         linkingNode = new NISLinkingNode(
-                "Account Linking",
+                "Identity Linking",
                 this
         );
 

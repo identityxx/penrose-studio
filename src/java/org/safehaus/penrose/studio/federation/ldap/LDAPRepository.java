@@ -28,6 +28,7 @@ public class LDAPRepository extends Repository {
 
     public void parseUrl() {
         String url = parameters.get("url");
+        if (url == null) return;
 
         int i = url.indexOf("://");
         if (i < 0) throw new RuntimeException("Invalid URL: "+url);

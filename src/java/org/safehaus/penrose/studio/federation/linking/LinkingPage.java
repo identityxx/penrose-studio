@@ -33,7 +33,7 @@ import java.util.ArrayList;
 /**
  * @author Endi S. Dewata
  */
-public class AccountLinkingPage extends FormPage {
+public class LinkingPage extends FormPage {
 
     public Logger log = Logger.getLogger(getClass());
 
@@ -53,7 +53,7 @@ public class AccountLinkingPage extends FormPage {
     Table globalTable;
     Table globalAttributeTable;
 
-    AccountLinkingEditor editor;
+    LinkingEditor editor;
 
     private Partition partition;
 
@@ -63,8 +63,8 @@ public class AccountLinkingPage extends FormPage {
     DN localBaseDn;
     DN globalBaseDn;
 
-    public AccountLinkingPage(AccountLinkingEditor editor) throws Exception {
-        super(editor, "ACCOUNT_LINKING", "  Account Linking  ");
+    public LinkingPage(LinkingEditor editor) throws Exception {
+        super(editor, "IDENTITY_LINKING", "  Identity Linking  ");
 
         this.editor = editor;
         this.partition = editor.getPartition();
