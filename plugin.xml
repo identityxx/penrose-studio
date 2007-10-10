@@ -143,46 +143,64 @@
            name="Service"
            icon="images/service.png"
            class="org.safehaus.penrose.studio.service.ServiceEditor"/>
+
+<!-- Federation -->
+
        <editor
-           id="org.safehaus.penrose.studio.nis.editor.NISEditor"
+           id="org.safehaus.penrose.studio.federation.editor.FederationEditor"
+           name="Federation"
+           icon="images/object.gif"
+           class="org.safehaus.penrose.studio.federation.editor.FederationEditor"/>
+       <editor
+           id="org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditor"
+           name="LDAP"
+           icon="images/object.gif"
+           class="org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditor"/>
+       <editor
+           id="org.safehaus.penrose.studio.federation.linking.AccountLinkingEditor"
+           name="Account Linking"
+           icon="images/object.gif"
+           class="org.safehaus.penrose.studio.federation.linking.AccountLinkingEditor"/>
+       <editor
+           id="org.safehaus.penrose.studio.federation.nis.editor.NISEditor"
            name="NIS"
            icon="images/object.gif"
-           class="org.safehaus.penrose.studio.nis.editor.NISEditor"/>
+           class="org.safehaus.penrose.studio.federation.nis.editor.NISEditor"/>
        <editor
-           id="org.safehaus.penrose.studio.nis.domain.NISDomainEditor"
+           id="org.safehaus.penrose.studio.federation.nis.NISDomainEditor"
            name="NIS Domain"
            icon="images/object.gif"
-           class="org.safehaus.penrose.studio.nis.domain.NISDomainEditor"/>
+           class="org.safehaus.penrose.studio.federation.nis.NISDomainEditor"/>
        <editor
-           id="org.safehaus.penrose.studio.nis.database.NISDatabaseEditor"
+           id="org.safehaus.penrose.studio.federation.nis.database.NISDatabaseEditor"
            name="NIS Database"
            icon="images/object.gif"
-           class="org.safehaus.penrose.studio.nis.database.NISDatabaseEditor"/>
+           class="org.safehaus.penrose.studio.federation.nis.database.NISDatabaseEditor"/>
        <editor
-           id="org.safehaus.penrose.studio.nis.ldap.NISLDAPEditor"
+           id="org.safehaus.penrose.studio.federation.nis.ldap.NISLDAPEditor"
            name="NIS LDAP"
            icon="images/object.gif"
-           class="org.safehaus.penrose.studio.nis.ldap.NISLDAPEditor"/>
+           class="org.safehaus.penrose.studio.federation.nis.ldap.NISLDAPEditor"/>
        <editor
-           id="org.safehaus.penrose.studio.nis.linking.NISLinkEditor"
+           id="org.safehaus.penrose.studio.federation.nis.linking.NISLinkEditor"
            name="NIS Users"
            icon="images/object.gif"
-           class="org.safehaus.penrose.studio.nis.linking.NISLinkEditor"/>
+           class="org.safehaus.penrose.studio.federation.nis.linking.NISLinkEditor"/>
        <editor
-           id="org.safehaus.penrose.studio.nis.conflict.NISUsersEditor"
+           id="org.safehaus.penrose.studio.federation.nis.conflict.NISUsersEditor"
            name="NIS Users"
            icon="images/object.gif"
-           class="org.safehaus.penrose.studio.nis.conflict.NISUsersEditor"/>
+           class="org.safehaus.penrose.studio.federation.nis.conflict.NISUsersEditor"/>
        <editor
-           id="org.safehaus.penrose.studio.nis.conflict.NISGroupsEditor"
+           id="org.safehaus.penrose.studio.federation.nis.conflict.NISGroupsEditor"
            name="NIS Users"
            icon="images/object.gif"
-           class="org.safehaus.penrose.studio.nis.conflict.NISGroupsEditor"/>
+           class="org.safehaus.penrose.studio.federation.nis.conflict.NISGroupsEditor"/>
        <editor
-           id="org.safehaus.penrose.studio.nis.ownership.NISFilesEditor"
+           id="org.safehaus.penrose.studio.federation.nis.ownership.NISFilesEditor"
            name="NIS Alignment Tool"
            icon="images/object.gif"
-           class="org.safehaus.penrose.studio.nis.ownership.NISFilesEditor"/>
+           class="org.safehaus.penrose.studio.federation.nis.ownership.NISFilesEditor"/>
    </extension>
    <extension
          id="application"

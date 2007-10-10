@@ -33,7 +33,7 @@ import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.license.LicenseDialog;
 import org.safehaus.penrose.studio.welcome.action.EnterLicenseKeyAction;
 import org.safehaus.penrose.studio.plugin.*;
-import org.safehaus.penrose.studio.nis.NISPlugin;
+import org.safehaus.penrose.studio.federation.nis.NISPlugin;
 import com.identyx.license.*;
 import org.safehaus.penrose.log4j.Log4jConfigReader;
 import org.safehaus.penrose.log4j.Log4jConfig;

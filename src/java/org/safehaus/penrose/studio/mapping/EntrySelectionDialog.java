@@ -87,13 +87,11 @@ public class EntrySelectionDialog extends Dialog {
                 EntryMapping entry = (EntryMapping)item.getData();
 
                 TreeItem items[] = item.getItems();
-                for (int i=0; i<items.length; i++) {
-                    items[i].dispose();
-                }
+                for (TreeItem ti : items) ti.dispose();
 
                 Collection children = partitionConfig.getDirectoryConfig().getChildren(entry);
-                for (Iterator i=children.iterator(); i.hasNext(); ) {
-                    EntryMapping child = (EntryMapping)i.next();
+                for (Object object : children) {
+                    EntryMapping child = (EntryMapping) object;
 
                     TreeItem it = new TreeItem(item, SWT.NONE);
                     it.setText(child.getRdn().toString());

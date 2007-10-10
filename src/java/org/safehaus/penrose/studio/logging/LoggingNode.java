@@ -5,7 +5,6 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.apache.log4j.Logger;
-import org.eclipse.swt.graphics.Image;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -19,8 +18,8 @@ public class LoggingNode extends Node {
 
     ServersView view;
 
-    public LoggingNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
-        super(name, type, image, object, parent);
+    public LoggingNode(ServersView view, String name, String type, Object object, Object parent) {
+        super(name, type, PenrosePlugin.getImage(PenroseImage.FOLDER), object, parent);
         this.view = view;
     }
 

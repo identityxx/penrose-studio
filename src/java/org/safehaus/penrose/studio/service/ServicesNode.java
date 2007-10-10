@@ -26,7 +26,6 @@ import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.service.ServiceConfig;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.apache.log4j.Logger;
 
@@ -46,8 +45,9 @@ public class ServicesNode extends Node {
 
     protected Map<String,Node> children;
 
-    public ServicesNode(String name, String type, Image image, Object object, Object parent) {
-        super(name, type, image, object, parent);
+    public ServicesNode(String name, String type, Object object, Object parent) {
+        super(name, type, PenrosePlugin.getImage(PenroseImage.FOLDER), object, parent);
+        
         projectNode = (ProjectNode)parent;
         view = projectNode.getServersView();
     }

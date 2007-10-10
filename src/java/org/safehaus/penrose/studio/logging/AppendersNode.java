@@ -67,6 +67,7 @@ public class AppendersNode extends Node {
     public boolean hasChildren() throws Exception {
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         Log4jConfig loggingConfig = penroseStudio.getLoggingConfig();
+        if (loggingConfig == null) return false;
 
         return !loggingConfig.getAppenderConfigs().isEmpty();
     }

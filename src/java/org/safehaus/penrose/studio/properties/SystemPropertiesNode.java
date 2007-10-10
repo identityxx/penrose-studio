@@ -18,10 +18,10 @@
 package org.safehaus.penrose.studio.properties;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
-import org.eclipse.swt.graphics.Image;
+import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseImage;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
@@ -38,8 +38,9 @@ public class SystemPropertiesNode extends Node {
 
     ProjectNode projectNode;
 
-    public SystemPropertiesNode(String name, String type, Image image, Object object, Object parent) {
-        super(name, type, image, object, parent);
+    public SystemPropertiesNode(String name, String type, Object object, Object parent) {
+        super(name, type, PenrosePlugin.getImage(PenroseImage.SYSTEM_PROPERTIES), object, parent);
+
         projectNode = (ProjectNode)parent;
     }
 

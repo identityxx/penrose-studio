@@ -6,11 +6,11 @@ import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.plugin.PluginsNode;
 import org.safehaus.penrose.studio.browser.BrowserEditorInput;
 import org.safehaus.penrose.studio.browser.BrowserEditor;
 import org.safehaus.penrose.studio.preview.PreviewEditorInput;
 import org.safehaus.penrose.studio.preview.PreviewEditor;
-import org.safehaus.penrose.studio.nis.NISNode;
 import org.safehaus.penrose.studio.properties.SystemPropertiesNode;
 import org.safehaus.penrose.studio.user.AdministratorNode;
 import org.safehaus.penrose.studio.logging.LoggingNode;
@@ -51,6 +51,7 @@ public class ProjectNode extends Node {
     protected SchemasNode    schemasNode;
     protected ServicesNode   servicesNode;
     protected LoggingNode    loggingNode;
+    protected PluginsNode    pluginsNode;
 
     public ProjectNode(ServersView serversView, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
@@ -199,7 +200,6 @@ public class ProjectNode extends Node {
                 serversView,
                 "Partitions",
                 "Partitions",
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
                 "Partitions",
                 this);
         children.add(partitionsNode);
@@ -207,7 +207,6 @@ public class ProjectNode extends Node {
         schemasNode = new SchemasNode(
                 "Schemas",
                 "Schemas",
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
                 "Schemas",
                 this);
         children.add(schemasNode);
@@ -215,7 +214,6 @@ public class ProjectNode extends Node {
         servicesNode = new ServicesNode(
                 "Services",
                 "Services",
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
                 "Services",
                 this);
         children.add(servicesNode);
@@ -224,15 +222,20 @@ public class ProjectNode extends Node {
                 serversView,
                 "Logging",
                 "Logging",
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
                 "Logging",
                 this);
         children.add(loggingNode);
 
+        pluginsNode = new PluginsNode(
+                "Plugins",
+                "Plugins",
+                "Plugins",
+                this);
+        children.add(pluginsNode);
+
         children.add(new AdministratorNode(
                 "Administrator",
                 "Administrator",
-                PenrosePlugin.getImage(PenroseImage.ADMINISTRATOR),
                 "Administrator",
                 this
         ));
@@ -240,21 +243,9 @@ public class ProjectNode extends Node {
         children.add(new SystemPropertiesNode(
                 "System Properties",
                 "System Properties",
-                PenrosePlugin.getImage(PenroseImage.SYSTEM_PROPERTIES),
                 "System Properties",
                 this
         ));
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        if (penroseStudio.getLicense() != null) {
-            children.add(new NISNode(
-                    "NIS",
-                    "NIS",
-                    PenrosePlugin.getImage(PenroseImage.MODULE),
-                    "NIS",
-                    this
-            ));
-        }
     }
 
     public void disconnect() throws Exception {

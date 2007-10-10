@@ -71,27 +71,42 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
 
         String url = connectionConfig.getParameter(Context.PROVIDER_URL);
 
-        int i = url.indexOf("://");
-        String protocol = url.substring(0, i);
+        String protocol;
+        String hostname;
+        String port;
+        String baseDn;
 
-        int j = url.indexOf("/", i+3);
-        String hostPort = url.substring(i+3, j);
-
-        int k = hostPort.indexOf(":");
-        String hostname, port;
-        if (k < 0) {
-            hostname = hostPort;
+        if (url == null) {
+            protocol = "ldap";
+            hostname = "localhost";
             port = "389";
+            baseDn = "";
+            
         } else {
-            hostname = hostPort.substring(0, k);
-            port = hostPort.substring(k+1);
+            int i = url.indexOf("://");
+            protocol = url.substring(0, i);
+
+            int j = url.indexOf("/", i+3);
+            String hostPort = url.substring(i+3, j);
+
+            int k = hostPort.indexOf(":");
+            if (k < 0) {
+                hostname = hostPort;
+                port = "389";
+            } else {
+                hostname = hostPort.substring(0, k);
+                port = hostPort.substring(k+1);
+            }
+
+            baseDn = url.substring(j+1);
         }
 
-        String baseDn = url.substring(j+1);
-
         String bindDn = connectionConfig.getParameter(Context.SECURITY_PRINCIPAL);
-        String bindPassword = connectionConfig.getParameter(Context.SECURITY_CREDENTIALS);
+        if (bindDn == null) bindDn = "";
 
+        String bindPassword = connectionConfig.getParameter(Context.SECURITY_CREDENTIALS);
+        if (bindPassword == null) bindPassword = "";
+        
         Label protocolLabel = new Label(composite, SWT.NONE);
         protocolLabel.setText("Protocol:");
 

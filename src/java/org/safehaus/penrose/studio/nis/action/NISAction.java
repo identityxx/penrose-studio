@@ -1,7 +1,7 @@
 package org.safehaus.penrose.studio.nis.action;
 
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.nis.NISTool;
+import org.safehaus.penrose.studio.federation.nis.NISFederation;
 
 /**
  * @author Endi S. Dewata
@@ -12,7 +12,7 @@ public class NISAction {
 
     protected String name;
     protected String description;
-    protected NISTool nisTool;
+    protected NISFederation nisFederation;
 
     public void execute(NISActionRequest request, NISActionResponse response) throws Exception {
     }
@@ -33,11 +33,11 @@ public class NISAction {
         this.description = description;
     }
 
-    public NISTool getNisTool() {
-        return nisTool;
+    public NISFederation getNisTool() {
+        return nisFederation;
     }
 
-    public void setNisTool(NISTool nisTool) {
-        this.nisTool = nisTool;
+    public void setNisTool(NISFederation nisFederation) {
+        this.nisFederation = nisFederation;
     }
 }

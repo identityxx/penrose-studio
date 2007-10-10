@@ -9,8 +9,9 @@ import org.safehaus.penrose.ldap.Attributes;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.studio.nis.NISTool;
+import org.safehaus.penrose.studio.federation.nis.NISRepository;
+import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.connection.Connection;
 
@@ -34,12 +35,12 @@ public class InconsistentUIDFinderAction extends NISAction {
     ) throws Exception {
 
         String domainName1 = request.getDomain();
-        NISDomain domain1 = nisTool.getNisDomains().get(domainName1);
+        NISRepository domain1 = nisFederation.getRepository(domainName1);
 
-        for (String domainName2 : nisTool.getNisDomains().keySet()) {
+        for (String domainName2 : nisFederation.getRepositoryNames()) {
             if (domainName1.equals(domainName2)) continue;
 
-            NISDomain domain2 = nisTool.getNisDomains().get(domainName2);
+            NISRepository domain2 = nisFederation.getRepository(domainName2);
             execute(domain1, domain2, response);
         }
 
@@ -47,24 +48,24 @@ public class InconsistentUIDFinderAction extends NISAction {
     }
 
     public void execute(
-            final NISDomain domain1,
-            final NISDomain domain2,
+            final NISRepository domain1,
+            final NISRepository domain2,
             final NISActionResponse response
     ) throws Exception {
 
         log.debug("Checking conflicts between "+domain1.getName()+" and "+domain2.getName()+".");
 
-        Project project = nisTool.getProject();
+        Project project = nisFederation.getProject();
         PartitionConfigs partitionConfigs = project.getPartitionConfigs();
 
         PartitionConfig partitionConfig1 = partitionConfigs.getPartitionConfig(domain1.getName());
-        SourceConfig sourceConfig1 = partitionConfig1.getSourceConfigs().getSourceConfig(NISTool.CACHE_USERS);
+        SourceConfig sourceConfig1 = partitionConfig1.getSourceConfigs().getSourceConfig(NISFederation.CACHE_USERS);
 
         PartitionConfig partitionConfig2 = partitionConfigs.getPartitionConfig(domain2.getName());
-        SourceConfig sourceConfig2 = partitionConfig2.getSourceConfigs().getSourceConfig(NISTool.CACHE_USERS);
+        SourceConfig sourceConfig2 = partitionConfig2.getSourceConfigs().getSourceConfig(NISFederation.CACHE_USERS);
 
-        Partition partition = nisTool.getNisPartition();
-        Connection connection = partition.getConnection(NISTool.NIS_CONNECTION_NAME);
+        Partition partition = nisFederation.getPartition();
+        Connection connection = partition.getConnection(Federation.JDBC);
         JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
         JDBCClient client = adapter.getClient();
 
@@ -73,9 +74,9 @@ public class InconsistentUIDFinderAction extends NISAction {
 
         String sql = "select a.uid, a.uidNumber, b.uidNumber, c.uid, c.uidNumber, d.uidNumber" +
                 " from "+table1+" a"+
-                " left join "+NISTool.NIS_TOOL +".users b on b.domain=? and a.uid=b.uid"+
+                " left join "+ NISFederation.NIS_TOOL +".users b on b.domain=? and a.uid=b.uid"+
                 " join "+table2+" c on a.uid = c.uid "+
-                " left join "+NISTool.NIS_TOOL +".users d on d.domain=? and c.uid=d.uid"+
+                " left join "+ NISFederation.NIS_TOOL +".users d on d.domain=? and c.uid=d.uid"+
                 " where b.uidNumber is null and d.uidNumber is null and a.uidNumber <> c.uidNumber"+
                     " or b.uidNumber is null and a.uidNumber <> d.uidNumber"+
                     " or d.uidNumber is null and b.uidNumber <> c.uidNumber"+

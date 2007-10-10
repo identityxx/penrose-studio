@@ -26,7 +26,6 @@ import org.safehaus.penrose.studio.partition.action.*;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.partition.PartitionConfigs;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.SWT;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
@@ -51,8 +50,8 @@ public class PartitionsNode extends Node {
 
     protected Map<String,Node> partitionNodes = new TreeMap<String,Node>();
 
-    public PartitionsNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
-        super(name, type, image, object, parent);
+    public PartitionsNode(ServersView view, String name, String type, Object object, Object parent) {
+        super(name, type, PenrosePlugin.getImage(PenroseImage.FOLDER), object, parent);
         this.view = view;
         projectNode = (ProjectNode)parent;
 

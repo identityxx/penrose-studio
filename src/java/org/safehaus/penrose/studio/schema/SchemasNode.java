@@ -27,7 +27,6 @@ import org.safehaus.penrose.studio.schema.action.NewSchemaAction;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.schema.SchemaConfig;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.apache.log4j.Logger;
 
@@ -44,8 +43,8 @@ public class SchemasNode extends Node {
     private ServersView view;
     private ProjectNode projectNode;
 
-    public SchemasNode(String name, String type, Image image, Object object, Object parent) {
-        super(name, type, image, object, parent);
+    public SchemasNode(String name, String type, Object object, Object parent) {
+        super(name, type, PenrosePlugin.getImage(PenroseImage.FOLDER), object, parent);
         projectNode = (ProjectNode)parent;
         view = projectNode.getServersView();
     }

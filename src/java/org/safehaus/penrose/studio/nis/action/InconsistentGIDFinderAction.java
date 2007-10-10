@@ -9,8 +9,9 @@ import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.nis.NISDomain;
-import org.safehaus.penrose.studio.nis.NISTool;
+import org.safehaus.penrose.studio.federation.nis.NISRepository;
+import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.connection.Connection;
 
@@ -34,12 +35,12 @@ public class InconsistentGIDFinderAction extends NISAction {
     ) throws Exception {
 
         String domainName1 = request.getDomain();
-        NISDomain domain1 = nisTool.getNisDomains().get(domainName1);
+        NISRepository domain1 = nisFederation.getRepository(domainName1);
 
-        for (String domainName2 : nisTool.getNisDomains().keySet()) {
+        for (String domainName2 : nisFederation.getRepositoryNames()) {
             if (domainName1.equals(domainName2)) continue;
 
-            NISDomain domain2 = nisTool.getNisDomains().get(domainName2);
+            NISRepository domain2 = nisFederation.getRepository(domainName2);
             execute(domain1, domain2, response);
         }
 
@@ -47,24 +48,24 @@ public class InconsistentGIDFinderAction extends NISAction {
     }
 
     public void execute(
-            final NISDomain domain1,
-            final NISDomain domain2,
+            final NISRepository domain1,
+            final NISRepository domain2,
             final NISActionResponse response
     ) throws Exception {
 
         log.debug("Checking conflicts between "+domain1.getName()+" and "+domain2.getName()+".");
 
-        Project project = nisTool.getProject();
+        Project project = nisFederation.getProject();
         PartitionConfigs partitionConfigs = project.getPartitionConfigs();
 
         PartitionConfig partitionConfig1 = partitionConfigs.getPartitionConfig(domain1.getName());
-        SourceConfig sourceConfig1 = partitionConfig1.getSourceConfigs().getSourceConfig(NISTool.CACHE_GROUPS);
+        SourceConfig sourceConfig1 = partitionConfig1.getSourceConfigs().getSourceConfig(NISFederation.CACHE_GROUPS);
 
         PartitionConfig partitionConfig2 = partitionConfigs.getPartitionConfig(domain2.getName());
-        SourceConfig sourceConfig2 = partitionConfig2.getSourceConfigs().getSourceConfig(NISTool.CACHE_GROUPS);
+        SourceConfig sourceConfig2 = partitionConfig2.getSourceConfigs().getSourceConfig(NISFederation.CACHE_GROUPS);
 
-        Partition partition = nisTool.getNisPartition();
-        Connection connection = partition.getConnection(NISTool.NIS_CONNECTION_NAME);
+        Partition partition = nisFederation.getPartition();
+        Connection connection = partition.getConnection(Federation.JDBC);
         JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
         JDBCClient client = adapter.getClient();
 
@@ -73,9 +74,9 @@ public class InconsistentGIDFinderAction extends NISAction {
 
         String sql = "select a.cn, a.gidNumber, b.gidNumber, c.cn, c.gidNumber, d.gidNumber" +
                 " from "+table1+" a"+
-                " left join "+NISTool.NIS_TOOL +".groups b on b.domain=? and a.cn=b.cn"+
+                " left join "+ NISFederation.NIS_TOOL +".groups b on b.domain=? and a.cn=b.cn"+
                 " join "+table2+" c on a.cn = c.cn "+
-                " left join "+NISTool.NIS_TOOL +".groups d on d.domain=? and c.cn=d.cn"+
+                " left join "+ NISFederation.NIS_TOOL +".groups d on d.domain=? and c.cn=d.cn"+
                 " where b.gidNumber is null and d.gidNumber is null and a.gidNumber <> c.gidNumber"+
                     " or b.gidNumber is null and a.gidNumber <> d.gidNumber"+
                     " or d.gidNumber is null and b.gidNumber <> c.gidNumber"+

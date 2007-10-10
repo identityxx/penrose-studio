@@ -72,6 +72,7 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
     public final static String ATTRIBUTE_TYPES   = "Attribute Types";
     public final static String ATTRIBUTE_TYPE    = "Attribute Type";
     public final static String SERVICE           = "Service";
+    public final static String PLUGIN            = "Plugin";
     public final static String ROOT_DSE          = "Root DSE";
     public final static String APPENDERS         = "Appenders";
     public final static String APPENDER          = "Appender";

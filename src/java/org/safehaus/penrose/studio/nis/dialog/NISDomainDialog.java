@@ -11,7 +11,7 @@ import org.eclipse.swt.graphics.Point;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenrosePlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.nis.NISDomain;
+import org.safehaus.penrose.studio.federation.nis.NISRepository;
 
 /**
  * @author Endi S. Dewata
@@ -31,7 +31,7 @@ public class NISDomainDialog extends Dialog {
 
     int action;
 
-    private NISDomain domain;
+    private NISRepository domain;
 
     public NISDomainDialog(Shell parent, int style) {
 		super(parent, style);
@@ -167,11 +167,11 @@ public class NISDomainDialog extends Dialog {
         this.action = action;
     }
 
-    public void setDomain(NISDomain domain) {
+    public void setDomain(NISRepository domain) {
         this.domain = domain;
     }
 
-    public NISDomain getDomain() {
+    public NISRepository getDomain() {
         return domain;
     }
 }
