@@ -81,7 +81,7 @@ public class FederationWizard extends Wizard {
 
         ldapPage = new JNDIConnectionInfoWizardPage();
         ldapPage.setDescription("Enter LDAP connection parameters.");
-        ldapPage.setConnectionConfig(ldapConfig);
+        ldapPage.setParameters(ldapConfig.getParameters());
         addPage(ldapPage);
     }
 

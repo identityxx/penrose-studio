@@ -45,6 +45,13 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
 
     public final static String NAME = "Connection Info";
 
+    private String protocol;
+    private String hostname;
+    private String port;
+    private String baseDn;
+    private String bindDn;
+    private String bindPassword;
+
     Combo protocolCombo;
 
     Text hostText;
@@ -55,7 +62,7 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
     Text bindDnText;
     Text passwordText;
 
-    private ConnectionConfig connectionConfig;
+    private ConnectionConfig xconnectionConfig;
 
     public JNDIConnectionInfoWizardPage() {
         super(NAME);
@@ -69,44 +76,6 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
 
         composite.setLayout(new GridLayout(4, false));
 
-        String url = connectionConfig.getParameter(Context.PROVIDER_URL);
-
-        String protocol;
-        String hostname;
-        String port;
-        String baseDn;
-
-        if (url == null) {
-            protocol = "ldap";
-            hostname = "localhost";
-            port = "389";
-            baseDn = "";
-            
-        } else {
-            int i = url.indexOf("://");
-            protocol = url.substring(0, i);
-
-            int j = url.indexOf("/", i+3);
-            String hostPort = url.substring(i+3, j);
-
-            int k = hostPort.indexOf(":");
-            if (k < 0) {
-                hostname = hostPort;
-                port = "389";
-            } else {
-                hostname = hostPort.substring(0, k);
-                port = hostPort.substring(k+1);
-            }
-
-            baseDn = url.substring(j+1);
-        }
-
-        String bindDn = connectionConfig.getParameter(Context.SECURITY_PRINCIPAL);
-        if (bindDn == null) bindDn = "";
-
-        String bindPassword = connectionConfig.getParameter(Context.SECURITY_CREDENTIALS);
-        if (bindPassword == null) bindPassword = "";
-        
         Label protocolLabel = new Label(composite, SWT.NONE);
         protocolLabel.setText("Protocol:");
 
@@ -297,6 +266,10 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
         return true;
     }
 
+    public void modifyText(ModifyEvent event) {
+        setPageComplete(validatePage());
+    }
+
     public Map<String,String> getParameters() {
         Map<String,String> map = new HashMap<String,String>();
 
@@ -307,15 +280,64 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
         return map;
     }
 
-    public void modifyText(ModifyEvent event) {
-        setPageComplete(validatePage());
+    public void setParameters(Map<String,String> parameters) {
+
+        String url = parameters.get(Context.PROVIDER_URL);
+
+        if (url == null) {
+            protocol = "ldap";
+            hostname = "localhost";
+            port = "389";
+            baseDn = "";
+
+        } else {
+            int i = url.indexOf("://");
+            protocol = url.substring(0, i);
+
+            int j = url.indexOf("/", i+3);
+            String hostPort = url.substring(i+3, j);
+
+            int k = hostPort.indexOf(":");
+            if (k < 0) {
+                hostname = hostPort;
+                port = "389";
+            } else {
+                hostname = hostPort.substring(0, k);
+                port = hostPort.substring(k+1);
+            }
+
+            baseDn = url.substring(j+1);
+        }
+
+        bindDn = parameters.get(Context.SECURITY_PRINCIPAL);
+        if (bindDn == null) bindDn = "";
+
+        bindPassword = parameters.get(Context.SECURITY_CREDENTIALS);
+        if (bindPassword == null) bindPassword = "";
+
     }
 
-    public ConnectionConfig getConnectionConfig() {
-        return connectionConfig;
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
     }
 
-    public void setConnectionConfig(ConnectionConfig connectionConfig) {
-        this.connectionConfig = connectionConfig;
+    public void setHostname(String hostname) {
+        this.hostname = hostname;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
+    }
+
+    public void setBaseDn(String baseDn) {
+        this.baseDn = baseDn;
+    }
+
+    public void setBindDn(String bindDn) {
+        this.bindDn = bindDn;
+    }
+
+    public void setBindPassword(String bindPassword) {
+        this.bindPassword = bindPassword;
     }
 }

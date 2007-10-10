@@ -21,7 +21,6 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISRepository;
 import org.safehaus.penrose.studio.federation.nis.wizard.NISRepositoryWizard;
-import org.safehaus.penrose.studio.federation.nis.editor.NISEditor;
 import org.safehaus.penrose.studio.nis.dialog.NISUserDialog;
 import org.safehaus.penrose.studio.nis.dialog.NISDomainDialog;
 import org.safehaus.penrose.studio.PenroseStudio;

@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.federation.nis.editor;
+package org.safehaus.penrose.studio.federation.ldap.editor;
 
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -17,33 +17,33 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISRepository;
-import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
+import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.management.PenroseClient;
 
 /**
  * @author Endi S. Dewata
  */
-public class NISPartitionsPage extends FormPage {
+public class LDAPPartitionsPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
     FormToolkit toolkit;
 
-    NISEditor editor;
-    NISFederation nisFederation;
+    LDAPEditor editor;
+    LDAPFederation ldapFederation;
 
     Table table;
 
-    public NISPartitionsPage(NISEditor editor, NISFederation nisFederation) {
+    public LDAPPartitionsPage(LDAPEditor editor, LDAPFederation ldapFederation) {
         super(editor, "PARTITONS", "  Partitions  ");
 
         this.editor = editor;
-        this.nisFederation = nisFederation;
+        this.ldapFederation = ldapFederation;
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -133,17 +133,17 @@ public class NISPartitionsPage extends FormPage {
 
                     TableItem[] items = table.getSelection();
 
-                    Project project = nisFederation.getProject();
+                    Project project = ldapFederation.getProject();
                     PenroseClient penroseClient = project.getClient();
 
                     for (TableItem ti : items) {
-                        NISRepository repository = (NISRepository)ti.getData();
+                        LDAPRepository repository = (LDAPRepository)ti.getData();
 
-                        nisFederation.createPartitionConfig(repository);
+                        ldapFederation.createPartitionConfig(repository);
                         project.upload("partitions/"+repository.getName());
 
                         penroseClient.startPartition(repository.getName());
-                        nisFederation.loadPartition(repository);
+                        ldapFederation.loadPartition(repository);
                     }
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -177,16 +177,16 @@ public class NISPartitionsPage extends FormPage {
 
                     TableItem[] items = table.getSelection();
 
-                    Project project = nisFederation.getProject();
+                    Project project = ldapFederation.getProject();
                     PenroseClient penroseClient = project.getClient();
 
                     for (TableItem ti : items) {
-                        NISRepository repository = (NISRepository)ti.getData();
+                        LDAPRepository repository = (LDAPRepository)ti.getData();
 
                         penroseClient.stopPartition(repository.getName());
-                        nisFederation.removePartition(repository);
+                        ldapFederation.removePartition(repository);
 
-                        nisFederation.removePartitionConfig(repository);
+                        ldapFederation.removePartitionConfig(repository);
                         project.removeDirectory("partitions/"+repository.getName());
                     }
 
@@ -223,10 +223,10 @@ public class NISPartitionsPage extends FormPage {
 
             table.removeAll();
 
-            Project project = nisFederation.getProject();
+            Project project = ldapFederation.getProject();
             PartitionConfigs partitionConfigs = project.getPartitionConfigs();
 
-            for (NISRepository repository : nisFederation.getRepositories()) {
+            for (LDAPRepository repository : ldapFederation.getRepositories()) {
                 PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(repository.getName());
                 //Partition partition = nisFederation.getPartitions().getPartition(repository.getName());
 

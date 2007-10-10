@@ -28,6 +28,7 @@ public class LDAPEditor extends FormEditor {
     public void addPages() {
         try {
             addPage(new LDAPRepositoriesPage(this, ldapFederation));
+            addPage(new LDAPPartitionsPage(this, ldapFederation));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

@@ -291,7 +291,7 @@ public class Federation {
         return repository;
     }
 
-    public void setGlobal(GlobalRepository repository) throws Exception {
+    public void setGlobalRepository(GlobalRepository repository) throws Exception {
 
         Map<String,String> parameters = repository.getParameters();
 
