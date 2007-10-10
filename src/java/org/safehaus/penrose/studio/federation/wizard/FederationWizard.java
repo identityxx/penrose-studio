@@ -10,7 +10,6 @@ import org.safehaus.penrose.studio.driver.Driver;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.studio.federation.Federation;
-import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionInfoWizardPage;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.connection.ConnectionConfig;
@@ -36,7 +35,6 @@ public class FederationWizard extends Wizard {
 
     public ConnectionDriverPage dbDriverPage;
     public JDBCConnectionWizardPage jdbcPage;
-    public JNDIConnectionInfoWizardPage ldapPage;
 
     public FederationWizard() {
         setWindowTitle("Setup Wizard");
@@ -57,7 +55,6 @@ public class FederationWizard extends Wizard {
     public boolean canFinish() {
         if (!dbDriverPage.isPageComplete()) return false;
         if (!jdbcPage.isPageComplete()) return false;
-        if (!ldapPage.isPageComplete()) return false;
 
         return true;
     }
@@ -76,13 +73,6 @@ public class FederationWizard extends Wizard {
         jdbcPage.setConnectionConfig(jdbcConfig);
         jdbcPage.setShowDatabase(false);
         addPage(jdbcPage);
-
-        ConnectionConfig ldapConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(Federation.LDAP);
-
-        ldapPage = new JNDIConnectionInfoWizardPage();
-        ldapPage.setDescription("Enter LDAP connection parameters.");
-        ldapPage.setParameters(ldapConfig.getParameters());
-        addPage(ldapPage);
     }
 
     public boolean performFinish() {
@@ -96,12 +86,6 @@ public class FederationWizard extends Wizard {
             Map<String,String> parameters = jdbcPage.getParameters();
             parameters.put(JDBCClient.URL, url);
             jdbcConfig.setParameters(parameters);
-
-            ConnectionConfig ldapConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(Federation.LDAP);
-
-            Map<String,String> map = ldapConfig.getParameters();
-            map.putAll(ldapPage.getParameters());
-            ldapConfig.setParameters(map);
 
             log.debug("Creating partition "+Federation.PARTITION +".");
 
@@ -187,21 +171,4 @@ public class FederationWizard extends Wizard {
     public void setPartitionConfig(PartitionConfig partitionConfig) {
         this.partitionConfig = partitionConfig;
     }
-/*
-    public ConnectionConfig getDbConnectionConfig() {
-        return dbConnectionConfig;
-    }
-
-    public void setDbConnectionConfig(ConnectionConfig dbConnectionConfig) {
-        this.dbConnectionConfig = dbConnectionConfig;
-    }
-
-    public ConnectionConfig getLdapConnectionConfig() {
-        return ldapConnectionConfig;
-    }
-
-    public void setLdapConnectionConfig(ConnectionConfig ldapConnectionConfig) {
-        this.ldapConnectionConfig = ldapConnectionConfig;
-    }
-*/
 }

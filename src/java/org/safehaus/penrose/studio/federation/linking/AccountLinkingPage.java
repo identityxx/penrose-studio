@@ -379,8 +379,10 @@ public class AccountLinkingPage extends FormPage {
                                 links.remove(link);
                             }
 
-                            if (links.isEmpty()) links = null;
-                            item.setData("links", null);
+                            if (links.isEmpty()) {
+                                links = null;
+                                item.setData("links", null);
+                            }
                         }
 
                         if (links == null) {
