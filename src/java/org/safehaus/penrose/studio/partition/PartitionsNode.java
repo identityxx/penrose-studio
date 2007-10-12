@@ -51,7 +51,7 @@ public class PartitionsNode extends Node {
     protected Map<String,Node> partitionNodes = new TreeMap<String,Node>();
 
     public PartitionsNode(ServersView view, String name, String type, Object object, Object parent) {
-        super(name, type, PenrosePlugin.getImage(PenroseImage.FOLDER), object, parent);
+        super(name, type, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), object, parent);
         this.view = view;
         projectNode = (ProjectNode)parent;
 
@@ -154,7 +154,7 @@ public class PartitionsNode extends Node {
         PartitionNode partitionNode = new PartitionNode(
                 partitionConfig.getName(),
                 ServersView.PARTITION,
-                PenrosePlugin.getImage(PenroseImage.PARTITION),
+                PenroseStudioPlugin.getImage(PenroseImage.PARTITION),
                 partitionConfig,
                 this
         );

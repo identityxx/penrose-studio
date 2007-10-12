@@ -7,6 +7,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.IProgressService;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
@@ -18,14 +19,20 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.wizard.BrowserWizard;
+import org.safehaus.penrose.studio.federation.Repository;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.filter.SubstringFilter;
 import org.safehaus.penrose.filter.FilterTool;
+import org.safehaus.penrose.filter.SimpleFilter;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -272,7 +279,40 @@ public class LinkingPage extends FormPage {
 
         refreshButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
-                search();
+                IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+/*
+                try {
+                    progressService.run(true, true, new IRunnableWithProgress() {
+                        public void run(final IProgressMonitor monitor) {
+                            Display.getDefault().asyncExec(new Runnable() {
+                                public void run() {
+                                    search(monitor);
+                                }
+                            });
+                        }
+                    });
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                }
+*/
+                Job job = new Job("Search") {
+                    public IStatus run(final IProgressMonitor monitor) {
+                        Display.getDefault().asyncExec(new Runnable() {
+                            public void run() {
+                                search(monitor);
+                            }
+                        });
+                        return Status.OK_STATUS;
+                    }
+                };
+
+                Shell shell = new Shell();
+                shell.setSize(200, 100);
+
+                progressService.showInDialog(shell, job);
+
+                job.schedule();
             }
         });
 
@@ -295,11 +335,10 @@ public class LinkingPage extends FormPage {
                         if (matches == null || matches.isEmpty()) continue;
 
                         SearchResult result = (SearchResult)item.getData("local");
-                        DN dn = result.getDn().append(localBaseDn);
 
                         if (matches.size() == 1) {
                             SearchResult globalResult = matches.iterator().next();
-                            createLink(globalResult, dn.toString());
+                            createLink(globalResult, result);
 
                             links = new ArrayList<SearchResult>();
                             links.add(globalResult);
@@ -308,13 +347,12 @@ public class LinkingPage extends FormPage {
 
                             updateStatus(item);
 
-                        } else {
-                            if (globalTable.getSelectionCount() != 1) continue;
+                        } else if (globalTable.getSelectionCount() == 1) {
 
                             TableItem globalItem = globalTable.getSelection()[0];
 
                             SearchResult globalResult = (SearchResult)globalItem.getData();
-                            createLink(globalResult, dn.toString());
+                            createLink(globalResult, result);
 
                             links = new ArrayList<SearchResult>();
                             links.add(globalResult);
@@ -358,7 +396,6 @@ public class LinkingPage extends FormPage {
 
                     for (TableItem item : localTable.getSelection()) {
                         SearchResult result = (SearchResult)item.getData("local");
-                        String localDn = result.getDn().append(localBaseDn).toString();
 
                         Collection<SearchResult> links = (Collection<SearchResult>)item.getData("links");
                         if (links == null || links.isEmpty()) continue;
@@ -366,7 +403,7 @@ public class LinkingPage extends FormPage {
                         if (globalTable.getSelectionCount() == 0) {
 
                             for (SearchResult link : links) {
-                                removeLink(link.getDn(), localDn);
+                                removeLink(link.getDn(), result);
                             }
 
                             links = null;
@@ -375,7 +412,7 @@ public class LinkingPage extends FormPage {
                         } else {
                             for (TableItem globalItem : globalTable.getSelection()) {
                                 SearchResult link = (SearchResult)globalItem.getData();
-                                removeLink(link.getDn(), localDn);
+                                removeLink(link.getDn(), result);
                                 links.remove(link);
                             }
 
@@ -434,12 +471,17 @@ public class LinkingPage extends FormPage {
 
                     if (dialog.open() != Window.OK) return;
 
+                    Collection<SearchResult> results = wizard.getResults();
+                    for (SearchResult globalResult : results) {
+                        createLink(globalResult, result);
+                    }
+
                     Collection<SearchResult> links = (Collection<SearchResult>)item.getData("links");
                     if (links == null) {
                         links = new ArrayList<SearchResult>();
                         item.setData("links", links);
                     }
-                    links.addAll(wizard.getResults());
+                    links.addAll(results);
 
                     updateStatus(item);
 
@@ -465,16 +507,8 @@ public class LinkingPage extends FormPage {
 
                     for (TableItem item : localTable.getSelection()) {
                         SearchResult result = (SearchResult)item.getData("local");
-                        String localDn = result.getDn().append(localBaseDn).toString();
 
-                        SearchResult globalResult = (SearchResult)result.clone();
-
-                        DN dn = globalResult.getDn();
-                        Attributes attributes = globalResult.getAttributes();
-                        attributes.addValue("objectClass", "extensibleObject");
-                        attributes.addValue("seeAlso", localDn);
-
-                        globalSource.add(dn, attributes);
+                        SearchResult globalResult = createEntry(result);
 
                         Collection<SearchResult> links = (Collection<SearchResult>)item.getData("links");
                         if (links == null) {
@@ -590,8 +624,10 @@ public class LinkingPage extends FormPage {
         return new SubstringFilter(name, substrings);
     }
 
-    public void search() {
+    public void search(final IProgressMonitor monitor) {
         try {
+            monitor.beginTask("Searching "+partition.getName()+"...", IProgressMonitor.UNKNOWN);
+
             localTable.removeAll();
             localAttributeTable.removeAll();
             globalTable.removeAll();
@@ -606,7 +642,7 @@ public class LinkingPage extends FormPage {
             int scope = scopeCombo.getSelectionIndex();
 
             log.debug("Searching ["+searchBaseDn+"]");
-            
+
             SearchRequest request = new SearchRequest();
             request.setDn(searchBaseDn);
             request.setFilter(filter);
@@ -615,6 +651,11 @@ public class LinkingPage extends FormPage {
             SearchResponse response = new SearchResponse() {
                 public void add(SearchResult result) throws Exception {
 
+                    if (monitor.isCanceled()) {
+                        close();
+                        return;
+                    }
+
                     String dn = result.getDn().append(localBaseDn).toString();
 
                     TableItem item = new TableItem(localTable, SWT.NONE);
@@ -622,7 +663,7 @@ public class LinkingPage extends FormPage {
 
                     item.setData("local", result);
 
-                    Collection<SearchResult> links = getLinks(dn);
+                    Collection<SearchResult> links = getLinks(result);
 
                     if (links == null || links.isEmpty()) {
                         Collection<SearchResult> matches = searchLinks(result);
@@ -633,6 +674,8 @@ public class LinkingPage extends FormPage {
                     }
 
                     updateStatus(item);
+
+                    monitor.worked((int)getTotalCount());
                 }
             };
 
@@ -641,6 +684,9 @@ public class LinkingPage extends FormPage {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+
+        } finally {
+            monitor.done();
         }
     }
 
@@ -719,26 +765,36 @@ public class LinkingPage extends FormPage {
     }
 
     public void updateAttributes(Table table, Source source, DN dn) throws Exception {
+        SearchResult result = source.find(dn);
+        Attributes attributes = result.getAttributes();
 
-        try {
-            SearchResult result = source.find(dn);
-            Attributes attributes = result.getAttributes();
-
-            for (Attribute attribute : attributes.getAll()) {
-                for (Object value : attribute.getValues()) {
-                    TableItem attrItem = new TableItem(table, SWT.NONE);
-                    attrItem.setText(0, attribute.getName());
-                    attrItem.setText(1, value.toString());
-                }
+        for (Attribute attribute : attributes.getAll()) {
+            for (Object value : attribute.getValues()) {
+                TableItem attrItem = new TableItem(table, SWT.NONE);
+                attrItem.setText(0, attribute.getName());
+                attrItem.setText(1, value.toString());
             }
-
-        } catch (Exception e) {
         }
     }
 
-    public Collection<SearchResult> getLinks(String localDn) {
+    public Collection<SearchResult> getLinks(SearchResult localEntry) {
         try {
-            SearchResponse response = globalSource.search(null, "(seeAlso="+localDn+")", SearchRequest.SCOPE_SUB);
+            Repository repository = editor.getRepository();
+            String localAttribute = repository.getParameter("localAttribute");
+            String globalAttribute = repository.getParameter("globalAttribute");
+
+            SimpleFilter filter;
+            
+            if (localAttribute == null || globalAttribute == null) {
+                DN localDn = localEntry.getDn().append(localBaseDn);
+                filter = new SimpleFilter("seeAlso", "=", localDn.toString());
+
+            } else {
+                Object localValue = localEntry.getAttributes().getValue(localAttribute);
+                filter = new SimpleFilter(globalAttribute, "=", localValue);
+            }
+
+            SearchResponse response = globalSource.search((DN)null, filter, SearchRequest.SCOPE_SUB);
             return response.getAll();
 
         } catch (Exception e) {
@@ -772,29 +828,80 @@ public class LinkingPage extends FormPage {
         }
     }
 
-    public void createLink(SearchResult result, String localDn) throws Exception {
+    public void createLink(SearchResult globalEntry, SearchResult localEntry) throws Exception {
 
-        Attributes attributes = result.getAttributes();
-        Attribute attribute = attributes.get("objectClass");
+        Repository repository = editor.getRepository();
+        String localAttribute = repository.getParameter("localAttribute");
+        String globalAttribute = repository.getParameter("globalAttribute");
 
-        if (!attribute.containsValue("extensibleObject")) {
+        Attributes globalAttributes = globalEntry.getAttributes();
+        Attribute objectClass = globalAttributes.get("objectClass");
+
+        if (!objectClass.containsValue("extensibleObject")) {
             Collection<Modification> modifications = new ArrayList<Modification>();
             modifications.add(new Modification(Modification.ADD, new Attribute("objectClass", "extensibleObject")));
 
-            globalSource.modify(result.getDn(), modifications);
+            globalSource.modify(globalEntry.getDn(), modifications);
         }
 
         Collection<Modification> modifications = new ArrayList<Modification>();
-        modifications.add(new Modification(Modification.ADD, new Attribute("seeAlso", localDn)));
 
-        globalSource.modify(result.getDn(), modifications);
+        if (localAttribute == null || globalAttribute == null) {
+            String localDn = localEntry.getDn().append(localBaseDn).toString();
+            modifications.add(new Modification(Modification.ADD, new Attribute("seeAlso", localDn)));
+
+        } else {
+            Object localValue = localEntry.getAttributes().getValue(localAttribute);
+            modifications.add(new Modification(Modification.ADD, new Attribute(globalAttribute, localValue)));
+        }
+
+        globalSource.modify(globalEntry.getDn(), modifications);
     }
 
-    public void removeLink(DN globalDn, String localDn) throws Exception {
+    public void removeLink(DN globalDn, SearchResult localEntry) throws Exception {
+
+        Repository repository = editor.getRepository();
+        String localAttribute = repository.getParameter("localAttribute");
+        String globalAttribute = repository.getParameter("globalAttribute");
+
         Collection<Modification> modifications = new ArrayList<Modification>();
-        modifications.add(new Modification(Modification.DELETE, new Attribute("seeAlso", localDn)));
+
+        if (localAttribute == null || globalAttribute == null) {
+            String localDn = localEntry.getDn().append(localBaseDn).toString();
+            modifications.add(new Modification(Modification.DELETE, new Attribute("seeAlso", localDn)));
+
+        } else {
+            Object localValue = localEntry.getAttributes().getValue(localAttribute);
+            modifications.add(new Modification(Modification.DELETE, new Attribute(globalAttribute, localValue)));
+        }
 
         globalSource.modify(globalDn, modifications);
+    }
+
+    public SearchResult createEntry(SearchResult localEntry) throws Exception {
+
+        Repository repository = editor.getRepository();
+        String localAttribute = repository.getParameter("localAttribute");
+        String globalAttribute = repository.getParameter("globalAttribute");
+
+        SearchResult globalResult = (SearchResult)localEntry.clone();
+
+        DN dn = globalResult.getDn();
+        Attributes attributes = globalResult.getAttributes();
+        attributes.addValue("objectClass", "extensibleObject");
+
+        if (localAttribute == null || globalAttribute == null) {
+            String localDn = localEntry.getDn().append(localBaseDn).toString();
+            attributes.addValue("seeAlso", localDn);
+
+        } else {
+            Object localValue = localEntry.getAttributes().getValue(localAttribute);
+            attributes.addValue(globalAttribute, localValue);
+        }
+
+        globalSource.add(dn, attributes);
+
+        return globalResult;
     }
 
     public Partition getPartition() {

@@ -32,14 +32,13 @@ import org.safehaus.penrose.source.TableConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
 import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.connection.Connections;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.PartitionContext;
 import org.safehaus.penrose.partition.PartitionFactory;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.naming.PenroseContext;
@@ -370,7 +369,7 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
 
             for (FieldConfig field : fields) {
                 TableItem it = new TableItem(fieldsTable, SWT.NONE);
-                it.setImage(PenrosePlugin.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                it.setImage(PenroseStudioPlugin.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
                 it.setText(0, field.getName());
                 it.setText(1, field.getType());
             }

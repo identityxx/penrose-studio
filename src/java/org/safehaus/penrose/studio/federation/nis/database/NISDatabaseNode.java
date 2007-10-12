@@ -5,7 +5,7 @@ import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISDomainNode;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.eclipse.jface.action.IMenuManager;
@@ -29,7 +29,7 @@ public class NISDatabaseNode extends Node {
         super(
                 name,
                 ServersView.ENTRY,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 null,
                 domainNode
         );

@@ -17,7 +17,7 @@
  */
 package org.safehaus.penrose.studio.schema;
 
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
@@ -44,7 +44,7 @@ public class SchemasNode extends Node {
     private ProjectNode projectNode;
 
     public SchemasNode(String name, String type, Object object, Object parent) {
-        super(name, type, PenrosePlugin.getImage(PenroseImage.FOLDER), object, parent);
+        super(name, type, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), object, parent);
         projectNode = (ProjectNode)parent;
         view = projectNode.getServersView();
     }
@@ -72,7 +72,7 @@ public class SchemasNode extends Node {
             SchemaNode schemaNode = new SchemaNode(
                     schemaConfig.getName(),
                     ServersView.SCHEMA,
-                    PenrosePlugin.getImage(PenroseImage.SCHEMA),
+                    PenroseStudioPlugin.getImage(PenroseImage.SCHEMA),
                     schemaConfig,
                     this
             );

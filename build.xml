@@ -26,7 +26,6 @@
     <path id="lib.path">
         <fileset dir="lib">
             <include name="*.jar"/>
-            <include name="penrose-pro/*.jar"/>
             <include name="plugins/*.jar"/>
         </fileset>
     </path>
@@ -74,29 +73,22 @@
     <target name="clean" depends="init">
         <delete dir="${project.dist}" failonerror="false"/>
         <delete dir="target" failonerror="false"/>
+        <ant dir="tools" target="clean"/>
     </target>
 
-    <target name="build-tools" depends="init">
-        <mkdir dir="target/tools"/>
-        <javac
-            srcdir="src/tools"
-            destdir="target/tools"
-            debug="on"
-            debuglevel="lines,vars,source"
-            source="1.5"
-            target="1.5"
-        />
-        <jar destfile="target/penrose-studio-tools-${product.version}.jar" basedir="target/tools"/>
-    </target>
-
-    <target name="manifest" depends="build-tools">
+    <target name="manifest" depends="init">
+        <ant dir="tools" target="compile"/>
         <mkdir dir="META-INF"/>
         <copy todir="META-INF" file="MANIFEST.MF" overwrite="true">
             <filterchain>
                 <expandproperties/>
             </filterchain>
         </copy>
-        <taskdef name="manifest-generator" classname="org.safehaus.penrose.tools.ManifestTask" classpath="target/penrose-studio-tools-${product.version}.jar"/>
+        <taskdef
+            name="manifest-generator"
+            classname="org.safehaus.penrose.studio.tools.ManifestTask"
+            classpath="tools/target/penrose-studio-tools-${product.version}.jar"
+        />
         <manifest-generator
             file="META-INF/MANIFEST.MF"
             dir="lib"
@@ -125,9 +117,6 @@
                 <include name="**/*.png"/>
                 <include name="**/*.ico"/>
             </fileset>
-            <fileset dir=".">
-                <include name="plugin.xml"/>
-            </fileset>
         </copy>
         <jar basedir="target/classes" destfile="target/${project.name}-${product.version}.jar">
             <patternset>
@@ -135,17 +124,17 @@
             </patternset>
             <manifest>
                 <attribute name="Specification-Version"  value="${product.specification}"/>
-                <attribute name="Implementation-Title"   value="Penrose Studio"/>
+                <attribute name="Implementation-Title"   value="${product.title}"/>
                 <attribute name="Implementation-Version" value="${product.version}"/>
-                <attribute name="Implementation-Vendor"  value="Identyx Corporation"/>
-                <attribute name="Built-Date" value="${TIMESTAMP}"/>
+                <attribute name="Implementation-Vendor"  value="${product.vendor}"/>
+                <attribute name="Built-Date"             value="${TIMESTAMP}"/>
             </manifest>
         </jar>
     </target>
 
     <target name="build" depends="compile">
         <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>
-        <property name="plugin.path" value="target/${dist.name}/plugins/org.safehaus.penrose_${plugin.version}"/>
+        <property name="plugin.path" value="target/${dist.name}/plugins/org.safehaus.penrose.studio_${plugin.version}"/>
         <copy todir="target" file="LICENSE.txt"/>
         <mkdir dir="target/${dist.name}"/>
         <copy todir="target/${dist.name}" file="LICENSE.txt"/>
@@ -159,7 +148,7 @@
         <mkdir dir="target/${dist.name}/conf/lib"/>
 -->
         <copy todir="target/${dist.name}/configuration">
-            <fileset dir="rcp/configuration">
+            <fileset dir="configuration">
                 <include name="*.*"/>
                 <exclude name=".svn/**"/>
             </fileset>
@@ -190,7 +179,11 @@
                 <expandproperties/>
             </filterchain>
         </copy>
-        <taskdef name="manifest-generator" classname="org.safehaus.penrose.tools.ManifestTask" classpath="target/penrose-studio-tools-${product.version}.jar"/>
+        <taskdef
+            name="manifest-generator"
+            classname="org.safehaus.penrose.studio.tools.ManifestTask"
+            classpath="tools/target/penrose-studio-tools-${product.version}.jar"
+        />
         <manifest-generator
             file="${plugin.path}/META-INF/MANIFEST.MF"
             dir="${plugin.path}/lib"
@@ -335,7 +328,7 @@
     </target>
 
     <target name="dist-macosx" depends="build-macosx" if="isMac">
-        <property name="app.name" value="Penrose Studio.app"/>
+        <property name="app.name" value="${product.title}.app"/>
         <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>
 
         <echo message="Creating ${app.name}"/>
@@ -376,7 +369,7 @@
             <arg line="--target dist/${project.name}-${product.version}.dmg"/>
             <!-- <arg line="- -volname &quot;Penrose Studio ${product.version}&quot;"/>  
 			The image path is absolute, NOT relative. This means your temporary disk image and your pkg-dmg disk images must have the same name. -->
-            <arg line="--volname &quot;Penrose Studio&quot;"/> 
+            <arg line="--volname &quot;${product.title}&quot;"/> 
             <arg line="--license target/LICENSE.txt"/>
             <arg line="--icon images/PenroseDMG.icns"/>
             <arg line="--mkdir /.background"/>

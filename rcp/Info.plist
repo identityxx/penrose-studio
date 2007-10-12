@@ -6,7 +6,7 @@
 	<key>CFBundleExecutable</key>
 		<string>eclipse</string>
 	<key>CFBundleGetInfoString</key>
-		<string>Penrose Studio ${product.version}. Copyright (c) 2000-2006, Identyx Corporation. All rights reserved.</string>
+		<string>${product.title} ${product.version}. Copyright (c) 2000-2006, Identyx Corporation. All rights reserved.</string>
 	<key>CFBundleIconFile</key>
 		<string>Penrose.icns</string>
 	<key>CFBundleIdentifier</key>

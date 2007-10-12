@@ -5,10 +5,13 @@
     <output url="file://$MODULE_DIR$/target/classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/federation/src/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/tools" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/tools/src/java" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/federation/target" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
+      <excludeFolder url="file://$MODULE_DIR$/tools/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -414,6 +417,15 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/ant.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/plugins/org.eclipse.core.jobs_3.2.0.v20060603.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

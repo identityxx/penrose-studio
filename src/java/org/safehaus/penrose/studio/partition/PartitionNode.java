@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.server.ServersView;
@@ -37,14 +37,11 @@ import org.safehaus.penrose.studio.module.ModulesNode;
 import org.safehaus.penrose.studio.source.SourcesNode;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.PartitionClient;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
 import java.util.ArrayList;
-import java.io.File;
 
 /**
  * @author Endi S. Dewata
@@ -75,7 +72,7 @@ public class PartitionNode extends Node {
         DirectoryNode directoryNode = new DirectoryNode(
                 ServersView.DIRECTORY,
                 ServersView.DIRECTORY,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 ServersView.DIRECTORY,
                 this
         );
@@ -87,7 +84,7 @@ public class PartitionNode extends Node {
         ConnectionsNode connectionsNode = new ConnectionsNode(
                 ServersView.CONNECTIONS,
                 ServersView.CONNECTIONS,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 partitionConfig,
                 this
         );
@@ -99,7 +96,7 @@ public class PartitionNode extends Node {
         SourcesNode sourcesNode = new SourcesNode(
                 ServersView.SOURCES,
                 ServersView.SOURCES,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 ServersView.SOURCES,
                 this
         );
@@ -111,7 +108,7 @@ public class PartitionNode extends Node {
         ModulesNode modulesNode = new ModulesNode(
                 ServersView.MODULES,
                 ServersView.MODULES,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 ServersView.MODULES,
                 this
         );
@@ -195,7 +192,7 @@ public class PartitionNode extends Node {
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.SIZE_16x16, PenroseImage.DELETE)) {
+        manager.add(new Action("Delete", PenroseStudioPlugin.getImageDescriptor(PenroseImage.SIZE_16x16, PenroseImage.DELETE)) {
             public void run() {
                 try {
                     remove();

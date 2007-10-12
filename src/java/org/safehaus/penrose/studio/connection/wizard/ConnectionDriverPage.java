@@ -44,7 +44,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.packageadmin.PackageAdmin;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.driver.Driver;
 import org.safehaus.penrose.studio.driver.DriverReader;
 import org.safehaus.penrose.studio.driver.DriverWizard;
@@ -94,8 +94,6 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
             File dir = new File(f, dir1);
 
 
-            BundleContext context = PenrosePlugin.getInstance().getBundleContext();
-
             log.debug("Installing bundle for " + dir);
 
             try {
@@ -120,7 +118,7 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
 	}
     
     private void installBundle(String dir) throws BundleException, ClassNotFoundException {
-    	BundleContext context = PenrosePlugin.getInstance().getBundleContext();
+    	BundleContext context = PenroseStudioPlugin.getInstance().getBundleContext();
     	
     	Bundle bundle = context.installBundle(dir);
 		

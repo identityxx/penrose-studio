@@ -1,4 +1,4 @@
-Summary: Penrose Studio
+Summary: ${product.title}
 Name: ${project.name}
 Version: ${product.version}
 Release: 1
@@ -23,7 +23,7 @@ ant -Dproduct.version=${product.version} -Dprefix=${rpm.prefix}$RPM_BUILD_ROOT i
 
 %post
 cat << EOF
-Penrose Studio ${product.version} has been installed in /usr/local/${project.name}-${product.version}.
+${product.title} ${product.version} has been installed in /usr/local/${project.name}-${product.version}.
 EOF
 
 %clean

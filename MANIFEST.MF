@@ -1,15 +1,16 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Penrose Studio
-Bundle-SymbolicName: org.safehaus.penrose; singleton:=true
+Bundle-Name: ${product.title}
+Bundle-SymbolicName: org.safehaus.penrose.studio; singleton:=true
 Bundle-Version: ${plugin.version}
-Bundle-Vendor: Identyx
-Bundle-Activator: org.safehaus.penrose.studio.PenrosePlugin
+Bundle-Vendor: ${product.vendor}
+Bundle-Activator: org.safehaus.penrose.studio.PenroseStudioPlugin
 Bundle-Localization: plugin
 Eclipse-AutoStart: true
-Plugin-Class: org.safehaus.penrose.studio.PenrosePlugin
+Plugin-Class: org.safehaus.penrose.studio.PenroseStudioPlugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.runtime.compatibility,
+ org.eclipse.core.jobs,
  org.eclipse.help,
  org.eclipse.ui,
  org.eclipse.ui.forms

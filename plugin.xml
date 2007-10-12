@@ -2,229 +2,211 @@
 <?eclipse version="3.0"?>
 <plugin>
 
-   <extension
-         point="org.eclipse.help.toc">
-      <toc
-            file="toc.xml">
-      </toc>
-      <toc
-            file="testToc.xml"
-            primary="true">
-      </toc>
-   </extension>
-   <extension
-         point="org.eclipse.ui.views">
-      <category
-            name="Penrose"
-            id="penrose">
-      </category>
-      <view
+    <extension point="org.eclipse.ui.views">
+        <category name="Penrose Studio" id="penrose-studio"/>
+        <view
             allowMultiple="false"
             class="org.safehaus.penrose.studio.server.ServersView"
-            category="penrose"
+            category="penrose-studio"
             name="Servers"
             icon="images/penrose16.ico"
             id="org.safehaus.penrose.studio.server.ServersView"/>
-      <view
+        <view
             allowMultiple="false"
             class="org.safehaus.penrose.studio.validation.ValidationView"
-            category="penrose"
+            category="penrose-studio"
             name="Validation"
             icon="images/validation.gif"
             id="org.safehaus.penrose.studio.validation.ValidationView"/>
-      <view
+        <view
             allowMultiple="false"
             class="org.safehaus.penrose.studio.views.ProjectInfoView"
-            category="penrose"
+            category="penrose-studio"
             name="Project"
             icon="images/penrose16.ico"
             id="org.safehaus.penrose.studio.views.ProjectInfoView"/>
-       <view
-             allowMultiple="false"
-             class="org.safehaus.penrose.studio.console.ConsoleView"
-             category="penrose"
-             name="Console"
-             icon="images/console.gif"
-             id="org.safehaus.penrose.studio.console.ConsoleView"/>
-   </extension>
-   <extension point="org.eclipse.ui.editors">
-       <editor
+        <view
+            allowMultiple="false"
+            class="org.safehaus.penrose.studio.console.ConsoleView"
+            category="penrose-studio"
+            name="Console"
+            icon="images/console.gif"
+            id="org.safehaus.penrose.studio.console.ConsoleView"/>
+    </extension>
+
+    <extension point="org.eclipse.ui.editors">
+        <editor
             id="org.safehaus.penrose.studio.welcome.WelcomeEditor"
             name="Welcome"
             icon="images/penrose16.ico"
             class="org.safehaus.penrose.studio.welcome.WelcomeEditor"/>
-       <editor
+        <editor
             id="org.safehaus.penrose.studio.connection.editor.ConnectionEditor"
             name="Connection"
             icon="images/server.png"
             class="org.safehaus.penrose.studio.connection.editor.ConnectionEditor"/>
-       <editor
+        <editor
             id="org.safehaus.penrose.studio.jdbc.connection.JDBCConnectionEditor"
             name="JDBC Connection"
             icon="images/server.png"
             class="org.safehaus.penrose.studio.jdbc.connection.JDBCConnectionEditor"/>
-       <editor
+        <editor
             id="org.safehaus.penrose.studio.jndi.connection.JNDIConnectionEditor"
             name="JNDI Connection"
             icon="images/server.png"
             class="org.safehaus.penrose.studio.jndi.connection.JNDIConnectionEditor"/>
-       <editor
+        <editor
             id="org.safehaus.penrose.studio.nis.connection.NISConnectionEditor"
             name="NIS Connection"
             icon="images/server.png"
             class="org.safehaus.penrose.studio.nis.connection.NISConnectionEditor"/>
-       <editor
+        <editor
             id="org.safehaus.penrose.studio.source.editor.SourceEditor"
             name="Source"
             icon="images/source.gif"
             class="org.safehaus.penrose.studio.source.editor.SourceEditor"/>
-       <editor
+        <editor
             id="org.safehaus.penrose.studio.jdbc.source.JDBCSourceEditor"
             name="JDBC Source"
             icon="images/source.gif"
             class="org.safehaus.penrose.studio.jdbc.source.JDBCSourceEditor"/>
-       <editor
+        <editor
             id="org.safehaus.penrose.studio.jndi.source.JNDISourceEditor"
             name="JNDI Source"
             icon="images/source.gif"
             class="org.safehaus.penrose.studio.jndi.source.JNDISourceEditor"/>
-       <editor
+        <editor
             id="org.safehaus.penrose.studio.nis.source.NISSourceEditor"
             name="NIS Source"
             icon="images/source.gif"
             class="org.safehaus.penrose.studio.nis.source.NISSourceEditor"/>
-       <editor
+        <editor
             id="org.safehaus.penrose.studio.mapping.editor.MappingEditor"
             name="Mapping"
             icon="images/penrose16.ico"
             class="org.safehaus.penrose.studio.mapping.editor.MappingEditor"/>
-       <editor
-           id="org.safehaus.penrose.studio.browser.BrowserEditor"
-           name="Browser"
-           icon="images/browser_22x22.png"
-           class="org.safehaus.penrose.studio.browser.BrowserEditor"/>
-       <editor
-           id="org.safehaus.penrose.studio.preview.PreviewEditor"
-           name="Preview"
-           icon="images/dirpreview_22x22.png"
-           class="org.safehaus.penrose.studio.preview.PreviewEditor"/>
-       <editor
-           id="org.safehaus.penrose.studio.properties.SystemPropertiesEditor"
-           name="System Properties"
-           icon="images/properties.png"
-           class="org.safehaus.penrose.studio.properties.SystemPropertiesEditor"/>
-       <editor
-           id="org.safehaus.penrose.studio.module.editor.ModuleEditor"
-           name="Module"
-           icon="images/object.gif"
-           class="org.safehaus.penrose.studio.module.editor.ModuleEditor"/>
-       <editor
-           id="org.safehaus.penrose.studio.schema.SchemaEditor"
-           name="Schema"
-           icon="images/schema.png"
-           class="org.safehaus.penrose.studio.schema.SchemaEditor"/>
-       <editor
-           id="org.safehaus.penrose.studio.schema.ObjectClassEditor"
-           name="Object Class"
-           icon="images/schema.png"
-           class="org.safehaus.penrose.studio.schema.ObjectClassEditor"/>
-       <editor
-           id="org.safehaus.penrose.studio.schema.AttributeTypeEditor"
-           name="Attribute Type"
-           icon="images/schema.png"
-           class="org.safehaus.penrose.studio.schema.AttributeTypeEditor"/>
-       <editor
-           id="org.safehaus.penrose.studio.user.UserEditor"
-           name="User"
-           icon="images/root.png"
-           class="org.safehaus.penrose.studio.user.UserEditor"/>
-       <editor
-           id="org.safehaus.penrose.studio.service.ServiceEditor"
-           name="Service"
-           icon="images/service.png"
-           class="org.safehaus.penrose.studio.service.ServiceEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.browser.BrowserEditor"
+            name="Browser"
+            icon="images/browser_22x22.png"
+            class="org.safehaus.penrose.studio.browser.BrowserEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.preview.PreviewEditor"
+            name="Preview"
+            icon="images/dirpreview_22x22.png"
+            class="org.safehaus.penrose.studio.preview.PreviewEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.properties.SystemPropertiesEditor"
+            name="System Properties"
+            icon="images/properties.png"
+            class="org.safehaus.penrose.studio.properties.SystemPropertiesEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.module.editor.ModuleEditor"
+            name="Module"
+            icon="images/object.gif"
+            class="org.safehaus.penrose.studio.module.editor.ModuleEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.schema.SchemaEditor"
+            name="Schema"
+            icon="images/schema.png"
+            class="org.safehaus.penrose.studio.schema.SchemaEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.schema.ObjectClassEditor"
+            name="Object Class"
+            icon="images/schema.png"
+            class="org.safehaus.penrose.studio.schema.ObjectClassEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.schema.AttributeTypeEditor"
+            name="Attribute Type"
+            icon="images/schema.png"
+            class="org.safehaus.penrose.studio.schema.AttributeTypeEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.user.UserEditor"
+            name="User"
+            icon="images/root.png"
+            class="org.safehaus.penrose.studio.user.UserEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.service.ServiceEditor"
+            name="Service"
+            icon="images/service.png"
+            class="org.safehaus.penrose.studio.service.ServiceEditor"/>
 
-<!-- Federation -->
+        <editor
+            id="org.safehaus.penrose.studio.federation.editor.FederationEditor"
+            name="Federation"
+            icon="images/object.gif"
+            class="org.safehaus.penrose.studio.federation.editor.FederationEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditor"
+            name="LDAP"
+            icon="images/object.gif"
+            class="org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.federation.linking.LinkingEditor"
+            name="Identity Linking"
+            icon="images/object.gif"
+            class="org.safehaus.penrose.studio.federation.linking.LinkingEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.federation.nis.editor.NISEditor"
+            name="NIS"
+            icon="images/object.gif"
+            class="org.safehaus.penrose.studio.federation.nis.editor.NISEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.federation.nis.NISDomainEditor"
+            name="NIS Domain"
+            icon="images/object.gif"
+            class="org.safehaus.penrose.studio.federation.nis.NISDomainEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.federation.nis.database.NISDatabaseEditor"
+            name="NIS Database"
+            icon="images/object.gif"
+            class="org.safehaus.penrose.studio.federation.nis.database.NISDatabaseEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.federation.nis.ldap.NISLDAPEditor"
+            name="NIS LDAP"
+            icon="images/object.gif"
+            class="org.safehaus.penrose.studio.federation.nis.ldap.NISLDAPEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.federation.nis.linking.NISLinkEditor"
+            name="NIS Users"
+            icon="images/object.gif"
+            class="org.safehaus.penrose.studio.federation.nis.linking.NISLinkEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.federation.nis.conflict.NISUsersEditor"
+            name="NIS Users"
+            icon="images/object.gif"
+            class="org.safehaus.penrose.studio.federation.nis.conflict.NISUsersEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.federation.nis.conflict.NISGroupsEditor"
+            name="NIS Users"
+            icon="images/object.gif"
+            class="org.safehaus.penrose.studio.federation.nis.conflict.NISGroupsEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.federation.nis.ownership.NISFilesEditor"
+            name="NIS Alignment Tool"
+            icon="images/object.gif"
+            class="org.safehaus.penrose.studio.federation.nis.ownership.NISFilesEditor"/>
+    </extension>
 
-       <editor
-           id="org.safehaus.penrose.studio.federation.editor.FederationEditor"
-           name="Federation"
-           icon="images/object.gif"
-           class="org.safehaus.penrose.studio.federation.editor.FederationEditor"/>
-       <editor
-           id="org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditor"
-           name="LDAP"
-           icon="images/object.gif"
-           class="org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditor"/>
-       <editor
-           id="org.safehaus.penrose.studio.federation.linking.LinkingEditor"
-           name="Identity Linking"
-           icon="images/object.gif"
-           class="org.safehaus.penrose.studio.federation.linking.LinkingEditor"/>
-       <editor
-           id="org.safehaus.penrose.studio.federation.nis.editor.NISEditor"
-           name="NIS"
-           icon="images/object.gif"
-           class="org.safehaus.penrose.studio.federation.nis.editor.NISEditor"/>
-       <editor
-           id="org.safehaus.penrose.studio.federation.nis.NISDomainEditor"
-           name="NIS Domain"
-           icon="images/object.gif"
-           class="org.safehaus.penrose.studio.federation.nis.NISDomainEditor"/>
-       <editor
-           id="org.safehaus.penrose.studio.federation.nis.database.NISDatabaseEditor"
-           name="NIS Database"
-           icon="images/object.gif"
-           class="org.safehaus.penrose.studio.federation.nis.database.NISDatabaseEditor"/>
-       <editor
-           id="org.safehaus.penrose.studio.federation.nis.ldap.NISLDAPEditor"
-           name="NIS LDAP"
-           icon="images/object.gif"
-           class="org.safehaus.penrose.studio.federation.nis.ldap.NISLDAPEditor"/>
-       <editor
-           id="org.safehaus.penrose.studio.federation.nis.linking.NISLinkEditor"
-           name="NIS Users"
-           icon="images/object.gif"
-           class="org.safehaus.penrose.studio.federation.nis.linking.NISLinkEditor"/>
-       <editor
-           id="org.safehaus.penrose.studio.federation.nis.conflict.NISUsersEditor"
-           name="NIS Users"
-           icon="images/object.gif"
-           class="org.safehaus.penrose.studio.federation.nis.conflict.NISUsersEditor"/>
-       <editor
-           id="org.safehaus.penrose.studio.federation.nis.conflict.NISGroupsEditor"
-           name="NIS Users"
-           icon="images/object.gif"
-           class="org.safehaus.penrose.studio.federation.nis.conflict.NISGroupsEditor"/>
-       <editor
-           id="org.safehaus.penrose.studio.federation.nis.ownership.NISFilesEditor"
-           name="NIS Alignment Tool"
-           icon="images/object.gif"
-           class="org.safehaus.penrose.studio.federation.nis.ownership.NISFilesEditor"/>
-   </extension>
-   <extension
-         id="application"
-         name="application"
-         point="org.eclipse.core.runtime.applications">
-      <application>
-         <run class="org.safehaus.penrose.studio.PenroseStudio"/>
-      </application>
-   </extension>
-   <extension
-         point="org.eclipse.ui.perspectives">
-      <perspective
+    <extension point="org.eclipse.ui.perspectives">
+        <perspective
             class="org.safehaus.penrose.studio.PenroseStudioPerspective"
             fixed="false"
             name="Penrose Studio"
             id="org.safehaus.penrose.studio.PenroseStudioPerspective"/>
-   </extension>
-    <extension
-            point="org.eclipse.core.runtime.products"
-            id="product">
+    </extension>
+
+    <extension point="org.eclipse.core.runtime.applications" id="application">
+        <application>
+            <run class="org.safehaus.penrose.studio.PenroseStudio"/>
+        </application>
+    </extension>
+
+    <extension point="org.eclipse.core.runtime.products" id="product">
         <product
-                name="Penrose Studio"
-                application="org.safehaus.penrose.application">
-        <property
+            name="Penrose Studio"
+            application="org.safehaus.penrose.studio.application">
+            <property
                 name="windowImages"
                 value="images/penrose16.gif,images/penrose32.gif"/>
         </product>

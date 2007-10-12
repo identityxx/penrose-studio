@@ -20,7 +20,7 @@ package org.safehaus.penrose.studio.user;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
@@ -39,7 +39,7 @@ public class AdministratorNode extends Node {
     ProjectNode projectNode;
 
     public AdministratorNode(String name, String type, Object object, Object parent) {
-        super(name, type, PenrosePlugin.getImage(PenroseImage.ADMINISTRATOR), object, parent);
+        super(name, type, PenroseStudioPlugin.getImage(PenroseImage.ADMINISTRATOR), object, parent);
         
         projectNode = (ProjectNode)parent;
     }

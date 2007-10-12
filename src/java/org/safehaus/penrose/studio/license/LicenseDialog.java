@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.apache.log4j.Logger;
 
@@ -63,9 +63,9 @@ public class LicenseDialog extends Dialog {
     public LicenseDialog(Shell parent) {
         super(parent);
 
-        penroseImage = PenrosePlugin.getImage(PenroseImage.LOGO16);
-        connectImage = PenrosePlugin.getImage(PenroseImage.SIZE_16x16, PenroseImage.CONNECT);
-        deleteImage = PenrosePlugin.getImage(PenroseImage.SIZE_16x16, PenroseImage.DELETE);
+        penroseImage = PenroseStudioPlugin.getImage(PenroseImage.LOGO16);
+        connectImage = PenroseStudioPlugin.getImage(PenroseImage.SIZE_16x16, PenroseImage.CONNECT);
+        deleteImage = PenroseStudioPlugin.getImage(PenroseImage.SIZE_16x16, PenroseImage.DELETE);
 
         shell = parent;
 

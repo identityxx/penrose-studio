@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.jndi.source.JNDIFieldDialog;
 import org.safehaus.penrose.studio.source.FieldDialog;
@@ -297,7 +297,7 @@ public class JNDISourcePropertyPage extends SourceEditorPage {
 					TableItem item = fieldTable.getItem(i);
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     fieldDefinition.setPrimaryKey(item.getChecked());
-					item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
+					item.setImage(PenroseStudioPlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
 				}
 
                 checkDirty();
@@ -310,7 +310,7 @@ public class JNDISourcePropertyPage extends SourceEditorPage {
 					TableItem item = fieldTable.getItem(i);
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     fieldDefinition.setPrimaryKey(item.getChecked());
-					item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
+					item.setImage(PenroseStudioPlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
 				}
 
                 checkDirty();
@@ -484,7 +484,7 @@ public class JNDISourcePropertyPage extends SourceEditorPage {
 
             TableItem item = new TableItem(fieldTable, SWT.CHECK);
             item.setChecked(fieldConfig.isPrimaryKey());
-            item.setImage(PenrosePlugin.getImage(fieldConfig.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
+            item.setImage(PenroseStudioPlugin.getImage(fieldConfig.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
             item.setText(0, fieldConfig.getName().equals(fieldConfig.getOriginalName()) ? fieldConfig.getName() : fieldConfig.getOriginalName());
             item.setText(1, fieldConfig.getName().equals(fieldConfig.getOriginalName()) ? "" : fieldConfig.getName());
             item.setText(2, fieldConfig.getType());

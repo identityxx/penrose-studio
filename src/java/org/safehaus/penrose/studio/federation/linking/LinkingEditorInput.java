@@ -4,6 +4,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.federation.Repository;
 import org.safehaus.penrose.partition.Partition;
 
 /**
@@ -13,6 +14,7 @@ public class LinkingEditorInput implements IEditorInput {
 
     private Project project;
     private Partition partition;
+    private Repository repository;
 
     public LinkingEditorInput() {
     }
@@ -78,5 +80,13 @@ public class LinkingEditorInput implements IEditorInput {
 
     public void setPartition(Partition partition) {
         this.partition = partition;
+    }
+
+    public Repository getRepository() {
+        return repository;
+    }
+
+    public void setRepository(Repository repository) {
+        this.repository = repository;
     }
 }

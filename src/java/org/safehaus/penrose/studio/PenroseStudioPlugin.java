@@ -21,41 +21,29 @@ import org.eclipse.ui.plugin.*;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.BundleContext;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class PenrosePlugin extends AbstractUIPlugin {
+public class PenroseStudioPlugin extends AbstractUIPlugin {
 
-    Logger log = Logger.getLogger(getClass());
+    public org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
 
-	public static PenrosePlugin instance;
+	public static PenroseStudioPlugin instance;
     public static HashMap<String,Image> images = new HashMap<String,Image>();
 
-	private ResourceBundle resourceBundle;
-	
 	private BundleContext bundleContext;
 	
-	public PenrosePlugin() {
-
+	public PenroseStudioPlugin() {
 		instance = this;
-
-        try {
-			resourceBundle = ResourceBundle.getBundle("org.safehaus.penrose.rcp.PenrosePluginResources");
-		} catch (MissingResourceException x) {
-			resourceBundle = null;
-		}
 	}
 
-    public BundleContext getBundleContext(){
-        return bundleContext;
-    }
-	
 	public void start(BundleContext bundleContext) throws Exception {
-        //log.debug("Starting PenrosePlugin");
-        super.start(bundleContext);
         this.bundleContext = bundleContext;
-        
+
+        log.debug("Starting Penrose Studio Plugin");
+        super.start(bundleContext);
+
         try {
             //IWorkbench workbench = PlatformUI.getWorkbench();
             //IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
@@ -70,25 +58,12 @@ public class PenrosePlugin extends AbstractUIPlugin {
 	}
 
 	public void stop(BundleContext bundleContext) throws Exception {
-        //log.debug("Stopping PenrosePlugin");
+        log.debug("Stopping Penrose Studio Plugin");
 		super.stop(bundleContext);
 	}
 
-	public static PenrosePlugin getInstance() {
+	public static PenroseStudioPlugin getInstance() {
 		return instance;
-	}
-
-	public static String getResourceString(String key) {
-		ResourceBundle bundle = PenrosePlugin.getInstance().getResourceBundle();
-		try {
-			return (bundle != null) ? bundle.getString(key) : key;
-		} catch (MissingResourceException e) {
-			return key;
-		}
-	}
-
-	public ResourceBundle getResourceBundle() {
-		return resourceBundle;
 	}
 
     public static ImageDescriptor getImageDescriptor(String size, String name) {
@@ -97,13 +72,13 @@ public class PenrosePlugin extends AbstractUIPlugin {
     }
 
     public static ImageDescriptor getImageDescriptor(String path) {
-        return AbstractUIPlugin.imageDescriptorFromPlugin("org.safehaus.penrose", path);
+        return AbstractUIPlugin.imageDescriptorFromPlugin("org.safehaus.penrose.studio", path);
     }
 
 	public static Image getImage(String path) {
 		Image image = images.get(path);
         if (image == null) {
-            ImageDescriptor descriptor = PenrosePlugin.getImageDescriptor(path);
+            ImageDescriptor descriptor = getImageDescriptor(path);
             image = descriptor.createImage();
             images.put(path, image);
         }
@@ -114,10 +89,18 @@ public class PenrosePlugin extends AbstractUIPlugin {
         String path = "images/"+size+"/"+name;
         Image image = images.get(path);
         if (image == null) {
-            ImageDescriptor descriptor = PenrosePlugin.getImageDescriptor(path);
+            ImageDescriptor descriptor = getImageDescriptor(path);
             image = descriptor.createImage();
             images.put(path, image);
         }
         return image;
+    }
+
+    public BundleContext getBundleContext(){
+        return bundleContext;
+    }
+
+    public void setBundleContext(BundleContext bundleContext) {
+        this.bundleContext = bundleContext;
     }
 }

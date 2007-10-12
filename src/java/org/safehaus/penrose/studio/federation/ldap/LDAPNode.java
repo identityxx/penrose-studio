@@ -2,7 +2,7 @@ package org.safehaus.penrose.studio.federation.ldap;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.federation.FederationNode;
@@ -34,7 +34,7 @@ public class LDAPNode extends Node {
     Map<String,Node> children = new TreeMap<String,Node>();
 
     public LDAPNode(String name, FederationNode federationNode) {
-        super(name, null, PenrosePlugin.getImage(PenroseImage.FOLDER), null, federationNode);
+        super(name, null, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), null, federationNode);
 
         this.federationNode = federationNode;
         this.projectNode = federationNode.getProjectNode();

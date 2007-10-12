@@ -8,7 +8,7 @@ import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
 import org.safehaus.penrose.studio.federation.linking.LinkingEditorInput;
 import org.safehaus.penrose.studio.federation.linking.LinkingEditor;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.partition.Partition;
@@ -33,7 +33,7 @@ public class LDAPLinkingNode extends Node {
         super(
                 name,
                 ServersView.ENTRY,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 null, 
                 repositoryNode
         );
@@ -65,6 +65,7 @@ public class LDAPLinkingNode extends Node {
 
         LinkingEditorInput ei = new LinkingEditorInput();
         ei.setPartition(partition);
+        ei.setRepository(repository);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();

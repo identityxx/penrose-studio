@@ -28,7 +28,7 @@ import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -72,7 +72,7 @@ public class AttributeTypeSelectionDialog extends Dialog implements SelectionLis
         shell.setLocation(l.x + (s.x - size.x)/2, l.y + (s.y - size.y)/2);
 
         shell.setText(getText());
-        shell.setImage(PenrosePlugin.getImage(PenroseImage.LOGO16));
+        shell.setImage(PenroseStudioPlugin.getImage(PenroseImage.LOGO16));
         shell.open();
 
         Display display = getParent().getDisplay();

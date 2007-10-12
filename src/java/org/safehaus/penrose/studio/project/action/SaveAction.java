@@ -25,7 +25,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
@@ -39,7 +39,7 @@ public class SaveAction extends Action {
 
     public SaveAction() {
         setText("&Save");
-        setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.SAVE));
+        setImageDescriptor(PenroseStudioPlugin.getImageDescriptor(PenroseImage.SAVE));
         setAccelerator(SWT.CTRL | 'S');
         setToolTipText("Save changes to disk");
         setId(getClass().getName());

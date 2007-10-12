@@ -42,7 +42,7 @@ public class ApplicationConfig {
 	}
 	
 	public void load(File file) throws Exception {
-		log.debug("Loading Penrose Studio configuration from "+file+".");
+		log.debug("Loading configuration from "+file+".");
 		try {
 			Digester digester = new Digester();
 			digester.addObjectCreate("config/project", ProjectConfig.class);

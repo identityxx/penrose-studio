@@ -3,7 +3,7 @@ package org.safehaus.penrose.studio.federation.ldap;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.federation.ldap.linking.LDAPLinkingNode;
 import org.apache.log4j.Logger;
@@ -31,7 +31,7 @@ public class LDAPRepositoryNode extends Node {
         super(
                 name,
                 ServersView.ENTRY,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 repository,
                 ldapNode
         );

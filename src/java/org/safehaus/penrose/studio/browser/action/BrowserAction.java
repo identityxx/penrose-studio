@@ -22,7 +22,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.project.ProjectConfig;
@@ -48,7 +48,7 @@ public class BrowserAction extends Action {
     public BrowserAction() {
 
         setText("&Browser");
-        setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.BROWSER));
+        setImageDescriptor(PenroseStudioPlugin.getImageDescriptor(PenroseImage.BROWSER));
         setToolTipText("Browser");
         setId(getClass().getName());
     }

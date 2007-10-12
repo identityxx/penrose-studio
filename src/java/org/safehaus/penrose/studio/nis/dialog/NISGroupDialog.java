@@ -12,7 +12,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.graphics.Point;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 
 import java.util.Collection;
@@ -76,7 +76,7 @@ public class NISGroupDialog extends Dialog {
         shell.setLocation(l.x + (s.x - size.x)/2, l.y + (s.y - size.y)/2);
 
         shell.setText(getText());
-        shell.setImage(PenrosePlugin.getImage(PenroseImage.LOGO16));
+        shell.setImage(PenroseStudioPlugin.getImage(PenroseImage.LOGO16));
         shell.open();
 
         refresh();

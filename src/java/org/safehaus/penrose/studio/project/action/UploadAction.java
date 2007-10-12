@@ -22,7 +22,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.swt.SWT;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
@@ -35,7 +35,7 @@ public class UploadAction extends Action {
 
 	public UploadAction() {
         setText("&Upload");
-        setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.UPLOAD));
+        setImageDescriptor(PenroseStudioPlugin.getImageDescriptor(PenroseImage.UPLOAD));
         setAccelerator(SWT.CTRL | 'S');
         setToolTipText("Upload configuration to Penrose Server");
         setId(getClass().getName());

@@ -45,7 +45,7 @@ public class NISDomainNode extends Node {
         super(
                 name,
                 ServersView.ENTRY,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 domain,
                 nisNode
         );
@@ -96,10 +96,10 @@ public class NISDomainNode extends Node {
         Project project = nisFederation.getProject();
         PartitionConfigs partitionConfigs = project.getPartitionConfigs();
         PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName());
-        return PenrosePlugin.getImage(partitionConfig == null ? PenroseImage.RED_FOLDER : PenroseImage.FOLDER);
+        return PenroseStudioPlugin.getImage(partitionConfig == null ? PenroseImage.RED_FOLDER : PenroseImage.FOLDER);
 
         //Partition partition = nisFederation.getPartitions().getPartition(domain.getName());
-        //return PenrosePlugin.getImage(partition == null ? PenroseImage.RED_FOLDER : PenroseImage.FOLDER);
+        //return PenroseStudioPlugin.getImage(partition == null ? PenroseImage.RED_FOLDER : PenroseImage.FOLDER);
     }
 
     public void showMenu(IMenuManager manager) throws Exception {

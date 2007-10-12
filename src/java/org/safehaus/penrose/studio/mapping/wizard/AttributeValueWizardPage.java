@@ -24,7 +24,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.mapping.AttributeTypeSelectionDialog;
 import org.safehaus.penrose.studio.mapping.ExpressionDialog;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -340,7 +340,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                 log.debug(" - " + ad.getName() + ": " + value);
 
                 TableItem it = new TableItem(attributeTable, SWT.CHECK);
-                it.setImage(PenrosePlugin.getImage(ad.isRdn() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                it.setImage(PenroseStudioPlugin.getImage(ad.isRdn() ? PenroseImage.KEY : PenroseImage.NOKEY));
                 it.setText(0, ad.getName());
                 it.setText(1, value == null ? "" : value);
                 it.setChecked(ad.isRdn());
@@ -385,7 +385,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
         for (TableItem item : items) {
             AttributeMapping ad = (AttributeMapping) item.getData();
             ad.setRdn(item.getChecked());
-            item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
+            item.setImage(PenroseStudioPlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
         }
     }
 

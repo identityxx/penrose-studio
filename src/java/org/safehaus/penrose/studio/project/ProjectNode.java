@@ -3,7 +3,7 @@ package org.safehaus.penrose.studio.project;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.plugin.PluginsNode;
@@ -31,6 +31,10 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -146,7 +150,7 @@ public class ProjectNode extends Node {
             }
         });
 
-        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.SIZE_16x16, PenroseImage.DELETE)) {
+        manager.add(new Action("Delete", PenroseStudioPlugin.getImageDescriptor(PenroseImage.SIZE_16x16, PenroseImage.DELETE)) {
             public void run() {
                 try {
                     remove();
@@ -178,6 +182,13 @@ public class ProjectNode extends Node {
         penroseStudio.notifyChangeListeners();
     }
 
+    public void expand() throws Exception {
+        if (!project.isConnected()) connect();
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
+    }
+
     public void close() throws Exception {
         disconnect();
         serversView.close(this);
@@ -187,14 +198,7 @@ public class ProjectNode extends Node {
     }
 
     public void connect() throws Exception {
-        try {
-            project.connect();
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            MessageDialog.openError(serversView.getSite().getShell(), "Action Failed", e.getMessage());
-            return;
-        }
+        project.connect();
 
         partitionsNode = new PartitionsNode(
                 serversView,
@@ -332,9 +336,11 @@ public class ProjectNode extends Node {
     }
 
     public Collection<Node> getChildren() throws Exception {
+/*
         if (!project.isConnected()) {
             connect();
         }
+*/
         return children;
     }
 

@@ -3,7 +3,7 @@ package org.safehaus.penrose.studio.plugin;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.apache.log4j.Logger;
 
@@ -22,7 +22,7 @@ public class PluginNode extends Node {
         super(
                 name,
                 ServersView.SERVICE,
-                PenrosePlugin.getImage(PenroseImage.MODULE),
+                PenroseStudioPlugin.getImage(PenroseImage.MODULE),
                 null,
                 parent
         );

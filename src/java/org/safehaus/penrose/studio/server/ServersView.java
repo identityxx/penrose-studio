@@ -27,11 +27,10 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.jface.viewers.*;
 import org.eclipse.jface.action.*;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenrosePlugin;
-import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.server.ServersContentProvider;
 import org.safehaus.penrose.studio.server.ServersLabelProvider;
 import org.safehaus.penrose.studio.project.ProjectConfig;
@@ -104,7 +103,6 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
 
 			Helper.hookContextMenu(treeViewer.getControl(), new IMenuListener() {
 				public void menuAboutToShow(IMenuManager manager) {
-
                     try {
                         if (treeViewer.getTree().getSelectionCount() == 0) return;
                         TreeItem item = treeViewer.getTree().getSelection()[0];
@@ -122,7 +120,8 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
             treeViewer.addDoubleClickListener(new IDoubleClickListener() {
                 public void doubleClick(DoubleClickEvent event) {
                     try {
-                        IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
+                        IStructuredSelection selection = (IStructuredSelection)event.getSelection();
+                        //IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
                         Object object = selection.getFirstElement();
 
                         Node node = (Node)object;
@@ -132,6 +131,42 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
 
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
+                        MessageDialog.openError(getSite().getShell(), "Action Failed", e.getMessage());
+                    }
+                }
+            });
+
+            treeViewer.addTreeListener(new ITreeViewerListener() {
+                public void treeExpanded(TreeExpansionEvent event) {
+                    try {
+                        Object object = event.getElement();
+
+                        Node node = (Node)object;
+                        node.expand();
+
+                        treeViewer.setExpandedState(object, true);
+
+                        treeViewer.refresh();
+
+                    } catch (Exception e) {
+                        log.error(e.getMessage(), e);
+                        MessageDialog.openError(getSite().getShell(), "Action Failed", e.getMessage());
+                    }
+                }
+                public void treeCollapsed(TreeExpansionEvent event) {
+                    try {
+                        Object object = event.getElement();
+
+                        Node node = (Node)object;
+                        node.collapse();
+
+                        treeViewer.setExpandedState(object, false);
+
+                        treeViewer.refresh();
+
+                    } catch (Exception e) {
+                        log.error(e.getMessage(), e);
+                        MessageDialog.openError(getSite().getShell(), "Action Failed", e.getMessage());
                     }
                 }
             });

@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.jdbc.source.JDBCFieldDialog;
 import org.safehaus.penrose.studio.source.FieldDialog;
@@ -283,7 +283,7 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
                     TableItem item = fieldTable.getItem(i);
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     fieldDefinition.setPrimaryKey(item.getChecked());
-                    item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                    item.setImage(PenroseStudioPlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
                 }
 
                 checkDirty();
@@ -296,7 +296,7 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
                     TableItem item = fieldTable.getItem(i);
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     fieldDefinition.setPrimaryKey(item.getChecked());
-                    item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                    item.setImage(PenroseStudioPlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
                 }
 
                 checkDirty();
@@ -438,7 +438,7 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
 
             TableItem item = new TableItem(fieldTable, SWT.CHECK);
             item.setChecked(fieldDefinition.isPrimaryKey());
-            item.setImage(PenrosePlugin.getImage(fieldDefinition.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
+            item.setImage(PenroseStudioPlugin.getImage(fieldDefinition.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
             item.setText(0, fieldDefinition.getName().equals(fieldDefinition.getOriginalName()) ? fieldDefinition.getName() : fieldDefinition.getOriginalName());
             item.setText(1, fieldDefinition.getName().equals(fieldDefinition.getOriginalName()) ? "" : fieldDefinition.getName());
             item.setText(2, fieldDefinition.getType());

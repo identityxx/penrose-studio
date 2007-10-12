@@ -7,7 +7,6 @@ import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
 
 import java.util.Collection;
-import java.util.ArrayList;
 
 /**
  * @author Endi Sukma Dewata
@@ -86,23 +85,6 @@ public class LinkingWizard extends Wizard {
     public boolean performFinish() {
         try {
             results = resultsPage.getSelections();
-
-            for (SearchResult result : results) {
-                Attributes attributes = result.getAttributes();
-                Attribute attribute = attributes.get("objectClass");
-
-                if (!attribute.containsValue("extensibleObject")) {
-                    Collection<Modification> modifications = new ArrayList<Modification>();
-                    modifications.add(new Modification(Modification.ADD, new Attribute("objectClass", "extensibleObject")));
-
-                    source.modify(result.getDn(), modifications);
-                }
-
-                Collection<Modification> modifications = new ArrayList<Modification>();
-                modifications.add(new Modification(Modification.ADD, new Attribute("seeAlso", dn.toString())));
-
-                source.modify(result.getDn(), modifications);
-            }
 
             return true;
 

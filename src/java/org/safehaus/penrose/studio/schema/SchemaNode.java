@@ -19,7 +19,7 @@ package org.safehaus.penrose.studio.schema;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.ProjectNode;
@@ -79,7 +79,7 @@ public class SchemaNode extends Node {
             }
         });
 */
-        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.SIZE_16x16, PenroseImage.DELETE)) {
+        manager.add(new Action("Delete", PenroseStudioPlugin.getImageDescriptor(PenroseImage.SIZE_16x16, PenroseImage.DELETE)) {
             public void run() {
                 try {
                     remove();
@@ -136,7 +136,7 @@ public class SchemaNode extends Node {
                 view,
                 ServersView.ATTRIBUTE_TYPES,
                 ServersView.ATTRIBUTE_TYPES,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 ServersView.ATTRIBUTE_TYPES,
                 this
         );
@@ -149,7 +149,7 @@ public class SchemaNode extends Node {
                 view,
                 ServersView.OBJECT_CLASSES,
                 ServersView.OBJECT_CLASSES,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 ServersView.OBJECT_CLASSES,
                 this
         );

@@ -5,9 +5,10 @@ import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISDomainNode;
+import org.safehaus.penrose.studio.federation.nis.NISRepository;
 import org.safehaus.penrose.studio.federation.linking.LinkingEditorInput;
 import org.safehaus.penrose.studio.federation.linking.LinkingEditor;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.partition.Partition;
@@ -32,7 +33,7 @@ public class NISLinkingNode extends Node {
         super(
                 name,
                 ServersView.ENTRY,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 null,
                 domainNode
         );
@@ -59,19 +60,13 @@ public class NISLinkingNode extends Node {
     }
 
     public void open() throws Exception {
-/*
-        NISLinkEditorInput ei = new NISLinkEditorInput();
-        ei.setNisFederation(nisFederation);
-        ei.etDomain(domainNode.getDomain());
 
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        IWorkbenchPage page = window.getActivePage();
-        page.openEditor(ei, NISLinkEditor.class.getName());
-*/
-        Partition partition = nisFederation.getPartitions().getPartition(domainNode.getName());
+        NISRepository repository = domainNode.getDomain();
+        Partition partition = nisFederation.getPartitions().getPartition(repository.getName());
 
         LinkingEditorInput ei = new LinkingEditorInput();
         ei.setPartition(partition);
+        ei.setRepository(repository);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();

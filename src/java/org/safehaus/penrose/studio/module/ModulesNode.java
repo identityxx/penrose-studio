@@ -20,7 +20,7 @@ package org.safehaus.penrose.studio.module;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
@@ -135,7 +135,7 @@ public class ModulesNode extends Node {
             ModuleNode moduleNode = new ModuleNode(
                     moduleConfig.getName(),
                     ServersView.MODULE,
-                    PenrosePlugin.getImage(PenroseImage.MODULE),
+                    PenroseStudioPlugin.getImage(PenroseImage.MODULE),
                     moduleConfig,
                     this
             );

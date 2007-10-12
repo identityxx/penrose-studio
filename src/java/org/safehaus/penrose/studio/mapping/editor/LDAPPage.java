@@ -25,7 +25,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.mapping.EntrySelectionDialog;
@@ -262,7 +262,7 @@ public class LDAPPage extends FormPage {
                         TableItem item = attributeTable.getItem(i);
                         AttributeMapping ad = (AttributeMapping)item.getData();
 
-                        item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                        item.setImage(PenroseStudioPlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
                         ad.setRdn(item.getChecked());
                     }
                     refreshRdn();
@@ -282,7 +282,7 @@ public class LDAPPage extends FormPage {
                         TableItem item = attributeTable.getItem(i);
                         AttributeMapping ad = (AttributeMapping)item.getData();
 
-                        item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                        item.setImage(PenroseStudioPlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
                         ad.setRdn(item.getChecked());
                     }
                     refreshRdn();
@@ -469,7 +469,7 @@ public class LDAPPage extends FormPage {
 
             TableItem item = new TableItem(attributeTable, SWT.CHECK);
             item.setChecked(ad.isRdn());
-            item.setImage(PenrosePlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
+            item.setImage(PenroseStudioPlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
             item.setText(0, ad.getName());
             item.setText(1, value == null ? "" : value);
             item.setData(ad);

@@ -17,7 +17,7 @@
  */
 package org.safehaus.penrose.studio.schema;
 
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
@@ -74,7 +74,7 @@ public class AttributeTypesNode extends Node {
                     view,
                     attributeType.getName(),
                     ServersView.ATTRIBUTE_TYPE,
-                    PenrosePlugin.getImage(PenroseImage.ATTRIBUTE_TYPE),
+                    PenroseStudioPlugin.getImage(PenroseImage.ATTRIBUTE_TYPE),
                     attributeType,
                     this
             ));

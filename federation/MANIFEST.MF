@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ${product.title} Federation
+Bundle-SymbolicName: org.safehaus.penrose.studio.federation; singleton:=true
+Bundle-Version: ${plugin.version}
+Bundle-Vendor: ${product.vendor}
+Bundle-Activator: org.safehaus.penrose.studio.federation.FederationPlugin
+Bundle-Localization: plugin
+Eclipse-AutoStart: true
+Plugin-Class: org.safehaus.penrose.studio.federation.FederationPlugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.runtime.compatibility,
+ org.eclipse.help,
+ org.eclipse.ui,
+ org.eclipse.ui.forms

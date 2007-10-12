@@ -22,7 +22,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.project.ProjectConfig;
 import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.apache.log4j.Logger;
@@ -97,7 +97,7 @@ public class ServersContentProvider implements ITreeContentProvider {
                 view,
                 projectConfig.getName(),
                 "Project",
-                PenrosePlugin.getImage(PenroseImage.LOGO16),
+                PenroseStudioPlugin.getImage(PenroseImage.LOGO16),
                 projectConfig,
                 null
         );

@@ -6,11 +6,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.server.ServersView;
 
 public class DisconnectAction extends Action {
@@ -19,7 +18,7 @@ public class DisconnectAction extends Action {
 
     public DisconnectAction() {
         setText("&Disconnect");
-        setImageDescriptor(PenrosePlugin.getImageDescriptor(PenroseImage.SIZE_22x22, PenroseImage.DISCONNECT));
+        setImageDescriptor(PenroseStudioPlugin.getImageDescriptor(PenroseImage.SIZE_22x22, PenroseImage.DISCONNECT));
         setAccelerator(SWT.CTRL | 'D');
         setToolTipText("Disconnect");
         setId(getClass().getName());

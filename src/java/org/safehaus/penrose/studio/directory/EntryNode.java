@@ -139,7 +139,7 @@ public class EntryNode extends Node {
             }
         });
 
-        manager.add(new Action("Delete", PenrosePlugin.getImageDescriptor(PenroseImage.SIZE_16x16, PenroseImage.DELETE)) {
+        manager.add(new Action("Delete", PenroseStudioPlugin.getImageDescriptor(PenroseImage.SIZE_16x16, PenroseImage.DELETE)) {
             public void run() {
                 try {
                     remove();
@@ -241,7 +241,7 @@ public class EntryNode extends Node {
             EntryNode entryNode = new EntryNode(
                     childMapping.getRdn().toString(),
                     ServersView.ENTRY,
-                    PenrosePlugin.getImage(PenroseImage.FOLDER),
+                    PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                     childMapping,
                     this
             );

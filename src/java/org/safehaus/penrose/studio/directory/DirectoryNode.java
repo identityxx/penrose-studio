@@ -98,7 +98,7 @@ public class DirectoryNode extends Node {
             EntryNode entryNode = new EntryNode(
                     dn,
                     ServersView.ENTRY,
-                    PenrosePlugin.getImage(PenroseImage.HOME_NODE),
+                    PenroseStudioPlugin.getImage(PenroseImage.HOME_NODE),
                     entryMapping,
                     this
             );

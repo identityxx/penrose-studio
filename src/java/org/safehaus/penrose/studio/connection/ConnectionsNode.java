@@ -18,7 +18,7 @@
 package org.safehaus.penrose.studio.connection;
 
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.partition.PartitionNode;
@@ -125,7 +125,7 @@ public class ConnectionsNode extends Node {
             ConnectionNode connectionNode = new ConnectionNode(
                     connectionConfig.getName(),
                     ServersView.CONNECTION,
-                    PenrosePlugin.getImage(PenroseImage.CONNECTION),
+                    PenroseStudioPlugin.getImage(PenroseImage.CONNECTION),
                     connectionConfig,
                     this
             );

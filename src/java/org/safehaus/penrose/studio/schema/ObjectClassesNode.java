@@ -17,7 +17,7 @@
  */
 package org.safehaus.penrose.studio.schema;
 
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
@@ -74,7 +74,7 @@ public class ObjectClassesNode extends Node {
                     view,
                     objectClass.getName(),
                     ServersView.OBJECT_CLASS,
-                    PenrosePlugin.getImage(PenroseImage.OBJECT_CLASS),
+                    PenroseStudioPlugin.getImage(PenroseImage.OBJECT_CLASS),
                     objectClass,
                     this
             ));

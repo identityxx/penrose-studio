@@ -6,7 +6,7 @@ import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISDomainNode;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
@@ -30,7 +30,7 @@ public class NISConflictsNode extends Node {
         super(
                 name,
                 ServersView.ENTRY,
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 null, 
                 domainNode
         );
@@ -75,7 +75,7 @@ public class NISConflictsNode extends Node {
         NISUsersNode usersNode = new NISUsersNode(
                 "Users",
                 "Users",
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 null,
                 this
         );
@@ -88,7 +88,7 @@ public class NISConflictsNode extends Node {
         NISGroupsNode groupsNode = new NISGroupsNode(
                 "Groups",
                 "Groups",
-                PenrosePlugin.getImage(PenroseImage.FOLDER),
+                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 null,
                 this
         );

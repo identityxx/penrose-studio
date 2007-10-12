@@ -18,7 +18,7 @@
 package org.safehaus.penrose.studio.logging;
 
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
@@ -26,9 +26,7 @@ import org.safehaus.penrose.log4j.Log4jConfig;
 import org.safehaus.penrose.log4j.LoggerConfig;
 import org.safehaus.penrose.log4j.RootConfig;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.apache.log4j.Logger;
@@ -136,7 +134,7 @@ public class LoggersNode extends Node {
                     view,
                     loggerConfig.getName(),
                     ServersView.LOGGER,
-                    PenrosePlugin.getImage(PenroseImage.LOGGER),
+                    PenroseStudioPlugin.getImage(PenroseImage.LOGGER),
                     loggerConfig,
                     this
             );

@@ -120,6 +120,12 @@ public class Node {
     public void open() throws Exception {
     }
 
+    public void expand() throws Exception {
+    }
+
+    public void collapse() throws Exception {
+    }
+
     public boolean hasChildren() throws Exception {
         return false;
     }

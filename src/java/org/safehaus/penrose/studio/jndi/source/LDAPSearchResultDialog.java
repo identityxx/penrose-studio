@@ -15,7 +15,7 @@ import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.ldap.Attributes;
 import org.safehaus.penrose.ldap.Attribute;
 import org.safehaus.penrose.ldap.RDNBuilder;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 
 import java.util.Map;
@@ -66,7 +66,7 @@ public class LDAPSearchResultDialog extends Dialog {
         shell.setLocation(l.x + (s.x - size.x)/2, l.y + (s.y - size.y)/2);
 
         shell.setText(getText());
-        shell.setImage(PenrosePlugin.getImage(PenroseImage.LOGO16));
+        shell.setImage(PenroseStudioPlugin.getImage(PenroseImage.LOGO16));
         shell.open();
 
         Display display = getParent().getDisplay();

@@ -3,7 +3,7 @@ package org.safehaus.penrose.studio.plugin;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.federation.FederationNode;
@@ -25,7 +25,7 @@ public class PluginsNode extends Node {
     protected Collection<Node> children = new ArrayList<Node>();
 
     public PluginsNode(String name, String type, Object object, Object parent) throws Exception {
-        super(name, type, PenrosePlugin.getImage(PenroseImage.FOLDER), object, parent);
+        super(name, type, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), object, parent);
 
         projectNode = (ProjectNode)parent;
         view = projectNode.getServersView();

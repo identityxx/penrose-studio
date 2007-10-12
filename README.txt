@@ -1,4 +1,4 @@
-Penrose Studio
+${product.title}
 --------------
 Version ${product.version}
 Copyright (c) 2000-2006, Identyx Corporation.
@@ -28,27 +28,27 @@ Checkout the project from:
 Building
 --------
 
-Building Penrose Studio for all platforms:
+Building ${product.title} for all platforms:
 
    ant dist-all
 
-Building Penrose Studio for MacOS X platform:
+Building ${product.title} for MacOS X platform:
 
    ant dist-macosx-carbon
 
-Building Penrose Studio for Solaris GTK platform:
+Building ${product.title} for Solaris GTK platform:
 
    ant dist-solaris-gtk
 
-Building Penrose Studio for Solaris Motif platform:
+Building ${product.title} for Solaris Motif platform:
 
    ant dist-solaris-motif
 
-Building Penrose Studio for Win32 platform:
+Building ${product.title} for Win32 platform:
 
    ant dist-win32
 
-Building Penrose Studio for Linux platforms:
+Building ${product.title} for Linux platforms:
 
    ant -Dplatform=<platform> dist-linux
 
@@ -58,7 +58,7 @@ Supported Linux platforms:
  - linux-gtk-x86_64
  - linux-motif
 
-Building Penrose Studio for other Unix platforms:
+Building ${product.title} for other Unix platforms:
 
    ant -Dplatform=<platform> dist-unix
 

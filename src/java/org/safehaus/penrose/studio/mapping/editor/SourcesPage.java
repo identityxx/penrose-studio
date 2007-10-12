@@ -36,7 +36,7 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.mapping.editor.MappingEditor;
 import org.safehaus.penrose.studio.mapping.SourceDialog;
 import org.safehaus.penrose.studio.mapping.ExpressionDialog;
@@ -239,7 +239,7 @@ public class SourcesPage extends FormPage implements ModifyListener {
         //item.setText(" "+source.getConnectionName()+" - "+source.getSourceName()+" ["+source.getName()+"]");
         //item.setFont(boldFont);
 
-        item.setImage(PenrosePlugin.getImage(PenroseImage.SOURCE));
+        item.setImage(PenroseStudioPlugin.getImage(PenroseImage.SOURCE));
 
         Composite composite = toolkit.createComposite(tabFolder);
         composite.setLayout(new GridLayout(2, false));
@@ -423,7 +423,7 @@ public class SourcesPage extends FormPage implements ModifyListener {
 
                 TableItem item = new TableItem(table, SWT.CHECK);
                 item.setChecked(fieldConfig.isPrimaryKey());
-                item.setImage(PenrosePlugin.getImage(fieldConfig.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                item.setImage(PenroseStudioPlugin.getImage(fieldConfig.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
                 item.setText(0, fieldName);
                 item.setText(1, value == null ? "" : value);
                 item.setData(fieldMapping);

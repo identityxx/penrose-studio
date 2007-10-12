@@ -4,15 +4,12 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.graphics.Point;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.acl.ACI;
 
 /**
  * @author Endi S. Dewata
@@ -47,7 +44,7 @@ public class PartitionDialog extends Dialog {
         shell.setLocation(l.x + (s.x - size.x)/2, l.y + (s.y - size.y)/2);
 
         shell.setText(getText());
-        shell.setImage(PenrosePlugin.getImage(PenroseImage.LOGO16));
+        shell.setImage(PenroseStudioPlugin.getImage(PenroseImage.LOGO16));
 
         reset();
 

@@ -2,7 +2,7 @@ package org.safehaus.penrose.studio.federation.nis;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.federation.FederationNode;
@@ -42,7 +42,7 @@ public class NISNode extends Node {
     NISOwnershipNode ownershipNode;
 
     public NISNode(String name, FederationNode federationNode) throws Exception {
-        super(name, null, PenrosePlugin.getImage(PenroseImage.FOLDER), null, federationNode);
+        super(name, null, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), null, federationNode);
 
         this.federationNode = federationNode;
         this.projectNode = federationNode.getProjectNode();

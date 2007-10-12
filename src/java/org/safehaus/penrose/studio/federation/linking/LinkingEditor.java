@@ -8,16 +8,19 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.studio.federation.Repository;
 
 public class LinkingEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
     private Partition partition;
+    private Repository repository;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         LinkingEditorInput ei = (LinkingEditorInput)input;
         partition = ei.getPartition();
+        repository = ei.getRepository();
 
         setSite(site);
         setInput(input);
@@ -53,5 +56,13 @@ public class LinkingEditor extends FormEditor {
 
     public void setPartition(Partition partition) {
         this.partition = partition;
+    }
+
+    public Repository getRepository() {
+        return repository;
+    }
+
+    public void setRepository(Repository repository) {
+        this.repository = repository;
     }
 }

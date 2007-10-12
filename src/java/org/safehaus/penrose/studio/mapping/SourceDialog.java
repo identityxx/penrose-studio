@@ -26,7 +26,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.mapping.SourceMapping;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 
 import java.util.Collection;
@@ -79,7 +79,7 @@ public class SourceDialog extends Dialog {
         shell.setLocation(l.x + (s.x - size.x)/2, l.y + (s.y - size.y)/2);
 
         shell.setText(getText());
-        shell.setImage(PenrosePlugin.getImage(PenroseImage.LOGO16));
+        shell.setImage(PenroseStudioPlugin.getImage(PenroseImage.LOGO16));
         shell.open();
 
         Display display = getParent().getDisplay();
@@ -302,7 +302,7 @@ public class SourceDialog extends Dialog {
             TreeItem ti = new TreeItem(sourceTree, SWT.NONE);
             ti.setText(sourceDefinition.getName());
             ti.setData(sourceDefinition);
-            ti.setImage(PenrosePlugin.getImage(PenroseImage.SOURCE));
+            ti.setImage(PenroseStudioPlugin.getImage(PenroseImage.SOURCE));
             items.put(sourceDefinition.getName(), ti);
         }
     }

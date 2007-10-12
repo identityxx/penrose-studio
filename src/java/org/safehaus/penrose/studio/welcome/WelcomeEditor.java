@@ -28,7 +28,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 
 /**
  * @author Endi S. Dewata
@@ -70,7 +70,7 @@ public class WelcomeEditor extends EditorPart {
         TableWrapData twd = new TableWrapData(TableWrapData.FILL, TableWrapData.FILL);
         ft.setLayoutData(twd);
 
-        image = PenrosePlugin.getImage(PenroseImage.WELCOME);
+        image = PenroseStudioPlugin.getImage(PenroseImage.WELCOME);
         ft.setImage("welcome", image);
 
         font = new Font(parent.getDisplay(), "Arial", 16, SWT.BOLD);

@@ -3,17 +3,15 @@ package org.safehaus.penrose.studio.logging;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenrosePlugin;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.log4j.Log4jConfig;
 import org.safehaus.penrose.log4j.AppenderConfig;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
-import org.eclipse.ui.PlatformUI;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -85,7 +83,7 @@ public class AppendersNode extends Node {
                     view,
                     appenderConfig.getName(),
                     ServersView.APPENDER,
-                    PenrosePlugin.getImage(PenroseImage.APPENDER),
+                    PenroseStudioPlugin.getImage(PenroseImage.APPENDER),
                     appenderConfig,
                     this
             );
