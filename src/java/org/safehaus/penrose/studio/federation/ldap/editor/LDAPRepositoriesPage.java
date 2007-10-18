@@ -21,7 +21,6 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
 import org.safehaus.penrose.studio.federation.ldap.wizard.LDAPRepositoryWizard;
-import org.safehaus.penrose.studio.federation.nis.NISRepository;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;

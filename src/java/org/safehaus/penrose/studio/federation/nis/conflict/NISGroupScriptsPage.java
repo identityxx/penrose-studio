@@ -15,7 +15,7 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.federation.nis.NISRepository;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.nis.dialog.NISGroupDialog;
@@ -57,7 +57,7 @@ public class NISGroupScriptsPage extends FormPage {
     Table matchesTable;
 
     NISGroupsEditor editor;
-    NISRepository domain;
+    NISDomain domain;
     NISFederation nisFederation;
 
     Map<String,Collection<Conflict>> conflicts = new TreeMap<String,Collection<Conflict>>();
@@ -369,7 +369,7 @@ public class NISGroupScriptsPage extends FormPage {
         JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
         JDBCClient client = adapter.getClient();
 
-        for (NISRepository repository : nisFederation.getRepositories()) {
+        for (NISDomain repository : nisFederation.getRepositories()) {
             final String name = repository.getName();
             if (domain.getName().equals(name)) continue;
 
@@ -435,7 +435,7 @@ public class NISGroupScriptsPage extends FormPage {
         NISActionRequest request = new NISActionRequest();
         request.setDomain(domain.getName());
 
-        for (NISRepository repository : nisFederation.getRepositories()) {
+        for (NISDomain repository : nisFederation.getRepositories()) {
             String name = repository.getName();
             request.addDomain(name);
         }
@@ -588,7 +588,7 @@ public class NISGroupScriptsPage extends FormPage {
             throw new Exception("GID number "+gidNumber+" is already allocated for user "+cn2+" in domain "+domainName);
         }
 
-        for (NISRepository repository : nisFederation.getRepositories()) {
+        for (NISDomain repository : nisFederation.getRepositories()) {
             String name = repository.getName();
 
             Partition partition2 = nisFederation.getPartitions().getPartition(name);

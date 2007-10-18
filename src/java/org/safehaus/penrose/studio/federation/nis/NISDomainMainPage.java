@@ -9,7 +9,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.studio.federation.nis.NISRepository;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.NISDomainEditor;
 
 /**
@@ -22,7 +22,7 @@ public class NISDomainMainPage extends FormPage {
     FormToolkit toolkit;
 
     NISDomainEditor editor;
-    NISRepository domain;
+    NISDomain domain;
 
     public NISDomainMainPage(NISDomainEditor editor) {
         super(editor, "DOMAIN", "  Domain  ");

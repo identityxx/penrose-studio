@@ -10,6 +10,7 @@ import org.safehaus.penrose.studio.federation.nis.ldap.NISLDAPNode;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.nis.database.NISDatabaseNode;
+import org.safehaus.penrose.studio.federation.nis.consolidation.NISConsolidationNode;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.eclipse.swt.graphics.Image;
@@ -31,7 +32,7 @@ public class NISDomainNode extends Node {
     private NISNode nisNode;
 
     private NISFederation nisFederation;
-    private NISRepository domain;
+    private NISDomain domain;
 
     Collection<Node> children = new ArrayList<Node>();
 
@@ -40,8 +41,9 @@ public class NISDomainNode extends Node {
     NISLinkingNode   linkingNode;
     NISConflictsNode conflictsNode;
     NISOwnershipNode ownershipNode;
+    NISConsolidationNode consolidationNode;
 
-    public NISDomainNode(String name, NISRepository domain, NISNode nisNode) {
+    public NISDomainNode(String name, NISDomain domain, NISNode nisNode) {
         super(
                 name,
                 ServersView.ENTRY,
@@ -90,6 +92,14 @@ public class NISDomainNode extends Node {
         );
 
         children.add(ownershipNode);
+
+        consolidationNode = new NISConsolidationNode(
+                "Consolidation",
+                this
+        );
+
+        children.add(consolidationNode);
+
     }
 
     public Image getImage() {
@@ -127,11 +137,11 @@ public class NISDomainNode extends Node {
         page.openEditor(ei, NISDomainEditor.class.getName());
     }
 
-    public NISRepository getDomain() {
+    public NISDomain getDomain() {
         return domain;
     }
 
-    public void setDomain(NISRepository domain) {
+    public void setDomain(NISDomain domain) {
         this.domain = domain;
     }
 

@@ -25,13 +25,13 @@ import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionInfoWizardPage;
 import org.safehaus.penrose.studio.util.ADUtil;
 import org.safehaus.penrose.studio.util.SchemaUtil;
 import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.ldap.LDAP;
 import org.safehaus.penrose.directory.EntryMapping;
+import org.safehaus.penrose.directory.SourceMapping;
 import org.apache.log4j.Logger;
 
 import javax.naming.InitialContext;

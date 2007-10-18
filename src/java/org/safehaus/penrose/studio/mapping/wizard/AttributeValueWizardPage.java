@@ -37,6 +37,7 @@ import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.directory.AttributeMapping;
+import org.safehaus.penrose.directory.SourceMapping;
 import org.apache.log4j.Logger;
 
 import java.util.*;

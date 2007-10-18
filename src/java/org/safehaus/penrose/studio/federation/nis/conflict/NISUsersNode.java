@@ -2,7 +2,7 @@ package org.safehaus.penrose.studio.federation.nis.conflict;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISRepository;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class NISUsersNode extends Node {
 
     private NISFederation nisFederation;
-    private NISRepository domain;
+    private NISDomain domain;
 
     public NISUsersNode(String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
@@ -50,11 +50,11 @@ public class NISUsersNode extends Node {
         this.nisFederation = nisFederation;
     }
 
-    public NISRepository getDomain() {
+    public NISDomain getDomain() {
         return domain;
     }
 
-    public void setDomain(NISRepository domain) {
+    public void setDomain(NISDomain domain) {
         this.domain = domain;
     }
 }

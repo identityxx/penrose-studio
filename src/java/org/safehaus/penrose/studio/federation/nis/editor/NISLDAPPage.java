@@ -19,7 +19,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.federation.nis.NISRepository;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.editor.NISEditor;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.Partitions;
@@ -161,7 +161,7 @@ public class NISLDAPPage extends FormPage {
                     Partitions partitions = nisFederation.getPartitions();
 
                     for (TableItem ti : items) {
-                        NISRepository domain = (NISRepository)ti.getData();
+                        NISDomain domain = (NISDomain)ti.getData();
 
                         Partition partition = partitions.getPartition(domain.getName());
 
@@ -224,7 +224,7 @@ public class NISLDAPPage extends FormPage {
                     Partitions partitions = nisFederation.getPartitions();
 
                     for (TableItem ti : items) {
-                        NISRepository domain = (NISRepository)ti.getData();
+                        NISDomain domain = (NISDomain)ti.getData();
 
                         Partition partition = partitions.getPartition(domain.getName());
 
@@ -287,7 +287,7 @@ public class NISLDAPPage extends FormPage {
                     PenroseClient client = nisFederation.getProject().getClient();
 
                     for (TableItem ti : items) {
-                        NISRepository domain = (NISRepository)ti.getData();
+                        NISDomain domain = (NISDomain)ti.getData();
 
                         PartitionClient partitionClient = client.getPartitionClient(domain.getName());
                         SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
@@ -330,7 +330,7 @@ public class NISLDAPPage extends FormPage {
 
             Partitions partitions = nisFederation.getPartitions();
 
-            for (NISRepository domain : nisFederation.getRepositories()) {
+            for (NISDomain domain : nisFederation.getRepositories()) {
                 Partition partition = partitions.getPartition(domain.getName());
                 Source ldap = partition.getSource("LDAP");
 

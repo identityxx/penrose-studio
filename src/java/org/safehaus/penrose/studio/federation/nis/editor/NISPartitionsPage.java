@@ -18,7 +18,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISRepository;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.partition.PartitionConfigs;
@@ -137,7 +137,7 @@ public class NISPartitionsPage extends FormPage {
                     PenroseClient penroseClient = project.getClient();
 
                     for (TableItem ti : items) {
-                        NISRepository repository = (NISRepository)ti.getData();
+                        NISDomain repository = (NISDomain)ti.getData();
 
                         nisFederation.createPartitionConfig(repository);
                         project.upload("partitions/"+repository.getName());
@@ -181,7 +181,7 @@ public class NISPartitionsPage extends FormPage {
                     PenroseClient penroseClient = project.getClient();
 
                     for (TableItem ti : items) {
-                        NISRepository repository = (NISRepository)ti.getData();
+                        NISDomain repository = (NISDomain)ti.getData();
 
                         penroseClient.stopPartition(repository.getName());
                         nisFederation.removePartition(repository);
@@ -226,7 +226,7 @@ public class NISPartitionsPage extends FormPage {
             Project project = nisFederation.getProject();
             PartitionConfigs partitionConfigs = project.getPartitionConfigs();
 
-            for (NISRepository repository : nisFederation.getRepositories()) {
+            for (NISDomain repository : nisFederation.getRepositories()) {
                 PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(repository.getName());
                 //Partition partition = nisFederation.getPartitions().getPartition(repository.getName());
 

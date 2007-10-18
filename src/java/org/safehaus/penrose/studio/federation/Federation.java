@@ -8,7 +8,7 @@ import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.Partitions;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISRepository;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
 import org.safehaus.penrose.studio.util.FileUtil;
@@ -179,7 +179,7 @@ public class Federation {
                 repository = new LDAPRepository();
 
             } else if ("NIS".equals(type)) {
-                repository = new NISRepository();
+                repository = new NISDomain();
 
             } else {
                 throw new Exception("Unknown type: "+type);

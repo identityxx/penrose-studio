@@ -23,7 +23,7 @@ import org.safehaus.penrose.ldap.SearchResult;
 import org.safehaus.penrose.ldap.SearchResponse;
 import org.safehaus.penrose.ldap.Attributes;
 import org.safehaus.penrose.agent.client.FindClient;
-import org.safehaus.penrose.studio.federation.nis.NISRepository;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 
 import java.util.*;
@@ -46,7 +46,7 @@ public class NISScriptsPage extends FormPage {
     Table table;
 
     NISFilesEditor editor;
-    NISRepository domain;
+    NISDomain domain;
     NISFederation nisFederation;
 
     Map<String,String> actions = new LinkedHashMap<String,String>();

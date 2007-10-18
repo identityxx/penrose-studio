@@ -18,7 +18,7 @@ import org.safehaus.penrose.studio.federation.nis.conflict.NISGroupsEditor;
 import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.studio.federation.nis.NISRepository;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.Assignment;
@@ -46,7 +46,7 @@ public class NISGroupsPage extends FormPage {
     Label entriesText;
 
     NISGroupsEditor editor;
-    NISRepository domain;
+    NISDomain domain;
     NISFederation nisFederation;
 
     public NISGroupsPage(NISGroupsEditor editor) {

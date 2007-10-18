@@ -33,6 +33,8 @@ import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.filter.SubstringFilter;
 import org.safehaus.penrose.filter.FilterTool;
 import org.safehaus.penrose.filter.SimpleFilter;
+import org.safehaus.penrose.util.ActiveDirectoryUtil;
+import org.safehaus.penrose.util.BinaryUtil;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -105,7 +107,7 @@ public class LinkingPage extends FormPage {
         gd.horizontalSpan = 2;
         localSection.setLayoutData(gd);
 
-        Control localControl = createLocalSection(localSection);
+        Control localControl = createLocalControl(localSection);
         localSection.setClient(localControl);
 
         Section globalSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
@@ -116,7 +118,7 @@ public class LinkingPage extends FormPage {
         globalSection.setClient(globalControl);
     }
 
-    public Composite createLocalSection(Composite parent) {
+    public Composite createLocalControl(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout();
@@ -769,10 +771,38 @@ public class LinkingPage extends FormPage {
         Attributes attributes = result.getAttributes();
 
         for (Attribute attribute : attributes.getAll()) {
+            String attributeName = attribute.getName();
+
             for (Object value : attribute.getValues()) {
+
+                log.debug("Attribute "+attributeName+": "+value.getClass().getSimpleName());
+
                 TableItem attrItem = new TableItem(table, SWT.NONE);
-                attrItem.setText(0, attribute.getName());
-                attrItem.setText(1, value.toString());
+                attrItem.setText(0, attributeName);
+
+                String s;
+                if ("objectGUID".equalsIgnoreCase(attributeName)) {
+                    s = ActiveDirectoryUtil.getGUID((byte[])value);
+
+                } else if ("seeAlsoObjectGUID".equalsIgnoreCase(attributeName)) {
+                    if (value instanceof String) {
+                        s = ActiveDirectoryUtil.getGUID(((String)value).getBytes());
+
+                    } else {
+                        s = ActiveDirectoryUtil.getGUID((byte[])value);
+                    }
+
+                } else if ("objectSid".equalsIgnoreCase(attributeName)) {
+                    s = ActiveDirectoryUtil.getSID((byte[])value);
+
+                } else if (value instanceof byte[]) {
+                    s = BinaryUtil.encode(BinaryUtil.BIG_INTEGER, (byte[])value);
+
+                } else {
+                    s = value.toString();
+                }
+
+                attrItem.setText(1, s);
             }
         }
     }

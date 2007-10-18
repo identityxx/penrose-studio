@@ -9,7 +9,7 @@ import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.studio.federation.nis.NISRepository;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.project.Project;
@@ -35,12 +35,12 @@ public class ConflictingGIDFinderAction extends NISAction {
     ) throws Exception {
 
         String domainName1 = request.getDomain();
-        NISRepository domain1 = nisFederation.getRepository(domainName1);
+        NISDomain domain1 = nisFederation.getRepository(domainName1);
 
         for (String domainName2 : nisFederation.getRepositoryNames()) {
             if (domainName1.equals(domainName2)) continue;
 
-            NISRepository domain2 = nisFederation.getRepository(domainName2);
+            NISDomain domain2 = nisFederation.getRepository(domainName2);
             execute(domain1, domain2, response);
         }
 
@@ -48,8 +48,8 @@ public class ConflictingGIDFinderAction extends NISAction {
     }
 
     public void execute(
-            final NISRepository domain1,
-            final NISRepository domain2,
+            final NISDomain domain1,
+            final NISDomain domain2,
             final NISActionResponse response
     ) throws Exception {
 

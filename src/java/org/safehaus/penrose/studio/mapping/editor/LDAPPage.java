@@ -44,6 +44,7 @@ import org.safehaus.penrose.ldap.RDNBuilder;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.directory.EntryMapping;
 import org.safehaus.penrose.directory.AttributeMapping;
+import org.safehaus.penrose.directory.SourceMapping;
 import org.apache.log4j.Logger;
 
 import java.util.*;

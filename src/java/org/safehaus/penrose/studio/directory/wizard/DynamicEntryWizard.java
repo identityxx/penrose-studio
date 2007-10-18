@@ -28,10 +28,7 @@ import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.ldap.RDNBuilder;
 import org.safehaus.penrose.ldap.DNBuilder;
-import org.safehaus.penrose.directory.DirectoryConfig;
-import org.safehaus.penrose.directory.EntryMapping;
-import org.safehaus.penrose.directory.AttributeMapping;
-import org.safehaus.penrose.directory.FieldMapping;
+import org.safehaus.penrose.directory.*;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;

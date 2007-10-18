@@ -14,7 +14,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISRepository;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.conflict.NISUsersEditor;
 import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.project.Project;
@@ -43,7 +43,7 @@ public class NISUsersPage extends FormPage {
     Label entriesText;
 
     NISUsersEditor editor;
-    NISRepository domain;
+    NISDomain domain;
     NISFederation nisFederation;
 
     public NISUsersPage(NISUsersEditor editor) {

@@ -1,22 +1,24 @@
-package org.safehaus.penrose.studio.federation.nis.conflict;
+package org.safehaus.penrose.studio.federation.nis.consolidation;
 
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
+import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.partition.Partition;
 
 /**
  * @author Endi S. Dewata
  */
-public class NISUsersEditorInput implements IEditorInput {
+public class NISConsolidationEditorInput implements IEditorInput {
 
     private Project project;
-    private NISFederation nisFederation;
+    private Partition partition;
     private NISDomain domain;
+    private NISFederation nisFederation;
 
-    public NISUsersEditorInput() {
+    public NISConsolidationEditorInput() {
     }
 
     public boolean exists() {
@@ -28,7 +30,7 @@ public class NISUsersEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "NIS Users - "+domain.getName();
+        return "Identity Linking - "+ partition.getName();
     }
 
     public IPersistableElement getPersistable() {
@@ -36,7 +38,7 @@ public class NISUsersEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return "NIS Users - "+domain.getName();
+        return getName();
     }
 
     public Object getAdapter(Class aClass) {
@@ -45,7 +47,7 @@ public class NISUsersEditorInput implements IEditorInput {
 
     public int hashCode() {
         return (project == null ? 0 : project.hashCode()) +
-                (domain == null ? 0 : domain.hashCode());
+                (partition == null ? 0 : partition.hashCode());
     }
 
     boolean equals(Object o1, Object o2) {
@@ -59,11 +61,27 @@ public class NISUsersEditorInput implements IEditorInput {
         if (object == null) return false;
         if (object.getClass() != this.getClass()) return false;
 
-        NISUsersEditorInput ei = (NISUsersEditorInput)object;
+        NISConsolidationEditorInput ei = (NISConsolidationEditorInput)object;
         if (!equals(project, ei.project)) return false;
-        if (!equals(domain, ei.domain)) return false;
+        if (!equals(partition, ei.partition)) return false;
 
         return true;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public Partition getPartition() {
+        return partition;
+    }
+
+    public void setPartition(Partition partition) {
+        this.partition = partition;
     }
 
     public NISDomain getDomain() {
@@ -74,19 +92,11 @@ public class NISUsersEditorInput implements IEditorInput {
         this.domain = domain;
     }
 
-    public NISFederation getNisTool() {
+    public NISFederation getNisFederation() {
         return nisFederation;
     }
 
-    public void setNisTool(NISFederation nisFederation) {
+    public void setNisFederation(NISFederation nisFederation) {
         this.nisFederation = nisFederation;
-    }
-
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
     }
 }

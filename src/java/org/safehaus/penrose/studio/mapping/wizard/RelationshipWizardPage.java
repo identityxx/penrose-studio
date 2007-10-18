@@ -28,6 +28,7 @@ import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.studio.mapping.RelationshipDialog;
+import org.safehaus.penrose.directory.SourceMapping;
 
 import java.util.Collection;
 import java.util.Iterator;

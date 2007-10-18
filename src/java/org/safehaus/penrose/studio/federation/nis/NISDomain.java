@@ -7,12 +7,12 @@ import java.util.Map;
 /**
  * @author Endi Sukma Dewata
  */
-public class NISRepository extends Repository {
+public class NISDomain extends Repository {
     
     protected String fullName;
     protected String server;
 
-    public NISRepository() {
+    public NISDomain() {
         setType("NIS");
     }
 
@@ -75,6 +75,14 @@ public class NISRepository extends Repository {
 
     public void setSuffix(String suffix) {
         parameters.put("suffix", suffix);
+    }
+
+    public String getNssSuffix() {
+        return parameters.get("nssSuffix");
+    }
+
+    public void setNssSuffix(String nssSuffix) {
+        parameters.put("nssSuffix", nssSuffix);
     }
 
     public void setParameters(Map<String,String> parameters) {

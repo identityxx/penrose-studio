@@ -5,7 +5,7 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.safehaus.penrose.studio.federation.nis.NISRepository;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.management.PenroseClient;
@@ -63,7 +63,7 @@ public class NISRepositoryWizard extends Wizard {
 
     public boolean performFinish() {
 
-        NISRepository repository = new NISRepository();
+        NISDomain repository = new NISDomain();
         repository.setName(partitionPage.getRepository());
         repository.setFullName(repositoryPage.getDomain());
         repository.setServer(repositoryPage.getServer());

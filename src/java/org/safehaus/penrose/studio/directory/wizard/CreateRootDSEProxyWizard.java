@@ -21,13 +21,13 @@ import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.directory.DirectoryConfig;
 import org.safehaus.penrose.directory.EntryMapping;
+import org.safehaus.penrose.directory.SourceMapping;
 import org.apache.log4j.Logger;
 
 /**

@@ -8,14 +8,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISRepository;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
 
 public class NISLinkEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
     NISFederation nisFederation;
-    NISRepository domain;
+    NISDomain domain;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         NISLinkEditorInput ei = (NISLinkEditorInput)input;
@@ -50,11 +50,11 @@ public class NISLinkEditor extends FormEditor {
         return false;
     }
 
-    public NISRepository getDomain() {
+    public NISDomain getDomain() {
         return domain;
     }
 
-    public void setDomain(NISRepository domain) {
+    public void setDomain(NISDomain domain) {
         this.domain = domain;
     }
 

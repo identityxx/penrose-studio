@@ -14,7 +14,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.federation.nis.NISRepository;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISFilesPage;
@@ -38,7 +38,7 @@ public class NISUserChangesPage extends FormPage {
     Button activateButton;
 
     FormEditor editor;
-    NISRepository domain;
+    NISDomain domain;
     NISFederation nisFederation;
 
     String title;
@@ -51,7 +51,7 @@ public class NISUserChangesPage extends FormPage {
         this.nisFederation = nisFederation;
     }
 
-    public NISUserChangesPage(FormEditor editor, NISRepository domain, NISFederation nisFederation) throws Exception {
+    public NISUserChangesPage(FormEditor editor, NISDomain domain, NISFederation nisFederation) throws Exception {
         super(editor, "CHANGES", "  Changes ");
         title = "Changes";
 

@@ -4,7 +4,7 @@ import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.directory.EntryMapping;
-import org.safehaus.penrose.mapping.SourceMapping;
+import org.safehaus.penrose.directory.SourceMapping;
 
 /**
  * @author Endi S. Dewata

@@ -18,7 +18,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISRepository;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.partition.Partitions;
 import org.safehaus.penrose.partition.Partition;
@@ -47,7 +47,7 @@ public class NISLDAPPage extends FormPage {
 
     NISLDAPEditor editor;
     NISFederation nisFederation;
-    NISRepository domain;
+    NISDomain domain;
 
     Table table;
 

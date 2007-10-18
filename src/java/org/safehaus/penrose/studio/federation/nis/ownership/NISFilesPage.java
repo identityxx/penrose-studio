@@ -19,7 +19,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.studio.federation.nis.NISRepository;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.filter.OrFilter;
 import org.safehaus.penrose.filter.SimpleFilter;
 import org.safehaus.penrose.filter.AndFilter;
@@ -42,7 +42,7 @@ public class NISFilesPage extends FormPage implements Runnable {
     Table table;
 
     NISFilesEditor editor;
-    NISRepository domain;
+    NISDomain domain;
     NISFederation nisFederation;
 
     public NISFilesPage(NISFilesEditor editor) {

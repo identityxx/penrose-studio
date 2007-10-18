@@ -32,7 +32,6 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.jndi.source.JNDIFieldDialog;
 import org.safehaus.penrose.studio.source.FieldDialog;
 import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
-import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.AttributeType;
@@ -41,6 +40,7 @@ import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.directory.EntryMapping;
+import org.safehaus.penrose.directory.SourceMapping;
 
 public class JNDISourcePropertyPage extends SourceEditorPage {
 

@@ -1,15 +1,10 @@
-package org.safehaus.penrose.studio.federation.nis.linking;
+package org.safehaus.penrose.studio.federation.nis.consolidation;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.federation.nis.NISNode;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISDomainNode;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
-import org.safehaus.penrose.studio.federation.linking.LinkingEditorInput;
-import org.safehaus.penrose.studio.federation.linking.LinkingEditor;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.federation.nis.*;
 import org.safehaus.penrose.partition.Partition;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
@@ -18,14 +13,14 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 
 /**
- * @author Endi S. Dewata
+ * @author Endi Sukma Dewata
  */
-public class NISLinkingNode extends Node {
+public class NISConsolidationNode extends Node {
 
     private NISDomainNode domainNode;
     private NISFederation nisFederation;
 
-    public NISLinkingNode(String name, NISDomainNode domainNode) {
+    public NISConsolidationNode(String name, NISDomainNode domainNode) {
         super(
                 name,
                 ServersView.ENTRY,
@@ -58,20 +53,14 @@ public class NISLinkingNode extends Node {
         NISDomain repository = domainNode.getDomain();
         Partition partition = nisFederation.getPartitions().getPartition(repository.getName());
 
-        LinkingEditorInput ei = new LinkingEditorInput();
+        NISConsolidationEditorInput ei = new NISConsolidationEditorInput();
         ei.setPartition(partition);
-        ei.setRepository(repository);
+        ei.setDomain(repository);
+        ei.setNisFederation(nisFederation);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
-        page.openEditor(ei, LinkingEditor.class.getName());
+        page.openEditor(ei, NISConsolidationEditor.class.getName());
     }
 
-    public NISFederation getNisFederation() {
-        return nisFederation;
-    }
-
-    public void setNisTool(NISFederation nisFederation) {
-        this.nisFederation = nisFederation;
-    }
 }

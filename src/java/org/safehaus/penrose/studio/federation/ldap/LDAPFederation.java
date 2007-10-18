@@ -157,6 +157,10 @@ public class LDAPFederation {
         federation.removePartitionConfig(repository);
     }
 
+    public LDAPRepository getRepository(String name) {
+        return repositories.get(name);
+    }
+
     public Collection<LDAPRepository> getRepositories() {
         return repositories.values();
     }

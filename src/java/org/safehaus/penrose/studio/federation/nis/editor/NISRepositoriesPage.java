@@ -19,7 +19,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISRepository;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.wizard.NISRepositoryWizard;
 import org.safehaus.penrose.studio.nis.dialog.NISUserDialog;
 import org.safehaus.penrose.studio.nis.dialog.NISDomainDialog;
@@ -155,7 +155,7 @@ public class NISRepositoriesPage extends FormPage {
 
                     TableItem item = table.getSelection()[0];
 
-                    NISRepository domain = (NISRepository)item.getData();
+                    NISDomain domain = (NISDomain)item.getData();
                     String domainName = domain.getName();
 
                     NISDomainDialog dialog = new NISDomainDialog(editor.getSite().getShell(), SWT.NONE);
@@ -203,7 +203,7 @@ public class NISRepositoriesPage extends FormPage {
 
                     TableItem[] items = table.getSelection();
                     for (TableItem ti : items) {
-                        NISRepository repository = (NISRepository)ti.getData();
+                        NISDomain repository = (NISDomain)ti.getData();
 
                         try {
                             penroseClient.stopPartition(repository.getName());
@@ -271,7 +271,7 @@ public class NISRepositoriesPage extends FormPage {
 
             table.removeAll();
 
-            for (NISRepository domain : nisFederation.getRepositories()) {
+            for (NISDomain domain : nisFederation.getRepositories()) {
 
                 TableItem ti = new TableItem(table, SWT.NONE);
 

@@ -51,14 +51,14 @@ public class NISNode extends Node {
 
         nisFederation.addListener(new FederationEventAdapter() {
             public void repositoryAdded(FederationEvent event) {
-                NISRepository repository = (NISRepository)event.getRepository();
+                NISDomain repository = (NISDomain)event.getRepository();
                 addRepository(repository);
 
                 PenroseStudio penroseStudio = PenroseStudio.getInstance();
                 penroseStudio.notifyChangeListeners();
             }
             public void repositoryRemoved(FederationEvent event) {
-                NISRepository repository = (NISRepository)event.getRepository();
+                NISDomain repository = (NISDomain)event.getRepository();
                 removeRepository(repository.getName());
 
                 PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -70,7 +70,7 @@ public class NISNode extends Node {
     }
 
     public void refresh() {
-        for (NISRepository nisDomain : nisFederation.getRepositories()) {
+        for (NISDomain nisDomain : nisFederation.getRepositories()) {
             addRepository(nisDomain);
         }
     }
@@ -119,7 +119,7 @@ public class NISNode extends Node {
         penroseStudio.notifyChangeListeners();
     }
 
-    public void addRepository(NISRepository domain) {
+    public void addRepository(NISDomain domain) {
 
         String name = domain.getName();
 

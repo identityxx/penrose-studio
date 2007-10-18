@@ -18,7 +18,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISRepository;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.editor.NISEditor;
 import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -136,7 +136,7 @@ public class NISDatabasesPage extends FormPage {
                     TableItem[] items = table.getSelection();
 
                     for (TableItem ti : items) {
-                        NISRepository domain = (NISRepository)ti.getData();
+                        NISDomain domain = (NISDomain)ti.getData();
                         nisFederation.createDatabase(domain);
                     }
 
@@ -172,7 +172,7 @@ public class NISDatabasesPage extends FormPage {
                     TableItem[] items = table.getSelection();
 
                     for (TableItem ti : items) {
-                        NISRepository domain = (NISRepository)ti.getData();
+                        NISDomain domain = (NISDomain)ti.getData();
                         nisFederation.removeDatabase(domain);
                     }
 
@@ -214,7 +214,7 @@ public class NISDatabasesPage extends FormPage {
             JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
             JDBCClient client = adapter.getClient();
 
-            for (NISRepository domain : nisFederation.getRepositories()) {
+            for (NISDomain domain : nisFederation.getRepositories()) {
                 boolean exists = client.checkDatabase(domain.getName());
 
                 TableItem ti = new TableItem(table, SWT.NONE);

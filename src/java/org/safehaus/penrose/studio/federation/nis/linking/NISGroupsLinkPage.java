@@ -15,7 +15,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.federation.nis.NISRepository;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.source.Source;
@@ -61,7 +61,7 @@ public class NISGroupsLinkPage extends FormPage {
     Text membersText;
 
     NISLinkEditor editor;
-    NISRepository domain;
+    NISDomain domain;
     NISFederation nisFederation;
 
     Partition partition;

@@ -21,7 +21,6 @@ import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.source.wizard.SelectSourceWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.DNBuilder;
@@ -29,6 +28,7 @@ import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.directory.DirectoryConfig;
 import org.safehaus.penrose.directory.EntryMapping;
+import org.safehaus.penrose.directory.SourceMapping;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;

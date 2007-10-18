@@ -186,6 +186,11 @@
             name="NIS Alignment Tool"
             icon="images/object.gif"
             class="org.safehaus.penrose.studio.federation.nis.ownership.NISFilesEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.federation.nis.consolidation.NISConsolidationEditor"
+            name="NIS Consolidation"
+            icon="images/object.gif"
+            class="org.safehaus.penrose.studio.federation.nis.consolidation.NISConsolidationEditor"/>
     </extension>
 
     <extension point="org.eclipse.ui.perspectives">

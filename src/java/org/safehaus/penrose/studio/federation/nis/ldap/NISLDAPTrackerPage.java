@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.federation.nis.NISRepository;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.PartitionClient;
 import org.safehaus.penrose.management.SchedulerClient;
@@ -43,7 +43,7 @@ public class NISLDAPTrackerPage extends FormPage {
 
     NISLDAPEditor editor;
     NISFederation nisFederation;
-    NISRepository domain;
+    NISDomain domain;
 
     Table trackerTable;
 

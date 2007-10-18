@@ -22,7 +22,7 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.directory.EntryMapping;
 import org.safehaus.penrose.directory.AttributeMapping;
 import org.safehaus.penrose.directory.FieldMapping;
-import org.safehaus.penrose.mapping.SourceMapping;
+import org.safehaus.penrose.directory.SourceMapping;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;

@@ -59,6 +59,7 @@ import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.directory.EntryMapping;
 import org.safehaus.penrose.directory.AttributeMapping;
 import org.safehaus.penrose.directory.FieldMapping;
+import org.safehaus.penrose.directory.SourceMapping;
 import org.apache.log4j.Logger;
 
 public class ExpressionEditorDialog extends BaseDialog {
