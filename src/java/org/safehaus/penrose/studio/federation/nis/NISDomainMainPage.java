@@ -76,8 +76,20 @@ public class NISDomainMainPage extends FormPage {
         Label suffixLabel = toolkit.createLabel(composite, "LDAP Suffix:");
         suffixLabel.setLayoutData(new GridData());
 
-        Label suffixText = toolkit.createLabel(composite, domain.getSuffix());
+        String suffix = domain.getSuffix();
+        if (suffix == null) suffix = "";
+
+        Label suffixText = toolkit.createLabel(composite, suffix);
         suffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label nssSuffixLabel = toolkit.createLabel(composite, "NSS Suffix:");
+        nssSuffixLabel.setLayoutData(new GridData());
+
+        String nssSuffix = domain.getNssSuffix();
+        if (nssSuffix == null) nssSuffix = "";
+
+        Label nssSuffixText = toolkit.createLabel(composite, nssSuffix);
+        nssSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         return composite;
     }

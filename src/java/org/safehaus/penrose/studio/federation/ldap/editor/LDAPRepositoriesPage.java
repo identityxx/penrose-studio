@@ -149,6 +149,23 @@ public class LDAPRepositoriesPage extends FormPage {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
+                    if (table.getSelectionCount() != 1) return;
+
+                    TableItem ti = table.getSelection()[0];
+
+                    LDAPRepository repository = (LDAPRepository)ti.getData();
+
+                    LDAPRepositoryDialog dialog = new LDAPRepositoryDialog(editor.getSite().getShell(), SWT.NONE);
+                    dialog.setRepository(repository);
+                    dialog.open();
+
+                    int action = dialog.getAction();
+                    if (action == LDAPRepositoryDialog.CANCEL) return;
+
+                    ldapFederation.updateRepository(repository);
+
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    penroseStudio.notifyChangeListeners();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -175,7 +192,6 @@ public class LDAPRepositoriesPage extends FormPage {
                     );
 
                     if (!confirm) return;
-
 
                     Project project = ldapFederation.getProject();
                     PenroseClient penroseClient = project.getClient();

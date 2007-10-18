@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.nis.dialog;
+package org.safehaus.penrose.studio.federation.ldap.editor;
 
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
@@ -9,14 +9,14 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.graphics.Point;
 import org.apache.log4j.Logger;
+import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
 
 /**
  * @author Endi S. Dewata
  */
-public class NISDomainDialog extends Dialog {
+public class LDAPRepositoryDialog extends Dialog {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -25,21 +25,22 @@ public class NISDomainDialog extends Dialog {
 
     Shell shell;
 
-    Text domainText;
-    Text serverText;
+    Text urlText;
     Text suffixText;
+    Text userText;
+    Text passwordText;
 
     int action;
 
-    private NISDomain domain;
+    private LDAPRepository repository;
 
-    public NISDomainDialog(Shell parent, int style) {
+    public LDAPRepositoryDialog(Shell parent, int style) {
 		super(parent, style);
     }
 
     public void open() {
 
-        setText("NIS Domain Editor");
+        setText("LDAP Repository Editor");
         shell = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
 
         init();
@@ -68,14 +69,17 @@ public class NISDomainDialog extends Dialog {
     }
 
     public void reset() {
-        String fullName = domain.getFullName();
-        domainText.setText(fullName == null ? "" : fullName);
+        String url = repository.getUrl();
+        urlText.setText(url == null ? "" : url);
 
-        String server = domain.getServer();
-        serverText.setText(server == null ? "" : server);
-
-        String suffix = domain.getSuffix();
+        String suffix = repository.getSuffix();
         suffixText.setText(suffix == null ? "" : suffix);
+
+        String user = repository.getUser();
+        userText.setText(user == null ? "" : user);
+
+        String password = repository.getPassword();
+        passwordText.setText(password == null ? "" : password);
     }
 
     public void createControl(Shell parent) {
@@ -95,28 +99,35 @@ public class NISDomainDialog extends Dialog {
         Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(new GridLayout(2, false));
 
-        Label domainLabel = new Label(composite, SWT.NONE);
-        domainLabel.setText("NIS Domain:");
+        Label urlLabel = new Label(composite, SWT.NONE);
+        urlLabel.setText("URL:");
         GridData gd = new GridData();
         gd.widthHint = 100;
-        domainLabel.setLayoutData(gd);
+        urlLabel.setLayoutData(gd);
 
-        domainText = new Text(composite, SWT.BORDER);
-        domainText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        Label serverLabel = new Label(composite, SWT.NONE);
-        serverLabel.setText("NIS Server:");
-        serverLabel.setLayoutData(new GridData());
-
-        serverText = new Text(composite, SWT.BORDER);
-        serverText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        urlText = new Text(composite, SWT.BORDER);
+        urlText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label suffixLabel = new Label(composite, SWT.NONE);
-        suffixLabel.setText("LDAP Suffix:");
+        suffixLabel.setText("Suffix:");
         suffixLabel.setLayoutData(new GridData());
 
         suffixText = new Text(composite, SWT.BORDER);
         suffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label userLabel = new Label(composite, SWT.NONE);
+        userLabel.setText("Bind DN:");
+        userLabel.setLayoutData(new GridData());
+
+        userText = new Text(composite, SWT.BORDER);
+        userText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label passwordLabel = new Label(composite, SWT.NONE);
+        passwordLabel.setText("NSS Suffix:");
+        passwordLabel.setLayoutData(new GridData());
+
+        passwordText = new Text(composite, SWT.BORDER | SWT.PASSWORD);
+        passwordText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         return composite;
     }
@@ -142,14 +153,17 @@ public class NISDomainDialog extends Dialog {
         okButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
 
-                String fullName = domainText.getText();
-                domain.setFullName("".equals(fullName) ? null : fullName);
-
-                String server = serverText.getText();
-                domain.setServer("".equals(server) ? null : server);
+                String url = urlText.getText();
+                repository.setUrl("".equals(url) ? null : url);
 
                 String suffix = suffixText.getText();
-                domain.setSuffix("".equals(suffix) ? null : suffix);
+                repository.setSuffix("".equals(suffix) ? null : suffix);
+
+                String user = userText.getText();
+                repository.setUser("".equals(user) ? null : user);
+
+                String password = passwordText.getText();
+                repository.setPassword("".equals(password) ? null : password);
 
                 action = OK;
                 shell.close();
@@ -167,11 +181,11 @@ public class NISDomainDialog extends Dialog {
         this.action = action;
     }
 
-    public void setDomain(NISDomain domain) {
-        this.domain = domain;
+    public void setRepository(LDAPRepository repository) {
+        this.repository = repository;
     }
 
-    public NISDomain getDomain() {
-        return domain;
+    public LDAPRepository getRepository() {
+        return repository;
     }
 }

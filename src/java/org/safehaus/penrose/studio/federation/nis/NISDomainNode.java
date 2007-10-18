@@ -79,6 +79,13 @@ public class NISDomainNode extends Node {
 
         children.add(linkingNode);
 
+        consolidationNode = new NISConsolidationNode(
+                "Stacking Authentication",
+                this
+        );
+
+        children.add(consolidationNode);
+
         conflictsNode = new NISConflictsNode(
                 "Conflict Resolution",
                 this
@@ -92,13 +99,6 @@ public class NISDomainNode extends Node {
         );
 
         children.add(ownershipNode);
-
-        consolidationNode = new NISConsolidationNode(
-                "Consolidation",
-                this
-        );
-
-        children.add(consolidationNode);
 
     }
 

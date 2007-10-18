@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.studio.federation.nis.conflict.NISUserChangesPage;
 import org.safehaus.penrose.studio.federation.nis.conflict.NISGroupChangesPage;
-import org.safehaus.penrose.studio.federation.nis.editor.NISRepositoriesPage;
+import org.safehaus.penrose.studio.federation.nis.editor.NISDomainsPage;
 import org.safehaus.penrose.studio.federation.nis.editor.NISDatabasesPage;
 import org.safehaus.penrose.studio.federation.nis.editor.NISPartitionsPage;
 import org.safehaus.penrose.studio.federation.nis.editor.NISLDAPPage;
@@ -33,7 +33,7 @@ public class NISEditor extends FormEditor {
 
     public void addPages() {
         try {
-            addPage(new NISRepositoriesPage(this, nisFederation));
+            addPage(new NISDomainsPage(this, nisFederation));
             addPage(new NISDatabasesPage(this, nisFederation));
             addPage(new NISPartitionsPage(this, nisFederation));
             addPage(new NISLDAPPage(this, nisFederation));

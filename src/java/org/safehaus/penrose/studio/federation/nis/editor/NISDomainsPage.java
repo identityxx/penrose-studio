@@ -22,7 +22,7 @@ import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.wizard.NISRepositoryWizard;
 import org.safehaus.penrose.studio.nis.dialog.NISUserDialog;
-import org.safehaus.penrose.studio.nis.dialog.NISDomainDialog;
+import org.safehaus.penrose.studio.federation.nis.editor.NISDomainDialog;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
@@ -30,7 +30,7 @@ import org.safehaus.penrose.management.PenroseClient;
 /**
  * @author Endi S. Dewata
  */
-public class NISRepositoriesPage extends FormPage {
+public class NISDomainsPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -41,7 +41,7 @@ public class NISRepositoriesPage extends FormPage {
 
     Table table;
 
-    public NISRepositoriesPage(NISEditor editor, NISFederation nisFederation) {
+    public NISDomainsPage(NISEditor editor, NISFederation nisFederation) {
         super(editor, "DOMAINS", "  Domains  ");
 
         this.editor = editor;
@@ -156,7 +156,6 @@ public class NISRepositoriesPage extends FormPage {
                     TableItem item = table.getSelection()[0];
 
                     NISDomain domain = (NISDomain)item.getData();
-                    String domainName = domain.getName();
 
                     NISDomainDialog dialog = new NISDomainDialog(editor.getSite().getShell(), SWT.NONE);
                     dialog.setDomain(domain);

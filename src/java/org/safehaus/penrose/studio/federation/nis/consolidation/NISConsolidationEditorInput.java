@@ -30,7 +30,7 @@ public class NISConsolidationEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "Identity Linking - "+ partition.getName();
+        return "Stacking Authentication - "+ partition.getName();
     }
 
     public IPersistableElement getPersistable() {
