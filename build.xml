@@ -376,7 +376,7 @@
             <arg line="--copy images/penrose.background.png:/.background/background.png"/>
 			<!-- Custom DS_Store contains the positioning of icons as well as window size which needs to match up
 			with your custom background -->
-            <arg line="--copy installer/DS_Store:/.DS_Store"/>
+            <arg line="--copy installer/PenroseStudioDS_Store:/.DS_Store"/>
 			<!-- this requires patched pkg-dmg to create symlinks to Applications -->
 			<arg line="--symlink /Applications"/> 
             <arg line="--verbosity 2"/>
