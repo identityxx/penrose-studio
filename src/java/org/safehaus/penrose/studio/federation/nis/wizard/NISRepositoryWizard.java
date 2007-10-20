@@ -9,6 +9,7 @@ import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.partition.PartitionConfig;
 
 /**
  * @author Endi Sukma Dewata
@@ -18,7 +19,8 @@ public class NISRepositoryWizard extends Wizard {
     public Logger log = LoggerFactory.getLogger(getClass());
 
     NISRepositoryWizardPage repositoryPage;
-    NISPartitionWizardPage partitionPage;
+    NISDomainWizardPage domainPage;
+    NISLdapWizardPage partitionPage;
 
     NISFederation nisFederation;
     Project project;
@@ -32,6 +34,7 @@ public class NISRepositoryWizard extends Wizard {
 
     public boolean canFinish() {
         if (!repositoryPage.isPageComplete()) return false;
+        if (!domainPage.isPageComplete()) return false;
         if (!partitionPage.isPageComplete()) return false;
         return true;
     }
@@ -40,22 +43,33 @@ public class NISRepositoryWizard extends Wizard {
         repositoryPage = new NISRepositoryWizardPage();
         addPage(repositoryPage);
 
-        partitionPage = new NISPartitionWizardPage();
+        domainPage = new NISDomainWizardPage();
+        addPage(domainPage);
+
+        partitionPage = new NISLdapWizardPage();
         addPage(partitionPage);
     }
 
     public IWizardPage getNextPage(IWizardPage page) {
         if (repositoryPage == page) {
-            String domainName = repositoryPage.getDomain();
-            int i = domainName.indexOf('.');
-            if (i >= 0) domainName = domainName.substring(0, i);
+            String name = repositoryPage.getRepository();
+            domainPage.setDomain(name);
+            
+        } else if (domainPage == page) {
+            String name = repositoryPage.getRepository();
+            String domainName = domainPage.getDomain();
 
-            partitionPage.setRepository(domainName);
+            String suffix = "ou="+name+",ou=nis";
+            String nssSuffix = "ou="+name+",ou=nss";
 
-            String suffix = repositoryPage.getDomain();
-            suffix = "ou="+suffix.replaceAll("\\.", ",dc=");
+            String s[] = domainName.split("\\.");
+            if (s.length > 2) {
+                suffix = suffix+",dc="+s[s.length-2]+",dc="+s[s.length-1];
+                nssSuffix = nssSuffix+",dc="+s[s.length-2]+",dc="+s[s.length-1];
+            }
 
             partitionPage.setSuffix(suffix);
+            partitionPage.setNssSuffix(nssSuffix);
         }
 
         return super.getNextPage(page);
@@ -64,10 +78,11 @@ public class NISRepositoryWizard extends Wizard {
     public boolean performFinish() {
 
         NISDomain repository = new NISDomain();
-        repository.setName(partitionPage.getRepository());
-        repository.setFullName(repositoryPage.getDomain());
-        repository.setServer(repositoryPage.getServer());
+        repository.setName(repositoryPage.getRepository());
+        repository.setFullName(domainPage.getDomain());
+        repository.setServer(domainPage.getServer());
         repository.setSuffix(partitionPage.getSuffix());
+        repository.setNssSuffix(partitionPage.getNssSuffix());
 
         try {
             nisFederation.addRepository(repository);
@@ -77,9 +92,14 @@ public class NISRepositoryWizard extends Wizard {
             return false;
         }
 
+        PartitionConfig partitionConfig = null;
+        PartitionConfig nssPartitionConfig = null;
         try {
-            nisFederation.createPartitionConfig(repository);
+            partitionConfig = nisFederation.createPartitionConfig(repository);
             project.upload("partitions/"+ repository.getName());
+
+            nssPartitionConfig = nisFederation.createNssPartitionConfig(repository);
+            project.upload("partitions/"+ nssPartitionConfig.getName());
 
         } catch (Exception e) {
             MessageDialog.openError(getShell(), "Failed creating partition.", e.getMessage());
@@ -98,7 +118,10 @@ public class NISRepositoryWizard extends Wizard {
 
         try {
             penroseClient.startPartition(repository.getName());
-            nisFederation.loadPartition(repository);
+            nisFederation.loadPartition(partitionConfig);
+
+            penroseClient.startPartition(nssPartitionConfig.getName());
+            nisFederation.loadPartition(nssPartitionConfig);
 
         } catch (Exception e) {
             MessageDialog.openError(getShell(), "Failed initializing partition.", e.getMessage());

@@ -42,7 +42,7 @@ public class AttributeTypeEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return attributeType.getName();
+        return "Attribute Type - "+attributeType.getName();
     }
 
     public IPersistableElement getPersistable() {
@@ -50,7 +50,7 @@ public class AttributeTypeEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return attributeType.getName();
+        return getName();
     }
 
     public Object getAdapter(Class aClass) {

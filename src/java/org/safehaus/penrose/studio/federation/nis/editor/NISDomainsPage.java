@@ -26,6 +26,7 @@ import org.safehaus.penrose.studio.federation.nis.editor.NISDomainDialog;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.partition.PartitionConfig;
 
 /**
  * @author Endi S. Dewata
@@ -205,30 +206,23 @@ public class NISDomainsPage extends FormPage {
                         NISDomain repository = (NISDomain)ti.getData();
 
                         try {
-                            penroseClient.stopPartition(repository.getName());
+                            PartitionConfig partitionConfig = nisFederation.getPartitionConfig(repository.getName());
+                            PartitionConfig nssPartitionConfig = nisFederation.getPartitionConfig(repository.getName()+"_nss");
+
+                            penroseClient.stopPartition(partitionConfig.getName());
+                            penroseClient.stopPartition(nssPartitionConfig.getName());
+
                             nisFederation.removePartition(repository);
-
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-
-                        try {
                             nisFederation.removeDatabase(repository);
 
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
+                            nisFederation.removePartitionConfig(partitionConfig.getName());
+                            project.removeDirectory("partitions/"+partitionConfig.getName());
 
-                        try {
-                            nisFederation.removePartitionConfig(repository);
-                            project.removeDirectory("partitions/"+repository.getName());
+                            nisFederation.removePartitionConfig(nssPartitionConfig.getName());
+                            project.removeDirectory("partitions/"+nssPartitionConfig.getName());
 
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-
-                        try {
-                            nisFederation.removeRepository(repository.getName());
+                            nisFederation.removeRepository(partitionConfig.getName());
+                            nisFederation.removeRepository(nssPartitionConfig.getName());
 
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);

@@ -12,6 +12,7 @@ import org.safehaus.penrose.studio.federation.nis.editor.NISEditor;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISOwnershipNode;
 import org.safehaus.penrose.studio.federation.nis.linking.NISLinkingNode;
 import org.safehaus.penrose.studio.federation.nis.conflict.NISConflictsNode;
+import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
 import org.safehaus.penrose.studio.federation.event.FederationEvent;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;

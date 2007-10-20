@@ -64,7 +64,7 @@ public class SchemaEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return schema.getName();
+        return "Schema - "+schema.getName();
     }
 
     public IPersistableElement getPersistable() {
@@ -72,7 +72,7 @@ public class SchemaEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return schema.getName();
+        return getName();
     }
 
     public Object getAdapter(Class aClass) {

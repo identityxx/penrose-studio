@@ -95,35 +95,45 @@ public class NISFederation {
         users     = partition.getSource("penrose_users");
         groups    = partition.getSource("penrose_groups");
 
+        PenroseClient penroseClient = project.getClient();
+
         for (Repository rep : federation.getRepositories("NIS")) {
 
-            NISDomain repository = (NISDomain)rep;
-            String name = repository.getName();
+            NISDomain domain = (NISDomain)rep;
+            String name = domain.getName();
 
-            repositories.put(name, repository);
+            repositories.put(name, domain);
 
             PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(name);
             boolean createPartitionConfig = partitionConfig == null;
 
             if (createPartitionConfig) { // create missing partition configs during start
-                createPartitionConfig(repository);
+                partitionConfig = createPartitionConfig(domain);
             }
 
             // create missing databases/tables
-            createDatabase(repository);
+            createDatabase(domain);
 
             if (createPartitionConfig) {
-                project.upload("partitions/"+repository.getName());
-
-                PenroseClient penroseClient = project.getClient();
-                penroseClient.startPartition(repository.getName());
+                project.upload("partitions/"+name);
+                penroseClient.startPartition(name);
             }
 
-            loadPartition(repository);
+            loadPartition(partitionConfig);
+
+            PartitionConfig nssPartitionConfig = project.getPartitionConfigs().getPartitionConfig(name+"_nss");
+
+            if (nssPartitionConfig == null) { // create missing partition configs during start
+                nssPartitionConfig = createNssPartitionConfig(domain);
+                project.upload("partitions/"+nssPartitionConfig.getName());
+                penroseClient.startPartition(nssPartitionConfig.getName());
+            }
+
+            loadPartition(nssPartitionConfig);
         }
     }
 
-    public void createPartitionConfig(NISDomain domain) throws Exception {
+    public PartitionConfig createPartitionConfig(NISDomain domain) throws Exception {
 
         String name = domain.getName();
         log.debug("Creating partition "+name+".");
@@ -209,9 +219,11 @@ public class NISFederation {
         PartitionConfigs partitionConfigs = project.getPartitionConfigs();
         PartitionConfig partitionConfig = partitionConfigs.load(partitionDir);
         partitionConfigs.addPartitionConfig(partitionConfig);
+
+        return partitionConfig;
     }
 
-    public void createNssPartitionConfig(NISDomain domain) throws Exception {
+    public PartitionConfig createNssPartitionConfig(NISDomain domain) throws Exception {
 
         String name = domain.getName();
         log.debug("Creating partition "+name+".");
@@ -252,10 +264,10 @@ public class NISFederation {
         antProject.setProperty("LDAP_PASSWORD",    ldapBindPassword);
 
         String nisSuffix = domain.getSuffix();
-        String localSuffix = domain.getNssSuffix();
+        String nssSuffix = domain.getNssSuffix();
         String globalSuffix = globalRepository.getSuffix();
 
-        antProject.setProperty("NSS_SUFFIX",     localSuffix);
+        antProject.setProperty("NSS_SUFFIX",       nssSuffix);
         antProject.setProperty("NIS_SUFFIX",       nisSuffix);
         antProject.setProperty("GLOBAL_SUFFIX",    globalSuffix);
 
@@ -280,10 +292,12 @@ public class NISFederation {
         PartitionConfigs partitionConfigs = project.getPartitionConfigs();
         PartitionConfig partitionConfig = partitionConfigs.load(partitionDir);
         partitionConfigs.addPartitionConfig(partitionConfig);
+
+        return partitionConfig;
     }
 
-    public void loadPartition(NISDomain repository) throws Exception {
-        federation.loadPartition(repository);
+    public void loadPartition(PartitionConfig partitionConfig) throws Exception {
+        federation.loadPartition(partitionConfig);
     }
 
     public void addRepository(NISDomain repository) throws Exception {
@@ -329,8 +343,12 @@ public class NISFederation {
         }
     }
 
-    public void removePartitionConfig(NISDomain repository) throws Exception {
-        federation.removePartitionConfig(repository);
+    public PartitionConfig getPartitionConfig(String name) throws Exception {
+        return federation.getPartitionConfig(name);
+    }
+
+    public PartitionConfig removePartitionConfig(String name) throws Exception {
+        return federation.removePartitionConfig(name);
     }
 
     public void removePartition(NISDomain repository) throws Exception {

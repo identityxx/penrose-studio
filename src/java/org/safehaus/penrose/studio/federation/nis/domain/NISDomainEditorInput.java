@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.federation.nis;
+package org.safehaus.penrose.studio.federation.nis.domain;
 
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
@@ -28,7 +28,7 @@ public class NISDomainEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "NIS";
+        return "NIS - "+domain.getName();
     }
 
     public IPersistableElement getPersistable() {
@@ -36,7 +36,7 @@ public class NISDomainEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return "NIS";
+        return getName();
     }
 
     public Object getAdapter(Class aClass) {
@@ -74,11 +74,11 @@ public class NISDomainEditorInput implements IEditorInput {
         this.domain = domain;
     }
 
-    public NISFederation getNisTool() {
+    public NISFederation getNisFederation() {
         return nisFederation;
     }
 
-    public void setNisTool(NISFederation nisFederation) {
+    public void setNisFederation(NISFederation nisFederation) {
         this.nisFederation = nisFederation;
     }
 

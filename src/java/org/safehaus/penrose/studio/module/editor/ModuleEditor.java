@@ -76,7 +76,7 @@ public class ModuleEditor extends EditorPart {
 
         setSite(site);
         setInput(input);
-        setPartName(partitionConfig.getName()+"/"+moduleConfig.getName());
+        setPartName(ei.getName());
     }
 
     public void createPartControl(Composite parent) {

@@ -15,21 +15,21 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Endi Sukma Dewata
  */
-public class NISPartitionWizardPage extends WizardPage implements ModifyListener {
+public class NISLdapWizardPage extends WizardPage implements ModifyListener {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    public final static String NAME = "NIS Partition";
+    public final static String NAME = "NIS LDAP";
 
-    Text repositoryText;
     Text suffixText;
+    Text nssSuffixText;
 
     boolean visited;
 
-    public NISPartitionWizardPage() {
+    public NISLdapWizardPage() {
         super(NAME);
 
-        setDescription("Enter a short name for this domain and an LDAP suffix.");
+        setDescription("Enter an LDAP suffix for the NIS entries and another LDAP suffix for the stacking authentication (NSS).");
     }
 
     public void createControl(final Composite parent) {
@@ -40,30 +40,30 @@ public class NISPartitionWizardPage extends WizardPage implements ModifyListener
         sectionLayout.numColumns = 2;
         composite.setLayout(sectionLayout);
 
-        Label partitionLabel = new Label(composite, SWT.NONE);
-        partitionLabel.setText("Short Name:");
+        Label suffixLabel = new Label(composite, SWT.NONE);
+        suffixLabel.setText("NIS Suffix:");
         GridData gd = new GridData();
         gd.widthHint = 100;
-        partitionLabel.setLayoutData(gd);
-
-        repositoryText = new Text(composite, SWT.BORDER);
-        repositoryText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        repositoryText.addModifyListener(this);
-
-        Label suffixLabel = new Label(composite, SWT.NONE);
-        suffixLabel.setText("LDAP Suffix:");
-        suffixLabel.setLayoutData(new GridData());
+        suffixLabel.setLayoutData(gd);
 
         suffixText = new Text(composite, SWT.BORDER);
         suffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         suffixText.addModifyListener(this);
         
+        Label nssSuffixLabel = new Label(composite, SWT.NONE);
+        nssSuffixLabel.setText("NSS Suffix:");
+        nssSuffixLabel.setLayoutData(new GridData());
+
+        nssSuffixText = new Text(composite, SWT.BORDER);
+        nssSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        nssSuffixText.addModifyListener(this);
+
         setPageComplete(validatePage());
     }
 
     public boolean validatePage() {
-        if ("".equals(getRepository())) return false;
         if ("".equals(getSuffix())) return false;
+        if ("".equals(getNssSuffix())) return false;
         return visited;
     }
 
@@ -74,14 +74,6 @@ public class NISPartitionWizardPage extends WizardPage implements ModifyListener
             setPageComplete(validatePage());
         }
     }
-    
-    public void setRepository(String name) {
-        repositoryText.setText(name);
-    }
-
-    public String getRepository() {
-        return repositoryText.getText();
-    }
 
     public void setSuffix(String suffix) {
         suffixText.setText(suffix);
@@ -89,6 +81,14 @@ public class NISPartitionWizardPage extends WizardPage implements ModifyListener
 
     public String getSuffix() {
         return suffixText.getText();
+    }
+
+    public void setNssSuffix(String nssSuffix) {
+        nssSuffixText.setText(nssSuffix);
+    }
+
+    public String getNssSuffix() {
+        return nssSuffixText.getText();
     }
 
     public void modifyText(ModifyEvent event) {

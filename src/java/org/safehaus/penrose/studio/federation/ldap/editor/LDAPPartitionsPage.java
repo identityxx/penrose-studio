@@ -139,11 +139,11 @@ public class LDAPPartitionsPage extends FormPage {
                     for (TableItem ti : items) {
                         LDAPRepository repository = (LDAPRepository)ti.getData();
 
-                        ldapFederation.createPartitionConfig(repository);
+                        PartitionConfig partitionConfig = ldapFederation.createPartitionConfig(repository);
                         project.upload("partitions/"+repository.getName());
 
                         penroseClient.startPartition(repository.getName());
-                        ldapFederation.loadPartition(repository);
+                        ldapFederation.loadPartition(partitionConfig);
                     }
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -186,7 +186,7 @@ public class LDAPPartitionsPage extends FormPage {
                         penroseClient.stopPartition(repository.getName());
                         ldapFederation.removePartition(repository);
 
-                        ldapFederation.removePartitionConfig(repository);
+                        ldapFederation.removePartitionConfig(repository.getName());
                         project.removeDirectory("partitions/"+repository.getName());
                     }
 

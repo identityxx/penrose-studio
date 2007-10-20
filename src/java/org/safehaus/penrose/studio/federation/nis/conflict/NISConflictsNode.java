@@ -5,7 +5,7 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISDomainNode;
+import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.eclipse.jface.action.IMenuManager;

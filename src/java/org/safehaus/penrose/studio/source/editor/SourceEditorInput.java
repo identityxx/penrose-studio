@@ -33,7 +33,7 @@ public class SourceEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return sourceConfig.getName();
+        return partitionConfig.getName()+"/"+ sourceConfig.getName();
     }
 
     public IPersistableElement getPersistable() {
@@ -41,7 +41,7 @@ public class SourceEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return sourceConfig.getName();
+        return getName();
     }
 
     public Object getAdapter(Class aClass) {

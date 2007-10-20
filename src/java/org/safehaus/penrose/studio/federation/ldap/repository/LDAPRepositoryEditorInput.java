@@ -1,22 +1,23 @@
-package org.safehaus.penrose.studio.federation.nis.ownership;
+package org.safehaus.penrose.studio.federation.ldap.repository;
 
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
+import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
 
 /**
  * @author Endi S. Dewata
  */
-public class NISFilesEditorInput implements IEditorInput {
+public class LDAPRepositoryEditorInput implements IEditorInput {
 
     private Project project;
-    private NISFederation nisFederation;
-    private NISDomain domain;
+    private LDAPFederation ldapFederation;
+    private LDAPRepository repository;
 
-    public NISFilesEditorInput() {
+    public LDAPRepositoryEditorInput() {
     }
 
     public boolean exists() {
@@ -28,7 +29,7 @@ public class NISFilesEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "NIS Alignment Tool - "+domain.getName();
+        return "LDAP - "+repository.getName();
     }
 
     public IPersistableElement getPersistable() {
@@ -45,7 +46,7 @@ public class NISFilesEditorInput implements IEditorInput {
 
     public int hashCode() {
         return (project == null ? 0 : project.hashCode()) +
-                (domain == null ? 0 : domain.hashCode());
+                (repository == null ? 0 : repository.hashCode());
     }
 
     boolean equals(Object o1, Object o2) {
@@ -59,27 +60,27 @@ public class NISFilesEditorInput implements IEditorInput {
         if (object == null) return false;
         if (object.getClass() != this.getClass()) return false;
 
-        NISFilesEditorInput ei = (NISFilesEditorInput)object;
-        if (!equals(project, ei.project)) return false;
-        if (!equals(domain, ei.domain)) return false;
+        LDAPRepositoryEditorInput cei = (LDAPRepositoryEditorInput)object;
+        if (!equals(project, cei.project)) return false;
+        if (!equals(repository, cei.repository)) return false;
 
         return true;
     }
 
-    public NISDomain getDomain() {
-        return domain;
+    public LDAPRepository getRepository() {
+        return repository;
     }
 
-    public void setDomain(NISDomain domain) {
-        this.domain = domain;
+    public void setRepository(LDAPRepository repository) {
+        this.repository = repository;
     }
 
-    public NISFederation getNisTool() {
-        return nisFederation;
+    public LDAPFederation getLdapFederation() {
+        return ldapFederation;
     }
 
-    public void setNisTool(NISFederation nisFederation) {
-        this.nisFederation = nisFederation;
+    public void setLdapFederation(LDAPFederation nisFederation) {
+        this.ldapFederation = nisFederation;
     }
 
     public Project getProject() {

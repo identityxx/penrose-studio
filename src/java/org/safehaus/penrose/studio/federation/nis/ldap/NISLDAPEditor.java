@@ -24,7 +24,7 @@ public class NISLDAPEditor extends FormEditor {
 
         setSite(site);
         setInput(input);
-        setPartName("NIS LDAP - "+domain.getName());
+        setPartName(ei.getName());
     }
 
     public void addPages() {

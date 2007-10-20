@@ -25,7 +25,7 @@ public class NISFilesEditor extends FormEditor {
 
         setSite(site);
         setInput(input);
-        setPartName("NIS Alignment Tool - "+domain.getName());
+        setPartName(ei.getName());
     }
 
     public void addPages() {

@@ -10,6 +10,7 @@ import org.safehaus.penrose.studio.federation.event.FederationEvent;
 import org.safehaus.penrose.studio.federation.event.FederationEventAdapter;
 import org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditor;
 import org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditorInput;
+import org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryNode;
 import org.apache.log4j.Logger;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;

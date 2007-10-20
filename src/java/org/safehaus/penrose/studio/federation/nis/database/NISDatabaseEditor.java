@@ -24,7 +24,7 @@ public class NISDatabaseEditor extends FormEditor {
 
         setSite(site);
         setInput(input);
-        setPartName("NIS Database - "+domain.getName());
+        setPartName(ei.getName());
     }
 
     public void addPages() {

@@ -34,7 +34,7 @@ public class LDAPEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return "LDAP";
+        return getName();
     }
 
     public Object getAdapter(Class aClass) {

@@ -1,35 +1,35 @@
-package org.safehaus.penrose.studio.federation.nis;
+package org.safehaus.penrose.studio.federation.ldap.repository;
 
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
+import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
 
-public class NISDomainEditor extends FormEditor {
+public class LDAPRepositoryEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    NISFederation nisFederation;
-    NISDomain domain;
+    LDAPFederation ldapFederation;
+    LDAPRepository repository;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        NISDomainEditorInput ei = (NISDomainEditorInput)input;
-        nisFederation = ei.getNisTool();
-        domain = ei.getDomain();
+        LDAPRepositoryEditorInput ei = (LDAPRepositoryEditorInput)input;
+        ldapFederation = ei.getLdapFederation();
+        repository = ei.getRepository();
 
         setSite(site);
         setInput(input);
-        setPartName("NIS - "+domain.getName());
+        setPartName(ei.getName());
     }
 
     public void addPages() {
         try {
-            addPage(new NISDomainMainPage(this));
+            addPage(new LDAPFederationSettingsPage(this));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -50,15 +50,15 @@ public class NISDomainEditor extends FormEditor {
         return false;
     }
 
-    public NISDomain getDomain() {
-        return domain;
+    public LDAPRepository getRepository() {
+        return repository;
     }
 
-    public void setDomain(NISDomain domain) {
-        this.domain = domain;
+    public void setRepository(LDAPRepository repository) {
+        this.repository = repository;
     }
 
-    public NISFederation getNisTool() {
-        return nisFederation;
+    public LDAPFederation getLdapFederation() {
+        return ldapFederation;
     }
 }

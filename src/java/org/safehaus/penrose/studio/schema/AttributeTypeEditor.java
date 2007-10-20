@@ -66,7 +66,7 @@ public class AttributeTypeEditor extends EditorPart implements ModifyListener, S
 
         setSite(site);
         setInput(input);
-        setPartName("Attribute Type - "+attributeType.getName());
+        setPartName(ei.getName());
     }
 
     public void createPartControl(Composite parent) {
@@ -283,7 +283,7 @@ public class AttributeTypeEditor extends EditorPart implements ModifyListener, S
             //schema.addObjectClass(objectClass);
         }
 
-        setPartName("Object Class - "+attributeType.getName());
+        setPartName("Attribute Type - "+attributeType.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();

@@ -56,7 +56,7 @@ public class UserEditor extends MultiPageEditorPart {
 
         setSite(site);
         setInput(input);
-        setPartName(userConfig.getDn().toString());
+        setPartName(ei.getName());
     }
 
     protected void createPages() {

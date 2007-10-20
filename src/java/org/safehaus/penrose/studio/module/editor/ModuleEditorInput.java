@@ -45,7 +45,7 @@ public class ModuleEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return moduleConfig.getName();
+        return partitionConfig.getName()+"/"+moduleConfig.getName();
     }
 
     public IPersistableElement getPersistable() {
@@ -53,7 +53,7 @@ public class ModuleEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return moduleConfig.getName();
+        return getName();
     }
 
     public Object getAdapter(Class aClass) {

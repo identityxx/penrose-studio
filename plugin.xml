@@ -142,6 +142,11 @@
             icon="images/object.gif"
             class="org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditor"/>
         <editor
+            id="org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryEditor"
+            name="LDAP Repository"
+            icon="images/object.gif"
+            class="org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryEditor"/>
+        <editor
             id="org.safehaus.penrose.studio.federation.linking.LinkingEditor"
             name="Identity Linking"
             icon="images/object.gif"
@@ -152,10 +157,10 @@
             icon="images/object.gif"
             class="org.safehaus.penrose.studio.federation.nis.editor.NISEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.federation.nis.NISDomainEditor"
+            id="org.safehaus.penrose.studio.federation.nis.domain.NISDomainEditor"
             name="NIS Domain"
             icon="images/object.gif"
-            class="org.safehaus.penrose.studio.federation.nis.NISDomainEditor"/>
+            class="org.safehaus.penrose.studio.federation.nis.domain.NISDomainEditor"/>
         <editor
             id="org.safehaus.penrose.studio.federation.nis.database.NISDatabaseEditor"
             name="NIS Database"
@@ -188,7 +193,7 @@
             class="org.safehaus.penrose.studio.federation.nis.ownership.NISFilesEditor"/>
         <editor
             id="org.safehaus.penrose.studio.federation.nis.consolidation.NISConsolidationEditor"
-            name="NIS Consolidation"
+            name="NIS Stacking Authentication"
             icon="images/object.gif"
             class="org.safehaus.penrose.studio.federation.nis.consolidation.NISConsolidationEditor"/>
     </extension>

@@ -33,7 +33,7 @@ public class ConnectionEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return connectionConfig.getName();
+        return partitionConfig.getName()+"/"+connectionConfig.getName();
     }
 
     public IPersistableElement getPersistable() {
@@ -41,7 +41,7 @@ public class ConnectionEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return connectionConfig.getName();
+        return getName();
     }
 
     public Object getAdapter(Class aClass) {

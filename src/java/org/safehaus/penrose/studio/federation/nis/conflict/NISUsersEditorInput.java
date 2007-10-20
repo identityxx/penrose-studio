@@ -36,7 +36,7 @@ public class NISUsersEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return "NIS Users - "+domain.getName();
+        return getName();
     }
 
     public Object getAdapter(Class aClass) {

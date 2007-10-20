@@ -28,7 +28,7 @@ public class NISLinkEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "NIS Users - "+domain.getName();
+        return "NIS Link - "+domain.getName();
     }
 
     public IPersistableElement getPersistable() {
@@ -36,7 +36,7 @@ public class NISLinkEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return "NIS Users - "+domain.getName();
+        return getName();
     }
 
     public Object getAdapter(Class aClass) {

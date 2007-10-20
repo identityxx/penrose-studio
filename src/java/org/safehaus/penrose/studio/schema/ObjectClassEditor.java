@@ -64,7 +64,7 @@ public class ObjectClassEditor extends EditorPart implements ModifyListener, Sel
 
         setSite(site);
         setInput(input);
-        setPartName("Object Class - "+objectClass.getName());
+        setPartName(ei.getName());
     }
 
     public void createPartControl(Composite parent) {

@@ -3,7 +3,7 @@ package org.safehaus.penrose.studio.federation.nis.linking;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISDomainNode;
+import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.linking.LinkingEditorInput;
 import org.safehaus.penrose.studio.federation.linking.LinkingEditor;

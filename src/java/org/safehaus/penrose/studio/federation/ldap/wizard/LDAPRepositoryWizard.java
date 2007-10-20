@@ -10,6 +10,7 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionInfoWizardPage;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.partition.PartitionConfig;
 
 import javax.naming.Context;
 import java.util.Map;
@@ -66,13 +67,13 @@ public class LDAPRepositoryWizard extends Wizard {
 
             ldapFederation.addRepository(repository);
 
-            ldapFederation.createPartitionConfig(repository);
+            PartitionConfig partitionConfig = ldapFederation.createPartitionConfig(repository);
             project.upload("partitions/"+ repository.getName());
 
             PenroseClient penroseClient = project.getClient();
 
             penroseClient.startPartition(repository.getName());
-            ldapFederation.loadPartition(repository);
+            ldapFederation.loadPartition(partitionConfig);
 
             return true;
 

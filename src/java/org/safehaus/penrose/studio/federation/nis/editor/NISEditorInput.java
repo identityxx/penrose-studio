@@ -34,7 +34,7 @@ public class NISEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return "NIS";
+        return getName();
     }
 
     public Object getAdapter(Class aClass) {

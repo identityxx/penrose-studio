@@ -2,7 +2,7 @@ package org.safehaus.penrose.studio.federation.ldap.linking;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.federation.ldap.LDAPRepositoryNode;
+import org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryNode;
 import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;

@@ -27,10 +27,10 @@ public class SchemaEditor extends FormEditor {
     boolean dirty;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        SchemaEditorInput sei = (SchemaEditorInput)input;
-        project = sei.getProject();
+        SchemaEditorInput ei = (SchemaEditorInput)input;
+        project = ei.getProject();
 
-        origSchema = sei.getSchema();
+        origSchema = ei.getSchema();
         try {
             schema = (Schema)origSchema.clone();
         } catch (Exception e) {
@@ -40,7 +40,7 @@ public class SchemaEditor extends FormEditor {
         setSite(site);
         setInput(input);
 
-        setPartName("Schema - "+schema.getName());
+        setPartName(ei.getName());
     }
 
     protected void addPages() {

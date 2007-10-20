@@ -67,11 +67,11 @@ public class LDAPFederation {
                 penroseClient.startPartition(repository.getName());
             }
 
-            loadPartition(repository);
+            loadPartition(partitionConfig);
         }
     }
 
-    public void createPartitionConfig(LDAPRepository repository) throws Exception {
+    public PartitionConfig createPartitionConfig(LDAPRepository repository) throws Exception {
 
         String name = repository.getName();
         log.debug("Creating partition "+name+".");
@@ -143,18 +143,24 @@ public class LDAPFederation {
         partitionConfigs.store(partitionDir, partitionConfig);
 
         partitionConfigs.addPartitionConfig(partitionConfig);
+
+        return partitionConfig;
     }
 
-    public void loadPartition(LDAPRepository repository) throws Exception {
-        federation.loadPartition(repository);
+    public void loadPartition(PartitionConfig partitionConfig) throws Exception {
+        federation.loadPartition(partitionConfig);
     }
 
     public void removePartition(LDAPRepository repository) throws Exception {
         federation.removePartition(repository);
     }
 
-    public void removePartitionConfig(LDAPRepository repository) throws Exception {
-        federation.removePartitionConfig(repository);
+    public PartitionConfig getPartitionConfig(String name) throws Exception {
+        return federation.getPartitionConfig(name);
+    }
+
+    public PartitionConfig removePartitionConfig(String name) throws Exception {
+        return federation.removePartitionConfig(name);
     }
 
     public LDAPRepository getRepository(String name) {

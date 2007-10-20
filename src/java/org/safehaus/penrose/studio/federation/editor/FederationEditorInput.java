@@ -34,7 +34,7 @@ public class FederationEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return "Federation";
+        return getName();
     }
 
     public Object getAdapter(Class aClass) {

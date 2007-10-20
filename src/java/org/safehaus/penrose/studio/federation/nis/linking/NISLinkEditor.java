@@ -24,7 +24,7 @@ public class NISLinkEditor extends FormEditor {
 
         setSite(site);
         setInput(input);
-        setPartName("NIS Link - "+domain.getName());
+        setPartName(ei.getName());
     }
 
     public void addPages() {

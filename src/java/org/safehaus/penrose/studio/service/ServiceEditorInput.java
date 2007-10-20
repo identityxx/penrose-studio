@@ -51,7 +51,7 @@ public class ServiceEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return serviceConfig.getName();
+        return getName();
     }
 
     public Object getAdapter(Class aClass) {

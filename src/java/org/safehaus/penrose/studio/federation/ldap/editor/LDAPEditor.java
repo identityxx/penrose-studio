@@ -22,7 +22,7 @@ public class LDAPEditor extends FormEditor {
 
         setSite(site);
         setInput(input);
-        setPartName("LDAP");
+        setPartName(ei.getName());
     }
 
     public void addPages() {

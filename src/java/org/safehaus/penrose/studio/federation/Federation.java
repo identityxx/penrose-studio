@@ -312,28 +312,29 @@ public class Federation {
         }
     }
 
-    public void removePartitionConfig(Repository repository) throws Exception {
+    public PartitionConfig getPartitionConfig(String name) throws Exception {
+        return project.getPartitionConfigs().getPartitionConfig(name);
+    }
 
-        String name = repository.getName();
+    public PartitionConfig removePartitionConfig(String name) throws Exception {
+
         log.debug("Removing partition "+name+".");
 
-        project.getPartitionConfigs().removePartitionConfig(name);
+        PartitionConfig partitionConfig = project.getPartitionConfigs().removePartitionConfig(name);
 
         File partitionDir = new File(project.getWorkDir(), "partitions"+File.separator+ name);
         FileUtil.delete(partitionDir);
+
+        return partitionConfig;
     }
 
-    public void loadPartition(Repository repository) throws Exception {
+    public void loadPartition(PartitionConfig partitionConfig) throws Exception {
 
-        String name = repository.getName();
-        log.debug("Loading partition "+name+".");
+        log.debug("Loading partition "+partitionConfig.getName()+".");
 
         File partitionsDir = new File(project.getWorkDir(), "partitions");
         PenroseConfig penroseConfig = project.getPenroseConfig();
         PenroseContext penroseContext = project.getPenroseContext();
-
-        PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(name);
-        if (partitionConfig == null) throw new Exception("Partition "+name+" not found.");
 
         PartitionFactory partitionFactory = new PartitionFactory();
         partitionFactory.setPartitionsDir(partitionsDir);

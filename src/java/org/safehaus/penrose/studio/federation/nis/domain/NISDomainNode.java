@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.federation.nis;
+package org.safehaus.penrose.studio.federation.nis.domain;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.server.ServersView;
@@ -11,6 +11,9 @@ import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.nis.database.NISDatabaseNode;
 import org.safehaus.penrose.studio.federation.nis.consolidation.NISConsolidationNode;
+import org.safehaus.penrose.studio.federation.nis.NISNode;
+import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.eclipse.swt.graphics.Image;
@@ -78,14 +81,14 @@ public class NISDomainNode extends Node {
         );
 
         children.add(linkingNode);
-
+/*
         consolidationNode = new NISConsolidationNode(
                 "Stacking Authentication",
                 this
         );
 
         children.add(consolidationNode);
-
+*/
         conflictsNode = new NISConflictsNode(
                 "Conflict Resolution",
                 this
@@ -129,7 +132,7 @@ public class NISDomainNode extends Node {
 
         NISDomainEditorInput ei = new NISDomainEditorInput();
         ei.setProject(projectNode.getProject());
-        ei.setNisTool(nisFederation);
+        ei.setNisFederation(nisFederation);
         ei.setDomain(domain);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

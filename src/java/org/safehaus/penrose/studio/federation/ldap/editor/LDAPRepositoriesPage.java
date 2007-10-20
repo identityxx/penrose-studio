@@ -211,7 +211,7 @@ public class LDAPRepositoriesPage extends FormPage {
                         }
 
                         try {
-                            ldapFederation.removePartitionConfig(repository);
+                            ldapFederation.removePartitionConfig(repository.getName());
                             project.removeDirectory("partitions/"+repository.getName());
 
                         } catch (Exception e) {

@@ -21,7 +21,7 @@ public class FederationEditor extends FormEditor {
 
         setSite(site);
         setInput(input);
-        setPartName("Federation");
+        setPartName(ei.getName());
     }
 
     public void addPages() {

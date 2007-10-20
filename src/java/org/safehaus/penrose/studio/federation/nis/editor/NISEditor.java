@@ -28,7 +28,7 @@ public class NISEditor extends FormEditor {
 
         setSite(site);
         setInput(input);
-        setPartName("NIS");
+        setPartName(ei.getName());
     }
 
     public void addPages() {

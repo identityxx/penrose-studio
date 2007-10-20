@@ -24,7 +24,7 @@ public class NISGroupsEditor extends FormEditor {
 
         setSite(site);
         setInput(input);
-        setPartName("NIS Groups - "+domain.getName());
+        setPartName(ei.getName());
     }
 
     public void addPages() {

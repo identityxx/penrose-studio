@@ -43,7 +43,7 @@ public class UserEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return project.getPenroseConfig().getRootDn().toString();
+        return userConfig.getDn().toString();
     }
 
     public IPersistableElement getPersistable() {
@@ -51,7 +51,7 @@ public class UserEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return project.getPenroseConfig().getRootDn().toString();
+        return getName();
     }
 
     public Object getAdapter(Class aClass) {

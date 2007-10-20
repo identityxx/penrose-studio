@@ -36,7 +36,7 @@ public class NISGroupsEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return "NIS Groups - "+domain.getName();
+        return getName();
     }
 
     public Object getAdapter(Class aClass) {

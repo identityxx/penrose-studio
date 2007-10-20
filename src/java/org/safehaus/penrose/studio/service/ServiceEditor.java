@@ -53,7 +53,7 @@ public class ServiceEditor extends MultiPageEditorPart {
 
         setSite(site);
         setInput(input);
-        setPartName(serviceConfig.getName());
+        setPartName(ei.getName());
     }
 
     protected void createPages() {

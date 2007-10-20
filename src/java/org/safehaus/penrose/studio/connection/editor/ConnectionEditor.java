@@ -36,11 +36,11 @@ public abstract class ConnectionEditor extends FormEditor {
     public void setInput(IEditorInput input) {
         super.setInput(input);
 
-        ConnectionEditorInput cei = (ConnectionEditorInput)input;
+        ConnectionEditorInput ei = (ConnectionEditorInput)input;
 
-        project = cei.getProject();
-        partitionConfig = cei.getPartitionConfig();
-        origConnectionConfig = cei.getConnectionConfig();
+        project = ei.getProject();
+        partitionConfig = ei.getPartitionConfig();
+        origConnectionConfig = ei.getConnectionConfig();
 
         try {
             connectionConfig = (ConnectionConfig)origConnectionConfig.clone();
@@ -48,7 +48,7 @@ public abstract class ConnectionEditor extends FormEditor {
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        setPartName(partitionConfig.getName()+"/"+connectionConfig.getName());
+        setPartName(ei.getName());
     }
 
     public PartitionConfig getPartitionConfig() {

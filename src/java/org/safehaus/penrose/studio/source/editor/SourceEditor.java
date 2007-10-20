@@ -48,7 +48,7 @@ public abstract class SourceEditor extends FormEditor {
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        setPartName(partitionConfig.getName()+"/"+ sourceConfig.getName());
+        setPartName(ei.getName());
     }
 
     public void doSave(IProgressMonitor iProgressMonitor) {

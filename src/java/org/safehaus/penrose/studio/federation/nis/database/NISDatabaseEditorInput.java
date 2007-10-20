@@ -28,7 +28,7 @@ public class NISDatabaseEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "NIS";
+        return "NIS Database - "+domain.getName();
     }
 
     public IPersistableElement getPersistable() {
@@ -36,7 +36,7 @@ public class NISDatabaseEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return "NIS";
+        return getName();
     }
 
     public Object getAdapter(Class aClass) {

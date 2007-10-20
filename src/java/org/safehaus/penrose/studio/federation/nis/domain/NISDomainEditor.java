@@ -1,16 +1,16 @@
-package org.safehaus.penrose.studio.federation.nis.conflict;
+package org.safehaus.penrose.studio.federation.nis.domain;
 
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
-import org.slf4j.Logger;
+import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
-public class NISUsersEditor extends FormEditor {
+public class NISDomainEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
@@ -18,8 +18,8 @@ public class NISUsersEditor extends FormEditor {
     NISDomain domain;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        NISUsersEditorInput ei = (NISUsersEditorInput)input;
-        nisFederation = ei.getNisTool();
+        NISDomainEditorInput ei = (NISDomainEditorInput)input;
+        nisFederation = ei.getNisFederation();
         domain = ei.getDomain();
 
         setSite(site);
@@ -29,9 +29,7 @@ public class NISUsersEditor extends FormEditor {
 
     public void addPages() {
         try {
-            //addPage(new NISUsersPage(this));
-            addPage(new NISUserScriptsPage(this));
-            addPage(new NISUserChangesPage(this, domain, nisFederation));
+            addPage(new NISDomainSettingsPage(this));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -60,7 +58,7 @@ public class NISUsersEditor extends FormEditor {
         this.domain = domain;
     }
 
-    public NISFederation getNisTool() {
+    public NISFederation getNisFederation() {
         return nisFederation;
     }
 }
