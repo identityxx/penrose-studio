@@ -20,10 +20,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Status;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.wizard.BrowserWizard;
 import org.safehaus.penrose.studio.federation.Repository;
@@ -39,6 +36,9 @@ import org.safehaus.penrose.util.BinaryUtil;
 
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Endi S. Dewata
@@ -601,29 +601,7 @@ public class LinkingPage extends FormPage {
     }
 
     public void refresh() throws Exception {
-        IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
-
         try {
-            progressService.busyCursorWhile(new IRunnableWithProgress() {
-                public void run(final IProgressMonitor monitor) {
-                    Display.getDefault().asyncExec(new Runnable() {
-                        public void run() {
-                            search(monitor);
-                        }
-                    });
-                }
-            });
-            
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
-        }
-    }
-
-    public void search(final IProgressMonitor monitor) {
-        try {
-            monitor.beginTask("Searching "+partition.getName()+"...", IProgressMonitor.UNKNOWN);
-
             localTable.removeAll();
             localAttributeTable.removeAll();
             globalTable.removeAll();
@@ -637,56 +615,79 @@ public class LinkingPage extends FormPage {
 
             int scope = scopeCombo.getSelectionIndex();
 
-            monitor.worked(1);
-
             log.debug("Searching ["+searchBaseDn+"]");
 
-            SearchRequest request = new SearchRequest();
+            final SearchRequest request = new SearchRequest();
             request.setDn(searchBaseDn);
             request.setFilter(filter);
             request.setScope(scope);
 
-            SearchResponse response = new SearchResponse() {
-                public void add(SearchResult result) throws Exception {
+            final Map<String,SearchResult> results = new HashMap<String,SearchResult>();
+            final Map<String,Collection<SearchResult>> links = new HashMap<String,Collection<SearchResult>>();
 
-                    if (monitor.isCanceled()) {
-                        close();
-                        return;
+            IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+            progressService.busyCursorWhile(new IRunnableWithProgress() {
+                public void run(final IProgressMonitor monitor) throws InvocationTargetException {
+                    try {
+                        monitor.beginTask("Searching "+partition.getName()+"...", IProgressMonitor.UNKNOWN);
+
+                        SearchResponse response = new SearchResponse() {
+                            public void add(SearchResult result) throws Exception {
+
+                                if (monitor.isCanceled()) {
+                                    close();
+                                    return;
+                                }
+
+                                String dn = result.getDn().append(localBaseDn).toString();
+
+                                monitor.subTask("Processing "+dn+"...");
+
+                                results.put(dn, result);
+
+                                Collection<SearchResult> list = search(result);
+                                links.put(dn, list);
+
+                                monitor.worked(1);
+                            }
+                        };
+
+                        localSource.search(request, response);
+
+                    } catch (Exception e) {
+                        throw new InvocationTargetException(e);
+
+                    } finally {
+                        monitor.done();
                     }
-
-                    String dn = result.getDn().append(localBaseDn).toString();
-
-                    monitor.subTask("Processing "+dn+"...");
-
-                    TableItem item = new TableItem(localTable, SWT.NONE);
-                    item.setText(0, dn);
-
-                    item.setData("local", result);
-
-                    Collection<SearchResult> links = getLinks(result);
-
-                    if (links == null || links.isEmpty()) {
-                        Collection<SearchResult> matches = searchLinks(result);
-                        item.setData("matches", matches);
-
-                    } else {
-                        item.setData("links", links);
-                    }
-
-                    updateStatus(item);
-
-                    monitor.worked(1);
                 }
-            };
+            });
 
-            localSource.search(request, response);
+            for (String dn : results.keySet()) {
+
+                SearchResult result = results.get(dn);
+                Collection<SearchResult> list = links.get(dn);
+
+                TableItem item = new TableItem(localTable, SWT.NONE);
+                item.setText(0, dn);
+
+                item.setData("local", result);
+
+                if (list == null || list.isEmpty()) {
+                    Collection<SearchResult> matches = searchLinks(result);
+                    item.setData("matches", matches);
+
+                } else {
+                    item.setData("links", list);
+                }
+
+                updateStatus(item);
+            }
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
-
-        } finally {
-            monitor.done();
         }
     }
 
@@ -805,7 +806,7 @@ public class LinkingPage extends FormPage {
         }
     }
 
-    public Collection<SearchResult> getLinks(SearchResult localEntry) {
+    public Collection<SearchResult> search(SearchResult localEntry) {
         try {
             Repository repository = editor.getRepository();
             String localAttribute = repository.getParameter("localAttribute");

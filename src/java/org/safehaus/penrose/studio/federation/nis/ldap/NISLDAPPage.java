@@ -39,6 +39,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.ArrayList;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Endi S. Dewata
@@ -298,7 +299,7 @@ public class NISLDAPPage extends FormPage {
                     IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
                     progressService.busyCursorWhile(new IRunnableWithProgress() {
-                        public void run(IProgressMonitor monitor) {
+                        public void run(IProgressMonitor monitor) throws InvocationTargetException {
                             try {
                                 monitor.beginTask("Loading LDAP...", IProgressMonitor.UNKNOWN);
 
@@ -324,8 +325,7 @@ public class NISLDAPPage extends FormPage {
                                 }
 
                             } catch (Exception e) {
-                                log.error(e.getMessage(), e);
-                                MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                                throw new InvocationTargetException(e);
 
                             } finally {
                                 monitor.done();
@@ -468,7 +468,7 @@ public class NISLDAPPage extends FormPage {
                     IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
                     progressService.busyCursorWhile(new IRunnableWithProgress() {
-                        public void run(IProgressMonitor monitor) {
+                        public void run(IProgressMonitor monitor) throws InvocationTargetException {
                             try {
                                 monitor.beginTask("Synchronizing LDAP...", IProgressMonitor.UNKNOWN);
 
@@ -483,8 +483,7 @@ public class NISLDAPPage extends FormPage {
                                 monitor.worked(1);
 
                             } catch (Exception e) {
-                                log.error(e.getMessage(), e);
-                                MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                                throw new InvocationTargetException(e);
 
                             } finally {
                                 monitor.done();

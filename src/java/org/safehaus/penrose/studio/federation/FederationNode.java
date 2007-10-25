@@ -33,6 +33,7 @@ import org.osgi.framework.Bundle;
 
 import java.util.Collection;
 import java.util.ArrayList;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Endi Sukma Dewata
@@ -154,7 +155,7 @@ public class FederationNode extends PluginNode {
         IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
         progressService.busyCursorWhile(new IRunnableWithProgress() {
-            public void run(IProgressMonitor monitor) {
+            public void run(IProgressMonitor monitor) throws InvocationTargetException {
                 try {
                     monitor.beginTask("Loading partitions...", IProgressMonitor.UNKNOWN);
 
@@ -179,8 +180,7 @@ public class FederationNode extends PluginNode {
                     started = true;
                     
                 } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    MessageDialog.openError(serversView.getSite().getShell(), "Action Failed", e.getMessage());
+                    throw new InvocationTargetException(e);
 
                 } finally {
                     monitor.done();

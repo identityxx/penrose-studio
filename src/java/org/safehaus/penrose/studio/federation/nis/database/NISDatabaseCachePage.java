@@ -41,6 +41,7 @@ import org.safehaus.penrose.scheduler.JobConfig;
 
 import java.util.*;
 import java.sql.ResultSet;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Endi S. Dewata
@@ -235,7 +236,7 @@ public class NISDatabaseCachePage extends FormPage {
                     IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
                     progressService.busyCursorWhile(new IRunnableWithProgress() {
-                        public void run(IProgressMonitor monitor) {
+                        public void run(IProgressMonitor monitor) throws InvocationTargetException {
                             try {
                                 monitor.beginTask("Loading cache...", IProgressMonitor.UNKNOWN);
 
@@ -254,8 +255,7 @@ public class NISDatabaseCachePage extends FormPage {
                                 }
 
                             } catch (Exception e) {
-                                log.error(e.getMessage(), e);
-                                MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                                throw new InvocationTargetException(e);
 
                             } finally {
                                 monitor.done();
@@ -380,7 +380,7 @@ public class NISDatabaseCachePage extends FormPage {
                     IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
                     progressService.busyCursorWhile(new IRunnableWithProgress() {
-                        public void run(IProgressMonitor monitor) {
+                        public void run(IProgressMonitor monitor) throws InvocationTargetException {
                             try {
                                 monitor.beginTask("Synchronizing cache...", IProgressMonitor.UNKNOWN);
 
@@ -399,8 +399,7 @@ public class NISDatabaseCachePage extends FormPage {
                                 }
 
                             } catch (Exception e) {
-                                log.error(e.getMessage(), e);
-                                MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                                throw new InvocationTargetException(e);
 
                             } finally {
                                 monitor.done();

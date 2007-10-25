@@ -77,11 +77,17 @@ public class Project {
         monitor.worked(1);
 
         log.debug("----------------------------------------------------------------------------------------------");
+
+        monitor.subTask("Downloading conf...");
+
         client.download(workDir, "conf");
 
         monitor.worked(1);
 
         log.debug("----------------------------------------------------------------------------------------------");
+
+        monitor.subTask("Downloading schema...");
+
         client.download(workDir, "schema");
 
         monitor.worked(1);
@@ -98,6 +104,9 @@ public class Project {
         monitor.worked(1);
 
         log.debug("----------------------------------------------------------------------------------------------");
+
+        monitor.subTask("Downloading partitions...");
+
         client.download(workDir, "partitions");
 
         monitor.worked(1);
@@ -106,6 +115,8 @@ public class Project {
 
             if (debug) log.debug("----------------------------------------------------------------------------------");
 
+            monitor.subTask("Loading "+partitionName+"...");
+            
             PartitionConfig partitionConfig = partitionConfigs.load(partitionName);
             partitionConfigs.addPartitionConfig(partitionConfig);
 

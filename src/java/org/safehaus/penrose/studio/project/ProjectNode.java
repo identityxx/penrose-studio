@@ -43,6 +43,7 @@ import org.eclipse.core.runtime.Status;
 
 import java.util.Collection;
 import java.util.ArrayList;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Endi S. Dewata
@@ -213,7 +214,7 @@ public class ProjectNode extends Node {
         IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
         progressService.busyCursorWhile(new IRunnableWithProgress() {
-            public void run(IProgressMonitor monitor) {
+            public void run(IProgressMonitor monitor) throws InvocationTargetException {
                 try {
                     monitor.beginTask("Opening " + projectConfig.getName() + "...", IProgressMonitor.UNKNOWN);
 
@@ -271,8 +272,7 @@ public class ProjectNode extends Node {
                     ));
 
                 } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    MessageDialog.openError(serversView.getSite().getShell(), "Action Failed", e.getMessage());
+                    throw new InvocationTargetException(e);
 
                 } finally {
                     monitor.done();
