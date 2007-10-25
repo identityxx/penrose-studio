@@ -19,6 +19,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -281,40 +282,13 @@ public class LinkingPage extends FormPage {
 
         refreshButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
-                IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
-/*
                 try {
-                    progressService.run(true, true, new IRunnableWithProgress() {
-                        public void run(final IProgressMonitor monitor) {
-                            Display.getDefault().asyncExec(new Runnable() {
-                                public void run() {
-                                    search(monitor);
-                                }
-                            });
-                        }
-                    });
+                    refresh();
+
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
                 }
-*/
-                Job job = new Job("Search") {
-                    public IStatus run(final IProgressMonitor monitor) {
-                        Display.getDefault().asyncExec(new Runnable() {
-                            public void run() {
-                                search(monitor);
-                            }
-                        });
-                        return Status.OK_STATUS;
-                    }
-                };
-
-                Shell shell = new Shell();
-                shell.setSize(200, 100);
-
-                progressService.showInDialog(shell, job);
-
-                job.schedule();
             }
         });
 
@@ -626,6 +600,26 @@ public class LinkingPage extends FormPage {
         return new SubstringFilter(name, substrings);
     }
 
+    public void refresh() throws Exception {
+        IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+        try {
+            progressService.busyCursorWhile(new IRunnableWithProgress() {
+                public void run(final IProgressMonitor monitor) {
+                    Display.getDefault().asyncExec(new Runnable() {
+                        public void run() {
+                            search(monitor);
+                        }
+                    });
+                }
+            });
+            
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+        }
+    }
+
     public void search(final IProgressMonitor monitor) {
         try {
             monitor.beginTask("Searching "+partition.getName()+"...", IProgressMonitor.UNKNOWN);
@@ -642,6 +636,8 @@ public class LinkingPage extends FormPage {
             if ("".equals(filter)) filter = "(objectClass=*)";
 
             int scope = scopeCombo.getSelectionIndex();
+
+            monitor.worked(1);
 
             log.debug("Searching ["+searchBaseDn+"]");
 
@@ -660,6 +656,8 @@ public class LinkingPage extends FormPage {
 
                     String dn = result.getDn().append(localBaseDn).toString();
 
+                    monitor.subTask("Processing "+dn+"...");
+
                     TableItem item = new TableItem(localTable, SWT.NONE);
                     item.setText(0, dn);
 
@@ -677,7 +675,7 @@ public class LinkingPage extends FormPage {
 
                     updateStatus(item);
 
-                    monitor.worked((int)getTotalCount());
+                    monitor.worked(1);
                 }
             };
 

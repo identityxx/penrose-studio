@@ -61,12 +61,12 @@ public class ACIDialog extends Dialog {
 
     private boolean saved;
 
-	public ACIDialog(Shell parent, int style) {
-		super(parent, style);
+	public ACIDialog(Shell parent) {
+		super(parent);
 
         shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
 
-        createControl(shell);
+        createControl();
     }
 
     public void open () {
@@ -89,10 +89,11 @@ public class ACIDialog extends Dialog {
         }
     }
 
-    public void createControl(final Shell parent) {
-        parent.setLayout(new GridLayout());
+    public void createControl() {
 
-        Composite composite = new Composite(parent, SWT.NONE);
+        shell.setLayout(new GridLayout());
+
+        Composite composite = new Composite(shell, SWT.NONE);
         composite.setLayoutData(new GridData(GridData.FILL_BOTH));
         composite.setLayout(new GridLayout(3, false));
 
@@ -240,7 +241,7 @@ public class ACIDialog extends Dialog {
         deleteCheckbox = new Button(composite, SWT.CHECK);
         deleteCheckbox.setText("Delete");
 
-        Composite buttons = new Composite(parent, SWT.NONE);
+        Composite buttons = new Composite(shell, SWT.NONE);
         buttons.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         buttons.setLayout(new RowLayout());
 
@@ -273,7 +274,7 @@ public class ACIDialog extends Dialog {
 
                 saved = true;
                 
-                shell.close();
+                ACIDialog.this.shell.close();
 			}
 		});
 
@@ -281,7 +282,7 @@ public class ACIDialog extends Dialog {
         cancelButton.setText("Cancel");
 		cancelButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-                shell.close();
+                ACIDialog.this.shell.close();
 			}
 		});
 	}

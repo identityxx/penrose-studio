@@ -6,6 +6,7 @@ import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.dialog.OpenProjectProgressBar;
 import org.safehaus.penrose.studio.plugin.PluginsNode;
 import org.safehaus.penrose.studio.browser.BrowserEditorInput;
 import org.safehaus.penrose.studio.browser.BrowserEditor;
@@ -23,18 +24,22 @@ import org.safehaus.penrose.ldap.LDAPService;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.internal.progress.ProgressManagerUtil;
+import org.eclipse.ui.progress.IProgressService;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Status;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -52,17 +57,17 @@ public class ProjectNode extends Node {
     Collection<Node> children = new ArrayList<Node>();
 
     protected PartitionsNode partitionsNode;
-    protected SchemasNode    schemasNode;
-    protected ServicesNode   servicesNode;
-    protected LoggingNode    loggingNode;
-    protected PluginsNode    pluginsNode;
+    protected SchemasNode schemasNode;
+    protected ServicesNode servicesNode;
+    protected LoggingNode loggingNode;
+    protected PluginsNode pluginsNode;
 
     public ProjectNode(ServersView serversView, String name, String type, Image image, Object object, Object parent) {
         super(name, type, image, object, parent);
 
         this.serversView = serversView;
 
-        projectConfig = (ProjectConfig)object;
+        projectConfig = (ProjectConfig) object;
         project = new Project(projectConfig);
     }
 
@@ -76,6 +81,7 @@ public class ProjectNode extends Node {
                     log.error(e.getMessage(), e);
                 }
             }
+
             public boolean isEnabled() {
                 return !project.isConnected();
             }
@@ -89,6 +95,7 @@ public class ProjectNode extends Node {
                     log.error(e.getMessage(), e);
                 }
             }
+
             public boolean isEnabled() {
                 return project.isConnected();
             }
@@ -104,6 +111,7 @@ public class ProjectNode extends Node {
                     log.error(e.getMessage(), e);
                 }
             }
+
             public boolean isEnabled() {
                 return project.isConnected();
             }
@@ -117,6 +125,7 @@ public class ProjectNode extends Node {
                     log.error(e.getMessage(), e);
                 }
             }
+
             public boolean isEnabled() {
                 return project.isConnected();
             }
@@ -132,6 +141,7 @@ public class ProjectNode extends Node {
                     log.error(e.getMessage(), e);
                 }
             }
+
             public boolean isEnabled() {
                 return false;
             }
@@ -145,6 +155,7 @@ public class ProjectNode extends Node {
                     log.error(e.getMessage(), e);
                 }
             }
+
             public boolean isEnabled() {
                 return false;
             }
@@ -198,58 +209,76 @@ public class ProjectNode extends Node {
     }
 
     public void connect() throws Exception {
-        project.connect();
 
-        partitionsNode = new PartitionsNode(
-                serversView,
-                "Partitions",
-                "Partitions",
-                "Partitions",
-                this);
-        children.add(partitionsNode);
+        IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
-        schemasNode = new SchemasNode(
-                "Schemas",
-                "Schemas",
-                "Schemas",
-                this);
-        children.add(schemasNode);
+        progressService.busyCursorWhile(new IRunnableWithProgress() {
+            public void run(IProgressMonitor monitor) {
+                try {
+                    monitor.beginTask("Opening " + projectConfig.getName() + "...", IProgressMonitor.UNKNOWN);
 
-        servicesNode = new ServicesNode(
-                "Services",
-                "Services",
-                "Services",
-                this);
-        children.add(servicesNode);
+                    project.connect(monitor);
 
-        loggingNode = new LoggingNode(
-                serversView,
-                "Logging",
-                "Logging",
-                "Logging",
-                this);
-        children.add(loggingNode);
+                    partitionsNode = new PartitionsNode(
+                            serversView,
+                            "Partitions",
+                            "Partitions",
+                            "Partitions",
+                            ProjectNode.this);
+                    children.add(partitionsNode);
 
-        pluginsNode = new PluginsNode(
-                "Plugins",
-                "Plugins",
-                "Plugins",
-                this);
-        children.add(pluginsNode);
+                    schemasNode = new SchemasNode(
+                            "Schemas",
+                            "Schemas",
+                            "Schemas",
+                            ProjectNode.this);
+                    children.add(schemasNode);
 
-        children.add(new AdministratorNode(
-                "Administrator",
-                "Administrator",
-                "Administrator",
-                this
-        ));
+                    servicesNode = new ServicesNode(
+                            "Services",
+                            "Services",
+                            "Services",
+                            ProjectNode.this);
+                    children.add(servicesNode);
 
-        children.add(new SystemPropertiesNode(
-                "System Properties",
-                "System Properties",
-                "System Properties",
-                this
-        ));
+                    loggingNode = new LoggingNode(
+                            serversView,
+                            "Logging",
+                            "Logging",
+                            "Logging",
+                            ProjectNode.this);
+                    children.add(loggingNode);
+
+                    pluginsNode = new PluginsNode(
+                            "Plugins",
+                            "Plugins",
+                            "Plugins",
+                            ProjectNode.this);
+                    children.add(pluginsNode);
+
+                    children.add(new AdministratorNode(
+                            "Administrator",
+                            "Administrator",
+                            "Administrator",
+                            ProjectNode.this
+                    ));
+
+                    children.add(new SystemPropertiesNode(
+                            "System Properties",
+                            "System Properties",
+                            "System Properties",
+                            ProjectNode.this
+                    ));
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    MessageDialog.openError(serversView.getSite().getShell(), "Action Failed", e.getMessage());
+
+                } finally {
+                    monitor.done();
+                }
+            }
+        });
     }
 
     public void disconnect() throws Exception {
@@ -260,7 +289,7 @@ public class ProjectNode extends Node {
     public void edit() throws Exception {
 
         String oldProjectName = projectConfig.getName();
-        
+
         Shell shell = serversView.getSite().getShell();
 
         ProjectDialog dialog = new ProjectDialog(shell, SWT.NONE);

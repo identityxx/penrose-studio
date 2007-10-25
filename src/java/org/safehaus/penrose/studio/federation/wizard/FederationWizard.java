@@ -86,7 +86,7 @@ public class FederationWizard extends Wizard {
             Map<String,String> parameters = jdbcPage.getParameters();
             parameters.put(JDBCClient.URL, url);
             jdbcConfig.setParameters(parameters);
-
+/*
             log.debug("Creating partition "+Federation.PARTITION +".");
 
             File sampleDir = new File(project.getWorkDir(), "samples/"+Federation.PARTITION);
@@ -129,7 +129,7 @@ public class FederationWizard extends Wizard {
                     log.debug(e.getMessage());
                 }
             }
-
+*/
             return true;
 
         } catch (Exception e) {

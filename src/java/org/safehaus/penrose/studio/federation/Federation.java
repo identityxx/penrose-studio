@@ -2,10 +2,7 @@ package org.safehaus.penrose.studio.federation;
 
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.partition.PartitionFactory;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.Partitions;
+import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
@@ -13,8 +10,14 @@ import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
 import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.source.Source;
+import org.safehaus.penrose.source.SourceConfigs;
+import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.ldap.*;
+import org.safehaus.penrose.connection.Connection;
+import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
+import org.safehaus.penrose.jdbc.JDBCClient;
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 import java.io.File;
 import java.util.Collection;
@@ -51,6 +54,57 @@ public class Federation {
 
     public Federation(Project project) throws Exception {
         this.project = project;
+    }
+
+    public void create(PartitionConfig partitionConfig) throws Exception {
+
+        log.debug("Creating partition "+Federation.PARTITION +".");
+
+        File workDir = project.getWorkDir();
+
+        File sampleDir = new File(workDir, "samples/"+Federation.PARTITION);
+        File partitionDir = new File(workDir, "partitions/"+Federation.PARTITION);
+        FileUtil.copy(sampleDir, partitionDir);
+
+        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+        partitionConfigs.addPartitionConfig(partitionConfig);
+        project.save(partitionConfig);
+
+        log.debug("Initializing partition "+Federation.PARTITION +".");
+
+        PenroseConfig penroseConfig = project.getPenroseConfig();
+        PenroseContext penroseContext = project.getPenroseContext();
+
+        PartitionFactory partitionFactory = new PartitionFactory();
+        partitionFactory.setPartitionsDir(partitionConfigs.getPartitionsDir());
+        partitionFactory.setPenroseConfig(penroseConfig);
+        partitionFactory.setPenroseContext(penroseContext);
+
+        Partition partition = partitionFactory.createPartition(partitionConfig);
+
+        log.debug("Creating database tables in "+Federation.PARTITION +".");
+
+        Connection connection = partition.getConnection(Federation.JDBC);
+
+        JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
+        JDBCClient client = adapter.getClient();
+        try {
+            client.createDatabase(Federation.PARTITION);
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+        }
+
+        SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
+        for (SourceConfig sourceConfig : sourceConfigs.getSourceConfigs()) {
+            try {
+                client.createTable(sourceConfig);
+            } catch (Exception e) {
+                log.debug(e.getMessage());
+            }
+        }
+    }
+
+    public void load(IProgressMonitor monitor) throws Exception {
 
         log.debug("Starting Federation tool.");
 
@@ -65,14 +119,21 @@ public class Federation {
         partitionFactory.setPenroseConfig(penroseConfig);
         partitionFactory.setPenroseContext(penroseContext);
 
+        monitor.subTask("Initializing...");
+
         partition = partitionFactory.createPartition(partitionConfig);
+
+        monitor.worked(1);
 
         globalParameters = partition.getSource(GLOBAL_PARAMETERS);
         repositories = partition.getSource(REPOSITORIES);
         repositoryParameters = partition.getSource(REPOSITORY_PARAMETERS);
 
         ldapFederation = new LDAPFederation(this);
+        ldapFederation.load(monitor);
+
         nisFederation = new NISFederation(this);
+        nisFederation.load(monitor);
     }
 
     public Partition getPartition() {

@@ -14,14 +14,20 @@ import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.*;
+import org.eclipse.ui.progress.IProgressService;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Bundle;
 
@@ -39,9 +45,12 @@ public class FederationNode extends PluginNode {
     private Project project;
     private Federation federation;
 
+    ServersView serversView;
+
     public FederationNode(PluginsNode parentsNode) throws Exception {
           super("Federation", parentsNode);
 
+        serversView = parentsNode.getView();
         ProjectNode projectNode = parentsNode.getProjectNode();
         project = projectNode.getProject();
     }
@@ -133,6 +142,8 @@ public class FederationNode extends PluginNode {
 
     public void start() throws Exception {
 
+        federation = new Federation(project);
+
         PartitionConfigs partitionConfigs = project.getPartitionConfigs();
 
         if (partitionConfigs.getPartitionConfig(Federation.PARTITION) == null) {
@@ -140,24 +151,42 @@ public class FederationNode extends PluginNode {
             if (!b) return;
         }
 
-        federation = new Federation(project);
-/*
-        children.add(new GlobalNode(
-                "Global",
-                this
-        ));
-*/
-        children.add(new LDAPNode(
-                "LDAP",
-                this
-        ));
+        IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
-        children.add(new NISNode(
-                "NIS",
-                this
-        ));
+        progressService.busyCursorWhile(new IRunnableWithProgress() {
+            public void run(IProgressMonitor monitor) {
+                try {
+                    monitor.beginTask("Loading partitions...", IProgressMonitor.UNKNOWN);
 
-        started = true;
+                    federation.load(monitor);
+
+                    /*
+                    children.add(new GlobalNode(
+                            "Global",
+                            FederationNode.this
+                    ));
+                    */
+                    children.add(new LDAPNode(
+                            "LDAP",
+                            FederationNode.this
+                    ));
+
+                    children.add(new NISNode(
+                            "NIS",
+                            FederationNode.this
+                    ));
+
+                    started = true;
+                    
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    MessageDialog.openError(serversView.getSite().getShell(), "Action Failed", e.getMessage());
+
+                } finally {
+                    monitor.done();
+                }
+            }
+        });
     }
 
     public boolean createPartition() throws Exception {
@@ -172,7 +201,12 @@ public class FederationNode extends PluginNode {
         WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
         dialog.setPageSize(600, 300);
 
-        return dialog.open() == Window.OK;
+        if (dialog.open() != Window.OK) return false;
+
+        PartitionConfig partitionConfig = wizard.getPartitionConfig();
+        federation.create(partitionConfig);
+
+        return true;
     }
 
     public boolean hasChildren() throws Exception {

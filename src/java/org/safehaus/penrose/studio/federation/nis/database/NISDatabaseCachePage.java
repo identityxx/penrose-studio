@@ -8,6 +8,8 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
+import org.eclipse.ui.progress.IProgressService;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
@@ -16,6 +18,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.partition.PartitionConfig;
@@ -222,19 +226,42 @@ public class NISDatabaseCachePage extends FormPage {
 
                     if (!confirm) return;
 
-                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
-
+                    final Collection<String> sourceNames = new ArrayList<String>();
                     for (TableItem item : table.getSelection()) {
                         String sourceName = (String)item.getData();
-
-                        try {
-                            JobClient jobClient = schedulerClient.getJobClient(sourceName);
-                            jobClient.invoke("load", new Object[] {}, new String[] {});
-
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
+                        sourceNames.add(sourceName);
                     }
+
+                    IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+                    progressService.busyCursorWhile(new IRunnableWithProgress() {
+                        public void run(IProgressMonitor monitor) {
+                            try {
+                                monitor.beginTask("Loading cache...", IProgressMonitor.UNKNOWN);
+
+                                SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
+
+                                for (String sourceName : sourceNames) {
+
+                                    if (monitor.isCanceled()) break;
+
+                                    monitor.subTask("Loading "+sourceName+"...");
+                                    
+                                    JobClient jobClient = schedulerClient.getJobClient(sourceName);
+                                    jobClient.invoke("load", new Object[] {}, new String[] {});
+                                    
+                                    monitor.worked(1);
+                                }
+
+                            } catch (Exception e) {
+                                log.error(e.getMessage(), e);
+                                MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+
+                            } finally {
+                                monitor.done();
+                            }
+                        }
+                    });
 
                     refresh();
 
@@ -344,19 +371,42 @@ public class NISDatabaseCachePage extends FormPage {
 
                     if (!confirm) return;
 
-                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
-
+                    final Collection<String> sourceNames = new ArrayList<String>();
                     for (TableItem item : table.getSelection()) {
                         String sourceName = (String)item.getData();
-
-                        try {
-                            JobClient jobClient = schedulerClient.getJobClient(sourceName);
-                            jobClient.invoke("synchronize", new Object[] {}, new String[] {});
-
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
+                        sourceNames.add(sourceName);
                     }
+
+                    IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+                    progressService.busyCursorWhile(new IRunnableWithProgress() {
+                        public void run(IProgressMonitor monitor) {
+                            try {
+                                monitor.beginTask("Synchronizing cache...", IProgressMonitor.UNKNOWN);
+
+                                SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
+
+                                for (String sourceName : sourceNames) {
+
+                                    if (monitor.isCanceled()) break;
+
+                                    monitor.subTask("Synchronizing "+sourceName+"...");
+
+                                    JobClient jobClient = schedulerClient.getJobClient(sourceName);
+                                    jobClient.invoke("synchronize", new Object[] {}, new String[] {});
+
+                                    monitor.worked(1);
+                                }
+
+                            } catch (Exception e) {
+                                log.error(e.getMessage(), e);
+                                MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+
+                            } finally {
+                                monitor.done();
+                            }
+                        }
+                    });
 
                     refresh();
 

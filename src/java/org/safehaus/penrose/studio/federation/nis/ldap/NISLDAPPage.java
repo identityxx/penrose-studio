@@ -8,6 +8,8 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
+import org.eclipse.ui.progress.IProgressService;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
@@ -16,6 +18,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
@@ -33,6 +37,8 @@ import org.safehaus.penrose.directory.Entry;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
@@ -75,7 +81,7 @@ public class NISLDAPPage extends FormPage {
         Control ldapControl = createLDAPControl(ldapSection);
         ldapSection.setClient(ldapControl);
 
-        refreshLDAP();
+        refresh();
     }
 
     public Composite createLDAPControl(Composite parent) {
@@ -283,32 +289,51 @@ public class NISLDAPPage extends FormPage {
 
                     TableItem[] items = table.getSelection();
 
-                    Project project = nisFederation.getProject();
-                    PenroseClient client = project.getClient();
-                    PartitionClient partitionClient = client.getPartitionClient(domain.getName());
-                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
-                    JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
-
-                    Partitions partitions = nisFederation.getPartitions();
-                    Partition partition = partitions.getPartition(domain.getName());
-                    Source ldap = partition.getSource("LDAP");
-
+                    final Collection<Entry> entries = new ArrayList<Entry>();
                     for (TableItem ti : items) {
                         Entry entry = (Entry)ti.getData();
-
-                        try {
-                            jobClient.invoke(
-                                    "load",
-                                    new Object[] { entry.getDn().toString() },
-                                    new String[] { String.class.getName() }
-                            );
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-
-                        Long count = getCount(ldap, entry.getDn());
-                        ti.setText(1, count == null ? "N/A" : ""+count);
+                        entries.add(entry);
                     }
+
+                    IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+                    progressService.busyCursorWhile(new IRunnableWithProgress() {
+                        public void run(IProgressMonitor monitor) {
+                            try {
+                                monitor.beginTask("Loading LDAP...", IProgressMonitor.UNKNOWN);
+
+                                Project project = nisFederation.getProject();
+                                PenroseClient client = project.getClient();
+                                PartitionClient partitionClient = client.getPartitionClient(domain.getName());
+                                SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
+                                JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
+
+                                for (Entry entry : entries) {
+
+                                    if (monitor.isCanceled()) break;
+
+                                    monitor.subTask("Loading "+entry.getDn()+"...");
+
+                                    jobClient.invoke(
+                                            "load",
+                                            new Object[] { entry.getDn().toString() },
+                                            new String[] { String.class.getName() }
+                                    );
+
+                                    monitor.worked(1);
+                                }
+
+                            } catch (Exception e) {
+                                log.error(e.getMessage(), e);
+                                MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+
+                            } finally {
+                                monitor.done();
+                            }
+                        }
+                    });
+
+                    refresh();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -440,15 +465,34 @@ public class NISLDAPPage extends FormPage {
 
                     if (!confirm) return;
 
-                    Project project = nisFederation.getProject();
-                    PenroseClient client = project.getClient();
-                    PartitionClient partitionClient = client.getPartitionClient(domain.getName());
-                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
+                    IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
-                    JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
-                    jobClient.invoke("synchronize", new Object[] {}, new String[] {});
+                    progressService.busyCursorWhile(new IRunnableWithProgress() {
+                        public void run(IProgressMonitor monitor) {
+                            try {
+                                monitor.beginTask("Synchronizing LDAP...", IProgressMonitor.UNKNOWN);
 
-                    refreshLDAP();
+                                Project project = nisFederation.getProject();
+                                PenroseClient client = project.getClient();
+                                PartitionClient partitionClient = client.getPartitionClient(domain.getName());
+                                SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
+
+                                JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
+                                jobClient.invoke("synchronize", new Object[] {}, new String[] {});
+
+                                monitor.worked(1);
+
+                            } catch (Exception e) {
+                                log.error(e.getMessage(), e);
+                                MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+
+                            } finally {
+                                monitor.done();
+                            }
+                        }
+                    });
+
+                    refresh();
                     
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -465,14 +509,14 @@ public class NISLDAPPage extends FormPage {
 
         refreshButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
-                refreshLDAP();
+                refresh();
             }
         });
 
         return composite;
     }
 
-    public void refreshLDAP() {
+    public void refresh() {
         try {
             int[] indices = table.getSelectionIndices();
 

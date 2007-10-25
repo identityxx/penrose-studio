@@ -69,7 +69,8 @@ public class PenroseStudioWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor 
             configurer.setInitialSize(new Point(1024, 768));
             configurer.setTitle("Penrose Studio");
             //configurer.setShowCoolBar(true);
-            //configurer.setShowStatusLine(true);
+            configurer.setShowStatusLine(true);
+            configurer.setShowProgressIndicator(true);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

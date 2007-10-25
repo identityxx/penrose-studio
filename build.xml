@@ -166,6 +166,7 @@
                 <include name="images/**"/>
                 <include name="lib/*.jar"/>
                 <include name="plugin.xml"/>
+                <include name="plugin_customization.ini"/>
                 <include name="splash.bmp"/>
             </fileset>
         </copy>

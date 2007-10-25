@@ -219,6 +219,9 @@
             <property
                 name="windowImages"
                 value="images/penrose16.gif,images/penrose32.gif"/>
+            <property
+                name="preferenceCustomization"
+                value="plugin_customization.ini"/>
         </product>
     </extension>
 

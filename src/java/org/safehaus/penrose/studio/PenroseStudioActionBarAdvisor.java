@@ -23,7 +23,6 @@ import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.swt.SWT;
-import org.safehaus.penrose.studio.preview.action.PreviewAction;
 import org.safehaus.penrose.studio.preview.action.RestartAction;
 import org.safehaus.penrose.studio.welcome.action.WelcomeAction;
 import org.safehaus.penrose.studio.welcome.action.AboutAction;
@@ -85,6 +84,9 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
 
     public PenroseStudioActionBarAdvisor(IActionBarConfigurer configurer) {
         super(configurer);
+
+        IStatusLineManager statusLineManager = configurer.getStatusLineManager();
+        statusLineManager.setCancelEnabled(true);
     }
 
     protected void makeActions(final IWorkbenchWindow window) {

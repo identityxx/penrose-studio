@@ -12,6 +12,7 @@ import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 import javax.naming.Context;
 import java.util.Map;
@@ -47,10 +48,14 @@ public class LDAPFederation {
         this.federation = federation;
         this.partition = federation.getPartition();
         this.project = federation.getProject();
+    }
 
+    public void load(IProgressMonitor monitor) throws Exception {
         log.debug("Starting LDAP Federation tool.");
 
         for (Repository rep : federation.getRepositories("LDAP")) {
+
+            if (monitor.isCanceled()) break;
 
             LDAPRepository repository = (LDAPRepository)rep;
             String name = repository.getName();
@@ -60,14 +65,21 @@ public class LDAPFederation {
             PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(name);
 
             if (partitionConfig == null) { // create missing partition configs during start
-                createPartitionConfig(repository);
+
+                monitor.subTask("Creating "+name+"...");
+
+                partitionConfig = createPartitionConfig(repository);
                 project.upload("partitions/"+repository.getName());
 
                 PenroseClient penroseClient = project.getClient();
                 penroseClient.startPartition(repository.getName());
             }
 
+            monitor.subTask("Loading "+name+"...");
+
             loadPartition(partitionConfig);
+
+            monitor.worked(1);
         }
     }
 

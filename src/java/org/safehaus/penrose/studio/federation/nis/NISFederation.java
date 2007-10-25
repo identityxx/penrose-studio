@@ -24,6 +24,7 @@ import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.FilterChain;
 import org.apache.tools.ant.taskdefs.Copy;
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 import java.util.*;
 import java.io.File;
@@ -70,7 +71,9 @@ public class NISFederation {
         this.federation = federation;
         this.partition = federation.getPartition();
         this.project = federation.getProject();
+    }
 
+    public void load(IProgressMonitor monitor) throws Exception {
         log.debug("Starting NIS Federation tool.");
 
         sourceLabels.put("nis_users", "Users");
@@ -99,6 +102,8 @@ public class NISFederation {
 
         for (Repository rep : federation.getRepositories("NIS")) {
 
+            if (monitor.isCanceled()) break;
+
             NISDomain domain = (NISDomain)rep;
             String name = domain.getName();
 
@@ -108,6 +113,9 @@ public class NISFederation {
             boolean createPartitionConfig = partitionConfig == null;
 
             if (createPartitionConfig) { // create missing partition configs during start
+
+                monitor.subTask("Creating "+name+"...");
+
                 partitionConfig = createPartitionConfig(domain);
             }
 
@@ -129,7 +137,11 @@ public class NISFederation {
                 penroseClient.startPartition(nssPartitionConfig.getName());
             }
 
+            monitor.subTask("Loading "+name+"...");
+
             loadPartition(nssPartitionConfig);
+
+            monitor.worked(1);
         }
     }
 

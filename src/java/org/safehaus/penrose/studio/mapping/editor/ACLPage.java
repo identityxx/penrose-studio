@@ -138,7 +138,7 @@ public class ACLPage extends FormPage implements ModifyListener {
                     TableItem item = aclTable.getSelection()[0];
                     ACI aci = (ACI)item.getData();
 
-                    ACIDialog dialog = new ACIDialog(editor.getParent().getShell(), SWT.NONE);
+                    ACIDialog dialog = new ACIDialog(editor.getParent().getShell());
                     dialog.setText("Edit ACL...");
 
                     dialog.setSubject(aci.getSubject());
@@ -179,7 +179,7 @@ public class ACLPage extends FormPage implements ModifyListener {
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    ACIDialog dialog = new ACIDialog(editor.getParent().getShell(), SWT.NONE);
+                    ACIDialog dialog = new ACIDialog(editor.getParent().getShell());
                     dialog.setText("Add ACL...");
 
                     dialog.open();
@@ -216,7 +216,7 @@ public class ACLPage extends FormPage implements ModifyListener {
                     TableItem item = aclTable.getSelection()[0];
                     ACI aci = (ACI)item.getData();
 
-                    ACIDialog dialog = new ACIDialog(editor.getParent().getShell(), SWT.NONE);
+                    ACIDialog dialog = new ACIDialog(editor.getParent().getShell());
                     dialog.setText("Edit ACL...");
 
                     dialog.setSubject(aci.getSubject());

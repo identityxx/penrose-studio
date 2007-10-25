@@ -22,6 +22,7 @@ import org.safehaus.penrose.connection.ConnectionConfigs;
 import org.safehaus.penrose.module.ModuleWriter;
 import org.safehaus.penrose.module.ModuleConfigs;
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 import java.io.File;
 
@@ -57,10 +58,11 @@ public class Project {
         return projectConfig.getName();
     }
 
-    public void connect() throws Exception {
+    public void connect(IProgressMonitor monitor) throws Exception {
 
         log.debug("-------------------------------------------------------------------------------------");
-        log.debug("Opening "+ projectConfig.getName()+".");
+
+        log.debug("Opening "+ projectConfig.getName()+"...");
 
         client = new PenroseClient(projectConfig.getType(), projectConfig.getHost(), projectConfig.getPort(), projectConfig.getUsername(), projectConfig.getPassword());
         client.connect();
@@ -72,11 +74,17 @@ public class Project {
         workDir = new File(homeDir, "Servers"+File.separator+projectConfig.getName());
         FileUtil.delete(workDir);
 
+        monitor.worked(1);
+
         log.debug("----------------------------------------------------------------------------------------------");
         client.download(workDir, "conf");
 
+        monitor.worked(1);
+
         log.debug("----------------------------------------------------------------------------------------------");
         client.download(workDir, "schema");
+
+        monitor.worked(1);
 
         PenroseConfigReader penroseConfigReader = new PenroseConfigReader(new File(workDir, "conf"+File.separator+"server.xml"));
         penroseConfig = penroseConfigReader.read();
@@ -87,8 +95,12 @@ public class Project {
         File partitionsDir = new File(workDir, "partitions");
         partitionConfigs = new PartitionConfigs(partitionsDir);
 
+        monitor.worked(1);
+
         log.debug("----------------------------------------------------------------------------------------------");
         client.download(workDir, "partitions");
+
+        monitor.worked(1);
 
         for (String partitionName : partitionConfigs.getAvailablePartitionNames()) {
 
@@ -96,6 +108,8 @@ public class Project {
 
             PartitionConfig partitionConfig = partitionConfigs.load(partitionName);
             partitionConfigs.addPartitionConfig(partitionConfig);
+
+            monitor.worked(1);
         }
 
         File servicesDir = new File(workDir, "services");
@@ -120,6 +134,8 @@ public class Project {
         Log4jConfigReader reader = new Log4jConfigReader(new File(workDir, "conf/log4j.xml"));
         loggingConfig = reader.read();
         //loadLoggers();
+
+        monitor.worked(1);
 
         connected = true;
     }
