@@ -24,23 +24,13 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.partition.PartitionConfigs;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.source.SourceConfigs;
-import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.*;
-import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
-import org.safehaus.penrose.jdbc.JDBCClient;
-import org.safehaus.penrose.jdbc.Assignment;
-import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.scheduler.SchedulerConfig;
 import org.safehaus.penrose.scheduler.JobConfig;
 
 import java.util.*;
-import java.sql.ResultSet;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -244,7 +234,9 @@ public class NISDatabaseCachePage extends FormPage {
 
                                 for (String sourceName : sourceNames) {
 
-                                    if (monitor.isCanceled()) break;
+                                    if (monitor.isCanceled()) {
+                                        throw new InterruptedException();
+                                    }
 
                                     monitor.subTask("Loading "+sourceName+"...");
                                     
@@ -253,6 +245,9 @@ public class NISDatabaseCachePage extends FormPage {
                                     
                                     monitor.worked(1);
                                 }
+
+                            } catch (InterruptedException e) {
+                                // ignore
 
                             } catch (Exception e) {
                                 throw new InvocationTargetException(e);
@@ -388,7 +383,9 @@ public class NISDatabaseCachePage extends FormPage {
 
                                 for (String sourceName : sourceNames) {
 
-                                    if (monitor.isCanceled()) break;
+                                    if (monitor.isCanceled()) {
+                                        throw new InterruptedException();
+                                    }
 
                                     monitor.subTask("Synchronizing "+sourceName+"...");
 
@@ -398,6 +395,9 @@ public class NISDatabaseCachePage extends FormPage {
                                     monitor.worked(1);
                                 }
 
+                            } catch (InterruptedException e) {
+                                // ignore
+                                
                             } catch (Exception e) {
                                 throw new InvocationTargetException(e);
 
@@ -437,16 +437,6 @@ public class NISDatabaseCachePage extends FormPage {
 
             table.removeAll();
 
-            Partition partition = nisFederation.getPartition();
-            Connection connection = partition.getConnection(Federation.JDBC);
-            JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
-            JDBCClient client = adapter.getClient();
-
-            PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-            PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName());
-            SchedulerConfig schedulerConfig = partitionConfig.getSchedulerConfig();
-            SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
-
             for (String sourceName : nisFederation.getSourceNames()) {
                 String label = nisFederation.getSourceLabel(sourceName);
                 log.debug("Checking cache for "+label+" ("+sourceName+").");
@@ -455,27 +445,14 @@ public class NISDatabaseCachePage extends FormPage {
                 if (caches == null) continue;
 
                 String cacheName = caches.iterator().next();
-                SourceConfig sourceConfig = sourceConfigs.getSourceConfig(cacheName);
+                SourceClient sourceClient = partitionClient.getSourceClient(cacheName);
 
                 final TableItem ti = new TableItem(table, SWT.NONE);
                 ti.setText(0, label);
                 ti.setData(sourceName);
 
                 try {
-                    String table = client.getTableName(sourceConfig);
-                    String sql = "select count(*) from "+table;
-
-                    Collection<Assignment> assignments = new ArrayList<Assignment>();
-
-                    QueryResponse queryResponse = new QueryResponse() {
-                        public void add(Object object) throws Exception {
-                            ResultSet rs = (ResultSet)object;
-                            Integer count = rs.getInt(1);
-                            ti.setText(1, count.toString());
-                        }
-                    };
-
-                    client.executeQuery(sql, assignments, queryResponse);
+                    ti.setText(1, sourceClient.getCount().toString());
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);

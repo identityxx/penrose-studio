@@ -11,8 +11,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
+import org.safehaus.penrose.management.SourceClient;
 
 /**
  * @author Endi Sukma Dewata
@@ -27,7 +27,7 @@ public class BrowserPage extends WizardPage {
     Text dnText;
 
     private String baseDn;
-    private Source source;
+    private SourceClient sourceClient;
 
     public BrowserPage() {
         super(NAME);
@@ -86,7 +86,7 @@ public class BrowserPage extends WizardPage {
 
             String parentDn = (String)parent.getData();
 
-            SearchResponse response = source.search(parentDn, null, SearchRequest.SCOPE_ONE);
+            SearchResponse response = sourceClient.search(parentDn, null, SearchRequest.SCOPE_ONE);
 
             while (response.hasNext()) {
                 SearchResult result = response.next();
@@ -113,12 +113,12 @@ public class BrowserPage extends WizardPage {
         this.baseDn = baseDn;
     }
 
-    public Source getSource() {
-        return source;
+    public SourceClient getSourceClient() {
+        return sourceClient;
     }
 
-    public void setSource(Source source) {
-        this.source = source;
+    public void setSourceClient(SourceClient sourceClient) {
+        this.sourceClient = sourceClient;
     }
 
     public String getDn() {

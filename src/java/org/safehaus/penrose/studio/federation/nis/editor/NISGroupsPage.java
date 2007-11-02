@@ -19,10 +19,9 @@ import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
-import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
-import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.QueryResponse;
+import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
@@ -86,10 +85,9 @@ public class NISGroupsPage extends FormPage {
 
             Partition partition = nisFederation.getPartition();
             Connection connection = partition.getConnection(Federation.JDBC);
-            JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
-            JDBCClient client = adapter.getClient();
+            JDBCConnection jdbcConnection = (JDBCConnection)connection;
 
-            String table = client.getTableName(sourceConfig);
+            String table = jdbcConnection.getTableName(sourceConfig);
             String sql = "select count(*) from "+table;
 
             Collection<Assignment> assignments = new ArrayList<Assignment>();
@@ -102,7 +100,7 @@ public class NISGroupsPage extends FormPage {
                 }
             };
 
-            client.executeQuery(sql, assignments, queryResponse);
+            jdbcConnection.executeQuery(sql, assignments, queryResponse);
 
         } catch (Exception e) {
             MessageDialog.openError(editor.getSite().getShell(), "Refresh Failed", e.getMessage());

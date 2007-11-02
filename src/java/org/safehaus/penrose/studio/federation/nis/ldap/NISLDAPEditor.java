@@ -9,16 +9,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
+import org.safehaus.penrose.studio.project.Project;
 
 public class NISLDAPEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
+    Project project;
     NISFederation nisFederation;
     NISDomain domain;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         NISLDAPEditorInput ei = (NISLDAPEditorInput)input;
+        project = ei.getProject();
         nisFederation = ei.getNisTool();
         domain = ei.getDomain();
 
@@ -62,5 +65,13 @@ public class NISLDAPEditor extends FormEditor {
 
     public NISFederation getNisTool() {
         return nisFederation;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

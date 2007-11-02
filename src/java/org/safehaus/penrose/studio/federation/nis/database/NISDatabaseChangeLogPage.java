@@ -20,10 +20,11 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.partition.Partitions;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.source.Source;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.ldap.*;
+import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.SourceClient;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -39,19 +40,30 @@ public class NISDatabaseChangeLogPage extends FormPage {
 
     FormToolkit toolkit;
 
+    Project project;
     NISDatabaseEditor editor;
     NISFederation nisFederation;
     NISDomain domain;
 
+    PenroseClient penroseClient;
+    PartitionClient partitionClient;
+    SourceClient changelog;
+
     Table table;
     Text changesText;
 
-    public NISDatabaseChangeLogPage(NISDatabaseEditor editor) {
+    public NISDatabaseChangeLogPage(NISDatabaseEditor editor) throws Exception {
         super(editor, "CHANGE_LOG", "  Change Log  ");
 
         this.editor = editor;
         this.nisFederation = editor.getNisTool();
+        this.project = nisFederation.getProject();
         this.domain = editor.getDomain();
+
+        penroseClient = project.getClient();
+        partitionClient = penroseClient.getPartitionClient(domain.getName());
+
+        changelog = partitionClient.getSourceClient("changelog");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -158,11 +170,6 @@ public class NISDatabaseChangeLogPage extends FormPage {
 
                     TableItem[] items = table.getSelection();
 
-                    Partitions partitions = nisFederation.getPartitions();
-                    Partition partition = partitions.getPartition(domain.getName());
-
-                    Source changelog = partition.getSource("changelog");
-
                     for (TableItem ti : items) {
                         SearchResult result = (SearchResult)ti.getData();
                         try {
@@ -206,32 +213,27 @@ public class NISDatabaseChangeLogPage extends FormPage {
 
             table.removeAll();
 
-            Partitions partitions = nisFederation.getPartitions();
-            Partition partition = partitions.getPartition(domain.getName());
-
-            Source changelog = partition.getSource("changelog");
-
             SearchRequest request = new SearchRequest();
-
-            SearchResponse response = new SearchResponse() {
-                public void add(SearchResult result) {
-
-                    Attributes attributes = result.getAttributes();
-                    String changeNumber = attributes.getValue("changeNumber").toString();
-                    String targetDn = (String)attributes.getValue("targetDN");
-                    String changeType = (String)attributes.getValue("changeType");
-
-                    TableItem ti = new TableItem(table, SWT.NONE);
-
-                    ti.setText(0, changeNumber);
-                    ti.setText(1, targetDn);
-                    ti.setText(2, changeType);
-
-                    ti.setData(result);
-                }
-            };
+            SearchResponse response = new SearchResponse();
 
             changelog.search(request, response);
+
+            while (response.hasNext()) {
+                SearchResult result = response.next();
+
+                Attributes attributes = result.getAttributes();
+                String changeNumber = attributes.getValue("changeNumber").toString();
+                String targetDn = (String)attributes.getValue("targetDN");
+                String changeType = (String)attributes.getValue("changeType");
+
+                TableItem ti = new TableItem(table, SWT.NONE);
+
+                ti.setText(0, changeNumber);
+                ti.setText(1, targetDn);
+                ti.setText(2, changeType);
+
+                ti.setData(result);
+            }
 
             table.select(indices);
 

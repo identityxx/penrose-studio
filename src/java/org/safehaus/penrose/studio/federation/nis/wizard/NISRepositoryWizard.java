@@ -76,59 +76,39 @@ public class NISRepositoryWizard extends Wizard {
     }
 
     public boolean performFinish() {
-
-        NISDomain repository = new NISDomain();
-        repository.setName(repositoryPage.getRepository());
-        repository.setFullName(domainPage.getDomain());
-        repository.setServer(domainPage.getServer());
-        repository.setSuffix(partitionPage.getSuffix());
-        repository.setNssSuffix(partitionPage.getNssSuffix());
-
         try {
+            NISDomain repository = new NISDomain();
+            repository.setName(repositoryPage.getRepository());
+            repository.setFullName(domainPage.getDomain());
+            repository.setServer(domainPage.getServer());
+            repository.setSuffix(partitionPage.getSuffix());
+            repository.setNssSuffix(partitionPage.getNssSuffix());
+
             nisFederation.addRepository(repository);
 
-        } catch (Exception e) {
-            MessageDialog.openError(getShell(), "Failed creating repository.", e.getMessage());
-            return false;
-        }
-
-        PartitionConfig partitionConfig = null;
-        PartitionConfig nssPartitionConfig = null;
-        try {
-            partitionConfig = nisFederation.createPartitionConfig(repository);
+            PartitionConfig partitionConfig = nisFederation.createPartitionConfig(repository);
             project.upload("partitions/"+ repository.getName());
 
-            nssPartitionConfig = nisFederation.createNssPartitionConfig(repository);
+            PartitionConfig nssPartitionConfig = nisFederation.createNssPartitionConfig(repository);
             project.upload("partitions/"+ nssPartitionConfig.getName());
 
-        } catch (Exception e) {
-            MessageDialog.openError(getShell(), "Failed creating partition.", e.getMessage());
-            return false;
-        }
-
-        try {
             nisFederation.createDatabase(repository);
 
-        } catch (Exception e) {
-            MessageDialog.openError(getShell(), "Failed creating database.", e.getMessage());
-            return false;
-        }
+            PenroseClient penroseClient = project.getClient();
 
-        PenroseClient penroseClient = project.getClient();
-
-        try {
             penroseClient.startPartition(repository.getName());
             nisFederation.loadPartition(partitionConfig);
 
             penroseClient.startPartition(nssPartitionConfig.getName());
             nisFederation.loadPartition(nssPartitionConfig);
 
+            return true;
+
         } catch (Exception e) {
-            MessageDialog.openError(getShell(), "Failed initializing partition.", e.getMessage());
+            log.error(e.getMessage(), e);
+            MessageDialog.openError(getShell(), "Action Failed", e.getMessage());
             return false;
         }
-
-        return true;
     }
 
     public boolean needsPreviousAndNextButtons() {

@@ -19,20 +19,16 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
-import org.safehaus.penrose.studio.federation.nis.editor.NISEditor;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.Partitions;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.PartitionClient;
-import org.safehaus.penrose.management.SchedulerClient;
-import org.safehaus.penrose.management.JobClient;
+import org.safehaus.penrose.management.*;
 import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
-import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.QueryResponse;
+import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 
 import java.util.ArrayList;
 import java.sql.ResultSet;
@@ -51,6 +47,7 @@ public class NISLDAPPage extends FormPage {
 
     FormToolkit toolkit;
 
+    Project project;
     NISEditor editor;
     NISFederation nisFederation;
 
@@ -60,6 +57,7 @@ public class NISLDAPPage extends FormPage {
         super(editor, "LDAP", "  LDAP  ");
 
         this.editor = editor;
+        this.project = editor.getProject();
         this.nisFederation = nisFederation;
     }
 
@@ -158,32 +156,33 @@ public class NISLDAPPage extends FormPage {
 
                     TableItem[] items = table.getSelection();
 
-                    Partitions partitions = nisFederation.getPartitions();
+                    PenroseClient penroseClient = project.getClient();
 
                     for (TableItem ti : items) {
-                        NISDomain domain = (NISDomain)ti.getData();
-
-                        Partition partition = partitions.getPartition(domain.getName());
-
-                        final Source penrose = partition.getSource("Penrose");
-                        final Source ldap = partition.getSource("LDAP");
-
                         try {
+                            NISDomain domain = (NISDomain)ti.getData();
+
+                            PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
+
+                            SourceClient penrose = partitionClient.getSourceClient("Penrose");
+                            SourceClient ldap = partitionClient.getSourceClient("LDAP");
+
                             SearchRequest request = new SearchRequest();
-                            SearchResponse response = new SearchResponse() {
-                                public void add(SearchResult result) throws Exception {
-
-                                    log.debug("Adding "+result.getDn());
-
-                                    try {
-                                        ldap.add(result.getDn(), result.getAttributes());
-                                    } catch (Exception e) {
-                                        log.error(e.getMessage());
-                                    }
-                                }
-                            };
+                            SearchResponse response = new SearchResponse();
 
                             penrose.search(request, response);
+
+                            while (response.hasNext()) {
+                                SearchResult result = response.next();
+
+                                log.debug("Adding "+result.getDn());
+
+                                try {
+                                    ldap.add(result.getDn(), result.getAttributes());
+                                } catch (Exception e) {
+                                    log.error(e.getMessage());
+                                }
+                            }
 
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
@@ -221,25 +220,26 @@ public class NISLDAPPage extends FormPage {
 
                     TableItem[] items = table.getSelection();
 
-                    Partitions partitions = nisFederation.getPartitions();
+                    PenroseClient penroseClient = project.getClient();
 
                     for (TableItem ti : items) {
-                        NISDomain domain = (NISDomain)ti.getData();
-
-                        Partition partition = partitions.getPartition(domain.getName());
-
-                        final ArrayList<DN> dns = new ArrayList<DN>();
-                        final Source ldap = partition.getSource("LDAP");
-
                         try {
+                            NISDomain domain = (NISDomain)ti.getData();
+
+                            PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
+
+                            ArrayList<DN> dns = new ArrayList<DN>();
+                            SourceClient ldap = partitionClient.getSourceClient("LDAP");
+
                             SearchRequest request = new SearchRequest();
-                            SearchResponse response = new SearchResponse() {
-                                public void add(SearchResult result) throws Exception {
-                                    dns.add(result.getDn());
-                                }
-                            };
+                            SearchResponse response = new SearchResponse();
 
                             ldap.search(request, response);
+
+                            while (response.hasNext()) {
+                                SearchResult result = response.next();
+                                dns.add(result.getDn());
+                            }
 
                             for (int i=dns.size()-1; i>=0; i--) {
                                 DN dn = dns.get(i);
@@ -328,11 +328,14 @@ public class NISLDAPPage extends FormPage {
 
             table.removeAll();
 
+            PenroseClient penroseClient = project.getClient();
             Partitions partitions = nisFederation.getPartitions();
 
             for (NISDomain domain : nisFederation.getRepositories()) {
+                PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
+                SourceClient ldap = partitionClient.getSourceClient("LDAP");
+
                 Partition partition = partitions.getPartition(domain.getName());
-                Source ldap = partition.getSource("LDAP");
 
                 boolean exists;
 
@@ -351,9 +354,9 @@ public class NISLDAPPage extends FormPage {
                 }
 
                 Source tracker = partition.getSource("tracker");
+
                 Connection connection = tracker.getConnection();
-                JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
-                JDBCClient client = adapter.getClient();
+                JDBCConnection jdbcConnection = (JDBCConnection)connection;
 
                 QueryResponse response = new QueryResponse() {
                     public void add(Object object) throws Exception {
@@ -362,8 +365,8 @@ public class NISLDAPPage extends FormPage {
                     }
                 };
 
-                client.executeQuery(
-                        "select max(changeNumber), max(changeTimestamp) from "+client.getTableName(tracker), response
+                jdbcConnection.executeQuery(
+                        "select max(changeNumber), max(changeTimestamp) from "+jdbcConnection.getTableName(tracker), response
                 );
 
                 String lastChangeNumber;

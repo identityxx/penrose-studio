@@ -19,24 +19,12 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.PartitionClient;
 import org.safehaus.penrose.management.SourceClient;
-import org.safehaus.penrose.partition.PartitionConfigs;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.source.SourceConfigs;
-import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
-import org.safehaus.penrose.jdbc.JDBCClient;
-import org.safehaus.penrose.jdbc.Assignment;
-import org.safehaus.penrose.jdbc.QueryResponse;
 
 import java.util.*;
-import java.sql.ResultSet;
 
 /**
  * @author Endi S. Dewata
@@ -71,12 +59,9 @@ public class NISDatabaseTablesPage extends FormPage {
         penroseClient = project.getClient();
         partitionClient = penroseClient.getPartitionClient(domain.getName());
 
-        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-        PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName());
-
-        for (SourceConfig sourceConfig : partitionConfig.getSourceConfigs().getSourceConfigs()) {
-            if (!NISFederation.CACHE_CONNECTION_NAME.equals(sourceConfig.getConnectionName())) continue;
-            String sourceName = sourceConfig.getName();
+        for (String sourceName : partitionClient.getSourceNames()) {
+            SourceClient sourceClient = partitionClient.getSourceClient(sourceName);
+            if (!NISFederation.CACHE_CONNECTION_NAME.equals(sourceClient.getConnectionName())) continue;
             sources.add(sourceName);
         }
     }
@@ -279,40 +264,17 @@ public class NISDatabaseTablesPage extends FormPage {
 
             table.removeAll();
 
-            Partition partition = nisFederation.getPartition();
-            Connection connection = partition.getConnection(Federation.JDBC);
-            JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
-            JDBCClient client = adapter.getClient();
-
-            PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-            PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName());
-
-            SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
-
             for (String sourceName : sources) {
                 log.debug("Checking table for "+sourceName+".");
 
-                SourceConfig sourceConfig = sourceConfigs.getSourceConfig(sourceName);
+                SourceClient sourceClient = partitionClient.getSourceClient(sourceName);
 
                 final TableItem ti = new TableItem(table, SWT.NONE);
                 ti.setText(0, sourceName);
                 ti.setData(sourceName);
 
                 try {
-                    String table = client.getTableName(sourceConfig);
-                    String sql = "select count(*) from "+table;
-
-                    Collection<Assignment> assignments = new ArrayList<Assignment>();
-
-                    QueryResponse queryResponse = new QueryResponse() {
-                        public void add(Object object) throws Exception {
-                            ResultSet rs = (ResultSet)object;
-                            Integer count = rs.getInt(1);
-                            ti.setText(1, count.toString());
-                        }
-                    };
-
-                    client.executeQuery(sql, assignments, queryResponse);
+                    ti.setText(1, sourceClient.getCount().toString());
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);

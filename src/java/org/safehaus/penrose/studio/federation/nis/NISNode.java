@@ -138,7 +138,7 @@ public class NISNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        return true;
+        return !children.isEmpty();
     }
 
     public Collection<Node> getChildren() throws Exception {

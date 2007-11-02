@@ -37,7 +37,6 @@ public class LDAPFederation {
     public Logger log = Logger.getLogger(getClass());
 
     private Project project;
-    private Partition partition;
     private Federation federation;
 
     private Map<String,LDAPRepository> repositories = new TreeMap<String,LDAPRepository>();
@@ -46,7 +45,6 @@ public class LDAPFederation {
 
     public LDAPFederation(Federation federation) throws Exception {
         this.federation = federation;
-        this.partition = federation.getPartition();
         this.project = federation.getProject();
     }
 
@@ -55,7 +53,9 @@ public class LDAPFederation {
 
         for (Repository rep : federation.getRepositories("LDAP")) {
 
-            if (monitor.isCanceled()) break;
+            if (monitor.isCanceled()) {
+                throw new InterruptedException();
+            }
 
             LDAPRepository repository = (LDAPRepository)rep;
             String name = repository.getName();
@@ -228,24 +228,12 @@ public class LDAPFederation {
         this.repositories = repositories;
     }
 
-    public Partitions getPartitions() {
-        return federation.getPartitions();
-    }
-
     public Project getProject() {
         return project;
     }
 
     public void setProject(Project project) {
         this.project = project;
-    }
-
-    public Partition getPartition() {
-        return partition;
-    }
-
-    public void setPartition(Partition partition) {
-        this.partition = partition;
     }
 
     public Federation getFederation() {

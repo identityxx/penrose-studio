@@ -5,7 +5,6 @@ import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.Repository;
-import org.safehaus.penrose.partition.Partition;
 
 /**
  * @author Endi S. Dewata
@@ -13,7 +12,6 @@ import org.safehaus.penrose.partition.Partition;
 public class LinkingEditorInput implements IEditorInput {
 
     private Project project;
-    private Partition partition;
     private Repository repository;
 
     public LinkingEditorInput() {
@@ -28,7 +26,7 @@ public class LinkingEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "Identity Linking - "+ partition.getName();
+        return "Identity Linking - "+ repository.getName();
     }
 
     public IPersistableElement getPersistable() {
@@ -45,7 +43,7 @@ public class LinkingEditorInput implements IEditorInput {
 
     public int hashCode() {
         return (project == null ? 0 : project.hashCode()) +
-                (partition == null ? 0 : partition.hashCode());
+                (repository == null ? 0 : repository.hashCode());
     }
 
     boolean equals(Object o1, Object o2) {
@@ -61,7 +59,7 @@ public class LinkingEditorInput implements IEditorInput {
 
         LinkingEditorInput ei = (LinkingEditorInput)object;
         if (!equals(project, ei.project)) return false;
-        if (!equals(partition, ei.partition)) return false;
+        if (!equals(repository, ei.repository)) return false;
 
         return true;
     }
@@ -72,14 +70,6 @@ public class LinkingEditorInput implements IEditorInput {
 
     public void setProject(Project project) {
         this.project = project;
-    }
-
-    public Partition getPartition() {
-        return partition;
-    }
-
-    public void setPartition(Partition partition) {
-        this.partition = partition;
     }
 
     public Repository getRepository() {

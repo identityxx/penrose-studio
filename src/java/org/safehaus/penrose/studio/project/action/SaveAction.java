@@ -57,6 +57,8 @@ public class SaveAction extends Action {
         try {
             ServersView serversView = ServersView.getInstance();
             ProjectNode projectNode = serversView.getSelectedProjectNode();
+            if (projectNode == null) return;
+
             Project project = projectNode.getProject();
 
             project.save();

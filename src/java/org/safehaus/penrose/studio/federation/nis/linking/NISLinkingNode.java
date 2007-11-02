@@ -9,6 +9,7 @@ import org.safehaus.penrose.studio.federation.linking.LinkingEditorInput;
 import org.safehaus.penrose.studio.federation.linking.LinkingEditor;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.partition.Partition;
 import org.eclipse.jface.action.IMenuManager;
@@ -22,6 +23,8 @@ import org.eclipse.ui.IWorkbenchPage;
  */
 public class NISLinkingNode extends Node {
 
+    private ProjectNode projectNode;
+    private NISNode nisNode;
     private NISDomainNode domainNode;
     private NISFederation nisFederation;
 
@@ -35,6 +38,8 @@ public class NISLinkingNode extends Node {
         );
 
         this.domainNode = domainNode;
+        this.nisNode = domainNode.getNisNode();
+        this.projectNode = nisNode.getProjectNode();
 
         NISNode nisNode = domainNode.getNisNode();
         nisFederation = nisNode.getNisFederation();
@@ -55,12 +60,9 @@ public class NISLinkingNode extends Node {
 
     public void open() throws Exception {
 
-        NISDomain repository = domainNode.getDomain();
-        Partition partition = nisFederation.getPartitions().getPartition(repository.getName());
-
         LinkingEditorInput ei = new LinkingEditorInput();
-        ei.setPartition(partition);
-        ei.setRepository(repository);
+        ei.setProject(projectNode.getProject());
+        ei.setRepository(domainNode.getDomain());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();

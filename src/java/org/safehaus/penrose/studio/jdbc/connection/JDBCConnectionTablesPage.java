@@ -31,7 +31,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.source.TableConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.jdbc.JDBCClient;
-import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
+import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -233,10 +233,9 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
             Connections connections = partition.getConnections();
             Connection connection = connections.createConnection(connectionConfig);
 
-            JDBCAdapter jdbcAdapter = (JDBCAdapter)connection.getAdapter();
-            JDBCClient client = jdbcAdapter.getClient();
+            JDBCConnection jdbcConnection = (JDBCConnection)connection;
 
-            Collection<String> catalogs = client.getCatalogs();
+            Collection<String> catalogs = jdbcConnection.getCatalogs();
 
             catalogCombo.add("");
             for (String catalogName : catalogs) {
@@ -249,7 +248,7 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
                 catalogCombo.select(0);
             }
 
-            Collection<String> schemas = client.getSchemas();
+            Collection<String> schemas = jdbcConnection.getSchemas();
 
             schemaCombo.add("");
             for (String schemaName : schemas) {
@@ -263,7 +262,7 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
             }
 
             try {
-                Collection<TableConfig> tables = client.getTables(getCatalog(), getSchema());
+                Collection<TableConfig> tables = jdbcConnection.getTables(getCatalog(), getSchema());
 
                 for (TableConfig tableConfig : tables) {
                     TableItem item = new TableItem(tablesTable, SWT.NONE);
@@ -317,11 +316,10 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
             Connections connections = partition.getConnections();
             Connection connection = connections.createConnection(connectionConfig);
 
-            JDBCAdapter jdbcAdapter = (JDBCAdapter)connection.getAdapter();
-            JDBCClient client = jdbcAdapter.getClient();
+            JDBCConnection jdbcConnection = (JDBCConnection)connection;
 
             try {
-                Collection<TableConfig> tables = client.getTables(getCatalog(), getSchema());
+                Collection<TableConfig> tables = jdbcConnection.getTables(getCatalog(), getSchema());
 
                 for (TableConfig tableConfig : tables) {
                     TableItem item = new TableItem(tablesTable, SWT.NONE);

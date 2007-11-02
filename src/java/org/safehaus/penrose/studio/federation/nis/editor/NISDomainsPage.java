@@ -222,7 +222,6 @@ public class NISDomainsPage extends FormPage {
                             project.removeDirectory("partitions/"+nssPartitionConfig.getName());
 
                             nisFederation.removeRepository(partitionConfig.getName());
-                            nisFederation.removeRepository(nssPartitionConfig.getName());
 
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);

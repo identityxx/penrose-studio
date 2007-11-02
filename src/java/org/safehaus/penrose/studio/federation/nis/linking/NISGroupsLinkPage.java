@@ -24,10 +24,9 @@ import org.safehaus.penrose.filter.SubstringFilter;
 import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.filter.FilterTool;
 import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
-import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.QueryResponse;
+import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -66,7 +65,7 @@ public class NISGroupsLinkPage extends FormPage {
 
     Partition partition;
 
-    JDBCClient client;
+    JDBCConnection jdbcConnection;
 
     Source localGroups;
     Source globalGroups;
@@ -82,8 +81,7 @@ public class NISGroupsLinkPage extends FormPage {
         partition = nisFederation.getPartitions().getPartition(domain.getName());
 
         Connection connection = partition.getConnection(NISFederation.CACHE_CONNECTION_NAME);
-        JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
-        client = adapter.getClient();
+        jdbcConnection = (JDBCConnection)connection;
 
         localGroups = partition.getSource("local_groups");
         globalGroups = partition.getSource("global_groups");
@@ -736,8 +734,8 @@ public class NISGroupsLinkPage extends FormPage {
             }
         };
 
-        client.executeQuery(
-                "select globalCn from "+client.getTableName(groupsLink)+" where cn=?",
+        jdbcConnection.executeQuery(
+                "select globalCn from "+ jdbcConnection.getTableName(groupsLink)+" where cn=?",
                 assignments,
                 queryResponse
         );
@@ -751,8 +749,8 @@ public class NISGroupsLinkPage extends FormPage {
         assignments.add(new Assignment(cn));
         assignments.add(new Assignment(globalCn));
 
-        client.executeUpdate(
-                "insert into "+client.getTableName(groupsLink)+" (cn, globalCn) values (?, ?)",
+        jdbcConnection.executeUpdate(
+                "insert into "+ jdbcConnection.getTableName(groupsLink)+" (cn, globalCn) values (?, ?)",
                 assignments
         );
     }
@@ -763,8 +761,8 @@ public class NISGroupsLinkPage extends FormPage {
         assignments.add(new Assignment(globalCn));
         assignments.add(new Assignment(cn));
 
-        client.executeUpdate(
-                "update "+client.getTableName(groupsLink)+" set globalCn=? where cn=?",
+        jdbcConnection.executeUpdate(
+                "update "+ jdbcConnection.getTableName(groupsLink)+" set globalCn=? where cn=?",
                 assignments
         );
     }
@@ -774,8 +772,8 @@ public class NISGroupsLinkPage extends FormPage {
         Collection<Assignment> assignments = new ArrayList<Assignment>();
         assignments.add(new Assignment(cn));
 
-        client.executeUpdate(
-                "delete from "+client.getTableName(groupsLink)+" where cn=?",
+        jdbcConnection.executeUpdate(
+                "delete from "+ jdbcConnection.getTableName(groupsLink)+" where cn=?",
                 assignments
         );
     }

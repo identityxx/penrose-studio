@@ -31,6 +31,8 @@ public class ConnectAction extends Action {
         try {
             ServersView serversView = ServersView.getInstance();
             ProjectNode projectNode = serversView.getSelectedProjectNode();
+            if (projectNode == null) return;
+
             Project project = projectNode.getProject();
 
             if (!project.isConnected()) projectNode.connect();

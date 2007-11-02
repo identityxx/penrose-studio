@@ -16,13 +16,14 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.partition.Partitions;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.source.Source;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.ldap.SearchResult;
 import org.safehaus.penrose.ldap.SearchRequest;
 import org.safehaus.penrose.ldap.SearchResponse;
 import org.safehaus.penrose.ldap.Attributes;
+import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.management.SourceClient;
+import org.safehaus.penrose.management.PenroseClient;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -47,20 +48,21 @@ public class NISLDAPErrorsPage extends FormPage {
     Text descriptionText;
     Text noteText;
 
-    Partition partition;
-    Source errors;
+    Project project;
+    PartitionClient partitionClient;
+    SourceClient errors;
 
-    public NISLDAPErrorsPage(NISLDAPEditor editor) {
+    public NISLDAPErrorsPage(NISLDAPEditor editor) throws Exception {
         super(editor, "ERRORS", "  Errors  ");
 
         this.editor = editor;
+        this.project = editor.getProject();
         this.nisFederation = editor.getNisTool();
         this.domain = editor.getDomain();
 
-        Partitions partitions = nisFederation.getPartitions();
-        partition = partitions.getPartition(domain.getName());
-
-        errors = partition.getSource("errors");
+        PenroseClient penroseClient = project.getClient();
+        partitionClient = penroseClient.getPartitionClient(domain.getName());
+        errors = partitionClient.getSourceClient("errors");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -198,26 +200,26 @@ public class NISLDAPErrorsPage extends FormPage {
             table.removeAll();
 
             SearchRequest request = new SearchRequest();
-
-            SearchResponse response = new SearchResponse() {
-                public void add(SearchResult result) {
-
-                    Attributes attributes = result.getAttributes();
-                    String id = attributes.getValue("id").toString();
-                    Timestamp time = (Timestamp)attributes.getValue("time");
-                    String title = (String)attributes.getValue("title");
-
-                    TableItem ti = new TableItem(table, SWT.NONE);
-
-                    ti.setText(0, id);
-                    ti.setText(1, df.format(time));
-                    ti.setText(2, title);
-
-                    ti.setData(result);
-                }
-            };
+            SearchResponse response = new SearchResponse();
 
             errors.search(request, response);
+
+            while (response.hasNext()) {
+                SearchResult result = response.next();
+
+                Attributes attributes = result.getAttributes();
+                String id = attributes.getValue("id").toString();
+                Timestamp time = (Timestamp)attributes.getValue("time");
+                String title = (String)attributes.getValue("title");
+
+                TableItem ti = new TableItem(table, SWT.NONE);
+
+                ti.setText(0, id);
+                ti.setText(1, df.format(time));
+                ti.setText(2, title);
+
+                ti.setData(result);
+            }
 
             table.select(indices);
 

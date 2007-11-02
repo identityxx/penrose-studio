@@ -17,14 +17,8 @@ import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
-import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.PartitionClient;
-import org.safehaus.penrose.management.SchedulerClient;
-import org.safehaus.penrose.management.JobClient;
-import org.safehaus.penrose.partition.Partitions;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.management.*;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.source.Source;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -41,6 +35,7 @@ public class NISLDAPTrackerPage extends FormPage {
 
     FormToolkit toolkit;
 
+    Project project;
     NISLDAPEditor editor;
     NISFederation nisFederation;
     NISDomain domain;
@@ -51,6 +46,7 @@ public class NISLDAPTrackerPage extends FormPage {
         super(editor, "TRACKER", "  Tracker  ");
 
         this.editor = editor;
+        this.project = editor.getProject();
         this.nisFederation = editor.getNisTool();
         this.domain = editor.getDomain();
     }
@@ -170,28 +166,29 @@ public class NISLDAPTrackerPage extends FormPage {
 
             trackerTable.removeAll();
 
-            Partitions partitions = nisFederation.getPartitions();
-            Partition partition = partitions.getPartition(domain.getName());
-            Source tracker = partition.getSource("tracker");
+            PenroseClient penroseClient = project.getClient();
+            PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
+            SourceClient tracker = partitionClient.getSourceClient("tracker");
 
             SearchRequest request = new SearchRequest();
-            SearchResponse response = new SearchResponse() {
-                public void add(SearchResult result) {
-
-                    Attributes attributes = result.getAttributes();
-                    String changeNumber = attributes.getValue("changeNumber").toString();
-                    String changeTimestamp = df.format((Timestamp)attributes.getValue("changeTimestamp"));
-
-                    TableItem ti = new TableItem(trackerTable, SWT.NONE);
-
-                    ti.setText(0, changeNumber);
-                    ti.setText(1, changeTimestamp);
-
-                    ti.setData(result);
-                }
-            };
+            SearchResponse response = new SearchResponse();
 
             tracker.search(request, response);
+
+            while (response.hasNext()) {
+                SearchResult result = response.next();
+
+                Attributes attributes = result.getAttributes();
+                String changeNumber = attributes.getValue("changeNumber").toString();
+                String changeTimestamp = df.format((Timestamp)attributes.getValue("changeTimestamp"));
+
+                TableItem ti = new TableItem(trackerTable, SWT.NONE);
+
+                ti.setText(0, changeNumber);
+                ti.setText(1, changeTimestamp);
+
+                ti.setData(result);
+            }
 
             trackerTable.select(indices);
 

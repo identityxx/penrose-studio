@@ -7,6 +7,8 @@ import org.safehaus.penrose.config.PenroseConfigWriter;
 import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.partition.PartitionReader;
+import org.safehaus.penrose.partition.DefaultPartitionConfig;
 import org.safehaus.penrose.service.ServiceConfigs;
 import org.safehaus.penrose.studio.logger.LoggerManager;
 import org.safehaus.penrose.studio.util.FileUtil;
@@ -21,6 +23,7 @@ import org.safehaus.penrose.connection.ConnectionWriter;
 import org.safehaus.penrose.connection.ConnectionConfigs;
 import org.safehaus.penrose.module.ModuleWriter;
 import org.safehaus.penrose.module.ModuleConfigs;
+import org.safehaus.penrose.adapter.AdapterConfig;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -111,11 +114,33 @@ public class Project {
 
         monitor.worked(1);
 
+        log.debug("----------------------------------------------------------------------------------");
+        log.debug("Loading DEFAULT partition...");
+
+        File conf = new File(workDir, "conf");
+
+        PartitionReader partitionReader = partitionConfigs.getPartitionReader();
+
+        PartitionConfig defaultPartitionConfig = new DefaultPartitionConfig();
+
+        for (AdapterConfig adapterConfig : penroseConfig.getAdapterConfigs()) {
+            defaultPartitionConfig.addAdapterConfig(adapterConfig);
+        }
+
+        partitionReader.read(conf, defaultPartitionConfig.getConnectionConfigs());
+        partitionReader.read(conf, defaultPartitionConfig.getSourceConfigs());
+        partitionReader.read(conf, defaultPartitionConfig.getDirectoryConfig());
+        partitionReader.read(conf, defaultPartitionConfig.getModuleConfigs());
+
+        partitionConfigs.addPartitionConfig(defaultPartitionConfig);
+
+        monitor.worked(1);
+
         for (String partitionName : partitionConfigs.getAvailablePartitionNames()) {
 
             if (debug) log.debug("----------------------------------------------------------------------------------");
 
-            monitor.subTask("Loading "+partitionName+"...");
+            monitor.subTask("Loading "+partitionName+" partition...");
             
             PartitionConfig partitionConfig = partitionConfigs.load(partitionName);
             partitionConfigs.addPartitionConfig(partitionConfig);

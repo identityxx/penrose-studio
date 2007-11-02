@@ -8,17 +8,10 @@ import org.safehaus.penrose.studio.connection.wizard.ConnectionDriverPage;
 import org.safehaus.penrose.studio.jdbc.connection.JDBCConnectionWizardPage;
 import org.safehaus.penrose.studio.driver.Driver;
 import org.safehaus.penrose.studio.util.Helper;
-import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.jdbc.JDBCClient;
-import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.config.PenroseConfig;
-import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.source.SourceConfigs;
-import org.safehaus.penrose.source.SourceConfig;
 
 import java.util.Map;
 import java.io.File;
@@ -86,50 +79,7 @@ public class FederationWizard extends Wizard {
             Map<String,String> parameters = jdbcPage.getParameters();
             parameters.put(JDBCClient.URL, url);
             jdbcConfig.setParameters(parameters);
-/*
-            log.debug("Creating partition "+Federation.PARTITION +".");
 
-            File sampleDir = new File(project.getWorkDir(), "samples/"+Federation.PARTITION);
-            File partitionDir = new File(project.getWorkDir(), "partitions/"+Federation.PARTITION);
-            FileUtil.copy(sampleDir, partitionDir);
-
-            PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-            partitionConfigs.addPartitionConfig(partitionConfig);
-            project.save(partitionConfig);
-
-            log.debug("Initializing partition "+Federation.PARTITION +".");
-
-            PenroseConfig penroseConfig = project.getPenroseConfig();
-            PenroseContext penroseContext = project.getPenroseContext();
-
-            PartitionFactory partitionFactory = new PartitionFactory();
-            partitionFactory.setPartitionsDir(partitionConfigs.getPartitionsDir());
-            partitionFactory.setPenroseConfig(penroseConfig);
-            partitionFactory.setPenroseContext(penroseContext);
-
-            Partition partition = partitionFactory.createPartition(partitionConfig);
-
-            log.debug("Creating database tables in "+Federation.PARTITION +".");
-
-            Connection connection = partition.getConnection(Federation.JDBC);
-
-            JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
-            JDBCClient client = adapter.getClient();
-            try {
-                client.createDatabase(Federation.PARTITION);
-            } catch (Exception e) {
-                log.debug(e.getMessage());
-            }
-
-            SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
-            for (SourceConfig sourceConfig : sourceConfigs.getSourceConfigs()) {
-                try {
-                    client.createTable(sourceConfig);
-                } catch (Exception e) {
-                    log.debug(e.getMessage());
-                }
-            }
-*/
             return true;
 
         } catch (Exception e) {

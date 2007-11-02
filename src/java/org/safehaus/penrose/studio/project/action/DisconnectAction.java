@@ -30,6 +30,7 @@ public class DisconnectAction extends Action {
         try {
             ServersView serversView = ServersView.getInstance();
             ProjectNode projectNode = serversView.getSelectedProjectNode();
+            if (projectNode == null) return;
 
             projectNode.disconnect();
             serversView.close(projectNode);

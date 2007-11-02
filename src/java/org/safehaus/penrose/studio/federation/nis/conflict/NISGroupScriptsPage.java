@@ -28,10 +28,9 @@ import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
-import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.QueryResponse;
+import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 import org.safehaus.penrose.connection.Connection;
 
 import java.util.Collection;
@@ -366,8 +365,7 @@ public class NISGroupScriptsPage extends FormPage {
 
         Partition partition = nisFederation.getPartition();
         Connection connection = partition.getConnection(Federation.JDBC);
-        JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
-        JDBCClient client = adapter.getClient();
+        JDBCConnection jdbcConnection = (JDBCConnection)connection;
 
         for (NISDomain repository : nisFederation.getRepositories()) {
             final String name = repository.getName();
@@ -376,7 +374,7 @@ public class NISGroupScriptsPage extends FormPage {
             PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(name);
             SourceConfig sourceConfig = partitionConfig.getSourceConfigs().getSourceConfig(NISFederation.CACHE_GROUPS);
 
-            String table = client.getTableName(sourceConfig);
+            String table = jdbcConnection.getTableName(sourceConfig);
 
             String sql = "select a.cn, a.gidNumber, b.gidNumber" +
                     " from "+table+" a"+
@@ -414,7 +412,7 @@ public class NISGroupScriptsPage extends FormPage {
                 }
             };
 
-            client.executeQuery(sql, assignments, queryResponse);
+            jdbcConnection.executeQuery(sql, assignments, queryResponse);
         }
     }
 

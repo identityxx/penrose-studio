@@ -282,8 +282,15 @@ public class ProjectNode extends Node {
     }
 
     public void disconnect() throws Exception {
+        try {
+            project.close();
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            MessageDialog.openError(serversView.getSite().getShell(), "Action Failed", e.getMessage());
+        }
+
         children.clear();
-        project.close();
     }
 
     public void edit() throws Exception {

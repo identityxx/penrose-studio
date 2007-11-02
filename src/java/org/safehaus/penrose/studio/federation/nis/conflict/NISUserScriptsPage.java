@@ -27,10 +27,9 @@ import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
-import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.QueryResponse;
+import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.PartitionClient;
@@ -370,8 +369,7 @@ public class NISUserScriptsPage extends FormPage {
 
         Partition partition = nisFederation.getPartition();
         Connection connection = partition.getConnection(Federation.JDBC);
-        JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
-        JDBCClient client = adapter.getClient();
+        JDBCConnection jdbcConnection = (JDBCConnection)connection;
 
         for (NISDomain repository : nisFederation.getRepositories()) {
             final String name = repository.getName();
@@ -380,7 +378,7 @@ public class NISUserScriptsPage extends FormPage {
             PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(name);
             SourceConfig sourceConfig = partitionConfig.getSourceConfigs().getSourceConfig(NISFederation.CACHE_USERS);
 
-            String table = client.getTableName(sourceConfig);
+            String table = jdbcConnection.getTableName(sourceConfig);
 
             String sql = "select a.uid, a.uidNumber, b.uidNumber" +
                     " from "+table+" a"+
@@ -418,7 +416,7 @@ public class NISUserScriptsPage extends FormPage {
                 }
             };
 
-            client.executeQuery(sql, assignments, queryResponse);
+            jdbcConnection.executeQuery(sql, assignments, queryResponse);
         }
     }
 

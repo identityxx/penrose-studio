@@ -29,17 +29,19 @@ public class DeleteProjectAction extends Action {
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
-        boolean confirm = MessageDialog.openQuestion(
-                window.getShell(),
-                "Removing Server", "Are you sure?"
-        );
-
-        if (!confirm) return;
-
         try {
             ServersView serversView = ServersView.getInstance();
             ProjectNode projectNode = serversView.getSelectedProjectNode();
+            if (projectNode == null) return;
+
             Project project = projectNode.getProject();
+
+            boolean confirm = MessageDialog.openQuestion(
+                    window.getShell(),
+                    "Removing Server", "Are you sure?"
+            );
+
+            if (!confirm) return;
 
             serversView.removeProjectConfig(project.getName());
 

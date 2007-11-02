@@ -10,7 +10,6 @@ import org.safehaus.penrose.studio.federation.nis.ldap.NISLDAPNode;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.nis.database.NISDatabaseNode;
-import org.safehaus.penrose.studio.federation.nis.consolidation.NISConsolidationNode;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
@@ -44,7 +43,6 @@ public class NISDomainNode extends Node {
     NISLinkingNode   linkingNode;
     NISConflictsNode conflictsNode;
     NISOwnershipNode ownershipNode;
-    NISConsolidationNode consolidationNode;
 
     public NISDomainNode(String name, NISDomain domain, NISNode nisNode) {
         super(

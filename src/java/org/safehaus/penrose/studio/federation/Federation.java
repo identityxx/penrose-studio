@@ -14,8 +14,7 @@ import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
-import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -50,10 +49,24 @@ public class Federation {
     private LDAPFederation ldapFederation;
     private NISFederation nisFederation;
 
-    protected Partitions partitions = new Partitions();
-
     public Federation(Project project) throws Exception {
         this.project = project;
+
+        PenroseConfig penroseConfig = project.getPenroseConfig();
+        PenroseContext penroseContext = project.getPenroseContext();
+        Partitions partitions = penroseContext.getPartitions();
+
+        File partitionsDir = new File(project.getWorkDir(), "partitions");
+
+        PartitionFactory partitionFactory = new PartitionFactory();
+        partitionFactory.setPartitionsDir(partitionsDir);
+        partitionFactory.setPenroseConfig(penroseConfig);
+        partitionFactory.setPenroseContext(penroseContext);
+
+        PartitionConfig defaultPartitionconfig = project.getPartitionConfigs().getPartitionConfig("DEFAULT");
+        Partition defaultPartition = partitionFactory.createPartition(defaultPartitionconfig);
+
+        partitions.addPartition(defaultPartition);
     }
 
     public void create(PartitionConfig partitionConfig) throws Exception {
@@ -86,10 +99,9 @@ public class Federation {
 
         Connection connection = partition.getConnection(Federation.JDBC);
 
-        JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
-        JDBCClient client = adapter.getClient();
+        JDBCConnection adapter = (JDBCConnection)connection;
         try {
-            client.createDatabase(Federation.PARTITION);
+            adapter.createDatabase(Federation.PARTITION);
         } catch (Exception e) {
             log.debug(e.getMessage());
         }
@@ -97,7 +109,7 @@ public class Federation {
         SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
         for (SourceConfig sourceConfig : sourceConfigs.getSourceConfigs()) {
             try {
-                client.createTable(sourceConfig);
+                adapter.createTable(sourceConfig);
             } catch (Exception e) {
                 log.debug(e.getMessage());
             }
@@ -109,10 +121,10 @@ public class Federation {
         log.debug("Starting Federation tool.");
 
         File partitionsDir = new File(project.getWorkDir(), "partitions");
+
         PenroseConfig penroseConfig = project.getPenroseConfig();
         PenroseContext penroseContext = project.getPenroseContext();
-
-        PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(PARTITION);
+        Partitions partitions = penroseContext.getPartitions();
 
         PartitionFactory partitionFactory = new PartitionFactory();
         partitionFactory.setPartitionsDir(partitionsDir);
@@ -121,7 +133,10 @@ public class Federation {
 
         monitor.subTask("Initializing...");
 
+        PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(PARTITION);
         partition = partitionFactory.createPartition(partitionConfig);
+
+        partitions.addPartition(partition);
 
         monitor.worked(1);
 
@@ -404,6 +419,7 @@ public class Federation {
 
         Partition partition = partitionFactory.createPartition(partitionConfig);
 
+        Partitions partitions = penroseContext.getPartitions();
         partitions.addPartition(partition);
     }
 
@@ -412,15 +428,13 @@ public class Federation {
         String name = repository.getName();
         log.debug("Removing partition config "+name+".");
 
+        PenroseContext penroseContext = project.getPenroseContext();
+        Partitions partitions = penroseContext.getPartitions();
         partitions.removePartition(name);
     }
 
     public Partitions getPartitions() {
-        return partitions;
+        PenroseContext penroseContext = project.getPenroseContext();
+        return penroseContext.getPartitions();
     }
-
-    public void setPartitions(Partitions partitions) {
-        this.partitions = partitions;
-    }
-
 }

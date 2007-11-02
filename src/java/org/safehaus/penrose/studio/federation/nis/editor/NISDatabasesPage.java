@@ -24,8 +24,7 @@ import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
-import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 
 /**
  * @author Endi S. Dewata
@@ -211,11 +210,10 @@ public class NISDatabasesPage extends FormPage {
 
             Partition nisPartition = nisFederation.getPartition();
             Connection connection = nisPartition.getConnection(Federation.JDBC);
-            JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
-            JDBCClient client = adapter.getClient();
+            JDBCConnection jdbcConnection = (JDBCConnection)connection;
 
             for (NISDomain domain : nisFederation.getRepositories()) {
-                boolean exists = client.checkDatabase(domain.getName());
+                boolean exists = jdbcConnection.checkDatabase(domain.getName());
 
                 TableItem ti = new TableItem(table, SWT.NONE);
 

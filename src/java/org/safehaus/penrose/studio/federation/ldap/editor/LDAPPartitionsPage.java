@@ -228,7 +228,6 @@ public class LDAPPartitionsPage extends FormPage {
 
             for (LDAPRepository repository : ldapFederation.getRepositories()) {
                 PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(repository.getName());
-                //Partition partition = nisFederation.getPartitions().getPartition(repository.getName());
 
                 TableItem ti = new TableItem(table, SWT.NONE);
 

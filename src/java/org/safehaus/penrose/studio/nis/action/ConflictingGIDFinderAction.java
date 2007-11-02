@@ -2,10 +2,9 @@ package org.safehaus.penrose.studio.nis.action;
 
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.ldap.Attributes;
-import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
-import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.jdbc.Assignment;
+import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
@@ -66,11 +65,10 @@ public class ConflictingGIDFinderAction extends NISAction {
 
         Partition partition = nisFederation.getPartition();
         Connection connection = partition.getConnection(Federation.JDBC);
-        JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
-        JDBCClient client = adapter.getClient();
+        JDBCConnection jdbcConnection = (JDBCConnection)connection;
 
-        String table1 = client.getTableName(sourceConfig1);
-        String table2 = client.getTableName(sourceConfig2);
+        String table1 = jdbcConnection.getTableName(sourceConfig1);
+        String table2 = jdbcConnection.getTableName(sourceConfig2);
 
         String sql = "select a.cn, a.gidNumber, b.gidNumber, c.cn, c.gidNumber, d.gidNumber" +
                 " from "+table1+" a"+
@@ -115,6 +113,6 @@ public class ConflictingGIDFinderAction extends NISAction {
             }
         };
 
-        client.executeQuery(sql, assignments, queryResponse);
+        jdbcConnection.executeQuery(sql, assignments, queryResponse);
     }
 }

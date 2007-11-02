@@ -22,7 +22,7 @@ import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.directory.EntryMapping;
 import org.safehaus.penrose.directory.SourceMapping;
 import org.safehaus.penrose.nis.*;
-import org.safehaus.penrose.nis.adapter.NISAdapter;
+import org.safehaus.penrose.nis.connection.NISConnection;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -51,13 +51,13 @@ public class NISSourcePropertyPage extends SourceEditorPage {
         ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
         if (connectionConfig == null) return;
 
-        String method = connectionConfig.getParameter(NISAdapter.METHOD);
-        if (method == null) method = NISAdapter.DEFAULT_METHOD;
+        String method = connectionConfig.getParameter(NISConnection.METHOD);
+        if (method == null) method = NISConnection.DEFAULT_METHOD;
 
-        if (NISAdapter.LOCAL.equals(method)) {
+        if (NISConnection.LOCAL.equals(method)) {
             client = new NISLocalClient();
 
-        } else if (NISAdapter.YP.equals(method)) {
+        } else if (NISConnection.YP.equals(method)) {
             client = new NISYPClient();
 
         } else { // if (METHOD_JNDI.equals(method)) {

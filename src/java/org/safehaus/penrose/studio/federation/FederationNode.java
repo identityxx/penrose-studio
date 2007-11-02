@@ -7,8 +7,6 @@ import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
 import org.safehaus.penrose.studio.federation.wizard.FederationWizard;
 import org.safehaus.penrose.studio.federation.editor.FederationEditor;
 import org.safehaus.penrose.studio.federation.editor.FederationEditorInput;
-//import org.safehaus.penrose.studio.federation.editor.TestEditorInput;
-//import org.safehaus.penrose.studio.federation.editor.TestEditor;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
@@ -180,7 +178,8 @@ public class FederationNode extends PluginNode {
                     started = true;
                     
                 } catch (Exception e) {
-                    throw new InvocationTargetException(e);
+                    log.error(e.getMessage(), e);
+                    MessageDialog.openError(serversView.getSite().getShell(), "Action Failed", e.getMessage());
 
                 } finally {
                     monitor.done();

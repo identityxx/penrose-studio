@@ -24,8 +24,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.wizard.BrowserWizard;
 import org.safehaus.penrose.studio.federation.Repository;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.source.Source;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.filter.SubstringFilter;
@@ -33,6 +32,9 @@ import org.safehaus.penrose.filter.FilterTool;
 import org.safehaus.penrose.filter.SimpleFilter;
 import org.safehaus.penrose.util.ActiveDirectoryUtil;
 import org.safehaus.penrose.util.BinaryUtil;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.management.SourceClient;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -65,10 +67,11 @@ public class LinkingPage extends FormPage {
 
     LinkingEditor editor;
 
-    private Partition partition;
+    Project project;
+    Repository repository;
 
-    Source localSource;
-    Source globalSource;
+    SourceClient localSourceClient;
+    SourceClient globalSourceClient;
 
     DN localBaseDn;
     DN globalBaseDn;
@@ -77,13 +80,17 @@ public class LinkingPage extends FormPage {
         super(editor, "IDENTITY_LINKING", "  Identity Linking  ");
 
         this.editor = editor;
-        this.partition = editor.getPartition();
+        this.project = editor.getProject();
+        this.repository = editor.getRepository();
 
-        localSource = partition.getSource("Local");
-        globalSource = partition.getSource("Global");
+        PenroseClient penroseClient = project.getClient();
+        PartitionClient partitionClient = penroseClient.getPartitionClient(repository.getName());
 
-        localBaseDn = new DN(localSource.getParameter("baseDn"));
-        globalBaseDn = new DN(globalSource.getParameter("baseDn"));
+        localSourceClient = partitionClient.getSourceClient("Local");
+        globalSourceClient = partitionClient.getSourceClient("Global");
+
+        localBaseDn = new DN(localSourceClient.getParameter("baseDn"));
+        globalBaseDn = new DN(globalSourceClient.getParameter("baseDn"));
 
         Display display = Display.getDefault();
 
@@ -93,33 +100,39 @@ public class LinkingPage extends FormPage {
     }
 
     public void createFormContent(IManagedForm managedForm) {
-        toolkit = managedForm.getToolkit();
+        try {
+            toolkit = managedForm.getToolkit();
 
-        ScrolledForm form = managedForm.getForm();
-        form.setText("LDAP Link");
+            ScrolledForm form = managedForm.getForm();
+            form.setText("LDAP Link");
 
-        Composite body = form.getBody();
-        body.setLayout(new GridLayout(2, false));
+            Composite body = form.getBody();
+            body.setLayout(new GridLayout(2, false));
 
-        Section localSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        localSection.setText("Local");
+            Section localSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+            localSection.setText("Local");
 
-        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalSpan = 2;
-        localSection.setLayoutData(gd);
+            GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+            gd.horizontalSpan = 2;
+            localSection.setLayoutData(gd);
 
-        Control localControl = createLocalControl(localSection);
-        localSection.setClient(localControl);
+            Control localControl = createLocalControl(localSection);
+            localSection.setClient(localControl);
 
-        Section globalSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        globalSection.setText("Global");
-        globalSection.setLayoutData(new GridData(GridData.FILL_BOTH));
+            Section globalSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+            globalSection.setText("Global");
+            globalSection.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Control globalControl = createGlobalControl(globalSection);
-        globalSection.setClient(globalControl);
+            Control globalControl = createGlobalControl(globalSection);
+            globalSection.setClient(globalControl);
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+        }
     }
 
-    public Composite createLocalControl(Composite parent) {
+    public Composite createLocalControl(Composite parent) throws Exception {
 
         Composite composite = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout();
@@ -135,7 +148,7 @@ public class LinkingPage extends FormPage {
         return composite;
     }
 
-    public Composite createTopLocalSection(Composite parent) {
+    public Composite createTopLocalSection(Composite parent) throws Exception {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(3, false));
@@ -159,7 +172,7 @@ public class LinkingPage extends FormPage {
                     BrowserWizard wizard = new BrowserWizard();
                     wizard.setBaseDn(localBaseDn.toString());
                     wizard.setDn(baseDnText.getText());
-                    wizard.setSource(localSource);
+                    wizard.setSourceClient(localSourceClient);
 
                     IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
                     WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
@@ -181,7 +194,7 @@ public class LinkingPage extends FormPage {
         gd.widthHint = 100;
         filterLabel.setLayoutData(gd);
 
-        String filter = localSource.getParameter("filter");
+        String filter = localSourceClient.getParameter("filter");
         if (filter == null) filter = "(objectClass=*)";
 
         filterText = toolkit.createText(composite, filter, SWT.BORDER);
@@ -194,7 +207,7 @@ public class LinkingPage extends FormPage {
         gd.widthHint = 100;
         scopeLabel.setLayoutData(gd);
 
-        String scope = localSource.getParameter("scope");
+        String scope = localSourceClient.getParameter("scope");
         if (scope == null) scope = "SUBTREE";
 
         scopeCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
@@ -247,7 +260,7 @@ public class LinkingPage extends FormPage {
                     TableItem item = localTable.getSelection()[0];
 
                     SearchResult local = (SearchResult)item.getData("local");
-                    updateAttributes(localAttributeTable, localSource, local.getDn());
+                    updateAttributes(localAttributeTable, localSourceClient, local.getDn());
 
                     updateGlobal(item);
 
@@ -438,7 +451,7 @@ public class LinkingPage extends FormPage {
                     LinkingWizard wizard = new LinkingWizard();
                     wizard.setDn(dn);
                     wizard.setSearchResult(result);
-                    wizard.setSource(globalSource);
+                    wizard.setSourceClient(globalSourceClient);
                     wizard.setBaseDn(globalBaseDn);
 
                     IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -542,7 +555,7 @@ public class LinkingPage extends FormPage {
                     TableItem item = globalTable.getSelection()[0];
 
                     SearchResult link = (SearchResult)item.getData();
-                    updateAttributes(globalAttributeTable, globalSource, link.getDn());
+                    updateAttributes(globalAttributeTable, globalSourceClient, link.getDn());
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -630,30 +643,35 @@ public class LinkingPage extends FormPage {
             progressService.busyCursorWhile(new IRunnableWithProgress() {
                 public void run(final IProgressMonitor monitor) throws InvocationTargetException {
                     try {
-                        monitor.beginTask("Searching "+partition.getName()+"...", IProgressMonitor.UNKNOWN);
+                        monitor.beginTask("Searching "+ repository.getName()+"...", IProgressMonitor.UNKNOWN);
 
-                        SearchResponse response = new SearchResponse() {
-                            public void add(SearchResult result) throws Exception {
+                        monitor.subTask("Searching "+ repository.getName()+"...");
 
-                                if (monitor.isCanceled()) {
-                                    close();
-                                    return;
-                                }
+                        SearchResponse response = new SearchResponse();
 
-                                String dn = result.getDn().append(localBaseDn).toString();
+                        localSourceClient.search(request, response);
 
-                                monitor.subTask("Processing "+dn+"...");
-
-                                results.put(dn, result);
-
-                                Collection<SearchResult> list = search(result);
-                                links.put(dn, list);
-
-                                monitor.worked(1);
+                        while (response.hasNext()) {
+                            SearchResult result = response.next();
+                            
+                            if (monitor.isCanceled()) {
+                                throw new InterruptedException();
                             }
-                        };
 
-                        localSource.search(request, response);
+                            String dn = result.getDn().append(localBaseDn).toString();
+
+                            monitor.subTask("Processing "+dn+"...");
+
+                            results.put(dn, result);
+
+                            Collection<SearchResult> list = search(result);
+                            links.put(dn, list);
+
+                            monitor.worked(1);
+                        }
+
+                    } catch (InterruptedException e) {
+                        // ignore
 
                     } catch (Exception e) {
                         throw new InvocationTargetException(e);
@@ -741,7 +759,7 @@ public class LinkingPage extends FormPage {
 
             if (links.size() == 1) {
                 SearchResult result = links.iterator().next();
-                updateAttributes(globalAttributeTable, globalSource, result.getDn());
+                updateAttributes(globalAttributeTable, globalSourceClient, result.getDn());
             }
 
             return;
@@ -758,15 +776,15 @@ public class LinkingPage extends FormPage {
 
             if (matches.size() == 1) {
                 SearchResult result = matches.iterator().next();
-                updateAttributes(globalAttributeTable, globalSource, result.getDn());
+                updateAttributes(globalAttributeTable, globalSourceClient, result.getDn());
             }
 
             return;
         }
     }
 
-    public void updateAttributes(Table table, Source source, DN dn) throws Exception {
-        SearchResult result = source.find(dn);
+    public void updateAttributes(Table table, SourceClient sourceClient, DN dn) throws Exception {
+        SearchResult result = sourceClient.find(dn);
         Attributes attributes = result.getAttributes();
 
         for (Attribute attribute : attributes.getAll()) {
@@ -823,7 +841,13 @@ public class LinkingPage extends FormPage {
                 filter = new SimpleFilter(globalAttribute, "=", localValue);
             }
 
-            SearchResponse response = globalSource.search((DN)null, filter, SearchRequest.SCOPE_SUB);
+            SearchRequest request = new SearchRequest();
+            request.setFilter(filter);
+
+            SearchResponse response = new SearchResponse();
+
+            globalSourceClient.search(request, response);
+
             return response.getAll();
 
         } catch (Exception e) {
@@ -848,7 +872,7 @@ public class LinkingPage extends FormPage {
 
             SearchResponse response = new SearchResponse();
 
-            globalSource.search(request, response);
+            globalSourceClient.search(request, response);
 
             return response.getAll();
 
@@ -870,7 +894,7 @@ public class LinkingPage extends FormPage {
             Collection<Modification> modifications = new ArrayList<Modification>();
             modifications.add(new Modification(Modification.ADD, new Attribute("objectClass", "extensibleObject")));
 
-            globalSource.modify(globalEntry.getDn(), modifications);
+            globalSourceClient.modify(globalEntry.getDn(), modifications);
         }
 
         Collection<Modification> modifications = new ArrayList<Modification>();
@@ -884,7 +908,7 @@ public class LinkingPage extends FormPage {
             modifications.add(new Modification(Modification.ADD, new Attribute(globalAttribute, localValue)));
         }
 
-        globalSource.modify(globalEntry.getDn(), modifications);
+        globalSourceClient.modify(globalEntry.getDn(), modifications);
     }
 
     public void removeLink(DN globalDn, SearchResult localEntry) throws Exception {
@@ -904,7 +928,7 @@ public class LinkingPage extends FormPage {
             modifications.add(new Modification(Modification.DELETE, new Attribute(globalAttribute, localValue)));
         }
 
-        globalSource.modify(globalDn, modifications);
+        globalSourceClient.modify(globalDn, modifications);
     }
 
     public SearchResult createEntry(SearchResult localEntry) throws Exception {
@@ -928,16 +952,8 @@ public class LinkingPage extends FormPage {
             attributes.addValue(globalAttribute, localValue);
         }
 
-        globalSource.add(dn, attributes);
+        globalSourceClient.add(dn, attributes);
 
         return globalResult;
-    }
-
-    public Partition getPartition() {
-        return partition;
-    }
-
-    public void setPartition(Partition partition) {
-        this.partition = partition;
     }
 }

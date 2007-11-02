@@ -2,7 +2,7 @@ package org.safehaus.penrose.studio.federation.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.source.Source;
+import org.safehaus.penrose.management.SourceClient;
 
 /**
  * @author Endi Sukma Dewata
@@ -12,7 +12,7 @@ public class BrowserWizard extends Wizard {
     Logger log = Logger.getLogger(getClass());
 
     private String baseDn;
-    private Source source;
+    private SourceClient sourceClient;
 
     BrowserPage browserPage;
 
@@ -25,7 +25,7 @@ public class BrowserWizard extends Wizard {
     public void addPages() {
         browserPage = new BrowserPage();
         browserPage.setBaseDn(baseDn);
-        browserPage.setSource(source);
+        browserPage.setSourceClient(sourceClient);
         addPage(browserPage);
     }
 
@@ -48,12 +48,12 @@ public class BrowserWizard extends Wizard {
         this.baseDn = baseDn;
     }
 
-    public Source getSource() {
-        return source;
+    public SourceClient getSourceClient() {
+        return sourceClient;
     }
 
-    public void setSource(Source source) {
-        this.source = source;
+    public void setSourceClient(SourceClient sourceClient) {
+        this.sourceClient = sourceClient;
     }
 
     public String getDn() {

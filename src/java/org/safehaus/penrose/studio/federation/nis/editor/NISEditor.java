@@ -15,15 +15,18 @@ import org.safehaus.penrose.studio.federation.nis.editor.NISPartitionsPage;
 import org.safehaus.penrose.studio.federation.nis.editor.NISLDAPPage;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.editor.NISEditorInput;
+import org.safehaus.penrose.studio.project.Project;
 
 public class NISEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
+    Project project;
     NISFederation nisFederation;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         NISEditorInput ei = (NISEditorInput)input;
+        setProject(ei.getProject());
         nisFederation = ei.getNisTool();
 
         setSite(site);
@@ -61,5 +64,13 @@ public class NISEditor extends FormEditor {
 
     public NISFederation getNisTool() {
         return nisFederation;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

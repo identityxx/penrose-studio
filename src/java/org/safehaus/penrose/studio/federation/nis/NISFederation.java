@@ -13,8 +13,7 @@ import org.safehaus.penrose.studio.federation.GlobalRepository;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
 import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
-import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.ServiceClient;
 import org.safehaus.penrose.config.PenroseConfig;
@@ -53,7 +52,6 @@ public class NISFederation {
     Partition partition;
     Federation federation;
 
-    //protected Source schedules;
     protected Source actions;
     protected Source hosts;
     protected Source files;
@@ -90,7 +88,6 @@ public class NISFederation {
         sourceLabels.put("nis_networks", "Networks");
         sourceLabels.put("nis_automounts", "Automounts");
 
-        //schedules = partition.getSource("penrose_schedules");
         actions   = partition.getSource("penrose_actions");
         hosts     = partition.getSource("penrose_hosts");
         files     = partition.getSource("penrose_files");
@@ -102,7 +99,9 @@ public class NISFederation {
 
         for (Repository rep : federation.getRepositories("NIS")) {
 
-            if (monitor.isCanceled()) break;
+            if (monitor.isCanceled()) {
+                throw new InterruptedException();
+            }
 
             NISDomain domain = (NISDomain)rep;
             String name = domain.getName();
@@ -464,11 +463,10 @@ public class NISFederation {
         log.debug("Creating database "+domain.getName()+".");
 
         Connection connection = partition.getConnection(Federation.JDBC);
-        JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
-        JDBCClient client = adapter.getClient();
+        JDBCConnection jdbcConnection = (JDBCConnection)connection;
 
         try {
-            client.createDatabase(domain.getName());
+            jdbcConnection.createDatabase(domain.getName());
         } catch (Exception e) {
             log.debug(e.getMessage());
         }
@@ -480,7 +478,7 @@ public class NISFederation {
             if (!CACHE_CONNECTION_NAME.equals(sourceConfig.getConnectionName())) continue;
 
             try {
-                client.createTable(sourceConfig);
+                jdbcConnection.createTable(sourceConfig);
             } catch (Exception e) {
                 log.debug(e.getMessage());
             }
@@ -492,9 +490,8 @@ public class NISFederation {
         log.debug("Removing cache "+domain.getName()+".");
 
         Connection connection = partition.getConnection(Federation.JDBC);
-        JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
-        JDBCClient client = adapter.getClient();
-        client.dropDatabase(domain.getName());
+        JDBCConnection jdbcConnection = (JDBCConnection)connection;
+        jdbcConnection.dropDatabase(domain.getName());
     }
 
     public Project getProject() {
@@ -511,14 +508,6 @@ public class NISFederation {
 
     public void removeListener(FederationEventListener listener) {
         listeners.remove(listener);
-    }
-
-    public Source getSchedules() {
-        return null; //schedules;
-    }
-
-    public void setSchedules(Source schedules) {
-        //this.schedules = schedules;
     }
 
     public Collection<String> getSourceNames() {

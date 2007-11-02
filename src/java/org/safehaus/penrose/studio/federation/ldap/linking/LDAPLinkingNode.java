@@ -5,13 +5,11 @@ import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryNode;
 import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
-import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
 import org.safehaus.penrose.studio.federation.linking.LinkingEditorInput;
 import org.safehaus.penrose.studio.federation.linking.LinkingEditor;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.partition.Partition;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -60,12 +58,9 @@ public class LDAPLinkingNode extends Node {
 
     public void open() throws Exception {
 
-        LDAPRepository repository = repositoryNode.getRepository();
-        Partition partition = ldapFederation.getPartitions().getPartition(repository.getName());
-
         LinkingEditorInput ei = new LinkingEditorInput();
-        ei.setPartition(partition);
-        ei.setRepository(repository);
+        ei.setProject(projectNode.getProject());
+        ei.setRepository(repositoryNode.getRepository());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();

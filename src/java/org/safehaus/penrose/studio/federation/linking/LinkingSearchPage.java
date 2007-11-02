@@ -13,7 +13,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.SearchResult;
 import org.safehaus.penrose.ldap.Attributes;
 import org.safehaus.penrose.ldap.Attribute;
@@ -22,6 +21,7 @@ import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.filter.FilterTool;
 import org.safehaus.penrose.filter.SubstringFilter;
 import org.safehaus.penrose.studio.federation.wizard.BrowserWizard;
+import org.safehaus.penrose.management.SourceClient;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class LinkingSearchPage extends WizardPage {
 
     private DN dn;
     private SearchResult searchResult;
-    private Source source;
+    private SourceClient sourceClient;
 
     public LinkingSearchPage() {
         super(NAME);
@@ -51,50 +51,55 @@ public class LinkingSearchPage extends WizardPage {
     }
 
     public void createControl(final Composite parent) {
+        try {
+            Composite composite = new Composite(parent, SWT.NONE);
+            GridLayout layout = new GridLayout();
+            layout.marginWidth = 0;
+            composite.setLayout(layout);
 
-        Composite composite = new Composite(parent, SWT.NONE);
-        GridLayout layout = new GridLayout();
-        layout.marginWidth = 0;
-        composite.setLayout(layout);
+            attributesTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+            GridData gd = new GridData(GridData.FILL_BOTH);
+            gd.horizontalSpan = 2;
+            attributesTable.setLayoutData(gd);
 
-        attributesTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
-        GridData gd = new GridData(GridData.FILL_BOTH);
-        gd.horizontalSpan = 2;
-        attributesTable.setLayoutData(gd);
+            attributesTable.setHeaderVisible(false);
+            attributesTable.setLinesVisible(true);
 
-        attributesTable.setHeaderVisible(false);
-        attributesTable.setLinesVisible(true);
+            TableColumn tc = new TableColumn(attributesTable, SWT.NONE);
+            tc.setText("Attribute");
+            tc.setWidth(150);
 
-        TableColumn tc = new TableColumn(attributesTable, SWT.NONE);
-        tc.setText("Attribute");
-        tc.setWidth(150);
+            tc = new TableColumn(attributesTable, SWT.NONE);
+            tc.setText("Value");
+            tc.setWidth(400);
 
-        tc = new TableColumn(attributesTable, SWT.NONE);
-        tc.setText("Value");
-        tc.setWidth(400);
+            TableItem item = new TableItem(attributesTable, SWT.NONE);
+            item.setText(0, "dn");
+            item.setText(1, dn.toString());
 
-        TableItem item = new TableItem(attributesTable, SWT.NONE);
-        item.setText(0, "dn");
-        item.setText(1, dn.toString());
-
-        Attributes attributes = searchResult.getAttributes();
-        for (Attribute attribute : attributes.getAll()) {
-            for (Object value : attribute.getValues()) {
-                TableItem ti = new TableItem(attributesTable, SWT.NONE);
-                ti.setText(0, attribute.getName());
-                ti.setText(1, value.toString());
+            Attributes attributes = searchResult.getAttributes();
+            for (Attribute attribute : attributes.getAll()) {
+                for (Object value : attribute.getValues()) {
+                    TableItem ti = new TableItem(attributesTable, SWT.NONE);
+                    ti.setText(0, attribute.getName());
+                    ti.setText(1, value.toString());
+                }
             }
+
+            new Label(composite, SWT.NONE);
+
+            Composite bottomPanel = createBottomPanel(composite);
+            bottomPanel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+            setControl(composite);
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            MessageDialog.openError(getShell(), "Action Failed", e.getMessage());
         }
-
-        new Label(composite, SWT.NONE);
-
-        Composite bottomPanel = createBottomPanel(composite);
-        bottomPanel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        setControl(composite);
     }
 
-    public Composite createBottomPanel(Composite parent) {
+    public Composite createBottomPanel(Composite parent) throws Exception {
 
         Composite composite = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(3, false);
@@ -105,7 +110,7 @@ public class LinkingSearchPage extends WizardPage {
         baseDnLabel.setText("Base DN:");
         baseDnLabel.setLayoutData(new GridData());
 
-        String s = source.getParameter("baseDn");
+        String s = sourceClient.getParameter("baseDn");
         final String baseDn = s == null ? "" : s;
 
         baseDnText = new Text(composite, SWT.BORDER);
@@ -124,7 +129,7 @@ public class LinkingSearchPage extends WizardPage {
                     BrowserWizard wizard = new BrowserWizard();
                     wizard.setBaseDn(baseDn);
                     wizard.setDn(baseDnText.getText());
-                    wizard.setSource(source);
+                    wizard.setSourceClient(sourceClient);
 
                     IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
                     WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
@@ -154,7 +159,7 @@ public class LinkingSearchPage extends WizardPage {
         scopeLabel.setText("Scope:");
         scopeLabel.setLayoutData(new GridData());
 
-        String scope = source.getParameter("scope");
+        String scope = sourceClient.getParameter("scope");
         if (scope == null) scope = "SUBTREE";
 
         scopeCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
@@ -218,12 +223,12 @@ public class LinkingSearchPage extends WizardPage {
         this.searchResult = searchResult;
     }
 
-    public Source getSource() {
-        return source;
+    public SourceClient getSourceClient() {
+        return sourceClient;
     }
 
-    public void setSource(Source source) {
-        this.source = source;
+    public void setSourceClient(SourceClient sourceClient) {
+        this.sourceClient = sourceClient;
     }
 
     public String getBaseDn() {

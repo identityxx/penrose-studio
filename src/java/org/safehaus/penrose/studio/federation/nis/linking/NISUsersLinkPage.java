@@ -21,10 +21,9 @@ import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.jdbc.adapter.JDBCAdapter;
-import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.QueryResponse;
+import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.filter.FilterTool;
 import org.safehaus.penrose.filter.SubstringFilter;
@@ -68,7 +67,7 @@ public class NISUsersLinkPage extends FormPage {
 
     Partition partition;
 
-    JDBCClient client;
+    JDBCConnection jdbcConnection;
 
     Source localUsers;
     Source globalUsers;
@@ -84,8 +83,7 @@ public class NISUsersLinkPage extends FormPage {
         partition = nisFederation.getPartitions().getPartition(domain.getName());
 
         Connection connection = partition.getConnection(NISFederation.CACHE_CONNECTION_NAME);
-        JDBCAdapter adapter = (JDBCAdapter)connection.getAdapter();
-        client = adapter.getClient();
+        jdbcConnection = (JDBCConnection)connection;
 
         localUsers = partition.getSource("local_users");
         globalUsers = partition.getSource("global_users");
@@ -772,8 +770,8 @@ public class NISUsersLinkPage extends FormPage {
             }
         };
 
-        client.executeQuery(
-                "select globalUid from "+client.getTableName(usersLink)+" where uid=?",
+        jdbcConnection.executeQuery(
+                "select globalUid from "+ jdbcConnection.getTableName(usersLink)+" where uid=?",
                 assignments,
                 queryResponse
         );
@@ -787,8 +785,8 @@ public class NISUsersLinkPage extends FormPage {
         assignments.add(new Assignment(uid));
         assignments.add(new Assignment(globalUid));
 
-        client.executeUpdate(
-                "insert into "+client.getTableName(usersLink)+" (uid, globalUid) values (?, ?)",
+        jdbcConnection.executeUpdate(
+                "insert into "+ jdbcConnection.getTableName(usersLink)+" (uid, globalUid) values (?, ?)",
                 assignments
         );
     }
@@ -799,8 +797,8 @@ public class NISUsersLinkPage extends FormPage {
         assignments.add(new Assignment(globalUid));
         assignments.add(new Assignment(uid));
 
-        client.executeUpdate(
-                "update "+client.getTableName(usersLink)+" set globalUid=? where uid=?",
+        jdbcConnection.executeUpdate(
+                "update "+ jdbcConnection.getTableName(usersLink)+" set globalUid=? where uid=?",
                 assignments
         );
     }
@@ -810,8 +808,8 @@ public class NISUsersLinkPage extends FormPage {
         Collection<Assignment> assignments = new ArrayList<Assignment>();
         assignments.add(new Assignment(uid));
 
-        client.executeUpdate(
-                "delete from "+client.getTableName(usersLink)+" where uid=?",
+        jdbcConnection.executeUpdate(
+                "delete from "+ jdbcConnection.getTableName(usersLink)+" where uid=?",
                 assignments
         );
     }

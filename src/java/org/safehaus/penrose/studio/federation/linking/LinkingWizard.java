@@ -3,8 +3,8 @@ package org.safehaus.penrose.studio.federation.linking;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
+import org.safehaus.penrose.management.SourceClient;
 
 import java.util.Collection;
 
@@ -17,7 +17,7 @@ public class LinkingWizard extends Wizard {
 
     private DN dn;
     private SearchResult searchResult;
-    private Source source;
+    private SourceClient sourceClient;
     private DN baseDn;
     private Collection<SearchResult> results;
 
@@ -32,13 +32,13 @@ public class LinkingWizard extends Wizard {
         searchPage = new LinkingSearchPage();
         searchPage.setDn(dn);
         searchPage.setSearchResult(searchResult);
-        searchPage.setSource(source);
+        searchPage.setSourceClient(sourceClient);
         addPage(searchPage);
 
         resultsPage = new LinkingResultsPage();
         resultsPage.setDn(dn);
         resultsPage.setEntry(searchResult);
-        resultsPage.setSource(source);
+        resultsPage.setSourceClient(sourceClient);
         resultsPage.setBaseDn(baseDn);
         addPage(resultsPage);
     }
@@ -71,7 +71,7 @@ public class LinkingWizard extends Wizard {
 
             SearchResponse response = new SearchResponse();
 
-            source.search(request, response);
+            sourceClient.search(request, response);
 
             return response.getAll();
 
@@ -94,12 +94,12 @@ public class LinkingWizard extends Wizard {
         }
     }
 
-    public Source getSource() {
-        return source;
+    public SourceClient getSourceClient() {
+        return sourceClient;
     }
 
-    public void setSource(Source source) {
-        this.source = source;
+    public void setSourceClient(SourceClient sourceClient) {
+        this.sourceClient = sourceClient;
     }
 
     public SearchResult getSearchResult() {

@@ -9,17 +9,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.studio.federation.Repository;
+import org.safehaus.penrose.studio.project.Project;
 
 public class LinkingEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    private Partition partition;
+    private Project project;
     private Repository repository;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         LinkingEditorInput ei = (LinkingEditorInput)input;
-        partition = ei.getPartition();
+        project = ei.getProject();
         repository = ei.getRepository();
 
         setSite(site);
@@ -50,19 +51,19 @@ public class LinkingEditor extends FormEditor {
         return false;
     }
 
-    public Partition getPartition() {
-        return partition;
-    }
-
-    public void setPartition(Partition partition) {
-        this.partition = partition;
-    }
-
     public Repository getRepository() {
         return repository;
     }
 
     public void setRepository(Repository repository) {
         this.repository = repository;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

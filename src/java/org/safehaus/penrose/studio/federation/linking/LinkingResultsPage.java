@@ -15,7 +15,7 @@ import org.safehaus.penrose.ldap.Attribute;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.filter.SubstringFilter;
-import org.safehaus.penrose.source.Source;
+import org.safehaus.penrose.management.SourceClient;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class LinkingResultsPage extends WizardPage {
 
     private DN dn;
     private SearchResult entry;
-    private Source source;
+    private SourceClient sourceClient;
 
     private DN baseDn;
     private Collection<SearchResult> results;
@@ -256,12 +256,12 @@ public class LinkingResultsPage extends WizardPage {
         this.dn = dn;
     }
 
-    public Source getSource() {
-        return source;
+    public SourceClient getSourceClient() {
+        return sourceClient;
     }
 
-    public void setSource(Source source) {
-        this.source = source;
+    public void setSourceClient(SourceClient sourceClient) {
+        this.sourceClient = sourceClient;
     }
 
     public DN getBaseDn() {
