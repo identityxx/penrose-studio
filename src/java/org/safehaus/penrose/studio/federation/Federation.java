@@ -74,17 +74,51 @@ public class Federation {
         partitions.addPartition(defaultPartition);
     }
 
-    public void create(JDBCConnection connection, PartitionConfig partitionConfig) throws Exception {
+    public void create(Map<String,String> allParameters, JDBCConnection connection) throws Exception {
 
         log.debug("Creating partition "+Federation.PARTITION +".");
 
         File workDir = project.getWorkDir();
 
         File sampleDir = new File(workDir, "samples/"+Federation.PARTITION);
+        if (!sampleDir.exists()) project.download("samples/"+Federation.PARTITION);
+
         File partitionDir = new File(workDir, "partitions/"+Federation.PARTITION);
-        FileUtil.copy(sampleDir, partitionDir);
+
+        String driver   = allParameters.get("driver");
+        String server   = allParameters.get("host");
+        String port     = allParameters.get("port");
+        String user     = allParameters.get("user");
+        String password = allParameters.get("password");
+
+        org.apache.tools.ant.Project antProject = new org.apache.tools.ant.Project();
+
+        antProject.setProperty("DRIVER",   driver);
+        antProject.setProperty("SERVER",   server);
+        antProject.setProperty("PORT",     port);
+        antProject.setProperty("USER",     user);
+        antProject.setProperty("PASSWORD", password);
+
+        Copy copy = new Copy();
+        copy.setOverwrite(true);
+        copy.setProject(antProject);
+
+        FileSet fs = new FileSet();
+        fs.setDir(sampleDir);
+        fs.setIncludes("**/*");
+        copy.addFileset(fs);
+
+        copy.setTodir(partitionDir);
+
+        FilterChain filterChain = copy.createFilterChain();
+        ExpandProperties expandProperties = new ExpandProperties();
+        expandProperties.setProject(antProject);
+        filterChain.addExpandProperties(expandProperties);
+
+        copy.execute();
 
         PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+        PartitionConfig partitionConfig = partitionConfigs.load(partitionDir);
         partitionConfigs.addPartitionConfig(partitionConfig);
         project.save(partitionConfig);
 
@@ -95,21 +129,12 @@ public class Federation {
         } catch (Exception e) {
             log.debug(e.getMessage());
         }
-/*
-        SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
-        for (SourceConfig sourceConfig : sourceConfigs.getSourceConfigs()) {
-            try {
-                connection.createTable(sourceConfig);
-            } catch (Exception e) {
-                log.debug(e.getMessage());
-            }
-        }
-*/
+
         project.upload("partitions/"+partitionConfig.getName());
 
         PenroseClient penroseClient = project.getClient();
         penroseClient.startPartition(partitionConfig.getName());
-
+/*
         log.debug("Initializing partition "+Federation.PARTITION +".");
 
         PenroseConfig penroseConfig = project.getPenroseConfig();
@@ -121,7 +146,7 @@ public class Federation {
         partitionFactory.setPenroseContext(penroseContext);
 
         partitionFactory.createPartition(partitionConfig);
-
+*/
     }
 
     public void createGlobalPartition(GlobalRepository globalRepository) throws Exception {

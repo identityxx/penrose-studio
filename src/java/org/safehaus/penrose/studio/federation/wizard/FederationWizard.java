@@ -7,14 +7,9 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.connection.wizard.ConnectionDriverPage;
 import org.safehaus.penrose.studio.jdbc.connection.JDBCConnectionWizardPage;
 import org.safehaus.penrose.studio.driver.Driver;
-import org.safehaus.penrose.studio.util.Helper;
-import org.safehaus.penrose.studio.federation.Federation;
-import org.safehaus.penrose.jdbc.JDBCClient;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.partition.*;
 
 import java.util.Map;
-import java.io.File;
+import java.util.HashMap;
 
 /**
  * @author Endi S. Dewata
@@ -24,12 +19,12 @@ public class FederationWizard extends Wizard {
     Logger log = Logger.getLogger(getClass());
 
     private Project project;
-    private PartitionConfig partitionConfig;
 
     public ConnectionDriverPage dbDriverPage;
     public JDBCConnectionWizardPage jdbcPage;
 
-    private ConnectionConfig connectionConfig = new ConnectionConfig();
+    private Map<String,String> allParameters = new HashMap<String,String>();
+    private Map<String,String> parameters = new HashMap<String,String>();
 
     public FederationWizard() {
         setWindowTitle("Setup Wizard");
@@ -37,14 +32,6 @@ public class FederationWizard extends Wizard {
 
     public void init(Project project) throws Exception {
         this.project = project;
-
-        File workDir = project.getWorkDir();
-        File sampleDir = new File(workDir, "samples/"+Federation.PARTITION);
-
-        project.download("samples/"+Federation.PARTITION);
-
-        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-        partitionConfig = partitionConfigs.load(sampleDir);
     }
 
     public boolean canFinish() {
@@ -61,24 +48,16 @@ public class FederationWizard extends Wizard {
         dbDriverPage.removeDriver("LDAP");
         addPage(dbDriverPage);
 
-        ConnectionConfig jdbcConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(Federation.JDBC);
-
         jdbcPage = new JDBCConnectionWizardPage();
         jdbcPage.setDescription("Enter database connection parameters.");
-        jdbcPage.setConnectionConfig(jdbcConfig);
         jdbcPage.setShowDatabase(false);
         addPage(jdbcPage);
     }
 
     public boolean performFinish() {
         try {
-            Map<String,String> allParameters = jdbcPage.getAllParameters();
-            String url = allParameters.get(JDBCClient.URL);
-            url = Helper.replace(url, allParameters);
-
-            Map<String,String> parameters = jdbcPage.getParameters();
-            parameters.put(JDBCClient.URL, url);
-            connectionConfig.setParameters(parameters);
+            allParameters = jdbcPage.getAllParameters();
+            parameters = jdbcPage.getParameters();
 
             return true;
 
@@ -114,19 +93,19 @@ public class FederationWizard extends Wizard {
         return project;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public Map<String, String> getAllParameters() {
+        return allParameters;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setAllParameters(Map<String, String> allParameters) {
+        this.allParameters = allParameters;
     }
 
-    public ConnectionConfig getConnectionConfig() {
-        return connectionConfig;
+    public Map<String, String> getParameters() {
+        return parameters;
     }
 
-    public void setConnectionConfig(ConnectionConfig connectionConfig) {
-        this.connectionConfig = connectionConfig;
+    public void setParameters(Map<String, String> parameters) {
+        this.parameters = parameters;
     }
 }

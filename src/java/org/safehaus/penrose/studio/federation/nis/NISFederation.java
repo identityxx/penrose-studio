@@ -193,10 +193,12 @@ public class NISFederation {
 
         log.debug("Creating partition "+partitionName+".");
 
-        File sampleDir = new File(project.getWorkDir(), "samples/"+ NIS_TEMPLATE);
+        File workDir = project.getWorkDir();
+
+        File sampleDir = new File(workDir, "samples/"+ NIS_TEMPLATE);
         if (!sampleDir.exists()) project.download("samples/"+ NIS_TEMPLATE);
 
-        File partitionDir = new File(project.getWorkDir(), "partitions"+File.separator+ partitionName);
+        File partitionDir = new File(workDir, "partitions"+File.separator+ partitionName);
 
         String ldapSuffix = domain.getSuffix();
 

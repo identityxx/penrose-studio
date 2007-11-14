@@ -12,14 +12,15 @@ import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.connection.ConnectionContext;
-import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.jdbc.connection.JDBCConnection;
+import org.safehaus.penrose.jdbc.JDBCClient;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.action.IMenuManager;
@@ -35,6 +36,7 @@ import org.osgi.framework.Bundle;
 
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Map;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -195,7 +197,16 @@ public class FederationNode extends PluginNode {
 
         if (dialog.open() != Window.OK) return false;
 
-        ConnectionConfig connectionConfig = wizard.getConnectionConfig();
+        ConnectionConfig connectionConfig = new ConnectionConfig();
+
+        Map<String,String> allParameters = wizard.getAllParameters();
+        String url = allParameters.get(JDBCClient.URL);
+        url = Helper.replace(url, allParameters);
+
+        Map<String,String> parameters = wizard.getParameters();
+        parameters.put(JDBCClient.URL, url);
+        
+        connectionConfig.setParameters(parameters);
 
         ConnectionContext connectionContext = new ConnectionContext();
         //connectionContext.setPartition(partition);
@@ -204,8 +215,7 @@ public class FederationNode extends PluginNode {
         JDBCConnection connection = new JDBCConnection();
         connection.init(connectionConfig, connectionContext);
 
-        PartitionConfig partitionConfig = wizard.getPartitionConfig();
-        federation.create(connection, partitionConfig);
+        federation.create(allParameters, connection);
 
         return true;
     }
