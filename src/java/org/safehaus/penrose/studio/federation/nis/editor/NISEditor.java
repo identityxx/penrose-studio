@@ -37,9 +37,10 @@ public class NISEditor extends FormEditor {
     public void addPages() {
         try {
             addPage(new NISDomainsPage(this, nisFederation));
-            addPage(new NISDatabasesPage(this, nisFederation));
+            addPage(new NISYPConfPage(this, nisFederation));
+            //addPage(new NISDatabasesPage(this, nisFederation));
             addPage(new NISPartitionsPage(this, nisFederation));
-            addPage(new NISLDAPPage(this, nisFederation));
+            //addPage(new NISLDAPPage(this, nisFederation));
             addPage(new NISUserChangesPage(this, nisFederation));
             addPage(new NISGroupChangesPage(this, nisFederation));
 
