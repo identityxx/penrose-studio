@@ -746,32 +746,6 @@ public class LinkingPage extends FormPage {
         globalPartitionClient.modify(globalDn, modifications);
     }
 
-    public SearchResult createEntry(SearchResult localEntry) throws Exception {
-
-        Repository repository = editor.getRepository();
-        String localAttribute = repository.getParameter("localAttribute");
-        String globalAttribute = repository.getParameter("globalAttribute");
-
-        SearchResult globalResult = (SearchResult)localEntry.clone();
-
-        DN dn = globalResult.getDn();
-        Attributes attributes = globalResult.getAttributes();
-        attributes.addValue("objectClass", "extensibleObject");
-
-        if (localAttribute == null || globalAttribute == null) {
-            String localDn = localEntry.getDn().toString();
-            attributes.addValue("seeAlso", localDn);
-
-        } else {
-            Object localValue = localEntry.getAttributes().getValue(localAttribute);
-            attributes.addValue(globalAttribute, localValue);
-        }
-
-        globalPartitionClient.add(dn, attributes);
-
-        return globalResult;
-    }
-
     public void link() {
         try {
             int count = localTable.getSelectionCount();
@@ -968,5 +942,33 @@ public class LinkingPage extends FormPage {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);
         }
+    }
+
+    public SearchResult createEntry(SearchResult localEntry) throws Exception {
+
+        Repository repository = editor.getRepository();
+        String localAttribute = repository.getParameter("localAttribute");
+        String globalAttribute = repository.getParameter("globalAttribute");
+
+        SearchResult globalResult = (SearchResult)localEntry.clone();
+
+        DN dn = globalResult.getDn().getPrefix(localBaseDn).append(globalBaseDn);
+        globalResult.setDn(dn);
+        
+        Attributes attributes = globalResult.getAttributes();
+        attributes.addValue("objectClass", "extensibleObject");
+
+        if (localAttribute == null || globalAttribute == null) {
+            String localDn = localEntry.getDn().toString();
+            attributes.addValue("seeAlso", localDn);
+
+        } else {
+            Object localValue = localEntry.getAttributes().getValue(localAttribute);
+            attributes.addValue(globalAttribute, localValue);
+        }
+
+        globalPartitionClient.add(dn, attributes);
+
+        return globalResult;
     }
 }
