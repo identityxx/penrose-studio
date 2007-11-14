@@ -61,7 +61,7 @@ public class NISYPConfPage extends FormPage {
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
 
-        text = toolkit.createText(composite, "", SWT.BORDER | SWT.MULTI | SWT.READ_ONLY);
+        text = toolkit.createText(composite, "", SWT.BORDER | SWT.MULTI | SWT.READ_ONLY | SWT.V_SCROLL | SWT.H_SCROLL);
         text.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         Composite rightPanel = toolkit.createComposite(composite);
