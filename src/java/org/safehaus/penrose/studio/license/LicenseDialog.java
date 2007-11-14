@@ -25,9 +25,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
@@ -150,9 +147,6 @@ public class LicenseDialog extends Dialog {
 
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
-                        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-                        Shell shell = window.getShell();
-
                         ErrorDialog.open(e);
                     }
                 }
@@ -210,9 +204,9 @@ public class LicenseDialog extends Dialog {
             Class fileMgr = Class.forName("com.apple.eio.FileManager");
             Method openURL = fileMgr.getDeclaredMethod(
                     "openURL",
-                    new Class[] { String.class }
+                    String.class
             );
-            openURL.invoke(null, new Object[] { url });
+            openURL.invoke(null, url);
 
         } else if (osName.startsWith("Windows")) {
             Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler "+url);
@@ -226,14 +220,20 @@ public class LicenseDialog extends Dialog {
             for (int count = 0; count < browsers.length && browser == null; count++) {
                 Process p = Runtime.getRuntime().exec(new String[] { "which", browsers[count] });
                 if (p.waitFor() == 0) browser = browsers[count];
-           }
+                p.getErrorStream().close();
+                p.getInputStream().close();
+                p.getOutputStream().close();
+            }
 
-           if (browser == null) {
-              throw new Exception("Could not find web browser");
-           } else {
-              Runtime.getRuntime().exec(new String[] { browser, url });
-           }
-       }
+            if (browser == null) {
+                throw new Exception("Could not find web browser");
+            } else {
+                Process p = Runtime.getRuntime().exec(new String[] { browser, url });
+                p.getErrorStream().close();
+                p.getInputStream().close();
+                p.getOutputStream().close();
+            }
+        }
     }
 
     public int getAction() {
