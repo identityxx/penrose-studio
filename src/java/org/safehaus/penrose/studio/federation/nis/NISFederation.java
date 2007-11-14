@@ -80,7 +80,7 @@ public class NISFederation {
 
         Collection<Repository> list = federation.getRepositories("NIS");
 
-        monitor.beginTask("Loading NIS repositories...", list.size());
+        monitor.beginTask("Loading NIS repositories...", list.size() == 1 ? IProgressMonitor.UNKNOWN : list.size());
 
         mapNames.add("Users");
         mapNames.add("Groups");

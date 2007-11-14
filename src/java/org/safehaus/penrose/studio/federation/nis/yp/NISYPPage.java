@@ -218,7 +218,7 @@ public class NISYPPage extends FormPage {
             progressService.busyCursorWhile(new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor) throws InvocationTargetException {
                     try {
-                        monitor.beginTask("Refreshing...", nisFederation.getMapNames().size());
+                        monitor.beginTask("Refreshing...", mapNames.size() == 1 ? IProgressMonitor.UNKNOWN : mapNames.size());
 
                         for (String mapName : mapNames) {
 

@@ -164,7 +164,7 @@ public class NISDatabaseCachePage extends FormPage {
                     progressService.busyCursorWhile(new IRunnableWithProgress() {
                         public void run(IProgressMonitor monitor) throws InvocationTargetException {
                             try {
-                                monitor.beginTask("Creating cache...", mapNames.size());
+                                monitor.beginTask("Creating cache...", mapNames.size() == 1 ? IProgressMonitor.UNKNOWN : mapNames.size());
 
                                 for (String mapName : mapNames) {
 
@@ -238,7 +238,7 @@ public class NISDatabaseCachePage extends FormPage {
                     progressService.busyCursorWhile(new IRunnableWithProgress() {
                         public void run(IProgressMonitor monitor) throws InvocationTargetException {
                             try {
-                                monitor.beginTask("Loading cache...", mapNames.size());
+                                monitor.beginTask("Loading cache...", mapNames.size() == 1 ? IProgressMonitor.UNKNOWN : mapNames.size());
 
                                 for (String mapName : mapNames) {
 
@@ -312,7 +312,7 @@ public class NISDatabaseCachePage extends FormPage {
                     progressService.busyCursorWhile(new IRunnableWithProgress() {
                         public void run(IProgressMonitor monitor) throws InvocationTargetException {
                             try {
-                                monitor.beginTask("Clearing cache...", mapNames.size());
+                                monitor.beginTask("Clearing cache...", mapNames.size() == 1 ? IProgressMonitor.UNKNOWN : mapNames.size());
 
                                 for (String mapName : mapNames) {
 
@@ -386,7 +386,7 @@ public class NISDatabaseCachePage extends FormPage {
                     progressService.busyCursorWhile(new IRunnableWithProgress() {
                         public void run(IProgressMonitor monitor) throws InvocationTargetException {
                             try {
-                                monitor.beginTask("Removing cache...", mapNames.size());
+                                monitor.beginTask("Removing cache...", mapNames.size() == 1 ? IProgressMonitor.UNKNOWN : mapNames.size());
 
                                 for (String mapName : mapNames) {
 
@@ -462,7 +462,7 @@ public class NISDatabaseCachePage extends FormPage {
                     progressService.busyCursorWhile(new IRunnableWithProgress() {
                         public void run(IProgressMonitor monitor) throws InvocationTargetException {
                             try {
-                                monitor.beginTask("Synchronizing cache...", mapNames.size());
+                                monitor.beginTask("Synchronizing cache...", mapNames.size() == 1 ? IProgressMonitor.UNKNOWN : mapNames.size());
 
                                 for (String mapName : mapNames) {
 
@@ -548,7 +548,7 @@ public class NISDatabaseCachePage extends FormPage {
             progressService.busyCursorWhile(new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor) throws InvocationTargetException {
                     try {
-                        monitor.beginTask("Refreshing...", nisFederation.getMapNames().size());
+                        monitor.beginTask("Refreshing...", mapNames.size() == 1 ? IProgressMonitor.UNKNOWN : mapNames.size());
 
                         for (String mapName : mapNames) {
 

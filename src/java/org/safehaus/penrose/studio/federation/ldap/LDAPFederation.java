@@ -54,7 +54,7 @@ public class LDAPFederation {
 
         Collection<Repository> list = federation.getRepositories("LDAP");
 
-        monitor.beginTask("Loading LDAP repositories...", list.size());
+        monitor.beginTask("Loading LDAP repositories...", list.size() == 1 ? IProgressMonitor.UNKNOWN : list.size());
 
         for (Repository rep : list) {
 

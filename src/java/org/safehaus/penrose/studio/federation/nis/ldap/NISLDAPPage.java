@@ -331,7 +331,7 @@ public class NISLDAPPage extends FormPage {
             progressService.busyCursorWhile(new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor) throws InvocationTargetException {
                     try {
-                        monitor.beginTask("Creating subtree...", mapNames.size());
+                        monitor.beginTask("Creating subtree...", mapNames.size() == 1 ? IProgressMonitor.UNKNOWN : mapNames.size());
 
                         for (String mapName : mapNames) {
 
@@ -403,7 +403,7 @@ public class NISLDAPPage extends FormPage {
             progressService.busyCursorWhile(new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor) throws InvocationTargetException {
                     try {
-                        monitor.beginTask("Loading LDAP...", mapNames.size());
+                        monitor.beginTask("Loading LDAP...", mapNames.size() == 1 ? IProgressMonitor.UNKNOWN : mapNames.size());
 
                         for (String mapName : mapNames) {
                             if (monitor.isCanceled()) throw new InterruptedException();
@@ -473,7 +473,7 @@ public class NISLDAPPage extends FormPage {
             progressService.busyCursorWhile(new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor) throws InvocationTargetException {
                     try {
-                        monitor.beginTask("Clearing LDAP...", mapNames.size());
+                        monitor.beginTask("Clearing LDAP...", mapNames.size() == 1 ? IProgressMonitor.UNKNOWN : mapNames.size());
 
                         for (String mapName : mapNames) {
                             if (monitor.isCanceled()) throw new InterruptedException();
@@ -542,7 +542,7 @@ public class NISLDAPPage extends FormPage {
             progressService.busyCursorWhile(new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor) throws InvocationTargetException {
                     try {
-                        monitor.beginTask("Removing subtree...", mapNames.size());
+                        monitor.beginTask("Removing subtree...", mapNames.size() == 1 ? IProgressMonitor.UNKNOWN : mapNames.size());
 
                         for (String mapName : mapNames) {
 
@@ -613,7 +613,7 @@ public class NISLDAPPage extends FormPage {
             progressService.busyCursorWhile(new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor) throws InvocationTargetException {
                     try {
-                        monitor.beginTask("Synchronizing LDAP...", mapNames.size());
+                        monitor.beginTask("Synchronizing LDAP...", mapNames.size() == 1 ? IProgressMonitor.UNKNOWN : mapNames.size());
 
                         for (String mapName : mapNames) {
                             if (monitor.isCanceled()) throw new InterruptedException();
@@ -724,7 +724,7 @@ public class NISLDAPPage extends FormPage {
         progressService.busyCursorWhile(new IRunnableWithProgress() {
             public void run(IProgressMonitor monitor) throws InvocationTargetException {
                 try {
-                    monitor.beginTask("Refreshing...", nisFederation.getMapNames().size());
+                    monitor.beginTask("Refreshing...", mapNames.size() == 1 ? IProgressMonitor.UNKNOWN : mapNames.size());
 
                     for (String mapName : mapNames) {
 
