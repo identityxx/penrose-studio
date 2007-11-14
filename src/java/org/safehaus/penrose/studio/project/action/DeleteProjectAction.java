@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.server.ServersView;
@@ -50,7 +51,7 @@ public class DeleteProjectAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(window.getShell(), "Action Failed", e.getMessage());
+            ErrorDialog.open(e);
         }
     }
 }

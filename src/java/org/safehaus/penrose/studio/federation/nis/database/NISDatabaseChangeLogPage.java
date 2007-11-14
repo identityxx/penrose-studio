@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.management.PartitionClient;
@@ -61,7 +62,7 @@ public class NISDatabaseChangeLogPage extends FormPage {
         this.domain = editor.getDomain();
 
         penroseClient = project.getClient();
-        partitionClient = penroseClient.getPartitionClient(domain.getName());
+        partitionClient = penroseClient.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
 
         changelog = partitionClient.getSourceClient("changelog");
     }
@@ -185,7 +186,7 @@ public class NISDatabaseChangeLogPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
 
                 refresh();
@@ -241,7 +242,7 @@ public class NISDatabaseChangeLogPage extends FormPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+            ErrorDialog.open(e);
         }
     }
 

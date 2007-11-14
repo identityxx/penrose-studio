@@ -8,6 +8,7 @@ import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionInfoWizardPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.PartitionConfig;
@@ -78,7 +79,7 @@ public class LDAPRepositoryWizard extends Wizard {
             return true;
 
         } catch (Exception e) {
-            MessageDialog.openError(getShell(), "Action Failed.", e.getMessage());
+            ErrorDialog.open(e);
             return false;
         }
     }

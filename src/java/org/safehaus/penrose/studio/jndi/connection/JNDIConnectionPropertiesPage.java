@@ -28,6 +28,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.ldap.LDAPClient;
 
 import javax.naming.InitialContext;
@@ -207,7 +208,7 @@ public class JNDIConnectionPropertiesPage extends ConnectionEditorPage {
 
                 } catch (Exception ex) {
                     log.error(ex.getMessage(), ex);
-                    MessageDialog.openError(parent.getShell(), "Failed to fetch base DNs", "Error: "+ex.getMessage());
+                    ErrorDialog.open(ex);
                 }
             }
         });

@@ -42,6 +42,7 @@ import org.safehaus.penrose.session.SessionManager;
 import org.safehaus.penrose.session.SessionContext;
 import org.safehaus.penrose.studio.project.ProjectConfig;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.io.File;
 
@@ -82,7 +83,7 @@ public class PreviewEditor extends EditorPart {
             if (penrose != null) penrose.stop();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
+            ErrorDialog.open(e);
         }
     }
 
@@ -132,7 +133,7 @@ public class PreviewEditor extends EditorPart {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -152,7 +153,7 @@ public class PreviewEditor extends EditorPart {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -167,7 +168,7 @@ public class PreviewEditor extends EditorPart {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -189,7 +190,7 @@ public class PreviewEditor extends EditorPart {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
+            ErrorDialog.open(e);
         }
     }
 

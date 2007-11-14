@@ -16,6 +16,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.PartitionConfig;
 
@@ -164,15 +165,12 @@ public class NISDomainSettingsPage extends FormPage {
 
                     if (!confirm) return;
 
-                    PartitionConfig partitionConfig = nisFederation.createPartitionConfig(domain);
-                    project.upload("partitions/"+partitionConfig.getName());
-
-                    PenroseClient penroseClient = project.getClient();
-                    penroseClient.startPartition(partitionConfig.getName());
+                    PartitionConfig partitionConfig = nisFederation.createYpPartitionConfig(domain);
+                    nisFederation.loadPartition(partitionConfig);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -192,14 +190,14 @@ public class NISDomainSettingsPage extends FormPage {
                     if (!confirm) return;
 
                     PenroseClient penroseClient = project.getClient();
-                    PartitionConfig partitionConfig = nisFederation.getPartitionConfig(domain.getName());
-                    penroseClient.stopPartition(partitionConfig.getName());
-                    nisFederation.removePartitionConfig(partitionConfig.getName());
-                    project.removeDirectory("partitions/"+partitionConfig.getName());
+                    PartitionConfig nisPartitionConfig = nisFederation.getPartitionConfig(domain.getName()+"_"+NISFederation.YP);
+                    penroseClient.stopPartition(nisPartitionConfig.getName());
+                    nisFederation.removePartitionConfig(nisPartitionConfig.getName());
+                    project.removeDirectory("partitions/"+nisPartitionConfig.getName());
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -268,14 +266,11 @@ public class NISDomainSettingsPage extends FormPage {
                     if (!confirm) return;
 
                     PartitionConfig partitionConfig = nisFederation.createNssPartitionConfig(domain);
-                    project.upload("partitions/"+partitionConfig.getName());
-
-                    PenroseClient penroseClient = project.getClient();
-                    penroseClient.startPartition(partitionConfig.getName());
+                    nisFederation.loadPartition(partitionConfig);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -295,14 +290,14 @@ public class NISDomainSettingsPage extends FormPage {
                     if (!confirm) return;
 
                     PenroseClient penroseClient = project.getClient();
-                    PartitionConfig partitionConfig = nisFederation.getPartitionConfig(domain.getName()+"_nss");
-                    penroseClient.stopPartition(partitionConfig.getName());
-                    nisFederation.removePartitionConfig(partitionConfig.getName());
-                    project.removeDirectory("partitions/"+partitionConfig.getName());
+                    PartitionConfig nssPartitionConfig = nisFederation.getPartitionConfig(domain.getName()+"_"+NISFederation.NSS);
+                    penroseClient.stopPartition(nssPartitionConfig.getName());
+                    nisFederation.removePartitionConfig(nssPartitionConfig.getName());
+                    project.removeDirectory("partitions/"+nssPartitionConfig.getName());
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });

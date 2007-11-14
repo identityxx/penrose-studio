@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.federation.GlobalRepository;
 import org.safehaus.penrose.studio.federation.wizard.GlobalRepositoryWizard;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import javax.naming.Context;
 import java.util.Map;
@@ -102,7 +103,7 @@ public class FederationGlobalRepositoryPage extends FormPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+            ErrorDialog.open(e);
         }
     }
 
@@ -178,12 +179,13 @@ public class FederationGlobalRepositoryPage extends FormPage {
                     globalRepository.setPassword(parameters.get(Context.SECURITY_CREDENTIALS));
 
                     federation.setGlobalRepository(globalRepository);
+                    federation.createGlobalPartition(globalRepository);
 
                     refresh();
                     
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });

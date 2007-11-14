@@ -32,6 +32,7 @@ import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.studio.connection.SchemaExportWizard;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.ldap.LDAPClient;
 
 import java.util.Collection;
@@ -120,15 +121,7 @@ public class JNDIConnectionSchemaPage extends ConnectionEditorPage {
                     dialog.open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-
-                    StringWriter sw = new StringWriter();
-                    PrintWriter pw = new PrintWriter(sw);
-                    e.printStackTrace(pw);
-                    String message = sw.toString();
-                    if (message.length() > 500) {
-                        message = message.substring(0, 500) + "...";
-                    }
-                    MessageDialog.openError(getEditorSite().getShell(), "Error", "Error: "+message);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -208,15 +201,7 @@ public class JNDIConnectionSchemaPage extends ConnectionEditorPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            String message = sw.toString();
-            if (message.length() > 500) {
-                message = message.substring(0, 500) + "...";
-            }
-            MessageDialog.openError(getEditorSite().getShell(), "Error", "Error: "+message);
+            ErrorDialog.open(e);
         }
     }
 }

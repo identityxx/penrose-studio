@@ -1,7 +1,6 @@
 package org.safehaus.penrose.studio.federation.wizard;
 
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TreeAdapter;
@@ -12,7 +11,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.management.SourceClient;
+import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 /**
  * @author Endi Sukma Dewata
@@ -26,8 +26,8 @@ public class BrowserPage extends WizardPage {
     Tree tree;
     Text dnText;
 
-    private String baseDn;
-    private SourceClient sourceClient;
+    private DN baseDn;
+    private PartitionClient partitionClient;
 
     public BrowserPage() {
         super(NAME);
@@ -56,19 +56,15 @@ public class BrowserPage extends WizardPage {
                 if (tree.getSelectionCount() != 1) return;
 
                 TreeItem item = tree.getSelection()[0];
-                String dn = (String)item.getData();
+                DN dn = (DN)item.getData();
 
-                DNBuilder db = new DNBuilder();
-                db.append(dn);
-                db.append(baseDn);
-
-                dnText.setText(db.toDn().toString());
+                dnText.setText(dn.toString());
             }
         });
 
         TreeItem item = new TreeItem(tree, SWT.NONE);
-        item.setText(baseDn);
-        item.setData("");
+        item.setText(baseDn.toString());
+        item.setData(baseDn);
 
         expand(item);
 
@@ -84,9 +80,9 @@ public class BrowserPage extends WizardPage {
         try {
             parent.removeAll();
 
-            String parentDn = (String)parent.getData();
+            DN parentDn = (DN)parent.getData();
 
-            SearchResponse response = sourceClient.search(parentDn, null, SearchRequest.SCOPE_ONE);
+            SearchResponse response = partitionClient.search(parentDn, null, SearchRequest.SCOPE_ONE);
 
             while (response.hasNext()) {
                 SearchResult result = response.next();
@@ -94,31 +90,31 @@ public class BrowserPage extends WizardPage {
 
                 TreeItem item = new TreeItem(parent, SWT.NONE);
                 item.setText(dn.getRdn().toString());
-                item.setData(dn.toString());
+                item.setData(dn);
 
                 new TreeItem(item, SWT.NONE);
             }
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(getShell(), "Action Failed", e.getMessage());
+            ErrorDialog.open(e);
         }
     }
 
-    public String getBaseDn() {
+    public DN getBaseDn() {
         return baseDn;
     }
 
-    public void setBaseDn(String baseDn) {
+    public void setBaseDn(DN baseDn) {
         this.baseDn = baseDn;
     }
 
-    public SourceClient getSourceClient() {
-        return sourceClient;
+    public PartitionClient getPartitionClient() {
+        return partitionClient;
     }
 
-    public void setSourceClient(SourceClient sourceClient) {
-        this.sourceClient = sourceClient;
+    public void setPartitionClient(PartitionClient partitionClient) {
+        this.partitionClient = partitionClient;
     }
 
     public String getDn() {

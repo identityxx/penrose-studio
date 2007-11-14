@@ -33,6 +33,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.welcome.WelcomeEditorInput;
 import org.safehaus.penrose.studio.welcome.WelcomeEditor;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -111,16 +112,7 @@ public class PenroseStudioWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor 
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-
-            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-            Shell shell = window.getShell();
-
-            MessageDialog.openError(
-                    shell,
-                    "ERROR",
-                    "Failed opening Penrose Studio.\n"+
-                            "See penrose-studio.log for details."
-            );
+            ErrorDialog.open(e);
         }
 /*
         try {
@@ -150,14 +142,7 @@ public class PenroseStudioWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor 
             //penroseStudio.validatePartitions();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-
-            String message = e.toString();
-            if (message.length() > 500) {
-                message = message.substring(0, 500) + "...";
-            }
-
-            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-            MessageDialog.openError(window.getShell(), "Open Failed", message);
+            ErrorDialog.open(e);
         }
     }
 

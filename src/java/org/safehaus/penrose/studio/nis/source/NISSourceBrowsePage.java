@@ -18,6 +18,7 @@ import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -151,7 +152,7 @@ public class NISSourceBrowsePage extends SourceEditorPage {
 
             Connection connection = partition.getConnection(sourceConfig.getConnectionName());
 
-            Source source = partition.createSource(sourceConfig, connection);
+            Source source = connection.createSource(sourceConfig);
 
             source.search(sc, sr);
 
@@ -159,11 +160,7 @@ public class NISSourceBrowsePage extends SourceEditorPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            String message = e.toString();
-            if (message.length() > 500) {
-                message = message.substring(0, 500) + "...";
-            }
-            MessageDialog.openError(editor.getSite().getShell(), "Browse Failed", message);
+            ErrorDialog.open(e);
         }
     }
 }

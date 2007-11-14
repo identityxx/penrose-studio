@@ -12,9 +12,14 @@ import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionContext;
+import org.safehaus.penrose.connection.Connection;
+import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.action.IMenuManager;
@@ -22,7 +27,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.*;
 import org.eclipse.ui.progress.IProgressService;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -155,37 +159,26 @@ public class FederationNode extends PluginNode {
         progressService.busyCursorWhile(new IRunnableWithProgress() {
             public void run(IProgressMonitor monitor) throws InvocationTargetException {
                 try {
-                    monitor.beginTask("Loading partitions...", IProgressMonitor.UNKNOWN);
-
                     federation.load(monitor);
 
-                    /*
-                    children.add(new GlobalNode(
-                            "Global",
-                            FederationNode.this
-                    ));
-                    */
-                    children.add(new LDAPNode(
-                            "LDAP",
-                            FederationNode.this
-                    ));
-
-                    children.add(new NISNode(
-                            "NIS",
-                            FederationNode.this
-                    ));
-
-                    started = true;
-                    
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(serversView.getSite().getShell(), "Action Failed", e.getMessage());
-
-                } finally {
-                    monitor.done();
+                    ErrorDialog.open(e);
                 }
             }
         });
+
+        children.add(new LDAPNode(
+                "LDAP",
+                FederationNode.this
+        ));
+
+        children.add(new NISNode(
+                "NIS",
+                FederationNode.this
+        ));
+
+        started = true;
     }
 
     public boolean createPartition() throws Exception {
@@ -202,8 +195,17 @@ public class FederationNode extends PluginNode {
 
         if (dialog.open() != Window.OK) return false;
 
+        ConnectionConfig connectionConfig = wizard.getConnectionConfig();
+
+        ConnectionContext connectionContext = new ConnectionContext();
+        //connectionContext.setPartition(partition);
+        //connectionContext.setAdapter(adapter);
+
+        JDBCConnection connection = new JDBCConnection();
+        connection.init(connectionConfig, connectionContext);
+
         PartitionConfig partitionConfig = wizard.getPartitionConfig();
-        federation.create(partitionConfig);
+        federation.create(connection, partitionConfig);
 
         return true;
     }

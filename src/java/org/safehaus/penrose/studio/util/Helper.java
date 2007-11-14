@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.apache.log4j.Logger;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 public class Helper {
 
@@ -67,15 +68,11 @@ public class Helper {
 
         } catch (ClassNotFoundException e) {
             log.debug(e.getMessage(), e);
-			MessageDialog.openError(shell, "Test Connection Result", "Error: "+e.getMessage());
+			ErrorDialog.open(e);
 
         } catch (SQLException e) {
             log.debug(e.getMessage(), e);
-			String message = e.toString();
-			if (message.length() > 500) {
-				message = message.substring(0, 500) + "...";
-			}
-			MessageDialog.openError(shell, "Test Connection Result", "Error: "+e.getSQLState()+"\n"+message);
+			ErrorDialog.open(e);
 
         } finally {
 			try { if (con != null) con.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
@@ -95,14 +92,7 @@ public class Helper {
 
         } catch (NamingException e) {
             log.debug(e.getMessage(), e);
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			e.printStackTrace(pw);
-			String message = sw.toString();
-			if (message.length() > 500) {
-				message = message.substring(0, 500) + "...";
-			}
-			MessageDialog.openError(shell, "Test Connection Result", "Error: "+message);
+			ErrorDialog.open(e);
 
         } finally {
 			try { if (ic != null) ic.close(); } catch (Exception e) { log.error(e.getMessage(), e); }

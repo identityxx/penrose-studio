@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
@@ -139,16 +140,16 @@ public class NISPartitionsPage extends FormPage {
                     for (TableItem ti : items) {
                         NISDomain repository = (NISDomain)ti.getData();
 
-                        PartitionConfig partitionConfig = nisFederation.createPartitionConfig(repository);
-                        project.upload("partitions/"+repository.getName());
+                        PartitionConfig nisPartitionConfig = nisFederation.createNisPartitionConfig(repository);
+                        nisFederation.loadPartition(nisPartitionConfig);
 
-                        penroseClient.startPartition(repository.getName());
-                        nisFederation.loadPartition(partitionConfig);
-
+                        PartitionConfig ypPartitionConfig = nisFederation.createYpPartitionConfig(repository);
+                        nisFederation.loadPartition(ypPartitionConfig);
+/*
+                        PartitionConfig dbPartitionConfig = nisFederation.createDbPartitionConfig(repository);
+                        nisFederation.loadPartition(dbPartitionConfig);
+*/
                         PartitionConfig nssPartitionConfig = nisFederation.createNssPartitionConfig(repository);
-                        project.upload("partitions/"+nssPartitionConfig.getName());
-
-                        penroseClient.startPartition(nssPartitionConfig.getName());
                         nisFederation.loadPartition(nssPartitionConfig);
                     }
 
@@ -157,7 +158,7 @@ public class NISPartitionsPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
 
                 refresh();
@@ -209,7 +210,7 @@ public class NISPartitionsPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
 
                 refresh();
@@ -241,7 +242,7 @@ public class NISPartitionsPage extends FormPage {
             PartitionConfigs partitionConfigs = project.getPartitionConfigs();
 
             for (NISDomain repository : nisFederation.getRepositories()) {
-                PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(repository.getName());
+                PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(repository.getName()+"_"+NISFederation.YP);
                 //Partition partition = nisFederation.getPartitions().getPartition(repository.getName());
 
                 TableItem ti = new TableItem(table, SWT.NONE);
@@ -256,7 +257,7 @@ public class NISPartitionsPage extends FormPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+            ErrorDialog.open(e);
         }
     }
 

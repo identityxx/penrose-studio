@@ -30,6 +30,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.apache.log4j.Logger;
 
 import java.text.SimpleDateFormat;
@@ -152,7 +153,7 @@ public class LicenseDialog extends Dialog {
                         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
                         Shell shell = window.getShell();
 
-                        MessageDialog.openError(shell, "ERROR", e.getMessage());
+                        ErrorDialog.open(e);
                     }
                 }
             });

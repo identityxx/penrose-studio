@@ -13,10 +13,15 @@ import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.jdbc.connection.JDBCConnection;
+import org.safehaus.penrose.management.PenroseClient;
 import org.apache.log4j.Logger;
+import org.apache.tools.ant.taskdefs.Copy;
+import org.apache.tools.ant.types.FileSet;
+import org.apache.tools.ant.types.FilterChain;
+import org.apache.tools.ant.filters.ExpandProperties;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 
 import java.io.File;
 import java.util.Collection;
@@ -69,7 +74,7 @@ public class Federation {
         partitions.addPartition(defaultPartition);
     }
 
-    public void create(PartitionConfig partitionConfig) throws Exception {
+    public void create(JDBCConnection connection, PartitionConfig partitionConfig) throws Exception {
 
         log.debug("Creating partition "+Federation.PARTITION +".");
 
@@ -83,6 +88,28 @@ public class Federation {
         partitionConfigs.addPartitionConfig(partitionConfig);
         project.save(partitionConfig);
 
+        log.debug("Creating database tables in "+Federation.PARTITION +".");
+
+        try {
+            connection.createDatabase(Federation.PARTITION);
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+        }
+/*
+        SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
+        for (SourceConfig sourceConfig : sourceConfigs.getSourceConfigs()) {
+            try {
+                connection.createTable(sourceConfig);
+            } catch (Exception e) {
+                log.debug(e.getMessage());
+            }
+        }
+*/
+        project.upload("partitions/"+partitionConfig.getName());
+
+        PenroseClient penroseClient = project.getClient();
+        penroseClient.startPartition(partitionConfig.getName());
+
         log.debug("Initializing partition "+Federation.PARTITION +".");
 
         PenroseConfig penroseConfig = project.getPenroseConfig();
@@ -93,62 +120,107 @@ public class Federation {
         partitionFactory.setPenroseConfig(penroseConfig);
         partitionFactory.setPenroseContext(penroseContext);
 
-        Partition partition = partitionFactory.createPartition(partitionConfig);
+        partitionFactory.createPartition(partitionConfig);
 
-        log.debug("Creating database tables in "+Federation.PARTITION +".");
+    }
 
-        Connection connection = partition.getConnection(Federation.JDBC);
+    public void createGlobalPartition(GlobalRepository globalRepository) throws Exception {
 
-        JDBCConnection adapter = (JDBCConnection)connection;
-        try {
-            adapter.createDatabase(Federation.PARTITION);
-        } catch (Exception e) {
-            log.debug(e.getMessage());
-        }
+        String partitionName = "federation_global";
 
-        SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
-        for (SourceConfig sourceConfig : sourceConfigs.getSourceConfigs()) {
-            try {
-                adapter.createTable(sourceConfig);
-            } catch (Exception e) {
-                log.debug(e.getMessage());
-            }
-        }
+        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+        if (partitionConfigs.getPartitionConfig(partitionName) != null) return;
+
+        log.debug("Creating partition "+partitionName+".");
+
+        File sampleDir = new File(project.getWorkDir(), "samples/"+partitionName);
+        if (!sampleDir.exists()) project.download("samples/"+partitionName);
+
+        File partitionDir = new File(project.getWorkDir(), "partitions"+File.separator+ partitionName);
+
+        org.apache.tools.ant.Project antProject = new org.apache.tools.ant.Project();
+
+        String url          = globalRepository.getUrl();
+        String bindDn       = globalRepository.getUser();
+        String bindPassword = globalRepository.getPassword();
+        String suffix       = globalRepository.getSuffix();
+
+        antProject.setProperty("LDAP_URL",      url);
+        antProject.setProperty("LDAP_USER",     bindDn);
+        antProject.setProperty("LDAP_PASSWORD", bindPassword);
+        antProject.setProperty("LDAP_SUFFIX",   suffix);
+
+        Copy copy = new Copy();
+        copy.setOverwrite(true);
+        copy.setProject(antProject);
+
+        FileSet fs = new FileSet();
+        fs.setDir(sampleDir);
+        fs.setIncludes("**/*");
+        copy.addFileset(fs);
+
+        copy.setTodir(partitionDir);
+
+        FilterChain filterChain = copy.createFilterChain();
+        ExpandProperties expandProperties = new ExpandProperties();
+        expandProperties.setProject(antProject);
+        filterChain.addExpandProperties(expandProperties);
+
+        copy.execute();
+
+        PartitionConfig partitionConfig = partitionConfigs.load(partitionDir);
+        partitionConfigs.addPartitionConfig(partitionConfig);
+
+        project.upload("partitions/"+partitionConfig.getName());
+
+        PenroseClient penroseClient = project.getClient();
+        penroseClient.startPartition(partitionConfig.getName());
     }
 
     public void load(IProgressMonitor monitor) throws Exception {
+        try {
+            log.debug("Starting Federation tool.");
 
-        log.debug("Starting Federation tool.");
+            monitor.beginTask("Loading partitions...", 2);
 
-        File partitionsDir = new File(project.getWorkDir(), "partitions");
+            File partitionsDir = new File(project.getWorkDir(), "partitions");
 
-        PenroseConfig penroseConfig = project.getPenroseConfig();
-        PenroseContext penroseContext = project.getPenroseContext();
-        Partitions partitions = penroseContext.getPartitions();
+            PenroseConfig penroseConfig = project.getPenroseConfig();
+            PenroseContext penroseContext = project.getPenroseContext();
+            Partitions partitions = penroseContext.getPartitions();
 
-        PartitionFactory partitionFactory = new PartitionFactory();
-        partitionFactory.setPartitionsDir(partitionsDir);
-        partitionFactory.setPenroseConfig(penroseConfig);
-        partitionFactory.setPenroseContext(penroseContext);
+            PartitionFactory partitionFactory = new PartitionFactory();
+            partitionFactory.setPartitionsDir(partitionsDir);
+            partitionFactory.setPenroseConfig(penroseConfig);
+            partitionFactory.setPenroseContext(penroseContext);
 
-        monitor.subTask("Initializing...");
+            PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+            PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(PARTITION);
+            partition = partitionFactory.createPartition(partitionConfig);
 
-        PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(PARTITION);
-        partition = partitionFactory.createPartition(partitionConfig);
+            partitions.addPartition(partition);
 
-        partitions.addPartition(partition);
+            globalParameters = partition.getSource(GLOBAL_PARAMETERS);
 
-        monitor.worked(1);
+            if (partitionConfigs.getPartitionConfig(Federation.PARTITION+"_global") == null) {
+                GlobalRepository globalRepository = getGlobalRepository();
+                if (globalRepository != null) createGlobalPartition(globalRepository);
+            }
 
-        globalParameters = partition.getSource(GLOBAL_PARAMETERS);
-        repositories = partition.getSource(REPOSITORIES);
-        repositoryParameters = partition.getSource(REPOSITORY_PARAMETERS);
+            repositories = partition.getSource(REPOSITORIES);
+            repositoryParameters = partition.getSource(REPOSITORY_PARAMETERS);
 
-        ldapFederation = new LDAPFederation(this);
-        ldapFederation.load(monitor);
+            SubProgressMonitor ldapMonitor = new SubProgressMonitor(monitor, 1);
+            ldapFederation = new LDAPFederation(this);
+            ldapFederation.load(ldapMonitor);
 
-        nisFederation = new NISFederation(this);
-        nisFederation.load(monitor);
+            SubProgressMonitor nisMonitor = new SubProgressMonitor(monitor, 1);
+            nisFederation = new NISFederation(this);
+            nisFederation.load(nisMonitor);
+
+        } finally {
+            monitor.done();
+        }
     }
 
     public Partition getPartition() {
@@ -257,6 +329,32 @@ public class Federation {
             } else if ("NIS".equals(type)) {
                 repository = new NISDomain();
 
+                String ypSuffix = parameters.get("ypSuffix");
+                if (ypSuffix == null) {
+
+                    DN suffix = new DN(parameters.get("suffix"));
+
+                    DNBuilder db = new DNBuilder();
+                    db.append(suffix.get(0));
+                    db.append("ou=yp");
+                    db.append(suffix.getSuffix(2));
+                    ypSuffix = db.toString();
+
+                    RDNBuilder rb = new RDNBuilder();
+                    rb.set("repository", name);
+                    rb.set("name", "ypSuffix");
+                    DN paramDn = new DN(rb.toRdn());
+
+                    Attributes paramAttrs = new Attributes();
+                    paramAttrs.setValue("repository", name);
+                    paramAttrs.setValue("name", "ypSuffix");
+                    paramAttrs.setValue("value", ypSuffix);
+
+                    repositoryParameters.add(paramDn, paramAttrs);
+
+                    parameters.put("ypSuffix", ypSuffix);
+                }
+
             } else {
                 throw new Exception("Unknown type: "+type);
             }
@@ -362,6 +460,8 @@ public class Federation {
             parameters.put(paramName, paramValue);
         }
 
+        if (parameters.isEmpty()) return null;
+        
         repository.setParameters(parameters);
 
         return repository;

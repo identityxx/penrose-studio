@@ -24,6 +24,7 @@ import org.safehaus.penrose.studio.federation.nis.wizard.NISRepositoryWizard;
 import org.safehaus.penrose.studio.nis.dialog.NISUserDialog;
 import org.safehaus.penrose.studio.federation.nis.editor.NISDomainDialog;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.PartitionConfig;
@@ -138,7 +139,7 @@ public class NISDomainsPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
 
                 refresh();
@@ -172,7 +173,7 @@ public class NISDomainsPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
 
                 refresh();
@@ -206,22 +207,24 @@ public class NISDomainsPage extends FormPage {
                         NISDomain repository = (NISDomain)ti.getData();
 
                         try {
-                            PartitionConfig partitionConfig = nisFederation.getPartitionConfig(repository.getName());
-                            PartitionConfig nssPartitionConfig = nisFederation.getPartitionConfig(repository.getName()+"_nss");
+                            PartitionConfig nisPartitionConfig = nisFederation.getPartitionConfig(repository.getName());
+                            penroseClient.stopPartition(nisPartitionConfig.getName());
+                            nisFederation.removePartitionConfig(nisPartitionConfig.getName());
+                            project.removeDirectory("partitions/"+nisPartitionConfig.getName());
 
-                            penroseClient.stopPartition(partitionConfig.getName());
+                            PartitionConfig ypPartitionConfig = nisFederation.getPartitionConfig(repository.getName()+"_"+NISFederation.YP);
+                            penroseClient.stopPartition(ypPartitionConfig.getName());
+                            nisFederation.removePartitionConfig(ypPartitionConfig.getName());
+                            project.removeDirectory("partitions/"+ypPartitionConfig.getName());
+
+                            PartitionConfig nssPartitionConfig = nisFederation.getPartitionConfig(repository.getName()+"_"+NISFederation.NSS);
                             penroseClient.stopPartition(nssPartitionConfig.getName());
-
-                            nisFederation.removePartition(repository);
-                            nisFederation.removeDatabase(repository);
-
-                            nisFederation.removePartitionConfig(partitionConfig.getName());
-                            project.removeDirectory("partitions/"+partitionConfig.getName());
-
                             nisFederation.removePartitionConfig(nssPartitionConfig.getName());
                             project.removeDirectory("partitions/"+nssPartitionConfig.getName());
 
-                            nisFederation.removeRepository(partitionConfig.getName());
+                            nisFederation.removePartition(repository);
+                            nisFederation.removeDatabase(repository);
+                            nisFederation.removeRepository(repository.getName());
 
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
@@ -235,7 +238,7 @@ public class NISDomainsPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
 
                 refresh();
@@ -278,7 +281,7 @@ public class NISDomainsPage extends FormPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+            ErrorDialog.open(e);
         }
     }
 

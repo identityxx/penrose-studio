@@ -2,7 +2,8 @@ package org.safehaus.penrose.studio.federation.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.management.SourceClient;
+import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.ldap.DN;
 
 /**
  * @author Endi Sukma Dewata
@@ -11,8 +12,8 @@ public class BrowserWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private String baseDn;
-    private SourceClient sourceClient;
+    private DN baseDn;
+    private PartitionClient partitionClient;
 
     BrowserPage browserPage;
 
@@ -25,7 +26,7 @@ public class BrowserWizard extends Wizard {
     public void addPages() {
         browserPage = new BrowserPage();
         browserPage.setBaseDn(baseDn);
-        browserPage.setSourceClient(sourceClient);
+        browserPage.setPartitionClient(partitionClient);
         addPage(browserPage);
     }
 
@@ -40,20 +41,20 @@ public class BrowserWizard extends Wizard {
         }
     }
 
-    public String getBaseDn() {
+    public DN getBaseDn() {
         return baseDn;
     }
 
-    public void setBaseDn(String baseDn) {
+    public void setBaseDn(DN baseDn) {
         this.baseDn = baseDn;
     }
 
-    public SourceClient getSourceClient() {
-        return sourceClient;
+    public PartitionClient getPartitionClient() {
+        return partitionClient;
     }
 
-    public void setSourceClient(SourceClient sourceClient) {
-        this.sourceClient = sourceClient;
+    public void setPartitionClient(PartitionClient partitionClient) {
+        this.partitionClient = partitionClient;
     }
 
     public String getDn() {

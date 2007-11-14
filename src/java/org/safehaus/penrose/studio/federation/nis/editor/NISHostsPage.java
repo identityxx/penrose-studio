@@ -11,18 +11,20 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISHostDialog;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISFilesEditor;
+import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.nis.dialog.NISUserDialog;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.PartitionClient;
 import org.safehaus.penrose.management.ModuleClient;
+import org.safehaus.penrose.management.SourceClient;
 
 import java.util.Date;
 import java.util.Collection;
@@ -104,17 +106,19 @@ public class NISHostsPage extends FormPage {
                 }
             };
 
-            nisFederation.getHosts().search(request, response);
+            Project project = nisFederation.getProject();
+            PenroseClient client = project.getClient();
+            PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+            SourceClient sourceClient = partitionClient.getSourceClient("penrose_hosts");
+
+            sourceClient.search(request, response);
+            //nisFederation.getHosts().search(request, response);
 
             hostsTable.select(indices);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            String message = e.toString();
-            if (message.length() > 500) {
-                message = message.substring(0, 500) + "...";
-            }
-            MessageDialog.openError(editor.getSite().getShell(), "Init Failed", message);
+            ErrorDialog.open(e);
         }
     }
 
@@ -165,11 +169,7 @@ public class NISHostsPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    String message = e.toString();
-                    if (message.length() > 500) {
-                        message = message.substring(0, 500) + "...";
-                    }
-                    MessageDialog.openError(editor.getSite().getShell(), "Add Failed", message);
+                    ErrorDialog.open(e);
                 }
 
                 refresh();
@@ -187,11 +187,7 @@ public class NISHostsPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    String message = e.toString();
-                    if (message.length() > 500) {
-                        message = message.substring(0, 500) + "...";
-                    }
-                    MessageDialog.openError(editor.getSite().getShell(), "Edit Failed", message);
+                    ErrorDialog.open(e);
                 }
 
                 refresh();
@@ -209,11 +205,7 @@ public class NISHostsPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    String message = e.toString();
-                    if (message.length() > 500) {
-                        message = message.substring(0, 500) + "...";
-                    }
-                    MessageDialog.openError(editor.getSite().getShell(), "Remove Failed", message);
+                    ErrorDialog.open(e);
                 }
 
                 refresh();
@@ -233,11 +225,7 @@ public class NISHostsPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    String message = e.toString();
-                    if (message.length() > 500) {
-                        message = message.substring(0, 500) + "...";
-                    }
-                    MessageDialog.openError(editor.getSite().getShell(), "Update Failed", message);
+                    ErrorDialog.open(e);
                 }
 
                 refresh();
@@ -278,7 +266,13 @@ public class NISHostsPage extends FormPage {
         attributes.setValue("port", dialog.getPort());
         attributes.setValue("paths", dialog.getPaths());
 
-        nisFederation.getHosts().add(dn, attributes);
+        Project project = nisFederation.getProject();
+        PenroseClient client = project.getClient();
+        PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+        SourceClient sourceClient = partitionClient.getSourceClient("penrose_hosts");
+
+        sourceClient.add(dn, attributes);
+        //nisFederation.getHosts().add(dn, attributes);
     }
 
     public void edit() throws Exception {
@@ -304,8 +298,14 @@ public class NISHostsPage extends FormPage {
         rb.set("name", dialog.getName());
         RDN newRdn = rb.toRdn();
 
+        Project project = nisFederation.getProject();
+        PenroseClient client = project.getClient();
+        PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+        SourceClient sourceClient = partitionClient.getSourceClient("penrose_hosts");
+
         if (!dn.getRdn().equals(newRdn)) {
-            nisFederation.getHosts().modrdn(dn, newRdn, true);
+            sourceClient.modrdn(dn, newRdn, true);
+            //nisFederation.getHosts().modrdn(dn, newRdn, true);
         }
 
         DNBuilder db = new DNBuilder();
@@ -325,18 +325,25 @@ public class NISHostsPage extends FormPage {
                 new Attribute("paths", dialog.getPaths())
         ));
 
-        nisFederation.getHosts().modify(newDn, modifications);
+        sourceClient.modify(newDn, modifications);
+        //nisFederation.getHosts().modify(newDn, modifications);
 
     }
 
     public void remove() throws Exception {
         if (hostsTable.getSelectionCount() == 0) return;
 
+        Project project = nisFederation.getProject();
+        PenroseClient client = project.getClient();
+        PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+        SourceClient sourceClient = partitionClient.getSourceClient("penrose_hosts");
+
         TableItem items[] = hostsTable.getSelection();
         for (TableItem ti : items) {
             SearchResult result = (SearchResult) ti.getData();
             DN dn = result.getDn();
-            nisFederation.getHosts().delete(dn);
+            sourceClient.delete(dn);
+            //nisFederation.getHosts().delete(dn);
         }
     }
 
@@ -345,8 +352,11 @@ public class NISHostsPage extends FormPage {
 
         Project project = nisFederation.getProject();
         PenroseClient client = project.getClient();
-        PartitionClient partitionClient = client.getPartitionClient(domain.getName());
-        ModuleClient moduleClient = partitionClient.getModuleClient("NISModule");
+        PartitionClient domainClient = client.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
+        ModuleClient moduleClient = domainClient.getModuleClient("NISModule");
+
+        PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+        SourceClient sourceClient = partitionClient.getSourceClient("penrose_hosts");
 
         TableItem items[] = hostsTable.getSelection();
 
@@ -365,7 +375,8 @@ public class NISHostsPage extends FormPage {
                     new Attribute("status", "UPDATING")
             ));
 
-            nisFederation.getHosts().modify(result.getDn(), modifications);
+            sourceClient.modify(result.getDn(), modifications);
+            //nisFederation.getHosts().modify(result.getDn(), modifications);
 
             Attributes attributes = result.getAttributes();
             String hostname = (String)attributes.getValue("name");

@@ -1,7 +1,6 @@
 package org.safehaus.penrose.studio.federation.linking;
 
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -15,7 +14,8 @@ import org.safehaus.penrose.ldap.Attribute;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.filter.SubstringFilter;
-import org.safehaus.penrose.management.SourceClient;
+import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -36,9 +36,8 @@ public class LinkingResultsPage extends WizardPage {
 
     private DN dn;
     private SearchResult entry;
-    private SourceClient sourceClient;
+    private PartitionClient partitionClient;
 
-    private DN baseDn;
     private Collection<SearchResult> results;
 
     public LinkingResultsPage() {
@@ -119,8 +118,6 @@ public class LinkingResultsPage extends WizardPage {
         tc.setText("DN");
         tc.setWidth(280);
 
-        final Shell shell = getShell();
-
         resultsTable.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
@@ -142,7 +139,7 @@ public class LinkingResultsPage extends WizardPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(shell, "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -232,7 +229,7 @@ public class LinkingResultsPage extends WizardPage {
                 if (linked) continue;
 
                 TableItem item = new TableItem(resultsTable, SWT.NONE);
-                item.setText(0, result.getDn().append(baseDn).toString());
+                item.setText(0, result.getDn().toString());
                 item.setData(result);
             }
         }
@@ -256,19 +253,11 @@ public class LinkingResultsPage extends WizardPage {
         this.dn = dn;
     }
 
-    public SourceClient getSourceClient() {
-        return sourceClient;
+    public PartitionClient getPartitionClient() {
+        return partitionClient;
     }
 
-    public void setSourceClient(SourceClient sourceClient) {
-        this.sourceClient = sourceClient;
-    }
-
-    public DN getBaseDn() {
-        return baseDn;
-    }
-
-    public void setBaseDn(DN baseDn) {
-        this.baseDn = baseDn;
+    public void setPartitionClient(PartitionClient partitionClient) {
+        this.partitionClient = partitionClient;
     }
 }

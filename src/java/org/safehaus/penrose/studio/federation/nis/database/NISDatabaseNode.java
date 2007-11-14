@@ -59,7 +59,7 @@ public class NISDatabaseNode extends Node {
 
         NISDatabaseEditorInput ei = new NISDatabaseEditorInput();
         ei.setProject(projectNode.getProject());
-        ei.setNisTool(nisFederation);
+        ei.setNisFederation(nisFederation);
         ei.setDomain(domainNode.getDomain());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

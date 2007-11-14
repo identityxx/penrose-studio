@@ -3,7 +3,6 @@ package org.safehaus.penrose.studio.federation.linking;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -21,7 +20,8 @@ import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.filter.FilterTool;
 import org.safehaus.penrose.filter.SubstringFilter;
 import org.safehaus.penrose.studio.federation.wizard.BrowserWizard;
-import org.safehaus.penrose.management.SourceClient;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
+import org.safehaus.penrose.management.PartitionClient;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class LinkingSearchPage extends WizardPage {
 
     private DN dn;
     private SearchResult searchResult;
-    private SourceClient sourceClient;
+    private PartitionClient partitionClient;
 
     public LinkingSearchPage() {
         super(NAME);
@@ -95,7 +95,7 @@ public class LinkingSearchPage extends WizardPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(getShell(), "Action Failed", e.getMessage());
+            ErrorDialog.open(e);
         }
     }
 
@@ -110,26 +110,21 @@ public class LinkingSearchPage extends WizardPage {
         baseDnLabel.setText("Base DN:");
         baseDnLabel.setLayoutData(new GridData());
 
-        String s = sourceClient.getParameter("baseDn");
-        final String baseDn = s == null ? "" : s;
-
         baseDnText = new Text(composite, SWT.BORDER);
-        baseDnText.setText(baseDn);
+        baseDnText.setText(dn.toString());
         baseDnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Button browseButton = new Button(composite, SWT.PUSH);
         browseButton.setText("  Browse  ");
         browseButton.setLayoutData(new GridData());
 
-        final Shell shell = getShell();
-
         browseButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
                     BrowserWizard wizard = new BrowserWizard();
-                    wizard.setBaseDn(baseDn);
+                    wizard.setBaseDn(dn);
                     wizard.setDn(baseDnText.getText());
-                    wizard.setSourceClient(sourceClient);
+                    wizard.setPartitionClient(partitionClient);
 
                     IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
                     WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
@@ -141,7 +136,7 @@ public class LinkingSearchPage extends WizardPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(shell, "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -159,8 +154,7 @@ public class LinkingSearchPage extends WizardPage {
         scopeLabel.setText("Scope:");
         scopeLabel.setLayoutData(new GridData());
 
-        String scope = sourceClient.getParameter("scope");
-        if (scope == null) scope = "SUBTREE";
+        String scope = "SUBTREE";
 
         scopeCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
         scopeCombo.add("OBJECT");
@@ -223,12 +217,12 @@ public class LinkingSearchPage extends WizardPage {
         this.searchResult = searchResult;
     }
 
-    public SourceClient getSourceClient() {
-        return sourceClient;
+    public PartitionClient getPartitionClient() {
+        return partitionClient;
     }
 
-    public void setSourceClient(SourceClient sourceClient) {
-        this.sourceClient = sourceClient;
+    public void setPartitionClient(PartitionClient partitionClient) {
+        this.partitionClient = partitionClient;
     }
 
     public String getBaseDn() {

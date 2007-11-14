@@ -24,6 +24,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.project.ProjectConfig;
 import org.safehaus.penrose.studio.project.ProjectNode;
@@ -84,7 +85,7 @@ public class BrowserAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(window.getShell(), "Error", e.getMessage());
+            ErrorDialog.open(e);
         }
 	}
 }

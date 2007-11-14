@@ -22,6 +22,7 @@ public class NISLdapWizardPage extends WizardPage implements ModifyListener {
     public final static String NAME = "NIS LDAP";
 
     Text suffixText;
+    Text ypSuffixText;
     Text nssSuffixText;
 
     boolean visited;
@@ -29,7 +30,7 @@ public class NISLdapWizardPage extends WizardPage implements ModifyListener {
     public NISLdapWizardPage() {
         super(NAME);
 
-        setDescription("Enter an LDAP suffix for the NIS entries and another LDAP suffix for the stacking authentication (NSS).");
+        setDescription("Enter an LDAP suffix for the NIS entries, YP entries, and NSS entries.");
     }
 
     public void createControl(final Composite parent) {
@@ -49,7 +50,15 @@ public class NISLdapWizardPage extends WizardPage implements ModifyListener {
         suffixText = new Text(composite, SWT.BORDER);
         suffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         suffixText.addModifyListener(this);
-        
+
+        Label ypSuffixLabel = new Label(composite, SWT.NONE);
+        ypSuffixLabel.setText("YP Suffix:");
+        ypSuffixLabel.setLayoutData(new GridData());
+
+        ypSuffixText = new Text(composite, SWT.BORDER);
+        ypSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        ypSuffixText.addModifyListener(this);
+
         Label nssSuffixLabel = new Label(composite, SWT.NONE);
         nssSuffixLabel.setText("NSS Suffix:");
         nssSuffixLabel.setLayoutData(new GridData());
@@ -81,6 +90,14 @@ public class NISLdapWizardPage extends WizardPage implements ModifyListener {
 
     public String getSuffix() {
         return suffixText.getText();
+    }
+
+    public void setYpSuffix(String ldapSuffix) {
+        ypSuffixText.setText(ldapSuffix);
+    }
+
+    public String getYpSuffix() {
+        return ypSuffixText.getText();
     }
 
     public void setNssSuffix(String nssSuffix) {

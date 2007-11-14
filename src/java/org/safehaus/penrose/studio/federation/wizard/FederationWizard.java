@@ -29,6 +29,8 @@ public class FederationWizard extends Wizard {
     public ConnectionDriverPage dbDriverPage;
     public JDBCConnectionWizardPage jdbcPage;
 
+    private ConnectionConfig connectionConfig = new ConnectionConfig();
+
     public FederationWizard() {
         setWindowTitle("Setup Wizard");
     }
@@ -70,15 +72,13 @@ public class FederationWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            ConnectionConfig jdbcConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(Federation.JDBC);
-
             Map<String,String> allParameters = jdbcPage.getAllParameters();
             String url = allParameters.get(JDBCClient.URL);
             url = Helper.replace(url, allParameters);
 
             Map<String,String> parameters = jdbcPage.getParameters();
             parameters.put(JDBCClient.URL, url);
-            jdbcConfig.setParameters(parameters);
+            connectionConfig.setParameters(parameters);
 
             return true;
 
@@ -120,5 +120,13 @@ public class FederationWizard extends Wizard {
 
     public void setPartitionConfig(PartitionConfig partitionConfig) {
         this.partitionConfig = partitionConfig;
+    }
+
+    public ConnectionConfig getConnectionConfig() {
+        return connectionConfig;
+    }
+
+    public void setConnectionConfig(ConnectionConfig connectionConfig) {
+        this.connectionConfig = connectionConfig;
     }
 }

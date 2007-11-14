@@ -25,6 +25,12 @@ import org.safehaus.penrose.ldap.Attributes;
 import org.safehaus.penrose.agent.client.FindClient;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.studio.federation.Federation;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.management.SourceClient;
 
 import java.util.*;
 
@@ -107,17 +113,19 @@ public class NISScriptsPage extends FormPage {
                }
            };
 
-           nisFederation.getHosts().search(request, response);
+           Project project = nisFederation.getProject();
+           PenroseClient client = project.getClient();
+           PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+           SourceClient sourceClient = partitionClient.getSourceClient("penrose_hosts");
+
+           sourceClient.search(request, response);
+           //nisFederation.getHosts().search(request, response);
 
            hostsList.selectAll();
 
        } catch (Exception e) {
            log.error(e.getMessage(), e);
-           String message = e.toString();
-           if (message.length() > 500) {
-               message = message.substring(0, 500) + "...";
-           }
-           MessageDialog.openError(editor.getSite().getShell(), "Init Failed", message);
+           ErrorDialog.open(e);
        }
    }
 
@@ -208,11 +216,7 @@ public class NISScriptsPage extends FormPage {
                     run();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    String message = e.toString();
-                    if (message.length() > 500) {
-                        message = message.substring(0, 500) + "...";
-                    }
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", message);
+                    ErrorDialog.open(e);
                 }
             }
         });

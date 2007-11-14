@@ -11,10 +11,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.studio.federation.Federation;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.management.ConnectionClient;
 
 /**
  * @author Endi S. Dewata
@@ -36,30 +39,42 @@ public class FederationDatabasePage extends FormPage {
     }
 
     public void createFormContent(IManagedForm managedForm) {
-        toolkit = managedForm.getToolkit();
+        try {
+            toolkit = managedForm.getToolkit();
 
-        ScrolledForm form = managedForm.getForm();
-        form.setText("Database");
+            ScrolledForm form = managedForm.getForm();
+            form.setText("Database");
 
-        Composite body = form.getBody();
-        body.setLayout(new GridLayout());
+            Composite body = form.getBody();
+            body.setLayout(new GridLayout());
 
-        Section databaseSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        databaseSection.setText("Database");
-        databaseSection.setLayoutData(new GridData(GridData.FILL_BOTH));
+            Section databaseSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+            databaseSection.setText("Database");
+            databaseSection.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Control databaseControl = createDatabaseControl(databaseSection);
-        databaseSection.setClient(databaseControl);
+            Control databaseControl = createDatabaseControl(databaseSection);
+            databaseSection.setClient(databaseControl);
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
+        }
     }
 
-    public Composite createDatabaseControl(Composite parent) {
+    public Composite createDatabaseControl(Composite parent) throws Exception {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
 
-        Partition partition = federation.getPartition();
-        Connection connection = partition.getConnection(Federation.JDBC);
-        ConnectionConfig connectionConfig = connection.getConnectionConfig();
+        Project project = federation.getProject();
+        PenroseClient client = project.getClient();
+        PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+        ConnectionClient connectionClient = partitionClient.getConnectionClient(Federation.JDBC);
+        ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
+
+        //Partition partition = federation.getPartition();
+        //JDBCConnection connection = (JDBCConnection)partition.getConnection(Federation.JDBC);
+        //ConnectionConfig connectionConfig = connection.getConnectionConfig();
 
         Label driverLabel = toolkit.createLabel(composite, "Driver:");
         GridData gd = new GridData();

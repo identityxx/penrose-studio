@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.apache.log4j.Logger;
 
 public class ProjectDialog extends Dialog {
@@ -159,7 +160,7 @@ public class ProjectDialog extends Dialog {
                     
 				} catch (Exception ex) {
                     log.debug(ex.getMessage(), ex);
-					MessageDialog.openError(shell, "Test Connection Result", "Error: "+ex.getMessage());
+					ErrorDialog.open(ex);
 				}
 			}
 		});

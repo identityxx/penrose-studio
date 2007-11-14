@@ -77,6 +77,22 @@ public class NISDomain extends Repository {
         parameters.put("suffix", suffix);
     }
 
+    public String getDbSuffix() {
+        return parameters.get("dbSuffix");
+    }
+
+    public void setDbSuffix(String dbSuffix) {
+        parameters.put("dbSuffix", dbSuffix);
+    }
+
+    public String getYpSuffix() {
+        return parameters.get("ypSuffix");
+    }
+
+    public void setYpSuffix(String ypSuffix) {
+        parameters.put("ypSuffix", ypSuffix);
+    }
+
     public String getNssSuffix() {
         return parameters.get("nssSuffix");
     }

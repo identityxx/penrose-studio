@@ -24,6 +24,12 @@ import org.safehaus.penrose.filter.OrFilter;
 import org.safehaus.penrose.filter.SimpleFilter;
 import org.safehaus.penrose.filter.AndFilter;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.studio.federation.Federation;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.management.SourceClient;
 
 /**
  * @author Endi S. Dewata
@@ -96,17 +102,19 @@ public class NISFilesPage extends FormPage implements Runnable {
                }
            };
 
-           nisFederation.getHosts().search(request, response);
+           Project project = nisFederation.getProject();
+           PenroseClient client = project.getClient();
+           PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+           SourceClient sourceClient = partitionClient.getSourceClient("penrose_hosts");
+
+           sourceClient.search(request, response);
+           //nisFederation.getHosts().search(request, response);
 
            hostsList.selectAll();
 
        } catch (Exception e) {
            log.error(e.getMessage(), e);
-           String message = e.toString();
-           if (message.length() > 500) {
-               message = message.substring(0, 500) + "...";
-           }
-           MessageDialog.openError(editor.getSite().getShell(), "Init Failed", message);
+           ErrorDialog.open(e);
        }
    }
 
@@ -226,11 +234,7 @@ public class NISFilesPage extends FormPage implements Runnable {
             runImpl();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            String message = e.toString();
-            if (message.length() > 500) {
-                message = message.substring(0, 500) + "...";
-            }
-            MessageDialog.openError(editor.getSite().getShell(), "Action Failed", message);
+            ErrorDialog.open(e);
         }
     }
 
@@ -287,7 +291,13 @@ public class NISFilesPage extends FormPage implements Runnable {
             }
         };
 
-        nisFederation.getFiles().search(request, response);
+        Project project = nisFederation.getProject();
+        PenroseClient client = project.getClient();
+        PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+        SourceClient sourceClient = partitionClient.getSourceClient("penrose_files");
+
+        sourceClient.search(request, response);
+        //nisFederation.getFiles().search(request, response);
 
         counter += response.getTotalCount();
 

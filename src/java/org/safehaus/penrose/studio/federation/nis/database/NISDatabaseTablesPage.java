@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.PartitionClient;
 import org.safehaus.penrose.management.SourceClient;
@@ -57,13 +58,9 @@ public class NISDatabaseTablesPage extends FormPage {
         project = nisFederation.getProject();
 
         penroseClient = project.getClient();
-        partitionClient = penroseClient.getPartitionClient(domain.getName());
+        partitionClient = penroseClient.getPartitionClient(domain.getName()+"_"+NISFederation.DB);
 
-        for (String sourceName : partitionClient.getSourceNames()) {
-            SourceClient sourceClient = partitionClient.getSourceClient(sourceName);
-            if (!NISFederation.CACHE_CONNECTION_NAME.equals(sourceClient.getConnectionName())) continue;
-            sources.add(sourceName);
-        }
+        sources.addAll(partitionClient.getSourceNames());
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -85,7 +82,7 @@ public class NISDatabaseTablesPage extends FormPage {
 
     public void setActive(boolean b) {
         super.setActive(b);
-        refresh();
+        if (b) refresh();
     }
 
     public Composite createMainSection(Composite parent) {
@@ -158,19 +155,16 @@ public class NISDatabaseTablesPage extends FormPage {
 
                     for (TableItem item : items) {
                         String sourceName = (String)item.getData();
-                        try {
-                            SourceClient sourceClient = partitionClient.getSourceClient(sourceName);
-                            sourceClient.create();
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-                    }
+                        
+                        SourceClient sourceClient = partitionClient.getSourceClient(sourceName);
+                        sourceClient.create();
 
-                    refresh();
+                        item.setText(1, getStatus(sourceClient));
+                    }
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -196,15 +190,16 @@ public class NISDatabaseTablesPage extends FormPage {
 
                     for (TableItem item : items) {
                         String sourceName = (String)item.getData();
+
                         SourceClient sourceClient = partitionClient.getSourceClient(sourceName);
                         sourceClient.clear();
-                    }
 
-                    refresh();
+                        item.setText(1, getStatus(sourceClient));
+                    }
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -230,15 +225,16 @@ public class NISDatabaseTablesPage extends FormPage {
 
                     for (TableItem item : items) {
                         String sourceName = (String)item.getData();
+
                         SourceClient sourceClient = partitionClient.getSourceClient(sourceName);
                         sourceClient.drop();
-                    }
 
-                    refresh();
+                        item.setText(1, getStatus(sourceClient));
+                    }
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -269,25 +265,27 @@ public class NISDatabaseTablesPage extends FormPage {
 
                 SourceClient sourceClient = partitionClient.getSourceClient(sourceName);
 
-                final TableItem ti = new TableItem(table, SWT.NONE);
-                ti.setText(0, sourceName);
-                ti.setData(sourceName);
-
-                try {
-                    ti.setText(1, sourceClient.getCount().toString());
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    ti.setText(1, "N/A");
-                }
+                TableItem item = new TableItem(table, SWT.NONE);
+                item.setText(0, sourceName);
+                item.setText(1, getStatus(sourceClient));
+                item.setData(sourceName);
             }
 
             table.select(indices);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+            ErrorDialog.open(e);
         }
     }
 
+    public String getStatus(SourceClient sourceClient) {
+        try {
+            return sourceClient.getCount().toString();
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return "N/A";
+        }
+    }
 }

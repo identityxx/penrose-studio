@@ -19,7 +19,13 @@ import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISFilesPage;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISScriptsPage;
+import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.nis.dialog.NISChangeDialog;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.management.SourceClient;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -81,7 +87,7 @@ public class NISUserChangesPage extends FormPage {
 
     public void setActive(boolean b) {
         super.setActive(b);
-        refresh();
+        if (b) refresh();
     }
 
     public void refresh() {
@@ -121,13 +127,19 @@ public class NISUserChangesPage extends FormPage {
                 }
             };
 
-            nisFederation.getUsers().search(request, response);
+            Project project = nisFederation.getProject();
+            PenroseClient client = project.getClient();
+            PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+            SourceClient sourceClient = partitionClient.getSourceClient("penrose_users");
+
+            sourceClient.search(request, response);
+            //nisFederation.getUsers().search(request, response);
 
             changesTable.select(indices);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(editor.getSite().getShell(), "Refresh Failed", e.getMessage());
+            ErrorDialog.open(e);
         }
 
         update();
@@ -158,7 +170,7 @@ public class NISUserChangesPage extends FormPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(editor.getSite().getShell(), "Update Failed", e.getMessage());
+            ErrorDialog.open(e);
         }
     }
 
@@ -247,11 +259,17 @@ public class NISUserChangesPage extends FormPage {
                         attributes.setValue("uidNumber", dialog.getNewValue());
                         attributes.setValue("message", dialog.getMessage());
 
-                        nisFederation.getUsers().add(dn, attributes);
+                        Project project = nisFederation.getProject();
+                        PenroseClient client = project.getClient();
+                        PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+                        SourceClient sourceClient = partitionClient.getSourceClient("penrose_users");
+
+                        sourceClient.add(dn, attributes);
+                        //nisFederation.getUsers().add(dn, attributes);
 
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
-                        MessageDialog.openError(editor.getSite().getShell(), "Edit Failed", e.getMessage());
+                        ErrorDialog.open(e);
                     }
 
                     refresh();
@@ -301,11 +319,17 @@ public class NISUserChangesPage extends FormPage {
                     modifications.add(new Modification(Modification.REPLACE, new Attribute("uidNumber", uidNumber)));
                     modifications.add(new Modification(Modification.REPLACE, new Attribute("message", message)));
 
-                    nisFederation.getUsers().modify(result.getDn(), modifications);
+                    Project project = nisFederation.getProject();
+                    PenroseClient client = project.getClient();
+                    PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+                    SourceClient sourceClient = partitionClient.getSourceClient("penrose_users");
+
+                    sourceClient.modify(result.getDn(), modifications);
+                    //nisFederation.getUsers().modify(result.getDn(), modifications);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Edit Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
 
                 refresh();
@@ -323,18 +347,24 @@ public class NISUserChangesPage extends FormPage {
 
                     int index = changesTable.getSelectionIndex();
 
+                    Project project = nisFederation.getProject();
+                    PenroseClient client = project.getClient();
+                    PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+                    SourceClient sourceClient = partitionClient.getSourceClient("penrose_users");
+
                     TableItem[] items = changesTable.getSelection();
                     for (TableItem ti : items) {
                         SearchResult result = (SearchResult)ti.getData();
 
-                        nisFederation.getUsers().delete(result.getDn());
+                        sourceClient.delete(result.getDn());
+                        //nisFederation.getUsers().delete(result.getDn());
                     }
 
                     changesTable.select(index);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Delete Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
 
                 refresh();
@@ -365,7 +395,7 @@ public class NISUserChangesPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -395,7 +425,7 @@ public class NISUserChangesPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -425,7 +455,7 @@ public class NISUserChangesPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -453,11 +483,17 @@ public class NISUserChangesPage extends FormPage {
                         modifications.add(new Modification(Modification.REPLACE, new Attribute("active", true)));
                     }
 
-                    nisFederation.getUsers().modify(result.getDn(), modifications);
+                    Project project = nisFederation.getProject();
+                    PenroseClient client = project.getClient();
+                    PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+                    SourceClient sourceClient = partitionClient.getSourceClient("penrose_users");
+
+                    sourceClient.modify(result.getDn(), modifications);
+                    //nisFederation.getUsers().modify(result.getDn(), modifications);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
 
                 refresh();

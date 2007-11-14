@@ -2,12 +2,12 @@ package org.safehaus.penrose.studio.federation.nis.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.PartitionConfig;
 
@@ -59,16 +59,20 @@ public class NISRepositoryWizard extends Wizard {
             String name = repositoryPage.getRepository();
             String domainName = domainPage.getDomain();
 
-            String suffix = "ou="+name+",ou=nis";
+            String nisSuffix = "ou="+name+",ou=nis";
+            String ypSuffix  = "ou="+name+",ou=yp";
             String nssSuffix = "ou="+name+",ou=nss";
 
             String s[] = domainName.split("\\.");
             if (s.length > 2) {
-                suffix = suffix+",dc="+s[s.length-2]+",dc="+s[s.length-1];
-                nssSuffix = nssSuffix+",dc="+s[s.length-2]+",dc="+s[s.length-1];
+                String suffix = ",dc="+s[s.length-2]+",dc="+s[s.length-1];
+                nisSuffix = nisSuffix+suffix;
+                ypSuffix  = ypSuffix+suffix;
+                nssSuffix = nssSuffix+suffix;
             }
 
-            partitionPage.setSuffix(suffix);
+            partitionPage.setSuffix(nisSuffix);
+            partitionPage.setYpSuffix(ypSuffix);
             partitionPage.setNssSuffix(nssSuffix);
         }
 
@@ -82,31 +86,30 @@ public class NISRepositoryWizard extends Wizard {
             repository.setFullName(domainPage.getDomain());
             repository.setServer(domainPage.getServer());
             repository.setSuffix(partitionPage.getSuffix());
+            repository.setYpSuffix(partitionPage.getYpSuffix());
             repository.setNssSuffix(partitionPage.getNssSuffix());
 
             nisFederation.addRepository(repository);
 
-            PartitionConfig partitionConfig = nisFederation.createPartitionConfig(repository);
-            project.upload("partitions/"+ repository.getName());
-
-            PartitionConfig nssPartitionConfig = nisFederation.createNssPartitionConfig(repository);
-            project.upload("partitions/"+ nssPartitionConfig.getName());
-
-            nisFederation.createDatabase(repository);
-
             PenroseClient penroseClient = project.getClient();
 
-            penroseClient.startPartition(repository.getName());
-            nisFederation.loadPartition(partitionConfig);
+            PartitionConfig nisPartitionConfig = nisFederation.createNisPartitionConfig(repository);
+            nisFederation.loadPartition(nisPartitionConfig);
 
-            penroseClient.startPartition(nssPartitionConfig.getName());
+            PartitionConfig ypPartitionConfig = nisFederation.createYpPartitionConfig(repository);
+            nisFederation.loadPartition(ypPartitionConfig);
+/*
+            PartitionConfig dbPartitionConfig = nisFederation.createDbPartitionConfig(repository);
+            nisFederation.loadPartition(dbPartitionConfig);
+*/
+            PartitionConfig nssPartitionConfig = nisFederation.createNssPartitionConfig(repository);
             nisFederation.loadPartition(nssPartitionConfig);
 
             return true;
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(getShell(), "Action Failed", e.getMessage());
+            ErrorDialog.open(e);
             return false;
         }
     }

@@ -24,13 +24,13 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.management.*;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.ArrayList;
+import java.util.*;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -52,9 +52,11 @@ public class NISLDAPPage extends FormPage {
     Table table;
 
     PartitionClient partitionClient;
+    DN suffix;
+    ModuleClient moduleClient;
 
     public NISLDAPPage(NISLDAPEditor editor) throws Exception {
-        super(editor, "LDAP", "  LDAP  ");
+        super(editor, "Content", "  Content  ");
 
         this.editor = editor;
         this.project = editor.getProject();
@@ -62,29 +64,87 @@ public class NISLDAPPage extends FormPage {
         this.domain = editor.getDomain();
 
         PenroseClient penroseClient = project.getClient();
+
         partitionClient = penroseClient.getPartitionClient(domain.getName());
+        
+        suffix = partitionClient.getSuffixes().iterator().next();
+        moduleClient = partitionClient.getModuleClient("NISLDAPSyncModule");
     }
 
     public void createFormContent(IManagedForm managedForm) {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("LDAP");
+        form.setText("NIS LDAP Server");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-        Section ldapSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        ldapSection.setText("LDAP");
-        ldapSection.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Section baseSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        baseSection.setText("Base");
+        baseSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Control ldapControl = createLDAPControl(ldapSection);
-        ldapSection.setClient(ldapControl);
+        Control baseControl = createBaseSection(baseSection);
+        baseSection.setClient(baseControl);
+
+        Section contentSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        contentSection.setText("Content");
+        contentSection.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        Control contentControl = createContentSection(contentSection);
+        contentSection.setClient(contentControl);
 
         refresh();
     }
 
-    public Composite createLDAPControl(Composite parent) {
+    public Composite createBaseSection(Composite parent) {
+
+        Composite composite = toolkit.createComposite(parent);
+        composite.setLayout(new GridLayout(2, false));
+
+        Composite leftPanel = toolkit.createComposite(composite);
+        leftPanel.setLayout(new GridLayout(2, false));
+        leftPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        Label suffixLabel = toolkit.createLabel(leftPanel, "Base DN:");
+        GridData gd = new GridData();
+        gd.widthHint = 80;
+        suffixLabel.setLayoutData(gd);
+
+        Label suffixText = toolkit.createLabel(leftPanel, domain.getSuffix());
+        suffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Composite rightPanel = toolkit.createComposite(composite);
+        rightPanel.setLayout(new GridLayout());
+        gd = new GridData(GridData.FILL_VERTICAL);
+        gd.verticalSpan = 2;
+        gd.widthHint = 120;
+        rightPanel.setLayoutData(gd);
+
+        Button createBaseButton = new Button(rightPanel, SWT.PUSH);
+        createBaseButton.setText("Create Base");
+        createBaseButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        createBaseButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                createBase();
+            }
+        });
+
+        Button removeBaseButton = new Button(rightPanel, SWT.PUSH);
+        removeBaseButton.setText("Remove Base");
+        removeBaseButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        removeBaseButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                removeBase();
+            }
+        });
+
+        return composite;
+    }
+
+    public Composite createContentSection(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
@@ -134,245 +194,33 @@ public class NISLDAPPage extends FormPage {
         gd.widthHint = 120;
         rightPanel.setLayoutData(gd);
 
-        Button createBaseButton = new Button(rightPanel, SWT.PUSH);
-        createBaseButton.setText("Create Base");
-        createBaseButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        createBaseButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                try {
-                    boolean confirm = MessageDialog.openQuestion(
-                            editor.getSite().getShell(),
-                            "Creating base LDAP entry",
-                            "Are you sure?"
-                    );
-
-                    if (!confirm) return;
-
-                    DN suffix = partitionClient.getSuffixes().iterator().next();
-
-                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
-                    JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
-
-                    jobClient.invoke(
-                            "create",
-                            new Object[] { suffix },
-                            new String[] { DN.class.getName() }
-                    );
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
-                }
-            }
-        });
-
-        Button removeBaseButton = new Button(rightPanel, SWT.PUSH);
-        removeBaseButton.setText("Remove Base");
-        removeBaseButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        removeBaseButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                try {
-                    boolean confirm = MessageDialog.openQuestion(
-                            editor.getSite().getShell(),
-                            "Removing base LDAP entry",
-                            "Are you sure?"
-                    );
-
-                    if (!confirm) return;
-
-                    DN suffix = partitionClient.getSuffixes().iterator().next();
-
-                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
-                    JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
-
-                    jobClient.invoke(
-                            "remove",
-                            new Object[] { suffix },
-                            new String[] { DN.class.getName() }
-                    );
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
-                }
-            }
-        });
-
-        new Label(rightPanel, SWT.NONE);
-
         Button createButton = new Button(rightPanel, SWT.PUSH);
         createButton.setText("Create");
         createButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
-                try {
-                    if (table.getSelectionCount() == 0) return;
-
-                    boolean confirm = MessageDialog.openQuestion(
-                            editor.getSite().getShell(),
-                            "Creating LDAP Subtree",
-                            "Are you sure?"
-                    );
-
-                    if (!confirm) return;
-
-                    TableItem[] items = table.getSelection();
-
-                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
-                    JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
-
-                    SourceClient ldap = partitionClient.getSourceClient("LDAP");
-
-                    for (TableItem ti : items) {
-                        DN dn = (DN)ti.getData();
-
-                        try {
-                            jobClient.invoke(
-                                    "create",
-                                    new Object[] { dn.toString() },
-                                    new String[] { String.class.getName() }
-                            );
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-
-                        Long count = getCount(ldap, dn);
-                        ti.setText(1, count == null ? "N/A" : ""+count);
-                    }
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
-                }
+                create();
             }
         });
-
+/*
         Button loadButton = new Button(rightPanel, SWT.PUSH);
         loadButton.setText("Load");
         loadButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         loadButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
-                try {
-                    if (table.getSelectionCount() == 0) return;
-
-                    boolean confirm = MessageDialog.openQuestion(
-                            editor.getSite().getShell(),
-                            "Loading LDAP Subtree",
-                            "Are you sure?"
-                    );
-
-                    if (!confirm) return;
-
-                    TableItem[] items = table.getSelection();
-
-                    final Collection<DN> dns = new ArrayList<DN>();
-                    for (TableItem ti : items) {
-                        DN dn = (DN)ti.getData();
-                        dns.add(dn);
-                    }
-
-                    IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
-
-                    progressService.busyCursorWhile(new IRunnableWithProgress() {
-                        public void run(IProgressMonitor monitor) throws InvocationTargetException {
-                            try {
-                                monitor.beginTask("Loading LDAP...", dns.size());
-
-                                SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
-                                JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
-
-                                for (DN dn : dns) {
-
-                                    if (monitor.isCanceled()) {
-                                        throw new InterruptedException();
-                                    }
-
-                                    monitor.subTask("Loading "+dn+"...");
-
-                                    jobClient.invoke(
-                                            "load",
-                                            new Object[] { dn.toString() },
-                                            new String[] { String.class.getName() }
-                                    );
-
-                                    monitor.worked(1);
-                                }
-
-                            } catch (InterruptedException e) {
-                                // ignore
-
-                            } catch (Exception e) {
-                                throw new InvocationTargetException(e);
-
-                            } finally {
-                                monitor.done();
-                            }
-                        }
-                    });
-
-                    SourceClient ldap = partitionClient.getSourceClient("LDAP");
-                    for (TableItem ti : items) {
-                        DN dn = (DN)ti.getData();
-                        Long count = getCount(ldap, dn);
-                        ti.setText(1, count == null ? "N/A" : ""+count);
-                    }
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
-                }
+                load();
             }
         });
-
+*/
         Button clearButton = new Button(rightPanel, SWT.PUSH);
         clearButton.setText("Clear");
         clearButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         clearButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
-                try {
-                    if (table.getSelectionCount() == 0) return;
-
-                    boolean confirm = MessageDialog.openQuestion(
-                            editor.getSite().getShell(),
-                            "Clearing LDAP Subtree",
-                            "Are you sure?"
-                    );
-
-                    if (!confirm) return;
-
-                    TableItem[] items = table.getSelection();
-
-                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
-                    JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
-
-                    SourceClient ldap = partitionClient.getSourceClient("LDAP");
-
-                    for (TableItem ti : items) {
-                        DN dn = (DN)ti.getData();
-
-                        try {
-                            jobClient.invoke(
-                                    "clear",
-                                    new Object[] { dn.toString() },
-                                    new String[] { String.class.getName() }
-                            );
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-
-                        Long count = getCount(ldap, dn);
-                        ti.setText(1, count == null ? "N/A" : ""+count);
-                    }
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
-                }
+                clear();
             }
         });
 
@@ -382,45 +230,7 @@ public class NISLDAPPage extends FormPage {
 
         removeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
-                try {
-                    if (table.getSelectionCount() == 0) return;
-
-                    boolean confirm = MessageDialog.openQuestion(
-                            editor.getSite().getShell(),
-                            "Removing LDAP Subtree",
-                            "Are you sure?"
-                    );
-
-                    if (!confirm) return;
-
-                    TableItem[] items = table.getSelection();
-
-                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
-                    JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
-
-                    SourceClient ldap = partitionClient.getSourceClient("LDAP");
-
-                    for (TableItem ti : items) {
-                        DN dn = (DN)ti.getData();
-
-                        try {
-                            jobClient.invoke(
-                                    "remove",
-                                    new Object[] { dn.toString() },
-                                    new String[] { String.class.getName() }
-                            );
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-
-                        Long count = getCount(ldap, dn);
-                        ti.setText(1, count == null ? "N/A" : ""+count);
-                    }
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
-                }
+                remove();
             }
         });
 
@@ -432,73 +242,7 @@ public class NISLDAPPage extends FormPage {
 
         synchronizeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
-                try {
-                    boolean confirm = MessageDialog.openQuestion(
-                            editor.getSite().getShell(),
-                            "Synchronize LDAP",
-                            "Are you sure?"
-                    );
-
-                    if (!confirm) return;
-
-                    TableItem[] items = table.getSelection();
-
-                    final Collection<DN> dns = new ArrayList<DN>();
-                    for (TableItem ti : items) {
-                        DN dn = (DN)ti.getData();
-                        dns.add(dn);
-                    }
-
-                    IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
-
-                    progressService.busyCursorWhile(new IRunnableWithProgress() {
-                        public void run(IProgressMonitor monitor) throws InvocationTargetException {
-                            try {
-                                monitor.beginTask("Synchronizing LDAP...", dns.size());
-
-                                SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
-                                JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
-
-                                for (DN dn : dns) {
-
-                                    if (monitor.isCanceled()) {
-                                        throw new InterruptedException();
-                                    }
-
-                                    monitor.subTask("Synchronizing "+dn+"...");
-
-                                    jobClient.invoke(
-                                            "synchronize",
-                                            new Object[] { dn },
-                                            new String[] { DN.class.getName() }
-                                    );
-
-                                    monitor.worked(1);
-                                }
-
-                            } catch (InterruptedException e) {
-                                // ignore
-
-                            } catch (Exception e) {
-                                throw new InvocationTargetException(e);
-
-                            } finally {
-                                monitor.done();
-                            }
-                        }
-                    });
-
-                    SourceClient ldap = partitionClient.getSourceClient("LDAP");
-                    for (TableItem ti : items) {
-                        DN dn = (DN)ti.getData();
-                        Long count = getCount(ldap, dn);
-                        ti.setText(1, count == null ? "N/A" : ""+count);
-                    }
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
-                }
+                synchronize();
             }
         });
 
@@ -517,62 +261,520 @@ public class NISLDAPPage extends FormPage {
         return composite;
     }
 
+    public void createBase() {
+        try {
+            boolean confirm = MessageDialog.openQuestion(
+                    editor.getSite().getShell(),
+                    "Creating base LDAP entry",
+                    "Are you sure?"
+            );
+
+            if (!confirm) return;
+
+            moduleClient.invoke(
+                    "createBase",
+                    new Object[] { },
+                    new String[] { }
+            );
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
+        }
+    }
+
+    public void removeBase() {
+        try {
+            boolean confirm = MessageDialog.openQuestion(
+                    editor.getSite().getShell(),
+                    "Removing base LDAP entry",
+                    "Are you sure?"
+            );
+
+            if (!confirm) return;
+
+            moduleClient.invoke(
+                    "removeBase",
+                    new Object[] { },
+                    new String[] { }
+            );
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
+        }
+    }
+
+    public void create() {
+        try {
+            if (table.getSelectionCount() == 0) return;
+
+            boolean confirm = MessageDialog.openQuestion(
+                    editor.getSite().getShell(),
+                    "Creating LDAP Subtree",
+                    "Are you sure?"
+            );
+
+            if (!confirm) return;
+
+            TableItem[] items = table.getSelection();
+
+            final Collection<String> mapNames = new ArrayList<String>();
+
+            for (TableItem item : items) {
+                String mapName = (String)item.getData("mapName");
+                mapNames.add(mapName);
+            }
+
+            IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+            progressService.busyCursorWhile(new IRunnableWithProgress() {
+                public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                    try {
+                        monitor.beginTask("Creating subtree...", mapNames.size());
+
+                        for (String mapName : mapNames) {
+
+                            if (monitor.isCanceled()) throw new InterruptedException();
+
+                            monitor.subTask("Creating "+mapName+"...");
+
+                            DN dn = getDn(mapName);
+
+                            moduleClient.invoke(
+                                    "create",
+                                    new Object[] { dn },
+                                    new String[] { DN.class.getName() }
+                            );
+
+                            monitor.worked(1);
+                        }
+
+                    } catch (InterruptedException e) {
+                        // ignore
+
+                    } catch (Exception e) {
+                        throw new InvocationTargetException(e);
+
+                    } finally {
+                        monitor.done();
+                    }
+                }
+            });
+
+            Map<String,String> statuses = refresh(mapNames);
+
+            for (TableItem ti : items) {
+                String mapName = (String)ti.getData("mapName");
+
+                String status = statuses.get(mapName);
+                ti.setText(1, status);
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
+        }
+    }
+
+    public void load() {
+        try {
+            if (table.getSelectionCount() == 0) return;
+
+            boolean confirm = MessageDialog.openQuestion(
+                    editor.getSite().getShell(),
+                    "Loading LDAP Subtree",
+                    "Are you sure?"
+            );
+
+            if (!confirm) return;
+
+            TableItem[] items = table.getSelection();
+
+            final Collection<String> mapNames = new ArrayList<String>();
+
+            for (TableItem ti : items) {
+                String mapName = (String)ti.getData("mapName");
+                mapNames.add(mapName);
+            }
+
+            IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+            progressService.busyCursorWhile(new IRunnableWithProgress() {
+                public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                    try {
+                        monitor.beginTask("Loading LDAP...", mapNames.size());
+
+                        for (String mapName : mapNames) {
+                            if (monitor.isCanceled()) throw new InterruptedException();
+
+                            DN dn = getDn(mapName);
+                            monitor.subTask("Loading "+dn+"...");
+
+                            moduleClient.invoke(
+                                    "load",
+                                    new Object[] { dn },
+                                    new String[] { DN.class.getName() }
+                            );
+
+                            monitor.worked(1);
+                        }
+
+                    } catch (InterruptedException e) {
+                        // ignore
+
+                    } catch (Exception e) {
+                        throw new InvocationTargetException(e);
+
+                    } finally {
+                        monitor.done();
+                    }
+                }
+            });
+
+            Map<String,String> statuses = refresh(mapNames);
+
+            for (TableItem ti : items) {
+                String mapName = (String)ti.getData("mapName");
+
+                String status = statuses.get(mapName);
+                ti.setText(1, status);
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
+        }
+    }
+
+    public void clear() {
+        try {
+            if (table.getSelectionCount() == 0) return;
+
+            boolean confirm = MessageDialog.openQuestion(
+                    editor.getSite().getShell(),
+                    "Clearing LDAP Subtree",
+                    "Are you sure?"
+            );
+
+            if (!confirm) return;
+
+            TableItem[] items = table.getSelection();
+
+            final Collection<String> mapNames = new ArrayList<String>();
+
+            for (TableItem ti : items) {
+                String mapName = (String)ti.getData("mapName");
+                mapNames.add(mapName);
+            }
+
+            IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+            progressService.busyCursorWhile(new IRunnableWithProgress() {
+                public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                    try {
+                        monitor.beginTask("Clearing LDAP...", mapNames.size());
+
+                        for (String mapName : mapNames) {
+                            if (monitor.isCanceled()) throw new InterruptedException();
+
+                            DN dn = getDn(mapName);
+
+                            monitor.subTask("Clearing "+dn+"...");
+
+                            moduleClient.invoke(
+                                    "clear",
+                                    new Object[] { dn },
+                                    new String[] { DN.class.getName() }
+                            );
+                        }
+
+                    } catch (InterruptedException e) {
+                        // ignore
+
+                    } catch (Exception e) {
+                        throw new InvocationTargetException(e);
+
+                    } finally {
+                        monitor.done();
+                    }
+                }
+            });
+
+            Map<String,String> statuses = refresh(mapNames);
+
+            for (TableItem ti : items) {
+                String mapName = (String)ti.getData("mapName");
+
+                String status = statuses.get(mapName);
+                ti.setText(1, status);
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
+        }
+    }
+
+    public void remove() {
+        try {
+            if (table.getSelectionCount() == 0) return;
+
+            boolean confirm = MessageDialog.openQuestion(
+                    editor.getSite().getShell(),
+                    "Removing LDAP Subtree",
+                    "Are you sure?"
+            );
+
+            if (!confirm) return;
+
+            TableItem[] items = table.getSelection();
+
+            final Collection<String> mapNames = new ArrayList<String>();
+
+            for (TableItem item : items) {
+                String mapName = (String)item.getData("mapName");
+                mapNames.add(mapName);
+            }
+
+            IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+            progressService.busyCursorWhile(new IRunnableWithProgress() {
+                public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                    try {
+                        monitor.beginTask("Removing subtree...", mapNames.size());
+
+                        for (String mapName : mapNames) {
+
+                            if (monitor.isCanceled()) throw new InterruptedException();
+
+                            monitor.subTask("Removing "+mapName+"...");
+
+                            DN dn = getDn(mapName);
+
+                            moduleClient.invoke(
+                                    "remove",
+                                    new Object[] { dn },
+                                    new String[] { DN.class.getName() }
+                            );
+
+                            monitor.worked(1);
+                        }
+
+                    } catch (InterruptedException e) {
+                        // ignore
+
+                    } catch (Exception e) {
+                        throw new InvocationTargetException(e);
+
+                    } finally {
+                        monitor.done();
+                    }
+                }
+            });
+
+            Map<String,String> statuses = refresh(mapNames);
+
+            for (TableItem ti : items) {
+                String mapName = (String)ti.getData("mapName");
+
+                String status = statuses.get(mapName);
+                ti.setText(1, status);
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
+        }
+    }
+
+    public void synchronize() {
+        try {
+            boolean confirm = MessageDialog.openQuestion(
+                    editor.getSite().getShell(),
+                    "Synchronize LDAP",
+                    "Are you sure?"
+            );
+
+            if (!confirm) return;
+
+            TableItem[] items = table.getSelection();
+
+            final Collection<String> mapNames = new ArrayList<String>();
+            for (TableItem ti : items) {
+                String mapName = (String)ti.getData("mapName");
+                mapNames.add(mapName);
+            }
+
+            final Collection<Boolean> errors = new ArrayList<Boolean>();
+
+            IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+            progressService.busyCursorWhile(new IRunnableWithProgress() {
+                public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                    try {
+                        monitor.beginTask("Synchronizing LDAP...", mapNames.size());
+
+                        for (String mapName : mapNames) {
+                            if (monitor.isCanceled()) throw new InterruptedException();
+
+                            DN dn = getDn(mapName);
+                            monitor.subTask("Synchronizing "+dn+"...");
+
+                            Boolean status = (Boolean)moduleClient.invoke(
+                                    "synchronize",
+                                    new Object[] { dn },
+                                    new String[] { DN.class.getName() }
+                            );
+
+                            if (!status) errors.add(status);
+
+                            monitor.worked(1);
+                        }
+
+                    } catch (InterruptedException e) {
+                        // ignore
+
+                    } catch (Exception e) {
+                        throw new InvocationTargetException(e);
+
+                    } finally {
+                        monitor.done();
+                    }
+                }
+            });
+
+            Map<String,String> statuses = refresh(mapNames);
+
+            for (TableItem ti : items) {
+                String mapName = (String)ti.getData("mapName");
+
+                String status = statuses.get(mapName);
+                ti.setText(1, status);
+            }
+
+            if (!errors.isEmpty()) {
+                ErrorDialog.open("ERROR", "Error(s) occured during synchronization. See Errors tab.");
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
+        }
+    }
+
     public void refresh() {
         try {
             int[] indices = table.getSelectionIndices();
+            TableItem[] items = table.getSelection();
 
-            table.removeAll();
+            final Collection<String> mapNames = new ArrayList<String>();
 
-            SourceClient ldap = partitionClient.getSourceClient("LDAP");
+            if (items.length == 0) {
+                for (String mapName : nisFederation.getMapNames()) {
+                    mapNames.add(mapName);
+                }
 
-            DN suffix = partitionClient.getSuffixes().iterator().next();
+                table.removeAll();
 
-            for (String sourceName : nisFederation.getSourceNames()) {
-                String sourceLabel = nisFederation.getSourceLabel(sourceName);
+            } else {
+                for (TableItem ti : items) {
+                    String mapName = (String)ti.getData("mapName");
+                    mapNames.add(mapName);
+                }
+            }
 
-                RDNBuilder rb = new RDNBuilder();
-                rb.set("ou", sourceLabel);
-                RDN rdn = rb.toRdn();
+            Map<String,String> statuses = refresh(mapNames);
 
-                DNBuilder db = new DNBuilder();
-                db.append(rdn);
-                db.append(suffix);
+            if (items.length == 0) {
+                for (String mapName : mapNames) {
 
-                DN dn = db.toDn();
+                    String status = statuses.get(mapName);
 
-                Long count = getCount(ldap, dn);
+                    TableItem ti = new TableItem(table, SWT.NONE);
+                    ti.setText(0, mapName);
+                    ti.setText(1, status);
 
-                TableItem ti = new TableItem(table, SWT.NONE);
-                ti.setText(0, sourceLabel);
-                ti.setText(1, count == null ? "N/A" : ""+count);
+                    ti.setData("mapName", mapName);
+                }
 
-                ti.setData(dn);
+            } else {
+                for (TableItem ti : items) {
+                    String mapName = (String)ti.getData("mapName");
+
+                    String status = statuses.get(mapName);
+                    ti.setText(1, status);
+                }
             }
 
             table.select(indices);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+            ErrorDialog.open(e);
         }
     }
 
-    public Long getCount(SourceClient sourceClient, DN baseDn) {
+    public Map<String,String> refresh(final Collection<String> mapNames) throws Exception {
+
+        final Map<String,String> statuses = new TreeMap<String,String>();
+
+        IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+        progressService.busyCursorWhile(new IRunnableWithProgress() {
+            public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                try {
+                    monitor.beginTask("Refreshing...", nisFederation.getMapNames().size());
+
+                    for (String mapName : mapNames) {
+
+                        if (monitor.isCanceled()) throw new InterruptedException();
+
+                        monitor.subTask("Checking "+mapName+"...");
+
+                        statuses.put(mapName, getStatus(mapName));
+
+                        monitor.worked(1);
+                    }
+
+                } catch (InterruptedException e) {
+                    // ignore
+
+                } catch (Exception e) {
+                    throw new InvocationTargetException(e);
+
+                } finally {
+                    monitor.done();
+                }
+            }
+        });
+
+        return statuses;
+    }
+
+    public DN getDn(String mapName) throws Exception {
+        RDNBuilder rb = new RDNBuilder();
+        rb.set("ou", mapName);
+        RDN rdn = rb.toRdn();
+
+        DNBuilder db = new DNBuilder();
+        db.append(rdn);
+        db.append(suffix);
+
+        return db.toDn();
+    }
+
+    public String getStatus(String mapName) {
         try {
-            SearchRequest request = new SearchRequest();
-            request.setDn(baseDn);
-            request.setScope(SearchRequest.SCOPE_ONE);
-            request.setAttributes(new String[] { "dn" });
-            request.setTypesOnly(true);
-
-            SearchResponse response = new SearchResponse();
-
-            sourceClient.search(request, response);
-
-            return response.getTotalCount();
+            return ""+moduleClient.invoke(
+                    "getCount",
+                    new Object[] { getDn(mapName) },
+                    new String[] { DN.class.getName() }
+            );
 
         } catch (Exception e) {
-            return null;
+            log.error(e.getMessage(), e);
+            return "N/A";
         }
     }
 }

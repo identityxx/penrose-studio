@@ -29,6 +29,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;
@@ -150,7 +151,7 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
 
                 } catch (Exception ex) {
                     log.debug(ex.getMessage(), ex);
-                    MessageDialog.openError(parent.getShell(), "Failed to fetch base DNs", "Error: "+ex.getMessage());
+                    ErrorDialog.open(ex);
                 }
             }
         });
@@ -200,14 +201,7 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
 
                 } catch (Exception ex) {
                     log.debug(ex.getMessage(), ex);
-                    StringWriter sw = new StringWriter();
-                    PrintWriter pw = new PrintWriter(sw);
-                    ex.printStackTrace(pw);
-                    String message = sw.toString();
-                    if (message.length() > 500) {
-                        message = message.substring(0, 500) + "...";
-                    }
-                    MessageDialog.openError(parent.getShell(), "Test Connection Result", "Error: "+message);
+                    ErrorDialog.open(ex);
                 }
             }
         });

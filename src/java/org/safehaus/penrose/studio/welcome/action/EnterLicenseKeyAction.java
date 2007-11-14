@@ -29,6 +29,7 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioWorkbenchAdvisor;
 import org.safehaus.penrose.studio.PenroseStudioWorkbenchWindowAdvisor;
 import org.safehaus.penrose.studio.PenroseStudioActionBarAdvisor;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 /**
  * @author Endi S. Dewata
@@ -89,7 +90,7 @@ public class EnterLicenseKeyAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(shell, "Error", e.getMessage());
+            ErrorDialog.open(e);
         }
     }
 }

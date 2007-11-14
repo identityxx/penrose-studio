@@ -28,6 +28,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.TableConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
@@ -274,15 +275,7 @@ public class JDBCFieldWizardPage extends WizardPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            String message = sw.toString();
-            if (message.length() > 500) {
-                message = message.substring(0, 500) + "...";
-            }
-            MessageDialog.openError(getShell(), "Error", "Error: "+message);
+            ErrorDialog.open(e);
         }
     }
 

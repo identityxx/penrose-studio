@@ -33,7 +33,7 @@ public class NISLDAPEditor extends FormEditor {
     public void addPages() {
         try {
             addPage(new NISLDAPPage(this));
-            addPage(new NISLDAPTrackerPage(this));
+            //addPage(new NISLDAPTrackerPage(this));
             addPage(new NISLDAPErrorsPage(this));
 
         } catch (Exception e) {

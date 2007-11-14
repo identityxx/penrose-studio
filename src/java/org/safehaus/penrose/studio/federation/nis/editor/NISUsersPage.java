@@ -11,13 +11,13 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.conflict.NISUsersEditor;
 import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.QueryResponse;
@@ -25,7 +25,6 @@ import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.connection.Connection;
 
 import java.util.*;
 import java.sql.ResultSet;
@@ -77,14 +76,13 @@ public class NISUsersPage extends FormPage {
             Project project = nisFederation.getProject();
             PartitionConfigs partitionConfigs = project.getPartitionConfigs();
 
-            PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName());
+            PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName()+"_"+NISFederation.YP);
             SourceConfig sourceConfig = partitionConfig.getSourceConfigs().getSourceConfig(NISFederation.CACHE_USERS);
 
             Partition partition = nisFederation.getPartition();
-            Connection connection = partition.getConnection(Federation.JDBC);
-            JDBCConnection jdbcConnection = (JDBCConnection)connection;
+            JDBCConnection connection = (JDBCConnection)partition.getConnection(Federation.JDBC);
 
-            String table = jdbcConnection.getTableName(sourceConfig);
+            String table = connection.getTableName(sourceConfig);
             String sql = "select count(*) from "+table;
 
             Collection<Assignment> assignments = new ArrayList<Assignment>();
@@ -97,10 +95,10 @@ public class NISUsersPage extends FormPage {
                 }
             };
 
-            jdbcConnection.executeQuery(sql, assignments, queryResponse);
+            connection.executeQuery(sql, assignments, queryResponse);
 
         } catch (Exception e) {
-            MessageDialog.openError(editor.getSite().getShell(), "Refresh Failed", e.getMessage());
+            ErrorDialog.open(e);
         }
     }
 

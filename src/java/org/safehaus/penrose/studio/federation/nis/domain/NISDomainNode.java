@@ -13,6 +13,7 @@ import org.safehaus.penrose.studio.federation.nis.database.NISDatabaseNode;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
+import org.safehaus.penrose.studio.federation.nis.yp.NISYPNode;
 import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.eclipse.swt.graphics.Image;
@@ -39,6 +40,7 @@ public class NISDomainNode extends Node {
     Collection<Node> children = new ArrayList<Node>();
 
     NISDatabaseNode  databaseNode;
+    NISYPNode serverNode;
     NISLDAPNode ldapNode;
     NISLinkingNode   linkingNode;
     NISConflictsNode conflictsNode;
@@ -59,15 +61,22 @@ public class NISDomainNode extends Node {
         nisFederation = nisNode.getNisFederation();
         projectNode = nisNode.getProjectNode();
 
+        serverNode = new NISYPNode(
+                "YP Server",
+                this
+        );
+
+        children.add(serverNode);
+/*
         databaseNode = new NISDatabaseNode(
                 "Database Synchronization",
                 this
         );
 
         children.add(databaseNode);
-
+*/
         ldapNode = new NISLDAPNode(
-                "LDAP Synchronization",
+                "LDAP Server",
                 this
         );
 
@@ -106,7 +115,7 @@ public class NISDomainNode extends Node {
     public Image getImage() {
         Project project = nisFederation.getProject();
         PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-        PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName());
+        PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName()+"_"+NISFederation.YP);
         return PenroseStudioPlugin.getImage(partitionConfig == null ? PenroseImage.RED_FOLDER : PenroseImage.FOLDER);
 
         //Partition partition = nisFederation.getPartitions().getPartition(domain.getName());

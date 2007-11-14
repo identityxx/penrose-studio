@@ -28,6 +28,7 @@ import org.safehaus.penrose.studio.project.ProjectDialog;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.apache.log4j.Logger;
 
@@ -69,7 +70,7 @@ public class NewProjectAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(shell, "Action Failed.", e.getMessage());
+            ErrorDialog.open(e);
         }
 	}
 	

@@ -6,7 +6,7 @@ import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.dialog.OpenProjectProgressBar;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.plugin.PluginsNode;
 import org.safehaus.penrose.studio.browser.BrowserEditorInput;
 import org.safehaus.penrose.studio.browser.BrowserEditor;
@@ -24,7 +24,6 @@ import org.safehaus.penrose.ldap.LDAPService;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
@@ -34,12 +33,8 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.internal.progress.ProgressManagerUtil;
 import org.eclipse.ui.progress.IProgressService;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Status;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -216,8 +211,6 @@ public class ProjectNode extends Node {
         progressService.busyCursorWhile(new IRunnableWithProgress() {
             public void run(IProgressMonitor monitor) throws InvocationTargetException {
                 try {
-                    monitor.beginTask("Opening " + projectConfig.getName() + "...", IProgressMonitor.UNKNOWN);
-
                     project.connect(monitor);
 
                     partitionsNode = new PartitionsNode(
@@ -273,9 +266,6 @@ public class ProjectNode extends Node {
 
                 } catch (Exception e) {
                     throw new InvocationTargetException(e);
-
-                } finally {
-                    monitor.done();
                 }
             }
         });
@@ -287,7 +277,7 @@ public class ProjectNode extends Node {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(serversView.getSite().getShell(), "Action Failed", e.getMessage());
+            ErrorDialog.open(e);
         }
 
         children.clear();

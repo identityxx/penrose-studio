@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.management.*;
 import org.safehaus.penrose.ldap.*;
@@ -120,7 +121,7 @@ public class NISLDAPTrackerPage extends FormPage {
 
                     Project project = nisFederation.getProject();
                     PenroseClient client = project.getClient();
-                    PartitionClient partitionClient = client.getPartitionClient(domain.getName());
+                    PartitionClient partitionClient = client.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
                     SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
 
                     JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
@@ -138,7 +139,7 @@ public class NISLDAPTrackerPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
 
                 refreshTracker();
@@ -167,7 +168,7 @@ public class NISLDAPTrackerPage extends FormPage {
             trackerTable.removeAll();
 
             PenroseClient penroseClient = project.getClient();
-            PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
+            PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
             SourceClient tracker = partitionClient.getSourceClient("tracker");
 
             SearchRequest request = new SearchRequest();
@@ -194,7 +195,7 @@ public class NISLDAPTrackerPage extends FormPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+            ErrorDialog.open(e);
         }
     }
 }

@@ -22,13 +22,11 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.management.*;
-import org.safehaus.penrose.scheduler.SchedulerConfig;
-import org.safehaus.penrose.scheduler.JobConfig;
+import org.safehaus.penrose.ldap.*;
 
 import java.util.*;
 import java.lang.reflect.InvocationTargetException;
@@ -49,44 +47,22 @@ public class NISDatabaseCachePage extends FormPage {
     NISFederation nisFederation;
 
     Project project;
-    PenroseClient penroseClient;
-    PartitionClient partitionClient;
 
-    Map<String,Collection<String>> sourceCaches = new TreeMap<String,Collection<String>>();
+    PartitionClient partitionClient;
+    ModuleClient moduleClient;
 
     public NISDatabaseCachePage(NISDatabaseEditor editor) throws Exception {
         super(editor, "DATABASE", "  Database  ");
 
         this.editor = editor;
+        this.project = editor.getProject();
+        this.nisFederation = editor.getNisTool();
+        this.domain = editor.getDomain();
 
-        domain = editor.getDomain();
-        nisFederation = editor.getNisTool();
-        project = nisFederation.getProject();
+        PenroseClient penroseClient = project.getClient();
 
-        penroseClient = project.getClient();
-        partitionClient = penroseClient.getPartitionClient(domain.getName());
-
-        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-        PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName());
-        SchedulerConfig schedulerConfig = partitionConfig.getSchedulerConfig();
-
-        log.debug("Source caches:");
-        for (String sourceName : nisFederation.getSourceNames()) {
-
-            JobConfig jobConfig = schedulerConfig.getJobConfig(sourceName);
-            if (jobConfig == null) continue;
-
-            String target = jobConfig.getParameter("target");
-
-            StringTokenizer st = new StringTokenizer(target, ";, ");
-
-            Collection<String> list = new ArrayList<String>();
-            while (st.hasMoreTokens()) list.add(st.nextToken());
-
-            log.debug(" - "+sourceName+": "+list);
-            
-            sourceCaches.put(sourceName, list);
-        }
+        partitionClient = penroseClient.getPartitionClient(domain.getName()+"_"+NISFederation.DB);
+        moduleClient = partitionClient.getModuleClient("NISDBSyncModule");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -104,10 +80,7 @@ public class NISDatabaseCachePage extends FormPage {
 
         Control mainSection = createMainSection(section);
         section.setClient(mainSection);
-    }
 
-    public void setActive(boolean b) {
-        super.setActive(b);
         refresh();
     }
 
@@ -177,25 +150,59 @@ public class NISDatabaseCachePage extends FormPage {
 
                     if (!confirm) return;
 
-                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
+                    TableItem[] items = table.getSelection();
 
-                    for (TableItem item : table.getSelection()) {
-                        String sourceName = (String)item.getData();
+                    final Collection<String> mapNames = new ArrayList<String>();
 
-                        try {
-                            JobClient jobClient = schedulerClient.getJobClient(sourceName);
-                            jobClient.invoke("create", new Object[] {}, new String[] {});
-
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
+                    for (TableItem item : items) {
+                        String mapName = (String)item.getData("mapName");
+                        mapNames.add(mapName);
                     }
 
-                    refresh();
+                    IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+                    progressService.busyCursorWhile(new IRunnableWithProgress() {
+                        public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                            try {
+                                monitor.beginTask("Creating cache...", mapNames.size());
+
+                                for (String mapName : mapNames) {
+
+                                    if (monitor.isCanceled()) throw new InterruptedException();
+
+                                    monitor.subTask("Creating "+mapName+"...");
+
+                                    DN dn = getDn(mapName);
+
+                                    moduleClient.invoke(
+                                            "create",
+                                            new Object[] { dn },
+                                            new String[] { DN.class.getName() }
+                                    );
+
+                                    monitor.worked(1);
+                                }
+
+                            } catch (InterruptedException e) {
+                                // ignore
+
+                            } catch (Exception e) {
+                                throw new InvocationTargetException(e);
+
+                            } finally {
+                                monitor.done();
+                            }
+                        }
+                    });
+
+                    for (TableItem item : items) {
+                        String mapName = (String)item.getData("mapName");
+                        item.setText(1, getStatus(mapName));
+                    }
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -217,10 +224,13 @@ public class NISDatabaseCachePage extends FormPage {
 
                     if (!confirm) return;
 
-                    final Collection<String> sourceNames = new ArrayList<String>();
-                    for (TableItem item : table.getSelection()) {
-                        String sourceName = (String)item.getData();
-                        sourceNames.add(sourceName);
+                    TableItem[] items = table.getSelection();
+
+                    final Collection<String> mapNames = new ArrayList<String>();
+
+                    for (TableItem item : items) {
+                        String mapName = (String)item.getData("mapName");
+                        mapNames.add(mapName);
                     }
 
                     IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
@@ -228,21 +238,22 @@ public class NISDatabaseCachePage extends FormPage {
                     progressService.busyCursorWhile(new IRunnableWithProgress() {
                         public void run(IProgressMonitor monitor) throws InvocationTargetException {
                             try {
-                                monitor.beginTask("Loading cache...", IProgressMonitor.UNKNOWN);
+                                monitor.beginTask("Loading cache...", mapNames.size());
 
-                                SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
+                                for (String mapName : mapNames) {
 
-                                for (String sourceName : sourceNames) {
+                                    if (monitor.isCanceled()) throw new InterruptedException();
 
-                                    if (monitor.isCanceled()) {
-                                        throw new InterruptedException();
-                                    }
+                                    monitor.subTask("Loading "+mapName+"...");
 
-                                    monitor.subTask("Loading "+sourceName+"...");
-                                    
-                                    JobClient jobClient = schedulerClient.getJobClient(sourceName);
-                                    jobClient.invoke("load", new Object[] {}, new String[] {});
-                                    
+                                    DN dn = getDn(mapName);
+
+                                    moduleClient.invoke(
+                                            "load",
+                                            new Object[] { dn },
+                                            new String[] { DN.class.getName() }
+                                    );
+
                                     monitor.worked(1);
                                 }
 
@@ -258,11 +269,14 @@ public class NISDatabaseCachePage extends FormPage {
                         }
                     });
 
-                    refresh();
+                    for (TableItem item : items) {
+                        String mapName = (String)item.getData("mapName");
+                        item.setText(1, getStatus(mapName));
+                    }
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -284,25 +298,59 @@ public class NISDatabaseCachePage extends FormPage {
 
                     if (!confirm) return;
 
-                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
+                    TableItem[] items = table.getSelection();
 
-                    for (TableItem item : table.getSelection()) {
-                        String sourceName = (String)item.getData();
+                    final Collection<String> mapNames = new ArrayList<String>();
 
-                        try {
-                            JobClient jobClient = schedulerClient.getJobClient(sourceName);
-                            jobClient.invoke("clear", new Object[] {}, new String[] {});
-
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
+                    for (TableItem item : items) {
+                        String mapName = (String)item.getData("mapName");
+                        mapNames.add(mapName);
                     }
 
-                    refresh();
+                    IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+                    progressService.busyCursorWhile(new IRunnableWithProgress() {
+                        public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                            try {
+                                monitor.beginTask("Clearing cache...", mapNames.size());
+
+                                for (String mapName : mapNames) {
+
+                                    if (monitor.isCanceled()) throw new InterruptedException();
+
+                                    monitor.subTask("Clearing "+mapName+"...");
+
+                                    DN dn = getDn(mapName);
+
+                                    moduleClient.invoke(
+                                            "clear",
+                                            new Object[] { dn },
+                                            new String[] { DN.class.getName() }
+                                    );
+
+                                    monitor.worked(1);
+                                }
+
+                            } catch (InterruptedException e) {
+                                // ignore
+
+                            } catch (Exception e) {
+                                throw new InvocationTargetException(e);
+
+                            } finally {
+                                monitor.done();
+                            }
+                        }
+                    });
+
+                    for (TableItem item : items) {
+                        String mapName = (String)item.getData("mapName");
+                        item.setText(1, getStatus(mapName));
+                    }
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -324,25 +372,59 @@ public class NISDatabaseCachePage extends FormPage {
 
                     if (!confirm) return;
 
-                    SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
+                    TableItem[] items = table.getSelection();
 
-                    for (TableItem item : table.getSelection()) {
-                        String sourceName = (String)item.getData();
+                    final Collection<String> mapNames = new ArrayList<String>();
 
-                        try {
-                            JobClient jobClient = schedulerClient.getJobClient(sourceName);
-                            jobClient.invoke("drop", new Object[] {}, new String[] {});
-
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
+                    for (TableItem item : items) {
+                        String mapName = (String)item.getData("mapName");
+                        mapNames.add(mapName);
                     }
 
-                    refresh();
+                    IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+                    progressService.busyCursorWhile(new IRunnableWithProgress() {
+                        public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                            try {
+                                monitor.beginTask("Removing cache...", mapNames.size());
+
+                                for (String mapName : mapNames) {
+
+                                    if (monitor.isCanceled()) throw new InterruptedException();
+
+                                    monitor.subTask("Removing "+mapName+"...");
+
+                                    DN dn = getDn(mapName);
+
+                                    moduleClient.invoke(
+                                            "remove",
+                                            new Object[] { dn },
+                                            new String[] { DN.class.getName() }
+                                    );
+
+                                    monitor.worked(1);
+                                }
+
+                            } catch (InterruptedException e) {
+                                // ignore
+
+                            } catch (Exception e) {
+                                throw new InvocationTargetException(e);
+
+                            } finally {
+                                monitor.done();
+                            }
+                        }
+                    });
+
+                    for (TableItem item : items) {
+                        String mapName = (String)item.getData("mapName");
+                        item.setText(1, getStatus(mapName));
+                    }
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -366,10 +448,13 @@ public class NISDatabaseCachePage extends FormPage {
 
                     if (!confirm) return;
 
-                    final Collection<String> sourceNames = new ArrayList<String>();
-                    for (TableItem item : table.getSelection()) {
-                        String sourceName = (String)item.getData();
-                        sourceNames.add(sourceName);
+                    TableItem[] items = table.getSelection();
+
+                    final Collection<String> mapNames = new ArrayList<String>();
+
+                    for (TableItem item : items) {
+                        String mapName = (String)item.getData("mapName");
+                        mapNames.add(mapName);
                     }
 
                     IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
@@ -377,20 +462,21 @@ public class NISDatabaseCachePage extends FormPage {
                     progressService.busyCursorWhile(new IRunnableWithProgress() {
                         public void run(IProgressMonitor monitor) throws InvocationTargetException {
                             try {
-                                monitor.beginTask("Synchronizing cache...", IProgressMonitor.UNKNOWN);
+                                monitor.beginTask("Synchronizing cache...", mapNames.size());
 
-                                SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
+                                for (String mapName : mapNames) {
 
-                                for (String sourceName : sourceNames) {
+                                    if (monitor.isCanceled()) throw new InterruptedException();
 
-                                    if (monitor.isCanceled()) {
-                                        throw new InterruptedException();
-                                    }
+                                    monitor.subTask("Synchronizing "+mapName+"...");
 
-                                    monitor.subTask("Synchronizing "+sourceName+"...");
+                                    DN dn = getDn(mapName);
 
-                                    JobClient jobClient = schedulerClient.getJobClient(sourceName);
-                                    jobClient.invoke("synchronize", new Object[] {}, new String[] {});
+                                    moduleClient.invoke(
+                                            "synchronize",
+                                            new Object[] { dn },
+                                            new String[] { DN.class.getName() }
+                                    );
 
                                     monitor.worked(1);
                                 }
@@ -407,11 +493,14 @@ public class NISDatabaseCachePage extends FormPage {
                         }
                     });
 
-                    refresh();
+                    for (TableItem item : items) {
+                        String mapName = (String)item.getData("mapName");
+                        item.setText(1, getStatus(mapName));
+                    }
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -434,29 +523,74 @@ public class NISDatabaseCachePage extends FormPage {
     public void refresh() {
         try {
             int[] indices = table.getSelectionIndices();
+            TableItem[] items = table.getSelection();
 
-            table.removeAll();
+            final Collection<String> mapNames = new ArrayList<String>();
 
-            for (String sourceName : nisFederation.getSourceNames()) {
-                String label = nisFederation.getSourceLabel(sourceName);
-                log.debug("Checking cache for "+label+" ("+sourceName+").");
+            if (items.length == 0) {
+                for (String mapName : nisFederation.getMapNames()) {
+                    mapNames.add(mapName);
+                }
 
-                Collection<String> caches = sourceCaches.get(sourceName);
-                if (caches == null) continue;
+                table.removeAll();
 
-                String cacheName = caches.iterator().next();
-                SourceClient sourceClient = partitionClient.getSourceClient(cacheName);
+            } else {
+                for (TableItem ti : items) {
+                    String mapName = (String)ti.getData("mapName");
+                    mapNames.add(mapName);
+                }
+            }
 
-                final TableItem ti = new TableItem(table, SWT.NONE);
-                ti.setText(0, label);
-                ti.setData(sourceName);
+            final Map<String,String> statuses = new TreeMap<String,String>();
 
-                try {
-                    ti.setText(1, sourceClient.getCount().toString());
+            IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    ti.setText(1, "N/A");
+            progressService.busyCursorWhile(new IRunnableWithProgress() {
+                public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                    try {
+                        monitor.beginTask("Refreshing...", nisFederation.getMapNames().size());
+
+                        for (String mapName : mapNames) {
+
+                            if (monitor.isCanceled()) throw new InterruptedException();
+
+                            monitor.subTask("Checking "+mapName+"...");
+
+                            statuses.put(mapName, getStatus(mapName));
+
+                            monitor.worked(1);
+                        }
+
+                    } catch (InterruptedException e) {
+                        // ignore
+
+                    } catch (Exception e) {
+                        throw new InvocationTargetException(e);
+
+                    } finally {
+                        monitor.done();
+                    }
+                }
+            });
+
+            if (items.length == 0) {
+                for (String mapName : mapNames) {
+
+                    String count = statuses.get(mapName);
+
+                    TableItem ti = new TableItem(table, SWT.NONE);
+                    ti.setText(0, mapName);
+                    ti.setText(1, count == null ? "N/A" : ""+count);
+
+                    ti.setData("mapName", mapName);
+                }
+
+            } else {
+                for (TableItem ti : items) {
+                    String mapName = (String)ti.getData("mapName");
+
+                    String count = statuses.get(mapName);
+                    ti.setText(1, count == null ? "N/A" : ""+count);
                 }
             }
 
@@ -464,8 +598,36 @@ public class NISDatabaseCachePage extends FormPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+            ErrorDialog.open(e);
         }
     }
 
+    public DN getDn(String mapName) throws Exception {
+
+        RDNBuilder rb = new RDNBuilder();
+        rb.set("ou", mapName);
+        RDN rdn = rb.toRdn();
+
+        DNBuilder db = new DNBuilder();
+        db.append(rdn);
+
+        DN suffix = partitionClient.getSuffixes().iterator().next();
+        db.append(suffix);
+
+        return db.toDn();
+    }
+
+    public String getStatus(String mapName) {
+        try {
+            return ""+moduleClient.invoke(
+                    "getCount",
+                    new Object[] { getDn(mapName) },
+                    new String[] { DN.class.getName() }
+            );
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return "N/A";
+        }
+    }
 }

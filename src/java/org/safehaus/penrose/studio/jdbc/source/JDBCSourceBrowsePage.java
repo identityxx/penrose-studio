@@ -18,6 +18,7 @@ import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.util.Iterator;
 import java.util.Collection;
@@ -169,7 +170,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
 
             Connection connection = partition.getConnection(sourceConfig.getConnectionName());
 
-            Source source = partition.createSource(sourceConfig, connection);
+            Source source = connection.createSource(sourceConfig);
 
             source.add(dn, attributes);
 
@@ -179,11 +180,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            String message = e.toString();
-            if (message.length() > 500) {
-                message = message.substring(0, 500) + "...";
-            }
-            MessageDialog.openError(editor.getSite().getShell(), "Browse Failed", message);
+            ErrorDialog.open(e);
         }
     }
 
@@ -224,7 +221,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
 
             Connection connection = partition.getConnection(sourceConfig.getConnectionName());
 
-            Source source = partition.createSource(sourceConfig, connection);
+            Source source = connection.createSource(sourceConfig);
 
             if (!rdn.equals(newRdn)) {
                 source.modrdn(dn, newRdn, true);
@@ -243,11 +240,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            String message = e.toString();
-            if (message.length() > 500) {
-                message = message.substring(0, 500) + "...";
-            }
-            MessageDialog.openError(editor.getSite().getShell(), "Browse Failed", message);
+            ErrorDialog.open(e);
         }
     }
 
@@ -272,7 +265,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
 
             Connection connection = partition.getConnection(sourceConfig.getConnectionName());
 
-            Source source = partition.createSource(sourceConfig, connection);
+            Source source = connection.createSource(sourceConfig);
 
             source.delete(dn);
 
@@ -282,11 +275,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            String message = e.toString();
-            if (message.length() > 500) {
-                message = message.substring(0, 500) + "...";
-            }
-            MessageDialog.openError(editor.getSite().getShell(), "Browse Failed", message);
+            ErrorDialog.open(e);
         }
     }
 
@@ -345,7 +334,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
 
             Connection connection = partition.getConnection(sourceConfig.getConnectionName());
 
-            Source source = partition.createSource(sourceConfig, connection);
+            Source source = connection.createSource(sourceConfig);
 
             source.search(request, response);
 
@@ -353,11 +342,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            String message = e.toString();
-            if (message.length() > 500) {
-                message = message.substring(0, 500) + "...";
-            }
-            MessageDialog.openError(editor.getSite().getShell(), "Error", message);
+            ErrorDialog.open(e);
         }
     }
 }

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Penrose Studio
 Bundle-SymbolicName: org.safehaus.penrose.studio; singleton:=true
-Bundle-Version: 2.0.0.b4
+Bundle-Version: 2.0.0.b5
 Bundle-Vendor: Identyx Corporation
 Bundle-Activator: org.safehaus.penrose.studio.PenroseStudioPlugin
 Bundle-Localization: plugin
@@ -27,7 +27,7 @@ Bundle-ClassPath: lib/ant.jar,
  lib/commons-pool-1.2.jar,
  lib/dom4j-1.4.jar,
  lib/hibernate3.jar,
- lib/hsqldb-1.7.2.2.jar,
+ lib/hsqldb.jar,
  lib/java-getopt-1.0.12.jar,
  lib/jbossall-client.jar,
  lib/jmx.jar,
@@ -41,12 +41,12 @@ Bundle-ClassPath: lib/ant.jar,
  lib/log4j-1.2.13.jar,
  lib/mysql-connector-java-3.0.16-ga-bin.jar,
  lib/nis.jar,
- lib/penrose-2.0b4.jar,
- lib/penrose-agent-2.0b4.jar,
- lib/penrose-agent-client-2.0b4.jar,
- lib/penrose-jmx-service-2.0b4.jar,
- lib/penrose-pro-2.0b4.jar,
- lib/penrose-server-2.0b4.jar,
+ lib/penrose-2.0b5.jar,
+ lib/penrose-agent-2.0b5.jar,
+ lib/penrose-agent-client-2.0b5.jar,
+ lib/penrose-jmx-service-2.0b5.jar,
+ lib/penrose-pro-2.0b5.jar,
+ lib/penrose-server-2.0b5.jar,
  lib/postgresql-8.1-405.jdbc3.jar,
  lib/quartz-1.6.0.jar,
  lib/slf4j-log4j12.jar,

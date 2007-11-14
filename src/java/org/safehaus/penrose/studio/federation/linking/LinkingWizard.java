@@ -4,7 +4,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.management.SourceClient;
+import org.safehaus.penrose.management.PartitionClient;
 
 import java.util.Collection;
 
@@ -17,8 +17,7 @@ public class LinkingWizard extends Wizard {
 
     private DN dn;
     private SearchResult searchResult;
-    private SourceClient sourceClient;
-    private DN baseDn;
+    private PartitionClient partitionClient;
     private Collection<SearchResult> results;
 
     LinkingSearchPage searchPage;
@@ -32,21 +31,20 @@ public class LinkingWizard extends Wizard {
         searchPage = new LinkingSearchPage();
         searchPage.setDn(dn);
         searchPage.setSearchResult(searchResult);
-        searchPage.setSourceClient(sourceClient);
+        searchPage.setPartitionClient(partitionClient);
         addPage(searchPage);
 
         resultsPage = new LinkingResultsPage();
         resultsPage.setDn(dn);
         resultsPage.setEntry(searchResult);
-        resultsPage.setSourceClient(sourceClient);
-        resultsPage.setBaseDn(baseDn);
+        resultsPage.setPartitionClient(partitionClient);
         addPage(resultsPage);
     }
 
     public IWizardPage getNextPage(IWizardPage page) {
         if (page == searchPage) {
 
-            DN searchBaseDn = new DN(searchPage.getBaseDn()).getPrefix(baseDn);
+            DN searchBaseDn = new DN(searchPage.getBaseDn());
             String filter = searchPage.getFilter();
             int scope = searchPage.getScope();
 
@@ -71,7 +69,7 @@ public class LinkingWizard extends Wizard {
 
             SearchResponse response = new SearchResponse();
 
-            sourceClient.search(request, response);
+            partitionClient.search(request, response);
 
             return response.getAll();
 
@@ -94,12 +92,12 @@ public class LinkingWizard extends Wizard {
         }
     }
 
-    public SourceClient getSourceClient() {
-        return sourceClient;
+    public PartitionClient getPartitionClient() {
+        return partitionClient;
     }
 
-    public void setSourceClient(SourceClient sourceClient) {
-        this.sourceClient = sourceClient;
+    public void setPartitionClient(PartitionClient partitionClient) {
+        this.partitionClient = partitionClient;
     }
 
     public SearchResult getSearchResult() {
@@ -116,14 +114,6 @@ public class LinkingWizard extends Wizard {
 
     public void setDn(DN dn) {
         this.dn = dn;
-    }
-
-    public DN getBaseDn() {
-        return baseDn;
-    }
-
-    public void setBaseDn(DN baseDn) {
-        this.baseDn = baseDn;
     }
 
     public Collection<SearchResult> getResults() {

@@ -35,6 +35,7 @@ import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
 import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.connection.Connections;
@@ -279,15 +280,7 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            String message = sw.toString();
-            if (message.length() > 500) {
-                message = message.substring(0, 500) + "...";
-            }
-            MessageDialog.openError(getEditorSite().getShell(), "Error", "Error: "+message);
+            ErrorDialog.open(e);
         }
     }
 
@@ -336,15 +329,7 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            String message = sw.toString();
-            if (message.length() > 500) {
-                message = message.substring(0, 500) + "...";
-            }
-            MessageDialog.openError(getEditorSite().getShell(), "Error", "Error: "+message);
+            ErrorDialog.open(e);
         }
     }
 
@@ -374,15 +359,7 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            String message = sw.toString();
-            if (message.length() > 500) {
-                message = message.substring(0, 500) + "...";
-            }
-            MessageDialog.openError(getEditorSite().getShell(), "Error", "Error: "+message);
+            ErrorDialog.open(e);
         }
     }
 }

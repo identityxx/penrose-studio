@@ -22,8 +22,10 @@ import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.editor.NISEditor;
 import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.connection.Connection;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 
 /**
@@ -134,9 +136,13 @@ public class NISDatabasesPage extends FormPage {
 
                     TableItem[] items = table.getSelection();
 
+                    Project project = nisFederation.getProject();
+                    
                     for (TableItem ti : items) {
                         NISDomain domain = (NISDomain)ti.getData();
-                        nisFederation.createDatabase(domain);
+                        String name = domain.getName();
+                        PartitionConfig nisPartitionConfig = project.getPartitionConfigs().getPartitionConfig(name+"_"+NISFederation.YP);
+                        //nisFederation.createDatabase(domain, nisPartitionConfig);
                     }
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -144,7 +150,7 @@ public class NISDatabasesPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
 
                 refresh();
@@ -180,7 +186,7 @@ public class NISDatabasesPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+                    ErrorDialog.open(e);
                 }
 
                 refresh();
@@ -209,11 +215,10 @@ public class NISDatabasesPage extends FormPage {
             table.removeAll();
 
             Partition nisPartition = nisFederation.getPartition();
-            Connection connection = nisPartition.getConnection(Federation.JDBC);
-            JDBCConnection jdbcConnection = (JDBCConnection)connection;
+            JDBCConnection connection = (JDBCConnection)nisPartition.getConnection(Federation.JDBC);
 
             for (NISDomain domain : nisFederation.getRepositories()) {
-                boolean exists = jdbcConnection.checkDatabase(domain.getName());
+                boolean exists = connection.checkDatabase(domain.getName());
 
                 TableItem ti = new TableItem(table, SWT.NONE);
 
@@ -227,7 +232,7 @@ public class NISDatabasesPage extends FormPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(editor.getSite().getShell(), "Action Failed", e.getMessage());
+            ErrorDialog.open(e);
         }
     }
 

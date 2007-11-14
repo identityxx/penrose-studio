@@ -27,12 +27,10 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.jface.viewers.*;
 import org.eclipse.jface.action.*;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.server.ServersContentProvider;
-import org.safehaus.penrose.studio.server.ServersLabelProvider;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.ProjectConfig;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.util.Helper;
@@ -131,7 +129,7 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
 
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
-                        MessageDialog.openError(getSite().getShell(), "Action Failed", e.getMessage());
+                        ErrorDialog.open(e);
                     }
                 }
             });
@@ -150,7 +148,7 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
 
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
-                        MessageDialog.openError(getSite().getShell(), "Action Failed", e.getMessage());
+                        ErrorDialog.open(e);
                     }
                 }
                 public void treeCollapsed(TreeExpansionEvent event) {
@@ -166,7 +164,7 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
 
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
-                        MessageDialog.openError(getSite().getShell(), "Action Failed", e.getMessage());
+                        ErrorDialog.open(e);
                     }
                 }
             });

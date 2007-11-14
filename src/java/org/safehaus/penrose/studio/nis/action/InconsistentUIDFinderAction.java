@@ -12,7 +12,6 @@ import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.connection.Connection;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -57,18 +56,17 @@ public class InconsistentUIDFinderAction extends NISAction {
         Project project = nisFederation.getProject();
         PartitionConfigs partitionConfigs = project.getPartitionConfigs();
 
-        PartitionConfig partitionConfig1 = partitionConfigs.getPartitionConfig(domain1.getName());
+        PartitionConfig partitionConfig1 = partitionConfigs.getPartitionConfig(domain1.getName()+"_"+NISFederation.YP);
         SourceConfig sourceConfig1 = partitionConfig1.getSourceConfigs().getSourceConfig(NISFederation.CACHE_USERS);
 
-        PartitionConfig partitionConfig2 = partitionConfigs.getPartitionConfig(domain2.getName());
+        PartitionConfig partitionConfig2 = partitionConfigs.getPartitionConfig(domain2.getName()+"_"+NISFederation.YP);
         SourceConfig sourceConfig2 = partitionConfig2.getSourceConfigs().getSourceConfig(NISFederation.CACHE_USERS);
 
         Partition partition = nisFederation.getPartition();
-        Connection connection = partition.getConnection(Federation.JDBC);
-        JDBCConnection jdbcConnection = (JDBCConnection)connection;
+        JDBCConnection connection = (JDBCConnection)partition.getConnection(Federation.JDBC);
 
-        String table1 = jdbcConnection.getTableName(sourceConfig1);
-        String table2 = jdbcConnection.getTableName(sourceConfig2);
+        String table1 = connection.getTableName(sourceConfig1);
+        String table2 = connection.getTableName(sourceConfig2);
 
         String sql = "select a.uid, a.uidNumber, b.uidNumber, c.uid, c.uidNumber, d.uidNumber" +
                 " from "+table1+" a"+
@@ -113,6 +111,6 @@ public class InconsistentUIDFinderAction extends NISAction {
             }
         };
 
-        jdbcConnection.executeQuery(sql, assignments, queryResponse);
+        connection.executeQuery(sql, assignments, queryResponse);
     }
 }

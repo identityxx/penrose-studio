@@ -74,11 +74,11 @@ public class NISDatabaseEditorInput implements IEditorInput {
         this.domain = domain;
     }
 
-    public NISFederation getNisTool() {
+    public NISFederation getNisFederation() {
         return nisFederation;
     }
 
-    public void setNisTool(NISFederation nisFederation) {
+    public void setNisFederation(NISFederation nisFederation) {
         this.nisFederation = nisFederation;
     }
 

@@ -37,6 +37,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.ietf.ldap.*;
 import org.safehaus.penrose.ldap.DN;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 public class BrowserEditor extends EditorPart {
 
@@ -125,7 +126,7 @@ public class BrowserEditor extends EditorPart {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -145,7 +146,7 @@ public class BrowserEditor extends EditorPart {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -160,7 +161,7 @@ public class BrowserEditor extends EditorPart {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -182,7 +183,7 @@ public class BrowserEditor extends EditorPart {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            MessageDialog.openError(getSite().getShell(), "Error", e.getMessage());
+            ErrorDialog.open(e);
         }
 	}
 
