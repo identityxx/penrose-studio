@@ -164,8 +164,7 @@ public class FederationNode extends PluginNode {
                     federation.load(monitor);
 
                 } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    ErrorDialog.open(e);
+                    throw new InvocationTargetException(e);
                 }
             }
         });

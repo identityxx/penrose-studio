@@ -90,6 +90,7 @@ public class FederationGlobalRepositoryPage extends FormPage {
     public void refresh() {
         try {
             GlobalRepository globalRepository = federation.getGlobalRepository();
+            if (globalRepository == null) return;
 
             String url = globalRepository.getUrl();
             if (url != null) url = url+globalRepository.getSuffix();
@@ -150,16 +151,17 @@ public class FederationGlobalRepositoryPage extends FormPage {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    GlobalRepository globalRepository = federation.getGlobalRepository();
-
                     Map<String,String> parameters = new LinkedHashMap<String,String>();
 
-                    String url = globalRepository.getUrl();
-                    if (url != null) url = url+globalRepository.getSuffix();
+                    GlobalRepository globalRepository = federation.getGlobalRepository();
+                    if (globalRepository != null) {
+                        String url = globalRepository.getUrl();
+                        if (url != null) url = url+globalRepository.getSuffix();
 
-                    parameters.put(Context.PROVIDER_URL, url);
-                    parameters.put(Context.SECURITY_PRINCIPAL, globalRepository.getUser());
-                    parameters.put(Context.SECURITY_CREDENTIALS, globalRepository.getPassword());
+                        parameters.put(Context.PROVIDER_URL, url);
+                        parameters.put(Context.SECURITY_PRINCIPAL, globalRepository.getUser());
+                        parameters.put(Context.SECURITY_CREDENTIALS, globalRepository.getPassword());
+                    }
 
                     GlobalRepositoryWizard wizard = new GlobalRepositoryWizard();
                     wizard.setParameters(parameters);
@@ -173,6 +175,12 @@ public class FederationGlobalRepositoryPage extends FormPage {
                     if (dialog.open() != Window.OK) return;
 
                     parameters = wizard.getParameters();
+
+                    if (globalRepository == null) {
+                        globalRepository = new GlobalRepository();
+                    } else {
+                        federation.removeGlobalPartition();
+                    }
 
                     globalRepository.setUrl(parameters.get(Context.PROVIDER_URL));
                     globalRepository.setUser(parameters.get(Context.SECURITY_PRINCIPAL));

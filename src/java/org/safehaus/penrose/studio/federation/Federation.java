@@ -149,12 +149,22 @@ public class Federation {
 */
     }
 
+    public void removeGlobalPartition() throws Exception {
+
+        String partitionName = "federation_global";
+
+        PenroseClient penroseClient = project.getClient();
+        penroseClient.stopPartition(partitionName);
+        nisFederation.removePartitionConfig(partitionName);
+        project.removeDirectory("partitions/"+partitionName);
+    }
+
     public void createGlobalPartition(GlobalRepository globalRepository) throws Exception {
 
         String partitionName = "federation_global";
 
         PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-        if (partitionConfigs.getPartitionConfig(partitionName) != null) return;
+        //if (partitionConfigs.getPartitionConfig(partitionName) != null) return;
 
         log.debug("Creating partition "+partitionName+".");
 
