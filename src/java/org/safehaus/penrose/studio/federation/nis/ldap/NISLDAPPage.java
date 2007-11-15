@@ -50,6 +50,7 @@ public class NISLDAPPage extends FormPage {
     NISDomain domain;
 
     Label statusText;
+    Button baseButton;
     Table table;
 
     PartitionClient partitionClient;
@@ -95,6 +96,7 @@ public class NISLDAPPage extends FormPage {
         Control contentControl = createContentSection(contentSection);
         contentSection.setClient(contentControl);
 
+        refreshBase();
         refresh();
     }
 
@@ -130,23 +132,17 @@ public class NISLDAPPage extends FormPage {
         gd.widthHint = 120;
         rightPanel.setLayoutData(gd);
 
-        Button createBaseButton = new Button(rightPanel, SWT.PUSH);
-        createBaseButton.setText("Create Base");
-        createBaseButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        baseButton = new Button(rightPanel, SWT.PUSH);
+        baseButton.setText("Create Base");
+        baseButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        createBaseButton.addSelectionListener(new SelectionAdapter() {
+        baseButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
-                createBase();
-            }
-        });
-
-        Button removeBaseButton = new Button(rightPanel, SWT.PUSH);
-        removeBaseButton.setText("Remove Base");
-        removeBaseButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        removeBaseButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                removeBase();
+                if ("Created".equals(statusText.getText())) {
+                    removeBase();
+                } else {
+                    createBase();
+                }
             }
         });
 
@@ -296,6 +292,9 @@ public class NISLDAPPage extends FormPage {
                     new String[] { }
             );
 
+            statusText.setText("Created");
+            baseButton.setText("Remove Base");
+
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);
@@ -318,6 +317,9 @@ public class NISLDAPPage extends FormPage {
                     new String[] { }
             );
 
+            statusText.setText("Missing");
+            baseButton.setText("Create Base");
+
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);
@@ -328,9 +330,11 @@ public class NISLDAPPage extends FormPage {
         try {
             partitionClient.find(suffix);
             statusText.setText("Created");
+            baseButton.setText("Remove Base");
 
         } catch (Exception e) {
             statusText.setText("Missing");
+            baseButton.setText("Create Base");
         }
     }
 

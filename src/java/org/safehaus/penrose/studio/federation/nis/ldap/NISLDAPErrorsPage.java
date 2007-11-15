@@ -46,8 +46,9 @@ public class NISLDAPErrorsPage extends FormPage {
     NISDomain domain;
 
     Table table;
+    Label totalLabel;
     Text descriptionText;
-    Text noteText;
+    //Text noteText;
 
     Project project;
     PartitionClient partitionClient;
@@ -117,20 +118,24 @@ public class NISLDAPErrorsPage extends FormPage {
             }
         });
 
+        totalLabel = toolkit.createLabel(leftPanel, "Total:");
+
+        new Label(leftPanel, SWT.NONE);
+
         toolkit.createLabel(leftPanel, "Description:");
 
         descriptionText = toolkit.createText(leftPanel, "", SWT.BORDER | SWT.READ_ONLY  | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.heightHint = 150;
+        gd.heightHint = 200;
         descriptionText.setLayoutData(gd);
-
+/*
         toolkit.createLabel(leftPanel, "Note:");
 
         noteText = toolkit.createText(leftPanel, "", SWT.BORDER | SWT.READ_ONLY  | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
         gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.heightHint = 150;
+        gd.heightHint = 100;
         noteText.setLayoutData(gd);
-
+*/
         Composite rightPanel = toolkit.createComposite(composite);
         rightPanel.setLayout(new GridLayout());
         gd = new GridData(GridData.FILL_VERTICAL);
@@ -222,6 +227,8 @@ public class NISLDAPErrorsPage extends FormPage {
                 ti.setData(result);
             }
 
+            totalLabel.setText("Total: "+response.getTotalCount());
+            
             table.select(indices);
 
             showError();
@@ -236,7 +243,7 @@ public class NISLDAPErrorsPage extends FormPage {
 
         if (table.getSelectionCount() !=  1) {
             descriptionText.setText("");
-            noteText.setText("");
+            //noteText.setText("");
             return;
         }
 
@@ -248,7 +255,7 @@ public class NISLDAPErrorsPage extends FormPage {
         String description = (String)attributes.getValue("description");
         descriptionText.setText(description == null ? "" : description);
 
-        String note = (String)attributes.getValue("note");
-        noteText.setText(note == null ? "" : note);
+        //String note = (String)attributes.getValue("note");
+        //noteText.setText(note == null ? "" : note);
     }
 }
