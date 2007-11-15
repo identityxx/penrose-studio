@@ -72,6 +72,7 @@ public class Federation {
         Partition defaultPartition = partitionFactory.createPartition(defaultPartitionconfig);
 
         partitions.addPartition(defaultPartition);
+
     }
 
     public void create(Map<String,String> allParameters, JDBCConnection connection) throws Exception {
@@ -134,7 +135,7 @@ public class Federation {
 
         PenroseClient penroseClient = project.getClient();
         penroseClient.startPartition(partitionConfig.getName());
-/*
+
         log.debug("Initializing partition "+Federation.PARTITION +".");
 
         PenroseConfig penroseConfig = project.getPenroseConfig();
@@ -146,7 +147,7 @@ public class Federation {
         partitionFactory.setPenroseContext(penroseContext);
 
         partitionFactory.createPartition(partitionConfig);
-*/
+
     }
 
     public void removeGlobalPartition() throws Exception {
@@ -542,7 +543,7 @@ public class Federation {
     public void loadPartition(PartitionConfig partitionConfig) throws Exception {
 
         log.debug("Loading partition "+partitionConfig.getName()+".");
-
+/*
         File partitionsDir = new File(project.getWorkDir(), "partitions");
         PenroseConfig penroseConfig = project.getPenroseConfig();
         PenroseContext penroseContext = project.getPenroseContext();
@@ -556,6 +557,7 @@ public class Federation {
 
         Partitions partitions = penroseContext.getPartitions();
         partitions.addPartition(partition);
+*/
     }
 
     public void removePartition(Repository repository) throws Exception {

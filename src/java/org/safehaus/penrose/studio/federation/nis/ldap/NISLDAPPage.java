@@ -49,6 +49,7 @@ public class NISLDAPPage extends FormPage {
     NISFederation nisFederation;
     NISDomain domain;
 
+    Label statusText;
     Table table;
 
     PartitionClient partitionClient;
@@ -111,8 +112,16 @@ public class NISLDAPPage extends FormPage {
         gd.widthHint = 80;
         suffixLabel.setLayoutData(gd);
 
-        Label suffixText = toolkit.createLabel(leftPanel, domain.getSuffix());
+        Label suffixText = toolkit.createLabel(leftPanel, suffix.toString());
         suffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label statusLabel = toolkit.createLabel(leftPanel, "Status:");
+        gd = new GridData();
+        gd.widthHint = 80;
+        statusLabel.setLayoutData(gd);
+
+        statusText = toolkit.createLabel(leftPanel, "");
+        statusText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Composite rightPanel = toolkit.createComposite(composite);
         rightPanel.setLayout(new GridLayout());
@@ -138,6 +147,16 @@ public class NISLDAPPage extends FormPage {
         removeBaseButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 removeBase();
+            }
+        });
+
+        Button refreshButton = new Button(rightPanel, SWT.PUSH);
+        refreshButton.setText("Refresh");
+        refreshButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        refreshButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                refreshBase();
             }
         });
 
@@ -302,6 +321,16 @@ public class NISLDAPPage extends FormPage {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);
+        }
+    }
+
+    public void refreshBase() {
+        try {
+            partitionClient.find(suffix);
+            statusText.setText("Created");
+
+        } catch (Exception e) {
+            statusText.setText("Missing");
         }
     }
 

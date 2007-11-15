@@ -22,7 +22,6 @@ import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.wizard.NISRepositoryWizard;
 import org.safehaus.penrose.studio.nis.dialog.NISUserDialog;
-import org.safehaus.penrose.studio.federation.nis.editor.NISDomainDialog;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
@@ -208,19 +207,25 @@ public class NISDomainsPage extends FormPage {
 
                         try {
                             PartitionConfig nisPartitionConfig = nisFederation.getPartitionConfig(repository.getName());
-                            penroseClient.stopPartition(nisPartitionConfig.getName());
-                            nisFederation.removePartitionConfig(nisPartitionConfig.getName());
-                            project.removeDirectory("partitions/"+nisPartitionConfig.getName());
+                            if (nisPartitionConfig != null) {
+                                penroseClient.stopPartition(nisPartitionConfig.getName());
+                                nisFederation.removePartitionConfig(nisPartitionConfig.getName());
+                                project.removeDirectory("partitions/"+nisPartitionConfig.getName());
+                            }
 
                             PartitionConfig ypPartitionConfig = nisFederation.getPartitionConfig(repository.getName()+"_"+NISFederation.YP);
-                            penroseClient.stopPartition(ypPartitionConfig.getName());
-                            nisFederation.removePartitionConfig(ypPartitionConfig.getName());
-                            project.removeDirectory("partitions/"+ypPartitionConfig.getName());
+                            if (ypPartitionConfig != null) {
+                                penroseClient.stopPartition(ypPartitionConfig.getName());
+                                nisFederation.removePartitionConfig(ypPartitionConfig.getName());
+                                project.removeDirectory("partitions/"+ypPartitionConfig.getName());
+                            }
 
                             PartitionConfig nssPartitionConfig = nisFederation.getPartitionConfig(repository.getName()+"_"+NISFederation.NSS);
-                            penroseClient.stopPartition(nssPartitionConfig.getName());
-                            nisFederation.removePartitionConfig(nssPartitionConfig.getName());
-                            project.removeDirectory("partitions/"+nssPartitionConfig.getName());
+                            if (nssPartitionConfig != null) {
+                                penroseClient.stopPartition(nssPartitionConfig.getName());
+                                nisFederation.removePartitionConfig(nssPartitionConfig.getName());
+                                project.removeDirectory("partitions/"+nssPartitionConfig.getName());
+                            }
 
                             nisFederation.removePartition(repository);
                             nisFederation.removeDatabase(repository);
