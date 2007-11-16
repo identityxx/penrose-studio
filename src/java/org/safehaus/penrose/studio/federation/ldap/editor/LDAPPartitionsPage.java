@@ -144,7 +144,6 @@ public class LDAPPartitionsPage extends FormPage {
                         project.upload("partitions/"+repository.getName());
 
                         penroseClient.startPartition(repository.getName());
-                        ldapFederation.loadPartition(partitionConfig);
                     }
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();

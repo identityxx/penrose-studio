@@ -91,19 +91,13 @@ public class NISRepositoryWizard extends Wizard {
 
             nisFederation.addRepository(repository);
 
-            PenroseClient penroseClient = project.getClient();
+            nisFederation.createNisPartitionConfig(repository);
 
-            PartitionConfig nisPartitionConfig = nisFederation.createNisPartitionConfig(repository);
-            nisFederation.loadPartition(nisPartitionConfig);
-
-            PartitionConfig ypPartitionConfig = nisFederation.createYpPartitionConfig(repository);
-            nisFederation.loadPartition(ypPartitionConfig);
+            nisFederation.createYpPartitionConfig(repository);
 /*
-            PartitionConfig dbPartitionConfig = nisFederation.createDbPartitionConfig(repository);
-            nisFederation.loadPartition(dbPartitionConfig);
+            nisFederation.createDbPartitionConfig(repository);
 */
-            PartitionConfig nssPartitionConfig = nisFederation.createNssPartitionConfig(repository);
-            nisFederation.loadPartition(nssPartitionConfig);
+             nisFederation.createNssPartitionConfig(repository);
 
             return true;
 

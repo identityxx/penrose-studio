@@ -74,7 +74,6 @@ public class LDAPRepositoryWizard extends Wizard {
             PenroseClient penroseClient = project.getClient();
 
             penroseClient.startPartition(repository.getName());
-            ldapFederation.loadPartition(partitionConfig);
 
             return true;
 

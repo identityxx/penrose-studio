@@ -25,6 +25,7 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.partition.PartitionConfig;
 
 /**
  * @author Endi S. Dewata
@@ -163,7 +164,21 @@ public class LDAPRepositoriesPage extends FormPage {
                     int action = dialog.getAction();
                     if (action == LDAPRepositoryDialog.CANCEL) return;
 
+                    Project project = ldapFederation.getProject();
+                    PenroseClient penroseClient = project.getClient();
+
+                    penroseClient.stopPartition(repository.getName());
+                    ldapFederation.removePartition(repository);
+
+                    ldapFederation.removePartitionConfig(repository.getName());
+                    project.removeDirectory("partitions/"+repository.getName());
+
                     ldapFederation.updateRepository(repository);
+
+                    PartitionConfig partitionConfig = ldapFederation.createPartitionConfig(repository);
+                    project.upload("partitions/"+repository.getName());
+
+                    penroseClient.startPartition(repository.getName());
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
@@ -203,28 +218,13 @@ public class LDAPRepositoriesPage extends FormPage {
                     for (TableItem ti : items) {
                         LDAPRepository repository = (LDAPRepository)ti.getData();
 
-                        try {
-                            penroseClient.stopPartition(repository.getName());
-                            ldapFederation.removePartition(repository);
+                        penroseClient.stopPartition(repository.getName());
+                        ldapFederation.removePartition(repository);
 
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
+                        ldapFederation.removePartitionConfig(repository.getName());
+                        project.removeDirectory("partitions/"+repository.getName());
 
-                        try {
-                            ldapFederation.removePartitionConfig(repository.getName());
-                            project.removeDirectory("partitions/"+repository.getName());
-
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-
-                        try {
-                            ldapFederation.removeRepository(repository.getName());
-
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
+                        ldapFederation.removeRepository(repository.getName());
                     }
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();

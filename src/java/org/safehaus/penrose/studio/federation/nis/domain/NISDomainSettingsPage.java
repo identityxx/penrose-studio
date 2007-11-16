@@ -165,8 +165,7 @@ public class NISDomainSettingsPage extends FormPage {
 
                     if (!confirm) return;
 
-                    PartitionConfig partitionConfig = nisFederation.createYpPartitionConfig(domain);
-                    nisFederation.loadPartition(partitionConfig);
+                    nisFederation.createYpPartitionConfig(domain);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -265,8 +264,7 @@ public class NISDomainSettingsPage extends FormPage {
 
                     if (!confirm) return;
 
-                    PartitionConfig partitionConfig = nisFederation.createNssPartitionConfig(domain);
-                    nisFederation.loadPartition(partitionConfig);
+                    nisFederation.createNssPartitionConfig(domain);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);

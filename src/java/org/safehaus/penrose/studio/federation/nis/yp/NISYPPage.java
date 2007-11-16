@@ -26,6 +26,7 @@ import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.management.*;
 import org.safehaus.penrose.ldap.*;
+import org.safehaus.penrose.nis.NIS;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -198,7 +199,7 @@ public class NISYPPage extends FormPage {
             final Collection<String> mapNames = new ArrayList<String>();
 
             if (items.length == 0) {
-                for (String mapName : nisFederation.getMapNames()) {
+                for (String mapName : NIS.mapNames) {
                     mapNames.add(mapName);
                 }
 

@@ -134,23 +134,16 @@ public class NISPartitionsPage extends FormPage {
 
                     TableItem[] items = table.getSelection();
 
-                    Project project = nisFederation.getProject();
-                    PenroseClient penroseClient = project.getClient();
-
                     for (TableItem ti : items) {
                         NISDomain repository = (NISDomain)ti.getData();
 
-                        PartitionConfig nisPartitionConfig = nisFederation.createNisPartitionConfig(repository);
-                        nisFederation.loadPartition(nisPartitionConfig);
+                        nisFederation.createNisPartitionConfig(repository);
 
-                        PartitionConfig ypPartitionConfig = nisFederation.createYpPartitionConfig(repository);
-                        nisFederation.loadPartition(ypPartitionConfig);
+                        nisFederation.createYpPartitionConfig(repository);
 /*
-                        PartitionConfig dbPartitionConfig = nisFederation.createDbPartitionConfig(repository);
-                        nisFederation.loadPartition(dbPartitionConfig);
+                        nisFederation.createDbPartitionConfig(repository);
 */
-                        PartitionConfig nssPartitionConfig = nisFederation.createNssPartitionConfig(repository);
-                        nisFederation.loadPartition(nssPartitionConfig);
+                        nisFederation.createNssPartitionConfig(repository);
                     }
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();

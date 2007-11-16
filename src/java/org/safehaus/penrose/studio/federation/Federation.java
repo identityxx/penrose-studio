@@ -540,26 +540,6 @@ public class Federation {
         return partitionConfig;
     }
 
-    public void loadPartition(PartitionConfig partitionConfig) throws Exception {
-
-        log.debug("Loading partition "+partitionConfig.getName()+".");
-/*
-        File partitionsDir = new File(project.getWorkDir(), "partitions");
-        PenroseConfig penroseConfig = project.getPenroseConfig();
-        PenroseContext penroseContext = project.getPenroseContext();
-
-        PartitionFactory partitionFactory = new PartitionFactory();
-        partitionFactory.setPartitionsDir(partitionsDir);
-        partitionFactory.setPenroseConfig(penroseConfig);
-        partitionFactory.setPenroseContext(penroseContext);
-
-        Partition partition = partitionFactory.createPartition(partitionConfig);
-
-        Partitions partitions = penroseContext.getPartitions();
-        partitions.addPartition(partition);
-*/
-    }
-
     public void removePartition(Repository repository) throws Exception {
 
         String name = repository.getName();

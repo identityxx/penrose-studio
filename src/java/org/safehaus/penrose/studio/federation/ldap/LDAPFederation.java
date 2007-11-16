@@ -80,8 +80,6 @@ public class LDAPFederation {
                 penroseClient.startPartition(repository.getName());
             }
 
-            loadPartition(partitionConfig);
-
             monitor.worked(1);
         }
     }
@@ -188,10 +186,6 @@ public class LDAPFederation {
         partitionConfigs.addPartitionConfig(partitionConfig);
 */
         return partitionConfig;
-    }
-
-    public void loadPartition(PartitionConfig partitionConfig) throws Exception {
-        federation.loadPartition(partitionConfig);
     }
 
     public void removePartition(LDAPRepository repository) throws Exception {

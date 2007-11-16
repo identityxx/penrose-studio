@@ -33,7 +33,6 @@ public class NISFederation {
     public Logger log = Logger.getLogger(getClass());
 
     public final static String YP                    = "yp";
-    public final static String NIS                   = "nis";
     public final static String NSS                   = "nss";
     public final static String DB                    = "db";
 
@@ -67,8 +66,6 @@ public class NISFederation {
 
     protected Collection<FederationEventListener> listeners = new ArrayList<FederationEventListener>();
 
-    Collection<String> mapNames = new TreeSet<String>();
-
     public NISFederation(Federation federation) throws Exception {
         this.federation = federation;
         this.partition = federation.getPartition();
@@ -81,20 +78,6 @@ public class NISFederation {
         Collection<Repository> list = federation.getRepositories("NIS");
 
         monitor.beginTask("Loading NIS repositories...", list.size() == 1 ? IProgressMonitor.UNKNOWN : list.size());
-
-        mapNames.add("Users");
-        mapNames.add("Groups");
-        mapNames.add("Hosts");
-        mapNames.add("Services");
-        mapNames.add("RPCs");
-        mapNames.add("NetIDs");
-        mapNames.add("Protocols");
-        mapNames.add("Aliases");
-        mapNames.add("Netgroups");
-        mapNames.add("Ethers");
-        mapNames.add("BootParams");
-        mapNames.add("Networks");
-        mapNames.add("Automounts");
 /*
         actions   = partition.getSource("penrose_actions");
         hosts     = partition.getSource("penrose_hosts");
@@ -129,8 +112,6 @@ public class NISFederation {
 
             monitor.subTask("Loading "+nisPartitionConfig.getName()+"...");
 
-            loadPartition(nisPartitionConfig);
-
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Creating YP Partition
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -146,8 +127,6 @@ public class NISFederation {
             }
 
             monitor.subTask("Loading "+ypPartitionConfig.getName()+"...");
-
-            loadPartition(ypPartitionConfig);
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Creating DB Partition
@@ -179,8 +158,6 @@ public class NISFederation {
             }
 
             monitor.subTask("Loading "+nssPartitionConfig.getName()+"...");
-
-            loadPartition(nssPartitionConfig);
 
             monitor.worked(1);
         }
@@ -450,10 +427,6 @@ public class NISFederation {
         return partitionConfig;
     }
 
-    public void loadPartition(PartitionConfig partitionConfig) throws Exception {
-        federation.loadPartition(partitionConfig);
-    }
-
     public void addRepository(NISDomain repository) throws Exception {
 
         federation.addRepository(repository);
@@ -663,9 +636,5 @@ public class NISFederation {
 
     public void removeListener(FederationEventListener listener) {
         listeners.remove(listener);
-    }
-
-    public Collection<String> getMapNames() {
-        return mapNames;
     }
 }
