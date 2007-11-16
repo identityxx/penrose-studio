@@ -10,6 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.PartitionClient;
+
+import java.util.Collection;
 
 public class NISLDAPEditor extends FormEditor {
 
@@ -32,8 +36,15 @@ public class NISLDAPEditor extends FormEditor {
 
     public void addPages() {
         try {
+
+            PenroseClient penroseClient = project.getClient();
+            PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
+            Collection<String> sourceNames = partitionClient.getSourceNames();
+
             addPage(new NISLDAPPage(this));
-            //addPage(new NISLDAPTrackerPage(this));
+            if (sourceNames.contains("changes")) {
+                addPage(new NISLDAPChangeLogPage(this));
+            }
             addPage(new NISLDAPErrorsPage(this));
 
         } catch (Exception e) {
