@@ -5,6 +5,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.IProgressService;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
@@ -12,16 +14,15 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.ldap.SearchResult;
-import org.safehaus.penrose.ldap.SearchRequest;
-import org.safehaus.penrose.ldap.SearchResponse;
-import org.safehaus.penrose.ldap.Attributes;
+import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.management.PartitionClient;
 import org.safehaus.penrose.management.SourceClient;
 import org.safehaus.penrose.management.PenroseClient;
@@ -29,6 +30,9 @@ import org.safehaus.penrose.management.PenroseClient;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.sql.Timestamp;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
@@ -162,15 +166,39 @@ public class NISLDAPErrorsPage extends FormPage {
 
                     TableItem[] items = table.getSelection();
 
+                    final Collection<DN> dns = new ArrayList<DN>();
                     for (TableItem ti : items) {
                         SearchResult result = (SearchResult)ti.getData();
-                        try {
-                            errors.delete(result.getDn());
-
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
+                        dns.add(result.getDn());
                     }
+
+                    IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+                    progressService.busyCursorWhile(new IRunnableWithProgress() {
+                        public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                            try {
+                                monitor.beginTask("Loading...", dns.size());
+
+                                for (DN dn : dns) {
+                                    
+                                    if (monitor.isCanceled()) throw new InterruptedException();
+
+                                    errors.delete(dn);   
+
+                                    monitor.worked(1);
+                                }
+
+                            } catch (InterruptedException e) {
+                                // ignore
+
+                            } catch (Exception e) {
+                                throw new InvocationTargetException(e);
+
+                            } finally {
+                                monitor.done();
+                            }
+                        }
+                    });
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
@@ -205,10 +233,29 @@ public class NISLDAPErrorsPage extends FormPage {
 
             table.removeAll();
 
-            SearchRequest request = new SearchRequest();
-            SearchResponse response = new SearchResponse();
+            final SearchRequest request = new SearchRequest();
+            final SearchResponse response = new SearchResponse();
 
-            errors.search(request, response);
+            IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+            progressService.busyCursorWhile(new IRunnableWithProgress() {
+                public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                    try {
+                        monitor.beginTask("Loading...", IProgressMonitor.UNKNOWN);
+
+                        errors.search(request, response);
+
+                    } catch (InterruptedException e) {
+                        // ignore
+
+                    } catch (Exception e) {
+                        throw new InvocationTargetException(e);
+
+                    } finally {
+                        monitor.done();
+                    }
+                }
+            });
 
             while (response.hasNext()) {
                 SearchResult result = response.next();
