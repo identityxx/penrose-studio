@@ -298,7 +298,7 @@ public class LinkingPage extends FormPage {
             }
         });
 
-        matchFilterText = toolkit.createText(buttons, "(|(uid=${uid})(cn=${givenName}*${sn}))", SWT.BORDER);
+        matchFilterText = toolkit.createText(buttons, "", SWT.BORDER);
         RowData rd = new RowData();
         rd.width = 250;
         matchFilterText.setLayoutData(rd);
@@ -680,6 +680,8 @@ public class LinkingPage extends FormPage {
 
     public Collection<SearchResult> searchLinks(SearchResult result, String linkFilter) {
         
+        if ("".equals(linkFilter)) return null;
+
         log.debug("Searching links for "+result.getDn());
         Attributes attributes = result.getAttributes();
 
