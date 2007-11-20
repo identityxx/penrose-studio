@@ -7,7 +7,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.studio.federation.Repository;
 import org.safehaus.penrose.studio.project.Project;
 

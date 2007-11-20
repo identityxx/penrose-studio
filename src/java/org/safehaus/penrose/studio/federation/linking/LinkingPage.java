@@ -16,6 +16,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.layout.RowData;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
@@ -36,10 +37,7 @@ import org.safehaus.penrose.util.BinaryUtil;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.PartitionClient;
 
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -61,6 +59,8 @@ public class LinkingPage extends FormPage {
 
     Table localTable;
     Table localAttributeTable;
+
+    Text matchFilterText;
 
     Table globalTable;
     Table globalAttributeTable;
@@ -285,7 +285,9 @@ public class LinkingPage extends FormPage {
         tc.setWidth(200);
 
         Composite buttons = toolkit.createComposite(composite);
-        buttons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
+        gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.horizontalSpan = 2;
+        buttons.setLayoutData(gd);
         buttons.setLayout(new RowLayout());
 
         Button refreshButton = toolkit.createButton(buttons, "  Refresh  ", SWT.PUSH);
@@ -296,6 +298,11 @@ public class LinkingPage extends FormPage {
             }
         });
 
+        matchFilterText = toolkit.createText(buttons, "(|(uid=${uid})(cn=${givenName}*${sn}))", SWT.BORDER);
+        RowData rd = new RowData();
+        rd.width = 250;
+        matchFilterText.setLayoutData(rd);
+        
         toolkit.createLabel(buttons, "  ", SWT.NONE);
 
         Button linkButton = toolkit.createButton(buttons, "  Link  ", SWT.PUSH);
@@ -443,9 +450,11 @@ public class LinkingPage extends FormPage {
             request.setFilter(filter);
             request.setScope(scope);
 
-            final Map<DN,SearchResult> results = new HashMap<DN,SearchResult>();
-            final Map<DN,Collection<SearchResult>> links = new HashMap<DN,Collection<SearchResult>>();
-            final Map<DN,Collection<SearchResult>> matches = new HashMap<DN,Collection<SearchResult>>();
+            final String linkFilter = matchFilterText.getText();
+
+            final Map<DN,SearchResult> results = new LinkedHashMap<DN,SearchResult>();
+            final Map<DN,Collection<SearchResult>> links = new LinkedHashMap<DN,Collection<SearchResult>>();
+            final Map<DN,Collection<SearchResult>> matches = new LinkedHashMap<DN,Collection<SearchResult>>();
 
             IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
@@ -476,7 +485,7 @@ public class LinkingPage extends FormPage {
                                 links.put(dn, list);
 
                             } else {
-                                list = searchLinks(result);
+                                list = searchLinks(result, linkFilter);
                                 matches.put(dn, list);
                             }
 
@@ -605,7 +614,7 @@ public class LinkingPage extends FormPage {
 
             for (Object value : attribute.getValues()) {
 
-                log.debug("Attribute "+attributeName+": "+value.getClass().getSimpleName());
+                //log.debug("Attribute "+attributeName+": "+value.getClass().getSimpleName());
 
                 TableItem attrItem = new TableItem(table, SWT.NONE);
                 attrItem.setText(0, attributeName);
@@ -669,16 +678,34 @@ public class LinkingPage extends FormPage {
         }
     }
 
-    public Collection<SearchResult> searchLinks(SearchResult result) {
+    public Collection<SearchResult> searchLinks(SearchResult result, String linkFilter) {
+        
+        log.debug("Searching links for "+result.getDn());
+        Attributes attributes = result.getAttributes();
+
+        StringBuilder sb = new StringBuilder(linkFilter);
+        int start = 0;
+
+        while (start < sb.length()) {
+            int i = sb.indexOf("${", start);
+            if (i < 0) break;
+
+            int j = sb.indexOf("}", i+2);
+            if (j < 0) break;
+
+            String name = sb.substring(i+2, j);
+            Object value = attributes.getValue(name);
+            String s = value == null ? "" : value.toString();
+
+            sb.replace(i, j+1, s);
+            start = i+s.length();
+        }
+
+        String s = sb.toString();
+        log.debug("Link filter: "+s);
+
         try {
-            Attributes attributes = result.getAttributes();
-            String uid = (String)attributes.getValue("uid");
-            String cn = (String)attributes.getValue("cn");
-
-            Filter filter = null;
-            filter = FilterTool.appendOrFilter(filter, createFilter("uid", uid));
-            filter = FilterTool.appendOrFilter(filter, createFilter("cn", cn));
-
+            Filter filter = FilterTool.parseFilter(s);
             if (filter == null) return null;
 
             SearchRequest request = new SearchRequest();
@@ -815,6 +842,8 @@ public class LinkingPage extends FormPage {
 
             if (!confirm) return;
 
+            String filter = matchFilterText.getText();
+
             for (TableItem item : localTable.getSelection()) {
                 SearchResult result = (SearchResult)item.getData("local");
 
@@ -844,7 +873,7 @@ public class LinkingPage extends FormPage {
                 }
 
                 if (links == null) {
-                    Collection<SearchResult> matches = searchLinks(result);
+                    Collection<SearchResult> matches = searchLinks(result, filter);
                     item.setData("matches", matches);
                 }
 
@@ -872,7 +901,6 @@ public class LinkingPage extends FormPage {
             TableItem item = localTable.getSelection()[0];
 
             SearchResult result = (SearchResult)item.getData("local");
-            DN dn = result.getDn();
 
             LinkingWizard wizard = new LinkingWizard();
             wizard.setDn(globalBaseDn);
@@ -918,14 +946,15 @@ public class LinkingPage extends FormPage {
             for (TableItem item : localTable.getSelection()) {
                 SearchResult result = (SearchResult)item.getData("local");
 
+                Collection<SearchResult> links = (Collection<SearchResult>)item.getData("links");
+                if (links != null && !links.isEmpty()) continue;
+
                 SearchResult globalResult = createEntry(result);
 
-                Collection<SearchResult> links = (Collection<SearchResult>)item.getData("links");
-                if (links == null) {
-                    links = new ArrayList<SearchResult>();
-                    item.setData("links", links);
-                }
+                links = new ArrayList<SearchResult>();
                 links.add(globalResult);
+
+                item.setData("links", links);
 
                 updateStatus(item);
             }
