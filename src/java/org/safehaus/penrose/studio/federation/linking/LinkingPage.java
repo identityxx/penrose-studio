@@ -1180,6 +1180,14 @@ public class LinkingPage extends FormPage {
             int count = localTable.getSelectionCount();
             if (count == 0) return;
 
+            boolean confirm = MessageDialog.openQuestion(
+                    editor.getSite().getShell(),
+                    "Import",
+                    "Are you sure?"
+            );
+
+            if (!confirm) return;
+
             final Collection<SearchResult> results = new ArrayList<SearchResult>();
 
             for (TableItem item : localTable.getSelection()) {
@@ -1261,6 +1269,17 @@ public class LinkingPage extends FormPage {
 
     public void deleteEntries() {
         try {
+            int count = globalTable.getSelectionCount();
+            if (count == 0) return;
+
+            boolean confirm = MessageDialog.openQuestion(
+                    editor.getSite().getShell(),
+                    "Delete",
+                    "Are you sure?"
+            );
+
+            if (!confirm) return;
+
             final Collection<DN> dns = new ArrayList<DN>();
 
             for (TableItem item : globalTable.getSelection()) {
