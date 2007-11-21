@@ -42,6 +42,7 @@ public class LinkingSearchPage extends WizardPage {
     Combo scopeCombo;
 
     private DN dn;
+    private Filter filter;
     private SearchResult searchResult;
     private PartitionClient partitionClient;
 
@@ -75,7 +76,7 @@ public class LinkingSearchPage extends WizardPage {
 
             TableItem item = new TableItem(attributesTable, SWT.NONE);
             item.setText(0, "dn");
-            item.setText(1, dn.toString());
+            item.setText(1, searchResult.getDn().toString());
 
             Attributes attributes = searchResult.getAttributes();
             for (Attribute attribute : attributes.getAll()) {
@@ -165,7 +166,7 @@ public class LinkingSearchPage extends WizardPage {
         gd = new GridData();
         gd.widthHint = 100;
         scopeCombo.setLayoutData(gd);
-
+/*
         Attributes attributes = searchResult.getAttributes();
         String uid = (String)attributes.getValue("uid");
         String cn = (String)attributes.getValue("cn");
@@ -173,7 +174,7 @@ public class LinkingSearchPage extends WizardPage {
         Filter filter = null;
         filter = FilterTool.appendOrFilter(filter, createFilter("uid", uid));
         filter = FilterTool.appendOrFilter(filter, createFilter("cn", cn));
-
+*/
         filterText.setText(filter == null ? "(objectClass=*)" : filter.toString());
 
         return composite;
@@ -243,5 +244,9 @@ public class LinkingSearchPage extends WizardPage {
 
     public void setDn(DN dn) {
         this.dn = dn;
+    }
+
+    public void setFilter(Filter filter) {
+        this.filter = filter;
     }
 }

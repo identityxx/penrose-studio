@@ -5,6 +5,7 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.filter.Filter;
 
 import java.util.Collection;
 
@@ -16,6 +17,7 @@ public class LinkingWizard extends Wizard {
     Logger log = Logger.getLogger(getClass());
 
     private DN dn;
+    private Filter filter;
     private SearchResult searchResult;
     private PartitionClient partitionClient;
     private Collection<SearchResult> results;
@@ -30,13 +32,14 @@ public class LinkingWizard extends Wizard {
     public void addPages() {
         searchPage = new LinkingSearchPage();
         searchPage.setDn(dn);
+        searchPage.setFilter(filter);
         searchPage.setSearchResult(searchResult);
         searchPage.setPartitionClient(partitionClient);
         addPage(searchPage);
 
         resultsPage = new LinkingResultsPage();
         resultsPage.setDn(dn);
-        resultsPage.setEntry(searchResult);
+        resultsPage.setSearchResult(searchResult);
         resultsPage.setPartitionClient(partitionClient);
         addPage(resultsPage);
     }
@@ -122,5 +125,13 @@ public class LinkingWizard extends Wizard {
 
     public void setResults(Collection<SearchResult> results) {
         this.results = results;
+    }
+
+    public Filter getFilter() {
+        return filter;
+    }
+
+    public void setFilter(Filter filter) {
+        this.filter = filter;
     }
 }

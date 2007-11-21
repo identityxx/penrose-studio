@@ -35,7 +35,7 @@ public class LinkingResultsPage extends WizardPage {
     Table resultAttributesTable;
 
     private DN dn;
-    private SearchResult entry;
+    private SearchResult searchResult;
     private PartitionClient partitionClient;
 
     private Collection<SearchResult> results;
@@ -87,9 +87,9 @@ public class LinkingResultsPage extends WizardPage {
 
         TableItem item = new TableItem(attributesTable, SWT.NONE);
         item.setText(0, "dn");
-        item.setText(1, dn.toString());
+        item.setText(1, searchResult.getDn().toString());
 
-        Attributes attributes = entry.getAttributes();
+        Attributes attributes = searchResult.getAttributes();
         for (Attribute attribute : attributes.getAll()) {
             for (Object value : attribute.getValues()) {
                 TableItem ti = new TableItem(attributesTable, SWT.NONE);
@@ -191,12 +191,12 @@ public class LinkingResultsPage extends WizardPage {
         return new SubstringFilter(name, substrings);
     }
 
-    public SearchResult getEntry() {
-        return entry;
+    public SearchResult getSearchResult() {
+        return searchResult;
     }
 
-    public void setEntry(SearchResult entry) {
-        this.entry = entry;
+    public void setSearchResult(SearchResult searchResult) {
+        this.searchResult = searchResult;
     }
 
     public Collection<SearchResult> getResults() {
