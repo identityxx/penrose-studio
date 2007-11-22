@@ -15,11 +15,11 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.wizard.BrowserWizard;
@@ -56,6 +56,7 @@ public class LinkingPage extends FormPage {
     Text localFilterText;
     Combo localScopeCombo;
 
+    TableViewer localTableViewer;
     Table localTable;
     Table localAttributeTable;
 
@@ -122,16 +123,7 @@ public class LinkingPage extends FormPage {
 
             Control globalControl = createGlobalControl(globalSection);
             globalSection.setClient(globalControl);
-/*
-            Section actionsSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-            actionsSection.setText("Actions");
-            GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-            gd.horizontalSpan = 2;
-            actionsSection.setLayoutData(gd);
 
-            Control actionsControl = createActionsControl(actionsSection);
-            actionsSection.setClient(actionsControl);
-*/
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);
@@ -244,21 +236,20 @@ public class LinkingPage extends FormPage {
         layout.marginHeight = 0;
         composite.setLayout(layout);
 
-        localTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+        localTableViewer = new TableViewer(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+        localTableViewer.setContentProvider(new LocalTableContentProvider());
+        localTableViewer.setLabelProvider(new LocalTableLabelProvider());
+
+        localTable = localTableViewer.getTable();
+
+        //localTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+
         GridData gd = new GridData(GridData.FILL_BOTH);
         //gd.heightHint = 150;
         localTable.setLayoutData(gd);
 
         localTable.setHeaderVisible(true);
         localTable.setLinesVisible(true);
-
-        TableColumn tc = new TableColumn(localTable, SWT.NONE);
-        tc.setText("DN");
-        tc.setWidth(230);
-
-        tc = new TableColumn(localTable, SWT.NONE);
-        tc.setText("Link");
-        tc.setWidth(70);
 
         localTable.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
@@ -271,10 +262,10 @@ public class LinkingPage extends FormPage {
 
                     TableItem item = localTable.getSelection()[0];
 
-                    SearchResult local = (SearchResult)item.getData("local");
-                    updateAttributes(localAttributeTable, localPartitionClient, local.getDn());
+                    Data data = (Data)item.getData();
+                    updateAttributes(localAttributeTable, localPartitionClient, data.getEntry());
 
-                    updateGlobal(item);
+                    updateGlobal(data);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -282,6 +273,31 @@ public class LinkingPage extends FormPage {
                 }
             }
         });
+
+        final TableColumn dnTableColumn = new TableColumn(localTable, SWT.NONE);
+        dnTableColumn.setText("DN");
+        dnTableColumn.setWidth(230);
+
+        dnTableColumn.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                //sortByDn();
+                localTable.setSortColumn(dnTableColumn);
+                localTable.setSortDirection(SWT.DOWN);
+            }
+        });
+
+        final TableColumn statusTableColumn = new TableColumn(localTable, SWT.NONE);
+        statusTableColumn.setText("Status");
+        statusTableColumn.setWidth(70);
+
+        statusTableColumn.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                //sortByStatus();
+                localTable.setSortColumn(statusTableColumn);
+                localTable.setSortDirection(SWT.DOWN);
+            }
+        });
+
 
         Menu menu = new Menu(localTable);
         localTable.setMenu(menu);
@@ -291,7 +307,7 @@ public class LinkingPage extends FormPage {
 
         mi.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                linkEntries();
+                linkLocalEntries();
             }
         });
 
@@ -323,13 +339,13 @@ public class LinkingPage extends FormPage {
         localAttributeTable.setHeaderVisible(true);
         localAttributeTable.setLinesVisible(true);
 
-        tc = new TableColumn(localAttributeTable, SWT.NONE);
-        tc.setText("Attribute");
-        tc.setWidth(100);
+        TableColumn attributeTableColumn = new TableColumn(localAttributeTable, SWT.NONE);
+        attributeTableColumn.setText("Attribute");
+        attributeTableColumn.setWidth(100);
 
-        tc = new TableColumn(localAttributeTable, SWT.NONE);
-        tc.setText("Value");
-        tc.setWidth(200);
+        TableColumn valueTableColumn = new TableColumn(localAttributeTable, SWT.NONE);
+        valueTableColumn.setText("Value");
+        valueTableColumn.setWidth(200);
 
         return composite;
     }
@@ -460,8 +476,8 @@ public class LinkingPage extends FormPage {
 
                     TableItem item = globalTable.getSelection()[0];
 
-                    SearchResult link = (SearchResult)item.getData();
-                    updateAttributes(globalAttributeTable, globalPartitionClient, link.getDn());
+                    DN dn = (DN)item.getData("global");
+                    updateAttributes(globalAttributeTable, globalPartitionClient, dn);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -478,7 +494,7 @@ public class LinkingPage extends FormPage {
 
         mi.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                linkEntries();
+                linkGlobalEntries();
             }
         });
 
@@ -518,70 +534,6 @@ public class LinkingPage extends FormPage {
         tc.setText("Value");
         tc.setWidth(200);
 
-        return composite;
-    }
-
-    public Composite createActionsControl(Composite parent) {
-
-        Composite composite = toolkit.createComposite(parent);
-        RowLayout layout = new RowLayout();
-        layout.marginWidth = 0;
-        layout.marginHeight = 0;
-        composite.setLayout(layout);
-/*
-        toolkit.createLabel(composite, "Global Filter:");
-
-        globalFilterText = toolkit.createText(composite, "", SWT.BORDER);
-        RowData rd = new RowData();
-        rd.width = 200;
-        globalFilterText.setLayoutData(rd);
-
-        Button matchButton = toolkit.createButton(composite, "  Search Global  ", SWT.PUSH);
-
-        matchButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                searchGlobal();
-            }
-        });
-
-        toolkit.createLabel(composite, "  ", SWT.NONE);
-*/
-        Button linkButton = toolkit.createButton(composite, "  Link  ", SWT.PUSH);
-
-        linkButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                linkEntries();
-            }
-        });
-
-        Button unlinkButton = toolkit.createButton(composite, "  Unlink  ", SWT.PUSH);
-
-        unlinkButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                unlinkEntries();
-            }
-        });
-
-        toolkit.createLabel(composite, "  ", SWT.NONE);
-
-        Button importButton = toolkit.createButton(composite, "  Import  ", SWT.PUSH);
-
-        importButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                importEntries();
-            }
-        });
-/*
-        toolkit.createLabel(composite, "  ", SWT.NONE);
-
-        Button manualButton = toolkit.createButton(composite, "  Manual  ", SWT.PUSH);
-
-        manualButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                manualSearch();
-            }
-        });
-*/
         return composite;
     }
 
@@ -627,7 +579,7 @@ public class LinkingPage extends FormPage {
             request.setFilter(localFilterText.getText());
             request.setScope(localScopeCombo.getSelectionIndex());
 
-            final SearchResponse response = new SearchResponse();
+            final Collection<Data> results = new ArrayList<Data>();
 
             IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
@@ -636,7 +588,18 @@ public class LinkingPage extends FormPage {
                     try {
                         monitor.beginTask("Searching "+ repository.getName()+"...", IProgressMonitor.UNKNOWN);
 
+                        SearchResponse response = new SearchResponse();
+
                         localPartitionClient.search(request, response);
+
+                        while (response.hasNext()) {
+                            SearchResult result = response.next();
+
+                            Data data = new Data();
+                            data.setEntry(result);
+
+                            results.add(data);
+                        }
 
                     } catch (InterruptedException e) {
                         // ignore
@@ -650,14 +613,7 @@ public class LinkingPage extends FormPage {
                 }
             });
 
-            while (response.hasNext()) {
-                SearchResult result = response.next();
-                DN dn = result.getDn();
-
-                TableItem item = new TableItem(localTable, SWT.NONE);
-                item.setText(0, dn.toString());
-                item.setData("local", result);
-            }
+            localTableViewer.setInput(results);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -673,19 +629,19 @@ public class LinkingPage extends FormPage {
             TableItem items[] = localTable.getSelection();
             if (items.length == 0) items = localTable.getItems();
 
-            final Collection<SearchResult> results = new ArrayList<SearchResult>();
+            final Collection<Data> results = new ArrayList<Data>();
 
             for (TableItem item : items) {
-                SearchResult result = (SearchResult)item.getData("local");
-                results.add(result);
+                Data data = (Data)item.getData();
+                data.setSearched(false);
+                data.removeLinks();
+                data.removeMatches();
+                results.add(data);
             }
 
             final String baseDn = globalBaseText.getText();
             final String filter = globalFilterText.getText();
             final int scope = globalScopeCombo.getSelectionIndex();
-
-            final Map<DN,Collection<SearchResult>> links = new LinkedHashMap<DN,Collection<SearchResult>>();
-            final Map<DN,Collection<SearchResult>> matches = new LinkedHashMap<DN,Collection<SearchResult>>();
 
             IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
@@ -694,21 +650,23 @@ public class LinkingPage extends FormPage {
                     try {
                         monitor.beginTask("Searching "+ repository.getName()+"...", results.size());
 
-                        for (SearchResult result : results) {
+                        for (Data data : results) {
                             if (monitor.isCanceled()) throw new InterruptedException();
 
-                            DN dn = result.getDn();
+                            DN dn = data.getDn();
 
                             monitor.subTask("Processing "+dn+"...");
 
-                            Collection<SearchResult> list = searchLinks(result);
+                            data.setSearched(true);
+
+                            Collection<DN> list = searchLinks(data.getEntry());
                             if (list != null && !list.isEmpty()) {
-                                links.put(dn, list);
+                                data.setLinks(list);
 
                             } else {
-                                Filter f = createFilter(result, filter);
+                                Filter f = createFilter(data.getEntry(), filter);
                                 list = searchLinks(baseDn, f, scope);
-                                matches.put(dn, list);
+                                data.setMatches(list);
                             }
 
                             monitor.worked(1);
@@ -726,159 +684,60 @@ public class LinkingPage extends FormPage {
                 }
             });
 
-            for (TableItem item : items) {
-                SearchResult result = (SearchResult)item.getData("local");
-                DN dn = result.getDn();
+            localTableViewer.refresh();
+            
+            if (items.length == 1) {
+                TableItem item = items[0];
+                Data data = (Data)item.getData();
+                updateGlobal(data);
+            }
 
-                Collection<SearchResult> list = links.get(dn);
-                if (list != null && !list.isEmpty()) {
-                    item.setData("links", list);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
+        }
+    }
 
-                } else {
-                    list = matches.get(dn);
-                    item.setData("matches", list);
+    public void updateGlobal(Data data) throws Exception {
+
+        Collection<DN> links = data.getLinks();
+
+        if (!links.isEmpty()) {
+            for (DN dn : links) {
+                TableItem ti = new TableItem(globalTable, SWT.NONE);
+                ti.setText(0, dn.toString());
+                ti.setData("global", dn);
+
+                if (links.size() == 1) {
+                    updateAttributes(globalAttributeTable, globalPartitionClient, dn);
                 }
-
-                updateStatus(item);
-            }
-
-            if (items.length != 1) return;
-
-            TableItem item = items[0];
-            updateGlobal(item);
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            ErrorDialog.open(e);
-        }
-    }
-
-    public void manualSearch() {
-        try {
-            if (localTable.getSelectionCount() != 1) return;
-
-            TableItem item = localTable.getSelection()[0];
-
-            SearchResult result = (SearchResult)item.getData("local");
-
-            String matchFilter = globalFilterText.getText();
-            Filter filter = createFilter(result, matchFilter);
-
-            LinkingWizard wizard = new LinkingWizard();
-            wizard.setDn(globalBaseDn);
-            wizard.setFilter(filter);
-            wizard.setSearchResult(result);
-            wizard.setPartitionClient(globalPartitionClient);
-
-            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-            WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
-            dialog.setPageSize(600, 500);
-
-            if (dialog.open() != Window.OK) return;
-
-            Collection<SearchResult> results = wizard.getResults();
-            for (SearchResult globalResult : results) {
-                createLink(globalResult, result);
-            }
-
-            Collection<SearchResult> links = (Collection<SearchResult>)item.getData("links");
-            if (links == null) {
-                links = new ArrayList<SearchResult>();
-                item.setData("links", links);
-            }
-            links.addAll(results);
-
-            updateStatus(item);
-
-            globalTable.removeAll();
-            globalAttributeTable.removeAll();
-
-            updateGlobal(item);
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            ErrorDialog.open(e);
-        }
-    }
-
-    public void updateStatus(TableItem item) throws Exception {
-
-        Collection<SearchResult> links = (Collection<SearchResult>)item.getData("links");
-
-        if (links != null && !links.isEmpty()) {
-
-            if (links.size() == 1) {
-                item.setText(1, "Linked");
-                item.setForeground(1, green);
-
-            } else {
-                item.setText(1, links.size()+" Links");
-                item.setForeground(1, red);
             }
 
             return;
         }
 
-        Collection<SearchResult> matches = (Collection<SearchResult>)item.getData("matches");
+        Collection<DN> matches = data.getMatches();
+        if (matches.isEmpty()) return;
 
-        if (matches != null && !matches.isEmpty()) {
+        for (DN dn : matches) {
+            TableItem ti = new TableItem(globalTable, SWT.NONE);
+            ti.setText(0, dn.toString());
+            ti.setData("global", dn);
 
             if (matches.size() == 1) {
-                item.setText(1, "1 Match");
-
-            } else {
-                item.setText(1, matches.size()+" Matches");
+                updateAttributes(globalAttributeTable, globalPartitionClient, dn);
             }
-
-            item.setForeground(1, blue);
-            return;
-        }
-
-        item.setText(1, "Not Found");
-        item.setForeground(1, red);
-    }
-
-    public void updateGlobal(TableItem item) throws Exception {
-
-        Collection<SearchResult> links = (Collection<SearchResult>)item.getData("links");
-
-        if (links != null && !links.isEmpty()) {
-            for (SearchResult link : links) {
-                TableItem ti = new TableItem(globalTable, SWT.NONE);
-                ti.setText(0, link.getDn().toString());
-                ti.setData(link);
-            }
-
-            if (links.size() == 1) {
-                SearchResult result = links.iterator().next();
-                updateAttributes(globalAttributeTable, globalPartitionClient, result.getDn());
-            }
-
-            return;
-        }
-
-        Collection<SearchResult> matches = (Collection<SearchResult>)item.getData("matches");
-
-        if (matches != null && !matches.isEmpty()) {
-            for (SearchResult link : matches) {
-                TableItem ti = new TableItem(globalTable, SWT.NONE);
-                ti.setText(0, link.getDn().toString());
-                ti.setData(link);
-            }
-
-            if (matches.size() == 1) {
-                SearchResult result = matches.iterator().next();
-                updateAttributes(globalAttributeTable, globalPartitionClient, result.getDn());
-            }
-
-            return;
         }
     }
 
     public void updateAttributes(Table table, PartitionClient partitionClient, DN dn) throws Exception {
-        SearchResult result = partitionClient.find(dn);
-        Attributes attributes = result.getAttributes();
+        SearchResult entry = partitionClient.find(dn);
+        updateAttributes(table, partitionClient, entry);
+    }
 
+    public void updateAttributes(Table table, PartitionClient partitionClient, SearchResult entry) throws Exception {
+
+        Attributes attributes = entry.getAttributes();
         log.debug("Attributes:");
 
         for (Attribute attribute : attributes.getAll()) {
@@ -918,7 +777,7 @@ public class LinkingPage extends FormPage {
         }
     }
 
-    public Collection<SearchResult> searchLinks(SearchResult localEntry) {
+    public Collection<DN> searchLinks(SearchResult localEntry) {
         try {
             Repository repository = editor.getRepository();
             String localAttribute = repository.getParameter("localAttribute");
@@ -943,7 +802,15 @@ public class LinkingPage extends FormPage {
 
             globalPartitionClient.search(request, response);
 
-            return response.getAll();
+            Collection<DN> results = new ArrayList<DN>();
+
+            while (response.hasNext()) {
+                SearchResult result = response.next();
+                DN dn = result.getDn();
+                results.add(dn);
+            }
+
+            return results;
 
         } catch (Exception e) {
             return null;
@@ -980,28 +847,33 @@ public class LinkingPage extends FormPage {
         return FilterTool.parseFilter(s);
     }
 
-    public Collection<SearchResult> searchLinks(String baseDn, Filter filter, int scope) throws Exception {
+    public Collection<DN> searchLinks(String baseDn, Filter filter, int scope) throws Exception {
         
         if (filter == null) return null;
 
-        //try {
-            SearchRequest request = new SearchRequest();
-            request.setDn(baseDn);
-            request.setFilter(filter);
-            request.setScope(scope);
+        SearchRequest request = new SearchRequest();
+        request.setDn(baseDn);
+        request.setFilter(filter);
+        request.setScope(scope);
 
-            SearchResponse response = new SearchResponse();
+        SearchResponse response = new SearchResponse();
 
-            globalPartitionClient.search(request, response);
+        globalPartitionClient.search(request, response);
 
-            return response.getAll();
+        Collection<DN> results = new ArrayList<DN>();
 
-        //} catch (Exception e) {
-        //    return null;
-        //}
+        while (response.hasNext()) {
+            SearchResult result = response.next();
+            DN dn = result.getDn();
+            results.add(dn);
+        }
+
+        return results;
     }
 
-    public void createLink(SearchResult globalEntry, SearchResult localEntry) throws Exception {
+    public void createLink(DN dn, SearchResult localEntry) throws Exception {
+
+        SearchResult globalEntry = globalPartitionClient.find(dn);
 
         Repository repository = editor.getRepository();
         String localAttribute = repository.getParameter("localAttribute");
@@ -1051,55 +923,98 @@ public class LinkingPage extends FormPage {
         globalPartitionClient.modify(globalDn, modifications);
     }
 
-    public void linkEntries() {
+    public void linkLocalEntries() {
         try {
             int count = localTable.getSelectionCount();
             if (count == 0) return;
 
-            for (TableItem item : localTable.getSelection()) {
+            if (count == 1) {
+                TableItem item = localTable.getSelection()[0];
+                Data data = (Data)item.getData();
 
-                Collection<SearchResult> links = (Collection<SearchResult>)item.getData("links");
-                if (links != null && !links.isEmpty()) continue;
+                Collection<DN> links = data.getLinks();
 
-                Collection<SearchResult> matches = (Collection<SearchResult>)item.getData("matches");
-                if (matches == null || matches.isEmpty()) continue;
+                if (!links.isEmpty()) {
+                    ErrorDialog.open("This account has been linked.");
+                    return;
+                }
 
-                SearchResult result = (SearchResult)item.getData("local");
+                Collection<DN> matches = data.getMatches();
 
-                if (matches.size() == 1) {
-                    SearchResult globalResult = matches.iterator().next();
-                    createLink(globalResult, result);
+                if (matches.isEmpty()) {
+                    ErrorDialog.open("Find a global identity to link to this account.");
+                    return;
+                }
 
-                    links = new ArrayList<SearchResult>();
-                    links.add(globalResult);
-                    item.setData("links", links);
-                    item.setData("matches", null);
+                if (matches.size() > 1) {
+                    ErrorDialog.open(
+                            "Cannot link multiple global identities.\n"+
+                            "Right click on one of the global identities, then select Link."
+                    );
+                    return;
+                }
 
-                    updateStatus(item);
+                SearchResult result = data.getEntry();
 
-                } else if (globalTable.getSelectionCount() == 1) {
+                DN dn = matches.iterator().next();
+                createLink(dn, result);
 
-                    TableItem globalItem = globalTable.getSelection()[0];
+                data.addLink(dn);
+                data.removeMatches();
 
-                    SearchResult globalResult = (SearchResult)globalItem.getData();
-                    createLink(globalResult, result);
+            } else {
 
-                    links = new ArrayList<SearchResult>();
-                    links.add(globalResult);
-                    item.setData("links", links);
-                    item.setData("matches", null);
+                for (TableItem item : localTable.getSelection()) {
+                    Data data = (Data)item.getData();
 
-                    updateStatus(item);
+                    Collection<DN> links = data.getLinks();
+                    if (!links.isEmpty()) continue;
+
+                    Collection<DN> matches = data.getMatches();
+                    if (matches.isEmpty() || matches.size() > 1) continue;
+
+                    SearchResult result = data.getEntry();
+
+                    DN dn = matches.iterator().next();
+                    createLink(dn, result);
+
+                    data.addLink(dn);
+                    data.removeMatches();
                 }
             }
+
+            localTableViewer.refresh();
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
+        }
+    }
+
+    public void linkGlobalEntries() {
+        try {
+            if (localTable.getSelectionCount() != 1) return;
+            if (globalTable.getSelectionCount() != 1) return;
+
+            TableItem localItem = localTable.getSelection()[0];
+            TableItem globalItem = globalTable.getSelection()[0];
+
+            Data data = (Data)localItem.getData();
+            SearchResult localEntry = data.getEntry();
+
+            DN dn = (DN)globalItem.getData("global");
+
+            createLink(dn, localEntry);
+
+            data.addLink(dn);
+            data.removeMatches();
+
+            localTableViewer.refresh();
 
             globalTable.removeAll();
             globalAttributeTable.removeAll();
 
-            if (count == 1) {
-                TableItem item = localTable.getSelection()[0];
-                updateGlobal(item);
-            }
+            updateGlobal(data);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -1125,48 +1040,44 @@ public class LinkingPage extends FormPage {
             int scope = globalScopeCombo.getSelectionIndex();
 
             for (TableItem item : localTable.getSelection()) {
-                SearchResult result = (SearchResult)item.getData("local");
+                Data data = (Data)item.getData();
+                SearchResult entry = data.getEntry();
 
-                Collection<SearchResult> links = (Collection<SearchResult>)item.getData("links");
-                if (links == null || links.isEmpty()) continue;
+                Collection<DN> links = data.getLinks();
+                if (links.isEmpty()) continue;
 
                 if (globalTable.getSelectionCount() == 0) {
 
-                    for (SearchResult link : links) {
-                        removeLink(link.getDn(), result);
+                    for (DN dn : links) {
+                        removeLink(dn, entry);
                     }
 
-                    links = null;
-                    item.setData("links", null);
+                    data.removeLinks();
 
                 } else {
                     for (TableItem globalItem : globalTable.getSelection()) {
-                        SearchResult link = (SearchResult)globalItem.getData();
-                        removeLink(link.getDn(), result);
-                        links.remove(link);
-                    }
-
-                    if (links.isEmpty()) {
-                        links = null;
-                        item.setData("links", null);
+                        DN dn = (DN)globalItem.getData("global");
+                        removeLink(dn, entry);
+                        links.remove(dn);
                     }
                 }
 
-                if (links == null) {
-                    Filter f = createFilter(result, filter);
-                    Collection<SearchResult> matches = searchLinks(baseDn, f, scope);
-                    item.setData("matches", matches);
+                if (links.isEmpty()) {
+                    Filter f = createFilter(entry, filter);
+                    Collection<DN> matches = searchLinks(baseDn, f, scope);
+                    data.setMatches(matches);
                 }
-
-                updateStatus(item);
             }
+
+            localTableViewer.refresh();
 
             globalTable.removeAll();
             globalAttributeTable.removeAll();
 
             if (count == 1) {
                 TableItem item = localTable.getSelection()[0];
-                updateGlobal(item);
+                Data data = (Data)item.getData();
+                updateGlobal(data);
             }
 
         } catch (Exception e) {
@@ -1188,20 +1099,16 @@ public class LinkingPage extends FormPage {
 
             if (!confirm) return;
 
-            final Collection<SearchResult> results = new ArrayList<SearchResult>();
+            final Collection<Data> results = new ArrayList<Data>();
 
             for (TableItem item : localTable.getSelection()) {
+                Data data = (Data)item.getData();
 
-                Collection<SearchResult> list = (Collection<SearchResult>)item.getData("links");
-                if (list != null && !list.isEmpty()) continue;
+                Collection<DN> list = data.getLinks();
+                if (!list.isEmpty()) continue;
 
-                SearchResult result = (SearchResult)item.getData("local");
-                results.add(result);
-
-                updateStatus(item);
+                results.add(data);
             }
-
-            final Map<DN,SearchResult> links = new LinkedHashMap<DN,SearchResult>();
 
             IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
@@ -1210,15 +1117,16 @@ public class LinkingPage extends FormPage {
                     try {
                         monitor.beginTask("Importing "+repository.getName()+"...", results.size());
 
-                        for (SearchResult result : results) {
+                        for (Data data : results) {
                             if (monitor.isCanceled()) throw new InterruptedException();
 
-                            DN dn = result.getDn();
+                            DN dn = data.getDn();
 
                             monitor.subTask("Processing "+dn+"...");
 
-                            SearchResult globalResult = createEntry(result);
-                            links.put(dn, globalResult);
+                            SearchResult globalResult = createEntry(data.getEntry());
+                            data.addLink(globalResult.getDn());
+                            data.removeMatches();
 
                             monitor.worked(1);
                         }
@@ -1235,30 +1143,15 @@ public class LinkingPage extends FormPage {
                 }
             });
 
-            for (TableItem item : localTable.getSelection()) {
-
-                Collection<SearchResult> list = (Collection<SearchResult>)item.getData("links");
-                if (list != null && !list.isEmpty()) continue;
-
-                SearchResult result = (SearchResult)item.getData("local");
-                SearchResult globalResult = links.get(result.getDn());
-                if (globalResult == null) continue;
-
-                list = new ArrayList<SearchResult>();
-                list.add(globalResult);
-
-                item.setData("links", list);
-
-                item.setText(1, "Linked");
-                item.setForeground(1, green);
-            }
+            localTableViewer.refresh();
 
             globalTable.removeAll();
             globalAttributeTable.removeAll();
 
             if (count == 1) {
                 TableItem item = localTable.getSelection()[0];
-                updateGlobal(item);
+                Data data = (Data)item.getData();
+                updateGlobal(data);
             }
 
         } catch (Exception e) {
@@ -1269,8 +1162,8 @@ public class LinkingPage extends FormPage {
 
     public void deleteEntries() {
         try {
-            int count = globalTable.getSelectionCount();
-            if (count == 0) return;
+            if (localTable.getSelectionCount() == 0) return;
+            if (globalTable.getSelectionCount() == 0) return;
 
             boolean confirm = MessageDialog.openQuestion(
                     editor.getSite().getShell(),
@@ -1280,11 +1173,22 @@ public class LinkingPage extends FormPage {
 
             if (!confirm) return;
 
+            TableItem localItem = localTable.getSelection()[0];
+            final Data data = (Data)localItem.getData();
+
+            final SearchResult entry = data.getEntry();
+            final Collection<DN> links = data.getLinks();
+            final Collection<DN> matches = data.getMatches();
+
+            final String baseDn = globalBaseText.getText();
+            final String filter = globalFilterText.getText();
+            final int scope = globalScopeCombo.getSelectionIndex();
+
             final Collection<DN> dns = new ArrayList<DN>();
 
             for (TableItem item : globalTable.getSelection()) {
-                SearchResult result = (SearchResult)item.getData();
-                dns.add(result.getDn());
+                DN dn = (DN)item.getData("global");
+                dns.add(dn);
             }
 
             IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
@@ -1301,7 +1205,16 @@ public class LinkingPage extends FormPage {
 
                             globalPartitionClient.delete(dn);
 
+                            links.remove(dn);
+                            matches.remove(dn);
+
                             monitor.worked(1);
+                        }
+
+                        if (links.isEmpty()) {
+                            Filter f = createFilter(entry, filter);
+                            Collection<DN> matches = searchLinks(baseDn, f, scope);
+                            data.setMatches(matches);
                         }
 
                     } catch (InterruptedException e) {
@@ -1316,48 +1229,17 @@ public class LinkingPage extends FormPage {
                 }
             });
 
+            localTableViewer.refresh();
+
             for (TableItem item : globalTable.getSelection()) {
                 item.dispose();
             }
 
+            globalTable.removeAll();
             globalAttributeTable.removeAll();
 
-            TableItem item = localTable.getSelection()[0];
+            updateGlobal(data);
 
-            Collection<SearchResult> list = (Collection<SearchResult>)item.getData("links");
-
-            if (list != null) {
-                Collection<SearchResult> newList = new ArrayList<SearchResult>();
-                for (SearchResult result : list) {
-                    if (dns.contains(result.getDn())) continue;
-                    newList.add(result);
-                }
-
-                if (newList.isEmpty()) {
-                    item.setData("links", null);
-                } else {
-                    item.setData("links", newList);
-                }
-            }
-
-            list = (Collection<SearchResult>)item.getData("matches");
-
-            if (list != null) {
-                Collection<SearchResult> newList = new ArrayList<SearchResult>();
-                for (SearchResult result : list) {
-                    if (dns.contains(result.getDn())) continue;
-                    newList.add(result);
-                }
-
-                if (newList.isEmpty()) {
-                    item.setData("matches", null);
-                } else {
-                    item.setData("matches", newList);
-                }
-            }
-
-            updateStatus(item);
-            
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);
@@ -1390,5 +1272,34 @@ public class LinkingPage extends FormPage {
         globalPartitionClient.add(dn, attributes);
 
         return globalResult;
+    }
+
+    public void sortByDn() {
+
+        Map<DN,SearchResult> entries = new LinkedHashMap<DN,SearchResult>();
+        Map<DN,Collection<DN>> links = new LinkedHashMap<DN,Collection<DN>>();
+        Map<DN,Collection<DN>> matches = new LinkedHashMap<DN,Collection<DN>>();
+
+        for (TableItem item : localTable.getItems()) {
+            Data data = (Data)item.getData();
+
+            SearchResult entry = data.getEntry();
+            entries.put(entry.getDn(), entry);
+
+            Collection<DN> list = data.getLinks();
+            links.put(entry.getDn(), list);
+
+            list = data.getMatches();
+            matches.put(entry.getDn(), list);
+        }
+
+        localTable.removeAll();
+        localAttributeTable.removeAll();
+        globalTable.removeAll();
+
+    }
+
+    public void sortByStatus() {
+
     }
 }

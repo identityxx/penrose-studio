@@ -16,6 +16,10 @@ public class ErrorDialog {
         open("ERROR", e);
     }
     
+    public static void open(String message) {
+        open("ERROR", message);
+    }
+
     public static void open(String title, Exception e) {
 
         StringWriter sw = new StringWriter();
