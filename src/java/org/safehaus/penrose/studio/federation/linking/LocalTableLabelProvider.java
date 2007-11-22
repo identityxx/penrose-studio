@@ -38,39 +38,16 @@ public class LocalTableLabelProvider implements ITableLabelProvider, ITableColor
 
     public String getColumnText(Object object, int index) {
 
-        Data data = (Data)object;
+        LocalData data = (LocalData)object;
 
-        if (index == 0) {
-            return data.getDn().toString();
+        switch (index) {
+            case 0:
+                return data.getDn().toString();
+            case 1:
+                return data.getStatus();
         }
 
-        if (!data.isSearched()) return "";
-
-        Collection<DN> links = data.getLinks();
-
-        if (!links.isEmpty()) {
-
-            if (links.size() == 1) {
-                return "Linked";
-
-            } else {
-                return links.size()+" Links";
-            }
-        }
-
-        Collection<DN> matches = data.getMatches();
-
-        if (!matches.isEmpty()) {
-
-            if (matches.size() == 1) {
-                return "1 Match";
-
-            } else {
-                return matches.size()+" Matches";
-            }
-        }
-
-        return "Not Found";
+        return "";
     }
 
     public void addListener(ILabelProviderListener listener) {
@@ -84,7 +61,7 @@ public class LocalTableLabelProvider implements ITableLabelProvider, ITableColor
     }
 
     public Color getForeground(Object object, int index) {
-        Data data = (Data)object;
+        LocalData data = (LocalData)object;
 
         if (index == 0) return null;
 

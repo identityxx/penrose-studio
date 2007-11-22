@@ -8,7 +8,6 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IProgressService;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -48,10 +47,6 @@ public class LinkingPage extends FormPage {
 
     FormToolkit toolkit;
 
-    Color red;
-    Color green;
-    Color blue;
-
     Text localBaseText;
     Text localFilterText;
     Combo localScopeCombo;
@@ -78,6 +73,9 @@ public class LinkingPage extends FormPage {
     DN localBaseDn;
     DN globalBaseDn;
 
+    DNSorter dnSorter         = new DNSorter();
+    StatusSorter statusSorter = new StatusSorter();
+
     public LinkingPage(LinkingEditor editor) throws Exception {
         super(editor, "IDENTITY_LINKING", "  Identity Linking  ");
 
@@ -92,12 +90,6 @@ public class LinkingPage extends FormPage {
 
         localBaseDn = localPartitionClient.getSuffixes().iterator().next();
         globalBaseDn = globalPartitionClient.getSuffixes().iterator().next();
-
-        Display display = Display.getDefault();
-
-        red = display.getSystemColor(SWT.COLOR_RED);
-        green = display.getSystemColor(SWT.COLOR_GREEN);
-        blue = display.getSystemColor(SWT.COLOR_BLUE);
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -141,8 +133,11 @@ public class LinkingPage extends FormPage {
         Composite topPanel = createTopLocalSection(composite);
         topPanel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+        Composite centerPanel = createCenterLocalSection(composite);
+        centerPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
+
         Composite bottomPanel = createBottomLocalSection(composite);
-        bottomPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
+        bottomPanel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         return composite;
     }
@@ -228,7 +223,7 @@ public class LinkingPage extends FormPage {
         return composite;
     }
 
-    public Composite createBottomLocalSection(Composite parent) throws Exception {
+    public Composite createCenterLocalSection(Composite parent) throws Exception {
 
         Composite composite = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout();
@@ -242,10 +237,7 @@ public class LinkingPage extends FormPage {
 
         localTable = localTableViewer.getTable();
 
-        //localTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
-
         GridData gd = new GridData(GridData.FILL_BOTH);
-        //gd.heightHint = 150;
         localTable.setLayoutData(gd);
 
         localTable.setHeaderVisible(true);
@@ -262,7 +254,7 @@ public class LinkingPage extends FormPage {
 
                     TableItem item = localTable.getSelection()[0];
 
-                    Data data = (Data)item.getData();
+                    LocalData data = (LocalData)item.getData();
                     updateAttributes(localAttributeTable, localPartitionClient, data.getEntry());
 
                     updateGlobal(data);
@@ -280,9 +272,17 @@ public class LinkingPage extends FormPage {
 
         dnTableColumn.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
-                //sortByDn();
-                localTable.setSortColumn(dnTableColumn);
-                localTable.setSortDirection(SWT.DOWN);
+
+                if (localTable.getSortColumn() == dnTableColumn) {
+                    dnSorter.invert();
+
+                } else {
+                    localTable.setSortColumn(dnTableColumn);
+                    localTableViewer.setSorter(dnSorter);
+                }
+
+                localTable.setSortDirection(dnSorter.getDirection());
+                localTableViewer.refresh();
             }
         });
 
@@ -292,12 +292,19 @@ public class LinkingPage extends FormPage {
 
         statusTableColumn.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
-                //sortByStatus();
-                localTable.setSortColumn(statusTableColumn);
-                localTable.setSortDirection(SWT.DOWN);
+
+                if (localTable.getSortColumn() == statusTableColumn) {
+                    statusSorter.invert();
+
+                } else {
+                    localTable.setSortColumn(statusTableColumn);
+                    localTableViewer.setSorter(statusSorter);
+                }
+
+                localTable.setSortDirection(statusSorter.getDirection());
+                localTableViewer.refresh();
             }
         });
-
 
         Menu menu = new Menu(localTable);
         localTable.setMenu(menu);
@@ -331,8 +338,19 @@ public class LinkingPage extends FormPage {
             }
         });
 
+        return composite;
+    }
+
+    public Composite createBottomLocalSection(Composite parent) throws Exception {
+
+        Composite composite = toolkit.createComposite(parent);
+        GridLayout layout = new GridLayout();
+        layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        composite.setLayout(layout);
+
         localAttributeTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
-        gd = new GridData(GridData.FILL_HORIZONTAL);
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 200;
         localAttributeTable.setLayoutData(gd);
 
@@ -361,8 +379,11 @@ public class LinkingPage extends FormPage {
         Composite topPanel = createTopGlobalSection(composite);
         topPanel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+        Composite centerPanel = createCenterGlobalSection(composite);
+        centerPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
+
         Composite bottomPanel = createBottomGlobalSection(composite);
-        bottomPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
+        bottomPanel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         return composite;
     }
@@ -448,7 +469,7 @@ public class LinkingPage extends FormPage {
         return composite;
     }
 
-    public Composite createBottomGlobalSection(Composite parent) {
+    public Composite createCenterGlobalSection(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout();
@@ -518,15 +539,26 @@ public class LinkingPage extends FormPage {
             }
         });
 
+        return composite;
+    }
+
+    public Composite createBottomGlobalSection(Composite parent) {
+
+        Composite composite = toolkit.createComposite(parent);
+        GridLayout layout = new GridLayout();
+        layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        composite.setLayout(layout);
+
         globalAttributeTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
-        gd = new GridData(GridData.FILL_HORIZONTAL);
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 200;
         globalAttributeTable.setLayoutData(gd);
 
         globalAttributeTable.setHeaderVisible(true);
         globalAttributeTable.setLinesVisible(true);
 
-        tc = new TableColumn(globalAttributeTable, SWT.NONE);
+        TableColumn tc = new TableColumn(globalAttributeTable, SWT.NONE);
         tc.setText("Attribute");
         tc.setWidth(100);
 
@@ -569,7 +601,6 @@ public class LinkingPage extends FormPage {
 
     public void searchLocal() {
         try {
-            localTable.removeAll();
             localAttributeTable.removeAll();
             globalTable.removeAll();
             globalAttributeTable.removeAll();
@@ -579,7 +610,7 @@ public class LinkingPage extends FormPage {
             request.setFilter(localFilterText.getText());
             request.setScope(localScopeCombo.getSelectionIndex());
 
-            final Collection<Data> results = new ArrayList<Data>();
+            final Collection<LocalData> results = new ArrayList<LocalData>();
 
             IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
@@ -595,7 +626,7 @@ public class LinkingPage extends FormPage {
                         while (response.hasNext()) {
                             SearchResult result = response.next();
 
-                            Data data = new Data();
+                            LocalData data = new LocalData();
                             data.setEntry(result);
 
                             results.add(data);
@@ -629,10 +660,10 @@ public class LinkingPage extends FormPage {
             TableItem items[] = localTable.getSelection();
             if (items.length == 0) items = localTable.getItems();
 
-            final Collection<Data> results = new ArrayList<Data>();
+            final Collection<LocalData> results = new ArrayList<LocalData>();
 
             for (TableItem item : items) {
-                Data data = (Data)item.getData();
+                LocalData data = (LocalData)item.getData();
                 data.setSearched(false);
                 data.removeLinks();
                 data.removeMatches();
@@ -650,7 +681,7 @@ public class LinkingPage extends FormPage {
                     try {
                         monitor.beginTask("Searching "+ repository.getName()+"...", results.size());
 
-                        for (Data data : results) {
+                        for (LocalData data : results) {
                             if (monitor.isCanceled()) throw new InterruptedException();
 
                             DN dn = data.getDn();
@@ -688,7 +719,7 @@ public class LinkingPage extends FormPage {
             
             if (items.length == 1) {
                 TableItem item = items[0];
-                Data data = (Data)item.getData();
+                LocalData data = (LocalData)item.getData();
                 updateGlobal(data);
             }
 
@@ -698,7 +729,7 @@ public class LinkingPage extends FormPage {
         }
     }
 
-    public void updateGlobal(Data data) throws Exception {
+    public void updateGlobal(LocalData data) throws Exception {
 
         Collection<DN> links = data.getLinks();
 
@@ -930,7 +961,7 @@ public class LinkingPage extends FormPage {
 
             if (count == 1) {
                 TableItem item = localTable.getSelection()[0];
-                Data data = (Data)item.getData();
+                LocalData data = (LocalData)item.getData();
 
                 Collection<DN> links = data.getLinks();
 
@@ -965,7 +996,7 @@ public class LinkingPage extends FormPage {
             } else {
 
                 for (TableItem item : localTable.getSelection()) {
-                    Data data = (Data)item.getData();
+                    LocalData data = (LocalData)item.getData();
 
                     Collection<DN> links = data.getLinks();
                     if (!links.isEmpty()) continue;
@@ -999,7 +1030,7 @@ public class LinkingPage extends FormPage {
             TableItem localItem = localTable.getSelection()[0];
             TableItem globalItem = globalTable.getSelection()[0];
 
-            Data data = (Data)localItem.getData();
+            LocalData data = (LocalData)localItem.getData();
             SearchResult localEntry = data.getEntry();
 
             DN dn = (DN)globalItem.getData("global");
@@ -1040,7 +1071,7 @@ public class LinkingPage extends FormPage {
             int scope = globalScopeCombo.getSelectionIndex();
 
             for (TableItem item : localTable.getSelection()) {
-                Data data = (Data)item.getData();
+                LocalData data = (LocalData)item.getData();
                 SearchResult entry = data.getEntry();
 
                 Collection<DN> links = data.getLinks();
@@ -1076,7 +1107,7 @@ public class LinkingPage extends FormPage {
 
             if (count == 1) {
                 TableItem item = localTable.getSelection()[0];
-                Data data = (Data)item.getData();
+                LocalData data = (LocalData)item.getData();
                 updateGlobal(data);
             }
 
@@ -1099,10 +1130,10 @@ public class LinkingPage extends FormPage {
 
             if (!confirm) return;
 
-            final Collection<Data> results = new ArrayList<Data>();
+            final Collection<LocalData> results = new ArrayList<LocalData>();
 
             for (TableItem item : localTable.getSelection()) {
-                Data data = (Data)item.getData();
+                LocalData data = (LocalData)item.getData();
 
                 Collection<DN> list = data.getLinks();
                 if (!list.isEmpty()) continue;
@@ -1117,7 +1148,7 @@ public class LinkingPage extends FormPage {
                     try {
                         monitor.beginTask("Importing "+repository.getName()+"...", results.size());
 
-                        for (Data data : results) {
+                        for (LocalData data : results) {
                             if (monitor.isCanceled()) throw new InterruptedException();
 
                             DN dn = data.getDn();
@@ -1150,7 +1181,7 @@ public class LinkingPage extends FormPage {
 
             if (count == 1) {
                 TableItem item = localTable.getSelection()[0];
-                Data data = (Data)item.getData();
+                LocalData data = (LocalData)item.getData();
                 updateGlobal(data);
             }
 
@@ -1174,7 +1205,7 @@ public class LinkingPage extends FormPage {
             if (!confirm) return;
 
             TableItem localItem = localTable.getSelection()[0];
-            final Data data = (Data)localItem.getData();
+            final LocalData data = (LocalData)localItem.getData();
 
             final SearchResult entry = data.getEntry();
             final Collection<DN> links = data.getLinks();
@@ -1272,34 +1303,5 @@ public class LinkingPage extends FormPage {
         globalPartitionClient.add(dn, attributes);
 
         return globalResult;
-    }
-
-    public void sortByDn() {
-
-        Map<DN,SearchResult> entries = new LinkedHashMap<DN,SearchResult>();
-        Map<DN,Collection<DN>> links = new LinkedHashMap<DN,Collection<DN>>();
-        Map<DN,Collection<DN>> matches = new LinkedHashMap<DN,Collection<DN>>();
-
-        for (TableItem item : localTable.getItems()) {
-            Data data = (Data)item.getData();
-
-            SearchResult entry = data.getEntry();
-            entries.put(entry.getDn(), entry);
-
-            Collection<DN> list = data.getLinks();
-            links.put(entry.getDn(), list);
-
-            list = data.getMatches();
-            matches.put(entry.getDn(), list);
-        }
-
-        localTable.removeAll();
-        localAttributeTable.removeAll();
-        globalTable.removeAll();
-
-    }
-
-    public void sortByStatus() {
-
     }
 }

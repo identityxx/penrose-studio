@@ -9,7 +9,7 @@ import java.util.ArrayList;
 /**
  * @author Endi Sukma Dewata
  */
-public class Data {
+public class LocalData {
 
     private SearchResult entry;
     private boolean searched;
@@ -87,5 +87,32 @@ public class Data {
 
     public void setSearched(boolean searched) {
         this.searched = searched;
+    }
+
+    public String getStatus() {
+
+        if (!searched) return "";
+
+        if (!links.isEmpty()) {
+
+            if (links.size() == 1) {
+                return "Linked";
+
+            } else {
+                return links.size()+" Links";
+            }
+        }
+
+        if (!matches.isEmpty()) {
+
+            if (matches.size() == 1) {
+                return "1 Match";
+
+            } else {
+                return matches.size()+" Matches";
+            }
+        }
+
+        return "Not Found";
     }
 }
