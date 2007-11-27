@@ -195,8 +195,7 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
                 properties.put(Context.SECURITY_CREDENTIALS, passwordText.getText());
 
                 try {
-                    LDAPClient client = new LDAPClient(properties);
-                    client.open().close();
+                    new LDAPClient(properties);
                     MessageDialog.openInformation(parent.getShell(), "Test Connection Result", "Connection successful!");
 
                 } catch (Exception ex) {
