@@ -29,6 +29,8 @@ public class BrowserPage extends WizardPage {
     private DN baseDn;
     private PartitionClient partitionClient;
 
+    DN dn;
+
     public BrowserPage() {
         super(NAME);
         setDescription("Select an entry from the LDAP tree or enter the DN manually.");
@@ -44,10 +46,16 @@ public class BrowserPage extends WizardPage {
 
         tree.addTreeListener(new TreeAdapter() {
             public void treeExpanded(TreeEvent event) {
-                if (event.item == null) return;
+                try {
+                    if (event.item == null) return;
 
-                TreeItem parent = (TreeItem)event.item;
-                expand(parent);
+                    TreeItem parent = (TreeItem)event.item;
+                    expand(parent);
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
+                }
             }
         });
 
@@ -66,7 +74,12 @@ public class BrowserPage extends WizardPage {
         item.setText(baseDn.toString());
         item.setData(baseDn);
 
-        expand(item);
+        try {
+            expand(item);
+            
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
 
         item.setExpanded(true);
 
@@ -76,28 +89,22 @@ public class BrowserPage extends WizardPage {
         setControl(composite);
     }
 
-    public void expand(TreeItem parent) {
-        try {
-            parent.removeAll();
+    public void expand(TreeItem parent) throws Exception {
+        parent.removeAll();
 
-            DN parentDn = (DN)parent.getData();
+        DN parentDn = (DN)parent.getData();
 
-            SearchResponse response = partitionClient.search(parentDn, null, SearchRequest.SCOPE_ONE);
+        SearchResponse response = partitionClient.search(parentDn, null, SearchRequest.SCOPE_ONE);
 
-            while (response.hasNext()) {
-                SearchResult result = response.next();
-                DN dn = result.getDn();
+        while (response.hasNext()) {
+            SearchResult result = response.next();
+            DN dn = result.getDn();
 
-                TreeItem item = new TreeItem(parent, SWT.NONE);
-                item.setText(dn.getRdn().toString());
-                item.setData(dn);
+            TreeItem item = new TreeItem(parent, SWT.NONE);
+            item.setText(dn.getRdn().toString());
+            item.setData(dn);
 
-                new TreeItem(item, SWT.NONE);
-            }
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            ErrorDialog.open(e);
+            new TreeItem(item, SWT.NONE);
         }
     }
 
@@ -119,5 +126,9 @@ public class BrowserPage extends WizardPage {
 
     public String getDn() {
         return dnText.getText();
+    }
+
+    public void setDn(String dn) {
+        this.dn = new DN(dn);
     }
 }

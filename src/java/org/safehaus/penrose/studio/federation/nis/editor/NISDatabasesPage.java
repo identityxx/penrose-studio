@@ -178,7 +178,11 @@ public class NISDatabasesPage extends FormPage {
 
                     for (TableItem ti : items) {
                         NISDomain domain = (NISDomain)ti.getData();
-                        nisFederation.removeDatabase(domain);
+                        try {
+                            //nisFederation.removeDatabase(domain);
+                        } catch (Exception e) {
+                            log.error(e.getMessage(), e);
+                        }
                     }
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();

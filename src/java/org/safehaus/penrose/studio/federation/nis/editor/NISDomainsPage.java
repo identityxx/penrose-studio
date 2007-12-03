@@ -228,7 +228,13 @@ public class NISDomainsPage extends FormPage {
                             }
 
                             nisFederation.removePartition(repository);
-                            nisFederation.removeDatabase(repository);
+
+                            try {
+                                //nisFederation.removeDatabase(repository);
+                            } catch (Exception e) {
+                                log.error(e.getMessage(), e);
+                            }
+
                             nisFederation.removeRepository(repository.getName());
 
                         } catch (Exception e) {

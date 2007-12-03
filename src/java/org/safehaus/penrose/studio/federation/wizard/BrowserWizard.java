@@ -27,6 +27,7 @@ public class BrowserWizard extends Wizard {
         browserPage = new BrowserPage();
         browserPage.setBaseDn(baseDn);
         browserPage.setPartitionClient(partitionClient);
+        browserPage.setDn(dn);
         addPage(browserPage);
     }
 

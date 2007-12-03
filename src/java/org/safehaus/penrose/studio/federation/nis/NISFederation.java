@@ -86,7 +86,6 @@ public class NISFederation {
         users     = partition.getSource("penrose_users");
         groups    = partition.getSource("penrose_groups");
 */
-        PenroseClient penroseClient = project.getClient();
 
         for (Repository rep : list) {
 

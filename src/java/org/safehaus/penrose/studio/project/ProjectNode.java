@@ -190,7 +190,13 @@ public class ProjectNode extends Node {
     }
 
     public void expand() throws Exception {
-        if (!project.isConnected()) connect();
+        if (!project.isConnected()) {
+            try {
+                connect();
+            } catch (Exception e) {
+                serversView.close(this);
+            }
+        }
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
