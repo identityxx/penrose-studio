@@ -529,7 +529,7 @@ public class NISDatabaseCachePage extends FormPage {
             final Collection<String> mapNames = new ArrayList<String>();
 
             if (items.length == 0) {
-                for (String mapName : NIS.mapNames) {
+                for (String mapName : NIS.mapLabels.values()) {
                     mapNames.add(mapName);
                 }
 

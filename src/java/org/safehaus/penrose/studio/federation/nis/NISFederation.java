@@ -176,6 +176,7 @@ public class NISFederation {
 
         File partitionDir = new File(workDir, "partitions"+File.separator+ partitionName);
 
+        String nisDomain  = domain.getFullName();
         String ldapSuffix = domain.getSuffix();
 
         GlobalRepository globalRepository = federation.getGlobalRepository();
@@ -187,6 +188,7 @@ public class NISFederation {
         org.apache.tools.ant.Project antProject = new org.apache.tools.ant.Project();
 
         antProject.setProperty("DOMAIN",        name);
+        antProject.setProperty("NIS_DOMAIN",    nisDomain);
 
         antProject.setProperty("LDAP_URL",      ldapUrl);
         antProject.setProperty("LDAP_USER",     ldapBindDn);
@@ -238,16 +240,18 @@ public class NISFederation {
 
         File partitionDir = new File(project.getWorkDir(), "partitions"+File.separator+ partitionName);
 
-        String nisUrl = domain.getUrl();
-        String ypSuffix = domain.getYpSuffix();
+        String nisDomain  = domain.getFullName();
+        String nisUrl     = domain.getUrl();
+        String ypSuffix   = domain.getYpSuffix();
 
         org.apache.tools.ant.Project antProject = new org.apache.tools.ant.Project();
 
-        antProject.setProperty("DOMAIN",    name);
+        antProject.setProperty("DOMAIN",     name);
+        antProject.setProperty("NIS_DOMAIN", nisDomain);
 
-        antProject.setProperty("NIS_URL",   nisUrl);
+        antProject.setProperty("NIS_URL",    nisUrl);
 
-        antProject.setProperty("YP_SUFFIX", ypSuffix);
+        antProject.setProperty("YP_SUFFIX",  ypSuffix);
 
         Copy copy = new Copy();
         copy.setOverwrite(true);
@@ -363,7 +367,10 @@ public class NISFederation {
 
         org.apache.tools.ant.Project antProject = new org.apache.tools.ant.Project();
 
+        String nisDomain = domain.getFullName();
+
         antProject.setProperty("DOMAIN",           name);
+        antProject.setProperty("NIS_DOMAIN",       nisDomain);
 
         LDAPFederation ldapFederation = federation.getLdapFederation();
         LDAPRepository adRepository = ldapFederation.getRepository("ad");

@@ -70,7 +70,7 @@ public class ImportSchemaWizard extends Wizard {
             project.getPenroseConfig().addSchemaConfig(schemaConfig);
 
             SchemaManager schemaManager = project.getSchemaManager();
-            schemaManager.init(project.getWorkDir(), schemaConfig);
+            schemaManager.init(schemaConfig);
 
             return true;
 

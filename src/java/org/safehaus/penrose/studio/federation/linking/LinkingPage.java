@@ -486,7 +486,7 @@ public class LinkingPage extends FormPage {
 
         TableColumn tc = new TableColumn(globalTable, SWT.NONE);
         tc.setText("DN");
-        tc.setWidth(350);
+        tc.setWidth(300);
 
         globalTable.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {

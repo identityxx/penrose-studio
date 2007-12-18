@@ -98,7 +98,10 @@ public class Project {
 
             monitor.worked(1);
 
-            PenroseConfigReader penroseConfigReader = new PenroseConfigReader(new File(workDir, "conf"+File.separator+"server.xml"));
+            File path = new File(workDir, "conf"+File.separator+"server.xml");
+            File schemaDir = new File(workDir, "schema");
+
+            PenroseConfigReader penroseConfigReader = new PenroseConfigReader(path, schemaDir);
             penroseConfig = penroseConfigReader.read();
 
             penroseContext = new PenroseContext(workDir);
