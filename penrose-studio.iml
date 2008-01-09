@@ -17,15 +17,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/hsqldb-1.7.2.2.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/slf4j-log4j12.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -144,15 +135,6 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/xercesImpl-2.8.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/bcprov-jdk14-132.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

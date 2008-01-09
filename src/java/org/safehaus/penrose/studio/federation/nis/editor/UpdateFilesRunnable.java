@@ -1,13 +1,18 @@
 package org.safehaus.penrose.studio.federation.nis.editor;
 
-import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.agent.client.FindClient;
-import org.safehaus.penrose.agent.client.FindResult;
-import org.safehaus.penrose.agent.AgentResults;
-import org.safehaus.penrose.source.Source;
 import org.apache.log4j.Logger;
+import org.safehaus.penrose.agent.client.FindClient;
+import org.safehaus.penrose.connection.Connection;
+import org.safehaus.penrose.ldap.Attributes;
+import org.safehaus.penrose.ldap.RDNBuilder;
+import org.safehaus.penrose.ldap.SearchResult;
+import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.source.Source;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * @author Endi Sukma Dewata
@@ -16,12 +21,15 @@ public class UpdateFilesRunnable implements Runnable {
 
     Logger log = Logger.getLogger(getClass());
 
+    Partition partition;
+
     SearchResult host;
 
     Source hosts;
     Source files;
 
-    public UpdateFilesRunnable(SearchResult host, Source hosts, Source files) {
+    public UpdateFilesRunnable(Partition partition, SearchResult host, Source hosts, Source files) {
+        this.partition = partition;
         this.host = host;
         this.hosts = hosts;
         this.files = files;
@@ -51,7 +59,8 @@ public class UpdateFilesRunnable implements Runnable {
         RDNBuilder rb = new RDNBuilder();
         rb.set("hostname", hostname);
 
-        Map<String,String> parameters = files.getConnection().getParameters();
+        Connection connection = files.getConnection();
+        Map<String,String> parameters = connection.getParameters();
 
         FindClient client = new FindClient(hostname, port);
 

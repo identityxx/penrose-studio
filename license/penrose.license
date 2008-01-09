@@ -5,9 +5,9 @@
   <license>
     <product-name>Penrose Server</product-name>
     <product-version>2.0</product-version>
-    <create-date>07/01/2007</create-date>
-    <expiry-date>12/31/2007</expiry-date>
-    <license-key>434d4060081105ebd80cf66075857e91</license-key>
+    <create-date>01/01/2008</create-date>
+    <expiry-date>06/30/2008</expiry-date>
+    <license-key>e340a4a78abeada0b1f3b43186c335cb</license-key>
     <parameter>
       <param-name>type</param-name>
       <param-value>EVALUATION</param-value>
@@ -16,9 +16,9 @@
   <license>
     <product-name>Penrose Studio</product-name>
     <product-version>2.0</product-version>
-    <create-date>07/01/2007</create-date>
-    <expiry-date>12/31/2007</expiry-date>
-    <license-key>0cfe1f3505fbcff4ed7f2f8665d48ffa</license-key>
+    <create-date>01/01/2008</create-date>
+    <expiry-date>06/30/2008</expiry-date>
+    <license-key>ac7b20129cf8a646c11ad77fe4ddad07</license-key>
     <parameter>
       <param-name>type</param-name>
       <param-value>EVALUATION</param-value>
