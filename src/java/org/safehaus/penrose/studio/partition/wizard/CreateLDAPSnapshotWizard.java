@@ -81,7 +81,7 @@ public class CreateLDAPSnapshotWizard extends Wizard {
             ConnectionConfig connectionConfig = new ConnectionConfig();
             connectionConfig.setName(name);
             connectionConfig.setAdapterName("LDAP");
-            connectionConfig.setParameter(Context.PROVIDER_URL, connectionInfoPage.getURL()+"/"+connectionInfoPage.getSuffix());
+            connectionConfig.setParameter(Context.PROVIDER_URL, connectionInfoPage.getProviderUrl());
             connectionConfig.setParameter(Context.SECURITY_PRINCIPAL, connectionInfoPage.getBindDN());
             connectionConfig.setParameter(Context.SECURITY_CREDENTIALS, connectionInfoPage.getPassword());
 

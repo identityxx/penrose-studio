@@ -56,9 +56,11 @@ public class GlobalRepository extends Repository {
             port = Integer.parseInt(s.substring(k+1));
         }
 
-        String suffix = url.substring(j+1);
+        int l = url.indexOf(" ", j+1);
+        String suffix = l < 0 ? url.substring(j+1) : url.substring(j+1, l);
+        
         if (suffix != null && !"".equals(suffix)) {
-            parameters.put("url", url.substring(0, j+1));
+            //parameters.put("url", url.substring(0, j+1));
             parameters.put("suffix", suffix);
         }
     }

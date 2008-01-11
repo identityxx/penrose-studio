@@ -1,18 +1,18 @@
 package org.safehaus.penrose.studio.federation.global;
 
-import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.federation.FederationNode;
-import org.safehaus.penrose.studio.federation.ldap.*;
-import org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditorInput;
-import org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditor;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudio;
 import org.apache.log4j.Logger;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchPage;
+import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.federation.FederationNode;
+import org.safehaus.penrose.studio.federation.global.editor.GlobalEditor;
+import org.safehaus.penrose.studio.federation.global.editor.GlobalEditorInput;
+import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.tree.Node;
 
 /**
  * @author Endi S. Dewata
@@ -42,13 +42,13 @@ public class GlobalNode extends Node {
 
     public void open() throws Exception {
 
-        LDAPEditorInput ei = new LDAPEditorInput();
+        GlobalEditorInput ei = new GlobalEditorInput();
         ei.setProject(projectNode.getProject());
-        ei.setLdapFederation(ldapFederation);
+        ei.setFederation(federationNode.getFederation());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
-        page.openEditor(ei, LDAPEditor.class.getName());
+        page.openEditor(ei, GlobalEditor.class.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();

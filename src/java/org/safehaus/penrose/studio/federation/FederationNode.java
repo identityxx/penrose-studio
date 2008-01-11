@@ -1,43 +1,42 @@
 package org.safehaus.penrose.studio.federation;
 
-import org.safehaus.penrose.studio.plugin.PluginNode;
-import org.safehaus.penrose.studio.plugin.PluginsNode;
-import org.safehaus.penrose.studio.federation.nis.NISNode;
-import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
-import org.safehaus.penrose.studio.federation.wizard.FederationWizard;
-import org.safehaus.penrose.studio.federation.editor.FederationEditor;
-import org.safehaus.penrose.studio.federation.editor.FederationEditorInput;
-import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.util.Helper;
-import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.partition.PartitionConfigs;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.connection.ConnectionContext;
-import org.safehaus.penrose.jdbc.connection.JDBCConnection;
-import org.safehaus.penrose.jdbc.JDBCClient;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.jface.window.Window;
-import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.window.Window;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.*;
 import org.eclipse.ui.progress.IProgressService;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionContext;
+import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.jdbc.connection.JDBCConnection;
+import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.federation.editor.FederationEditor;
+import org.safehaus.penrose.studio.federation.editor.FederationEditorInput;
+import org.safehaus.penrose.studio.federation.global.GlobalNode;
+import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
+import org.safehaus.penrose.studio.federation.nis.NISNode;
+import org.safehaus.penrose.studio.federation.wizard.FederationWizard;
+import org.safehaus.penrose.studio.plugin.PluginNode;
+import org.safehaus.penrose.studio.plugin.PluginsNode;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.tree.Node;
+import org.safehaus.penrose.studio.util.Helper;
 
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.Map;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author Endi Sukma Dewata
@@ -168,6 +167,11 @@ public class FederationNode extends PluginNode {
                 }
             }
         });
+
+        children.add(new GlobalNode(
+                "Global",
+                FederationNode.this
+        ));
 
         children.add(new LDAPNode(
                 "LDAP",

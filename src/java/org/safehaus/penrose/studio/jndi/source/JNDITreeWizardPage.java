@@ -17,20 +17,23 @@
  */
 package org.safehaus.penrose.studio.jndi.source;
 
-import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.ldap.LDAPClient;
-import org.safehaus.penrose.ldap.DN;
 import org.apache.log4j.Logger;
+import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.TreeEvent;
+import org.eclipse.swt.events.TreeListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.*;
+import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.ldap.DN;
+import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.ldap.SearchResult;
 
-import javax.naming.directory.SearchResult;
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
@@ -148,11 +151,11 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
             item.setText(suffix);
             item.setData("");
 
-            Collection results = client.getChildren("");
+            Collection<SearchResult> results = client.getChildren("");
 
             for (Iterator i=results.iterator(); i.hasNext(); ) {
                 SearchResult entry = (SearchResult)i.next();
-                String dn = entry.getName();
+                String dn = entry.getDn().toString();
 
                 TreeItem it = new TreeItem(item, SWT.NONE);
                 it.setText(dn);
@@ -183,11 +186,11 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
                 items[i].dispose();
             }
 
-            Collection results = client.getChildren(baseDn);
+            Collection<SearchResult> results = client.getChildren(baseDn);
 
             for (Iterator i=results.iterator(); i.hasNext(); ) {
                 SearchResult entry = (SearchResult)i.next();
-                String dn = entry.getName();
+                String dn = entry.getDn().toString();
                 String rdn = new DN(dn).getRdn().toString();
 
                 TreeItem it = new TreeItem(item, SWT.NONE);

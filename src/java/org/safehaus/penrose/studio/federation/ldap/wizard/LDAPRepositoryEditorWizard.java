@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.federation.wizard;
+package org.safehaus.penrose.studio.federation.ldap.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.apache.log4j.Logger;
@@ -16,25 +16,19 @@ import java.util.LinkedHashMap;
 /**
  * @author Endi S. Dewata
  */
-public class GlobalRepositoryWizard extends Wizard {
+public class LDAPRepositoryEditorWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
 
-    private Federation federation;
     private Project project;
 
     public JNDIConnectionInfoWizardPage ldapPage;
 
     private Map<String,String> parameters = new LinkedHashMap<String,String>();
+    private String suffix;
 
-    public GlobalRepositoryWizard() {
-        setWindowTitle("Global Repository Setup Wizard");
-    }
-
-    public void init(Federation federation) throws Exception {
-        this.federation = federation;
-        this.project = federation.getProject();
+    public LDAPRepositoryEditorWizard() {
     }
 
     public boolean canFinish() {
@@ -48,11 +42,13 @@ public class GlobalRepositoryWizard extends Wizard {
         ldapPage = new JNDIConnectionInfoWizardPage();
         ldapPage.setDescription("Enter LDAP connection parameters.");
         ldapPage.setParameters(parameters);
+        ldapPage.setSuffix(suffix);
         addPage(ldapPage);
     }
 
     public boolean performFinish() {
         try {
+            setSuffix(ldapPage.getSuffix());
             setParameters(ldapPage.getParameters());
 
             return true;
@@ -75,14 +71,6 @@ public class GlobalRepositoryWizard extends Wizard {
         return project;
     }
 
-    public Federation getFederation() {
-        return federation;
-    }
-
-    public void setFederation(Federation federation) {
-        this.federation = federation;
-    }
-
     public Map<String, String> getParameters() {
         return parameters;
     }
@@ -91,5 +79,13 @@ public class GlobalRepositoryWizard extends Wizard {
         if (this.parameters == parameters) return;
         this.parameters.clear();
         this.parameters.putAll(parameters);
+    }
+
+    public String getSuffix() {
+        return suffix;
+    }
+
+    public void setSuffix(String suffix) {
+        this.suffix = suffix;
     }
 }

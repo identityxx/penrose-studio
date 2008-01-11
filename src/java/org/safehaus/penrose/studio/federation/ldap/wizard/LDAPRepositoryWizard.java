@@ -65,10 +65,11 @@ public class LDAPRepositoryWizard extends Wizard {
             repository.setUrl(map.get(Context.PROVIDER_URL));
             repository.setUser(map.get(Context.SECURITY_PRINCIPAL));
             repository.setPassword(map.get(Context.SECURITY_CREDENTIALS));
+            repository.setSuffix(ldapPage.getSuffix());
 
             ldapFederation.addRepository(repository);
 
-            PartitionConfig partitionConfig = ldapFederation.createPartitionConfig(repository);
+            ldapFederation.createPartitionConfig(repository);
             project.upload("partitions/"+ repository.getName());
 
             PenroseClient penroseClient = project.getClient();

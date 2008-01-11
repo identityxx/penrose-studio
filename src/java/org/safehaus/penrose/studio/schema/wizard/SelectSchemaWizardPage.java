@@ -17,21 +17,19 @@
  */
 package org.safehaus.penrose.studio.schema.wizard;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.ldap.Attribute;
 import org.safehaus.penrose.ldap.LDAP;
-import org.apache.log4j.Logger;
-
-import javax.naming.NamingEnumeration;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.SearchResult;
+import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.ldap.SearchResult;
 
 /**
  * @author Endi S. Dewata
@@ -147,9 +145,8 @@ public class SelectSchemaWizardPage extends WizardPage {
 
             Attribute schemaNamingContexts = rootDse.getAttributes().get("schemaNamingContext");
             if (schemaNamingContexts != null) {
-                for (NamingEnumeration e = schemaNamingContexts.getAll(); e.hasMore(); ) {
-                    String schemaNamingContext = (String)e.next();
-
+                for (Object value : schemaNamingContexts.getValues()) {
+                    String schemaNamingContext = (String)value;
                     sourceSchemaList.add(schemaNamingContext);
                 }
             }

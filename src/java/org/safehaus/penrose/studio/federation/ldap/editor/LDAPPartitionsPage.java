@@ -140,7 +140,7 @@ public class LDAPPartitionsPage extends FormPage {
                     for (TableItem ti : items) {
                         LDAPRepository repository = (LDAPRepository)ti.getData();
 
-                        PartitionConfig partitionConfig = ldapFederation.createPartitionConfig(repository);
+                        ldapFederation.createPartitionConfig(repository);
                         project.upload("partitions/"+repository.getName());
 
                         penroseClient.startPartition(repository.getName());

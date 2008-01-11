@@ -17,35 +17,30 @@
  */
 package org.safehaus.penrose.studio.jndi.connection;
 
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.layout.*;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.TreeListener;
-import org.eclipse.swt.events.TreeEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.ui.forms.widgets.*;
-import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.ui.forms.events.HyperlinkAdapter;
+import org.eclipse.swt.events.TreeEvent;
+import org.eclipse.swt.events.TreeListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.schema.Schema;
+import org.eclipse.ui.forms.events.HyperlinkAdapter;
+import org.eclipse.ui.forms.events.HyperlinkEvent;
+import org.eclipse.ui.forms.widgets.Hyperlink;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.forms.widgets.Section;
+import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.schema.ObjectClass;
-import org.safehaus.penrose.studio.jndi.connection.JNDISourceWizard;
-import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
+import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.ldap.LDAPClient;
-import org.safehaus.penrose.ldap.DN;
 
-import javax.naming.directory.SearchResult;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.Attribute;
-import javax.naming.NamingEnumeration;
 import java.util.*;
-import java.io.StringWriter;
-import java.io.PrintWriter;
 
 /**
  * @author Endi S. Dewata
@@ -157,7 +152,7 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
 
                     TreeItem treeItem = tree.getSelection()[0];
                     SearchResult entry = (SearchResult)treeItem.getData();
-                    String baseDn = entry.getName();
+                    String baseDn = entry.getDn().toString();
 
                     Collection attributeNames = getAttributeNames(schema, entry);
 
@@ -195,7 +190,7 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
 
                     TreeItem treeItem = tree.getSelection()[0];
                     SearchResult entry = (SearchResult)treeItem.getData();
-                    String baseDn = entry.getName();
+                    String baseDn = entry.getDn().toString();
 
                     JNDISourceWizard wizard = new JNDISourceWizard(
                             client,
@@ -232,17 +227,17 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
 
                     TreeItem treeItem = tree.getSelection()[0];
                     SearchResult entry = (SearchResult)treeItem.getData();
-                    DN baseDn = new DN(entry.getName());
+                    DN baseDn = entry.getDn();
                     DN parentDn = baseDn.getParentDn();
 
                     Attribute oc = entry.getAttributes().get("objectClass");
                     int counter = 0;
                     StringBuilder sb = new StringBuilder();
-                    for (NamingEnumeration en=oc.getAll(); en.hasMore(); ) {
-                        String value = (String)en.next();
-                        if ("top".equalsIgnoreCase(value)) continue;
+                    for (Object value : oc.getValues()) {
+                        String objectClass = (String)value;
+                        if ("top".equalsIgnoreCase(objectClass)) continue;
                         sb.append("(objectClass=");
-                        sb.append(value);
+                        sb.append(objectClass);
                         sb.append(")");
                         counter++;
                     }
@@ -289,8 +284,8 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
         Attributes attributes = entry.getAttributes();
 
         Attribute objectClass = attributes.get("objectClass");
-        for (NamingEnumeration en=objectClass.getAll(); en.hasMore(); ) {
-            String ocName = (String)en.next();
+        for (Object value : objectClass.getValues()) {
+            String ocName = (String)value;
             schema.getAllObjectClasses(ocName, map);
         }
 
@@ -307,9 +302,8 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
             }
         }
 
-        for (NamingEnumeration i=attributes.getAll(); i.hasMore(); ) {
-            Attribute at = (Attribute)i.next();
-            String name = at.getID();
+        for (Attribute at : attributes.getAll()) {
+            String name = at.getName();
             if ("objectClass".equalsIgnoreCase(name)) continue;
             attributeNames.add(name);
         }
@@ -344,12 +338,10 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
         table.removeAll();
 
         Attributes attributes = entry.getAttributes();
-        for (NamingEnumeration i=attributes.getAll(); i.hasMore(); ) {
-            Attribute attribute = (Attribute)i.next();
-            String name = attribute.getID();
+        for (Attribute attribute : attributes.getAll()) {
+            String name = attribute.getName();
 
-            for (NamingEnumeration j=attribute.getAll(); j.hasMore(); ) {
-                Object value = j.next();
+            for (Object value : attribute.getValues()) {
                 String label = value instanceof byte[] ? "(binary)" : value.toString();
 
                 TableItem ti = new TableItem(table, SWT.NONE);
@@ -381,7 +373,7 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
             Collection<SearchResult> results = client.getChildren("");
 
             for (SearchResult entry : results) {
-                String dn = entry.getName();
+                String dn = entry.getDn().toString();
 
                 TreeItem it = new TreeItem(item, SWT.NONE);
                 it.setText(dn);
@@ -409,7 +401,7 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
 
             TreeItem item = (TreeItem)event.item;
             SearchResult entry = (SearchResult)item.getData();
-            String baseDn = entry.getName();
+            String baseDn = entry.getDn().toString();
             //log.debug("Expanding "+baseDn);
 
             TreeItem items[] = item.getItems();
@@ -421,7 +413,7 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
             Collection<SearchResult> results = client.getChildren(baseDn);
 
             for (SearchResult en : results) {
-                DN dn = new DN(en.getName());
+                DN dn = en.getDn();
                 String rdn = dn.getRdn().toString();
 
                 TreeItem it = new TreeItem(item, SWT.NONE);

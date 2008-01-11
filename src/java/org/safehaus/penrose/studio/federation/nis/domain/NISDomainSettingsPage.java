@@ -54,21 +54,21 @@ public class NISDomainSettingsPage extends FormPage {
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-        Section nisSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        nisSection.setText("NIS Domain");
-        nisSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Section domainSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        domainSection.setText("NIS Domain");
+        domainSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Control nisControl = createDomainsSection(nisSection);
-        nisSection.setClient(nisControl);
+        Control domainControl = createDomainsSection(domainSection);
+        domainSection.setClient(domainControl);
 
         new Label(body, SWT.NONE);
 
-        Section ldapSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        ldapSection.setText("NIS Partition");
-        ldapSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Section nisSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        nisSection.setText("NIS Partition");
+        nisSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Control ldapControl = createLdapPanel(ldapSection);
-        ldapSection.setClient(ldapControl);
+        Control nisControl = createNisControl(nisSection);
+        nisSection.setClient(nisControl);
 
         new Label(body, SWT.NONE);
 
@@ -105,17 +105,17 @@ public class NISDomainSettingsPage extends FormPage {
         return composite;
     }
 
-    public Composite createLdapPanel(Composite parent) {
+    public Composite createNisControl(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout(2, false);
         layout.marginWidth = 0;
         composite.setLayout(layout);
 
-        Composite left = createLdapLeftPanel(composite);
+        Composite left = createNisLeftPanel(composite);
         left.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Composite right = createLdapRightPanel(composite);
+        Composite right = createNisRightPanel(composite);
         GridData gd = new GridData(GridData.FILL_VERTICAL);
         gd.widthHint = 100;
         right.setLayoutData(gd);
@@ -123,7 +123,7 @@ public class NISDomainSettingsPage extends FormPage {
         return composite;
     }
 
-    public Composite createLdapLeftPanel(Composite parent) {
+    public Composite createNisLeftPanel(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout(2, false);
@@ -144,7 +144,7 @@ public class NISDomainSettingsPage extends FormPage {
         return composite;
     }
 
-    public Composite createLdapRightPanel(Composite parent) {
+    public Composite createNisRightPanel(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout();

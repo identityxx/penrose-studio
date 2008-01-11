@@ -137,6 +137,11 @@
             icon="images/object.gif"
             class="org.safehaus.penrose.studio.federation.editor.FederationEditor"/>
         <editor
+            id="org.safehaus.penrose.studio.federation.global.editor.GlobalEditor"
+            name="Global Repository"
+            icon="images/object.gif"
+            class="org.safehaus.penrose.studio.federation.global.editor.GlobalEditor"/>
+        <editor
             id="org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditor"
             name="LDAP"
             icon="images/object.gif"

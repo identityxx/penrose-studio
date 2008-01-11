@@ -8,6 +8,8 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
@@ -17,15 +19,20 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
 import org.safehaus.penrose.studio.federation.ldap.wizard.LDAPRepositoryWizard;
+import org.safehaus.penrose.studio.federation.ldap.wizard.LDAPRepositoryEditorWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.partition.PartitionConfig;
+
+import javax.naming.Context;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
 /**
  * @author Endi S. Dewata
@@ -38,6 +45,7 @@ public class LDAPRepositoriesPage extends FormPage {
 
     LDAPEditor editor;
     LDAPFederation ldapFederation;
+    Project project;
 
     Table table;
 
@@ -46,6 +54,7 @@ public class LDAPRepositoriesPage extends FormPage {
 
         this.editor = editor;
         this.ldapFederation = ldapFederation;
+        this.project = ldapFederation.getProject();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -157,14 +166,38 @@ public class LDAPRepositoriesPage extends FormPage {
 
                     LDAPRepository repository = (LDAPRepository)ti.getData();
 
+                    LDAPRepositoryEditorWizard wizard = new LDAPRepositoryEditorWizard();
+                    wizard.setWindowTitle("LDAP Repository");
+
+                    wizard.setSuffix(repository.getSuffix());
+
+                    Map<String,String> parameters = new LinkedHashMap<String,String>();
+                    parameters.put(Context.PROVIDER_URL, repository.getUrl());
+                    parameters.put(Context.SECURITY_PRINCIPAL, repository.getUser());
+                    parameters.put(Context.SECURITY_CREDENTIALS, repository.getPassword());
+                    wizard.setParameters(parameters);
+
+                    wizard.setProject(project);
+
+                    IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+
+                    WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
+                    dialog.setPageSize(600, 300);
+
+                    if (dialog.open() != Window.OK) return;
+/*
                     LDAPRepositoryDialog dialog = new LDAPRepositoryDialog(editor.getSite().getShell(), SWT.NONE);
                     dialog.setRepository(repository);
                     dialog.open();
 
                     int action = dialog.getAction();
                     if (action == LDAPRepositoryDialog.CANCEL) return;
+*/
+                    repository.setUrl(parameters.get(Context.PROVIDER_URL));
+                    repository.setUser(parameters.get(Context.SECURITY_PRINCIPAL));
+                    repository.setPassword(parameters.get(Context.SECURITY_CREDENTIALS));
+                    repository.setSuffix(wizard.getSuffix());
 
-                    Project project = ldapFederation.getProject();
                     PenroseClient penroseClient = project.getClient();
 
                     penroseClient.stopPartition(repository.getName());
@@ -175,7 +208,7 @@ public class LDAPRepositoriesPage extends FormPage {
 
                     ldapFederation.updateRepository(repository);
 
-                    PartitionConfig partitionConfig = ldapFederation.createPartitionConfig(repository);
+                    ldapFederation.createPartitionConfig(repository);
                     project.upload("partitions/"+repository.getName());
 
                     penroseClient.startPartition(repository.getName());

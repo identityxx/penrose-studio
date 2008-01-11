@@ -1,21 +1,15 @@
 package org.safehaus.penrose.studio.util;
 
-import org.safehaus.penrose.schema.Schema;
-import org.safehaus.penrose.schema.AttributeType;
-import org.safehaus.penrose.schema.attributeSyntax.AttributeSyntax;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.directory.EntryMapping;
 import org.safehaus.penrose.directory.AttributeMapping;
-import org.safehaus.penrose.ldap.RDN;
-import org.safehaus.penrose.ldap.DN;
-import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.directory.EntryMapping;
+import org.safehaus.penrose.ldap.*;
+import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.schema.AttributeType;
+import org.safehaus.penrose.schema.Schema;
+import org.safehaus.penrose.schema.attributeSyntax.AttributeSyntax;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.directory.SearchResult;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.Attribute;
-import javax.naming.NamingEnumeration;
 import java.util.Collection;
 
 /**
@@ -43,7 +37,7 @@ public class SnapshotUtil {
             EntryMapping entryMapping = createMapping(client, entry);
             partitionConfig.getDirectoryConfig().addEntryMapping(entryMapping);
 
-            createEntries(partitionConfig, client, entry.getName());
+            createEntries(partitionConfig, client, entry.getDn().toString());
         }
 
     }
@@ -52,17 +46,16 @@ public class SnapshotUtil {
 
         Schema schema = client.getSchema();
 
-        DN dn = entry.getName().equals("") ? client.getSuffix() : new DN(entry.getName()+","+client.getSuffix());
+        DN dn = entry.getDn().isEmpty() ? client.getSuffix() : entry.getDn().append(client.getSuffix());
         RDN rdn = dn.getRdn();
 
         EntryMapping entryMapping = new EntryMapping(dn);
 
         log.debug("Attributes:");
         Attributes attributes = entry.getAttributes();
-        for (NamingEnumeration i=attributes.getAll(); i.hasMore(); ) {
-            Attribute attribute = (Attribute)i.next();
+        for (Attribute attribute : attributes.getAll()) {
 
-            String name = attribute.getID();
+            String name = attribute.getName();
             AttributeType attributeType = schema.getAttributeType(name);
             AttributeSyntax attributeSyntax = AttributeSyntax.getAttributeSyntax(attributeType.getSyntax());
             boolean binary = attributeSyntax != null && attributeSyntax.isHumanReadable();
@@ -70,8 +63,7 @@ public class SnapshotUtil {
 
             boolean oc = "objectClass".equalsIgnoreCase(name);
 
-            for (NamingEnumeration j=attribute.getAll(); j.hasMore(); ) {
-                Object value = j.next();
+            for (Object value : attribute.getValues()) {
 
                 if (oc) {
                     entryMapping.addObjectClass(value.toString());

@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.federation.ldap.repository;
+package org.safehaus.penrose.studio.federation.global.editor;
 
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.IEditorSite;
@@ -7,20 +7,17 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
-import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
+import org.safehaus.penrose.studio.federation.Federation;
 
-public class LDAPRepositoryEditor extends FormEditor {
+public class GlobalEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    LDAPFederation ldapFederation;
-    LDAPRepository repository;
+    Federation federation;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        LDAPRepositoryEditorInput ei = (LDAPRepositoryEditorInput)input;
-        ldapFederation = ei.getLdapFederation();
-        repository = ei.getRepository();
+        GlobalEditorInput ei = (GlobalEditorInput)input;
+        federation = ei.getFederation();
 
         setSite(site);
         setInput(input);
@@ -29,7 +26,7 @@ public class LDAPRepositoryEditor extends FormEditor {
 
     public void addPages() {
         try {
-            addPage(new LDAPRepositorySettingsPage(this));
+            addPage(new GlobalRepositoryPage(this));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -50,15 +47,7 @@ public class LDAPRepositoryEditor extends FormEditor {
         return false;
     }
 
-    public LDAPRepository getRepository() {
-        return repository;
-    }
-
-    public void setRepository(LDAPRepository repository) {
-        this.repository = repository;
-    }
-
-    public LDAPFederation getLdapFederation() {
-        return ldapFederation;
+    public Federation getFederation() {
+        return federation;
     }
 }

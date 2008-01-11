@@ -90,7 +90,7 @@ public class CreateLDAPProxyWizard extends Wizard {
             ConnectionConfig connectionConfig = new ConnectionConfig();
             connectionConfig.setName(name);
             connectionConfig.setAdapterName("LDAP");
-            connectionConfig.setParameter(InitialContext.PROVIDER_URL, connectionInfoPage.getURL()+"/");
+            connectionConfig.setParameter(InitialContext.PROVIDER_URL, connectionInfoPage.getProviderUrl());
             connectionConfig.setParameter(InitialContext.SECURITY_PRINCIPAL, connectionInfoPage.getBindDN());
             connectionConfig.setParameter(InitialContext.SECURITY_CREDENTIALS, connectionInfoPage.getPassword());
 
