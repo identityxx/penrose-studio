@@ -1,19 +1,23 @@
 package org.safehaus.penrose.studio.federation.nis;
 
-import org.safehaus.penrose.studio.federation.Repository;
+import org.safehaus.penrose.studio.federation.RepositoryConfig;
 
 import java.util.Map;
 
 /**
  * @author Endi Sukma Dewata
  */
-public class NISDomain extends Repository {
+public class NISDomain extends RepositoryConfig {
     
     protected String fullName;
     protected String server;
 
     public NISDomain() {
         setType("NIS");
+    }
+
+    public NISDomain(RepositoryConfig repository) {
+        super(repository);
     }
 
     public String getUrl() {

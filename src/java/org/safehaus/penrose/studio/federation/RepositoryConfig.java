@@ -1,19 +1,29 @@
 package org.safehaus.penrose.studio.federation;
 
-import java.util.Map;
-import java.util.LinkedHashMap;
+import java.io.Serializable;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author Endi Sukma Dewata
  */
-public class Repository {
+public class RepositoryConfig implements Serializable, Cloneable {
 
     protected String name;
     protected String type;
 
     protected Map<String,String> parameters = new LinkedHashMap<String,String>();
 
+    public RepositoryConfig() {
+    }
+
+    public RepositoryConfig(RepositoryConfig repository) {
+        setName(repository.name);
+        setType(repository.type);
+        setParameters(repository.parameters);
+    }
+    
     public String getName() {
         return name;
     }
@@ -30,6 +40,10 @@ public class Repository {
         this.type = type;
     }
 
+    public void setParameter(String name, String value) {
+        parameters.put(name, value);
+    }
+    
     public Collection<String> getParameterNames() {
         return parameters.keySet();
     }
@@ -65,11 +79,26 @@ public class Repository {
         if (object == null) return false;
         if (object.getClass() != this.getClass()) return false;
 
-        Repository domain = (Repository)object;
+        RepositoryConfig domain = (RepositoryConfig)object;
         if (!equals(name, domain.name)) return false;
         if (!equals(type, domain.type)) return false;
         if (!equals(parameters, domain.parameters)) return false;
 
         return true;
+    }
+
+    public Object clone() throws CloneNotSupportedException {
+        RepositoryConfig repository = (RepositoryConfig)super.clone();
+
+        repository.name = name;
+        repository.type = type;
+
+        repository.parameters = new LinkedHashMap<String,String>();
+        for (String name : parameters.keySet()) {
+            String value = parameters.get(name);
+            repository.parameters.put(name, value);
+        }
+
+        return repository;
     }
 }

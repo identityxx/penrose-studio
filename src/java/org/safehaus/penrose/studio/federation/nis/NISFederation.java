@@ -7,7 +7,7 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.event.FederationEventListener;
 import org.safehaus.penrose.studio.federation.event.FederationEvent;
 import org.safehaus.penrose.studio.federation.Federation;
-import org.safehaus.penrose.studio.federation.Repository;
+import org.safehaus.penrose.studio.federation.RepositoryConfig;
 import org.safehaus.penrose.studio.federation.GlobalRepository;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
@@ -75,7 +75,7 @@ public class NISFederation {
     public void load(IProgressMonitor monitor) throws Exception {
         log.debug("Starting NIS Federation tool.");
 
-        Collection<Repository> list = federation.getRepositories("NIS");
+        Collection<RepositoryConfig> list = federation.getRepositories("NIS");
 
         monitor.beginTask("Loading NIS repositories...", list.size() == 1 ? IProgressMonitor.UNKNOWN : list.size());
 /*
@@ -87,7 +87,7 @@ public class NISFederation {
         groups    = partition.getSource("penrose_groups");
 */
 
-        for (Repository rep : list) {
+        for (RepositoryConfig rep : list) {
 
             if (monitor.isCanceled()) throw new InterruptedException();
 

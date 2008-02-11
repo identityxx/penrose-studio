@@ -73,18 +73,23 @@ public class RootEntryWizard extends Wizard {
     }
 
     public IWizardPage getNextPage(IWizardPage page) {
-        if (ocPage == page) {
-            Collection objectClasses = ocPage.getSelectedObjectClasses();
-            attrPage.setObjectClasses(objectClasses);
+        try {
+            if (ocPage == page) {
+                Collection objectClasses = ocPage.getSelectedObjectClasses();
+                attrPage.setObjectClasses(objectClasses);
 
-            if (!objectClasses.isEmpty()) {
-                DN dn = new DN(dnPage.getDn());
-                RDN rdn = dn.getRdn();
-                attrPage.setRdn(rdn);
+                if (!objectClasses.isEmpty()) {
+                    DN dn = new DN(dnPage.getDn());
+                    RDN rdn = dn.getRdn();
+                    attrPage.setRdn(rdn);
+                }
             }
-        }
 
-        return super.getNextPage(page);
+            return super.getNextPage(page);
+            
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     public boolean performFinish() {

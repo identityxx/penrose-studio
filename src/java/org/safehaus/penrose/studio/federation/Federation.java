@@ -10,8 +10,6 @@ import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
 import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.source.Source;
-import org.safehaus.penrose.source.SourceConfigs;
-import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 import org.safehaus.penrose.management.PenroseClient;
@@ -47,12 +45,10 @@ public class Federation {
     private Project project;
     private Partition partition;
 
-    private Source globalParameters;
-    private Source repositories;
-    private Source repositoryParameters;
-
     private LDAPFederation ldapFederation;
     private NISFederation nisFederation;
+
+    private FederationConfig federationConfig = new FederationConfig();
 
     public Federation(Project project) throws Exception {
         this.project = project;
@@ -236,15 +232,13 @@ public class Federation {
 
             partitions.addPartition(partition);
 
-            globalParameters = partition.getSource(GLOBAL_PARAMETERS);
+            //loadFromFile();
+            loadFromDatabase();
 
             if (partitionConfigs.getPartitionConfig(Federation.PARTITION+"_global") == null) {
                 GlobalRepository globalRepository = getGlobalRepository();
-                if (globalRepository != null) createGlobalPartition(globalRepository);
+                createGlobalPartition(globalRepository);
             }
-
-            repositories = partition.getSource(REPOSITORIES);
-            repositoryParameters = partition.getSource(REPOSITORY_PARAMETERS);
 
             SubProgressMonitor ldapMonitor = new SubProgressMonitor(monitor, 1);
             ldapFederation = new LDAPFederation(this);
@@ -259,93 +253,55 @@ public class Federation {
         }
     }
 
-    public Partition getPartition() {
-        return partition;
+    public void loadFromFile() throws Exception {
+
+        File partitionsDir = new File(project.getWorkDir(), "partitions");
+        File file = new File(partitionsDir, PARTITION+File.separator+"DIR-INF"+File.separator+"federation.xml");
+
+        if (file.exists()) {
+            log.debug("Loading "+file);
+            FederationReader reader = new FederationReader();
+            reader.read(file, federationConfig);
+        }
     }
 
-    public void setPartition(Partition partition) {
-        this.partition = partition;
-    }
+    public void loadFromDatabase() throws Exception {
 
-    public LDAPFederation getLdapFederation() {
-        return ldapFederation;
-    }
+        Source globalParameters     = partition.getSource(GLOBAL_PARAMETERS);
+        Source repositories         = partition.getSource(REPOSITORIES);
+        Source repositoryParameters = partition.getSource(REPOSITORY_PARAMETERS);
 
-    public void setLdapFederation(LDAPFederation ldapFederation) {
-        this.ldapFederation = ldapFederation;
-    }
+        GlobalRepository globalRepository = new GlobalRepository();
+        globalRepository.setName("GLOBAL");
+        globalRepository.setType("GLOBAL");
 
-    public NISFederation getNisFederation() {
-        return nisFederation;
-    }
+        Map<String,String> parameters = new TreeMap<String,String>();
 
-    public void setNisFederation(NISFederation nisFederation) {
-        this.nisFederation = nisFederation;
-    }
-
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-    }
-
-    public Source getGlobalParameters() {
-        return globalParameters;
-    }
-
-    public void setGlobalParameters(Source globalParameters) {
-        this.globalParameters = globalParameters;
-    }
-
-    public Source getRepositories() {
-        return repositories;
-    }
-
-    public void setRepositories(Source repositories) {
-        this.repositories = repositories;
-    }
-
-    public Source getRepositoryParameters() {
-        return repositoryParameters;
-    }
-
-    public void setRepositoryParameters(Source repositoryParameters) {
-        this.repositoryParameters = repositoryParameters;
-    }
-
-    public Collection<String> getRepositoryNames(String type) throws Exception {
-
-        Collection<String> list = new ArrayList<String>();
-
+        // load global repository
         SearchRequest request = new SearchRequest();
-        request.setFilter("(type="+type+")");
-
         SearchResponse response = new SearchResponse();
 
-        repositories.search(request, response);
+        globalParameters.search(request, response);
 
         while (response.hasNext()) {
             SearchResult result = response.next();
 
-            RDN rdn = result.getDn().getRdn();
-            String name = (String)rdn.get("name");
+            Attributes attributes = result.getAttributes();
+            String paramName = (String)attributes.getValue("name");
+            String paramValue = (String)attributes.getValue("value");
 
-            list.add(name);
+            parameters.put(paramName, paramValue);
         }
 
-        return list;
-    }
+        if (parameters.isEmpty()) return;
 
-    public Collection<Repository> getRepositories(String type) throws Exception {
+        globalRepository.setParameters(parameters);
 
-        Collection<Repository> list = new ArrayList<Repository>();
+        federationConfig.addRepositoryConfig(globalRepository);
 
-        SearchRequest request = new SearchRequest();
-        request.setFilter("(type="+type+")");
-
-        SearchResponse response = new SearchResponse();
+        // load other repositories
+        request = new SearchRequest();
+        response = new SearchResponse();
 
         repositories.search(request, response);
 
@@ -354,10 +310,11 @@ public class Federation {
 
             Attributes attributes = result.getAttributes();
             String name = (String)attributes.getValue("name");
+            String type = (String)attributes.getValue("type");
 
-            Map<String,String> parameters = getRepositoryParameters(name);
+            parameters = getRepositoryParameters(repositoryParameters, name);
 
-            Repository repository;
+            RepositoryConfig repository;
 
             if ("LDAP".equals(type)) {
                 repository = new LDAPRepository();
@@ -399,13 +356,11 @@ public class Federation {
             repository.setType(type);
             repository.setParameters(parameters);
 
-            list.add(repository);
+            federationConfig.addRepositoryConfig(repository);
         }
-
-        return list;
     }
 
-    public Map<String,String> getRepositoryParameters(String name) throws Exception {
+    public Map<String,String> getRepositoryParameters(Source repositoryParameters, String name) throws Exception {
 
         Map<String,String> map = new TreeMap<String,String>();
 
@@ -429,8 +384,104 @@ public class Federation {
         return map;
     }
 
-    public void addRepository(Repository repository) throws Exception {
+    public Partition getPartition() {
+        return partition;
+    }
 
+    public void setPartition(Partition partition) {
+        this.partition = partition;
+    }
+
+    public LDAPFederation getLdapFederation() {
+        return ldapFederation;
+    }
+
+    public void setLdapFederation(LDAPFederation ldapFederation) {
+        this.ldapFederation = ldapFederation;
+    }
+
+    public NISFederation getNisFederation() {
+        return nisFederation;
+    }
+
+    public void setNisFederation(NISFederation nisFederation) {
+        this.nisFederation = nisFederation;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+/*
+    public Source getGlobalParameters() {
+        return globalParameters;
+    }
+
+    public void setGlobalParameters(Source globalParameters) {
+        this.globalParameters = globalParameters;
+    }
+
+    public Source getRepositories() {
+        return repositories;
+    }
+
+    public void setRepositories(Source repositories) {
+        this.repositories = repositories;
+    }
+
+    public Source getRepositoryParameters() {
+        return repositoryParameters;
+    }
+
+    public void setRepositoryParameters(Source repositoryParameters) {
+        this.repositoryParameters = repositoryParameters;
+    }
+*/
+/*
+    public Collection<String> getRepositoryNames(String type) throws Exception {
+
+        Collection<String> list = new ArrayList<String>();
+
+        SearchRequest request = new SearchRequest();
+        request.setFilter("(type="+type+")");
+
+        SearchResponse response = new SearchResponse();
+
+        repositories.search(request, response);
+
+        while (response.hasNext()) {
+            SearchResult result = response.next();
+
+            RDN rdn = result.getDn().getRdn();
+            String name = (String)rdn.get("name");
+
+            list.add(name);
+        }
+
+        return list;
+    }
+*/
+    public Collection<RepositoryConfig> getRepositories(String type) throws Exception {
+
+        Collection<RepositoryConfig> list = new ArrayList<RepositoryConfig>();
+
+        for (RepositoryConfig repository : federationConfig.getRepositoryConfigs()) {
+            if (type.equals(repository.getType())) {
+                list.add(repository);
+            }
+        }
+    
+        return list;
+    }
+
+    public void addRepository(RepositoryConfig repository) throws Exception {
+
+        federationConfig.addRepositoryConfig(repository);
+        save();
+/*
         RDNBuilder rb = new RDNBuilder();
         rb.set("name", repository.getName());
         DN dn = new DN(rb.toRdn());
@@ -458,10 +509,14 @@ public class Federation {
 
             repositoryParameters.add(dn, attributes);
         }
+*/
     }
 
     public void removeRepository(String name) throws Exception {
 
+        federationConfig.removeRepositoryConfig(name);
+        save();
+/*
         RDNBuilder rb = new RDNBuilder();
         rb.set("repository", name);
         DN dn = new DN(rb.toRdn());
@@ -473,38 +528,18 @@ public class Federation {
         dn = new DN(rb.toRdn());
 
         repositories.delete(dn);
+*/
     }
 
     public GlobalRepository getGlobalRepository() throws Exception {
-
-        GlobalRepository repository = new GlobalRepository();
-
-        Map<String,String> parameters = new TreeMap<String,String>();
-
-        SearchRequest request = new SearchRequest();
-        SearchResponse response = new SearchResponse();
-
-        globalParameters.search(request, response);
-
-        while (response.hasNext()) {
-            SearchResult result = response.next();
-
-            Attributes attributes = result.getAttributes();
-            String paramName = (String)attributes.getValue("name");
-            String paramValue = (String)attributes.getValue("value");
-
-            parameters.put(paramName, paramValue);
-        }
-
-        if (parameters.isEmpty()) return null;
-        
-        repository.setParameters(parameters);
-
-        return repository;
+        return (GlobalRepository)federationConfig.getRepositoryConfig("GLOBAL");
     }
 
     public void setGlobalRepository(GlobalRepository repository) throws Exception {
 
+        federationConfig.addRepositoryConfig(repository);
+        save();
+/*
         Map<String,String> parameters = repository.getParameters();
 
         globalParameters.delete(new DN());
@@ -522,6 +557,7 @@ public class Federation {
 
             globalParameters.add(dn, attributes);
         }
+*/
     }
 
     public PartitionConfig getPartitionConfig(String name) throws Exception {
@@ -540,7 +576,7 @@ public class Federation {
         return partitionConfig;
     }
 
-    public void removePartition(Repository repository) throws Exception {
+    public void removePartition(RepositoryConfig repository) throws Exception {
 
         String name = repository.getName();
         log.debug("Removing partition config "+name+".");
@@ -553,5 +589,25 @@ public class Federation {
     public Partitions getPartitions() {
         PenroseContext penroseContext = project.getPenroseContext();
         return penroseContext.getPartitions();
+    }
+
+    public void save() throws Exception {
+
+        File partitionsDir = new File(project.getWorkDir(), "partitions");
+        File file = new File(partitionsDir, PARTITION+File.separator+"DIR-INF"+File.separator+"federation.xml");
+
+        log.debug("Storing "+file);
+        FederationWriter writer = new FederationWriter();
+        writer.write(file, federationConfig);
+
+        project.upload("partitions/"+PARTITION+"/DIR-INF/federation.xml");
+    }
+
+    public FederationConfig getFederationConfig() {
+        return federationConfig;
+    }
+
+    public void setFederationConfig(FederationConfig federationConfig) {
+        this.federationConfig = federationConfig;
     }
 }

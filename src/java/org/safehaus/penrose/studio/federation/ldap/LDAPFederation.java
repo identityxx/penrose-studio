@@ -7,7 +7,7 @@ import org.apache.tools.ant.types.FilterChain;
 import org.apache.tools.ant.filters.ExpandProperties;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.Federation;
-import org.safehaus.penrose.studio.federation.Repository;
+import org.safehaus.penrose.studio.federation.RepositoryConfig;
 import org.safehaus.penrose.studio.federation.GlobalRepository;
 import org.safehaus.penrose.studio.federation.event.FederationEventListener;
 import org.safehaus.penrose.studio.federation.event.FederationEvent;
@@ -52,11 +52,11 @@ public class LDAPFederation {
     public void load(IProgressMonitor monitor) throws Exception {
         log.debug("Starting LDAP Federation tool.");
 
-        Collection<Repository> list = federation.getRepositories("LDAP");
+        Collection<RepositoryConfig> list = federation.getRepositories("LDAP");
 
         monitor.beginTask("Loading LDAP repositories...", list.size() == 1 ? IProgressMonitor.UNKNOWN : list.size());
 
-        for (Repository rep : list) {
+        for (RepositoryConfig rep : list) {
 
             if (monitor.isCanceled()) throw new InterruptedException();
 

@@ -208,11 +208,16 @@ public class LinkingResultsPage extends WizardPage {
     }
 
     public void setVisible(boolean b) {
-        super.setVisible(b);
-        if (b) refresh();
+        try {
+            super.setVisible(b);
+            if (b) refresh();
+            
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
-    public void refresh() {
+    public void refresh() throws Exception {
         resultsTable.removeAll();
 
         if (results != null) {

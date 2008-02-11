@@ -7,7 +7,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.safehaus.penrose.studio.federation.Repository;
+import org.safehaus.penrose.studio.federation.RepositoryConfig;
 import org.safehaus.penrose.studio.project.Project;
 
 public class LinkingEditor extends FormEditor {
@@ -15,7 +15,7 @@ public class LinkingEditor extends FormEditor {
     public Logger log = LoggerFactory.getLogger(getClass());
 
     private Project project;
-    private Repository repository;
+    private RepositoryConfig repository;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         LinkingEditorInput ei = (LinkingEditorInput)input;
@@ -50,11 +50,11 @@ public class LinkingEditor extends FormEditor {
         return false;
     }
 
-    public Repository getRepository() {
+    public RepositoryConfig getRepository() {
         return repository;
     }
 
-    public void setRepository(Repository repository) {
+    public void setRepository(RepositoryConfig repository) {
         this.repository = repository;
     }
 

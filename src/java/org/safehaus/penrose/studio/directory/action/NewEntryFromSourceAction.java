@@ -103,21 +103,22 @@ public class NewEntryFromSourceAction extends Action {
                 Filter filter = parser.parse();
 
                 FilterProcessor fp = new FilterProcessor() {
-                    public void process(Stack<Filter> path, Filter filter) throws Exception {
+                    public Filter process(Stack<Filter> path, Filter filter) throws Exception {
                         if (!(filter instanceof SimpleFilter)) {
-                            super.process(path, filter);
-                            return;
+                            return super.process(path, filter);
                         }
 
                         SimpleFilter sf = (SimpleFilter)filter;
 
                         String attribute = sf.getAttribute();
-                        if (!attribute.equalsIgnoreCase("objectClass")) return;
+                        if (!attribute.equalsIgnoreCase("objectClass")) return filter;
 
                         Object value = sf.getValue();
-                        if (value.equals("*")) return;
+                        if (value.equals("*")) return filter;
 
                         entry.addObjectClass(value.toString());
+                        
+                        return filter;
                     }
                 };
                 

@@ -4,7 +4,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.federation.Repository;
+import org.safehaus.penrose.studio.federation.RepositoryConfig;
 
 /**
  * @author Endi S. Dewata
@@ -12,7 +12,7 @@ import org.safehaus.penrose.studio.federation.Repository;
 public class LinkingEditorInput implements IEditorInput {
 
     private Project project;
-    private Repository repository;
+    private RepositoryConfig repository;
 
     public LinkingEditorInput() {
     }
@@ -72,11 +72,11 @@ public class LinkingEditorInput implements IEditorInput {
         this.project = project;
     }
 
-    public Repository getRepository() {
+    public RepositoryConfig getRepository() {
         return repository;
     }
 
-    public void setRepository(Repository repository) {
+    public void setRepository(RepositoryConfig repository) {
         this.repository = repository;
     }
 }

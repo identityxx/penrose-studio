@@ -1,13 +1,13 @@
 package org.safehaus.penrose.studio.federation.ldap;
 
-import org.safehaus.penrose.studio.federation.Repository;
+import org.safehaus.penrose.studio.federation.RepositoryConfig;
 
 import java.util.Map;
 
 /**
  * @author Endi Sukma Dewata
  */
-public class LDAPRepository extends Repository {
+public class LDAPRepository extends RepositoryConfig {
 
     protected String protocol;
     protected String server;
@@ -15,6 +15,10 @@ public class LDAPRepository extends Repository {
 
     public LDAPRepository() {
         setType("LDAP");
+    }
+
+    public LDAPRepository(RepositoryConfig repository) {
+        super(repository);
     }
 
     public String getUrl() {

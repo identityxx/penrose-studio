@@ -22,7 +22,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.wizard.BrowserWizard;
-import org.safehaus.penrose.studio.federation.Repository;
+import org.safehaus.penrose.studio.federation.RepositoryConfig;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.ldap.*;
@@ -65,7 +65,7 @@ public class LinkingPage extends FormPage {
     LinkingEditor editor;
 
     Project project;
-    Repository repository;
+    RepositoryConfig repository;
 
     PartitionClient localPartitionClient;
     PartitionClient globalPartitionClient;
@@ -810,7 +810,7 @@ public class LinkingPage extends FormPage {
 
     public Collection<DN> searchLinks(SearchResult localEntry) {
         try {
-            Repository repository = editor.getRepository();
+            RepositoryConfig repository = editor.getRepository();
             String localAttribute = repository.getParameter("localAttribute");
             String globalAttribute = repository.getParameter("globalAttribute");
 
@@ -906,7 +906,7 @@ public class LinkingPage extends FormPage {
 
         SearchResult globalEntry = globalPartitionClient.find(dn);
 
-        Repository repository = editor.getRepository();
+        RepositoryConfig repository = editor.getRepository();
         String localAttribute = repository.getParameter("localAttribute");
         String globalAttribute = repository.getParameter("globalAttribute");
 
@@ -936,7 +936,7 @@ public class LinkingPage extends FormPage {
 
     public void removeLink(DN globalDn, SearchResult localEntry) throws Exception {
 
-        Repository repository = editor.getRepository();
+        RepositoryConfig repository = editor.getRepository();
         String localAttribute = repository.getParameter("localAttribute");
         String globalAttribute = repository.getParameter("globalAttribute");
 
@@ -1279,7 +1279,7 @@ public class LinkingPage extends FormPage {
 
     public SearchResult createEntry(SearchResult localEntry) throws Exception {
 
-        Repository repository = editor.getRepository();
+        RepositoryConfig repository = editor.getRepository();
         String localAttribute = repository.getParameter("localAttribute");
         String globalAttribute = repository.getParameter("globalAttribute");
 

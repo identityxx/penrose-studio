@@ -1,23 +1,28 @@
 package org.safehaus.penrose.studio.federation.editor;
 
+import org.apache.log4j.Logger;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.*;
+import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.GridData;
-import org.apache.log4j.Logger;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.studio.federation.Federation;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.PartitionClient;
-import org.safehaus.penrose.management.ConnectionClient;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
+import org.safehaus.penrose.studio.federation.*;
+import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
+import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
+import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.studio.project.Project;
+
+import java.io.File;
 
 /**
  * @author Endi S. Dewata
@@ -68,6 +73,7 @@ public class FederationDatabasePage extends FormPage {
 
         Project project = federation.getProject();
         PenroseClient client = project.getClient();
+/*
         PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
         ConnectionClient connectionClient = partitionClient.getConnectionClient(Federation.JDBC);
         ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
@@ -104,7 +110,95 @@ public class FederationDatabasePage extends FormPage {
 
         Label suffixText = toolkit.createLabel(composite, "*****");
         suffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+*/
+/*
+        Button importButton = toolkit.createButton(composite, "Import", SWT.PUSH);
+        importButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                try {
+                    importFederationConfig();
+                } catch (Exception e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+        });
 
+        Button exportButton = toolkit.createButton(composite, "Export", SWT.PUSH);
+        exportButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                try {
+                    exportFederationConfig();
+                } catch (Exception e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+        });
+*/
         return composite;
     }
+/*
+    public void importFederationConfig() throws Exception {
+
+        FileDialog dialog = new FileDialog(getSite().getShell(), SWT.OPEN);
+        dialog.setText("Import");
+        dialog.setFilterExtensions(new String[] { "*.xml" });
+
+        String filename = dialog.open();
+        if (filename == null) return;
+
+        File file = new File(filename);
+
+        FederationReader reader = new FederationReader();
+        FederationConfig federationConfig = reader.read(file);
+
+        for (RepositoryConfig repository : federationConfig.getRepositoryConfigs()) {
+            federation.addRepository(repository);
+        }
+    }
+
+    public void exportFederationConfig() throws Exception {
+
+        FileDialog dialog = new FileDialog(getSite().getShell(), SWT.SAVE);
+        dialog.setText("Export");
+        dialog.setFilterExtensions(new String[] { "*.xml" });
+
+        String filename = dialog.open();
+        if (filename == null) return;
+
+        FederationConfig federationConfig =  new FederationConfig();
+
+        RepositoryConfig globalRepository = federation.getGlobalRepository();
+        globalRepository.setName("GLOBAL");
+        globalRepository.setType("GLOBAL");
+        
+        federationConfig.addRepositoryConfig(globalRepository);
+
+        LDAPFederation ldapFederation = federation.getLdapFederation();
+        for (LDAPRepository repository : ldapFederation.getRepositories()) {
+            federationConfig.addRepositoryConfig(repository);
+        }
+
+        NISFederation nisFederation = federation.getNisFederation();
+        for (NISDomain repository : nisFederation.getRepositories()) {
+            federationConfig.addRepositoryConfig(repository);
+        }
+
+        File file = new File(filename);
+
+        if (file.exists()) {
+
+            boolean confirm = MessageDialog.openConfirm(
+                    getSite().getShell(),
+                    "Confirm Export",
+                    file.getName()+" already exists.\n"+
+                    "Do you want to replace it?"
+            );
+
+            if (!confirm) return;
+        }
+
+        FederationWriter writer = new FederationWriter();
+        writer.write(file, federationConfig);
+    }
+*/
 }

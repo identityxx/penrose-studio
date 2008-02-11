@@ -73,16 +73,21 @@ public class StaticEntryWizard extends Wizard {
     }
 
     public IWizardPage getNextPage(IWizardPage page) {
-        if (rdnPage == page) {
-            RDN rdn = new RDN(rdnPage.getRdn());
-            attrPage.setRdn(rdn);
+            try {
+            if (rdnPage == page) {
+                RDN rdn = new RDN(rdnPage.getRdn());
+                attrPage.setRdn(rdn);
 
-        } else if (ocPage == page) {
-            Collection objectClasses = ocPage.getSelectedObjectClasses();
-            attrPage.setObjectClasses(objectClasses);
+            } else if (ocPage == page) {
+                Collection objectClasses = ocPage.getSelectedObjectClasses();
+                attrPage.setObjectClasses(objectClasses);
+            }
+
+            return super.getNextPage(page);
+                
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
-
-        return super.getNextPage(page);
     }
 
     public boolean performFinish() {

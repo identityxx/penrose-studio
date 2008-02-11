@@ -5,13 +5,17 @@ import java.util.Map;
 /**
  * @author Endi Sukma Dewata
  */
-public class GlobalRepository extends Repository {
+public class GlobalRepository extends RepositoryConfig {
 
     protected String protocol;
     protected String server;
     protected int port;
 
     public GlobalRepository() {
+    }
+
+    public GlobalRepository(RepositoryConfig repository) {
+        super(repository);
     }
 
     public String getUrl() {

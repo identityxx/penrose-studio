@@ -8,8 +8,11 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.*;
 import org.eclipse.ui.progress.IProgressService;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.SWT;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.safehaus.penrose.connection.ConnectionConfig;
@@ -23,7 +26,11 @@ import org.safehaus.penrose.studio.federation.editor.FederationEditor;
 import org.safehaus.penrose.studio.federation.editor.FederationEditorInput;
 import org.safehaus.penrose.studio.federation.global.GlobalNode;
 import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
+import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
+import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
+import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.wizard.FederationWizard;
 import org.safehaus.penrose.studio.plugin.PluginNode;
 import org.safehaus.penrose.studio.plugin.PluginsNode;
@@ -37,6 +44,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.io.File;
 
 /**
  * @author Endi Sukma Dewata
@@ -65,6 +73,28 @@ public class FederationNode extends PluginNode {
             public void run() {
                 try {
                     open();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(new Action("Import") {
+            public void run() {
+                try {
+                    importFederationConfig();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Action("Export") {
+            public void run() {
+                try {
+                    exportFederationConfig();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
@@ -163,7 +193,7 @@ public class FederationNode extends PluginNode {
                     federation.load(monitor);
 
                 } catch (Exception e) {
-                    throw new InvocationTargetException(e);
+                    throw new InvocationTargetException(e, e.getMessage());
                 }
             }
         });
@@ -189,6 +219,7 @@ public class FederationNode extends PluginNode {
     public boolean createPartition() throws Exception {
 
         log.debug("Creating Federation partition");
+        importFederationConfig();
 
         FederationWizard wizard = new FederationWizard();
         wizard.init(project);
@@ -245,5 +276,71 @@ public class FederationNode extends PluginNode {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public void importFederationConfig() throws Exception {
+
+        FileDialog dialog = new FileDialog(getView().getSite().getShell(), SWT.OPEN);
+        dialog.setText("Import");
+        dialog.setFilterExtensions(new String[] { "*.xml" });
+
+        String filename = dialog.open();
+        if (filename == null) return;
+
+        File file = new File(filename);
+
+        FederationReader reader = new FederationReader();
+        FederationConfig federationConfig = reader.read(file);
+
+        for (RepositoryConfig repository : federationConfig.getRepositoryConfigs()) {
+            federation.addRepository(repository);
+        }
+    }
+
+    public void exportFederationConfig() throws Exception {
+
+        FileDialog dialog = new FileDialog(getView().getSite().getShell(), SWT.SAVE);
+        dialog.setText("Export");
+        dialog.setFilterExtensions(new String[] { "*.xml" });
+
+        String filename = dialog.open();
+        if (filename == null) return;
+
+        FederationConfig federationConfig = federation.getFederationConfig();
+/*
+        FederationConfig federationConfig = new FederationConfig();
+
+        RepositoryConfig globalRepository = federation.getGlobalRepository();
+        globalRepository.setName("GLOBAL");
+        globalRepository.setType("GLOBAL");
+
+        federationConfig.addRepositoryConfig(globalRepository);
+
+        LDAPFederation ldapFederation = federation.getLdapFederation();
+        for (LDAPRepository repository : ldapFederation.getRepositories()) {
+            federationConfig.addRepositoryConfig(repository);
+        }
+
+        NISFederation nisFederation = federation.getNisFederation();
+        for (NISDomain repository : nisFederation.getRepositories()) {
+            federationConfig.addRepositoryConfig(repository);
+        }
+*/
+        File file = new File(filename);
+
+        if (file.exists()) {
+
+            boolean confirm = MessageDialog.openConfirm(
+                    getView().getSite().getShell(),
+                    "Confirm Export",
+                    file.getName()+" already exists.\n"+
+                    "Do you want to replace it?"
+            );
+
+            if (!confirm) return;
+        }
+
+        FederationWriter writer = new FederationWriter();
+        writer.write(file, federationConfig);
     }
 }
