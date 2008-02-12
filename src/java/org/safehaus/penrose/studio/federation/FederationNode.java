@@ -4,47 +4,32 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.window.Window;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.*;
 import org.eclipse.ui.progress.IProgressService;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.SWT;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.connection.ConnectionContext;
-import org.safehaus.penrose.jdbc.JDBCClient;
-import org.safehaus.penrose.jdbc.connection.JDBCConnection;
-import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.federation.editor.FederationEditor;
-import org.safehaus.penrose.studio.federation.editor.FederationEditorInput;
 import org.safehaus.penrose.studio.federation.global.GlobalNode;
 import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
-import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
-import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
-import org.safehaus.penrose.studio.federation.wizard.FederationWizard;
 import org.safehaus.penrose.studio.plugin.PluginNode;
 import org.safehaus.penrose.studio.plugin.PluginsNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.util.Helper;
+import org.safehaus.penrose.studio.util.FileUtil;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
-import java.io.File;
 
 /**
  * @author Endi Sukma Dewata
@@ -116,7 +101,7 @@ public class FederationNode extends PluginNode {
 
     public void open() throws Exception {
         if (!started) start();
-
+/*
         FederationEditorInput ei = new FederationEditorInput();
         ei.setProject(project);
         ei.setFederation(federation);
@@ -124,7 +109,7 @@ public class FederationNode extends PluginNode {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
         page.openEditor(ei, FederationEditor.class.getName());
-
+*/
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
@@ -178,13 +163,6 @@ public class FederationNode extends PluginNode {
 
         federation = new Federation(project);
 
-        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-
-        if (partitionConfigs.getPartitionConfig(Federation.PARTITION) == null) {
-            boolean b = createPartition();
-            if (!b) return;
-        }
-
         IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
         progressService.busyCursorWhile(new IRunnableWithProgress() {
@@ -216,10 +194,8 @@ public class FederationNode extends PluginNode {
         started = true;
     }
 
+/*
     public boolean createPartition() throws Exception {
-
-        log.debug("Creating Federation partition");
-        importFederationConfig();
 
         FederationWizard wizard = new FederationWizard();
         wizard.init(project);
@@ -249,10 +225,9 @@ public class FederationNode extends PluginNode {
         JDBCConnection connection = new JDBCConnection();
         connection.init(connectionConfig, connectionContext);
 
-        federation.create(allParameters, connection);
-
         return true;
     }
+*/
 
     public boolean hasChildren() throws Exception {
         return true;
@@ -289,12 +264,32 @@ public class FederationNode extends PluginNode {
 
         File file = new File(filename);
 
+        File file2 = new File(project.getWorkDir(), "conf"+File.separator+"federation.xml");
+
+        FileUtil.copy(file, file2);
+/*
         FederationReader reader = new FederationReader();
         FederationConfig federationConfig = reader.read(file);
 
         for (RepositoryConfig repository : federationConfig.getRepositoryConfigs()) {
             federation.addRepository(repository);
         }
+*/
+        IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+        progressService.busyCursorWhile(new IRunnableWithProgress() {
+            public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                try {
+                    federation.load(monitor);
+
+                } catch (Exception e) {
+                    throw new InvocationTargetException(e, e.getMessage());
+                }
+            }
+        });
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public void exportFederationConfig() throws Exception {

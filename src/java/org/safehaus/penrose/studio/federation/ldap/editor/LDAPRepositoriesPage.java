@@ -28,7 +28,6 @@ import org.safehaus.penrose.studio.federation.ldap.wizard.LDAPRepositoryEditorWi
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.management.PenroseClient;
 
 import javax.naming.Context;
 import java.util.Map;
@@ -198,20 +197,7 @@ public class LDAPRepositoriesPage extends FormPage {
                     repository.setPassword(parameters.get(Context.SECURITY_CREDENTIALS));
                     repository.setSuffix(wizard.getSuffix());
 
-                    PenroseClient penroseClient = project.getClient();
-
-                    penroseClient.stopPartition(repository.getName());
-                    ldapFederation.removePartition(repository);
-
-                    ldapFederation.removePartitionConfig(repository.getName());
-                    project.removeDirectory("partitions/"+repository.getName());
-
                     ldapFederation.updateRepository(repository);
-
-                    ldapFederation.createPartitionConfig(repository);
-                    project.upload("partitions/"+repository.getName());
-
-                    penroseClient.startPartition(repository.getName());
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
@@ -242,21 +228,13 @@ public class LDAPRepositoriesPage extends FormPage {
 
                     if (!confirm) return;
 
-                    Project project = ldapFederation.getProject();
-                    PenroseClient penroseClient = project.getClient();
-
                     int index = table.getSelectionIndex();
 
                     TableItem[] items = table.getSelection();
                     for (TableItem ti : items) {
                         LDAPRepository repository = (LDAPRepository)ti.getData();
 
-                        penroseClient.stopPartition(repository.getName());
-                        ldapFederation.removePartition(repository);
-
-                        ldapFederation.removePartitionConfig(repository.getName());
-                        project.removeDirectory("partitions/"+repository.getName());
-
+                        ldapFederation.removePartitions(repository);
                         ldapFederation.removeRepository(repository.getName());
                     }
 

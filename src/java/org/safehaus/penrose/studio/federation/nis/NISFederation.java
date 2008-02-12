@@ -2,10 +2,7 @@ package org.safehaus.penrose.studio.federation.nis;
 
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.source.*;
-import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.federation.event.FederationEventListener;
-import org.safehaus.penrose.studio.federation.event.FederationEvent;
 import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.federation.RepositoryConfig;
 import org.safehaus.penrose.studio.federation.GlobalRepository;
@@ -62,13 +59,9 @@ public class NISFederation {
     protected Source users;
     protected Source groups;
 */
-    protected Map<String, NISDomain> repositories = new TreeMap<String, NISDomain>();
-
-    protected Collection<FederationEventListener> listeners = new ArrayList<FederationEventListener>();
-
     public NISFederation(Federation federation) throws Exception {
         this.federation = federation;
-        this.partition = federation.getPartition();
+        //this.partition = federation.getPartition();
         this.project = federation.getProject();
     }
 
@@ -94,8 +87,6 @@ public class NISFederation {
             NISDomain domain = (NISDomain)rep;
             String name = domain.getName();
 
-            repositories.put(name, domain);
-
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Creating NIS Partition
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,7 +97,7 @@ public class NISFederation {
 
                 monitor.subTask("Creating "+name+"...");
 
-                nisPartitionConfig = createNisPartitionConfig(domain);
+                nisPartitionConfig = createNisPartition(domain);
             }
 
             monitor.subTask("Loading "+nisPartitionConfig.getName()+"...");
@@ -122,7 +113,7 @@ public class NISFederation {
 
                 monitor.subTask("Creating "+name+"_"+NISFederation.YP+"...");
 
-                ypPartitionConfig = createYpPartitionConfig(domain);
+                ypPartitionConfig = createYpPartition(domain);
             }
 
             monitor.subTask("Loading "+ypPartitionConfig.getName()+"...");
@@ -134,7 +125,7 @@ public class NISFederation {
             PartitionConfig dbPartitionConfig = project.getPartitionConfigs().getPartitionConfig(name+"_"+NISFederation.DB);
 
             if (dbPartitionConfig == null) { // create missing partition config during start
-                dbPartitionConfig = createDbPartitionConfig(domain);
+                dbPartitionConfig = createDbPartition(domain);
                 project.upload("partitions/"+dbPartitionConfig.getName());
                 penroseClient.startPartition(dbPartitionConfig.getName());
             }
@@ -153,7 +144,7 @@ public class NISFederation {
 
                 monitor.subTask("Creating "+name+"_"+NISFederation.NSS+"...");
 
-                nssPartitionConfig = createNssPartitionConfig(domain);
+                nssPartitionConfig = createNssPartition(domain);
             }
 
             monitor.subTask("Loading "+nssPartitionConfig.getName()+"...");
@@ -162,19 +153,30 @@ public class NISFederation {
         }
     }
 
-    public PartitionConfig createNisPartitionConfig(NISDomain domain) throws Exception {
+    public void createPartitions(NISDomain domain) throws Exception {
+        createNisPartition(domain);
+        createYpPartition(domain);
+        createNssPartition(domain);
+    }
+
+    public void removePartitions(NISDomain domain) throws Exception {
+        removeNisPartition(domain);
+        removeYpPartition(domain);
+        removeNssPartition(domain);
+    }
+
+    public PartitionConfig createNisPartition(NISDomain domain) throws Exception {
 
         String name = domain.getName();
-        String partitionName = name;
 
-        log.debug("Creating partition "+partitionName+".");
+        log.debug("Creating partition "+name+".");
 
         File workDir = project.getWorkDir();
 
         File sampleDir = new File(workDir, "samples/"+ NIS_TEMPLATE);
         if (!sampleDir.exists()) project.download("samples/"+ NIS_TEMPLATE);
 
-        File partitionDir = new File(workDir, "partitions"+File.separator+ partitionName);
+        File partitionDir = new File(workDir, "partitions"+File.separator+ name);
 
         String nisDomain  = domain.getFullName();
         String ldapSuffix = domain.getSuffix();
@@ -225,7 +227,15 @@ public class NISFederation {
         return partitionConfig;
     }
 
-    public PartitionConfig createYpPartitionConfig(NISDomain domain) throws Exception {
+    public void removeNisPartition(NISDomain domain) throws Exception {
+
+        PartitionConfig nisPartitionConfig = getPartitionConfig(domain.getName());
+        if (nisPartitionConfig == null) return;
+
+        removePartition(domain.getName());
+    }
+
+    public PartitionConfig createYpPartition(NISDomain domain) throws Exception {
 
         String name = domain.getName();
         String partitionName = name+"_"+NISFederation.YP;
@@ -283,7 +293,15 @@ public class NISFederation {
         return partitionConfig;
     }
 
-    public PartitionConfig createDbPartitionConfig(NISDomain domain) throws Exception {
+    public void removeYpPartition(NISDomain domain) throws Exception {
+        
+        PartitionConfig ypPartitionConfig = getPartitionConfig(domain.getName()+"_"+NISFederation.YP);
+        if (ypPartitionConfig == null) return;
+
+        removePartition(domain.getName()+"_"+NISFederation.YP);
+    }
+
+    public PartitionConfig createDbPartition(NISDomain domain) throws Exception {
 
         String name = domain.getName();
         String partitionName = name+"_"+NISFederation.DB;
@@ -350,7 +368,7 @@ public class NISFederation {
         return partitionConfig;
     }
 
-    public PartitionConfig createNssPartitionConfig(NISDomain domain) throws Exception {
+    public PartitionConfig createNssPartition(NISDomain domain) throws Exception {
 
         String name = domain.getName();
         String partitionName = name+"_"+NISFederation.NSS;
@@ -433,59 +451,41 @@ public class NISFederation {
         return partitionConfig;
     }
 
-    public void addRepository(NISDomain repository) throws Exception {
-
-        federation.addRepository(repository);
-        repositories.put(repository.getName(), repository);
-
-        FederationEvent event = new FederationEvent();
-        event.setRepository(repository);
+    public void removeNssPartition(NISDomain domain) throws Exception {
         
-        for (FederationEventListener listener : listeners) {
-            listener.repositoryAdded(event);
-        }
+        PartitionConfig nssPartitionConfig = getPartitionConfig(domain.getName()+"_"+NISFederation.NSS);
+        if (nssPartitionConfig == null) return;
+
+        removePartition(domain.getName()+"_"+NISFederation.NSS);
+    }
+
+    public void addRepository(NISDomain repository) throws Exception {
+        federation.addRepository(repository);
+        federation.update();
     }
 
     public void updateRepository(NISDomain repository) throws Exception {
 
+        removePartitions(repository);
+
         federation.removeRepository(repository.getName());
         federation.addRepository(repository);
+        federation.update();
 
-        FederationEvent event = new FederationEvent();
-        event.setRepository(repository);
-
-        for (FederationEventListener listener : listeners) {
-            listener.repositoryModified(event);
-        }
+        createPartitions(repository);
     }
 
     public void removeRepository(String name) throws Exception {
-
-        NISDomain repository = repositories.remove(name);
-
-        File dir = new File(project.getWorkDir(), "partitions"+File.separator+ repository.getName());
-        FileUtil.delete(dir);
-
-        federation.removeRepository(repository.getName());
-
-        FederationEvent event = new FederationEvent();
-        event.setRepository(repository);
-
-        for (FederationEventListener listener : listeners) {
-            listener.repositoryRemoved(event);
-        }
+        federation.removeRepository(name);
+        federation.update();
     }
 
     public PartitionConfig getPartitionConfig(String name) throws Exception {
         return federation.getPartitionConfig(name);
     }
 
-    public PartitionConfig removePartitionConfig(String name) throws Exception {
-        return federation.removePartitionConfig(name);
-    }
-
-    public void removePartition(NISDomain repository) throws Exception {
-        federation.removePartition(repository);
+    public PartitionConfig removePartition(String name) throws Exception {
+        return federation.removePartition(name);
     }
 /*
     public Source getActions() {
@@ -537,23 +537,23 @@ public class NISFederation {
     }
 */
     public NISDomain getRepository(String name) {
-        return repositories.get(name);
+        return (NISDomain)federation.getFederationConfig().getRepositoryConfig(name);
     }
     
     public Collection<String> getRepositoryNames() {
-        return repositories.keySet();
+        return federation.getFederationConfig().getRepositoryNames();
     }
     
     public Collection<NISDomain> getRepositories() {
-        return repositories.values();
-    }
-
-    public void setRepositories(Map<String, NISDomain> repositories) {
-        this.repositories = repositories;
+        Collection<NISDomain> list = new ArrayList<NISDomain>();
+        for (RepositoryConfig repository : federation.getRepositories("NIS")) {
+            list.add((NISDomain)repository);
+        }
+        return list;
     }
 
     public Partitions getPartitions() {
-        return federation.getPartitions();
+        return null; // federation.getPartitions();
     }
 
     public Partition getPartition() {
@@ -634,13 +634,5 @@ public class NISFederation {
 
     public void setProject(Project project) {
         this.project = project;
-    }
-
-    public void addListener(FederationEventListener listener) {
-        listeners.add(listener);
-    }
-
-    public void removeListener(FederationEventListener listener) {
-        listeners.remove(listener);
     }
 }

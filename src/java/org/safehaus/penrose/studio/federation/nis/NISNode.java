@@ -6,6 +6,10 @@ import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.federation.FederationNode;
+import org.safehaus.penrose.studio.federation.Federation;
+import org.safehaus.penrose.studio.federation.RepositoryConfig;
+import org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryNode;
+import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
 import org.safehaus.penrose.studio.federation.event.FederationEventAdapter;
 import org.safehaus.penrose.studio.federation.nis.editor.NISEditorInput;
 import org.safehaus.penrose.studio.federation.nis.editor.NISEditor;
@@ -25,6 +29,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
@@ -36,7 +41,7 @@ public class NISNode extends Node {
 
     NISFederation nisFederation;
 
-    Map<String,Node> children = new TreeMap<String,Node>();
+    //Map<String,Node> children = new TreeMap<String,Node>();
 
     NISLinkingNode linkingNode;
     NISConflictsNode conflictsNode;
@@ -49,31 +54,6 @@ public class NISNode extends Node {
         this.projectNode = federationNode.getProjectNode();
 
         nisFederation = federationNode.getFederation().getNisFederation();
-
-        nisFederation.addListener(new FederationEventAdapter() {
-            public void repositoryAdded(FederationEvent event) {
-                NISDomain repository = (NISDomain)event.getRepository();
-                addRepository(repository);
-
-                PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                penroseStudio.notifyChangeListeners();
-            }
-            public void repositoryRemoved(FederationEvent event) {
-                NISDomain repository = (NISDomain)event.getRepository();
-                removeRepository(repository.getName());
-
-                PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                penroseStudio.notifyChangeListeners();
-            }
-        });
-
-        refresh();
-    }
-
-    public void refresh() {
-        for (NISDomain nisDomain : nisFederation.getRepositories()) {
-            addRepository(nisDomain);
-        }
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -130,19 +110,34 @@ public class NISNode extends Node {
                 this
         );
 
-        children.put(name, node);
+        //children.put(name, node);
     }
 
     public void removeRepository(String name) {
-        children.remove(name);
+        //children.remove(name);
     }
 
     public boolean hasChildren() throws Exception {
+        Federation federation = federationNode.getFederation();
+        Collection<RepositoryConfig> children = federation.getRepositories("NIS");
         return !children.isEmpty();
     }
 
     public Collection<Node> getChildren() throws Exception {
-        return children.values();
+
+        Collection<Node> children = new ArrayList<Node>();
+
+        Federation federation = federationNode.getFederation();
+        for (RepositoryConfig repository : federation.getRepositories("NIS")) {
+            NISDomainNode node = new NISDomainNode(
+                    repository.getName(),
+                    (NISDomain)repository,
+                    this
+            );
+            children.add(node);
+        }
+
+        return children;
     }
 
     public NISFederation getNisFederation() {

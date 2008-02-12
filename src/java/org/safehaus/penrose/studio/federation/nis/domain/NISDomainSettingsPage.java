@@ -15,10 +15,10 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.federation.nis.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.studio.federation.nis.editor.NISDomainDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.studio.nis.dialog.NISUserDialog;
 
 /**
  * @author Endi S. Dewata
@@ -28,6 +28,12 @@ public class NISDomainSettingsPage extends FormPage {
     Logger log = Logger.getLogger(getClass());
 
     FormToolkit toolkit;
+
+    Label domainText;
+    Label serverText;
+    Label nisSuffixText;
+    Label ypSuffixText;
+    Label nssSuffixText;
 
     NISDomainEditor editor;
     NISFederation nisFederation;
@@ -72,15 +78,42 @@ public class NISDomainSettingsPage extends FormPage {
 
         new Label(body, SWT.NONE);
 
+        Section ypSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        ypSection.setText("YP Partition");
+        ypSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Control ypControl = createYpPanel(ypSection);
+        ypSection.setClient(ypControl);
+
+        new Label(body, SWT.NONE);
+
         Section nssSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
         nssSection.setText("NSS Partition");
         nssSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Control nssControl = createNssPanel(nssSection);
         nssSection.setClient(nssControl);
+
+        refresh();
     }
 
     public Composite createDomainsSection(Composite parent) {
+
+        Composite composite = toolkit.createComposite(parent);
+        GridLayout layout = new GridLayout(2, false);
+        layout.marginWidth = 0;
+        composite.setLayout(layout);
+
+        Composite leftPanel = createSettingsLeftPanel(composite);
+        leftPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        Composite rightPanel = createSettingsRightPanel(composite);
+        rightPanel.setLayoutData(new GridData(GridData.FILL_VERTICAL));
+
+        return composite;
+    }
+
+    public Composite createSettingsLeftPanel(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout(2, false);
@@ -93,14 +126,48 @@ public class NISDomainSettingsPage extends FormPage {
         gd.widthHint = 100;
         domainLabel.setLayoutData(gd);
 
-        Label domainText = toolkit.createLabel(composite, domain.getFullName());
+        domainText = toolkit.createLabel(composite, "");
         domainText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label serverLabel = toolkit.createLabel(composite, "Server:");
         serverLabel.setLayoutData(new GridData());
 
-        Label serverText = toolkit.createLabel(composite, domain.getServer());
+        serverText = toolkit.createLabel(composite, "");
         serverText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        return composite;
+    }
+
+    public Composite createSettingsRightPanel(Composite parent) {
+
+        Composite composite = toolkit.createComposite(parent);
+        composite.setLayout(new GridLayout());
+
+        Button editButton = toolkit.createButton(composite, "Edit", SWT.PUSH);
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.widthHint = 100;
+        editButton.setLayoutData(gd);
+
+        editButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                try {
+                    NISDomainDialog dialog = new NISDomainDialog(editor.getSite().getShell(), SWT.NONE);
+                    dialog.setDomain(domain);
+                    dialog.open();
+
+                    int action = dialog.getAction();
+                    if (action == NISUserDialog.CANCEL) return;
+
+                    nisFederation.updateRepository(domain);
+
+                    refresh();
+                    
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
+                }
+            }
+        });
 
         return composite;
     }
@@ -135,11 +202,8 @@ public class NISDomainSettingsPage extends FormPage {
         gd.widthHint = 100;
         suffixLabel.setLayoutData(gd);
 
-        String suffix = domain.getSuffix();
-        if (suffix == null) suffix = "";
-
-        Label suffixText = toolkit.createLabel(composite, suffix);
-        suffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        nisSuffixText = toolkit.createLabel(composite, "");
+        nisSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         return composite;
     }
@@ -165,7 +229,7 @@ public class NISDomainSettingsPage extends FormPage {
 
                     if (!confirm) return;
 
-                    nisFederation.createYpPartitionConfig(domain);
+                    nisFederation.createNisPartition(domain);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -188,11 +252,99 @@ public class NISDomainSettingsPage extends FormPage {
 
                     if (!confirm) return;
 
-                    PenroseClient penroseClient = project.getClient();
-                    PartitionConfig nisPartitionConfig = nisFederation.getPartitionConfig(domain.getName()+"_"+NISFederation.YP);
-                    penroseClient.stopPartition(nisPartitionConfig.getName());
-                    nisFederation.removePartitionConfig(nisPartitionConfig.getName());
-                    project.removeDirectory("partitions/"+nisPartitionConfig.getName());
+                    nisFederation.removeNisPartition(domain);
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
+                }
+            }
+        });
+
+        return composite;
+    }
+
+    public Composite createYpPanel(Composite parent) {
+
+        Composite composite = toolkit.createComposite(parent);
+        GridLayout layout = new GridLayout(2, false);
+        layout.marginWidth = 0;
+        composite.setLayout(layout);
+
+        Composite left = createYpLeftPanel(composite);
+        left.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        Composite right = createYpRightPanel(composite);
+        GridData gd = new GridData(GridData.FILL_VERTICAL);
+        gd.widthHint = 100;
+        right.setLayoutData(gd);
+
+        return composite;
+    }
+
+    public Composite createYpLeftPanel(Composite parent) {
+
+        Composite composite = toolkit.createComposite(parent);
+        GridLayout layout = new GridLayout(2, false);
+        layout.marginWidth = 0;
+        composite.setLayout(layout);
+
+        Label suffixLabel = toolkit.createLabel(composite, "Suffix:");
+        GridData gd = new GridData();
+        gd.widthHint = 100;
+        suffixLabel.setLayoutData(gd);
+
+        ypSuffixText = toolkit.createLabel(composite, "");
+        ypSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        return composite;
+    }
+
+    public Composite createYpRightPanel(Composite parent) {
+
+        Composite composite = toolkit.createComposite(parent);
+        GridLayout layout = new GridLayout();
+        layout.marginWidth = 0;
+        composite.setLayout(layout);
+
+        Button createButton = toolkit.createButton(composite, "Create", SWT.PUSH);
+        createButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        createButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    boolean confirm = MessageDialog.openQuestion(
+                            editor.getSite().getShell(),
+                            "Creating Partition",
+                            "Are you sure?"
+                    );
+
+                    if (!confirm) return;
+
+                    nisFederation.createYpPartition(domain);
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
+                }
+            }
+        });
+
+        Button removeButton = toolkit.createButton(composite, "Remove", SWT.PUSH);
+        removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        removeButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                try {
+                    boolean confirm = MessageDialog.openQuestion(
+                            editor.getSite().getShell(),
+                            "Removing Partition",
+                            "Are you sure?"
+                    );
+
+                    if (!confirm) return;
+
+                    nisFederation.removeYpPartition(domain);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -229,15 +381,12 @@ public class NISDomainSettingsPage extends FormPage {
         layout.marginWidth = 0;
         composite.setLayout(layout);
 
-        Label nssSuffixLabel = toolkit.createLabel(composite, "Suffix:");
+        Label suffixLabel = toolkit.createLabel(composite, "Suffix:");
         GridData gd = new GridData();
         gd.widthHint = 100;
-        nssSuffixLabel.setLayoutData(gd);
+        suffixLabel.setLayoutData(gd);
 
-        String nssSuffix = domain.getNssSuffix();
-        if (nssSuffix == null) nssSuffix = "";
-
-        Label nssSuffixText = toolkit.createLabel(composite, nssSuffix);
+        nssSuffixText = toolkit.createLabel(composite, "");
         nssSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         return composite;
@@ -264,7 +413,7 @@ public class NISDomainSettingsPage extends FormPage {
 
                     if (!confirm) return;
 
-                    nisFederation.createNssPartitionConfig(domain);
+                    nisFederation.createNssPartition(domain);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -287,11 +436,7 @@ public class NISDomainSettingsPage extends FormPage {
 
                     if (!confirm) return;
 
-                    PenroseClient penroseClient = project.getClient();
-                    PartitionConfig nssPartitionConfig = nisFederation.getPartitionConfig(domain.getName()+"_"+NISFederation.NSS);
-                    penroseClient.stopPartition(nssPartitionConfig.getName());
-                    nisFederation.removePartitionConfig(nssPartitionConfig.getName());
-                    project.removeDirectory("partitions/"+nssPartitionConfig.getName());
+                    nisFederation.removeNssPartition(domain);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -301,5 +446,28 @@ public class NISDomainSettingsPage extends FormPage {
         });
 
         return composite;
+    }
+
+    public void refresh() {
+        try {
+            String fullName = domain.getFullName();
+            domainText.setText(fullName == null ? "" : fullName);
+
+            String server = domain.getServer();
+            serverText.setText(server == null ? "" : server);
+
+            String nisSuffix = domain.getSuffix();
+            nisSuffixText.setText(nisSuffix == null ? "" : nisSuffix);
+
+            String ypSuffix = domain.getYpSuffix();
+            ypSuffixText.setText(ypSuffix == null ? "" : ypSuffix);
+
+            String nssSuffix = domain.getNssSuffix();
+            nssSuffixText.setText(nssSuffix == null ? "" : nssSuffix);
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
+        }
     }
 }

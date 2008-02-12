@@ -27,7 +27,8 @@ public class NISDomainDialog extends Dialog {
 
     Text domainText;
     Text serverText;
-    Text suffixText;
+    Text nisSuffixText;
+    Text ypSuffixText;
     Text nssSuffixText;
 
     int action;
@@ -75,8 +76,11 @@ public class NISDomainDialog extends Dialog {
         String server = domain.getServer();
         serverText.setText(server == null ? "" : server);
 
-        String suffix = domain.getSuffix();
-        suffixText.setText(suffix == null ? "" : suffix);
+        String nisSuffix = domain.getSuffix();
+        nisSuffixText.setText(nisSuffix == null ? "" : nisSuffix);
+
+        String ypSuffix = domain.getYpSuffix();
+        ypSuffixText.setText(ypSuffix == null ? "" : ypSuffix);
 
         String nssSuffix = domain.getNssSuffix();
         nssSuffixText.setText(nssSuffix == null ? "" : nssSuffix);
@@ -115,12 +119,19 @@ public class NISDomainDialog extends Dialog {
         serverText = new Text(composite, SWT.BORDER);
         serverText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Label suffixLabel = new Label(composite, SWT.NONE);
-        suffixLabel.setText("LDAP Suffix:");
-        suffixLabel.setLayoutData(new GridData());
+        Label nisSuffixLabel = new Label(composite, SWT.NONE);
+        nisSuffixLabel.setText("NIS Suffix:");
+        nisSuffixLabel.setLayoutData(new GridData());
 
-        suffixText = new Text(composite, SWT.BORDER);
-        suffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        nisSuffixText = new Text(composite, SWT.BORDER);
+        nisSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label ypSuffixLabel = new Label(composite, SWT.NONE);
+        ypSuffixLabel.setText("YP Suffix:");
+        ypSuffixLabel.setLayoutData(new GridData());
+
+        ypSuffixText = new Text(composite, SWT.BORDER);
+        ypSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label nssSuffixLabel = new Label(composite, SWT.NONE);
         nssSuffixLabel.setText("NSS Suffix:");
@@ -159,8 +170,11 @@ public class NISDomainDialog extends Dialog {
                 String server = serverText.getText();
                 domain.setServer("".equals(server) ? null : server);
 
-                String suffix = suffixText.getText();
-                domain.setSuffix("".equals(suffix) ? null : suffix);
+                String nisSuffix = nisSuffixText.getText();
+                domain.setSuffix("".equals(nisSuffix) ? null : nisSuffix);
+
+                String ypSuffix = ypSuffixText.getText();
+                domain.setYpSuffix("".equals(ypSuffix) ? null : ypSuffix);
 
                 String nssSuffix = nssSuffixText.getText();
                 domain.setNssSuffix("".equals(nssSuffix) ? null : nssSuffix);

@@ -206,30 +206,37 @@
 
     <target name="dist" depends="init">
         <antcall target="build-linux"/>
-        <antcall target="build-linux-gtk-x86_64"/>
         <antcall target="build-macosx"/>
         <antcall target="build-win32"/>
     </target>
 
+    <target name="build-linux">
+        <antcall target="build-linux-gtk"/>
+        <antcall target="build-linux-gtk-x86_64"/>
+    </target>
+
+    <target name="build-linux-gtk" depends="init" if="isLinux">
+        <antcall target="build-linux-rcp-gtk"/>
+    </target>
+
     <target name="build-linux-gtk-x86_64" depends="init" if="isLinux64">
-        <property name="platform" value="linux-gtk-x86_64"/>
-        <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>
-        <!-- uncompress rpc -->
-        <untar src="rcp/${rcp.prefix}-${platform}.tar.gz" dest="target" compression="gzip"/>
-        <move todir="target/${dist.name}">
-            <fileset dir="target/eclipse"/>
-        </move>
-        <move file="target/${dist.name}/eclipse" tofile="target/${dist.name}/${project.name}"/>
-        <chmod file="target/${dist.name}/${project.name}" perm="a+rx"/>
-        <antcall target="build">
-            <param name="platform" value="${platform}"/>
+        <antcall target="build-linux-rcp-gtk-x86_64"/>
+    </target>
+
+    <target name="build-linux-rcp-gtk">
+        <antcall target="build-linux-rcp">
+            <param name="platform" value="linux-gtk"/>
         </antcall>
     </target>
 
-    <target name="build-linux" depends="init" if="isLinux">
-        <property name="platform" value="linux-gtk"/>
+    <target name="build-linux-rcp-gtk-x86_64">
+        <antcall target="build-linux-rcp">
+            <param name="platform" value="linux-gtk-x86_64"/>
+        </antcall>
+    </target>
+
+    <target name="build-linux-rcp">
         <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>
-        <!-- uncompress rpc -->
         <untar src="rcp/${rcp.prefix}-${platform}.tar.gz" dest="target" compression="gzip"/>
         <move todir="target/${dist.name}">
             <fileset dir="target/eclipse"/>
@@ -303,12 +310,24 @@
             file="target/${project.name}-${product.version}.jar">
         </copy>
         <antcall target="dist-linux"/>
-        <antcall target="dist-linux-gtk-x86_64"/>
         <antcall target="dist-macosx"/>
         <antcall target="dist-win32"/>
     </target>
 
-    <target name="dist-linux" depends="build-linux" if="isLinux">
+    <target name="dist-linux">
+        <antcall target="dist-linux-gtk"/>
+        <antcall target="dist-linux-gtk-x86_64"/>
+    </target>
+
+    <target name="dist-linux-gtk" if="isLinux">
+        <antcall target="dist-linux-rpm-gtk"/>
+    </target>
+
+    <target name="dist-linux-gtk-x86_64" if="isLinux64">
+        <antcall target="dist-linux-rpm-gtk-x86_64"/>
+    </target>
+
+    <target name="dist-linux-rpm-gtk" depends="build-linux-rcp-gtk">
     	<antcall target="rpm">
             <param name="rpm.prefix" value=""/>
             <param name="rpm.home" value="/usr/src/redhat"/>
@@ -318,7 +337,7 @@
         </antcall>
    </target>
 
-    <target name="dist-linux-gtk-x86_64" depends="build-linux-gtk-x86_64" if="isLinux64">
+     <target name="dist-linux-rpm-gtk-x86_64" depends="build-linux-rcp-gtk-x86_64">
         <antcall target="rpm">
             <param name="rpm.prefix" value=""/>
             <param name="rpm.home" value="/usr/src/redhat"/>

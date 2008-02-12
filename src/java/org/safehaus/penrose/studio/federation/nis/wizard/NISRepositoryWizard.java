@@ -91,13 +91,7 @@ public class NISRepositoryWizard extends Wizard {
 
             nisFederation.addRepository(repository);
 
-            nisFederation.createNisPartitionConfig(repository);
-
-            nisFederation.createYpPartitionConfig(repository);
-/*
-            nisFederation.createDbPartitionConfig(repository);
-*/
-             nisFederation.createNssPartitionConfig(repository);
+            nisFederation.createPartitions(repository);
 
             return true;
 

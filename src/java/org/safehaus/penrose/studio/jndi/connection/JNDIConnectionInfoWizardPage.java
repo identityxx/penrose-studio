@@ -290,12 +290,12 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
                     Map<String,String> properties = new HashMap<String,String>();
                     properties.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
                     properties.put(Context.PROVIDER_URL, getProviderUrl());
-
-                    if (bindDn != null) properties.put(Context.SECURITY_PRINCIPAL, bindDn);
-                    if (bindPassword != null) properties.put(Context.SECURITY_CREDENTIALS, bindPassword);
+                    properties.put(Context.SECURITY_PRINCIPAL, getBindDN());
+                    properties.put(Context.SECURITY_CREDENTIALS, getPassword());
 
                     LDAPClient client = new LDAPClient(properties);
                     Collection<String> baseDns = client.getNamingContexts();
+                    client.close();
 
                     suffixCombo.removeAll();
                     for (String baseDn : baseDns) {
@@ -345,10 +345,10 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
                     Map<String,String> properties = new HashMap<String,String>();
                     properties.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
                     properties.put(Context.PROVIDER_URL, getProviderUrl());
-                    properties.put(Context.SECURITY_PRINCIPAL, bindDnText.getText());
-                    properties.put(Context.SECURITY_CREDENTIALS, passwordText.getText());
+                    properties.put(Context.SECURITY_PRINCIPAL, getBindDN());
+                    properties.put(Context.SECURITY_CREDENTIALS, getPassword());
 
-                    LDAPClient client = new LDAPClient(properties, false);
+                    LDAPClient client = new LDAPClient(properties);
                     client.connect();
                     client.close();
 

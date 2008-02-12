@@ -1,7 +1,6 @@
 package org.safehaus.penrose.studio.federation.ldap.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
@@ -10,8 +9,6 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionInfoWizardPage;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.partition.PartitionConfig;
 
 import javax.naming.Context;
 import java.util.Map;
@@ -69,12 +66,7 @@ public class LDAPRepositoryWizard extends Wizard {
 
             ldapFederation.addRepository(repository);
 
-            ldapFederation.createPartitionConfig(repository);
-            project.upload("partitions/"+ repository.getName());
-
-            PenroseClient penroseClient = project.getClient();
-
-            penroseClient.startPartition(repository.getName());
+            ldapFederation.createPartitions(repository);
 
             return true;
 

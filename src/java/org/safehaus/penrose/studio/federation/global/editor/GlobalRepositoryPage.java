@@ -182,6 +182,7 @@ public class GlobalRepositoryPage extends FormPage {
                     globalRepository.setSuffix(wizard.getSuffix());
 
                     federation.setGlobalRepository(globalRepository);
+                    federation.update();
                     federation.createGlobalPartition(globalRepository);
 
                     refresh();

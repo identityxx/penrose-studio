@@ -20,11 +20,9 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
-import org.safehaus.penrose.studio.federation.ldap.editor.LDAPRepositoryDialog;
 import org.safehaus.penrose.studio.federation.ldap.wizard.LDAPRepositoryEditorWizard;
 import org.safehaus.penrose.studio.project.Project;
 
@@ -49,6 +47,7 @@ public class LDAPRepositorySettingsPage extends FormPage {
     LDAPRepositoryEditor editor;
     LDAPRepository repository;
     LDAPFederation ldapFederation;
+
     Project project;
 
     public LDAPRepositorySettingsPage(LDAPRepositoryEditor editor) {
@@ -56,8 +55,9 @@ public class LDAPRepositorySettingsPage extends FormPage {
 
         this.editor = editor;
         this.ldapFederation = editor.ldapFederation;
-        this.project = ldapFederation.getProject();
         this.repository = editor.getRepository();
+
+        this.project = ldapFederation.getProject();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -175,25 +175,13 @@ public class LDAPRepositorySettingsPage extends FormPage {
                     int action = dialog.getAction();
                     if (action == LDAPRepositoryDialog.CANCEL) return;
 */
-                    repository.setUrl(parameters.get(Context.PROVIDER_URL));
-                    repository.setUser(parameters.get(Context.SECURITY_PRINCIPAL));
-                    repository.setPassword(parameters.get(Context.SECURITY_CREDENTIALS));
+                    Map<String,String> newParameters = wizard.getParameters();
+                    repository.setUrl(newParameters.get(Context.PROVIDER_URL));
+                    repository.setUser(newParameters.get(Context.SECURITY_PRINCIPAL));
+                    repository.setPassword(newParameters.get(Context.SECURITY_CREDENTIALS));
                     repository.setSuffix(wizard.getSuffix());
 
-                    PenroseClient penroseClient = project.getClient();
-
-                    penroseClient.stopPartition(repository.getName());
-                    ldapFederation.removePartition(repository);
-
-                    ldapFederation.removePartitionConfig(repository.getName());
-                    project.removeDirectory("partitions/"+repository.getName());
-
                     ldapFederation.updateRepository(repository);
-
-                    ldapFederation.createPartitionConfig(repository);
-                    project.upload("partitions/"+repository.getName());
-
-                    penroseClient.startPartition(repository.getName());
 
                     refresh();
 
@@ -264,11 +252,7 @@ public class LDAPRepositorySettingsPage extends FormPage {
 
                     if (!confirm) return;
 
-                    PenroseClient penroseClient = project.getClient();
-                    ldapFederation.createPartitionConfig(repository);
-                    project.upload("partitions/"+repository.getName());
-
-                    penroseClient.startPartition(repository.getName());
+                    ldapFederation.createPartitions(repository);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -291,12 +275,7 @@ public class LDAPRepositorySettingsPage extends FormPage {
 
                     if (!confirm) return;
 
-                    PenroseClient penroseClient = project.getClient();
-                    penroseClient.stopPartition(repository.getName());
-                    ldapFederation.removePartition(repository);
-
-                    ldapFederation.removePartitionConfig(repository.getName());
-                    project.removeDirectory("partitions/"+repository.getName());
+                    ldapFederation.removePartitions(repository);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);

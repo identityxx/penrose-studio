@@ -9,15 +9,10 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.federation.RepositoryConfig;
 import org.safehaus.penrose.studio.federation.GlobalRepository;
-import org.safehaus.penrose.studio.federation.event.FederationEventListener;
-import org.safehaus.penrose.studio.federation.event.FederationEvent;
-import org.safehaus.penrose.studio.util.FileUtil;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.management.PenroseClient;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.io.File;
@@ -40,10 +35,6 @@ public class LDAPFederation {
     private Project project;
     private Federation federation;
 
-    private Map<String,LDAPRepository> repositories = new TreeMap<String,LDAPRepository>();
-
-    protected Collection<FederationEventListener> listeners = new ArrayList<FederationEventListener>();
-
     public LDAPFederation(Federation federation) throws Exception {
         this.federation = federation;
         this.project = federation.getProject();
@@ -65,36 +56,29 @@ public class LDAPFederation {
 
             monitor.subTask("Loading "+name+"...");
 
-            repositories.put(name, repository);
-
             PartitionConfig partitionConfig = project.getPartitionConfigs().getPartitionConfig(name);
 
             if (partitionConfig == null) { // create missing partition configs during start
 
                 monitor.subTask("Creating "+name+"...");
 
-                partitionConfig = createPartitionConfig(repository);
-                project.upload("partitions/"+repository.getName());
-
-                PenroseClient penroseClient = project.getClient();
-                penroseClient.startPartition(repository.getName());
+                createPartitions(repository);
             }
 
             monitor.worked(1);
         }
     }
 
-    public PartitionConfig createPartitionConfig(LDAPRepository repository) throws Exception {
+    public PartitionConfig createPartitions(LDAPRepository repository) throws Exception {
 
         String name = repository.getName();
-        String partitionName = name;
 
-        log.debug("Creating partition "+partitionName+".");
+        log.debug("Creating partition "+name+".");
 
         File sampleDir = new File(project.getWorkDir(), "samples/"+ TEMPLATE);
         if (!sampleDir.exists()) project.download("samples/"+ TEMPLATE);
 
-        File partitionDir = new File(project.getWorkDir(), "partitions"+File.separator+ partitionName);
+        File partitionDir = new File(project.getWorkDir(), "partitions"+File.separator+ name);
 
         String ldapUrl = repository.getUrl();
         String ldapUser = repository.getUser();
@@ -185,72 +169,53 @@ public class LDAPFederation {
         partitionConfigs.store(partitionDir, partitionConfig);
         partitionConfigs.addPartitionConfig(partitionConfig);
 */
-        return partitionConfig;
-    }
+        project.upload("partitions/"+name);
 
-    public void removePartition(LDAPRepository repository) throws Exception {
-        federation.removePartition(repository);
+        PenroseClient penroseClient = project.getClient();
+        penroseClient.startPartition(name);
+
+        return partitionConfig;
     }
 
     public PartitionConfig getPartitionConfig(String name) throws Exception {
         return federation.getPartitionConfig(name);
     }
 
-    public PartitionConfig removePartitionConfig(String name) throws Exception {
-        return federation.removePartitionConfig(name);
+    public void removePartitions(LDAPRepository repository) throws Exception {
+        federation.removePartition(repository.getName());
     }
 
     public LDAPRepository getRepository(String name) {
-        return repositories.get(name);
+        return (LDAPRepository)federation.getFederationConfig().getRepositoryConfig(name);
     }
 
     public Collection<LDAPRepository> getRepositories() {
-        return repositories.values();
+        Collection<LDAPRepository> list = new ArrayList<LDAPRepository>();
+        for (RepositoryConfig repository : federation.getRepositories("LDAP")) {
+            list.add((LDAPRepository)repository);
+        }
+        return list;
     }
 
     public void addRepository(LDAPRepository repository) throws Exception {
         federation.addRepository(repository);
-        repositories.put(repository.getName(), repository);
-
-        FederationEvent event = new FederationEvent();
-        event.setRepository(repository);
-
-        for (FederationEventListener listener : listeners) {
-            listener.repositoryAdded(event);
-        }
+        federation.update();
     }
 
     public void updateRepository(LDAPRepository repository) throws Exception {
 
+        removePartitions(repository);
+
         federation.removeRepository(repository.getName());
         federation.addRepository(repository);
+        federation.update();
 
-        FederationEvent event = new FederationEvent();
-        event.setRepository(repository);
-
-        for (FederationEventListener listener : listeners) {
-            listener.repositoryModified(event);
-        }
+        createPartitions(repository);
     }
 
     public void removeRepository(String name) throws Exception {
-        LDAPRepository repository = repositories.remove(name);
-
-        File dir = new File(project.getWorkDir(), "partitions"+File.separator+ repository.getName());
-        FileUtil.delete(dir);
-
         federation.removeRepository(name);
-
-        FederationEvent event = new FederationEvent();
-        event.setRepository(repository);
-
-        for (FederationEventListener listener : listeners) {
-            listener.repositoryRemoved(event);
-        }
-    }
-
-    public void setRepositories(Map<String, LDAPRepository> repositories) {
-        this.repositories = repositories;
+        federation.update();
     }
 
     public Project getProject() {
@@ -267,13 +232,5 @@ public class LDAPFederation {
 
     public void setFederation(Federation federation) {
         this.federation = federation;
-    }
-
-    public void addListener(FederationEventListener listener) {
-        listeners.add(listener);
-    }
-
-    public void removeListener(FederationEventListener listener) {
-        listeners.remove(listener);
     }
 }

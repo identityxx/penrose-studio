@@ -137,13 +137,7 @@ public class NISPartitionsPage extends FormPage {
                     for (TableItem ti : items) {
                         NISDomain repository = (NISDomain)ti.getData();
 
-                        nisFederation.createNisPartitionConfig(repository);
-
-                        nisFederation.createYpPartitionConfig(repository);
-/*
-                        nisFederation.createDbPartitionConfig(repository);
-*/
-                        nisFederation.createNssPartitionConfig(repository);
+                        nisFederation.createPartitions(repository);
                     }
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -177,34 +171,10 @@ public class NISPartitionsPage extends FormPage {
 
                     TableItem[] items = table.getSelection();
 
-                    Project project = nisFederation.getProject();
-                    PenroseClient penroseClient = project.getClient();
-
                     for (TableItem ti : items) {
                         NISDomain repository = (NISDomain)ti.getData();
 
-                        PartitionConfig partitionConfig = nisFederation.getPartitionConfig(repository.getName());
-                        if (partitionConfig != null) {
-                            nisFederation.removePartitionConfig(partitionConfig.getName());
-                            penroseClient.stopPartition(partitionConfig.getName());
-                            project.removeDirectory("partitions/"+partitionConfig.getName());
-                        }
-
-                        PartitionConfig ypPartitionConfig = nisFederation.getPartitionConfig(repository.getName()+"_"+NISFederation.YP);
-                        if (ypPartitionConfig != null) {
-                            nisFederation.removePartitionConfig(ypPartitionConfig.getName());
-                            penroseClient.stopPartition(ypPartitionConfig.getName());
-                            project.removeDirectory("partitions/"+ypPartitionConfig.getName());
-                        }
-
-                        PartitionConfig nssPartitionConfig = nisFederation.getPartitionConfig(repository.getName()+"_"+NISFederation.NSS);
-                        if (nssPartitionConfig != null) {
-                            nisFederation.removePartitionConfig(nssPartitionConfig.getName());
-                            penroseClient.stopPartition(nssPartitionConfig.getName());
-                            project.removeDirectory("partitions/"+nssPartitionConfig.getName());
-                        }
-
-                        nisFederation.removePartition(repository);
+                        nisFederation.removePartitions(repository);
                     }
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();

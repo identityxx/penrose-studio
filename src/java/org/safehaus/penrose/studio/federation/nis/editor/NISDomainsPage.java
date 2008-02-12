@@ -196,9 +196,6 @@ public class NISDomainsPage extends FormPage {
 
                     if (!confirm) return;
 
-                    Project project = nisFederation.getProject();
-                    PenroseClient penroseClient = project.getClient();
-
                     int index = table.getSelectionIndex();
 
                     TableItem[] items = table.getSelection();
@@ -206,35 +203,7 @@ public class NISDomainsPage extends FormPage {
                         NISDomain repository = (NISDomain)ti.getData();
 
                         try {
-                            PartitionConfig nisPartitionConfig = nisFederation.getPartitionConfig(repository.getName());
-                            if (nisPartitionConfig != null) {
-                                penroseClient.stopPartition(nisPartitionConfig.getName());
-                                nisFederation.removePartitionConfig(nisPartitionConfig.getName());
-                                project.removeDirectory("partitions/"+nisPartitionConfig.getName());
-                            }
-
-                            PartitionConfig ypPartitionConfig = nisFederation.getPartitionConfig(repository.getName()+"_"+NISFederation.YP);
-                            if (ypPartitionConfig != null) {
-                                penroseClient.stopPartition(ypPartitionConfig.getName());
-                                nisFederation.removePartitionConfig(ypPartitionConfig.getName());
-                                project.removeDirectory("partitions/"+ypPartitionConfig.getName());
-                            }
-
-                            PartitionConfig nssPartitionConfig = nisFederation.getPartitionConfig(repository.getName()+"_"+NISFederation.NSS);
-                            if (nssPartitionConfig != null) {
-                                penroseClient.stopPartition(nssPartitionConfig.getName());
-                                nisFederation.removePartitionConfig(nssPartitionConfig.getName());
-                                project.removeDirectory("partitions/"+nssPartitionConfig.getName());
-                            }
-
-                            nisFederation.removePartition(repository);
-
-                            try {
-                                //nisFederation.removeDatabase(repository);
-                            } catch (Exception e) {
-                                log.error(e.getMessage(), e);
-                            }
-
+                            nisFederation.removePartitions(repository);
                             nisFederation.removeRepository(repository.getName());
 
                         } catch (Exception e) {
