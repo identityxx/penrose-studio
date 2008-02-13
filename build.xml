@@ -327,18 +327,26 @@
         <antcall target="dist-rpm-linux-gtk-x86_64"/>
     </target>
 
-    <target name="dist-rpm-linux-gtk" depends="build-linux-gtk">
-    	<antcall target="rpm">
+    <target name="dist-rpm-linux-gtk">
+        <exec executable="/bin/uname" output="target/arch.txt">
+            <arg line="-i"/>
+        </exec>
+        <loadfile property="rpm.arch" srcFile="target/arch.txt"/>
+        <antcall target="build-linux-gtk"/>
+        <antcall target="rpm">
             <param name="platform" value="linux-gtk"/>
             <param name="rpm.prefix" value=""/>
             <param name="rpm.home" value="/usr/src/redhat"/>
             <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
+<!--
             <param name="rpm.arch" value="i386"/>
-            <param name="rpm.name" value="${project.name}-${product.version}-1.i386.rpm"/>
+-->
+            <param name="rpm.name" value="${project.name}-${product.version}-1.${rpm.arch}.rpm"/>
         </antcall>
-   </target>
+    </target>
 
-     <target name="dist-rpm-linux-gtk-x86_64" depends="build-linux-gtk-x86_64">
+    <target name="dist-rpm-linux-gtk-x86_64">
+        <antcall target="build-linux-gtk-x86_64"/>
         <antcall target="rpm">
             <param name="platform" value="linux-gtk-x86_64"/>
             <param name="rpm.prefix" value=""/>
