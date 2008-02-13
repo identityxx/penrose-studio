@@ -16,10 +16,10 @@ http://penrose.safehaus.org
 %setup -q
 
 %build
-ant -Dproduct.version=${product.version} -Dprefix=${rpm.prefix}$RPM_BUILD_ROOT dist
+ant -Dproduct.version=${product.version} -Dprefix=${rpm.prefix}$RPM_BUILD_ROOT build-${platform}
 
 %install
-ant -Dproduct.version=${product.version} -Dprefix=${rpm.prefix}$RPM_BUILD_ROOT install
+ant -Dproduct.version=${product.version} -Dprefix=${rpm.prefix}$RPM_BUILD_ROOT install-${platform}
 
 %post
 cat << EOF

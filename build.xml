@@ -211,31 +211,31 @@
     </target>
 
     <target name="build-linux">
+        <antcall target="build-rcp-linux-gtk"/>
+        <antcall target="build-rcp-linux-gtk-x86_64"/>
+    </target>
+
+    <target name="build-rcp-linux-gtk" depends="init" if="isLinux">
         <antcall target="build-linux-gtk"/>
+    </target>
+
+    <target name="build-rcp-linux-gtk-x86_64" depends="init" if="isLinux64">
         <antcall target="build-linux-gtk-x86_64"/>
     </target>
 
-    <target name="build-linux-gtk" depends="init" if="isLinux">
-        <antcall target="build-linux-rcp-gtk"/>
-    </target>
-
-    <target name="build-linux-gtk-x86_64" depends="init" if="isLinux64">
-        <antcall target="build-linux-rcp-gtk-x86_64"/>
-    </target>
-
-    <target name="build-linux-rcp-gtk">
-        <antcall target="build-linux-rcp">
+    <target name="build-linux-gtk">
+        <antcall target="build-rcp-linux">
             <param name="platform" value="linux-gtk"/>
         </antcall>
     </target>
 
-    <target name="build-linux-rcp-gtk-x86_64">
-        <antcall target="build-linux-rcp">
+    <target name="build-linux-gtk-x86_64">
+        <antcall target="build-rcp-linux">
             <param name="platform" value="linux-gtk-x86_64"/>
         </antcall>
     </target>
 
-    <target name="build-linux-rcp">
+    <target name="build-rcp-linux">
         <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>
         <untar src="rcp/${rcp.prefix}-${platform}.tar.gz" dest="target" compression="gzip"/>
         <move todir="target/${dist.name}">
@@ -320,15 +320,16 @@
     </target>
 
     <target name="dist-linux-gtk" if="isLinux">
-        <antcall target="dist-linux-rpm-gtk"/>
+        <antcall target="dist-rpm-linux-gtk"/>
     </target>
 
     <target name="dist-linux-gtk-x86_64" if="isLinux64">
-        <antcall target="dist-linux-rpm-gtk-x86_64"/>
+        <antcall target="dist-rpm-linux-gtk-x86_64"/>
     </target>
 
-    <target name="dist-linux-rpm-gtk" depends="build-linux-rcp-gtk">
+    <target name="dist-rpm-linux-gtk" depends="build-linux-gtk">
     	<antcall target="rpm">
+            <param name="platform" value="linux-gtk"/>
             <param name="rpm.prefix" value=""/>
             <param name="rpm.home" value="/usr/src/redhat"/>
             <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
@@ -337,8 +338,9 @@
         </antcall>
    </target>
 
-     <target name="dist-linux-rpm-gtk-x86_64" depends="build-linux-rcp-gtk-x86_64">
+     <target name="dist-rpm-linux-gtk-x86_64" depends="build-linux-gtk-x86_64">
         <antcall target="rpm">
+            <param name="platform" value="linux-gtk-x86_64"/>
             <param name="rpm.prefix" value=""/>
             <param name="rpm.home" value="/usr/src/redhat"/>
             <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
@@ -414,6 +416,7 @@
             <arg line="/Q target/penrose-studio.iss"/>
         </exec>
         <antcall target="rpm">
+            <param name="platform" value="win32"/>
             <param name="rpm.prefix" value="${cygwin.home}"/>
             <param name="rpm.home" value="${cygwin.home}/usr/src/rpm"/>
             <param name="rpm.builder" value="${cygwin.home}/lib/rpm/rpmb.exe"/>
@@ -469,21 +472,33 @@
 
     <target name="install" depends="init">
         <antcall target="install-linux"/>
-        <antcall target="install-linux-gtk-x86_64"/>
         <antcall target="install-macosx"/>
         <antcall target="install-win32"/>
     </target>
 
-    <target name="install-linux-gtk-x86_64" if="isLinux64">
+    <target name="install-linux">
+        <antcall target="install-dist-linux-gtk"/>
+        <antcall target="install-dist-linux-gtk-x86_64"/>
+    </target>
+
+    <target name="install-dist-linux-gtk" if="isLinux">
+        <antcall target="install-linux-gtk"/>
+    </target>
+
+    <target name="install-dist-linux-gtk-x86_64" if="isLinux64">
+        <antcall target="install-linux-gtk-x86_64"/>
+    </target>
+
+    <target name="install-linux-gtk">
         <antcall target="install-dist">
-            <param name="platform" value="linux-gtk-x86_64"/>
+            <param name="platform" value="linux-gtk"/>
         </antcall>
         <chmod dir="${penrose.studio.home}" includes="penrose-studio" perm="a+rx" />
     </target>
 
-    <target name="install-linux" if="isLinux">
+    <target name="install-linux-gtk-x86_64">
         <antcall target="install-dist">
-            <param name="platform" value="linux-gtk"/>
+            <param name="platform" value="linux-gtk-x86_64"/>
         </antcall>
         <chmod dir="${penrose.studio.home}" includes="penrose-studio" perm="a+rx" />
     </target>
