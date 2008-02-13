@@ -333,10 +333,16 @@
     </target>
 
     <target name="dist-rpm-linux-gtk">
+        <mkdir dir="target"/>
         <exec executable="/bin/uname" output="target/arch.txt">
             <arg line="-i"/>
         </exec>
-        <loadfile property="arch" srcFile="target/arch.txt"/>
+        <loadfile property="arch" srcFile="target/arch.txt">
+            <filterchain>
+                <striplinebreaks/>
+            </filterchain>
+        </loadfile>
+        <echo message="Arch: ${arch}"/>
         <antcall target="build-linux-gtk"/>
         <antcall target="rpm">
             <param name="platform" value="linux-gtk"/>
@@ -462,18 +468,20 @@
         <copy todir="${project.dist}" failonerror="false"
             file="${rpm.home}/RPMS/${rpm.arch}/${rpm.name}">
         </copy>
+
         <copy file="bin/sfx-header" tofile="${project.dist}/${rpm.name}.bin" overwrite="true"/>
 
-        <echo message="__LICENSE__" file="${project.dist}/${rpm.name}.bin" append="true"/>
+        <echo message="__LICENSE__${line.separator}" file="${project.dist}/${rpm.name}.bin" append="true"/>
         <concat destfile="${project.dist}/${rpm.name}.bin" append="true">
             <fileset dir="." includes="LICENSE.txt"/>
         </concat>
-        
-        <echo message="__CONTENT__" file="${project.dist}/${rpm.name}.bin" append="true"/>
+
+        <echo message="__CONTENT__${line.separator}" file="${project.dist}/${rpm.name}.bin" append="true"/>
+<!--
         <concat destfile="${project.dist}/${rpm.name}.bin" append="true" binary="true">
             <fileset dir="${project.dist}" includes="${rpm.name}"/>
         </concat>
-<!--
+
         <exec executable="${rpm.prefix}/bin/sh">
             <arg value="-c"/>
             <arg value="echo __LICENSE__ &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
@@ -486,11 +494,12 @@
             <arg value="-c"/>
             <arg value="echo __CONTENT__ &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
         </exec>
+-->
         <exec executable="${rpm.prefix}/bin/sh">
             <arg value="-c"/>
             <arg value="cat ${project.dist}/${rpm.name} &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
         </exec>
--->
+
         <chmod file="${project.dist}/${rpm.name}.bin" perm="a+rx"/>
     </target>
 
