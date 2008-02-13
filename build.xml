@@ -327,21 +327,24 @@
         <antcall target="dist-rpm-linux-gtk-x86_64"/>
     </target>
 
+    <target name="dist-rpm">
+        <antcall target="dist-linux-gtk"/>
+        <antcall target="dist-linux-gtk-x86_64"/>
+    </target>
+
     <target name="dist-rpm-linux-gtk">
         <exec executable="/bin/uname" output="target/arch.txt">
             <arg line="-i"/>
         </exec>
-        <loadfile property="rpm.arch" srcFile="target/arch.txt"/>
+        <loadfile property="arch" srcFile="target/arch.txt"/>
         <antcall target="build-linux-gtk"/>
         <antcall target="rpm">
             <param name="platform" value="linux-gtk"/>
             <param name="rpm.prefix" value=""/>
             <param name="rpm.home" value="/usr/src/redhat"/>
             <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
-<!--
-            <param name="rpm.arch" value="i386"/>
--->
-            <param name="rpm.name" value="${project.name}-${product.version}-1.${rpm.arch}.rpm"/>
+            <param name="rpm.arch" value="${arch}"/>
+            <param name="rpm.name" value="${project.name}-${product.version}-1.${arch}.rpm"/>
         </antcall>
     </target>
 
@@ -354,6 +357,17 @@
             <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
             <param name="rpm.arch" value="x86_64"/>
             <param name="rpm.name" value="${project.name}-${product.version}-1.x86_64.rpm"/>
+        </antcall>
+    </target>
+
+    <target name="dist-rpm-win32">
+        <antcall target="rpm">
+            <param name="platform" value="win32"/>
+            <param name="rpm.prefix" value="${cygwin.home}"/>
+            <param name="rpm.home" value="${cygwin.home}/usr/src/rpm"/>
+            <param name="rpm.builder" value="${cygwin.home}/lib/rpm/rpmb.exe"/>
+            <param name="rpm.arch" value="i386"/>
+            <param name="rpm.name" value="${project.name}-${product.version}-1.cygwin.i386.rpm"/>
         </antcall>
     </target>
 
@@ -423,14 +437,7 @@
         <exec executable="${iscc.path}">
             <arg line="/Q target/penrose-studio.iss"/>
         </exec>
-        <antcall target="rpm">
-            <param name="platform" value="win32"/>
-            <param name="rpm.prefix" value="${cygwin.home}"/>
-            <param name="rpm.home" value="${cygwin.home}/usr/src/rpm"/>
-            <param name="rpm.builder" value="${cygwin.home}/lib/rpm/rpmb.exe"/>
-            <param name="rpm.arch" value="i386"/>
-            <param name="rpm.name" value="${project.name}-${product.version}-1.cygwin.i386.rpm"/>
-        </antcall>
+        <antcall target="dist-rpm-win32"/>
     </target>
 
     <target name="rpm-check" depends="init">
@@ -456,6 +463,17 @@
             file="${rpm.home}/RPMS/${rpm.arch}/${rpm.name}">
         </copy>
         <copy file="bin/sfx-header" tofile="${project.dist}/${rpm.name}.bin" overwrite="true"/>
+
+        <echo message="__LICENSE__" file="${project.dist}/${rpm.name}.bin" append="true"/>
+        <concat destfile="${project.dist}/${rpm.name}.bin" append="true">
+            <fileset dir="." includes="LICENSE.txt"/>
+        </concat>
+        
+        <echo message="__CONTENT__" file="${project.dist}/${rpm.name}.bin" append="true"/>
+        <concat destfile="${project.dist}/${rpm.name}.bin" append="true" binary="true">
+            <fileset dir="${project.dist}" includes="${rpm.name}"/>
+        </concat>
+<!--
         <exec executable="${rpm.prefix}/bin/sh">
             <arg value="-c"/>
             <arg value="echo __LICENSE__ &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
@@ -472,6 +490,7 @@
             <arg value="-c"/>
             <arg value="cat ${project.dist}/${rpm.name} &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
         </exec>
+-->
         <chmod file="${project.dist}/${rpm.name}.bin" perm="a+rx"/>
     </target>
 
