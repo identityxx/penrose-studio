@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
+import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.management.*;
 import org.safehaus.penrose.ldap.*;
@@ -252,7 +252,7 @@ public class NISYPPage extends FormPage {
 
                     TableItem ti = new TableItem(table, SWT.NONE);
                     ti.setText(0, mapName);
-                    ti.setText(1, status);
+                    ti.setText(1, status == null ? "" : status);
 
                     ti.setData("mapName", mapName);
                 }
@@ -262,7 +262,7 @@ public class NISYPPage extends FormPage {
                     String mapName = (String)ti.getData("mapName");
 
                     String status = statuses.get(mapName);
-                    ti.setText(1, status);
+                    ti.setText(1, status == null ? "" : status);
                 }
             }
 
@@ -292,7 +292,6 @@ public class NISYPPage extends FormPage {
         try {
             SearchRequest request = new SearchRequest();
             request.setDn(getDn(mapName));
-            request.setScope(SearchRequest.SCOPE_ONE);
             request.setAttributes(new String[] { "dn" });
             request.setTypesOnly(true);
 
@@ -304,11 +303,11 @@ public class NISYPPage extends FormPage {
                 return "N/A";
             }
 
-            return ""+response.getTotalCount();
+            return ""+(response.getTotalCount()-1);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return null;
+            return "N/A";
         }
     }
 }

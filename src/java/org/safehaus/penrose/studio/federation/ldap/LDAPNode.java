@@ -9,9 +9,8 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.federation.FederationNode;
-import org.safehaus.penrose.studio.federation.RepositoryConfig;
-import org.safehaus.penrose.studio.federation.event.FederationEvent;
-import org.safehaus.penrose.studio.federation.event.FederationEventAdapter;
+import org.safehaus.penrose.federation.repository.Repository;
+import org.safehaus.penrose.federation.repository.LDAPRepository;
 import org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditor;
 import org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditorInput;
 import org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryNode;
@@ -20,8 +19,6 @@ import org.safehaus.penrose.studio.tree.Node;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * @author Endi S. Dewata
@@ -66,7 +63,7 @@ public class LDAPNode extends Node {
 
     public boolean hasChildren() throws Exception {
         Federation federation = federationNode.getFederation();
-        Collection<RepositoryConfig> children = federation.getRepositories("LDAP");
+        Collection<Repository> children = federation.getRepositories("LDAP");
         return !children.isEmpty();
     }
 
@@ -75,7 +72,7 @@ public class LDAPNode extends Node {
         Collection<Node> children = new ArrayList<Node>();
 
         Federation federation = federationNode.getFederation();
-        for (RepositoryConfig repository : federation.getRepositories("LDAP")) {
+        for (Repository repository : federation.getRepositories("LDAP")) {
             LDAPRepositoryNode node = new LDAPRepositoryNode(
                     repository.getName(),
                     (LDAPRepository)repository,

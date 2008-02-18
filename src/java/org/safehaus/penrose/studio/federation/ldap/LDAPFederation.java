@@ -7,8 +7,9 @@ import org.apache.tools.ant.types.FilterChain;
 import org.apache.tools.ant.filters.ExpandProperties;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.Federation;
-import org.safehaus.penrose.studio.federation.RepositoryConfig;
-import org.safehaus.penrose.studio.federation.GlobalRepository;
+import org.safehaus.penrose.federation.repository.Repository;
+import org.safehaus.penrose.federation.repository.GlobalRepository;
+import org.safehaus.penrose.federation.repository.LDAPRepository;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.management.PenroseClient;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -43,11 +44,11 @@ public class LDAPFederation {
     public void load(IProgressMonitor monitor) throws Exception {
         log.debug("Starting LDAP Federation tool.");
 
-        Collection<RepositoryConfig> list = federation.getRepositories("LDAP");
+        Collection<Repository> list = federation.getRepositories("LDAP");
 
         monitor.beginTask("Loading LDAP repositories...", list.size() == 1 ? IProgressMonitor.UNKNOWN : list.size());
 
-        for (RepositoryConfig rep : list) {
+        for (Repository rep : list) {
 
             if (monitor.isCanceled()) throw new InterruptedException();
 
@@ -186,12 +187,12 @@ public class LDAPFederation {
     }
 
     public LDAPRepository getRepository(String name) {
-        return (LDAPRepository)federation.getFederationConfig().getRepositoryConfig(name);
+        return (LDAPRepository)federation.getFederationConfig().getRepository(name);
     }
 
     public Collection<LDAPRepository> getRepositories() {
         Collection<LDAPRepository> list = new ArrayList<LDAPRepository>();
-        for (RepositoryConfig repository : federation.getRepositories("LDAP")) {
+        for (Repository repository : federation.getRepositories("LDAP")) {
             list.add((LDAPRepository)repository);
         }
         return list;

@@ -7,7 +7,7 @@ import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.federation.ldap.linking.LDAPLinkingNode;
 import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
-import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
+import org.safehaus.penrose.federation.repository.LDAPRepository;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IMenuManager;

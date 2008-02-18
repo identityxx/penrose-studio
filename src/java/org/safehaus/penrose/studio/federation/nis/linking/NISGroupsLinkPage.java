@@ -15,7 +15,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
+import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.partition.Partition;
@@ -79,7 +79,7 @@ public class NISGroupsLinkPage extends FormPage {
         domain = editor.getDomain();
         nisFederation = editor.getNisTool();
 
-        partition = nisFederation.getPartitions().getPartition(domain.getName());
+        partition = nisFederation.getPartitions().getPartition(domain.getName()+"_"+NISFederation.NIS);
 
         Connection connection = partition.getConnection(NISFederation.CACHE_CONNECTION_NAME);
         jdbcConnection = (JDBCConnection)connection;

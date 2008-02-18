@@ -22,7 +22,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
+import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.ldap.*;
@@ -68,7 +68,7 @@ public class NISLDAPPage extends FormPage {
 
         PenroseClient penroseClient = project.getClient();
 
-        partitionClient = penroseClient.getPartitionClient(domain.getName());
+        partitionClient = penroseClient.getPartitionClient(domain.getName()+"_"+NISFederation.NIS);
         
         suffix = partitionClient.getSuffixes().iterator().next();
         moduleClient = partitionClient.getModuleClient("NISLDAPSyncModule");
@@ -727,7 +727,7 @@ public class NISLDAPPage extends FormPage {
 
                     TableItem ti = new TableItem(table, SWT.NONE);
                     ti.setText(0, mapName);
-                    ti.setText(1, status);
+                    ti.setText(1, status == null ? "" : status);
 
                     ti.setData("mapName", mapName);
                 }
@@ -737,7 +737,7 @@ public class NISLDAPPage extends FormPage {
                     String mapName = (String)ti.getData("mapName");
 
                     String status = statuses.get(mapName);
-                    ti.setText(1, status);
+                    ti.setText(1, status == null ? "" : status);
                 }
             }
 
@@ -799,12 +799,34 @@ public class NISLDAPPage extends FormPage {
     }
 
     public String getStatus(String mapName) {
+/*
         try {
             return ""+moduleClient.invoke(
                     "getCount",
                     new Object[] { getDn(mapName) },
                     new String[] { DN.class.getName() }
             );
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return "N/A";
+        }
+*/
+        try {
+            SearchRequest request = new SearchRequest();
+            request.setDn(getDn(mapName));
+            request.setAttributes(new String[] { "dn" });
+            request.setTypesOnly(true);
+
+            SearchResponse response = new SearchResponse();
+
+            partitionClient.search(request, response);
+
+            if (response.getReturnCode() != LDAP.SUCCESS) {
+                return "N/A";
+            }
+
+            return ""+(response.getTotalCount()-1);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

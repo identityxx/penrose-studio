@@ -8,7 +8,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
+import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.PartitionClient;
@@ -38,7 +38,7 @@ public class NISLDAPEditor extends FormEditor {
         try {
 
             PenroseClient penroseClient = project.getClient();
-            PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName());
+            PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName()+"_"+NISFederation.NIS);
             Collection<String> sourceNames = partitionClient.getSourceNames();
 
             addPage(new NISLDAPPage(this));

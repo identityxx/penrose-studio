@@ -19,14 +19,11 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
+import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.wizard.NISRepositoryWizard;
 import org.safehaus.penrose.studio.nis.dialog.NISUserDialog;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.partition.PartitionConfig;
 
 /**
  * @author Endi S. Dewata
@@ -92,7 +89,7 @@ public class NISDomainsPage extends FormPage {
 
         tc = new TableColumn(table, SWT.NONE);
         tc.setWidth(250);
-        tc.setText("LDAP Suffix");
+        tc.setText("NIS Server");
 
         Composite links = toolkit.createComposite(leftPanel);
         links.setLayout(new RowLayout());
@@ -252,7 +249,7 @@ public class NISDomainsPage extends FormPage {
 
                 ti.setText(0, domain.getName());
                 ti.setText(1, domain.getFullName());
-                ti.setText(2, domain.getSuffix());
+                ti.setText(2, domain.getServer());
 
                 ti.setData(domain);
             }

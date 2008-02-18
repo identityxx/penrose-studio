@@ -4,10 +4,11 @@ import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.source.*;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.Federation;
-import org.safehaus.penrose.studio.federation.RepositoryConfig;
-import org.safehaus.penrose.studio.federation.GlobalRepository;
+import org.safehaus.penrose.federation.repository.Repository;
+import org.safehaus.penrose.federation.repository.GlobalRepository;
+import org.safehaus.penrose.federation.repository.LDAPRepository;
+import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
-import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.PartitionClient;
@@ -30,6 +31,7 @@ public class NISFederation {
     public Logger log = Logger.getLogger(getClass());
 
     public final static String YP                    = "yp";
+    public final static String NIS                   = "nis";
     public final static String NSS                   = "nss";
     public final static String DB                    = "db";
 
@@ -68,7 +70,7 @@ public class NISFederation {
     public void load(IProgressMonitor monitor) throws Exception {
         log.debug("Starting NIS Federation tool.");
 
-        Collection<RepositoryConfig> list = federation.getRepositories("NIS");
+        Collection<Repository> list = federation.getRepositories("NIS");
 
         monitor.beginTask("Loading NIS repositories...", list.size() == 1 ? IProgressMonitor.UNKNOWN : list.size());
 /*
@@ -80,7 +82,7 @@ public class NISFederation {
         groups    = partition.getSource("penrose_groups");
 */
 
-        for (RepositoryConfig rep : list) {
+        for (Repository rep : list) {
 
             if (monitor.isCanceled()) throw new InterruptedException();
 
@@ -91,16 +93,16 @@ public class NISFederation {
             // Creating NIS Partition
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            PartitionConfig nisPartitionConfig = project.getPartitionConfigs().getPartitionConfig(name);
+            PartitionConfig nisPartitionConfig = project.getPartitionConfigs().getPartitionConfig(name+"_"+NISFederation.NIS);
 
             if (nisPartitionConfig == null) { // create missing partition config during start
 
-                monitor.subTask("Creating "+name+"...");
+                monitor.subTask("Creating "+name+"_"+NISFederation.NIS+"...");
 
-                nisPartitionConfig = createNisPartition(domain);
+                createNisPartition(domain);
             }
 
-            monitor.subTask("Loading "+nisPartitionConfig.getName()+"...");
+            monitor.subTask("Loading "+name+"_"+NISFederation.NIS+"...");
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Creating YP Partition
@@ -113,10 +115,10 @@ public class NISFederation {
 
                 monitor.subTask("Creating "+name+"_"+NISFederation.YP+"...");
 
-                ypPartitionConfig = createYpPartition(domain);
+                createYpPartition(domain);
             }
 
-            monitor.subTask("Loading "+ypPartitionConfig.getName()+"...");
+            monitor.subTask("Loading "+name+"_"+NISFederation.YP+"...");
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Creating DB Partition
@@ -144,10 +146,10 @@ public class NISFederation {
 
                 monitor.subTask("Creating "+name+"_"+NISFederation.NSS+"...");
 
-                nssPartitionConfig = createNssPartition(domain);
+                createNssPartition(domain);
             }
 
-            monitor.subTask("Loading "+nssPartitionConfig.getName()+"...");
+            monitor.subTask("Loading "+name+"_"+NISFederation.NSS+"...");
 
             monitor.worked(1);
         }
@@ -165,37 +167,33 @@ public class NISFederation {
         removeNssPartition(domain);
     }
 
-    public PartitionConfig createNisPartition(NISDomain domain) throws Exception {
+    public void createNisPartition(NISDomain domain) throws Exception {
+
+        if (!domain.isNisEnabled()) return;
 
         String name = domain.getName();
+        String partitionName = name+"_"+NISFederation.NIS;
 
-        log.debug("Creating partition "+name+".");
+        log.debug("Creating partition "+partitionName+".");
 
         File workDir = project.getWorkDir();
 
         File sampleDir = new File(workDir, "samples/"+ NIS_TEMPLATE);
         if (!sampleDir.exists()) project.download("samples/"+ NIS_TEMPLATE);
 
-        File partitionDir = new File(workDir, "partitions"+File.separator+ name);
-
-        String nisDomain  = domain.getFullName();
-        String ldapSuffix = domain.getSuffix();
+        File partitionDir = new File(workDir, "partitions"+File.separator+ partitionName);
 
         GlobalRepository globalRepository = federation.getGlobalRepository();
-
-        String ldapUrl          = globalRepository.getUrl();
-        String ldapBindDn       = globalRepository.getUser();
-        String ldapBindPassword = globalRepository.getPassword();
 
         org.apache.tools.ant.Project antProject = new org.apache.tools.ant.Project();
 
         antProject.setProperty("DOMAIN",        name);
-        antProject.setProperty("NIS_DOMAIN",    nisDomain);
+        antProject.setProperty("NIS_DOMAIN",    domain.getFullName());
 
-        antProject.setProperty("LDAP_URL",      ldapUrl);
-        antProject.setProperty("LDAP_USER",     ldapBindDn);
-        antProject.setProperty("LDAP_PASSWORD", ldapBindPassword);
-        antProject.setProperty("LDAP_SUFFIX",   ldapSuffix);
+        antProject.setProperty("LDAP_URL",      globalRepository.getUrl());
+        antProject.setProperty("LDAP_USER",     globalRepository.getUser());
+        antProject.setProperty("LDAP_PASSWORD", globalRepository.getPassword());
+        antProject.setProperty("LDAP_SUFFIX",   domain.getNisSuffix());
 
         Copy copy = new Copy();
         copy.setOverwrite(true);
@@ -223,45 +221,40 @@ public class NISFederation {
 
         project.upload("partitions/"+partitionConfig.getName());
         penroseClient.startPartition(partitionConfig.getName());
-
-        return partitionConfig;
     }
 
     public void removeNisPartition(NISDomain domain) throws Exception {
 
-        PartitionConfig nisPartitionConfig = getPartitionConfig(domain.getName());
+        PartitionConfig nisPartitionConfig = getPartitionConfig(domain.getName()+"_"+NISFederation.NIS);
         if (nisPartitionConfig == null) return;
 
-        removePartition(domain.getName());
+        removePartition(domain.getName()+"_"+NISFederation.NIS);
     }
 
-    public PartitionConfig createYpPartition(NISDomain domain) throws Exception {
+    public void createYpPartition(NISDomain domain) throws Exception {
+
+        if (!domain.isYpEnabled()) return;
 
         String name = domain.getName();
         String partitionName = name+"_"+NISFederation.YP;
 
         log.debug("Creating partition "+partitionName+".");
 
-        File sampleDir = new File(project.getWorkDir(), "samples/"+ YP_TEMPLATE);
+        File workDir = project.getWorkDir();
 
-        if (!sampleDir.exists()) {
-            project.download("samples/"+ YP_TEMPLATE);
-        }
+        File sampleDir = new File(workDir, "samples/"+ YP_TEMPLATE);
+        if (!sampleDir.exists()) project.download("samples/"+ YP_TEMPLATE);
 
-        File partitionDir = new File(project.getWorkDir(), "partitions"+File.separator+ partitionName);
-
-        String nisDomain  = domain.getFullName();
-        String nisUrl     = domain.getUrl();
-        String ypSuffix   = domain.getYpSuffix();
+        File partitionDir = new File(workDir, "partitions"+File.separator+ partitionName);
 
         org.apache.tools.ant.Project antProject = new org.apache.tools.ant.Project();
 
-        antProject.setProperty("DOMAIN",     name);
-        antProject.setProperty("NIS_DOMAIN", nisDomain);
+        antProject.setProperty("DOMAIN",         name);
 
-        antProject.setProperty("NIS_URL",    nisUrl);
+        antProject.setProperty("NIS_DOMAIN",     domain.getFullName());
+        antProject.setProperty("NIS_URL",        domain.getUrl());
 
-        antProject.setProperty("YP_SUFFIX",  ypSuffix);
+        antProject.setProperty("YP_SUFFIX",      domain.getYpSuffix());
 
         Copy copy = new Copy();
         copy.setOverwrite(true);
@@ -289,8 +282,6 @@ public class NISFederation {
         
         project.upload("partitions/"+partitionConfig.getName());
         penroseClient.startPartition(partitionConfig.getName());
-
-        return partitionConfig;
     }
 
     public void removeYpPartition(NISDomain domain) throws Exception {
@@ -318,7 +309,7 @@ public class NISFederation {
 
         PenroseClient client = project.getClient();
 
-        PartitionClient partitionClient   = client.getPartitionClient(Federation.PARTITION);
+        PartitionClient partitionClient   = client.getPartitionClient(Federation.FEDERATION);
         ConnectionClient connectionClient = partitionClient.getConnectionClient(Federation.JDBC);
         ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
@@ -368,7 +359,9 @@ public class NISFederation {
         return partitionConfig;
     }
 
-    public PartitionConfig createNssPartition(NISDomain domain) throws Exception {
+    public void createNssPartition(NISDomain domain) throws Exception {
+
+        if (!domain.isNssEnabled()) return;
 
         String name = domain.getName();
         String partitionName = name+"_"+NISFederation.NSS;
@@ -385,41 +378,27 @@ public class NISFederation {
 
         org.apache.tools.ant.Project antProject = new org.apache.tools.ant.Project();
 
-        String nisDomain = domain.getFullName();
-
         antProject.setProperty("DOMAIN",           name);
-        antProject.setProperty("NIS_DOMAIN",       nisDomain);
+
+        antProject.setProperty("NIS_DOMAIN",       domain.getFullName());
 
         LDAPFederation ldapFederation = federation.getLdapFederation();
         LDAPRepository adRepository = ldapFederation.getRepository("ad");
 
-        String adUrl      = adRepository.getUrl();
-        String adUser     = adRepository.getUser();
-        String adPassword = adRepository.getPassword();
-        String adSuffix   = adRepository.getSuffix();
-
-        antProject.setProperty("AD_URL",           adUrl);
-        antProject.setProperty("AD_USER",          adUser);
-        antProject.setProperty("AD_PASSWORD",      adPassword);
-        antProject.setProperty("AD_SUFFIX",        adSuffix);
+        antProject.setProperty("AD_URL",           adRepository.getUrl());
+        antProject.setProperty("AD_USER",          adRepository.getUser());
+        antProject.setProperty("AD_PASSWORD",      adRepository.getPassword());
+        antProject.setProperty("AD_SUFFIX",        adRepository.getSuffix());
 
         GlobalRepository globalRepository = federation.getGlobalRepository();
 
-        String ldapUrl          = globalRepository.getUrl();
-        String ldapBindDn       = globalRepository.getUser();
-        String ldapBindPassword = globalRepository.getPassword();
+        antProject.setProperty("LDAP_URL",         globalRepository.getUrl());
+        antProject.setProperty("LDAP_USER",        globalRepository.getUser());
+        antProject.setProperty("LDAP_PASSWORD",    globalRepository.getPassword());
 
-        antProject.setProperty("LDAP_URL",         ldapUrl);
-        antProject.setProperty("LDAP_USER",        ldapBindDn);
-        antProject.setProperty("LDAP_PASSWORD",    ldapBindPassword);
-
-        String nisSuffix    = domain.getSuffix();
-        String nssSuffix    = domain.getNssSuffix();
-        String globalSuffix = globalRepository.getSuffix();
-
-        antProject.setProperty("NSS_SUFFIX",       nssSuffix);
-        antProject.setProperty("NIS_SUFFIX",       nisSuffix);
-        antProject.setProperty("GLOBAL_SUFFIX",    globalSuffix);
+        antProject.setProperty("NSS_SUFFIX",       domain.getNssSuffix());
+        antProject.setProperty("NIS_SUFFIX",       domain.getNisSuffix());
+        antProject.setProperty("GLOBAL_SUFFIX",    globalRepository.getSuffix());
 
         Copy copy = new Copy();
         copy.setOverwrite(true);
@@ -447,8 +426,6 @@ public class NISFederation {
 
         project.upload("partitions/"+partitionConfig.getName());
         penroseClient.startPartition(partitionConfig.getName());
-
-        return partitionConfig;
     }
 
     public void removeNssPartition(NISDomain domain) throws Exception {
@@ -537,7 +514,7 @@ public class NISFederation {
     }
 */
     public NISDomain getRepository(String name) {
-        return (NISDomain)federation.getFederationConfig().getRepositoryConfig(name);
+        return (NISDomain)federation.getFederationConfig().getRepository(name);
     }
     
     public Collection<String> getRepositoryNames() {
@@ -546,7 +523,7 @@ public class NISFederation {
     
     public Collection<NISDomain> getRepositories() {
         Collection<NISDomain> list = new ArrayList<NISDomain>();
-        for (RepositoryConfig repository : federation.getRepositories("NIS")) {
+        for (Repository repository : federation.getRepositories("NIS")) {
             list.add((NISDomain)repository);
         }
         return list;
@@ -586,7 +563,7 @@ public class NISFederation {
 
         PenroseClient client = project.getClient();
 
-        PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+        PartitionClient partitionClient = client.getPartitionClient(Federation.FEDERATION);
 
         ConnectionClient connectionClient = partitionClient.getConnectionClient(Federation.JDBC);
         //JDBCConnection connection = (JDBCConnection)partition.getConnection(Federation.JDBC);
@@ -619,7 +596,7 @@ public class NISFederation {
 
         PenroseClient client = project.getClient();
 
-        PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+        PartitionClient partitionClient = client.getPartitionClient(Federation.FEDERATION);
         ConnectionClient connectionClient = partitionClient.getConnectionClient(Federation.JDBC);
 
         connectionClient.invoke("dropDatabase", new Object[] { domain.getName() }, new String[] { String.class.getName() });

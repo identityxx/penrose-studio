@@ -1,22 +1,21 @@
 package org.safehaus.penrose.studio.federation.nis.linking;
 
-import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.federation.nis.NISNode;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
-import org.safehaus.penrose.studio.federation.linking.LinkingEditorInput;
-import org.safehaus.penrose.studio.federation.linking.LinkingEditor;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.partition.Partition;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchPage;
+import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.federation.linking.LinkingEditor;
+import org.safehaus.penrose.studio.federation.linking.LinkingEditorInput;
+import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.studio.federation.nis.NISNode;
+import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.tree.Node;
 
 /**
  * @author Endi S. Dewata
@@ -60,9 +59,12 @@ public class NISLinkingNode extends Node {
 
     public void open() throws Exception {
 
+        NISDomain domain = domainNode.getDomain();
+
         LinkingEditorInput ei = new LinkingEditorInput();
         ei.setProject(projectNode.getProject());
-        ei.setRepository(domainNode.getDomain());
+        ei.setRepository(domain);
+        ei.setPartitionName(domain.getName()+"_"+NISFederation.NIS);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();

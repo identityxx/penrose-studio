@@ -21,7 +21,7 @@ import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
+import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.Partitions;
 import org.safehaus.penrose.source.Source;
@@ -330,13 +330,10 @@ public class NISLDAPPage extends FormPage {
             table.removeAll();
 
             PenroseClient penroseClient = project.getClient();
-            Partitions partitions = nisFederation.getPartitions();
 
             for (NISDomain domain : nisFederation.getRepositories()) {
                 PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
                 SourceClient ldap = partitionClient.getSourceClient("LDAP");
-
-                Partition partition = partitions.getPartition(domain.getName());
 
                 boolean exists;
 
@@ -354,27 +351,36 @@ public class NISLDAPPage extends FormPage {
                     exists = false;
                 }
 
-                Source tracker = partition.getSource("tracker");
+                TableItem ti = new TableItem(table, SWT.NONE);
 
-                Connection connection = tracker.getConnection();
-                JDBCConnection jdbcConnection = (JDBCConnection)connection;
+                ti.setText(0, domain.getName());
+                ti.setText(1, exists ? "OK" : "Missing");
+/*
+                SourceClient tracker = partitionClient.getSourceClient("tracker");
+                String trackerTableName = tracker.getParameter("table");
 
-                QueryResponse response = new QueryResponse() {
-                    public void add(Object object) throws Exception {
-                        ResultSet rs = (ResultSet)object;
-                        super.add(new Object[] { rs.getObject(1), rs.getTimestamp(2) });
-                    }
-                };
+                ConnectionClient connectionClient = partitionClient.getConnectionClient(tracker.getConnectionName());
+                //String trackerTableName = connectionClient.getTableName(tracker);
 
-                jdbcConnection.executeQuery(
-                        "select max(changeNumber), max(changeTimestamp) from "+jdbcConnection.getTableName(tracker), response
+                QueryResponse response = new QueryResponse();
+
+                connectionClient.invoke(
+                        "executeQuery",
+                        new Object[] {
+                                "select max(changeNumber), max(changeTimestamp) from "+trackerTableName,
+                                response
+                        },
+                        new String[] { }
                 );
 
                 String lastChangeNumber;
                 String lastChangeTimestamp;
 
                 if (response.hasNext()) {
-                    Object[] objects = (Object[])response.next();
+                    Object object = response.next();
+                    ResultSet rs = (ResultSet)object;
+
+                    Object[] objects = new Object[] { rs.getObject(1), rs.getTimestamp(2) };
                     lastChangeNumber = objects[0] == null ? "" : ""+objects[0];
                     lastChangeTimestamp = objects[1] == null ? "" : df.format((Timestamp)objects[1]);
 
@@ -383,13 +389,9 @@ public class NISLDAPPage extends FormPage {
                     lastChangeTimestamp = "";
                 }
 
-                TableItem ti = new TableItem(table, SWT.NONE);
-
-                ti.setText(0, domain.getName());
-                ti.setText(1, exists ? "OK" : "Missing");
                 ti.setText(2, lastChangeNumber);
                 ti.setText(3, lastChangeTimestamp);
-
+*/
                 ti.setData(domain);
             }
 

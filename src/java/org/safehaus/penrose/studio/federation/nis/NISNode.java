@@ -7,17 +7,14 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.federation.FederationNode;
 import org.safehaus.penrose.studio.federation.Federation;
-import org.safehaus.penrose.studio.federation.RepositoryConfig;
-import org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryNode;
-import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
-import org.safehaus.penrose.studio.federation.event.FederationEventAdapter;
+import org.safehaus.penrose.federation.repository.Repository;
+import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.editor.NISEditorInput;
 import org.safehaus.penrose.studio.federation.nis.editor.NISEditor;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISOwnershipNode;
 import org.safehaus.penrose.studio.federation.nis.linking.NISLinkingNode;
 import org.safehaus.penrose.studio.federation.nis.conflict.NISConflictsNode;
 import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
-import org.safehaus.penrose.studio.federation.event.FederationEvent;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
@@ -27,8 +24,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchPage;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.ArrayList;
 
 /**
@@ -40,8 +35,6 @@ public class NISNode extends Node {
     private FederationNode federationNode;
 
     NISFederation nisFederation;
-
-    //Map<String,Node> children = new TreeMap<String,Node>();
 
     NISLinkingNode linkingNode;
     NISConflictsNode conflictsNode;
@@ -100,26 +93,9 @@ public class NISNode extends Node {
         penroseStudio.notifyChangeListeners();
     }
 
-    public void addRepository(NISDomain domain) {
-
-        String name = domain.getName();
-
-        NISDomainNode node = new NISDomainNode(
-                name,
-                domain,
-                this
-        );
-
-        //children.put(name, node);
-    }
-
-    public void removeRepository(String name) {
-        //children.remove(name);
-    }
-
     public boolean hasChildren() throws Exception {
         Federation federation = federationNode.getFederation();
-        Collection<RepositoryConfig> children = federation.getRepositories("NIS");
+        Collection<Repository> children = federation.getRepositories("NIS");
         return !children.isEmpty();
     }
 
@@ -128,7 +104,7 @@ public class NISNode extends Node {
         Collection<Node> children = new ArrayList<Node>();
 
         Federation federation = federationNode.getFederation();
-        for (RepositoryConfig repository : federation.getRepositories("NIS")) {
+        for (Repository repository : federation.getRepositories("NIS")) {
             NISDomainNode node = new NISDomainNode(
                     repository.getName(),
                     (NISDomain)repository,

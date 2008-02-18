@@ -18,13 +18,11 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
+import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.partition.PartitionConfigs;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.management.PenroseClient;
 
 /**
  * @author Endi S. Dewata
@@ -86,7 +84,15 @@ public class NISPartitionsPage extends FormPage {
 
         tc = new TableColumn(table, SWT.NONE);
         tc.setWidth(100);
-        tc.setText("Status");
+        tc.setText("YP");
+
+        tc = new TableColumn(table, SWT.NONE);
+        tc.setWidth(100);
+        tc.setText("NIS");
+
+        tc = new TableColumn(table, SWT.NONE);
+        tc.setWidth(100);
+        tc.setText("NSS");
 
         Composite links = toolkit.createComposite(leftPanel);
         links.setLayout(new RowLayout());
@@ -213,16 +219,24 @@ public class NISPartitionsPage extends FormPage {
             Project project = nisFederation.getProject();
             PartitionConfigs partitionConfigs = project.getPartitionConfigs();
 
-            for (NISDomain repository : nisFederation.getRepositories()) {
-                PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(repository.getName()+"_"+NISFederation.YP);
-                //Partition partition = nisFederation.getPartitions().getPartition(repository.getName());
+            for (NISDomain domain : nisFederation.getRepositories()) {
 
                 TableItem ti = new TableItem(table, SWT.NONE);
+                ti.setText(0, domain.getName());
 
-                ti.setText(0, repository.getName());
-                ti.setText(1, partitionConfig == null ? "Missing" : "OK");
+                boolean ypPartition = partitionConfigs.getPartitionConfig(domain.getName()+"_"+NISFederation.YP) != null;
+                String status = domain.isYpEnabled() ? (ypPartition ? "OK" : "Missing") : "Disabled";
+                ti.setText(1, status);
 
-                ti.setData(repository);
+                boolean nisPartition = partitionConfigs.getPartitionConfig(domain.getName()+"_"+NISFederation.NIS) != null;
+                status = domain.isNisEnabled() ? (nisPartition ? "OK" : "Missing") : "Disabled";
+                ti.setText(2, status);
+
+                boolean nssPartition = partitionConfigs.getPartitionConfig(domain.getName()+"_"+NISFederation.NSS) != null;
+                status = domain.isNssEnabled() ? (nssPartition ? "OK" : "Missing") : "Disabled";
+                ti.setText(3, status);
+
+                ti.setData(domain);
             }
 
             table.select(indices);

@@ -13,7 +13,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
+import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.editor.NISDomainDialog;
 import org.safehaus.penrose.studio.project.Project;
@@ -31,9 +31,15 @@ public class NISDomainSettingsPage extends FormPage {
 
     Label domainText;
     Label serverText;
-    Label nisSuffixText;
+
     Label ypSuffixText;
+    Label ypEnabledText;
+
+    Label nisSuffixText;
+    Label nisEnabledText;
+
     Label nssSuffixText;
+    Label nssEnabledText;
 
     NISDomainEditor editor;
     NISFederation nisFederation;
@@ -69,21 +75,21 @@ public class NISDomainSettingsPage extends FormPage {
 
         new Label(body, SWT.NONE);
 
-        Section nisSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        nisSection.setText("NIS Partition");
-        nisSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        Control nisControl = createNisControl(nisSection);
-        nisSection.setClient(nisControl);
-
-        new Label(body, SWT.NONE);
-
         Section ypSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
         ypSection.setText("YP Partition");
         ypSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Control ypControl = createYpPanel(ypSection);
         ypSection.setClient(ypControl);
+
+        new Label(body, SWT.NONE);
+
+        Section nisSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        nisSection.setText("NIS Partition");
+        nisSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Control nisControl = createNisControl(nisSection);
+        nisSection.setClient(nisControl);
 
         new Label(body, SWT.NONE);
 
@@ -197,10 +203,16 @@ public class NISDomainSettingsPage extends FormPage {
         layout.marginWidth = 0;
         composite.setLayout(layout);
 
-        Label suffixLabel = toolkit.createLabel(composite, "Suffix:");
+
+        Label enabledLabel = toolkit.createLabel(composite, "Enabled:");
         GridData gd = new GridData();
         gd.widthHint = 100;
-        suffixLabel.setLayoutData(gd);
+        enabledLabel.setLayoutData(gd);
+
+        nisEnabledText = toolkit.createLabel(composite, "");
+        nisEnabledText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        toolkit.createLabel(composite, "Suffix:");
 
         nisSuffixText = toolkit.createLabel(composite, "");
         nisSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -289,10 +301,15 @@ public class NISDomainSettingsPage extends FormPage {
         layout.marginWidth = 0;
         composite.setLayout(layout);
 
-        Label suffixLabel = toolkit.createLabel(composite, "Suffix:");
+        Label enabledLabel = toolkit.createLabel(composite, "Enabled:");
         GridData gd = new GridData();
         gd.widthHint = 100;
-        suffixLabel.setLayoutData(gd);
+        enabledLabel.setLayoutData(gd);
+
+        ypEnabledText = toolkit.createLabel(composite, "");
+        ypEnabledText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        toolkit.createLabel(composite, "Suffix:");
 
         ypSuffixText = toolkit.createLabel(composite, "");
         ypSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -381,10 +398,15 @@ public class NISDomainSettingsPage extends FormPage {
         layout.marginWidth = 0;
         composite.setLayout(layout);
 
-        Label suffixLabel = toolkit.createLabel(composite, "Suffix:");
+        Label enabledLabel = toolkit.createLabel(composite, "Enabled:");
         GridData gd = new GridData();
         gd.widthHint = 100;
-        suffixLabel.setLayoutData(gd);
+        enabledLabel.setLayoutData(gd);
+
+        nssEnabledText = toolkit.createLabel(composite, "");
+        nssEnabledText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        toolkit.createLabel(composite, "Suffix:");
 
         nssSuffixText = toolkit.createLabel(composite, "");
         nssSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -456,14 +478,20 @@ public class NISDomainSettingsPage extends FormPage {
             String server = domain.getServer();
             serverText.setText(server == null ? "" : server);
 
-            String nisSuffix = domain.getSuffix();
+            String nisSuffix = domain.getNisSuffix();
             nisSuffixText.setText(nisSuffix == null ? "" : nisSuffix);
+
+            nisEnabledText.setText(domain.isNisEnabled() ? "Yes" : "No");
 
             String ypSuffix = domain.getYpSuffix();
             ypSuffixText.setText(ypSuffix == null ? "" : ypSuffix);
 
+            ypEnabledText.setText(domain.isYpEnabled() ? "Yes" : "No");
+
             String nssSuffix = domain.getNssSuffix();
             nssSuffixText.setText(nssSuffix == null ? "" : nssSuffix);
+
+            nssEnabledText.setText(domain.isNssEnabled() ? "Yes" : "No");
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

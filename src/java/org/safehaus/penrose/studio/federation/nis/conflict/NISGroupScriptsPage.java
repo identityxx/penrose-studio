@@ -14,7 +14,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
+import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.nis.dialog.NISGroupDialog;
@@ -552,7 +552,7 @@ public class NISGroupScriptsPage extends FormPage {
 
         Project project = nisFederation.getProject();
         PenroseClient client = project.getClient();
-        PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+        PartitionClient partitionClient = client.getPartitionClient(Federation.FEDERATION);
 
         //Partition partition = nisFederation.getPartition();
 

@@ -1,10 +1,6 @@
 package org.safehaus.penrose.studio.federation.editor;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
@@ -15,14 +11,8 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.federation.*;
-import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
-import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.project.Project;
-
-import java.io.File;
+import org.safehaus.penrose.studio.federation.Federation;
 
 /**
  * @author Endi S. Dewata
@@ -151,7 +141,7 @@ public class FederationDatabasePage extends FormPage {
         FederationReader reader = new FederationReader();
         FederationConfig federationConfig = reader.read(file);
 
-        for (RepositoryConfig repository : federationConfig.getRepositoryConfigs()) {
+        for (Repository repository : federationConfig.getRepositories()) {
             federation.addRepository(repository);
         }
     }
@@ -167,20 +157,20 @@ public class FederationDatabasePage extends FormPage {
 
         FederationConfig federationConfig =  new FederationConfig();
 
-        RepositoryConfig globalRepository = federation.getGlobalRepository();
-        globalRepository.setName("GLOBAL");
+        Repository globalRepository = federation.getGlobalRepository();
+        globalRepository.setName(Federation.GLOBAL);
         globalRepository.setType("GLOBAL");
         
-        federationConfig.addRepositoryConfig(globalRepository);
+        federationConfig.addRepository(globalRepository);
 
         LDAPFederation ldapFederation = federation.getLdapFederation();
         for (LDAPRepository repository : ldapFederation.getRepositories()) {
-            federationConfig.addRepositoryConfig(repository);
+            federationConfig.addRepository(repository);
         }
 
         NISFederation nisFederation = federation.getNisFederation();
         for (NISDomain repository : nisFederation.getRepositories()) {
-            federationConfig.addRepositoryConfig(repository);
+            federationConfig.addRepository(repository);
         }
 
         File file = new File(filename);

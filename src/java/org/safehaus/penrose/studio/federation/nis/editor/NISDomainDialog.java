@@ -11,7 +11,7 @@ import org.eclipse.swt.graphics.Point;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
+import org.safehaus.penrose.federation.repository.NISDomain;
 
 /**
  * @author Endi S. Dewata
@@ -27,8 +27,14 @@ public class NISDomainDialog extends Dialog {
 
     Text domainText;
     Text serverText;
-    Text nisSuffixText;
+
+    Button ypEnabledButton;
     Text ypSuffixText;
+
+    Button nisEnabledButton;
+    Text nisSuffixText;
+
+    Button nssEnabledButton;
     Text nssSuffixText;
 
     int action;
@@ -45,7 +51,7 @@ public class NISDomainDialog extends Dialog {
         shell = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
 
         init();
-        reset();
+        refresh();
 
         Point size = new Point(600, 400);
         shell.setSize(size);
@@ -69,18 +75,27 @@ public class NISDomainDialog extends Dialog {
         createControl(shell);
     }
 
-    public void reset() {
+    public void refresh() {
         String fullName = domain.getFullName();
         domainText.setText(fullName == null ? "" : fullName);
 
         String server = domain.getServer();
         serverText.setText(server == null ? "" : server);
 
-        String nisSuffix = domain.getSuffix();
-        nisSuffixText.setText(nisSuffix == null ? "" : nisSuffix);
+        boolean ypEnabled = domain.isYpEnabled();
+        ypEnabledButton.setSelection(ypEnabled);
 
         String ypSuffix = domain.getYpSuffix();
         ypSuffixText.setText(ypSuffix == null ? "" : ypSuffix);
+
+        boolean nisEnabled = domain.isNisEnabled();
+        nisEnabledButton.setSelection(nisEnabled);
+
+        String nisSuffix = domain.getNisSuffix();
+        nisSuffixText.setText(nisSuffix == null ? "" : nisSuffix);
+
+        boolean nssEnabled = domain.isNssEnabled();
+        nssEnabledButton.setSelection(nssEnabled);
 
         String nssSuffix = domain.getNssSuffix();
         nssSuffixText.setText(nssSuffix == null ? "" : nssSuffix);
@@ -114,28 +129,48 @@ public class NISDomainDialog extends Dialog {
 
         Label serverLabel = new Label(composite, SWT.NONE);
         serverLabel.setText("NIS Server:");
-        serverLabel.setLayoutData(new GridData());
 
         serverText = new Text(composite, SWT.BORDER);
         serverText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Label nisSuffixLabel = new Label(composite, SWT.NONE);
-        nisSuffixLabel.setText("NIS Suffix:");
-        nisSuffixLabel.setLayoutData(new GridData());
+        new Label(composite, SWT.NONE);
+        new Label(composite, SWT.NONE);
 
-        nisSuffixText = new Text(composite, SWT.BORDER);
-        nisSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Label ypEnabledLabel = new Label(composite, SWT.NONE);
+        ypEnabledLabel.setText("YP Enabled:");
+
+        ypEnabledButton = new Button(composite, SWT.CHECK);
 
         Label ypSuffixLabel = new Label(composite, SWT.NONE);
         ypSuffixLabel.setText("YP Suffix:");
-        ypSuffixLabel.setLayoutData(new GridData());
 
         ypSuffixText = new Text(composite, SWT.BORDER);
         ypSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+        new Label(composite, SWT.NONE);
+        new Label(composite, SWT.NONE);
+
+        Label nisEnabledLabel = new Label(composite, SWT.NONE);
+        nisEnabledLabel.setText("NIS Enabled:");
+
+        nisEnabledButton = new Button(composite, SWT.CHECK);
+
+        Label nisSuffixLabel = new Label(composite, SWT.NONE);
+        nisSuffixLabel.setText("NIS Suffix:");
+
+        nisSuffixText = new Text(composite, SWT.BORDER);
+        nisSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        new Label(composite, SWT.NONE);
+        new Label(composite, SWT.NONE);
+                
+        Label nssEnabledLabel = new Label(composite, SWT.NONE);
+        nssEnabledLabel.setText("NSS Enabled:");
+
+        nssEnabledButton = new Button(composite, SWT.CHECK);
+
         Label nssSuffixLabel = new Label(composite, SWT.NONE);
         nssSuffixLabel.setText("NSS Suffix:");
-        nssSuffixLabel.setLayoutData(new GridData());
 
         nssSuffixText = new Text(composite, SWT.BORDER);
         nssSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -170,11 +205,17 @@ public class NISDomainDialog extends Dialog {
                 String server = serverText.getText();
                 domain.setServer("".equals(server) ? null : server);
 
+                domain.setNisEnabled(nisEnabledButton.getSelection());
+
                 String nisSuffix = nisSuffixText.getText();
-                domain.setSuffix("".equals(nisSuffix) ? null : nisSuffix);
+                domain.setNisSuffix("".equals(nisSuffix) ? null : nisSuffix);
+
+                domain.setYpEnabled(ypEnabledButton.getSelection());
 
                 String ypSuffix = ypSuffixText.getText();
                 domain.setYpSuffix("".equals(ypSuffix) ? null : ypSuffix);
+
+                domain.setNssEnabled(nssEnabledButton.getSelection());
 
                 String nssSuffix = nssSuffixText.getText();
                 domain.setNssSuffix("".equals(nssSuffix) ? null : nssSuffix);

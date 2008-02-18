@@ -1,19 +1,19 @@
 package org.safehaus.penrose.studio.federation.event;
 
-import org.safehaus.penrose.studio.federation.RepositoryConfig;
+import org.safehaus.penrose.federation.repository.Repository;
 
 /**
  * @author Endi Sukma Dewata
  */
 public class FederationEvent {
     
-    private RepositoryConfig repository;
+    private Repository repository;
 
-    public RepositoryConfig getRepository() {
+    public Repository getRepository() {
         return repository;
     }
 
-    public void setRepository(RepositoryConfig repository) {
+    public void setRepository(Repository repository) {
         this.repository = repository;
     }
 }

@@ -4,7 +4,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.federation.RepositoryConfig;
+import org.safehaus.penrose.federation.repository.Repository;
 
 /**
  * @author Endi S. Dewata
@@ -12,7 +12,8 @@ import org.safehaus.penrose.studio.federation.RepositoryConfig;
 public class LinkingEditorInput implements IEditorInput {
 
     private Project project;
-    private RepositoryConfig repository;
+    private Repository repository;
+    private String partitionName;
 
     public LinkingEditorInput() {
     }
@@ -43,7 +44,8 @@ public class LinkingEditorInput implements IEditorInput {
 
     public int hashCode() {
         return (project == null ? 0 : project.hashCode()) +
-                (repository == null ? 0 : repository.hashCode());
+                (repository == null ? 0 : repository.hashCode()) +
+                (partitionName == null ? 0 : partitionName.hashCode());
     }
 
     boolean equals(Object o1, Object o2) {
@@ -60,6 +62,7 @@ public class LinkingEditorInput implements IEditorInput {
         LinkingEditorInput ei = (LinkingEditorInput)object;
         if (!equals(project, ei.project)) return false;
         if (!equals(repository, ei.repository)) return false;
+        if (!equals(partitionName, ei.partitionName)) return false;
 
         return true;
     }
@@ -72,11 +75,19 @@ public class LinkingEditorInput implements IEditorInput {
         this.project = project;
     }
 
-    public RepositoryConfig getRepository() {
+    public Repository getRepository() {
         return repository;
     }
 
-    public void setRepository(RepositoryConfig repository) {
+    public void setRepository(Repository repository) {
         this.repository = repository;
+    }
+
+    public String getPartitionName() {
+        return partitionName;
+    }
+
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 }

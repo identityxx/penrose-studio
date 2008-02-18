@@ -22,7 +22,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
-import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
+import org.safehaus.penrose.federation.repository.LDAPRepository;
 import org.safehaus.penrose.studio.federation.ldap.wizard.LDAPRepositoryEditorWizard;
 import org.safehaus.penrose.studio.project.Project;
 

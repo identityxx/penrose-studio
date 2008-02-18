@@ -4,12 +4,10 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
+import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.partition.PartitionConfig;
 
 /**
  * @author Endi Sukma Dewata
@@ -71,7 +69,7 @@ public class NISRepositoryWizard extends Wizard {
                 nssSuffix = nssSuffix+suffix;
             }
 
-            partitionPage.setSuffix(nisSuffix);
+            partitionPage.setNisSuffix(nisSuffix);
             partitionPage.setYpSuffix(ypSuffix);
             partitionPage.setNssSuffix(nssSuffix);
         }
@@ -81,17 +79,23 @@ public class NISRepositoryWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            NISDomain repository = new NISDomain();
-            repository.setName(repositoryPage.getRepository());
-            repository.setFullName(domainPage.getDomain());
-            repository.setServer(domainPage.getServer());
-            repository.setSuffix(partitionPage.getSuffix());
-            repository.setYpSuffix(partitionPage.getYpSuffix());
-            repository.setNssSuffix(partitionPage.getNssSuffix());
+            NISDomain domain = new NISDomain();
+            domain.setName(repositoryPage.getRepository());
+            domain.setFullName(domainPage.getDomain());
+            domain.setServer(domainPage.getServer());
 
-            nisFederation.addRepository(repository);
+            domain.setNisEnabled(partitionPage.isNisEnabled());
+            domain.setNisSuffix(partitionPage.getNisSuffix());
 
-            nisFederation.createPartitions(repository);
+            domain.setYpEnabled(partitionPage.isYpEnabled());
+            domain.setYpSuffix(partitionPage.getYpSuffix());
+
+            domain.setNssEnabled(partitionPage.isNssEnabled());
+            domain.setNssSuffix(partitionPage.getNssSuffix());
+
+            nisFederation.addRepository(domain);
+
+            nisFederation.createPartitions(domain);
 
             return true;
 

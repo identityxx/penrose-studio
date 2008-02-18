@@ -4,12 +4,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionInfoWizardPage;
-import org.safehaus.penrose.studio.federation.Federation;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.partition.PartitionConfigs;
-import org.safehaus.penrose.connection.ConnectionConfig;
 
-import java.io.File;
 import java.util.Map;
 import java.util.LinkedHashMap;
 

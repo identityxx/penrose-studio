@@ -22,7 +22,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
-import org.safehaus.penrose.studio.federation.ldap.LDAPRepository;
+import org.safehaus.penrose.federation.repository.LDAPRepository;
 import org.safehaus.penrose.studio.federation.ldap.wizard.LDAPRepositoryWizard;
 import org.safehaus.penrose.studio.federation.ldap.wizard.LDAPRepositoryEditorWizard;
 import org.safehaus.penrose.studio.PenroseStudio;

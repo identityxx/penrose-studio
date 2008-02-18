@@ -1,20 +1,22 @@
 package org.safehaus.penrose.studio.federation.ldap.linking;
 
-import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryNode;
-import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
-import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
-import org.safehaus.penrose.studio.federation.linking.LinkingEditorInput;
-import org.safehaus.penrose.studio.federation.linking.LinkingEditor;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.server.ServersView;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchPage;
+import org.safehaus.penrose.federation.repository.Repository;
+import org.safehaus.penrose.federation.repository.LDAPRepository;
+import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
+import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
+import org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryNode;
+import org.safehaus.penrose.studio.federation.linking.LinkingEditor;
+import org.safehaus.penrose.studio.federation.linking.LinkingEditorInput;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.tree.Node;
 
 /**
  * @author Endi S. Dewata
@@ -58,9 +60,12 @@ public class LDAPLinkingNode extends Node {
 
     public void open() throws Exception {
 
+        LDAPRepository repository = repositoryNode.getRepository();
+        
         LinkingEditorInput ei = new LinkingEditorInput();
         ei.setProject(projectNode.getProject());
-        ei.setRepository(repositoryNode.getRepository());
+        ei.setRepository(repository);
+        ei.setPartitionName(repository.getName());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();

@@ -2,7 +2,7 @@ package org.safehaus.penrose.studio.federation.nis.conflict;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
+import org.safehaus.penrose.federation.repository.NISDomain;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;

@@ -1,42 +1,44 @@
 package org.safehaus.penrose.studio.federation.linking;
 
+import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.window.Window;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.*;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IProgressService;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.jface.window.Window;
-import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.federation.wizard.BrowserWizard;
-import org.safehaus.penrose.studio.federation.RepositoryConfig;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.ldap.*;
+import org.safehaus.penrose.federation.repository.Repository;
 import org.safehaus.penrose.filter.Filter;
-import org.safehaus.penrose.filter.SubstringFilter;
 import org.safehaus.penrose.filter.FilterTool;
 import org.safehaus.penrose.filter.SimpleFilter;
+import org.safehaus.penrose.filter.SubstringFilter;
+import org.safehaus.penrose.ldap.*;
+import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
+import org.safehaus.penrose.studio.federation.Federation;
+import org.safehaus.penrose.studio.federation.wizard.BrowserWizard;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.util.ActiveDirectoryUtil;
 import org.safehaus.penrose.util.BinaryUtil;
-import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.PartitionClient;
 
-import java.util.*;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
@@ -62,10 +64,9 @@ public class LinkingPage extends FormPage {
     Table globalTable;
     Table globalAttributeTable;
 
-    LinkingEditor editor;
-
     Project project;
-    RepositoryConfig repository;
+    Repository repository;
+    String partitionName;
 
     PartitionClient localPartitionClient;
     PartitionClient globalPartitionClient;
@@ -79,14 +80,16 @@ public class LinkingPage extends FormPage {
     public LinkingPage(LinkingEditor editor) throws Exception {
         super(editor, "IDENTITY_LINKING", "  Identity Linking  ");
 
-        this.editor = editor;
-        this.project = editor.getProject();
-        this.repository = editor.getRepository();
+        LinkingEditorInput ei = (LinkingEditorInput)editor.getEditorInput();
+
+        this.project = ei.getProject();
+        this.repository = ei.getRepository();
+        this.partitionName = ei.getPartitionName();
 
         PenroseClient penroseClient = project.getClient();
 
-        localPartitionClient = penroseClient.getPartitionClient(repository.getName());
-        globalPartitionClient = penroseClient.getPartitionClient("federation_global");
+        localPartitionClient = penroseClient.getPartitionClient(partitionName);
+        globalPartitionClient = penroseClient.getPartitionClient(Federation.GLOBAL);
 
         localBaseDn = localPartitionClient.getSuffixes().iterator().next();
         globalBaseDn = globalPartitionClient.getSuffixes().iterator().next();
@@ -810,7 +813,6 @@ public class LinkingPage extends FormPage {
 
     public Collection<DN> searchLinks(SearchResult localEntry) {
         try {
-            RepositoryConfig repository = editor.getRepository();
             String localAttribute = repository.getParameter("localAttribute");
             String globalAttribute = repository.getParameter("globalAttribute");
 
@@ -906,7 +908,6 @@ public class LinkingPage extends FormPage {
 
         SearchResult globalEntry = globalPartitionClient.find(dn);
 
-        RepositoryConfig repository = editor.getRepository();
         String localAttribute = repository.getParameter("localAttribute");
         String globalAttribute = repository.getParameter("globalAttribute");
 
@@ -936,7 +937,6 @@ public class LinkingPage extends FormPage {
 
     public void removeLink(DN globalDn, SearchResult localEntry) throws Exception {
 
-        RepositoryConfig repository = editor.getRepository();
         String localAttribute = repository.getParameter("localAttribute");
         String globalAttribute = repository.getParameter("globalAttribute");
 
@@ -1059,7 +1059,7 @@ public class LinkingPage extends FormPage {
             if (count == 0) return;
 
             boolean confirm = MessageDialog.openQuestion(
-                    editor.getSite().getShell(),
+                    getSite().getShell(),
                     "Unlink",
                     "Are you sure?"
             );
@@ -1123,7 +1123,7 @@ public class LinkingPage extends FormPage {
             if (count == 0) return;
 
             boolean confirm = MessageDialog.openQuestion(
-                    editor.getSite().getShell(),
+                    getSite().getShell(),
                     "Import",
                     "Are you sure?"
             );
@@ -1197,7 +1197,7 @@ public class LinkingPage extends FormPage {
             if (globalTable.getSelectionCount() == 0) return;
 
             boolean confirm = MessageDialog.openQuestion(
-                    editor.getSite().getShell(),
+                    getSite().getShell(),
                     "Delete",
                     "Are you sure?"
             );
@@ -1279,7 +1279,6 @@ public class LinkingPage extends FormPage {
 
     public SearchResult createEntry(SearchResult localEntry) throws Exception {
 
-        RepositoryConfig repository = editor.getRepository();
         String localAttribute = repository.getParameter("localAttribute");
         String globalAttribute = repository.getParameter("globalAttribute");
 

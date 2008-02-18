@@ -16,16 +16,15 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.ldap.SearchRequest;
 import org.safehaus.penrose.ldap.SearchResult;
 import org.safehaus.penrose.ldap.SearchResponse;
 import org.safehaus.penrose.ldap.Attributes;
 import org.safehaus.penrose.agent.client.FindClient;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.federation.Federation;
+import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
@@ -115,7 +114,7 @@ public class NISScriptsPage extends FormPage {
 
            Project project = nisFederation.getProject();
            PenroseClient client = project.getClient();
-           PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+           PartitionClient partitionClient = client.getPartitionClient(Federation.FEDERATION);
            SourceClient sourceClient = partitionClient.getSourceClient("penrose_hosts");
 
            sourceClient.search(request, response);

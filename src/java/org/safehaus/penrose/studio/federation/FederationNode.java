@@ -3,7 +3,6 @@ package org.safehaus.penrose.studio.federation;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -25,6 +24,9 @@ import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.util.FileUtil;
+import org.safehaus.penrose.federation.FederationWriter;
+import org.safehaus.penrose.federation.FederationConfig;
+import org.safehaus.penrose.studio.federation.Federation;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -53,7 +55,7 @@ public class FederationNode extends PluginNode {
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
-
+/*
         manager.add(new Action("Open") {
             public void run() {
                 try {
@@ -65,13 +67,13 @@ public class FederationNode extends PluginNode {
         });
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-
+*/
         manager.add(new Action("Import") {
             public void run() {
                 try {
                     importFederationConfig();
                 } catch (Exception e) {
-                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
         });
@@ -81,11 +83,11 @@ public class FederationNode extends PluginNode {
                 try {
                     exportFederationConfig();
                 } catch (Exception e) {
-                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
         });
-
+/*
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
         manager.add(new Action("Test") {
@@ -97,6 +99,7 @@ public class FederationNode extends PluginNode {
                 }
             }
         });
+*/
     }
 
     public void open() throws Exception {
@@ -254,6 +257,7 @@ public class FederationNode extends PluginNode {
     }
 
     public void importFederationConfig() throws Exception {
+        if (!started) start();
 
         FileDialog dialog = new FileDialog(getView().getSite().getShell(), SWT.OPEN);
         dialog.setText("Import");
@@ -262,25 +266,18 @@ public class FederationNode extends PluginNode {
         String filename = dialog.open();
         if (filename == null) return;
 
-        File file = new File(filename);
-
+        File file1 = new File(filename);
         File file2 = new File(project.getWorkDir(), "conf"+File.separator+"federation.xml");
 
-        FileUtil.copy(file, file2);
-/*
-        FederationReader reader = new FederationReader();
-        FederationConfig federationConfig = reader.read(file);
+        log.debug("Copying "+file1+" to "+file2);
+        FileUtil.copy(file1, file2);
 
-        for (RepositoryConfig repository : federationConfig.getRepositoryConfigs()) {
-            federation.addRepository(repository);
-        }
-*/
         IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
         progressService.busyCursorWhile(new IRunnableWithProgress() {
             public void run(IProgressMonitor monitor) throws InvocationTargetException {
                 try {
-                    federation.load(monitor);
+                    federation.importFederationConfig(monitor);
 
                 } catch (Exception e) {
                     throw new InvocationTargetException(e, e.getMessage());
@@ -293,6 +290,7 @@ public class FederationNode extends PluginNode {
     }
 
     public void exportFederationConfig() throws Exception {
+        if (!started) start();
 
         FileDialog dialog = new FileDialog(getView().getSite().getShell(), SWT.SAVE);
         dialog.setText("Export");
@@ -305,20 +303,20 @@ public class FederationNode extends PluginNode {
 /*
         FederationConfig federationConfig = new FederationConfig();
 
-        RepositoryConfig globalRepository = federation.getGlobalRepository();
-        globalRepository.setName("GLOBAL");
+        Repository globalRepository = federation.getGlobalRepository();
+        globalRepository.setName(Federation.GLOBAL);
         globalRepository.setType("GLOBAL");
 
-        federationConfig.addRepositoryConfig(globalRepository);
+        federationConfig.addRepository(globalRepository);
 
         LDAPFederation ldapFederation = federation.getLdapFederation();
         for (LDAPRepository repository : ldapFederation.getRepositories()) {
-            federationConfig.addRepositoryConfig(repository);
+            federationConfig.addRepository(repository);
         }
 
         NISFederation nisFederation = federation.getNisFederation();
         for (NISDomain repository : nisFederation.getRepositories()) {
-            federationConfig.addRepositoryConfig(repository);
+            federationConfig.addRepository(repository);
         }
 */
         File file = new File(filename);

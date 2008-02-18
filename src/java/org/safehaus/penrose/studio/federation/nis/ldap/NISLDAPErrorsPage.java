@@ -18,7 +18,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
+import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
@@ -67,7 +67,7 @@ public class NISLDAPErrorsPage extends FormPage {
         this.domain = editor.getDomain();
 
         PenroseClient penroseClient = project.getClient();
-        partitionClient = penroseClient.getPartitionClient(domain.getName());
+        partitionClient = penroseClient.getPartitionClient(domain.getName()+"_"+NISFederation.NIS);
         errors = partitionClient.getSourceClient("errors");
     }
 

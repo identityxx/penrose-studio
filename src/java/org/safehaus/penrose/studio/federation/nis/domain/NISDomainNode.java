@@ -8,14 +8,11 @@ import org.safehaus.penrose.studio.federation.nis.ownership.NISOwnershipNode;
 import org.safehaus.penrose.studio.federation.nis.linking.NISLinkingNode;
 import org.safehaus.penrose.studio.federation.nis.ldap.NISLDAPNode;
 import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.nis.database.NISDatabaseNode;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
+import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.yp.NISYPNode;
-import org.safehaus.penrose.partition.PartitionConfigs;
-import org.safehaus.penrose.partition.PartitionConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
@@ -61,33 +58,47 @@ public class NISDomainNode extends Node {
         nisFederation = nisNode.getNisFederation();
         projectNode = nisNode.getProjectNode();
 
-        serverNode = new NISYPNode(
-                "YP Server",
-                this
-        );
+        if (domain.isYpEnabled()) {
 
-        children.add(serverNode);
-/*
-        databaseNode = new NISDatabaseNode(
-                "Database Synchronization",
-                this
-        );
+            serverNode = new NISYPNode(
+                    "YP Server",
+                    this
+            );
 
-        children.add(databaseNode);
-*/
-        ldapNode = new NISLDAPNode(
-                "LDAP Server",
-                this
-        );
+            children.add(serverNode);
+        }
 
-        children.add(ldapNode);
+        if (domain.isNisEnabled()) {
 
-        linkingNode = new NISLinkingNode(
-                "Identity Linking",
-                this
-        );
+            ldapNode = new NISLDAPNode(
+                    "LDAP Server",
+                    this
+            );
 
-        children.add(linkingNode);
+            children.add(ldapNode);
+
+            linkingNode = new NISLinkingNode(
+                    "Identity Linking",
+                    this
+            );
+
+            children.add(linkingNode);
+
+            conflictsNode = new NISConflictsNode(
+                    "Conflict Resolution",
+                    this
+            );
+
+            children.add(conflictsNode);
+
+            ownershipNode = new NISOwnershipNode(
+                    "Ownership Alignment",
+                    this
+            );
+
+            children.add(ownershipNode);
+        }
+
 /*
         consolidationNode = new NISConsolidationNode(
                 "Stacking Authentication",
@@ -96,30 +107,19 @@ public class NISDomainNode extends Node {
 
         children.add(consolidationNode);
 */
-        conflictsNode = new NISConflictsNode(
-                "Conflict Resolution",
-                this
-        );
-
-        children.add(conflictsNode);
-
-        ownershipNode = new NISOwnershipNode(
-                "Ownership Alignment",
-                this
-        );
-
-        children.add(ownershipNode);
-
     }
 
     public Image getImage() {
+/*
         Project project = nisFederation.getProject();
         PartitionConfigs partitionConfigs = project.getPartitionConfigs();
         PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName()+"_"+NISFederation.YP);
         return PenroseStudioPlugin.getImage(partitionConfig == null ? PenroseImage.RED_FOLDER : PenroseImage.FOLDER);
-
+*/
         //Partition partition = nisFederation.getPartitions().getPartition(domain.getName());
         //return PenroseStudioPlugin.getImage(partition == null ? PenroseImage.RED_FOLDER : PenroseImage.FOLDER);
+
+        return PenroseStudioPlugin.getImage(PenroseImage.FOLDER);
     }
 
     public void showMenu(IMenuManager manager) throws Exception {

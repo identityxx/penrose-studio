@@ -1,24 +1,33 @@
 package org.safehaus.penrose.studio.federation;
 
-import org.safehaus.penrose.config.PenroseConfig;
-import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
-import org.safehaus.penrose.studio.util.FileUtil;
-import org.safehaus.penrose.management.PenroseClient;
 import org.apache.log4j.Logger;
+import org.apache.tools.ant.filters.ExpandProperties;
 import org.apache.tools.ant.taskdefs.Copy;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.FilterChain;
-import org.apache.tools.ant.filters.ExpandProperties;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.safehaus.penrose.config.PenroseConfig;
+import org.safehaus.penrose.federation.FederationConfig;
+import org.safehaus.penrose.federation.FederationReader;
+import org.safehaus.penrose.federation.FederationWriter;
+import org.safehaus.penrose.federation.repository.GlobalRepository;
+import org.safehaus.penrose.federation.repository.LDAPRepository;
+import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.federation.repository.Repository;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.naming.PenroseContext;
+import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.partition.PartitionFactory;
+import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
+import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.util.FileUtil;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author Endi Sukma Dewata
@@ -27,11 +36,11 @@ public class Federation {
 
     public Logger log = Logger.getLogger(getClass());
 
-    public final static String PARTITION = "federation";
-    public final static String GLOBAL    = "federation_global";
+    public final static String FEDERATION = "federation";
+    public final static String GLOBAL     = "global";
 
-    public final static String JDBC      = "JDBC";
-    public final static String LDAP      = "LDAP";
+    public final static String JDBC       = "JDBC";
+    public final static String LDAP       = "LDAP";
 
     public final static String GLOBAL_PARAMETERS     = "global_parameters";
     public final static String REPOSITORIES          = "repositories";
@@ -69,14 +78,14 @@ public class Federation {
     public void createPartition() throws Exception {
     //public void createPartition(Map<String,String> allParameters, JDBCConnection connection) throws Exception {
 
-        log.debug("Creating partition "+Federation.PARTITION +".");
+        log.debug("Creating partition "+Federation.FEDERATION +".");
 
         File workDir = project.getWorkDir();
 
-        File sampleDir = new File(workDir, "samples/"+Federation.PARTITION);
-        if (!sampleDir.exists()) project.download("samples/"+Federation.PARTITION);
+        File sampleDir = new File(workDir, "samples/"+Federation.FEDERATION);
+        if (!sampleDir.exists()) project.download("samples/"+Federation.FEDERATION);
 
-        File partitionDir = new File(workDir, "partitions/"+Federation.PARTITION);
+        File partitionDir = new File(workDir, "partitions/"+Federation.FEDERATION);
 
         org.apache.tools.ant.Project antProject = new org.apache.tools.ant.Project();
 /*
@@ -128,7 +137,7 @@ public class Federation {
         PenroseClient penroseClient = project.getClient();
         penroseClient.startPartition(partitionConfig.getName());
 
-        log.debug("Initializing partition "+Federation.PARTITION +".");
+        log.debug("Initializing partition "+Federation.FEDERATION +".");
 
         PenroseConfig penroseConfig = project.getPenroseConfig();
         PenroseContext penroseContext = project.getPenroseContext();
@@ -145,17 +154,21 @@ public class Federation {
         nisFederation.removePartition(GLOBAL);
     }
 
-    public void createGlobalPartition(GlobalRepository globalRepository) throws Exception {
+    public void createGlobalPartition() throws Exception {
 
+        GlobalRepository globalRepository = getGlobalRepository();
+        if (globalRepository == null) return;
+
+        String templateName = FEDERATION+"_"+GLOBAL;
         String partitionName = GLOBAL;
 
         PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-        //if (partitionConfigs.getPartitionConfig(partitionName) != null) return;
+        //if (partitionConfigs.getPartitionConfig(templateName) != null) return;
 
         log.debug("Creating global partition.");
 
-        File sampleDir = new File(project.getWorkDir(), "samples/"+partitionName);
-        if (!sampleDir.exists()) project.download("samples/"+partitionName);
+        File sampleDir = new File(project.getWorkDir(), "samples/"+ templateName);
+        if (!sampleDir.exists()) project.download("samples/"+ templateName);
 
         File partitionDir = new File(project.getWorkDir(), "partitions"+File.separator+ partitionName);
 
@@ -223,26 +236,24 @@ public class Federation {
 */
             loadConfigFromFile();
             //loadConfigFromDatabase();
-
-            PartitionConfigs partitionConfigs = project.getPartitionConfigs();
 /*
+            PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+
             if (partitionConfigs.getPartitionConfig(Federation.PARTITION) == null) {
                 createPartition();
             }
-*/
+
             if (partitionConfigs.getPartitionConfig(Federation.GLOBAL) == null) {
-                GlobalRepository globalRepository = getGlobalRepository();
-                log.debug("Global partition: "+globalRepository);
-                if (globalRepository != null) createGlobalPartition(globalRepository);
+                createGlobalPartition();
             }
-
-            SubProgressMonitor ldapMonitor = new SubProgressMonitor(monitor, 1);
+*/
+            //SubProgressMonitor ldapMonitor = new SubProgressMonitor(monitor, 1);
             ldapFederation = new LDAPFederation(this);
-            ldapFederation.load(ldapMonitor);
+            //ldapFederation.load(ldapMonitor);
 
-            SubProgressMonitor nisMonitor = new SubProgressMonitor(monitor, 1);
+            //SubProgressMonitor nisMonitor = new SubProgressMonitor(monitor, 1);
             nisFederation = new NISFederation(this);
-            nisFederation.load(nisMonitor);
+            //nisFederation.load(nisMonitor);
 
         } finally {
             monitor.done();
@@ -259,6 +270,36 @@ public class Federation {
             reader.read(file, federationConfig);
         }
     }
+
+    public void importFederationConfig(IProgressMonitor monitor) throws Exception {
+        try {
+            log.debug("Starting Federation tool.");
+
+            monitor.beginTask("Loading partitions...", IProgressMonitor.UNKNOWN);
+
+            loadConfigFromFile();
+            monitor.worked(1);
+
+            update();
+            monitor.worked(1);
+
+            createGlobalPartition();
+            monitor.worked(1);
+
+            for (LDAPRepository ldapRepository : ldapFederation.getRepositories()) {
+                ldapFederation.createPartitions(ldapRepository);
+                monitor.worked(1);
+            }
+
+            for (NISDomain nisDomain : nisFederation.getRepositories()) {
+                nisFederation.createPartitions(nisDomain);
+                monitor.worked(1);
+            }
+
+        } finally {
+            monitor.done();
+        }
+    }
 /*
     public void loadConfigFromDatabase() throws Exception {
 
@@ -267,7 +308,7 @@ public class Federation {
         Source repositoryParameters = partition.getSource(REPOSITORY_PARAMETERS);
 
         GlobalRepository globalRepository = new GlobalRepository();
-        globalRepository.setName("GLOBAL");
+        globalRepository.setName(GLOBAL);
         globalRepository.setType("GLOBAL");
 
         Map<String,String> parameters = new TreeMap<String,String>();
@@ -292,7 +333,7 @@ public class Federation {
 
         globalRepository.setParameters(parameters);
 
-        federationConfig.addRepositoryConfig(globalRepository);
+        federationConfig.addRepository(globalRepository);
 
         // load other repositories
         request = new SearchRequest();
@@ -309,7 +350,7 @@ public class Federation {
 
             parameters = getRepositoryParameters(repositoryParameters, name);
 
-            RepositoryConfig repository;
+            Repository repository;
 
             if ("LDAP".equals(type)) {
                 repository = new LDAPRepository();
@@ -351,7 +392,7 @@ public class Federation {
             repository.setType(type);
             repository.setParameters(parameters);
 
-            federationConfig.addRepositoryConfig(repository);
+            federationConfig.addRepository(repository);
         }
     }
 
@@ -459,11 +500,11 @@ public class Federation {
         return list;
     }
 */
-    public Collection<RepositoryConfig> getRepositories(String type) {
+    public Collection<Repository> getRepositories(String type) {
 
-        Collection<RepositoryConfig> list = new ArrayList<RepositoryConfig>();
+        Collection<Repository> list = new ArrayList<Repository>();
 
-        for (RepositoryConfig repository : federationConfig.getRepositoryConfigs()) {
+        for (Repository repository : federationConfig.getRepositories()) {
             if (type.equals(repository.getType())) {
                 list.add(repository);
             }
@@ -472,9 +513,9 @@ public class Federation {
         return list;
     }
 
-    public void addRepository(RepositoryConfig repository) throws Exception {
+    public void addRepository(Repository repository) throws Exception {
 
-        federationConfig.addRepositoryConfig(repository);
+        federationConfig.addRepository(repository);
 /*
         RDNBuilder rb = new RDNBuilder();
         rb.set("name", repository.getName());
@@ -508,7 +549,7 @@ public class Federation {
 
     public void removeRepository(String name) throws Exception {
 
-        RepositoryConfig repository = federationConfig.removeRepositoryConfig(name);
+        Repository repository = federationConfig.removeRepository(name);
 
         File dir = new File(project.getWorkDir(), "partitions"+File.separator+ repository.getName());
         FileUtil.delete(dir);
@@ -528,12 +569,12 @@ public class Federation {
     }
 
     public GlobalRepository getGlobalRepository() throws Exception {
-        return (GlobalRepository)federationConfig.getRepositoryConfig("GLOBAL");
+        return (GlobalRepository)federationConfig.getRepository(GLOBAL);
     }
 
     public void setGlobalRepository(GlobalRepository repository) throws Exception {
 
-        federationConfig.addRepositoryConfig(repository);
+        federationConfig.addRepository(repository);
 /*
         Map<String,String> parameters = repository.getParameters();
 

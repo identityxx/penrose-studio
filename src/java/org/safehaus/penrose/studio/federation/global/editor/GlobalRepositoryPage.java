@@ -22,7 +22,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.federation.Federation;
-import org.safehaus.penrose.studio.federation.GlobalRepository;
+import org.safehaus.penrose.federation.repository.GlobalRepository;
 import org.safehaus.penrose.studio.federation.ldap.wizard.LDAPRepositoryEditorWizard;
 import org.safehaus.penrose.studio.project.Project;
 
@@ -172,6 +172,9 @@ public class GlobalRepositoryPage extends FormPage {
 
                     if (globalRepository == null) {
                         globalRepository = new GlobalRepository();
+                        globalRepository.setName(Federation.GLOBAL);
+                        globalRepository.setType("GLOBAL");
+
                     } else {
                         federation.removeGlobalPartition();
                     }
@@ -183,7 +186,7 @@ public class GlobalRepositoryPage extends FormPage {
 
                     federation.setGlobalRepository(globalRepository);
                     federation.update();
-                    federation.createGlobalPartition(globalRepository);
+                    federation.createGlobalPartition();
 
                     refresh();
                     
@@ -254,8 +257,7 @@ public class GlobalRepositoryPage extends FormPage {
 
                     if (!confirm) return;
 
-                    GlobalRepository globalRepository = federation.getGlobalRepository();
-                    federation.createGlobalPartition(globalRepository);
+                    federation.createGlobalPartition();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);

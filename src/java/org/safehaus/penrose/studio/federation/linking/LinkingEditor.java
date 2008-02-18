@@ -7,7 +7,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.safehaus.penrose.studio.federation.RepositoryConfig;
+import org.safehaus.penrose.federation.repository.Repository;
 import org.safehaus.penrose.studio.project.Project;
 
 public class LinkingEditor extends FormEditor {
@@ -15,12 +15,14 @@ public class LinkingEditor extends FormEditor {
     public Logger log = LoggerFactory.getLogger(getClass());
 
     private Project project;
-    private RepositoryConfig repository;
+    private Repository repository;
+    private String partitionName;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         LinkingEditorInput ei = (LinkingEditorInput)input;
         project = ei.getProject();
         repository = ei.getRepository();
+        partitionName = ei.getPartitionName();
 
         setSite(site);
         setInput(input);
@@ -50,11 +52,11 @@ public class LinkingEditor extends FormEditor {
         return false;
     }
 
-    public RepositoryConfig getRepository() {
+    public Repository getRepository() {
         return repository;
     }
 
-    public void setRepository(RepositoryConfig repository) {
+    public void setRepository(Repository repository) {
         this.repository = repository;
     }
 
@@ -64,5 +66,13 @@ public class LinkingEditor extends FormEditor {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public String getPartitionName() {
+        return partitionName;
+    }
+
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 }

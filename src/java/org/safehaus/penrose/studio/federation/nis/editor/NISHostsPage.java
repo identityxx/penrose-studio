@@ -13,11 +13,11 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.studio.federation.nis.NISDomain;
+import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISHostDialog;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISFilesEditor;
-import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.nis.dialog.NISUserDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
@@ -108,7 +108,7 @@ public class NISHostsPage extends FormPage {
 
             Project project = nisFederation.getProject();
             PenroseClient client = project.getClient();
-            PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+            PartitionClient partitionClient = client.getPartitionClient(Federation.FEDERATION);
             SourceClient sourceClient = partitionClient.getSourceClient("penrose_hosts");
 
             sourceClient.search(request, response);
@@ -268,7 +268,7 @@ public class NISHostsPage extends FormPage {
 
         Project project = nisFederation.getProject();
         PenroseClient client = project.getClient();
-        PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+        PartitionClient partitionClient = client.getPartitionClient(Federation.FEDERATION);
         SourceClient sourceClient = partitionClient.getSourceClient("penrose_hosts");
 
         sourceClient.add(dn, attributes);
@@ -300,7 +300,7 @@ public class NISHostsPage extends FormPage {
 
         Project project = nisFederation.getProject();
         PenroseClient client = project.getClient();
-        PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+        PartitionClient partitionClient = client.getPartitionClient(Federation.FEDERATION);
         SourceClient sourceClient = partitionClient.getSourceClient("penrose_hosts");
 
         if (!dn.getRdn().equals(newRdn)) {
@@ -335,7 +335,7 @@ public class NISHostsPage extends FormPage {
 
         Project project = nisFederation.getProject();
         PenroseClient client = project.getClient();
-        PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+        PartitionClient partitionClient = client.getPartitionClient(Federation.FEDERATION);
         SourceClient sourceClient = partitionClient.getSourceClient("penrose_hosts");
 
         TableItem items[] = hostsTable.getSelection();
@@ -355,7 +355,7 @@ public class NISHostsPage extends FormPage {
         PartitionClient domainClient = client.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
         ModuleClient moduleClient = domainClient.getModuleClient("NISModule");
 
-        PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
+        PartitionClient partitionClient = client.getPartitionClient(Federation.FEDERATION);
         SourceClient sourceClient = partitionClient.getSourceClient("penrose_hosts");
 
         TableItem items[] = hostsTable.getSelection();
