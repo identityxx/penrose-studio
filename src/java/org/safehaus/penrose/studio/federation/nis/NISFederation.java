@@ -369,10 +369,7 @@ public class NISFederation {
         log.debug("Creating partition "+partitionName+".");
 
         File sampleDir = new File(project.getWorkDir(), "samples/"+ NSS_TEMPLATE);
-
-        if (!sampleDir.exists()) {
-            project.download("samples/"+ NSS_TEMPLATE);
-        }
+        if (!sampleDir.exists()) project.download("samples/"+ NSS_TEMPLATE);
 
         File partitionDir = new File(project.getWorkDir(), "partitions"+File.separator+partitionName);
 

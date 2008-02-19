@@ -275,23 +275,30 @@ public class Federation {
         try {
             log.debug("Starting Federation tool.");
 
-            monitor.beginTask("Loading partitions...", IProgressMonitor.UNKNOWN);
+            monitor.beginTask("Importing Federation configuration...", IProgressMonitor.UNKNOWN);
 
+            File file = new File(project.getWorkDir(), "conf"+File.separator+"federation.xml");
+
+            monitor.subTask("Loading Federation configuration "+file+"...");
             loadConfigFromFile();
             monitor.worked(1);
 
+            monitor.subTask("Uploading Federation configuration...");
             update();
             monitor.worked(1);
 
+            monitor.subTask("Creating global partition...");
             createGlobalPartition();
             monitor.worked(1);
 
             for (LDAPRepository ldapRepository : ldapFederation.getRepositories()) {
+                monitor.subTask("Creating "+ldapRepository.getName()+" partition...");
                 ldapFederation.createPartitions(ldapRepository);
                 monitor.worked(1);
             }
 
             for (NISDomain nisDomain : nisFederation.getRepositories()) {
+                monitor.subTask("Creating "+nisDomain.getName()+" partition...");
                 nisFederation.createPartitions(nisDomain);
                 monitor.worked(1);
             }
@@ -572,28 +579,38 @@ public class Federation {
         return (GlobalRepository)federationConfig.getRepository(GLOBAL);
     }
 
-    public void setGlobalRepository(GlobalRepository repository) throws Exception {
+    public void updateGlobalRepository(IProgressMonitor monitor, GlobalRepository repository) throws Exception {
 
-        federationConfig.addRepository(repository);
-/*
-        Map<String,String> parameters = repository.getParameters();
+        try {
+            log.debug("Updating global repository.");
 
-        globalParameters.delete(new DN());
+            monitor.beginTask("Updating global repository...", IProgressMonitor.UNKNOWN);
 
-        for (String paramName : parameters.keySet()) {
-            String paramValue = parameters.get(paramName);
+            federationConfig.addRepository(repository);
 
-            RDNBuilder rb = new RDNBuilder();
-            rb.set("name", paramName);
-            DN dn = new DN(rb.toRdn());
+            monitor.subTask("Uploading Federation configuration...");
+            update();
+            monitor.worked(1);
 
-            Attributes attributes = new Attributes();
-            attributes.setValue("name", paramName);
-            attributes.setValue("value", paramValue);
+            monitor.subTask("Creating global partition...");
+            createGlobalPartition();
+            monitor.worked(1);
 
-            globalParameters.add(dn, attributes);
+            for (LDAPRepository ldapRepository : ldapFederation.getRepositories()) {
+                monitor.subTask("Creating "+ldapRepository.getName()+" partition...");
+                ldapFederation.createPartitions(ldapRepository);
+                monitor.worked(1);
+            }
+
+            for (NISDomain nisDomain : nisFederation.getRepositories()) {
+                monitor.subTask("Creating "+nisDomain.getName()+" partition...");
+                nisFederation.createPartitions(nisDomain);
+                monitor.worked(1);
+            }
+
+        } finally {
+            monitor.done();
         }
-*/
     }
 
     public PartitionConfig getPartitionConfig(String name) throws Exception {

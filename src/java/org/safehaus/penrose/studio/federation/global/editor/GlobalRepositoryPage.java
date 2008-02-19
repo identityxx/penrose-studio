@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -15,11 +16,13 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.IProgressService;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.federation.repository.GlobalRepository;
@@ -29,6 +32,7 @@ import org.safehaus.penrose.studio.project.Project;
 import javax.naming.Context;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Endi S. Dewata
@@ -184,9 +188,20 @@ public class GlobalRepositoryPage extends FormPage {
                     globalRepository.setPassword(parameters.get(Context.SECURITY_CREDENTIALS));
                     globalRepository.setSuffix(wizard.getSuffix());
 
-                    federation.setGlobalRepository(globalRepository);
-                    federation.update();
-                    federation.createGlobalPartition();
+                    final GlobalRepository repository = globalRepository;
+
+                    IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+                    progressService.busyCursorWhile(new IRunnableWithProgress() {
+                        public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                            try {
+                                federation.updateGlobalRepository(monitor, repository);
+
+                            } catch (Exception e) {
+                                throw new InvocationTargetException(e, e.getMessage());
+                            }
+                        }
+                    });
 
                     refresh();
                     
