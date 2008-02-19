@@ -39,7 +39,7 @@ public class NISLdapWizardPage extends WizardPage implements ModifyListener, Sel
     public NISLdapWizardPage() {
         super(NAME);
 
-        setDescription("Enter an LDAP suffix for the NIS entries, YP entries, and NSS entries.");
+        setDescription("Enter an LDAP suffix for the YP entries, NIS entries, and NSS entries.");
     }
 
     public void createControl(final Composite parent) {
