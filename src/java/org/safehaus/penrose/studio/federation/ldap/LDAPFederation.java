@@ -1,22 +1,25 @@
 package org.safehaus.penrose.studio.federation.ldap;
 
 import org.apache.log4j.Logger;
+import org.apache.tools.ant.filters.ExpandProperties;
 import org.apache.tools.ant.taskdefs.Copy;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.FilterChain;
-import org.apache.tools.ant.filters.ExpandProperties;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.federation.Federation;
-import org.safehaus.penrose.federation.repository.Repository;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.federation.repository.GlobalRepository;
 import org.safehaus.penrose.federation.repository.LDAPRepository;
-import org.safehaus.penrose.partition.*;
+import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.federation.repository.Repository;
 import org.safehaus.penrose.management.PenroseClient;
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.studio.federation.Federation;
+import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.studio.project.Project;
 
-import java.util.Collection;
-import java.util.ArrayList;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author Endi Sukma Dewata
@@ -210,6 +213,11 @@ public class LDAPFederation {
         federation.removeRepository(repository.getName());
         federation.addRepository(repository);
         federation.update();
+
+        NISFederation nisFederation = federation.getNisFederation();
+        for (NISDomain nisDomain : nisFederation.getRepositories()) {
+            nisFederation.createPartitions(nisDomain);
+        }
 
         createPartitions(repository);
     }
