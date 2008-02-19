@@ -592,18 +592,18 @@ public class Federation {
             update();
             monitor.worked(1);
 
-            monitor.subTask("Creating global partition...");
+            monitor.subTask("Updating global partition...");
             createGlobalPartition();
             monitor.worked(1);
 
             for (LDAPRepository ldapRepository : ldapFederation.getRepositories()) {
-                monitor.subTask("Creating "+ldapRepository.getName()+" partition...");
+                monitor.subTask("Updating "+ldapRepository.getName()+" partition...");
                 ldapFederation.createPartitions(ldapRepository);
                 monitor.worked(1);
             }
 
             for (NISDomain nisDomain : nisFederation.getRepositories()) {
-                monitor.subTask("Creating "+nisDomain.getName()+" partition...");
+                monitor.subTask("Updating "+nisDomain.getName()+" partition...");
                 nisFederation.createPartitions(nisDomain);
                 monitor.worked(1);
             }
