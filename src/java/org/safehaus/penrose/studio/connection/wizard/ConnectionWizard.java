@@ -25,13 +25,12 @@ import org.safehaus.penrose.studio.driver.Driver;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.jdbc.connection.JDBCConnectionWizardPage;
 import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionParametersWizardPage;
-import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionInfoWizardPage;
+import org.safehaus.penrose.studio.jndi.connection.LDAPConnectionWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.apache.log4j.Logger;
 
-import javax.naming.InitialContext;
 import javax.naming.Context;
 import java.util.Map;
 import java.util.TreeMap;
@@ -51,7 +50,7 @@ public class ConnectionWizard extends Wizard {
     public ConnectionDriverPage driverPage = new ConnectionDriverPage();
     public JDBCConnectionWizardPage jdbcPage = new JDBCConnectionWizardPage();
 
-    public JNDIConnectionInfoWizardPage jndiInfoPage = new JNDIConnectionInfoWizardPage();
+    public LDAPConnectionWizardPage jndiInfoPage = new LDAPConnectionWizardPage();
     public JNDIConnectionParametersWizardPage jndiParametersPage = new JNDIConnectionParametersWizardPage();
 
     public ConnectionWizard(PartitionConfig partitionConfig) {

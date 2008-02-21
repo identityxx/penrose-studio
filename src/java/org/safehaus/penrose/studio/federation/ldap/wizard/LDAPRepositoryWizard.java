@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.federation.repository.LDAPRepository;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionInfoWizardPage;
+import org.safehaus.penrose.studio.jndi.connection.LDAPConnectionWizardPage;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.connection.ConnectionConfig;
 
@@ -21,7 +21,8 @@ public class LDAPRepositoryWizard extends Wizard {
     public Logger log = LoggerFactory.getLogger(getClass());
 
     LDAPRepositoryWizardPage repositoryPage;
-    JNDIConnectionInfoWizardPage ldapPage;
+    LDAPConnectionWizardPage connectionPage;
+    //LDAPPartitionsWizardPage partitionsPage;
 
     LDAPFederation ldapFederation;
     Project project;
@@ -37,7 +38,8 @@ public class LDAPRepositoryWizard extends Wizard {
 
     public boolean canFinish() {
         if (!repositoryPage.isPageComplete()) return false;
-        if (!ldapPage.isPageComplete()) return false;
+        if (!connectionPage.isPageComplete()) return false;
+        //if (!partitionsPage.isPageComplete()) return false;
         return true;
     }
 
@@ -45,24 +47,35 @@ public class LDAPRepositoryWizard extends Wizard {
         repositoryPage = new LDAPRepositoryWizardPage();
         addPage(repositoryPage);
 
-        ldapPage = new JNDIConnectionInfoWizardPage();
-        ldapPage.setDescription("Enter LDAP connection parameters.");
-        ldapPage.setParameters(ldapConfig.getParameters());
-        addPage(ldapPage);
+        connectionPage = new LDAPConnectionWizardPage();
+        connectionPage.setDescription("Enter LDAP connection parameters.");
+        connectionPage.setParameters(ldapConfig.getParameters());
+        addPage(connectionPage);
 
+        //partitionsPage = new LDAPPartitionsWizardPage();
+        //addPage(partitionsPage);
     }
+/*
+    public IWizardPage getNextPage(IWizardPage page) {
+        if (connectionPage == page) {
+            String suffix = connectionPage.getSuffix();
 
+            partitionsPage.setSuffix(suffix);
+        }
+        return super.getNextPage(page);
+    }
+*/
     public boolean performFinish() {
 
         try {
-            Map<String,String> map = ldapPage.getParameters();
+            Map<String,String> map = connectionPage.getParameters();
 
             LDAPRepository repository = new LDAPRepository();
             repository.setName(repositoryPage.getRepository());
             repository.setUrl(map.get(Context.PROVIDER_URL));
             repository.setUser(map.get(Context.SECURITY_PRINCIPAL));
             repository.setPassword(map.get(Context.SECURITY_CREDENTIALS));
-            repository.setSuffix(ldapPage.getSuffix());
+            repository.setSuffix(connectionPage.getSuffix());
 
             ldapFederation.addRepository(repository);
 

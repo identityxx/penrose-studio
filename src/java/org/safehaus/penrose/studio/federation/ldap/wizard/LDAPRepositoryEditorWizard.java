@@ -3,7 +3,7 @@ package org.safehaus.penrose.studio.federation.ldap.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionInfoWizardPage;
+import org.safehaus.penrose.studio.jndi.connection.LDAPConnectionWizardPage;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -18,7 +18,7 @@ public class LDAPRepositoryEditorWizard extends Wizard {
 
     private Project project;
 
-    public JNDIConnectionInfoWizardPage ldapPage;
+    public LDAPConnectionWizardPage ldapPage;
 
     private Map<String,String> parameters = new LinkedHashMap<String,String>();
     private String suffix;
@@ -34,7 +34,7 @@ public class LDAPRepositoryEditorWizard extends Wizard {
 
     public void addPages() {
 
-        ldapPage = new JNDIConnectionInfoWizardPage();
+        ldapPage = new LDAPConnectionWizardPage();
         ldapPage.setDescription("Enter LDAP connection parameters.");
         ldapPage.setParameters(parameters);
         ldapPage.setSuffix(suffix);

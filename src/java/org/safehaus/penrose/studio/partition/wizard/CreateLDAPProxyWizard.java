@@ -21,7 +21,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionParametersWizardPage;
-import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionInfoWizardPage;
+import org.safehaus.penrose.studio.jndi.connection.LDAPConnectionWizardPage;
 import org.safehaus.penrose.studio.util.ADUtil;
 import org.safehaus.penrose.studio.util.SchemaUtil;
 import org.safehaus.penrose.partition.*;
@@ -50,7 +50,7 @@ public class CreateLDAPProxyWizard extends Wizard {
     private Project project;
 
     public PartitionProxyPage infoPage = new PartitionProxyPage();
-    public JNDIConnectionInfoWizardPage connectionInfoPage = new JNDIConnectionInfoWizardPage();
+    public LDAPConnectionWizardPage connectionInfoPage = new LDAPConnectionWizardPage();
     public JNDIConnectionParametersWizardPage connectionParametersPage = new JNDIConnectionParametersWizardPage();
 
     public CreateLDAPProxyWizard() {

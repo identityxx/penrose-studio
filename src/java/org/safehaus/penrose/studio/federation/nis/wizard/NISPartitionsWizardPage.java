@@ -18,28 +18,28 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Endi Sukma Dewata
  */
-public class NISLdapWizardPage extends WizardPage implements ModifyListener, SelectionListener {
+public class NISPartitionsWizardPage extends WizardPage implements ModifyListener, SelectionListener {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    public final static String NAME = "NIS LDAP";
+    public final static String NAME = "NIS PARTITIONS";
 
-
-    Button nisEnabledButton;
-    Text nisSuffixText;
 
     Button ypEnabledButton;
     Text ypSuffixText;
+
+    Button nisEnabledButton;
+    Text nisSuffixText;
 
     Button nssEnabledButton;
     Text nssSuffixText;
 
     boolean visited;
 
-    public NISLdapWizardPage() {
+    public NISPartitionsWizardPage() {
         super(NAME);
 
-        setDescription("Enter an LDAP suffix for the YP entries, NIS entries, and NSS entries.");
+        setDescription("Enter a suffix for the YP, NIS, and NSS partitions.");
     }
 
     public void createControl(final Composite parent) {

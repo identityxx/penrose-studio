@@ -39,7 +39,7 @@ import java.util.*;
 /**
  * @author Endi S. Dewata
  */
-public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyListener {
+public class LDAPConnectionWizardPage extends WizardPage implements ModifyListener {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -67,7 +67,7 @@ public class JNDIConnectionInfoWizardPage extends WizardPage implements ModifyLi
     Text bindDnText;
     Text passwordText;
 
-    public JNDIConnectionInfoWizardPage() {
+    public LDAPConnectionWizardPage() {
         super(NAME);
         setDescription("Enter connection information.");
     }

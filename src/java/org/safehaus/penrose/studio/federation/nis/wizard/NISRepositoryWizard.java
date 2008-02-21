@@ -17,8 +17,8 @@ public class NISRepositoryWizard extends Wizard {
     public Logger log = LoggerFactory.getLogger(getClass());
 
     NISRepositoryWizardPage repositoryPage;
-    NISDomainWizardPage domainPage;
-    NISLdapWizardPage partitionPage;
+    NISDomainWizardPage     connectionPage;
+    NISPartitionsWizardPage partitionsPage;
 
     NISFederation nisFederation;
     Project project;
@@ -32,8 +32,8 @@ public class NISRepositoryWizard extends Wizard {
 
     public boolean canFinish() {
         if (!repositoryPage.isPageComplete()) return false;
-        if (!domainPage.isPageComplete()) return false;
-        if (!partitionPage.isPageComplete()) return false;
+        if (!connectionPage.isPageComplete()) return false;
+        if (!partitionsPage.isPageComplete()) return false;
         return true;
     }
 
@@ -41,21 +41,21 @@ public class NISRepositoryWizard extends Wizard {
         repositoryPage = new NISRepositoryWizardPage();
         addPage(repositoryPage);
 
-        domainPage = new NISDomainWizardPage();
-        addPage(domainPage);
+        connectionPage = new NISDomainWizardPage();
+        addPage(connectionPage);
 
-        partitionPage = new NISLdapWizardPage();
-        addPage(partitionPage);
+        partitionsPage = new NISPartitionsWizardPage();
+        addPage(partitionsPage);
     }
 
     public IWizardPage getNextPage(IWizardPage page) {
         if (repositoryPage == page) {
             String name = repositoryPage.getRepository();
-            domainPage.setDomain(name);
+            connectionPage.setDomain(name);
             
-        } else if (domainPage == page) {
+        } else if (connectionPage == page) {
             String name = repositoryPage.getRepository();
-            String domainName = domainPage.getDomain();
+            String domainName = connectionPage.getDomain();
 
             String nisSuffix = "ou="+name+",ou=nis";
             String ypSuffix  = "ou="+name+",ou=yp";
@@ -69,9 +69,9 @@ public class NISRepositoryWizard extends Wizard {
                 nssSuffix = nssSuffix+suffix;
             }
 
-            partitionPage.setNisSuffix(nisSuffix);
-            partitionPage.setYpSuffix(ypSuffix);
-            partitionPage.setNssSuffix(nssSuffix);
+            partitionsPage.setNisSuffix(nisSuffix);
+            partitionsPage.setYpSuffix(ypSuffix);
+            partitionsPage.setNssSuffix(nssSuffix);
         }
 
         return super.getNextPage(page);
@@ -81,17 +81,17 @@ public class NISRepositoryWizard extends Wizard {
         try {
             NISDomain domain = new NISDomain();
             domain.setName(repositoryPage.getRepository());
-            domain.setFullName(domainPage.getDomain());
-            domain.setServer(domainPage.getServer());
+            domain.setFullName(connectionPage.getDomain());
+            domain.setServer(connectionPage.getServer());
 
-            domain.setNisEnabled(partitionPage.isNisEnabled());
-            domain.setNisSuffix(partitionPage.getNisSuffix());
+            domain.setNisEnabled(partitionsPage.isNisEnabled());
+            domain.setNisSuffix(partitionsPage.getNisSuffix());
 
-            domain.setYpEnabled(partitionPage.isYpEnabled());
-            domain.setYpSuffix(partitionPage.getYpSuffix());
+            domain.setYpEnabled(partitionsPage.isYpEnabled());
+            domain.setYpSuffix(partitionsPage.getYpSuffix());
 
-            domain.setNssEnabled(partitionPage.isNssEnabled());
-            domain.setNssSuffix(partitionPage.getNssSuffix());
+            domain.setNssEnabled(partitionsPage.isNssEnabled());
+            domain.setNssSuffix(partitionsPage.getNssSuffix());
 
             nisFederation.addRepository(domain);
 

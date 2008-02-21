@@ -21,7 +21,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionParametersWizardPage;
-import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionInfoWizardPage;
+import org.safehaus.penrose.studio.jndi.connection.LDAPConnectionWizardPage;
 import org.safehaus.penrose.studio.util.SnapshotUtil;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.ldap.LDAPClient;
@@ -43,7 +43,7 @@ public class CreateLDAPSnapshotWizard extends Wizard {
     private Project project;
 
     public PartitionNamePage namePage = new PartitionNamePage();
-    public JNDIConnectionInfoWizardPage connectionInfoPage = new JNDIConnectionInfoWizardPage();
+    public LDAPConnectionWizardPage connectionInfoPage = new LDAPConnectionWizardPage();
     public JNDIConnectionParametersWizardPage connectionParametersPage = new JNDIConnectionParametersWizardPage();
 
     public CreateLDAPSnapshotWizard() {
