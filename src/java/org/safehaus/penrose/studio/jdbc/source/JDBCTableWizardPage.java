@@ -18,24 +18,21 @@
 package org.safehaus.penrose.studio.jdbc.source;
 
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.jdbc.*;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.source.TableConfig;
 import org.apache.log4j.Logger;
 
 import java.util.*;
-import java.io.StringWriter;
-import java.io.PrintWriter;
 
 /**
  * @author Endi S. Dewata
@@ -222,9 +219,9 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
         JDBCClient client = new JDBCClient(connectionConfig.getParameters());
 
         try {
-            Collection<TableConfig> tables = client.getTables(getCatalog(), getSchema());
+            Collection<org.safehaus.penrose.jdbc.Table> tables = client.getTables(getCatalog(), getSchema());
 
-            for (TableConfig tableConfig : tables) {
+            for (org.safehaus.penrose.jdbc.Table tableConfig : tables) {
                 String tableName = tableConfig.getName();
 
                 TableItem item = new TableItem(tableTable, SWT.NONE);
@@ -270,16 +267,16 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
         return "".equals(tableText.getText()) ? null : tableText.getText();
     }
 
-    public TableConfig getTableConfig() {
+    public org.safehaus.penrose.jdbc.Table getTable() {
         if (tableTable.getSelectionCount() == 0) {
-            TableConfig tableConfig = new TableConfig(getTableName());
-            tableConfig.setCatalog(getCatalog());
-            tableConfig.setSchema(getSchema());
-            return tableConfig;
+            org.safehaus.penrose.jdbc.Table table = new org.safehaus.penrose.jdbc.Table(getTableName());
+            table.setCatalog(getCatalog());
+            table.setSchema(getSchema());
+            return table;
         }
         
         TableItem ti = tableTable.getSelection()[0];
-        return (TableConfig)ti.getData();
+        return (org.safehaus.penrose.jdbc.Table)ti.getData();
     }
 
     public boolean validatePage() {

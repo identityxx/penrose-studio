@@ -18,6 +18,7 @@
 package org.safehaus.penrose.studio.jdbc.connection;
 
 import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -27,10 +28,8 @@ import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.source.TableConfig;
 import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.jdbc.*;
 import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -45,8 +44,6 @@ import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.naming.PenroseContext;
 
 import java.util.Collection;
-import java.io.StringWriter;
-import java.io.PrintWriter;
 
 /**
  * @author Endi S. Dewata
@@ -180,9 +177,9 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
             public void widgetSelected(SelectionEvent event) {
                 try {
                     TableItem ti = tablesTable.getSelection()[0];
-                    TableConfig tableConfig = (TableConfig)ti.getData();
+                    org.safehaus.penrose.jdbc.Table table = (org.safehaus.penrose.jdbc.Table)ti.getData();
 
-                    JDBCSourceWizard wizard = new JDBCSourceWizard(partitionConfig, connectionConfig, tableConfig);
+                    JDBCSourceWizard wizard = new JDBCSourceWizard(partitionConfig, connectionConfig, table);
                     wizard.setProject(editor.getProject());
 
                     WizardDialog dialog = new WizardDialog(getEditor().getSite().getShell(), wizard);
@@ -263,12 +260,12 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
             }
 
             try {
-                Collection<TableConfig> tables = jdbcConnection.getTables(getCatalog(), getSchema());
+                Collection<org.safehaus.penrose.jdbc.Table> tables = jdbcConnection.getTables(getCatalog(), getSchema());
 
-                for (TableConfig tableConfig : tables) {
+                for (org.safehaus.penrose.jdbc.Table table : tables) {
                     TableItem item = new TableItem(tablesTable, SWT.NONE);
-                    item.setText(tableConfig.getName());
-                    item.setData(tableConfig);
+                    item.setText(table.getName());
+                    item.setData(table);
                 }
 
             } catch (Exception e) {
@@ -312,9 +309,9 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
             JDBCConnection jdbcConnection = (JDBCConnection)connection;
 
             try {
-                Collection<TableConfig> tables = jdbcConnection.getTables(getCatalog(), getSchema());
+                Collection<org.safehaus.penrose.jdbc.Table> tables = jdbcConnection.getTables(getCatalog(), getSchema());
 
-                for (TableConfig tableConfig : tables) {
+                for (org.safehaus.penrose.jdbc.Table tableConfig : tables) {
                     TableItem item = new TableItem(tablesTable, SWT.NONE);
                     item.setText(tableConfig.getName());
                     item.setData(tableConfig);
@@ -342,11 +339,11 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
             if (tablesTable.getSelectionCount() == 0) return;
 
             TableItem ti = tablesTable.getSelection()[0];
-            TableConfig tableConfig = (TableConfig)ti.getData();
+            org.safehaus.penrose.jdbc.Table table = (org.safehaus.penrose.jdbc.Table)ti.getData();
 
             JDBCClient client = new JDBCClient(connectionConfig.getParameters());
 
-            Collection<FieldConfig> fields = client.getColumns(getCatalog(), getSchema(), tableConfig.getName());
+            Collection<FieldConfig> fields = client.getColumns(getCatalog(), getSchema(), table.getName());
 
             client.close();
 

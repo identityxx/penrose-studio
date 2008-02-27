@@ -25,7 +25,7 @@ public class SnapshotUtil {
     
     public void createEntries(PartitionConfig partitionConfig, LDAPClient client, String baseDn) throws Exception {
         if ("".equals(baseDn)) {
-            SearchResult entry = client.getEntry(baseDn);
+            SearchResult entry = client.find(baseDn);
             if (entry == null) return;
             
             EntryMapping entryMapping = createMapping(client, entry);
@@ -46,7 +46,7 @@ public class SnapshotUtil {
 
         Schema schema = client.getSchema();
 
-        DN dn = entry.getDn().isEmpty() ? client.getSuffix() : entry.getDn().append(client.getSuffix());
+        DN dn = entry.getDn();
         RDN rdn = dn.getRdn();
 
         EntryMapping entryMapping = new EntryMapping(dn);

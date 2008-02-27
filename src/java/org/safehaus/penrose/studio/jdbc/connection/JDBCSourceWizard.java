@@ -25,9 +25,9 @@ import org.safehaus.penrose.studio.jdbc.source.JDBCPrimaryKeyWizardPage;
 import org.safehaus.penrose.studio.jdbc.source.JDBCFieldWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.jdbc.Table;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.source.TableConfig;
 import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
@@ -44,19 +44,19 @@ public class JDBCSourceWizard extends Wizard {
     private Project project;
     private PartitionConfig partitionConfig;
     private ConnectionConfig connectionConfig;
-    private TableConfig tableConfig;
+    private Table table;
     private SourceConfig sourceConfig;
 
     public SourceWizardPage propertyPage;
     public JDBCFieldWizardPage fieldsPage;
     public JDBCPrimaryKeyWizardPage primaryKeyPage = new JDBCPrimaryKeyWizardPage();
 
-    public JDBCSourceWizard(PartitionConfig partition, ConnectionConfig connectionConfig, TableConfig tableConfig) {
+    public JDBCSourceWizard(PartitionConfig partition, ConnectionConfig connectionConfig, Table table) {
         this.partitionConfig = partition;
         this.connectionConfig = connectionConfig;
-        this.tableConfig = tableConfig;
+        this.table = table;
 
-        propertyPage = new SourceWizardPage(tableConfig.getName().toLowerCase());
+        propertyPage = new SourceWizardPage(table.getName().toLowerCase());
         fieldsPage = new JDBCFieldWizardPage();
 
         setWindowTitle(connectionConfig.getName()+" - New Source");
@@ -76,9 +76,9 @@ public class JDBCSourceWizard extends Wizard {
             sourceConfig.setName(propertyPage.getSourceName());
             sourceConfig.setConnectionName(connectionConfig.getName());
 
-            String catalog = tableConfig.getCatalog();
-            String schema = tableConfig.getSchema();
-            String table = tableConfig.getName();
+            String catalog = table.getCatalog();
+            String schema = table.getSchema();
+            String table = this.table.getName();
 
             sourceConfig.setParameter(JDBCClient.CATALOG, catalog);
             sourceConfig.setParameter(JDBCClient.SCHEMA, schema);
@@ -128,7 +128,7 @@ public class JDBCSourceWizard extends Wizard {
 
     public IWizardPage getNextPage(IWizardPage page) {
         if (propertyPage == page) {
-            fieldsPage.setTableConfig(connectionConfig, tableConfig);
+            fieldsPage.setTableConfig(connectionConfig, table);
 
         } else if (fieldsPage == page) {
             Collection<FieldConfig> selectedFields = fieldsPage.getSelectedFieldConfigs();

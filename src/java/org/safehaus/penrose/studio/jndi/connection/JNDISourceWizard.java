@@ -78,12 +78,7 @@ public class JNDISourceWizard extends Wizard {
         this.scope = scope;
         this.attributeNames = attributeNames;
 
-        RDN rdn;
-        if (baseDn == null || "".equals(baseDn)) {
-            rdn = client.getSuffix().getRdn();
-        } else {
-            rdn = new DN(baseDn).getRdn();
-        }
+        RDN rdn = new DN(baseDn).getRdn();
         String rdnAttr = rdn.getNames().iterator().next();
         String rdnValue = (String)rdn.get(rdnAttr);
         String name = rdnValue.replaceAll("\\s", "").toLowerCase();

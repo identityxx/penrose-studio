@@ -253,7 +253,11 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
 
                     JDBCClient client = new JDBCClient(connectionConfig.getParameters());
                     
-                    Collection fields = client.getColumns(sourceConfig);
+                    String catalog = sourceConfig.getParameter(JDBCClient.CATALOG);
+                    String schema = sourceConfig.getParameter(JDBCClient.SCHEMA);
+                    String table = sourceConfig.getParameter(JDBCClient.TABLE);
+
+                    Collection<FieldConfig> fields = client.getColumns(catalog, schema, table);
                     client.close();
 
                     JDBCFieldDialog dialog = new JDBCFieldDialog(parent.getShell(), SWT.NONE);
@@ -332,10 +336,14 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
 
                     ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
 
-                    JDBCClient helper = new JDBCClient(connectionConfig.getParameters());
+                    JDBCClient client = new JDBCClient(connectionConfig.getParameters());
 
-                    Collection fields = helper.getColumns(sourceConfig);
-                    helper.close();
+                    String catalog = sourceConfig.getParameter(JDBCClient.CATALOG);
+                    String schema = sourceConfig.getParameter(JDBCClient.SCHEMA);
+                    String table = sourceConfig.getParameter(JDBCClient.TABLE);
+
+                    Collection<FieldConfig> fields = client.getColumns(catalog, schema, table);
+                    client.close();
 
                     JDBCFieldDialog dialog = new JDBCFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setColumns(fields);
@@ -373,10 +381,14 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
 
                     ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
 
-                    JDBCClient helper = new JDBCClient(connectionConfig.getParameters());
+                    JDBCClient client = new JDBCClient(connectionConfig.getParameters());
 
-                    Collection fields = helper.getColumns(sourceConfig);
-                    helper.close();
+                    String catalog = sourceConfig.getParameter(JDBCClient.CATALOG);
+                    String schema = sourceConfig.getParameter(JDBCClient.SCHEMA);
+                    String table = sourceConfig.getParameter(JDBCClient.TABLE);
+
+                    Collection<FieldConfig> fields = client.getColumns(catalog, schema, table);
+                    client.close();
 
                     JDBCFieldDialog dialog = new JDBCFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setColumns(fields);

@@ -357,17 +357,12 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
             tree.removeAll();
 
             LDAPClient client = new LDAPClient(connectionConfig.getParameters());
-            SearchResult root = client.getEntry("");
+            SearchResult root = client.find("");
             if (root == null) return;
 
             TreeItem item = new TreeItem(tree, SWT.NONE);
 
-            DN suffix = client.getSuffix();
-            if (suffix.isEmpty()) {
-                item.setText("Root DSE");
-            } else {
-                item.setText(suffix.toString());
-            }
+            item.setText("Root DSE");
             item.setData(root);
 
             Collection<SearchResult> results = client.getChildren("");

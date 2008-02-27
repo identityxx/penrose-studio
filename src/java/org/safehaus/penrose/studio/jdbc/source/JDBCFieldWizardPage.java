@@ -18,25 +18,22 @@
 package org.safehaus.penrose.studio.jdbc.source;
 
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.FillLayout;
-import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.jdbc.*;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.source.TableConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
 import java.util.*;
-import java.io.StringWriter;
-import java.io.PrintWriter;
 
 /**
  * @author Endi S. Dewata
@@ -53,7 +50,7 @@ public class JDBCFieldWizardPage extends WizardPage {
     Text filterText;
 
     ConnectionConfig connectionConfig;
-    TableConfig tableConfig;
+    org.safehaus.penrose.jdbc.Table table;
 
     public JDBCFieldWizardPage() {
         super(NAME);
@@ -231,9 +228,9 @@ public class JDBCFieldWizardPage extends WizardPage {
         setPageComplete(validatePage());
     }
 
-    public void setTableConfig(ConnectionConfig connectionConfig, TableConfig tableConfig) {
+    public void setTableConfig(ConnectionConfig connectionConfig, org.safehaus.penrose.jdbc.Table tableConfig) {
         this.connectionConfig = connectionConfig;
-        this.tableConfig = tableConfig;
+        this.table = tableConfig;
     }
 
     public void setVisible(boolean visible) {
@@ -243,28 +240,27 @@ public class JDBCFieldWizardPage extends WizardPage {
 
     public void init() {
         try {
-            String catalog = tableConfig.getCatalog();
-            String schema = tableConfig.getSchema();
-            String tableName = tableConfig.getName();
+            String catalog = table.getCatalog();
+            String schema = table.getSchema();
+            String tableName = table.getName();
 
             JDBCClient client = new JDBCClient(connectionConfig.getParameters());
 
-            Collection fields = client.getColumns(catalog, schema, tableName);
+            Collection<FieldConfig> fields = client.getColumns(catalog, schema, tableName);
             client.close();
 
             if (fields == null) return;
 
-            Set set = new HashSet();
+            Set<String> set = new HashSet<String>();
             TableItem items[] = selectedTable.getItems();
-            for (int i=0; i<items.length; i++) {
-                FieldConfig field = (FieldConfig)items[i].getData();
+            for (TableItem item : items) {
+                FieldConfig field = (FieldConfig) item.getData();
                 set.add(field.getName());
             }
 
             availableTable.removeAll();
 
-            for (Iterator i=fields.iterator(); i.hasNext(); ) {
-                FieldConfig field = (FieldConfig)i.next();
+            for (FieldConfig field : fields) {
                 if (set.contains(field.getName())) continue;
 
                 TableItem item = new TableItem(availableTable, SWT.NONE);

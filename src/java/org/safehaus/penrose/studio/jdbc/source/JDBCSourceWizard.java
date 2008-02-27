@@ -21,9 +21,9 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.jdbc.Table;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.source.TableConfig;
 import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.studio.source.wizard.SourceWizardPage;
@@ -82,8 +82,8 @@ public class JDBCSourceWizard extends Wizard {
             jdbcTablePage.setConnectionConfig(connectionConfig);
 
         } else if (jdbcTablePage == page) {
-            TableConfig tableConfig = jdbcTablePage.getTableConfig();
-            jdbcFieldsPage.setTableConfig(connectionConfig, tableConfig);
+            Table table = jdbcTablePage.getTable();
+            jdbcFieldsPage.setTableConfig(connectionConfig, table);
 
         } else if (jdbcFieldsPage == page) {
             Collection<FieldConfig> selectedFields = jdbcFieldsPage.getSelectedFieldConfigs();
@@ -99,11 +99,11 @@ public class JDBCSourceWizard extends Wizard {
             sourceConfig.setName(propertyPage.getSourceName());
             sourceConfig.setConnectionName(connectionConfig.getName());
 
-            TableConfig tableConfig = jdbcTablePage.getTableConfig();
+            Table table = jdbcTablePage.getTable();
 
-            String catalog = tableConfig.getCatalog();
-            String schema = tableConfig.getSchema();
-            String tableName = tableConfig.getName();
+            String catalog   = table.getCatalog();
+            String schema    = table.getSchema();
+            String tableName = table.getName();
 
             sourceConfig.setParameter(JDBCClient.CATALOG, catalog);
             sourceConfig.setParameter(JDBCClient.SCHEMA, schema);

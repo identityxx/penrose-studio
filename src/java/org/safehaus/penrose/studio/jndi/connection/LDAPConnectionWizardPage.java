@@ -31,6 +31,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.widgets.List;
 import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.ldap.LDAPConnectionFactory;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import javax.naming.Context;
@@ -342,14 +343,12 @@ public class LDAPConnectionWizardPage extends WizardPage implements ModifyListen
         testButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 try {
-                    Map<String,String> properties = new HashMap<String,String>();
-                    properties.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-                    properties.put(Context.PROVIDER_URL, getProviderUrl());
-                    properties.put(Context.SECURITY_PRINCIPAL, getBindDN());
-                    properties.put(Context.SECURITY_CREDENTIALS, getPassword());
+                    String providerUrl = getProviderUrl();
+                    String bindDn = getBindDN();
+                    byte[] bindPassword = getPassword().getBytes("UTF-8");
 
-                    LDAPClient client = new LDAPClient(properties);
-                    client.connect();
+                    LDAPClient client = new LDAPClient(providerUrl);
+                    client.bind(bindDn, bindPassword);
                     client.close();
 
                     MessageDialog.openInformation(parent.getShell(), "Test Connection Result", "Connection successful!");
