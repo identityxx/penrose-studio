@@ -50,5 +50,4 @@ Bundle-ClassPath: lib/ant.jar,
  lib/quartz-1.6.0.jar,
  lib/slf4j-log4j12.jar,
  lib/xercesImpl-2.8.0.jar,
- lib/xml-apis-2.8.0.jar,
- lib/zql.jar
+ lib/xml-apis-2.8.0.jar
