@@ -30,8 +30,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.widgets.List;
+import org.safehaus.penrose.ldap.BindRequest;
+import org.safehaus.penrose.ldap.BindResponse;
 import org.safehaus.penrose.ldap.LDAPClient;
-import org.safehaus.penrose.ldap.LDAPConnectionFactory;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import javax.naming.Context;
@@ -347,8 +348,14 @@ public class LDAPConnectionWizardPage extends WizardPage implements ModifyListen
                     String bindDn = getBindDN();
                     byte[] bindPassword = getPassword().getBytes("UTF-8");
 
+                    BindRequest request = new BindRequest();
+                    request.setDn(bindDn);
+                    request.setPassword(bindPassword);
+
+                    BindResponse response = new BindResponse();
+
                     LDAPClient client = new LDAPClient(providerUrl);
-                    client.bind(bindDn, bindPassword);
+                    client.bind(request, response);
                     client.close();
 
                     MessageDialog.openInformation(parent.getShell(), "Test Connection Result", "Connection successful!");
