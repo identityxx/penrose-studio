@@ -163,7 +163,7 @@ public class NISPartitionsPage extends FormPage {
 
                                 for (NISDomain domain : domains) {
 
-                                    monitor.subTask("Creating "+domain.getName()+" partition.");
+                                    monitor.subTask("Creating "+domain.getName()+" partitions.");
                                     nisFederation.createPartitions(domain);
 
                                     monitor.worked(1);
@@ -221,7 +221,7 @@ public class NISPartitionsPage extends FormPage {
 
                                 for (NISDomain domain : domains) {
 
-                                    monitor.subTask("Removing "+domain.getName()+" partition.");
+                                    monitor.subTask("Removing "+domain.getName()+" partitions.");
                                     nisFederation.removePartitions(domain);
 
                                     monitor.worked(1);
