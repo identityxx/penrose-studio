@@ -123,6 +123,7 @@ public class NISLDAPErrorsPage extends FormPage {
         });
 
         totalLabel = toolkit.createLabel(leftPanel, "Total:");
+        totalLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         new Label(leftPanel, SWT.NONE);
 
