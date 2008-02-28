@@ -1,28 +1,36 @@
 package org.safehaus.penrose.studio.federation.nis.editor;
 
-import org.eclipse.ui.forms.editor.FormPage;
-import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
-import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.widgets.Hyperlink;
-import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.forms.events.HyperlinkAdapter;
-import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.RowLayout;
+import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.*;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.forms.editor.FormPage;
+import org.eclipse.ui.forms.events.HyperlinkAdapter;
+import org.eclipse.ui.forms.events.HyperlinkEvent;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.Hyperlink;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.progress.IProgressService;
 import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.partition.PartitionConfigs;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
+import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.partition.PartitionConfigs;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
@@ -139,12 +147,33 @@ public class NISPartitionsPage extends FormPage {
                     if (!confirm) return;
 
                     TableItem[] items = table.getSelection();
+                    final Collection<NISDomain> domains = new ArrayList<NISDomain>();
 
                     for (TableItem ti : items) {
-                        NISDomain repository = (NISDomain)ti.getData();
-
-                        nisFederation.createPartitions(repository);
+                        NISDomain domain = (NISDomain)ti.getData();
+                        domains.add(domain);
                     }
+
+                    IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+                    progressService.busyCursorWhile(new IRunnableWithProgress() {
+                        public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                            try {
+                                monitor.beginTask("Creating partitions...", domains.size());
+
+                                for (NISDomain domain : domains) {
+
+                                    monitor.subTask("Creating "+domain.getName()+" partition.");
+                                    nisFederation.createPartitions(domain);
+
+                                    monitor.worked(1);
+                                }
+
+                            } catch (Exception e) {
+                                throw new InvocationTargetException(e, e.getMessage());
+                            }
+                        }
+                    });
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
@@ -176,12 +205,33 @@ public class NISPartitionsPage extends FormPage {
                     if (!confirm) return;
 
                     TableItem[] items = table.getSelection();
+                    final Collection<NISDomain> domains = new ArrayList<NISDomain>();
 
                     for (TableItem ti : items) {
-                        NISDomain repository = (NISDomain)ti.getData();
-
-                        nisFederation.removePartitions(repository);
+                        NISDomain domain = (NISDomain)ti.getData();
+                        domains.add(domain);
                     }
+
+                    IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+                    progressService.busyCursorWhile(new IRunnableWithProgress() {
+                        public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                            try {
+                                monitor.beginTask("Removing partitions...", domains.size());
+
+                                for (NISDomain domain : domains) {
+
+                                    monitor.subTask("Removing "+domain.getName()+" partition.");
+                                    nisFederation.removePartitions(domain);
+
+                                    monitor.worked(1);
+                                }
+
+                            } catch (Exception e) {
+                                throw new InvocationTargetException(e, e.getMessage());
+                            }
+                        }
+                    });
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
