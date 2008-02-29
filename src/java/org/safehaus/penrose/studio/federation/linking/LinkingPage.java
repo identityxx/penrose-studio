@@ -777,7 +777,7 @@ public class LinkingPage extends FormPage {
         for (Attribute attribute : attributes.getAll()) {
             String attributeName = attribute.getName();
 
-            log.debug(attribute);
+            if (log.isDebugEnabled()) attribute.print();
 
             for (Object value : attribute.getValues()) {
 
@@ -868,7 +868,19 @@ public class LinkingPage extends FormPage {
 
             String name = sb.substring(i+2, j);
             Object value = attributes.getValue(name);
-            String s = value == null ? "" : value.toString();
+
+            if (log.isDebugEnabled()) {
+                if (value instanceof byte[]) {
+                    String s = BinaryUtil.encode(BinaryUtil.BIG_INTEGER, (byte[]) value);
+                    log.debug(" - " + name + ": " + s);
+
+                } else if (value != null) {
+                    String s = BinaryUtil.encode(BinaryUtil.BIG_INTEGER, value.toString().getBytes("UTF-8"));
+                    log.debug(" - " + name + ": " + value + " (" + s + ")");
+                }
+            }
+
+            String s = value == null ? "" : FilterTool.escape(value);
 
             sb.replace(i, j+1, s);
             start = i+s.length();
