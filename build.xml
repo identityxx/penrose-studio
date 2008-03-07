@@ -197,6 +197,7 @@
         </copy>
         <copy todir="target/${dist.name}" file="COPYING.txt"/>
         <copy todir="target/${dist.name}" file="INSTALL-BINARY.txt"/>
+        <copy todir="target/${dist.name}" file="THIRDPARTY.txt"/>
         <copy todir="target/${dist.name}/docs">
             <fileset dir="docs" includes="*.url"/>
         </copy>
