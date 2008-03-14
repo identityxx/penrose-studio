@@ -493,7 +493,7 @@ public class NISUserScriptsPage extends FormPage {
         SearchResponse response = new SearchResponse();
 
         sourceClient.search(request, response);
-        penroseUsers.search(request, response);
+        penroseUsers.search(null, request, response);
 
         if (response.hasNext()) {
             SearchResult result = response.next();
@@ -521,7 +521,7 @@ public class NISUserScriptsPage extends FormPage {
             attrs.setValue("uidNumber", uidNumber);
             attrs.setValue("message", message);
 
-            penroseUsers.add(dn, attrs);
+            penroseUsers.add(null, dn, attrs);
 
         } else if (action == NISUserDialog.CHANGE) {
 
@@ -531,11 +531,11 @@ public class NISUserScriptsPage extends FormPage {
             modifications.add(new Modification(Modification.REPLACE, new Attribute("uidNumber", uidNumber)));
             modifications.add(new Modification(Modification.REPLACE, new Attribute("message", message)));
 
-            penroseUsers.modify(dn, modifications);
+            penroseUsers.modify(null, dn, modifications);
 
         } else { // if (action == NISUserDialog.REMOVE) {
 
-            penroseUsers.delete(dn);
+            penroseUsers.delete(null, dn);
         }
     }
 

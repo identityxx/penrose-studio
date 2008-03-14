@@ -172,7 +172,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
 
             Source source = connection.createSource(sourceConfig);
 
-            source.add(dn, attributes);
+            source.add(null, dn, attributes);
 
             partition.destroy();
 
@@ -224,7 +224,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
             Source source = connection.createSource(sourceConfig);
 
             if (!rdn.equals(newRdn)) {
-                source.modrdn(dn, newRdn, true);
+                source.modrdn(null, dn, newRdn, true);
 
                 DNBuilder db = new DNBuilder();
                 db.append(newRdn);
@@ -232,7 +232,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
                 dn = db.toDn();
             }
 
-            source.modify(dn, modifications);
+            source.modify(null, dn, modifications);
 
             partition.destroy();
 
@@ -267,7 +267,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
 
             Source source = connection.createSource(sourceConfig);
 
-            source.delete(dn);
+            source.delete(null, dn);
 
             partition.destroy();
 
@@ -336,7 +336,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
 
             Source source = connection.createSource(sourceConfig);
 
-            source.search(request, response);
+            source.search(null, request, response);
 
             partition.destroy();
 

@@ -154,7 +154,7 @@ public class NISSourceBrowsePage extends SourceEditorPage {
 
             Source source = connection.createSource(sourceConfig);
 
-            source.search(sc, sr);
+            source.search(null, sc, sr);
 
             partition.destroy();
 

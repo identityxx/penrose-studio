@@ -21,7 +21,7 @@ import org.safehaus.penrose.ldap.SearchRequest;
 import org.safehaus.penrose.ldap.SearchResult;
 import org.safehaus.penrose.ldap.SearchResponse;
 import org.safehaus.penrose.ldap.Attributes;
-import org.safehaus.penrose.agent.client.FindClient;
+//import org.safehaus.penrose.agent.client.FindClient;
 import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
@@ -270,7 +270,7 @@ public class NISScriptsPage extends FormPage {
             Collection<String> paths = new ArrayList<String>();
             StringTokenizer st = new StringTokenizer(s, ",");
             while (st.hasMoreTokens()) paths.add(st.nextToken());
-
+/*
             FindClient client = new FindClient(hostname, port);
 
             if ("changeUid".equals(action)) {
@@ -285,6 +285,7 @@ public class NISScriptsPage extends FormPage {
 
                 messageLabel.setText(rc == 0 ? "Operation succeeded." : "Operation failed. RC: "+rc);
             }
+*/
         }
     }
 

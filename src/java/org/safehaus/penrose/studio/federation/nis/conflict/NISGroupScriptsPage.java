@@ -486,7 +486,7 @@ public class NISGroupScriptsPage extends FormPage {
 
         SearchResponse response = new SearchResponse();
 
-        penroseGroups.search(request, response);
+        penroseGroups.search(null, request, response);
 
         if (response.hasNext()) {
             SearchResult result = response.next();
@@ -501,7 +501,7 @@ public class NISGroupScriptsPage extends FormPage {
 
         response = new SearchResponse();
 
-        members.search(request, response);
+        members.search(null, request, response);
 
         while (response.hasNext()) {
             SearchResult result = response.next();
@@ -530,7 +530,7 @@ public class NISGroupScriptsPage extends FormPage {
             attrs.setValue("gidNumber", newGidNumber);
             attrs.setValue("message", message);
 
-            penroseGroups.add(dn, attrs);
+            penroseGroups.add(null, dn, attrs);
 
         } else if (action == NISGroupDialog.CHANGE) {
 
@@ -540,11 +540,11 @@ public class NISGroupScriptsPage extends FormPage {
             modifications.add(new Modification(Modification.REPLACE, new Attribute("gidNumber", newGidNumber)));
             modifications.add(new Modification(Modification.REPLACE, new Attribute("message", message)));
 
-            penroseGroups.modify(dn, modifications);
+            penroseGroups.modify(null, dn, modifications);
 
         } else { // if (action == NISGroupDialog.REMOVE) {
 
-            penroseGroups.delete(dn);
+            penroseGroups.delete(null, dn);
         }
     }
 

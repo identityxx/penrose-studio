@@ -194,9 +194,10 @@ public class JNDIConnectionPropertiesPage extends ConnectionEditorPage {
         fetchButton.setLayoutData(gd);
 
         fetchButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent event) {
+                LDAPClient client = null;
                 try {
-                    LDAPClient client = new LDAPClient(connectionConfig.getParameters());
+                    client = new LDAPClient(connectionConfig.getParameters());
                     Collection<String> list = client.getNamingContexts();
 
                     suffixCombo.removeAll();
@@ -209,6 +210,9 @@ public class JNDIConnectionPropertiesPage extends ConnectionEditorPage {
                 } catch (Exception ex) {
                     log.error(ex.getMessage(), ex);
                     ErrorDialog.open(ex);
+
+                } finally {
+                    if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
                 }
             }
         });

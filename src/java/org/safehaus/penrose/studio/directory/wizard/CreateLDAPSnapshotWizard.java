@@ -49,10 +49,11 @@ public class CreateLDAPSnapshotWizard extends Wizard {
     }
 
     public boolean performFinish() {
+        LDAPClient client = null;
         try {
             ConnectionConfig connectionConfig = connectionPage.getConnectionConfig();
 
-            LDAPClient client = new LDAPClient(connectionConfig.getParameters());
+            client = new LDAPClient(connectionConfig.getParameters());
 
             SnapshotUtil snapshotUtil = new SnapshotUtil();
             snapshotUtil.createSnapshot(partitionConfig, client);
@@ -64,6 +65,9 @@ public class CreateLDAPSnapshotWizard extends Wizard {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return false;
+
+        } finally {
+            if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
         }
     }
 

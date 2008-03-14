@@ -287,7 +287,8 @@ public class LDAPConnectionWizardPage extends WizardPage implements ModifyListen
         fetchButton.setLayoutData(new GridData());
 
         fetchButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent event) {
+                LDAPClient client = null;
                 try {
                     Map<String,String> properties = new HashMap<String,String>();
                     properties.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
@@ -295,9 +296,8 @@ public class LDAPConnectionWizardPage extends WizardPage implements ModifyListen
                     properties.put(Context.SECURITY_PRINCIPAL, getBindDN());
                     properties.put(Context.SECURITY_CREDENTIALS, getPassword());
 
-                    LDAPClient client = new LDAPClient(properties);
+                    client = new LDAPClient(properties);
                     Collection<String> baseDns = client.getNamingContexts();
-                    client.close();
 
                     suffixCombo.removeAll();
                     for (String baseDn : baseDns) {
@@ -308,6 +308,9 @@ public class LDAPConnectionWizardPage extends WizardPage implements ModifyListen
                 } catch (Exception ex) {
                     log.debug(ex.getMessage(), ex);
                     ErrorDialog.open(ex);
+
+                } finally {
+                    if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
                 }
             }
         });
@@ -342,7 +345,10 @@ public class LDAPConnectionWizardPage extends WizardPage implements ModifyListen
         testButton.setText("Test Connection");
 
         testButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent event) {
+
+                LDAPClient client = null;
+
                 try {
                     String providerUrl = getProviderUrl();
                     String bindDn = getBindDN();
@@ -354,15 +360,17 @@ public class LDAPConnectionWizardPage extends WizardPage implements ModifyListen
 
                     BindResponse response = new BindResponse();
 
-                    LDAPClient client = new LDAPClient(providerUrl);
+                    client = new LDAPClient(providerUrl);
                     client.bind(request, response);
-                    client.close();
 
                     MessageDialog.openInformation(parent.getShell(), "Test Connection Result", "Connection successful!");
 
                 } catch (Exception ex) {
-                    log.debug(ex.getMessage(), ex);
+                    log.error(ex.getMessage(), ex);
                     ErrorDialog.open(ex);
+
+                } finally {
+                    if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
                 }
             }
         });

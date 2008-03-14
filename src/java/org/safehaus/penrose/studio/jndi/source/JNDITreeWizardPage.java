@@ -51,7 +51,6 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
     Text objectClassesText;
 
     ConnectionConfig connectionConfig;
-    LDAPClient client;
 
     public JNDITreeWizardPage() {
         super(NAME);
@@ -126,15 +125,6 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
 
     public void setConnectionConfig(ConnectionConfig connectionConfig) {
         this.connectionConfig = connectionConfig;
-
-        try {
-            if (client == null) {
-                client = new LDAPClient(connectionConfig.getParameters());
-            }
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
     }
 
     public void setVisible(boolean visible) {
@@ -143,8 +133,11 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
     }
 
     public void init() {
+        LDAPClient client = null;
         try {
             baseDnTree.removeAll();
+
+            client = new LDAPClient(connectionConfig.getParameters());
 
             TreeItem item = new TreeItem(baseDnTree, SWT.NONE);
             String suffix = "Root DSE";
@@ -168,6 +161,9 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+
+        } finally {
+            if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }                                
         }
     }
 
@@ -175,6 +171,7 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
     }
 
     public void treeExpanded(TreeEvent event) {
+        LDAPClient client = null;
         try {
             if (event.item == null) return;
 
@@ -186,6 +183,7 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
                 items[i].dispose();
             }
 
+            client = new LDAPClient(connectionConfig.getParameters());
             Collection<SearchResult> results = client.getChildren(baseDn);
 
             for (Iterator i=results.iterator(); i.hasNext(); ) {
@@ -201,6 +199,9 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+
+        } finally {
+            if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
         }
     }
 

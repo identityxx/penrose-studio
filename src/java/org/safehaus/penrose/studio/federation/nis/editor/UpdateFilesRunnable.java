@@ -1,7 +1,7 @@
 package org.safehaus.penrose.studio.federation.nis.editor;
 
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.agent.client.FindClient;
+//import org.safehaus.penrose.agent.client.FindClient;
 import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.ldap.Attributes;
 import org.safehaus.penrose.ldap.RDNBuilder;
@@ -61,11 +61,11 @@ public class UpdateFilesRunnable implements Runnable {
 
         Connection connection = files.getConnection();
         Map<String,String> parameters = connection.getParameters();
-
+/*
         FindClient client = new FindClient(hostname, port);
 
         client.find(paths, parameters);
-/*
+
         // files.delete(new DN(rb.toRdn()));
 
         AgentResults<FindResult> results = new AgentResults<FindResult>() {

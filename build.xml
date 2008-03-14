@@ -47,7 +47,7 @@
                 </not>
             </and>
         </condition>
-        <condition property="isLinux64">
+        <condition property="isLinuxAMD64">
             <and>
                 <os family="unix"/>
                 <not>
@@ -62,8 +62,10 @@
     </target>
 
     <target name="import" depends="init">
+<!--
         <copy todir="lib" file="../penrose-pro-${product.specification}/agent/target/penrose-agent-${penrose.version}.jar"/>
         <copy todir="lib" file="../penrose-pro-${product.specification}/agent/target/penrose-agent-client-${penrose.version}.jar"/>
+-->
         <copy todir="lib" file="../penrose-pro-${product.specification}/lib/penrose-${penrose.version}.jar"/>
         <copy todir="lib" file="../penrose-pro-${product.specification}/server/lib/penrose-server-${penrose.version}.jar"/>
         <copy todir="lib" file="../penrose-pro-${product.specification}/services/JMX/SERVICE-INF/lib/penrose-jmx-service-${penrose.version}.jar"/>
@@ -220,7 +222,7 @@
         <antcall target="build-linux-gtk"/>
     </target>
 
-    <target name="build-rcp-linux-gtk-x86_64" depends="init" if="isLinux64">
+    <target name="build-rcp-linux-gtk-x86_64" depends="init" if="isLinuxAMD64">
         <antcall target="build-linux-gtk-x86_64"/>
     </target>
 
@@ -324,7 +326,7 @@
         <antcall target="dist-rpm-linux-gtk"/>
     </target>
 
-    <target name="dist-linux-gtk-x86_64" if="isLinux64">
+    <target name="dist-linux-gtk-x86_64" if="isLinuxAMD64">
         <antcall target="dist-rpm-linux-gtk-x86_64"/>
     </target>
 
@@ -522,7 +524,7 @@
         <antcall target="install-linux-gtk"/>
     </target>
 
-    <target name="install-dist-linux-gtk-x86_64" if="isLinux64">
+    <target name="install-dist-linux-gtk-x86_64" if="isLinuxAMD64">
         <antcall target="install-linux-gtk-x86_64"/>
     </target>
 

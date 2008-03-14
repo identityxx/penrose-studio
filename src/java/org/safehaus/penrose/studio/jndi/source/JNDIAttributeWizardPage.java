@@ -244,14 +244,18 @@ public class JNDIAttributeWizardPage extends WizardPage {
     }
 
     public void setConnectionConfig(ConnectionConfig connectionConfig) {
+        LDAPClient client = null;
         try {
             if (schema == null) {
-                LDAPClient client = new LDAPClient(connectionConfig.getParameters());
+                client = new LDAPClient(connectionConfig.getParameters());
                 schema = client.getSchema();
             }
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+
+        } finally {
+            if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
         }
     }
 

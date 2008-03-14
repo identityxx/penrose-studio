@@ -176,11 +176,12 @@ public class JNDIConnectionSchemaPage extends ConnectionEditorPage {
     }
 
     public void refresh() {
+        LDAPClient client = null;
         try {
             attributeTypesTable.removeAll();
             objectClassesTable.removeAll();
 
-            LDAPClient client = new LDAPClient(connectionConfig.getParameters());
+            client = new LDAPClient(connectionConfig.getParameters());
             schema = client.getSchema();
 
             Collection<AttributeType> attributeTypes = schema.getAttributeTypes();
@@ -202,6 +203,9 @@ public class JNDIConnectionSchemaPage extends ConnectionEditorPage {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);
+
+        } finally {
+            if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
         }
     }
 }

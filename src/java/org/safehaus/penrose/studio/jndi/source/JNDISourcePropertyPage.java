@@ -58,17 +58,10 @@ public class JNDISourcePropertyPage extends SourceEditorPage {
     Button editButton;
     Button removeButton;
 
-	LDAPClient client;
-	
 	String[] scopes = new String[] { "OBJECT", "ONELEVEL", "SUBTREE" };
 
     public JNDISourcePropertyPage(JNDISourceEditor editor) throws Exception {
         super(editor, "PROPERTIES", "  Properties  ");
-
-        ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
-        if (connectionConfig != null) {
-            client = new LDAPClient(connectionConfig.getParameters());
-        }
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -254,6 +247,7 @@ public class JNDISourcePropertyPage extends SourceEditorPage {
 
 		fieldTable.addMouseListener(new MouseAdapter() {
             public void mouseDoubleClick(MouseEvent event) {
+                LDAPClient client = null;
                 try {
                     if (fieldTable.getSelectionCount() == 0) return;
 
@@ -263,6 +257,11 @@ public class JNDISourcePropertyPage extends SourceEditorPage {
                     String oldName = fieldDefinition.getName();
 
                     Collection<AttributeType> attributeTypes;
+
+                    ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
+                    if (connectionConfig != null) {
+                        client = new LDAPClient(connectionConfig.getParameters());
+                    }
                     if (client == null) {
                         attributeTypes = new ArrayList<AttributeType>();
                     } else {
@@ -289,6 +288,9 @@ public class JNDISourcePropertyPage extends SourceEditorPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+
+                } finally {
+                    if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
                 }
             }
 

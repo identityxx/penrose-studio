@@ -139,8 +139,9 @@ public class SelectSchemaWizardPage extends WizardPage {
         sourceSchemaList.removeAll();
         if (connectionConfig == null) return;
 
+        LDAPClient client = null;
         try {
-            LDAPClient client = new LDAPClient(connectionConfig.getParameters());
+            client = new LDAPClient(connectionConfig.getParameters());
             SearchResult rootDse = client.getRootDSE();
 
             Attribute schemaNamingContexts = rootDse.getAttributes().get("schemaNamingContext");
@@ -164,6 +165,9 @@ public class SelectSchemaWizardPage extends WizardPage {
 */
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+
+        } finally {
+            if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
         }
     }
 

@@ -124,14 +124,19 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
 
         tree.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
+                LDAPClient client = null;
                 try {
                     TreeItem ti = tree.getSelection()[0];
                     SearchResult entry = (SearchResult)ti.getData();
 
-                    LDAPClient client = new LDAPClient(connectionConfig.getParameters());
+                    client = new LDAPClient(connectionConfig.getParameters());
                     showEntry(client, entry);
+
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+
+                } finally {
+                    if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
                 }
             }
         });
@@ -146,8 +151,9 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
 
         mi.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
+                LDAPClient client = null;
                 try {
-                    LDAPClient client = new LDAPClient(connectionConfig.getParameters());
+                    client = new LDAPClient(connectionConfig.getParameters());
                     Schema schema = client.getSchema();
 
                     TreeItem treeItem = tree.getSelection()[0];
@@ -176,6 +182,9 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+
+                } finally {
+                    if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
                 }
             }
         });
@@ -185,8 +194,9 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
 
         mi.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
+                LDAPClient client = null;
                 try {
-                    LDAPClient client = new LDAPClient(connectionConfig.getParameters());
+                    client = new LDAPClient(connectionConfig.getParameters());
 
                     TreeItem treeItem = tree.getSelection()[0];
                     SearchResult entry = (SearchResult)treeItem.getData();
@@ -212,6 +222,9 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+
+                } finally {
+                    if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
                 }
             }
         });
@@ -221,8 +234,9 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
 
         mi.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
+                LDAPClient client = null;
                 try {
-                    LDAPClient client = new LDAPClient(connectionConfig.getParameters());
+                    client = new LDAPClient(connectionConfig.getParameters());
                     Schema schema = client.getSchema();
 
                     TreeItem treeItem = tree.getSelection()[0];
@@ -271,6 +285,9 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+
+                } finally {
+                    if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
                 }
             }
         });
@@ -353,10 +370,11 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
     }
 
     public void refresh() {
+        LDAPClient client = null;
         try {
             tree.removeAll();
 
-            LDAPClient client = new LDAPClient(connectionConfig.getParameters());
+            client = new LDAPClient(connectionConfig.getParameters());
             SearchResult root = client.find("");
             if (root == null) return;
 
@@ -384,6 +402,9 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);
+
+        } finally {
+            if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
         }
     }
 
@@ -391,6 +412,7 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
     }
 
     public void treeExpanded(TreeEvent event) {
+        LDAPClient client = null;
         try {
             if (event.item == null) return;
 
@@ -404,7 +426,7 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
                 item1.dispose();
             }
 
-            LDAPClient client = new LDAPClient(connectionConfig.getParameters());
+            client = new LDAPClient(connectionConfig.getParameters());
             Collection<SearchResult> results = client.getChildren(baseDn);
 
             for (SearchResult en : results) {
@@ -420,6 +442,8 @@ public class JNDIConnectionBrowserPage extends ConnectionEditorPage implements T
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);
+        } finally {
+            if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
         }
     }
 }

@@ -330,7 +330,7 @@ public class NISUsersLinkPage extends FormPage {
                         globalAttributes.setValue("uid", newLink);
                         globalAttributes.setValue("cn", nameText.getText());
 
-                        globalUsers.add(rb.toRdn(), globalAttributes);
+                        globalUsers.add(null, rb.toRdn(), globalAttributes);
 
                         String link = (String)item.getData("link");
                         if (link == null) {
@@ -358,7 +358,7 @@ public class NISUsersLinkPage extends FormPage {
                         Attributes attributes = result.getAttributes();
                         String uid = (String)attributes.getValue("uid");
 
-                        globalUsers.add(result.getDn().getRdn(), result.getAttributes());
+                        globalUsers.add(null, result.getDn().getRdn(), result.getAttributes());
 
                         String link = (String)item.getData("link");
                         if (link == null) {
@@ -517,7 +517,7 @@ public class NISUsersLinkPage extends FormPage {
                         RDN rdn = result.getDn().getRdn();
                         String globalUid = (String)rdn.get("uid");
 
-                        globalUsers.delete(rdn);
+                        globalUsers.delete(null, rdn);
 
                         SearchResult localResult = (SearchResult)item.getData("local");
                         Attributes localAttributes = localResult.getAttributes();
@@ -632,7 +632,7 @@ public class NISUsersLinkPage extends FormPage {
 
         SearchResponse response = new SearchResponse();
 
-        globalUsers.search(request, response);
+        globalUsers.search(null, request, response);
 
         return response.getAll();
     }
@@ -648,7 +648,7 @@ public class NISUsersLinkPage extends FormPage {
         SearchResponse response = new SearchResponse();
 
         try {
-            globalUsers.search(request, response);
+            globalUsers.search(null, request, response);
             return response.getAll();
 
         } catch (Exception e) {
@@ -749,7 +749,7 @@ public class NISUsersLinkPage extends FormPage {
                 }
             };
 
-            localUsers.search(request, response);
+            localUsers.search(null, request, response);
 
             localTable.setSelection(selection);
 

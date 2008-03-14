@@ -309,7 +309,7 @@ public class NISGroupsLinkPage extends FormPage {
                         Attributes globalAttributes = (Attributes)attributes.clone();
                         globalAttributes.setValue("cn", newLink);
 
-                        globalGroups.add(rb.toRdn(), globalAttributes);
+                        globalGroups.add(null, rb.toRdn(), globalAttributes);
 
                         String link = (String)item.getData("link");
                         if (link == null) {
@@ -337,7 +337,7 @@ public class NISGroupsLinkPage extends FormPage {
                         Attributes attributes = result.getAttributes();
                         String cn = (String)attributes.getValue("cn");
 
-                        globalGroups.add(result.getDn().getRdn(), result.getAttributes());
+                        globalGroups.add(null, result.getDn().getRdn(), result.getAttributes());
 
                         String link = (String)item.getData("link");
                         if (link == null) {
@@ -484,7 +484,7 @@ public class NISGroupsLinkPage extends FormPage {
                         RDN rdn = result.getDn().getRdn();
                         String globalCn = (String)rdn.get("cn");
 
-                        globalGroups.delete(rdn);
+                        globalGroups.delete(null, rdn);
 
                         SearchResult localResult = (SearchResult)item.getData("local");
                         Attributes localAttributes = localResult.getAttributes();
@@ -598,7 +598,7 @@ public class NISGroupsLinkPage extends FormPage {
 
         SearchResponse response = new SearchResponse();
 
-        globalGroups.search(request, response);
+        globalGroups.search(null, request, response);
 
         return response.getAll();
     }
@@ -614,7 +614,7 @@ public class NISGroupsLinkPage extends FormPage {
         SearchResponse response = new SearchResponse();
 
         try {
-            globalGroups.search(request, response);
+            globalGroups.search(null, request, response);
             return response.getAll();
 
         } catch (Exception e) {
@@ -713,7 +713,7 @@ public class NISGroupsLinkPage extends FormPage {
                 }
             };
 
-            localGroups.search(request, response);
+            localGroups.search(null, request, response);
 
             localTable.setSelection(selection);
 
