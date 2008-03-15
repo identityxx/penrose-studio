@@ -17,7 +17,7 @@ LicenseFile=LICENSE.txt
 
 [Files]
 
-Source: "${project.name}-${product.version}-win32\*"; DestDir: "{app}"; Flags: recursesubdirs;
+Source: "dist\*"; DestDir: "{app}"; Flags: recursesubdirs;
 
 [Icons]
 

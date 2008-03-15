@@ -42,6 +42,14 @@
                 <not>
                     <os family="mac"/>
                 </not>
+            </and>
+        </condition>
+        <condition property="isLinuxIntel">
+            <and>
+                <os family="unix"/>
+                <not>
+                    <os family="mac"/>
+                </not>
                 <not>
                     <os arch="amd64"/>
                 </not>
@@ -135,29 +143,28 @@
     </target>
 
     <target name="build" depends="compile">
-        <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>
-        <property name="plugin.path" value="target/${dist.name}/plugins/org.safehaus.penrose.studio_${plugin.version}"/>
+        <property name="plugin.path" value="target/dist/plugins/org.safehaus.penrose.studio_${plugin.version}"/>
         <copy todir="target" file="LICENSE.txt"/>
-        <mkdir dir="target/${dist.name}"/>
-        <copy todir="target/${dist.name}" file="LICENSE.txt"/>
-        <copy todir="target/${dist.name}/conf">
+        <mkdir dir="target/dist"/>
+        <copy todir="target/dist" file="LICENSE.txt"/>
+        <copy todir="target/dist/conf">
             <fileset dir="conf">
                 <include name="*.*"/>
                 <exclude name=".svn/**"/>
             </fileset>
         </copy>
 <!--
-        <mkdir dir="target/${dist.name}/conf/lib"/>
+        <mkdir dir="target/dist/conf/lib"/>
 -->
-        <copy todir="target/${dist.name}/configuration">
+        <copy todir="target/dist/configuration">
             <fileset dir="configuration">
                 <include name="*.*"/>
                 <exclude name=".svn/**"/>
             </fileset>
         </copy>
-        <mkdir dir="target/${dist.name}/logs"/>
+        <mkdir dir="target/dist/logs"/>
         <mkdir dir="${plugin.path}"/>
-        <copy todir="target/${dist.name}/plugins">
+        <copy todir="target/dist/plugins">
             <fileset dir="lib/plugins">
                 <include name="org.eclipse.core.runtime.compatibility_3.1.1.jar"/>
                 <include name="org.eclipse.ui.forms_3.2.0.jar"/>
@@ -192,18 +199,18 @@
             dir="${plugin.path}/lib"
             newDir="lib"
         />
-        <copy todir="target/${dist.name}" file="README.txt">
+        <copy todir="target/dist" file="README.txt">
             <filterchain>
                 <expandproperties/>
             </filterchain>
         </copy>
-        <copy todir="target/${dist.name}" file="COPYING.txt"/>
-        <copy todir="target/${dist.name}" file="INSTALL-BINARY.txt"/>
-        <copy todir="target/${dist.name}" file="THIRDPARTY.txt"/>
-        <copy todir="target/${dist.name}/docs">
+        <copy todir="target/dist" file="COPYING.txt"/>
+        <copy todir="target/dist" file="INSTALL-BINARY.txt"/>
+        <copy todir="target/dist" file="THIRDPARTY.txt"/>
+        <copy todir="target/dist/docs">
             <fileset dir="docs" includes="*.url"/>
         </copy>
-        <copy todir="target/${dist.name}" file="images/penrose.ico"/>
+        <copy todir="target/dist" file="images/penrose.ico"/>
         <fixcrlf srcdir="target" includes="**/*.txt" eol="unix"/>
     </target>
 
@@ -214,38 +221,29 @@
     </target>
 
     <target name="build-linux">
-        <antcall target="build-rcp-linux-gtk"/>
-        <antcall target="build-rcp-linux-gtk-x86_64"/>
-    </target>
-
-    <target name="build-rcp-linux-gtk" depends="init" if="isLinux">
         <antcall target="build-linux-gtk"/>
-    </target>
-
-    <target name="build-rcp-linux-gtk-x86_64" depends="init" if="isLinuxAMD64">
         <antcall target="build-linux-gtk-x86_64"/>
     </target>
 
-    <target name="build-linux-gtk">
+    <target name="build-linux-gtk" depends="init" if="isLinuxIntel">
         <antcall target="build-rcp-linux">
             <param name="platform" value="linux-gtk"/>
         </antcall>
     </target>
 
-    <target name="build-linux-gtk-x86_64">
+    <target name="build-linux-gtk-x86_64" depends="init" if="isLinuxAMD64">
         <antcall target="build-rcp-linux">
             <param name="platform" value="linux-gtk-x86_64"/>
         </antcall>
     </target>
 
     <target name="build-rcp-linux">
-        <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>
         <untar src="rcp/${rcp.prefix}-${platform}.tar.gz" dest="target" compression="gzip"/>
-        <move todir="target/${dist.name}">
+        <move todir="target/dist">
             <fileset dir="target/eclipse"/>
         </move>
-        <move file="target/${dist.name}/eclipse" tofile="target/${dist.name}/${project.name}"/>
-        <chmod file="target/${dist.name}/${project.name}" perm="a+rx"/>
+        <move file="target/dist/eclipse" tofile="target/dist/${project.name}"/>
+        <chmod file="target/dist/${project.name}" perm="a+rx"/>
         <antcall target="build">
             <param name="platform" value="${platform}"/>
         </antcall>
@@ -253,21 +251,20 @@
 
     <target name="build-macosx" depends="init" if="isMac">
         <property name="platform" value="macosx-carbon"/>
-        <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>
         <!-- uncompress rcp -->
         <untar src="rcp/${rcp.prefix}-${platform}.tar.gz" dest="target" compression="gzip"/>
-        <move todir="target/${dist.name}">
+        <move todir="target/dist">
             <fileset dir="target/eclipse"/>
         </move>
         <!-- apply universal binary patch 
         doesnt need anymore since the RCP is 3.2
         <copy
-            todir="target/${dist.name}/plugins"
+            todir="target/dist/plugins"
             file="rcp/org.eclipse.swt.carbon.macosx.ppc_3.1.0.jar"
             overwrite="true"
         />
     	-->
-        <chmod file="target/${dist.name}/eclipse" perm="a+rx"/>
+        <chmod file="target/dist/eclipse" perm="a+rx"/>
         <antcall target="build">
             <param name="platform" value="${platform}"/>
         </antcall>
@@ -275,14 +272,13 @@
 
     <target name="build-win32" depends="init" if="isWindows">
         <property name="platform" value="win32"/>
-        <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>
         <!-- uncompress rpc -->
         <unzip src="rcp/${rcp.prefix}-${platform}.zip" dest="target"/>
-        <move todir="target/${dist.name}">
+        <move todir="target/dist">
             <fileset dir="target/eclipse"/>
         </move>
-        <move file="target/${dist.name}/eclipse.exe" tofile="target/${dist.name}/penrose-studio.exe"/>
-        <copy file="launcher/penrose-studio.exe" tofile="target/${dist.name}/penrose-studio.exe"/>
+        <move file="target/dist/eclipse.exe" tofile="target/dist/penrose-studio.exe"/>
+        <copy file="launcher/penrose-studio.exe" tofile="target/dist/penrose-studio.exe"/>
         <antcall target="build">
             <param name="platform" value="${platform}"/>
         </antcall>
@@ -317,108 +313,56 @@
         <antcall target="dist-win32"/>
     </target>
 
-    <target name="dist-linux">
-        <antcall target="dist-linux-gtk"/>
-        <antcall target="dist-linux-gtk-x86_64"/>
-    </target>
-
-    <target name="dist-linux-gtk" if="isLinux">
-        <antcall target="dist-rpm-linux-gtk"/>
-    </target>
-
-    <target name="dist-linux-gtk-x86_64" if="isLinuxAMD64">
-        <antcall target="dist-rpm-linux-gtk-x86_64"/>
-    </target>
-
-    <target name="dist-rpm">
-        <antcall target="dist-linux-gtk"/>
-        <antcall target="dist-linux-gtk-x86_64"/>
-    </target>
-
-    <target name="dist-rpm-linux-gtk">
-        <mkdir dir="target"/>
-        <exec executable="/bin/uname" output="target/arch.txt">
-            <arg line="-i"/>
-        </exec>
-        <loadfile property="arch" srcFile="target/arch.txt">
-            <filterchain>
-                <striplinebreaks/>
-            </filterchain>
-        </loadfile>
-        <echo message="Arch: ${arch}"/>
-        <antcall target="build-linux-gtk"/>
-        <antcall target="rpm">
-            <param name="platform" value="linux-gtk"/>
-            <param name="rpm.prefix" value=""/>
-            <param name="rpm.home" value="/usr/src/redhat"/>
-            <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
-            <param name="rpm.arch" value="${arch}"/>
-            <param name="rpm.name" value="${project.name}-${product.version}-1.${arch}.rpm"/>
-        </antcall>
-    </target>
-
-    <target name="dist-rpm-linux-gtk-x86_64">
-        <antcall target="build-linux-gtk-x86_64"/>
-        <antcall target="rpm">
-            <param name="platform" value="linux-gtk-x86_64"/>
-            <param name="rpm.prefix" value=""/>
-            <param name="rpm.home" value="/usr/src/redhat"/>
-            <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
-            <param name="rpm.arch" value="x86_64"/>
-            <param name="rpm.name" value="${project.name}-${product.version}-1.x86_64.rpm"/>
-        </antcall>
-    </target>
-
-    <target name="dist-rpm-win32">
-        <antcall target="rpm">
-            <param name="platform" value="win32"/>
-            <param name="rpm.prefix" value="${cygwin.home}"/>
-            <param name="rpm.home" value="${cygwin.home}/usr/src/rpm"/>
-            <param name="rpm.builder" value="${cygwin.home}/lib/rpm/rpmb.exe"/>
-            <param name="rpm.arch" value="i386"/>
-            <param name="rpm.name" value="${project.name}-${product.version}-1.cygwin.i386.rpm"/>
-        </antcall>
+    <target name="dist-linux" depends="build-linux">
+        <tar destfile="${project.dist}/${project.name}-${product.version}.tar.gz" compression="gzip">
+            <tarfileset dir="target/dist" prefix="${project.name}-${product.version}" mode="755">
+                <include name="penrose-studio"/>
+            </tarfileset>
+            <tarfileset dir="target/dist" prefix="${project.name}-${product.version}">
+                <include name="**/*"/>
+                <exclude name="penrose-studio"/>
+            </tarfileset>
+        </tar>
     </target>
 
     <target name="dist-macosx" depends="build-macosx" if="isMac">
         <property name="app.name" value="${product.title}.app"/>
-        <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>
 
         <echo message="Creating ${app.name}"/>
-        <mkdir dir="target/${dist.name}"/>
-        <move todir="target/${dist.name}/${app.name}">
-            <fileset dir="target/${dist.name}/Eclipse.app"/>
+        <mkdir dir="target/dist"/>
+        <move todir="target/dist/${app.name}">
+            <fileset dir="target/dist/Eclipse.app"/>
         </move>
-        <delete file="target/${dist.name}/eclipse"/>
-        <move todir="target/${dist.name}/${app.name}/Contents/MacOS">
-            <fileset dir="target/${dist.name}">
+        <delete file="target/dist/eclipse"/>
+        <move todir="target/dist/${app.name}/Contents/MacOS">
+            <fileset dir="target/dist">
                 <exclude name="${app.name}/**"/>
             </fileset>
         </move>
 <!--
-        <move tofile="target/${dist.name}/${app.name}/Contents/MacOS/penrose-studio"
-            file="target/${dist.name}/${app.name}/Contents/MacOS/eclipse"
+        <move tofile="target/dist/${app.name}/Contents/MacOS/penrose-studio"
+            file="target/dist/${app.name}/Contents/MacOS/eclipse"
         />
 -->
-        <chmod file="target/${dist.name}/${app.name}/Contents/MacOS/eclipse" perm="a+rx" />
-        <copy todir="target/${dist.name}/${app.name}/Contents" file="rcp/Info.plist" overwrite="true">
+        <chmod file="target/dist/${app.name}/Contents/MacOS/eclipse" perm="a+rx" />
+        <copy todir="target/dist/${app.name}/Contents" file="rcp/Info.plist" overwrite="true">
             <filterchain>
                 <expandproperties/>
             </filterchain>
         </copy>
-        <copy todir="target/${dist.name}/${app.name}/Contents/MacOS"
+        <copy todir="target/dist/${app.name}/Contents/MacOS"
             file="rcp/eclipse.ini" overwrite="true"
         />
-        <copy tofile="target/${dist.name}/${app.name}/Contents/Resources/Penrose.icns"
+        <copy tofile="target/dist/${app.name}/Contents/Resources/Penrose.icns"
             file="images/Penrose.icns" overwrite="true"
         />
-        <delete file="target/${dist.name}/${app.name}/Contents/Resources/Eclipse.icns"/>
-        <mkdir dir="target/${dist.name}/.background"/>
+        <delete file="target/dist/${app.name}/Contents/Resources/Eclipse.icns"/>
+        <mkdir dir="target/dist/.background"/>
 
         <echo message="Creating ${project.name}-${product.version}.dmg"/>
         <mkdir dir="${project.dist}"/>
         <exec executable="bin/pkg-dmg">
-            <arg line="--source target/${dist.name}"/>
+            <arg line="--source target/dist"/>
             <arg line="--target dist/${project.name}-${product.version}.dmg"/>
             <!-- <arg line="- -volname &quot;Penrose Studio ${product.version}&quot;"/>  
 			The image path is absolute, NOT relative. This means your temporary disk image and your pkg-dmg disk images must have the same name. -->
@@ -446,7 +390,64 @@
         <exec executable="${iscc.path}">
             <arg line="/Q target/penrose-studio.iss"/>
         </exec>
+        <zip destfile="${project.dist}/${project.name}-${product.version}.zip">
+            <zipfileset dir="target/dist" prefix="${project.name}-${product.version}" filemode="755">
+                <include name="penrose-studio.exe"/>
+            </zipfileset>
+            <zipfileset dir="target/dist" prefix="${project.name}-${product.version}">
+                <include name="**/*"/>
+                <exclude name="penrose-studio.exe"/>
+            </zipfileset>
+        </zip>
+    </target>
+
+    <target name="dist-rpm">
+        <antcall target="dist-rpm-linux-gtk"/>
+        <antcall target="dist-rpm-linux-gtk-x86_64"/>
         <antcall target="dist-rpm-win32"/>
+    </target>
+
+    <target name="dist-rpm-linux-gtk" depends="init" if="isLinuxIntel">
+        <mkdir dir="target"/>
+        <exec executable="/bin/uname" output="target/arch.txt">
+            <arg line="-i"/>
+        </exec>
+        <loadfile property="arch" srcFile="target/arch.txt">
+            <filterchain>
+                <striplinebreaks/>
+            </filterchain>
+        </loadfile>
+        <echo message="Arch: ${arch}"/>
+        <antcall target="rpm">
+            <param name="platform" value="linux-gtk"/>
+            <param name="rpm.prefix" value=""/>
+            <param name="rpm.home" value="/usr/src/redhat"/>
+            <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
+            <param name="rpm.arch" value="${arch}"/>
+            <param name="rpm.name" value="${project.name}-${product.version}-1.${arch}.rpm"/>
+        </antcall>
+    </target>
+
+    <target name="dist-rpm-linux-gtk-x86_64" depends="init" if="isLinuxAMD64">
+        <antcall target="rpm">
+            <param name="platform" value="linux-gtk-x86_64"/>
+            <param name="rpm.prefix" value=""/>
+            <param name="rpm.home" value="/usr/src/redhat"/>
+            <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
+            <param name="rpm.arch" value="x86_64"/>
+            <param name="rpm.name" value="${project.name}-${product.version}-1.x86_64.rpm"/>
+        </antcall>
+    </target>
+
+    <target name="dist-rpm-win32" depends="init" if="isWindows">
+        <antcall target="rpm">
+            <param name="platform" value="win32"/>
+            <param name="rpm.prefix" value="${cygwin.home}"/>
+            <param name="rpm.home" value="${cygwin.home}/usr/src/rpm"/>
+            <param name="rpm.builder" value="${cygwin.home}/lib/rpm/rpmb.exe"/>
+            <param name="rpm.arch" value="i386"/>
+            <param name="rpm.name" value="${project.name}-${product.version}-1.cygwin.i386.rpm"/>
+        </antcall>
     </target>
 
     <target name="rpm-check" depends="init">
@@ -520,7 +521,7 @@
         <antcall target="install-dist-linux-gtk-x86_64"/>
     </target>
 
-    <target name="install-dist-linux-gtk" if="isLinux">
+    <target name="install-dist-linux-gtk" if="isLinuxIntel">
         <antcall target="install-linux-gtk"/>
     </target>
 
@@ -564,16 +565,14 @@
     </target>
 
     <target name="copy-penrose-conf" depends="init" if="penrose.conf.missing">
-        <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>
         <copy todir="${penrose.studio.home}">
-            <fileset dir="target/${dist.name}">
+            <fileset dir="target/dist">
                 <include name="conf/**/*"/>
             </fileset>
         </copy>
     </target>
 
     <target name="install-dist" depends="pre-install,copy-penrose-conf">
-        <property name="dist.name" value="${project.name}-${product.version}-${platform}"/>
         <delete failonerror="false" includeemptydirs="true">
             <fileset dir="${penrose.studio.home}">
                 <include name="configuration/**/*"/>
@@ -581,7 +580,7 @@
             </fileset>
         </delete>
         <copy todir="${penrose.studio.home}">
-            <fileset dir="target/${dist.name}">
+            <fileset dir="target/dist">
                 <include name="**/*"/>
                 <exclude name="conf/**/*"/>
             </fileset>
