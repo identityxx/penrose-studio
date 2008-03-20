@@ -526,10 +526,6 @@ public class NISFederation {
         return list;
     }
 
-    public Partitions getPartitions() {
-        return null; // federation.getPartitions();
-    }
-
     public Partition getPartition() {
         return partition;
     }

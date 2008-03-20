@@ -473,7 +473,7 @@ public class NISUserScriptsPage extends FormPage {
         PartitionClient partitionClient = penroseClient.getPartitionClient(domainName+"_"+NISFederation.YP);
         SourceClient sourceClient = partitionClient.getSourceClient(NISFederation.CHANGE_USERS);
 
-        Partition partition = nisFederation.getPartitions().getPartition(domainName);
+        Partition partition = null; // nisFederation.getPartitions().getPartition(domainName);
 
         RDNBuilder rb = new RDNBuilder();
         rb.set("domain", domainName);

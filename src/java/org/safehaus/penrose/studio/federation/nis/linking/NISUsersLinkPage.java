@@ -81,7 +81,7 @@ public class NISUsersLinkPage extends FormPage {
         domain = editor.getDomain();
         nisFederation = editor.getNisTool();
 
-        partition = nisFederation.getPartitions().getPartition(domain.getName()+"_"+NISFederation.NIS);
+        partition = null; // nisFederation.getPartitions().getPartition(domain.getName()+"_"+NISFederation.NIS);
 
         Connection connection = partition.getConnection(NISFederation.CACHE_CONNECTION_NAME);
         jdbcConnection = (JDBCConnection)connection;

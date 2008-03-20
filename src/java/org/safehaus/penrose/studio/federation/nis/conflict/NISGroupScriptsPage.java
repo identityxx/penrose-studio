@@ -467,7 +467,7 @@ public class NISGroupScriptsPage extends FormPage {
             Integer origGidNumber
     ) throws Exception {
 
-        Partition partition = nisFederation.getPartitions().getPartition(domainName);
+        Partition partition = null; // nisFederation.getPartitions().getPartition(domainName);
 
         RDNBuilder rb = new RDNBuilder();
         rb.set("domain", domainName);

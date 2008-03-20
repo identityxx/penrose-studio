@@ -22,18 +22,10 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.federation.repository.NISDomain;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.Partitions;
-import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.management.*;
-import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.jdbc.QueryResponse;
-import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 
 import java.util.ArrayList;
-import java.sql.ResultSet;
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
