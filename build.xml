@@ -303,14 +303,11 @@
         </tar>
     </target>
 
-    <target name="dist-all" depends="compile">
+    <target name="dist-all" depends="dist-linux,dist-macosx,dist-win32">
         <copy
             todir="${project.dist}"
             file="target/${project.name}-${product.version}.jar">
         </copy>
-        <antcall target="dist-linux"/>
-        <antcall target="dist-macosx"/>
-        <antcall target="dist-win32"/>
     </target>
 
     <target name="dist-linux" depends="build-linux">
