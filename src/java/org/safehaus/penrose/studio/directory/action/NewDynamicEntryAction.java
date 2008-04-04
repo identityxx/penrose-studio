@@ -46,8 +46,8 @@ public class NewDynamicEntryAction extends Action {
 
             DynamicEntryWizard wizard = new DynamicEntryWizard();
             wizard.setProject(projectNode.getProject());
-            wizard.setPartitionConfig(node.getPartitionConfig());
-            wizard.setParentMapping(node.getEntryMapping());
+            wizard.setPartitionName(node.getPartitionName());
+            wizard.setParentDn(node.getEntryConfig().getDn());
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);

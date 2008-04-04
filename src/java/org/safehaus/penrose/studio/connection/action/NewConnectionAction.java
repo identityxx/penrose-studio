@@ -45,7 +45,7 @@ public class NewConnectionAction extends Action {
             ServersView serversView = ServersView.getInstance();
             Project project = connectionsNode.getProjectNode().getProject();
 
-            ConnectionWizard wizard = new ConnectionWizard(connectionsNode.getPartitionConfig());
+            ConnectionWizard wizard = new ConnectionWizard(connectionsNode.getPartitionName());
             wizard.setProject(project);
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);

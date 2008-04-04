@@ -34,6 +34,7 @@ import org.eclipse.ui.part.*;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.Penrose;
 import org.safehaus.penrose.PenroseFactory;
+import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.session.Session;
@@ -65,15 +66,22 @@ public class PreviewEditor extends EditorPart {
     byte[] password;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        PreviewEditorInput ei = (PreviewEditorInput)input;
-        project = ei.getProject();
-        projectConfig = project.getProjectConfig();
-        workDir = project.getWorkDir();
-        penroseConfig = project.getPenroseConfig();
+        try {
+            PreviewEditorInput ei = (PreviewEditorInput)input;
+            project = ei.getProject();
+            projectConfig = project.getProjectConfig();
+            workDir = project.getWorkDir();
 
-        setSite(site);
-        setInput(input);
-        setPartName(projectConfig.getName());
+            PenroseClient client = project.getClient();
+            penroseConfig = client.getPenroseConfig();
+
+            setSite(site);
+            setInput(input);
+            setPartName(projectConfig.getName());
+
+        } catch (Exception e) {
+            throw new PartInitException(e.getMessage(), e);
+        }
     }
 
     public void dispose() {

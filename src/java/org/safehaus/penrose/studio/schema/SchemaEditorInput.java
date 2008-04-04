@@ -20,8 +20,6 @@ package org.safehaus.penrose.studio.schema;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.schema.Schema;
-import org.safehaus.penrose.schema.SchemaConfig;
 import org.safehaus.penrose.studio.project.Project;
 
 /**
@@ -31,28 +29,17 @@ public class SchemaEditorInput implements IEditorInput {
 
     private Project project;
 
-    private SchemaConfig schemaConfig;
-    private Schema schema;
+    private String schemaName;
 
-    public SchemaEditorInput(SchemaConfig schemaConfig, Schema schema) {
-        this.schemaConfig = schemaConfig;
-        this.schema = schema;
+    public SchemaEditorInput() {
     }
 
-    public SchemaConfig getSchemaConfig() {
-        return schemaConfig;
+    public String getSchemaName() {
+        return schemaName;
     }
 
-    public void setSchemaConfig(SchemaConfig schemaConfig) {
-        this.schemaConfig = schemaConfig;
-    }
-
-    public Schema getSchema() {
-        return schema;
-    }
-
-    public void setSchema(Schema schema) {
-        this.schema = schema;
+    public void setSchemaName(String schemaName) {
+        this.schemaName = schemaName;
     }
 
     public boolean exists() {
@@ -64,7 +51,7 @@ public class SchemaEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "Schema - "+schema.getName();
+        return "Schema - "+ schemaName;
     }
 
     public IPersistableElement getPersistable() {
@@ -85,8 +72,7 @@ public class SchemaEditorInput implements IEditorInput {
         if (object.getClass() != this.getClass()) return false;
 
         SchemaEditorInput ei = (SchemaEditorInput)object;
-        if (!schemaConfig.equals(ei.schemaConfig)) return false;
-        if (!schema.equals(ei.schema)) return false;
+        if (!schemaName.equals(ei.schemaName)) return false;
 
         return true;
     }

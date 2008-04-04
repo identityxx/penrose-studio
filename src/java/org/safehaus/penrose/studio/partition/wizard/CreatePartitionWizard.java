@@ -17,12 +17,14 @@
  */
 package org.safehaus.penrose.studio.partition.wizard;
 
-import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.partition.PartitionConfigs;
 import org.apache.log4j.Logger;
+import org.eclipse.jface.wizard.Wizard;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.partition.PartitionsNode;
+import org.safehaus.penrose.studio.project.Project;
 
 /**
  * @author Endi S. Dewata
@@ -32,10 +34,13 @@ public class CreatePartitionWizard extends Wizard {
     Logger log = Logger.getLogger(getClass());
 
     public Project project;
+    public PartitionsNode partitionsNode;
+
     public PartitionNamePage namePage = new PartitionNamePage();
 
-    public CreatePartitionWizard(Project project) {
+    public CreatePartitionWizard(Project project, PartitionsNode partitionsNode) {
         this.project = project;
+        this.partitionsNode = partitionsNode;
         setWindowTitle("New Partition");
     }
 
@@ -52,11 +57,17 @@ public class CreatePartitionWizard extends Wizard {
 
             PartitionConfig partitionConfig = new PartitionConfig(name);
 
-            PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-            partitionConfigs.addPartitionConfig(partitionConfig);
+            //PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
+            //partitionConfigManager.addPartitionConfig(partitionConfig);
 
-            project.save(partitionConfig);
+            //project.save(partitionConfig);
             
+            //partitionsNode.addPartitionConfig(partitionConfig);
+
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            partitionManagerClient.createPartition(partitionConfig);
+
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 

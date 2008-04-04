@@ -24,8 +24,8 @@ public class PluginsNode extends Node {
 
     protected Collection<Node> children = new ArrayList<Node>();
 
-    public PluginsNode(String name, String type, Object object, Object parent) throws Exception {
-        super(name, type, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), object, parent);
+    public PluginsNode(String name, Object object, Object parent) throws Exception {
+        super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), object, parent);
 
         projectNode = (ProjectNode)parent;
         view = projectNode.getServersView();

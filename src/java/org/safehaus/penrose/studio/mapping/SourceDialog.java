@@ -44,7 +44,7 @@ public class SourceDialog extends Dialog {
     Tree sourceTree;
     Text aliasText;
 
-    Map items = new HashMap();
+    Map<String,TreeItem> items = new HashMap<String,TreeItem>();
 
     SourceMapping sourceMapping;
 
@@ -293,17 +293,16 @@ public class SourceDialog extends Dialog {
         return enabled;
     }
 
-    public void setSourceConfigs(Collection sources) {
+    public void setSourceConfigs(Collection<SourceConfig> sourceConfigs) {
         sourceTree.removeAll();
         items.clear();
 
-        for (Iterator i=sources.iterator(); i.hasNext(); ) {
-            SourceConfig sourceDefinition = (SourceConfig)i.next();
+        for (SourceConfig sourceConfig : sourceConfigs) {
             TreeItem ti = new TreeItem(sourceTree, SWT.NONE);
-            ti.setText(sourceDefinition.getName());
-            ti.setData(sourceDefinition);
+            ti.setText(sourceConfig.getName());
+            ti.setData(sourceConfig);
             ti.setImage(PenroseStudioPlugin.getImage(PenroseImage.SOURCE));
-            items.put(sourceDefinition.getName(), ti);
+            items.put(sourceConfig.getName(), ti);
         }
     }
 

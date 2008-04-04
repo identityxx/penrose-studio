@@ -20,8 +20,6 @@ package org.safehaus.penrose.studio.module.editor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.module.ModuleConfig;
-import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.project.Project;
 
 /**
@@ -30,8 +28,8 @@ import org.safehaus.penrose.studio.project.Project;
 public class ModuleEditorInput implements IEditorInput {
 
     private Project project;
-    private PartitionConfig partitionConfig;
-    private ModuleConfig moduleConfig;
+    private String partitionName;
+    private String moduleName;
 
     public ModuleEditorInput() {
     }
@@ -45,7 +43,7 @@ public class ModuleEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return partitionConfig.getName()+"/"+moduleConfig.getName();
+        return partitionName+"/"+moduleName;
     }
 
     public IPersistableElement getPersistable() {
@@ -65,24 +63,8 @@ public class ModuleEditorInput implements IEditorInput {
         if (object == null) return false;
         if (object.getClass() != this.getClass()) return false;
 
-        ModuleEditorInput cei = (ModuleEditorInput)object;
-        return moduleConfig.equals(cei.moduleConfig);
-    }
-
-    public ModuleConfig getModuleConfig() {
-        return moduleConfig;
-    }
-
-    public void setModuleConfig(ModuleConfig moduleConfig) {
-        this.moduleConfig = moduleConfig;
-    }
-
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
-    }
-
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+        ModuleEditorInput ei = (ModuleEditorInput)object;
+        return moduleName.equals(ei.moduleName);
     }
 
     public Project getProject() {
@@ -91,5 +73,21 @@ public class ModuleEditorInput implements IEditorInput {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public String getModuleName() {
+        return moduleName;
+    }
+
+    public void setModuleName(String moduleName) {
+        this.moduleName = moduleName;
+    }
+
+    public String getPartitionName() {
+        return partitionName;
+    }
+
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 }

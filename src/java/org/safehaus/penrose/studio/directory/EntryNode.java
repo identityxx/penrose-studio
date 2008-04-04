@@ -17,35 +17,39 @@
  */
 package org.safehaus.penrose.studio.directory;
 
-import org.eclipse.jface.action.IMenuManager;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchPage;
-import org.safehaus.penrose.studio.*;
-import org.safehaus.penrose.studio.partition.PartitionsNode;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.safehaus.penrose.directory.EntryConfig;
+import org.safehaus.penrose.management.directory.EntryClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.directory.action.MapLDAPTreeAction;
+import org.safehaus.penrose.studio.directory.action.NewDynamicEntryAction;
+import org.safehaus.penrose.studio.directory.action.NewEntryFromSourceAction;
+import org.safehaus.penrose.studio.directory.action.NewStaticEntryAction;
+import org.safehaus.penrose.studio.directory.editor.EntryEditorInput;
+import org.safehaus.penrose.studio.directory.editor.EntryEditor;
 import org.safehaus.penrose.studio.partition.PartitionNode;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.mapping.editor.MappingEditor;
-import org.safehaus.penrose.studio.mapping.editor.MappingEditorInput;
-import org.safehaus.penrose.studio.directory.action.NewStaticEntryAction;
-import org.safehaus.penrose.studio.directory.action.NewDynamicEntryAction;
-import org.safehaus.penrose.studio.directory.action.MapLDAPTreeAction;
-import org.safehaus.penrose.studio.directory.action.NewEntryFromSourceAction;
-import org.safehaus.penrose.directory.EntryMapping;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.directory.DirectoryConfig;
-import org.apache.log4j.Logger;
 
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
@@ -60,11 +64,11 @@ public class EntryNode extends Node {
     protected PartitionNode partitionNode;
     protected DirectoryNode directoryNode;
 
-    private PartitionConfig partitionConfig;
-    private EntryMapping entryMapping;
+    private String partitionName;
+    private EntryConfig entryConfig;
 
-    public EntryNode(String name, String type, Image image, Object object, Object parent) {
-        super(name, type, image, object, parent);
+    public EntryNode(String name, Image image, Object object, Object parent) {
+        super(name, image, object, parent);
 
         if (parent instanceof DirectoryNode) {
             directoryNode = (DirectoryNode)parent;
@@ -167,36 +171,42 @@ public class EntryNode extends Node {
 
     public void open() throws Exception {
 
-        MappingEditorInput mei = new MappingEditorInput(partitionConfig, entryMapping);
-        mei.setProject(projectNode.getProject());
+        EntryEditorInput ei = new EntryEditorInput();
+        ei.setPartitionName(partitionName);
+        ei.setEntryId(entryConfig.getId());
+        ei.setProject(projectNode.getProject());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
 
-        page.openEditor(mei, MappingEditor.class.getName());
+        page.openEditor(ei, EntryEditor.class.getName());
     }
 
     public void editSources() throws Exception {
 
-        MappingEditorInput mei = new MappingEditorInput(partitionConfig, entryMapping);
-        mei.setProject(projectNode.getProject());
+        EntryEditorInput ei = new EntryEditorInput();
+        ei.setPartitionName(partitionName);
+        ei.setEntryId(entryConfig.getId());
+        ei.setProject(projectNode.getProject());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
 
-        MappingEditor editor = (MappingEditor)page.openEditor(mei, MappingEditor.class.getName());
+        EntryEditor editor = (EntryEditor)page.openEditor(ei, EntryEditor.class.getName());
         editor.showSourcesPage();
     }
 
     public void editACL() throws Exception {
 
-        MappingEditorInput mei = new MappingEditorInput(partitionConfig, entryMapping);
-        mei.setProject(projectNode.getProject());
+        EntryEditorInput ei = new EntryEditorInput();
+        ei.setPartitionName(partitionName);
+        ei.setEntryId(entryConfig.getId());
+        ei.setProject(projectNode.getProject());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
 
-        MappingEditor editor = (MappingEditor)page.openEditor(mei, MappingEditor.class.getName());
+        EntryEditor editor = (EntryEditor)page.openEditor(ei, EntryEditor.class.getName());
         editor.showACLPage();
     }
 
@@ -209,45 +219,66 @@ public class EntryNode extends Node {
 
         if (!confirm) return;
 
-        DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
+        Project project = projectNode.getProject();
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+        //DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
 
         for (Node node : view.getSelectedNodes()) {
             if (!(node instanceof EntryNode)) continue;
 
             EntryNode entryNode = (EntryNode) node;
 
-            EntryMapping entryMapping = entryNode.getEntryMapping();
-            directoryConfig.removeEntryMapping(entryMapping);
+            String id = entryNode.getEntryConfig().getId();
+            partitionClient.removeEntry(id);
         }
 
-        Project project = projectNode.getProject();
-        project.save(partitionConfig, directoryConfig);
+        //project.save(partitionConfig, directoryConfig);
+        partitionClient.store();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
 
     public boolean hasChildren() throws Exception {
-        Collection children = partitionConfig.getDirectoryConfig().getChildren(entryMapping);
-        return (children != null && children.size() > 0);
+        return !getChildren().isEmpty();
     }
 
     public Collection<Node> getChildren() throws Exception {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        for (EntryMapping childMapping : partitionConfig.getDirectoryConfig().getChildren(entryMapping)) {
+        Project project = projectNode.getProject();
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+        EntryClient entryClient = partitionClient.getEntryClient(entryConfig.getId());
+
+        log.debug("Getting children:");
+
+        for (String id : entryClient.getChildIds()) {
+            log.debug(" - "+id);
+
+            EntryClient childClient = partitionClient.getEntryClient(id);
+            EntryConfig childConfig = childClient.getEntryConfig();
+
+            //log.debug(" - childConfig "+childConfig);
+            //log.debug(" - childConfig.rdn "+childConfig.getRdn());
+
+            String rdn = childConfig.getRdn() == null ? "Root DSE" : childConfig.getRdn().toString();
 
             EntryNode entryNode = new EntryNode(
-                    childMapping.getRdn().toString(),
-                    ServersView.ENTRY,
+                    rdn,
                     PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
-                    childMapping,
+                    childConfig,
                     this
             );
 
-            entryNode.setPartitionConfig(partitionConfig);
-            entryNode.setEntryMapping(childMapping);
+            entryNode.setPartitionName(partitionName);
+            entryNode.setEntryConfig(childConfig);
 
             children.add(entryNode);
         }
@@ -255,20 +286,20 @@ public class EntryNode extends Node {
         return children;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 
-    public EntryMapping getEntryMapping() {
-        return entryMapping;
+    public EntryConfig getEntryConfig() {
+        return entryConfig;
     }
 
-    public void setEntryMapping(EntryMapping entryMapping) {
-        this.entryMapping = entryMapping;
+    public void setEntryConfig(EntryConfig entryConfig) {
+        this.entryConfig = entryConfig;
     }
 
     public ServersView getView() {

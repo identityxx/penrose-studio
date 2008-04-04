@@ -17,9 +17,14 @@
  */
 package org.safehaus.penrose.studio.partition.wizard;
 
-import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.partition.*;
 import org.apache.log4j.Logger;
+import org.eclipse.jface.wizard.Wizard;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.partition.PartitionWriter;
+import org.safehaus.penrose.studio.project.Project;
 
 import java.io.File;
 
@@ -30,12 +35,14 @@ public class ExportPartitionWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private PartitionConfig partitionConfig;
+    private Project project;
+    private String partitionName;
 
     public PartitionLocationPage locationPage = new PartitionLocationPage();
 
-    public ExportPartitionWizard(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public ExportPartitionWizard(Project project, String partitionName) {
+        this.project = project;
+        this.partitionName = partitionName;
 
         setWindowTitle("Export Partition");
         locationPage.setDescription("Enter the location to which the partition will be exported.");
@@ -53,8 +60,12 @@ public class ExportPartitionWizard extends Wizard {
 
             File directory = new File(locationPage.getLocation());
 
-            PartitionWriter partitionWriter = new PartitionWriter();
-            partitionWriter.write(directory, partitionConfig);
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            PartitionConfig partitionConfig = partitionClient.getPartitionConfig();
+            partitionConfig.store(directory);
 
             return true;
 
@@ -72,11 +83,11 @@ public class ExportPartitionWizard extends Wizard {
         return true;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 }

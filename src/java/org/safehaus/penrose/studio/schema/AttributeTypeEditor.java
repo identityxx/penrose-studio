@@ -83,6 +83,7 @@ public class AttributeTypeEditor extends EditorPart implements ModifyListener, S
 
 	    } catch (Exception e) {
             log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
 	}
 
@@ -255,6 +256,7 @@ public class AttributeTypeEditor extends EditorPart implements ModifyListener, S
             store();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -304,8 +306,6 @@ public class AttributeTypeEditor extends EditorPart implements ModifyListener, S
                 return;
             }
 
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
         } finally {
             firePropertyChange(PROP_DIRTY);
         }

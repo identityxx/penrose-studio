@@ -35,7 +35,7 @@ public class LDAPNode extends Node {
     //Map<String,Node> children = new TreeMap<String,Node>();
 
     public LDAPNode(String name, FederationNode federationNode) {
-        super(name, null, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), null, federationNode);
+        super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), null, federationNode);
 
         this.federationNode = federationNode;
         this.projectNode = federationNode.getProjectNode();

@@ -44,7 +44,7 @@ public class NewSourceAction extends Action {
             ServersView serversView = ServersView.getInstance();
             Project project = sourcesNode.getProjectNode().getProject();
 
-            SourceWizard wizard = new SourceWizard(sourcesNode.getPartitionConfig());
+            SourceWizard wizard = new SourceWizard(sourcesNode.getPartitionName());
             wizard.setProject(project);
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
@@ -58,6 +58,7 @@ public class NewSourceAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
 	}
 	

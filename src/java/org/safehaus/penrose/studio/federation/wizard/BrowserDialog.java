@@ -11,7 +11,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.graphics.Point;
 import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.directory.EntryMapping;
+import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 
@@ -29,7 +29,7 @@ public class BrowserDialog extends Dialog {
     Button saveButton;
 
     private PartitionConfig partitionConfig;
-    private EntryMapping entryMapping;
+    private EntryConfig entryConfig;
 
 	public BrowserDialog(Shell parent, int style) {
 		super(parent, style);
@@ -70,7 +70,7 @@ public class BrowserDialog extends Dialog {
                 if (event.item == null) return;
 
                 TreeItem item = (TreeItem)event.item;
-                EntryMapping entry = (EntryMapping)item.getData();
+                EntryConfig entry = (EntryConfig)item.getData();
 
                 TreeItem items[] = item.getItems();
                 for (int i=0; i<items.length; i++) {
@@ -79,7 +79,7 @@ public class BrowserDialog extends Dialog {
 
                 Collection children = partitionConfig.getDirectoryConfig().getChildren(entry);
                 for (Iterator i=children.iterator(); i.hasNext(); ) {
-                    EntryMapping child = (EntryMapping)i.next();
+                    EntryConfig child = (EntryConfig)i.next();
 
                     TreeItem it = new TreeItem(item, SWT.NONE);
                     it.setText(child.getRdn().toString());
@@ -109,7 +109,7 @@ public class BrowserDialog extends Dialog {
 		saveButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
                 TreeItem item = tree.getSelection()[0];
-                entryMapping = (EntryMapping)item.getData();
+                entryConfig = (EntryConfig)item.getData();
                 shell.close();
 			}
 		});
@@ -118,18 +118,18 @@ public class BrowserDialog extends Dialog {
         cancelButton.setText("Cancel");
 		cancelButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-                entryMapping = null;
+                entryConfig = null;
                 shell.close();
 			}
 		});
 	}
 
-    public EntryMapping getEntryMapping() {
-        return entryMapping;
+    public EntryConfig getEntryConfig() {
+        return entryConfig;
     }
 
-    public void setEntryMapping(EntryMapping entryMapping) {
-        this.entryMapping = entryMapping;
+    public void setEntryConfig(EntryConfig entryConfig) {
+        this.entryConfig = entryConfig;
     }
 
     public PartitionConfig getPartitionConfig() {
@@ -139,9 +139,9 @@ public class BrowserDialog extends Dialog {
     public void setPartitionConfig(PartitionConfig partitionConfig) {
         this.partitionConfig = partitionConfig;
 
-        Collection rootEntries = partitionConfig.getDirectoryConfig().getRootEntryMappings();
+        Collection rootEntries = partitionConfig.getDirectoryConfig().getRootEntryConfigs();
         for (Iterator i=rootEntries.iterator(); i.hasNext(); ) {
-            EntryMapping entry = (EntryMapping)i.next();
+            EntryConfig entry = (EntryConfig)i.next();
             String dn = entry.getDn().isEmpty() ? "Root DSE" : entry.getDn().toString();
 
             TreeItem item = new TreeItem(tree, SWT.NONE);

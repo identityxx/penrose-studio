@@ -22,11 +22,12 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.source.SourceConfigs;
-import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.source.wizard.SourceWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.schema.AttributeType;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -39,7 +40,7 @@ public class JNDISourceWizard extends Wizard {
     Logger log = Logger.getLogger(getClass());
 
     private Project project;
-    private PartitionConfig partitionConfig;
+    private String partitionName;
     private ConnectionConfig connectionConfig;
     private SourceConfig sourceConfig;
 
@@ -48,8 +49,8 @@ public class JNDISourceWizard extends Wizard {
     public JNDIAttributeWizardPage jndiAttributesPage;
     public JNDIFieldWizardPage jndiFieldsPage;
 
-    public JNDISourceWizard(PartitionConfig partitionConfig, ConnectionConfig connectionConfig) throws Exception {
-        this.partitionConfig = partitionConfig;
+    public JNDISourceWizard(String partitionName, ConnectionConfig connectionConfig) throws Exception {
+        this.partitionName = partitionName;
         this.connectionConfig = connectionConfig;
 
         propertyPage = new SourceWizardPage();
@@ -109,9 +110,15 @@ public class JNDISourceWizard extends Wizard {
                 sourceConfig.addFieldConfig(field);
             }
 
-            SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
-            sourceConfigs.addSourceConfig(sourceConfig);
-            project.save(partitionConfig, sourceConfigs);
+            //SourceConfigManager sourceConfigManager = partitionConfig.getSourceConfigManager();
+            //sourceConfigManager.addSourceConfig(sourceConfig);
+            //project.save(partitionConfig, sourceConfigManager);
+
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            partitionClient.createSource(sourceConfig);
+            partitionClient.store();
 
             return true;
 
@@ -141,12 +148,12 @@ public class JNDISourceWizard extends Wizard {
         this.connectionConfig = connectionConfig;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 
     public Project getProject() {

@@ -17,19 +17,21 @@
  */
 package org.safehaus.penrose.studio.directory.wizard;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.studio.source.wizard.SelectSourceWizardPage;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.ldap.RDN;
+import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.directory.EntryConfig;
+import org.safehaus.penrose.directory.SourceMapping;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.DNBuilder;
+import org.safehaus.penrose.ldap.RDN;
+import org.safehaus.penrose.management.connection.ConnectionClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.directory.DirectoryConfig;
-import org.safehaus.penrose.directory.EntryMapping;
-import org.safehaus.penrose.directory.SourceMapping;
-import org.apache.log4j.Logger;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.source.wizard.SelectSourceWizardPage;
 
 import javax.naming.Context;
 
@@ -43,22 +45,23 @@ public class CreateLDAPProxyWizard extends Wizard {
     public SelectSourceWizardPage sourcePage;
 
     private Project project;
-    private PartitionConfig partitionConfig;
-    EntryMapping parentMapping;
+    private String partitionName;
 
-    public CreateLDAPProxyWizard(PartitionConfig partitionConfig) {
-        this(partitionConfig, null);
+    private DN parentDn;
+
+    public CreateLDAPProxyWizard(String partitionName) {
+        this(partitionName, null);
     }
 
-    public CreateLDAPProxyWizard(PartitionConfig partitionConfig, EntryMapping parentMapping) {
-        this.partitionConfig = partitionConfig;
-        this.parentMapping = parentMapping;
+    public CreateLDAPProxyWizard(String partitionName, DN parentDn) {
+        this.partitionName = partitionName;
+        this.parentDn = parentDn;
 
         setWindowTitle("New LDAP Proxy");
     }
 
     public void addPages() {
-        sourcePage = new SelectSourceWizardPage(partitionConfig);
+        sourcePage = new SelectSourceWizardPage(partitionName);
 
         addPage(sourcePage);
     }
@@ -71,7 +74,13 @@ public class CreateLDAPProxyWizard extends Wizard {
     public boolean performFinish() {
         try {
             SourceConfig sourceConfig = sourcePage.getSourceConfig();
-            ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
+
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+            ConnectionClient connectionClient = partitionClient.getConnectionClient(sourceConfig.getConnectionName());
+            ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
             String url = connectionConfig.getParameter(Context.PROVIDER_URL);
 
@@ -92,34 +101,37 @@ public class CreateLDAPProxyWizard extends Wizard {
 
             log.debug("DN: "+dn);
 
-            EntryMapping entryMapping = new EntryMapping();
-            if (parentMapping == null) {
-                entryMapping.setDn(dn);
+            EntryConfig entryConfig = new EntryConfig();
+            if (parentDn == null) {
+                entryConfig.setDn(dn);
 
             } else {
                 RDN rdn = dn.getRdn();
 
                 db.clear();
                 db.append(rdn);
-                db.append(parentMapping.getDn());
+                db.append(parentDn);
 
-                entryMapping.setDn(db.toDn());
+                entryConfig.setDn(db.toDn());
             }
 
             SourceMapping sourceMapping = new SourceMapping("DEFAULT", sourceConfig.getName());
-            entryMapping.addSourceMapping(sourceMapping);
+            entryConfig.addSourceMapping(sourceMapping);
 
-            entryMapping.setHandlerName("PROXY");
-
+            entryConfig.setHandlerName("PROXY");
+/*
             DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
-            directoryConfig.addEntryMapping(entryMapping);
+            directoryConfig.addEntryConfig(entryConfig);
             project.save(partitionConfig, directoryConfig);
-
+*/
+            partitionClient.createEntry(entryConfig);
+            partitionClient.store();
+            
             return true;
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return false;
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -135,11 +147,19 @@ public class CreateLDAPProxyWizard extends Wizard {
         this.project = project;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
+    }
+
+    public DN getParentDn() {
+        return parentDn;
+    }
+
+    public void setParentDn(DN parentDn) {
+        this.parentDn = parentDn;
     }
 }

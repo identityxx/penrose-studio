@@ -2,7 +2,7 @@ package org.safehaus.penrose.studio.federation.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
 import org.safehaus.penrose.ldap.DN;
 
 /**
@@ -38,7 +38,7 @@ public class BrowserWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return false;
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.federation.repository.LDAPRepository;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.jndi.connection.LDAPConnectionWizardPage;
+import org.safehaus.penrose.studio.ldap.connection.LDAPConnectionWizardPage;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.connection.ConnectionConfig;
 

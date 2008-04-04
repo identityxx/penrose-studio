@@ -20,9 +20,9 @@ import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.source.Source;
+import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 import org.safehaus.penrose.filter.Filter;
@@ -81,14 +81,15 @@ public class NISUsersLinkPage extends FormPage {
         domain = editor.getDomain();
         nisFederation = editor.getNisTool();
 
-        partition = null; // nisFederation.getPartitions().getPartition(domain.getName()+"_"+NISFederation.NIS);
+        partition = null; // nisFederation.getPartitionManager().getPartition(domain.getName()+"_"+NISFederation.NIS);
+        SourceManager sourceManager = partition.getSourceManager();
 
         Connection connection = partition.getConnection(NISFederation.CACHE_CONNECTION_NAME);
         jdbcConnection = (JDBCConnection)connection;
 
-        localUsers = partition.getSource("local_users");
-        globalUsers = partition.getSource("global_users");
-        usersLink = partition.getSource("cache_users_link");
+        localUsers = sourceManager.getSource("local_users");
+        globalUsers = sourceManager.getSource("global_users");
+        usersLink = sourceManager.getSource("cache_users_link");
 
         Display display = Display.getDefault();
 
@@ -760,8 +761,6 @@ public class NISUsersLinkPage extends FormPage {
     }
 
     public String getLink(String uid) throws Exception {
-        Collection<Assignment> assignments = new ArrayList<Assignment>();
-        assignments.add(new Assignment(uid));
 
         QueryResponse queryResponse = new QueryResponse() {
             public void add(Object object) throws Exception {
@@ -773,7 +772,7 @@ public class NISUsersLinkPage extends FormPage {
 
         jdbcConnection.executeQuery(
                 "select globalUid from "+ jdbcConnection.getTableName(usersLink)+" where uid=?",
-                assignments,
+                new Object[] { uid },
                 queryResponse
         );
 
@@ -782,36 +781,25 @@ public class NISUsersLinkPage extends FormPage {
 
     public void createLink(String uid, String globalUid) throws Exception {
 
-        Collection<Assignment> assignments = new ArrayList<Assignment>();
-        assignments.add(new Assignment(uid));
-        assignments.add(new Assignment(globalUid));
-
         jdbcConnection.executeUpdate(
                 "insert into "+ jdbcConnection.getTableName(usersLink)+" (uid, globalUid) values (?, ?)",
-                assignments
+                new Object[] { uid, globalUid }
         );
     }
 
     public void updateLink(String uid, String globalUid) throws Exception {
 
-        Collection<Assignment> assignments = new ArrayList<Assignment>();
-        assignments.add(new Assignment(globalUid));
-        assignments.add(new Assignment(uid));
-
         jdbcConnection.executeUpdate(
                 "update "+ jdbcConnection.getTableName(usersLink)+" set globalUid=? where uid=?",
-                assignments
+                new Object[] { globalUid, uid }
         );
     }
 
     public void removeLink(String uid) throws Exception {
 
-        Collection<Assignment> assignments = new ArrayList<Assignment>();
-        assignments.add(new Assignment(uid));
-
         jdbcConnection.executeUpdate(
                 "delete from "+ jdbcConnection.getTableName(usersLink)+" where uid=?",
-                assignments
+                new Object[] { uid }
         );
     }
 

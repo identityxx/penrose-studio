@@ -17,17 +17,20 @@
  */
 package org.safehaus.penrose.studio.connection.action;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.jndi.source.JNDISourceWizard;
-import org.safehaus.penrose.studio.jdbc.source.JDBCSourceWizard;
-import org.safehaus.penrose.studio.connection.ConnectionNode;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.apache.log4j.Logger;
+import org.safehaus.penrose.management.connection.ConnectionClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.connection.ConnectionNode;
+import org.safehaus.penrose.studio.jdbc.source.JDBCSourceWizard;
+import org.safehaus.penrose.studio.jndi.source.JNDISourceWizard;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServersView;
 
 public class NewSourceAction extends Action {
 
@@ -47,12 +50,19 @@ public class NewSourceAction extends Action {
             ServersView serversView = ServersView.getInstance();
             Project project = node.getProjectNode().getProject();
 
-            PartitionConfig partitionConfig = node.getPartitionConfig();
-            ConnectionConfig connectionConfig = node.getConnectionConfig();
-            String adapterName = connectionConfig.getAdapterName();
+            String partitionName  = node.getPartitionName();
+            String adapterName    = node.getAdapterName();
+            String connectionName = node.getConnectionName();
+
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+            ConnectionClient connectionClient = partitionClient.getConnectionClient(connectionName);
+            ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
             if ("JDBC".equals(adapterName)) {
-                JDBCSourceWizard wizard = new JDBCSourceWizard(partitionConfig, connectionConfig);
+                JDBCSourceWizard wizard = new JDBCSourceWizard(partitionName, connectionConfig);
                 wizard.setProject(project);
                 
                 WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
@@ -60,7 +70,7 @@ public class NewSourceAction extends Action {
                 dialog.open();
 
             } else if ("LDAP".equals(adapterName)) {
-                JNDISourceWizard wizard = new JNDISourceWizard(partitionConfig, connectionConfig);
+                JNDISourceWizard wizard = new JNDISourceWizard(partitionName, connectionConfig);
                 wizard.setProject(project);
 
                 WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
@@ -75,6 +85,7 @@ public class NewSourceAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
 	}
 	

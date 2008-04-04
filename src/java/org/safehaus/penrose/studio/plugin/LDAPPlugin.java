@@ -4,8 +4,8 @@ import org.safehaus.penrose.studio.jndi.source.JNDISourceEditorInput;
 import org.safehaus.penrose.studio.jndi.source.JNDISourceEditor;
 import org.safehaus.penrose.studio.source.editor.SourceEditorInput;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorInput;
-import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionEditorInput;
-import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionEditor;
+import org.safehaus.penrose.studio.ldap.connection.editor.LDAPConnectionEditorInput;
+import org.safehaus.penrose.studio.ldap.connection.editor.LDAPConnectionEditor;
 
 /**
  * @author Endi S. Dewata
@@ -13,11 +13,11 @@ import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionEditor;
 public class LDAPPlugin extends Plugin {
 
     public ConnectionEditorInput createConnectionEditorInput() {
-        return new JNDIConnectionEditorInput();
+        return new LDAPConnectionEditorInput();
     }
 
     public String getConnectionEditorClass() {
-        return JNDIConnectionEditor.class.getName();
+        return LDAPConnectionEditor.class.getName();
     }
 
     public SourceEditorInput createSourceEditorInput() {

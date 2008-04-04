@@ -17,21 +17,21 @@
  */
 package org.safehaus.penrose.studio.schema;
 
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.tree.Node;
+import org.eclipse.swt.graphics.Image;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.schema.SchemaClient;
+import org.safehaus.penrose.management.schema.SchemaManagerClient;
 import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.schema.SchemaConfig;
-import org.safehaus.penrose.schema.SchemaManager;
-import org.safehaus.penrose.schema.Schema;
-import org.eclipse.swt.graphics.Image;
+import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.tree.Node;
 
-import java.util.Collection;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
@@ -44,18 +44,15 @@ public class AttributeTypesNode extends Node {
 
     private SchemaConfig schemaConfig;
 
-    public AttributeTypesNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
-        super(name, type, image, object, parent);
+    public AttributeTypesNode(ServersView view, String name, Image image, Object object, Object parent) {
+        super(name, image, object, parent);
         schemaNode = (SchemaNode)parent;
         projectNode = schemaNode.getProjectNode();
         this.view = projectNode.getServersView();
     }
 
     public boolean hasChildren() throws Exception {
-        Project project = projectNode.getProject();
-        SchemaManager schemaManager = project.getSchemaManager();
-        Schema schema = schemaManager.getSchema(schemaConfig.getName());
-        return !schema.getAttributeTypes().isEmpty();
+        return !getChildren().isEmpty();
     }
 
     public Collection<Node> getChildren() throws Exception {
@@ -63,17 +60,15 @@ public class AttributeTypesNode extends Node {
         Collection<Node> children = new ArrayList<Node>();
 
         Project project = projectNode.getProject();
-        SchemaManager schemaManager = project.getSchemaManager();
-        Schema schema = schemaManager.getSchema(schemaConfig.getName());
+        PenroseClient client = project.getClient();
+        SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+        SchemaClient schemaClient = schemaManagerClient.getSchemaClient(schemaConfig.getName());
 
-        Collection attributeTypes = schema.getAttributeTypes();
-        for (Iterator i=attributeTypes.iterator(); i.hasNext(); ) {
-            AttributeType attributeType = (AttributeType)i.next();
-
+        Collection<AttributeType> attributeTypes = schemaClient.getAttributeTypes();
+        for (AttributeType attributeType : attributeTypes) {
             children.add(new AttributeTypeNode(
                     view,
                     attributeType.getName(),
-                    ServersView.ATTRIBUTE_TYPE,
                     PenroseStudioPlugin.getImage(PenroseImage.ATTRIBUTE_TYPE),
                     attributeType,
                     this

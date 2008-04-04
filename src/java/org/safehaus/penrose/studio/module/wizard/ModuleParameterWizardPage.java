@@ -144,12 +144,12 @@ public class ModuleParameterWizardPage extends WizardPage implements SelectionLi
         setPageComplete(validatePage());
     }
 
-    public Map getParameters() {
-        Map parameters = new HashMap();
+    public Map<String,String> getParameters() {
+        Map<String,String> parameters = new HashMap<String,String>();
         TableItem items[] = parametersTable.getItems();
-        for (int i=0; i<items.length; i++) {
-            String name = items[i].getText(0);
-            String value = items[i].getText(1);
+        for (TableItem item : items) {
+            String name = item.getText(0);
+            String value = item.getText(1);
             parameters.put(name, value);
         }
         return parameters;

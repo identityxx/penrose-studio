@@ -32,14 +32,12 @@ public class Node {
     public boolean debug = log.isDebugEnabled();
 
     protected String name;
-    protected String type;
     protected Image image;
     protected Object object;
     protected Object parent;
 
-    public Node(String name, String type, Image image, Object object, Object parent) {
+    public Node(String name, Image image, Object object, Object parent) {
         this.name = name;
-        this.type = type;
         this.image = image;
         this.object = object;
         this.parent = parent;
@@ -51,14 +49,6 @@ public class Node {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public Image getImage() {
@@ -87,7 +77,6 @@ public class Node {
 
     public int hashCode() {
         return (name == null ? 0 : name.hashCode()) +
-                (type == null ? 0 : type.hashCode()) +
                 (image == null ? 0 : image.hashCode()) +
                 (object == null ? 0 : object.hashCode()) +
                 (parent == null ? 0 : parent.hashCode());
@@ -106,7 +95,6 @@ public class Node {
 
         Node node = (Node)object;
         if (!equals(name, node.name)) return false;
-        if (!equals(type, node.type)) return false;
         if (!equals(image, node.image)) return false;
         if (!equals(this.object, node.object)) return false;
         if (!equals(parent, node.parent)) return false;

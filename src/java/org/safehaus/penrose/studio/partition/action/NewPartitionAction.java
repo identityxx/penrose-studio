@@ -17,28 +17,30 @@
  */
 package org.safehaus.penrose.studio.partition.action;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.partition.wizard.CreatePartitionWizard;
 import org.safehaus.penrose.studio.project.ProjectNode;
-import org.apache.log4j.Logger;
+import org.safehaus.penrose.studio.server.ServersView;
 
 public class NewPartitionAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
-	public NewPartitionAction() {
+    public NewPartitionAction() {
         setText("&New Partition...");
         setId(getClass().getName());
-	}
+    }
 	
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
             ProjectNode projectNode = serversView.getSelectedProjectNode();
+            PartitionsNode partitionsNode = projectNode.getPartitionsNode();
 
-            CreatePartitionWizard wizard = new CreatePartitionWizard(projectNode.getProject());
+            CreatePartitionWizard wizard = new CreatePartitionWizard(projectNode.getProject(), partitionsNode);
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
             dialog.open();

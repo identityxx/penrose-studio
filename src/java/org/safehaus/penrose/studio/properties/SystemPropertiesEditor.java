@@ -17,19 +17,20 @@
  */
 package org.safehaus.penrose.studio.properties;
 
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.part.MultiPageEditorPart;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.PartInitException;
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.part.MultiPageEditorPart;
+import org.safehaus.penrose.config.PenroseConfig;
+import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.config.PenroseConfig;
-import org.apache.log4j.Logger;
 
-import java.util.TreeMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author Endi S. Dewata
@@ -48,15 +49,23 @@ public class SystemPropertiesEditor extends MultiPageEditorPart {
     SystemPropertiesPage propertyPage;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        SystemPropertiesEditorInput ei = (SystemPropertiesEditorInput)input;
-        project = ei.getProject();
+        try {
+            SystemPropertiesEditorInput ei = (SystemPropertiesEditorInput)input;
+            project = ei.getProject();
 
-        setSite(site);
-        setInput(input);
-        setPartName("System Properties");
+            setSite(site);
+            setInput(input);
+            setPartName("System Properties");
 
-        origProperties = project.getPenroseConfig().getSystemProperties();
-        properties.putAll(origProperties);
+            PenroseClient client = project.getClient();
+            PenroseConfig penroseConfig = client.getPenroseConfig();
+            
+            origProperties = penroseConfig.getSystemProperties();
+            properties.putAll(origProperties);
+
+        } catch (Exception e) {
+            throw new PartInitException(e.getMessage(), e);
+        }
     }
 
     protected void createPages() {

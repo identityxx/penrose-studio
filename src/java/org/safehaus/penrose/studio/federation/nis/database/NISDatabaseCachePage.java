@@ -26,6 +26,9 @@ import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.management.*;
+import org.safehaus.penrose.management.module.ModuleClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.nis.NIS;
 
@@ -62,7 +65,8 @@ public class NISDatabaseCachePage extends FormPage {
 
         PenroseClient penroseClient = project.getClient();
 
-        partitionClient = penroseClient.getPartitionClient(domain.getName()+"_"+NISFederation.DB);
+        PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
+        partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.DB);
         moduleClient = partitionClient.getModuleClient("NISDBSyncModule");
     }
 

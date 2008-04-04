@@ -17,16 +17,22 @@
  */
 package org.safehaus.penrose.studio.schema;
 
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.events.*;
-import org.eclipse.ui.forms.widgets.*;
-import org.eclipse.ui.forms.editor.FormPage;
-import org.eclipse.ui.forms.IManagedForm;
-import org.safehaus.penrose.schema.SchemaConfig;
 import org.apache.log4j.Logger;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.forms.editor.FormPage;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.forms.widgets.Section;
+import org.safehaus.penrose.schema.Schema;
 
 /**
  * @author Endi S. Dewata
@@ -38,16 +44,18 @@ public class SchemaPropertiesEditorPage extends FormPage {
     FormToolkit toolkit;
 
     Text nameText;
-    Text pathText;
+    //Text pathText;
 
     SchemaEditor editor;
-    SchemaConfig schemaConfig;
+    Schema schema;
+    //SchemaConfig schemaConfig;
 
     public SchemaPropertiesEditorPage(SchemaEditor editor) {
         super(editor, "PROPERTIES", "  Properties  ");
 
         this.editor = editor;
-        this.schemaConfig = editor.getSchema().getSchemaConfig();
+        this.schema = editor.getSchema();
+        //this.schemaConfig = editor.getSchema().getSchemaConfig();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -79,17 +87,17 @@ public class SchemaPropertiesEditorPage extends FormPage {
         gd.widthHint = 100;
         nameLabel.setLayoutData(gd);
 
-        nameText = toolkit.createText(composite, schemaConfig.getName(), SWT.BORDER);
+        nameText = toolkit.createText(composite, schema.getName(), SWT.BORDER);
         nameText.setEnabled(false);
         nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         nameText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                schemaConfig.setName(nameText.getText());
+                schema.setName(nameText.getText());
                 checkDirty();
             }
         });
-
+/*
         Label pathLabel = toolkit.createLabel(composite, "Path:");
         pathLabel.setLayoutData(new GridData());
 
@@ -103,7 +111,7 @@ public class SchemaPropertiesEditorPage extends FormPage {
                 checkDirty();
             }
         });
-
+*/
         return composite;
     }
 

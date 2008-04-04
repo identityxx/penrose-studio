@@ -38,8 +38,8 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.part.*;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.mapping.editor.MappingEditorInput;
-import org.safehaus.penrose.studio.mapping.editor.MappingEditor;
+import org.safehaus.penrose.studio.directory.editor.EntryEditorInput;
+import org.safehaus.penrose.studio.directory.editor.EntryEditor;
 import org.safehaus.penrose.studio.connection.editor.*;
 import org.safehaus.penrose.studio.source.editor.*;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -49,7 +49,7 @@ import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.directory.EntryMapping;
+import org.safehaus.penrose.directory.EntryConfig;
 
 public class ValidationView extends ViewPart {
 
@@ -144,50 +144,52 @@ public class ValidationView extends ViewPart {
 		Object object = item.getData();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PartitionConfigs partitionConfigs = null; //penroseStudio.getPartitionConfigs();
+        PartitionConfigManager partitionConfigManager = null; //penroseStudio.getPartitionConfigManager();
         PluginManager pluginManager = penroseStudio.getPluginManager();
 
         if (object instanceof ConnectionConfig) {
             ConnectionConfig connectionConfig = (ConnectionConfig)object;
-            PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(connectionConfig);
+            PartitionConfig partitionConfig = partitionConfigManager.getPartitionConfig(connectionConfig);
 
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
 
             Plugin plugin = pluginManager.getPlugin(connectionConfig.getAdapterName());
-            ConnectionEditorInput cei = plugin.createConnectionEditorInput();
-            cei.setPartitionConfig(partitionConfig);
-            cei.setConnectionConfig(connectionConfig);
+            ConnectionEditorInput ei = plugin.createConnectionEditorInput();
+            ei.setPartitionName(partitionConfig.getName());
+            ei.setConnectionName(connectionConfig.getName());
 
             String connectionEditorClass = plugin.getConnectionEditorClass();
-            page.openEditor(cei, connectionEditorClass);
+            page.openEditor(ei, connectionEditorClass);
 
 		} else if (object instanceof SourceConfig) {
 			SourceConfig sourceConfig = (SourceConfig)object;
-            PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(sourceConfig);
-            ConnectionConfig connection = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
+            PartitionConfig partitionConfig = partitionConfigManager.getPartitionConfig(sourceConfig);
+            ConnectionConfig connection = partitionConfig.getConnectionConfigManager().getConnectionConfig(sourceConfig.getConnectionName());
 
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
 
             Plugin plugin = pluginManager.getPlugin(connection.getAdapterName());
-            SourceEditorInput sei = plugin.createSourceEditorInput();
-            sei.setPartitionConfig(partitionConfig);
-            sei.setSourceConfig(sourceConfig);
+            SourceEditorInput ei = plugin.createSourceEditorInput();
+            ei.setPartitionName(partitionConfig.getName());
+            ei.setSourceName(sourceConfig.getName());
 
             String sourceEditorClass = plugin.getSourceEditorClass();
-            page.openEditor(sei, sourceEditorClass);
+            page.openEditor(ei, sourceEditorClass);
 
-		} else if (object instanceof EntryMapping) {
-            EntryMapping entryMapping = (EntryMapping)object;
-            PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(entryMapping);
+		} else if (object instanceof EntryConfig) {
+            EntryConfig entryConfig = (EntryConfig)object;
+            PartitionConfig partitionConfig = partitionConfigManager.getPartitionConfig(entryConfig);
 
-            MappingEditorInput mei = new MappingEditorInput(partitionConfig, entryMapping);
+            EntryEditorInput ei = new EntryEditorInput();
+            ei.setPartitionName(partitionConfig.getName());
+            ei.setEntryId(entryConfig.getId());
 
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
 
-            page.openEditor(mei, MappingEditor.class.getName());
+            page.openEditor(ei, EntryEditor.class.getName());
 		}
 	}
 

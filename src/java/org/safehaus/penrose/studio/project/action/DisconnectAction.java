@@ -11,6 +11,7 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.server.ServersView;
 
 public class DisconnectAction extends Action {
@@ -26,12 +27,13 @@ public class DisconnectAction extends Action {
     }
 
     public void run() {
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-
         try {
             ServersView serversView = ServersView.getInstance();
             ProjectNode projectNode = serversView.getSelectedProjectNode();
             if (projectNode == null) return;
+
+            Project project = projectNode.getProject();
+            if (!project.isConnected()) return;
 
             projectNode.disconnect();
             serversView.close(projectNode);

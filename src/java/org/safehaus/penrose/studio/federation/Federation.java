@@ -6,24 +6,23 @@ import org.apache.tools.ant.taskdefs.Copy;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.FilterChain;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.federation.FederationConfig;
 import org.safehaus.penrose.federation.FederationReader;
-import org.safehaus.penrose.federation.FederationWriter;
 import org.safehaus.penrose.federation.repository.GlobalRepository;
 import org.safehaus.penrose.federation.repository.LDAPRepository;
 import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.federation.repository.Repository;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.management.module.ModuleClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.partition.PartitionConfigs;
-import org.safehaus.penrose.partition.PartitionFactory;
+import org.safehaus.penrose.partition.PartitionReader;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.util.FileUtil;
+import org.safehaus.penrose.util.FileUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -47,19 +46,18 @@ public class Federation {
     public final static String REPOSITORY_PARAMETERS = "repository_parameters";
 
     private Project project;
-    private Partition partition;
 
     private LDAPFederation ldapFederation;
     private NISFederation nisFederation;
 
-    private FederationConfig federationConfig = new FederationConfig();
+    private FederationConfig federationConfig;
 
     public Federation(Project project) throws Exception {
         this.project = project;
 /*
         PenroseConfig penroseConfig = project.getPenroseConfig();
         PenroseContext penroseContext = project.getPenroseContext();
-        Partitions partitions = penroseContext.getPartitions();
+        Partitions partitions = penroseContext.getPartitionManager();
 
         File partitionsDir = new File(project.getWorkDir(), "partitions");
 
@@ -68,7 +66,7 @@ public class Federation {
         partitionFactory.setPenroseConfig(penroseConfig);
         partitionFactory.setPenroseContext(penroseContext);
 
-        PartitionConfig defaultPartitionconfig = project.getPartitionConfigs().getPartitionConfig("DEFAULT");
+        PartitionConfig defaultPartitionconfig = project.getPartitionConfigManager().getPartitionConfig("DEFAULT");
         Partition defaultPartition = partitionFactory.createPartition(defaultPartitionconfig);
 
         partitions.addPartition(defaultPartition);
@@ -78,14 +76,16 @@ public class Federation {
     public void createPartition() throws Exception {
     //public void createPartition(Map<String,String> allParameters, JDBCConnection connection) throws Exception {
 
-        log.debug("Creating partition "+Federation.FEDERATION +".");
+        String partitionName = Federation.FEDERATION;
+
+        log.debug("Creating partition "+partitionName +".");
 
         File workDir = project.getWorkDir();
 
-        File sampleDir = new File(workDir, "samples/"+Federation.FEDERATION);
-        if (!sampleDir.exists()) project.download("samples/"+Federation.FEDERATION);
+        File sampleDir = new File(workDir, "samples/"+partitionName);
+        if (!sampleDir.exists()) project.download("samples/"+partitionName);
 
-        File partitionDir = new File(workDir, "partitions/"+Federation.FEDERATION);
+        File partitionDir = new File(workDir, "partitions/"+partitionName);
 
         org.apache.tools.ant.Project antProject = new org.apache.tools.ant.Project();
 /*
@@ -118,36 +118,25 @@ public class Federation {
         filterChain.addExpandProperties(expandProperties);
 
         copy.execute();
-
-        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-        PartitionConfig partitionConfig = partitionConfigs.load(partitionDir);
-        partitionConfigs.addPartitionConfig(partitionConfig);
-        project.save(partitionConfig);
 /*
-        log.debug("Creating database tables in "+Federation.PARTITION +".");
+        PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
+        PartitionConfig partitionConfig = partitionConfigManager.load(partitionDir);
+        partitionConfigManager.addPartitionConfig(partitionConfig);
 
-        try {
-            connection.createDatabase(Federation.PARTITION);
-        } catch (Exception e) {
-            log.debug(e.getMessage());
-        }
-*/
+        project.save(partitionConfig);
         project.upload("partitions/"+partitionConfig.getName());
 
-        PenroseClient penroseClient = project.getClient();
-        penroseClient.startPartition(partitionConfig.getName());
+        PenroseClient client = project.getClient();
+        client.startPartition(partitionConfig.getName());
+*/
+        PartitionConfig partitionConfig = new PartitionConfig(partitionName);
+        partitionConfig.load(partitionDir);
+
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        partitionManagerClient.createPartition(partitionConfig);
 
         log.debug("Initializing partition "+Federation.FEDERATION +".");
-
-        PenroseConfig penroseConfig = project.getPenroseConfig();
-        PenroseContext penroseContext = project.getPenroseContext();
-
-        PartitionFactory partitionFactory = new PartitionFactory();
-        partitionFactory.setPartitionsDir(partitionConfigs.getPartitionsDir());
-        partitionFactory.setPenroseConfig(penroseConfig);
-        partitionFactory.setPenroseContext(penroseContext);
-
-        partitionFactory.createPartition(partitionConfig);
     }
 
     public void removeGlobalPartition() throws Exception {
@@ -162,8 +151,7 @@ public class Federation {
         String templateName = FEDERATION+"_"+GLOBAL;
         String partitionName = GLOBAL;
 
-        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-        //if (partitionConfigs.getPartitionConfig(templateName) != null) return;
+        //if (partitionConfigManager.getPartitionConfig(templateName) != null) return;
 
         log.debug("Creating global partition.");
 
@@ -201,59 +189,35 @@ public class Federation {
         filterChain.addExpandProperties(expandProperties);
 
         copy.execute();
-
-        PartitionConfig partitionConfig = partitionConfigs.load(partitionDir);
-        partitionConfigs.addPartitionConfig(partitionConfig);
+/*
+        PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
+        PartitionConfig partitionConfig = partitionConfigManager.load(partitionDir);
+        partitionConfigManager.addPartitionConfig(partitionConfig);
 
         project.upload("partitions/"+partitionConfig.getName());
 
         PenroseClient penroseClient = project.getClient();
         penroseClient.startPartition(partitionConfig.getName());
+*/
+        PartitionConfig partitionConfig = new PartitionConfig(partitionName);
+        partitionConfig.load(partitionDir);
+
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        partitionManagerClient.createPartition(partitionConfig);
     }
 
     public void load(IProgressMonitor monitor) throws Exception {
         try {
             log.debug("Starting Federation tool.");
 
-            monitor.beginTask("Loading partitions...", 2);
-/*
-            File partitionsDir = new File(project.getWorkDir(), "partitions");
+            monitor.beginTask("Loading partitions...", IProgressMonitor.UNKNOWN);
 
-            PenroseConfig penroseConfig = project.getPenroseConfig();
-            PenroseContext penroseContext = project.getPenroseContext();
-            Partitions partitions = penroseContext.getPartitions();
+            //loadConfigFromFile();
+            loadConfigFromServer();
 
-            PartitionFactory partitionFactory = new PartitionFactory();
-            partitionFactory.setPartitionsDir(partitionsDir);
-            partitionFactory.setPenroseConfig(penroseConfig);
-            partitionFactory.setPenroseContext(penroseContext);
-
-            //PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-            //PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(PARTITION);
-            //partition = partitionFactory.createPartition(partitionConfig);
-
-            partitions.addPartition(partition);
-*/
-            loadConfigFromFile();
-            //loadConfigFromDatabase();
-/*
-            PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-
-            if (partitionConfigs.getPartitionConfig(Federation.PARTITION) == null) {
-                createPartition();
-            }
-
-            if (partitionConfigs.getPartitionConfig(Federation.GLOBAL) == null) {
-                createGlobalPartition();
-            }
-*/
-            //SubProgressMonitor ldapMonitor = new SubProgressMonitor(monitor, 1);
             ldapFederation = new LDAPFederation(this);
-            //ldapFederation.load(ldapMonitor);
-
-            //SubProgressMonitor nisMonitor = new SubProgressMonitor(monitor, 1);
             nisFederation = new NISFederation(this);
-            //nisFederation.load(nisMonitor);
 
         } finally {
             monitor.done();
@@ -267,7 +231,33 @@ public class Federation {
         if (file.exists()) {
             log.debug("Loading "+file);
             FederationReader reader = new FederationReader();
-            reader.read(file, federationConfig);
+            federationConfig = reader.read(file);
+
+        } else {
+            federationConfig = new FederationConfig();
+        }
+    }
+
+    public void loadConfigFromServer() throws Exception {
+
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient("DEFAULT");
+
+        ModuleClient moduleClient = partitionClient.getModuleClient("FederationModule");
+        
+        if (moduleClient.exists()) {
+            federationConfig = (FederationConfig)moduleClient.getAttribute("FederationConfig");
+
+        } else {
+            federationConfig = new FederationConfig();
+
+            ModuleConfig moduleConfig = new ModuleConfig();
+            moduleConfig.setName("FederationModule");
+            moduleConfig.setModuleClass("org.safehaus.penrose.federation.module.FederationModule");
+
+            partitionClient.createModule(moduleConfig);
+            partitionClient.store();
         }
     }
 
@@ -613,36 +603,35 @@ public class Federation {
         }
     }
 
-    public PartitionConfig getPartitionConfig(String name) throws Exception {
-        return project.getPartitionConfigs().getPartitionConfig(name);
-    }
-
-    public PartitionConfig removePartition(String name) throws Exception {
+    public void removePartition(String name) throws Exception {
 
         log.debug("Removing partition "+name+".");
 
         PenroseClient penroseClient = project.getClient();
+/*
         penroseClient.stopPartition(name);
 
         project.removeDirectory("partitions/"+name);
 
-        PartitionConfig partitionConfig = project.getPartitionConfigs().removePartitionConfig(name);
+        PartitionConfig partitionConfig = project.getPartitionConfigManager().removePartitionConfig(name);
 
         File partitionDir = new File(project.getWorkDir(), "partitions"+File.separator+ name);
         FileUtil.delete(partitionDir);
-
-        return partitionConfig;
+*/
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        partitionManagerClient.removePartition(name);
     }
 
     public void update() throws Exception {
 
-        File file = new File(project.getWorkDir(), "conf"+File.separator+"federation.xml");
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient("DEFAULT");
 
-        log.debug("Storing "+file);
-        FederationWriter writer = new FederationWriter();
-        writer.write(file, federationConfig);
-
-        project.upload("conf/federation.xml");
+        ModuleClient moduleClient = partitionClient.getModuleClient("FederationModule");
+        moduleClient.setAttribute("FederationConfig", federationConfig);
+        moduleClient.invoke("store");
     }
 
     public FederationConfig getFederationConfig() {

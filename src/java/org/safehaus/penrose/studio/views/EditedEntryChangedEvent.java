@@ -17,21 +17,21 @@
  */
 package org.safehaus.penrose.studio.views;
 
-import org.safehaus.penrose.directory.EntryMapping;
+import org.safehaus.penrose.directory.EntryConfig;
 
 public class EditedEntryChangedEvent {
 	
-	EntryMapping entry;
+	EntryConfig entry;
 	
-	public EditedEntryChangedEvent(EntryMapping entry) {
+	public EditedEntryChangedEvent(EntryConfig entry) {
 		this.entry=entry;
 	}
 	
 
-	public EntryMapping getEntry() {
+	public EntryConfig getEntry() {
 		return entry;
 	}
-	public void setEntry(EntryMapping entry) {
+	public void setEntry(EntryConfig entry) {
 		this.entry = entry;
 	}
 }

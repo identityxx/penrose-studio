@@ -44,7 +44,12 @@ public class NewStaticEntryAction extends Action {
             ServersView serversView = ServersView.getInstance();
             ProjectNode projectNode = node.getProjectNode();
 
-            StaticEntryWizard wizard = new StaticEntryWizard(projectNode.getProject(), node.getPartitionConfig(), node.getEntryMapping());
+            StaticEntryWizard wizard = new StaticEntryWizard(
+                    projectNode.getProject(),
+                    node.getPartitionName(), 
+                    node.getEntryConfig().getDn()
+            );
+
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
             dialog.open();
@@ -56,6 +61,7 @@ public class NewStaticEntryAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
 	}
 	

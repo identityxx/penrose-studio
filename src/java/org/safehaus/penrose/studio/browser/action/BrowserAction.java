@@ -17,24 +17,23 @@
  */
 package org.safehaus.penrose.studio.browser.action;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchPage;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.service.ServiceManagerClient;
+import org.safehaus.penrose.service.ServiceConfig;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.browser.BrowserEditor;
+import org.safehaus.penrose.studio.browser.BrowserEditorInput;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.project.ProjectConfig;
 import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.browser.BrowserEditorInput;
-import org.safehaus.penrose.studio.browser.BrowserEditor;
-import org.safehaus.penrose.service.ServiceConfig;
-import org.safehaus.penrose.service.ServiceConfigs;
-import org.safehaus.penrose.config.PenroseConfig;
-import org.apache.log4j.Logger;
+import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.user.UserConfig;
 
 /**
  * @author Endi S. Dewata
@@ -61,18 +60,21 @@ public class BrowserAction extends Action {
             ServersView serversView = ServersView.getInstance();
             ProjectNode projectNode = serversView.getSelectedProjectNode();
             Project project = projectNode.getProject();
+            PenroseClient client = project.getClient();
 
             ProjectConfig projectConfig = project.getProjectConfig();
             String hostname = projectConfig.getHost();
 
-            ServiceConfigs serviceConfigs = project.getServiceConfigs();
-            ServiceConfig serviceConfig = serviceConfigs.getServiceConfig("LDAP");
+            ServiceManagerClient serviceManagerClient = client.getServiceManagerClient();
+            ServiceConfig serviceConfig = serviceManagerClient.getServiceConfig("LDAP");
             String s = serviceConfig == null ? null : serviceConfig.getParameter(LDAP_PORT);
             int port = s == null ? DEFAULT_LDAP_PORT : Integer.parseInt(s);
 
-            PenroseConfig penroseConfig = project.getPenroseConfig();
-            String bindDn = penroseConfig.getRootDn().toString();
-            byte[] password = penroseConfig.getRootPassword();
+            PenroseClient penroseClient = project.getClient();
+            UserConfig rootUserConfig = penroseClient.getRootUserConfig();
+
+            String bindDn = rootUserConfig.getDn().toString();
+            byte[] password = rootUserConfig.getPassword();
 
             BrowserEditorInput ei = new BrowserEditorInput();
             ei.setHostname(hostname);
@@ -85,7 +87,7 @@ public class BrowserAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            ErrorDialog.open(e);
+            throw new RuntimeException(e.getMessage(), e);
         }
 	}
 }

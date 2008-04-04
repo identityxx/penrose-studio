@@ -17,18 +17,20 @@
  */
 package org.safehaus.penrose.studio.directory.wizard;
 
-import org.eclipse.jface.wizard.Wizard;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.safehaus.penrose.directory.EntryMapping;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
-import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
-import org.safehaus.penrose.studio.mapping.wizard.StaticEntryRDNWizardPage;
-import org.safehaus.penrose.studio.project.Project;
+import org.eclipse.jface.wizard.Wizard;
+import org.safehaus.penrose.directory.EntryConfig;
+import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDN;
-import org.safehaus.penrose.directory.DirectoryConfig;
-import org.apache.log4j.Logger;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
+import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
+import org.safehaus.penrose.studio.mapping.wizard.StaticEntryRDNWizardPage;
+import org.safehaus.penrose.studio.project.Project;
 
 import java.util.Collection;
 
@@ -40,23 +42,25 @@ public class StaticEntryWizard extends Wizard {
     Logger log = Logger.getLogger(getClass());
 
     private Project project;
-    private PartitionConfig partitionConfig;
-    private EntryMapping parentMapping;
-    private EntryMapping entryMapping;
+    private String partitionName;
+    private EntryConfig entryConfig;
 
     public StaticEntryRDNWizardPage rdnPage;
     public ObjectClassWizardPage ocPage;
     public AttributeValueWizardPage attrPage;
 
-    public StaticEntryWizard(Project project, PartitionConfig partitionConfig, EntryMapping parentMapping) {
+    public StaticEntryWizard(Project project, String partitionName, DN parentDn) {
         this.project = project;
-        this.partitionConfig = partitionConfig;
-        this.parentMapping = parentMapping;
+        this.partitionName = partitionName;
         setWindowTitle("Adding static entry");
 
-        rdnPage = new StaticEntryRDNWizardPage(partitionConfig, parentMapping);
+        rdnPage = new StaticEntryRDNWizardPage();
+        rdnPage.setProject(project);
+        rdnPage.setPartitionName(partitionName);
+        rdnPage.setParentDn(parentDn);
+
         ocPage = new ObjectClassWizardPage(project);
-        attrPage = new AttributeValueWizardPage(project, partitionConfig);
+        attrPage = new AttributeValueWizardPage(project, partitionName);
     }
 
     public boolean canFinish() {
@@ -86,25 +90,32 @@ public class StaticEntryWizard extends Wizard {
             return super.getNextPage(page);
                 
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     public boolean performFinish() {
         try {
-            entryMapping = new EntryMapping();
+            entryConfig = new EntryConfig();
 
             DNBuilder db = new DNBuilder();
             db.append(rdnPage.getRdn());
             db.append(rdnPage.getParentDn());
-            entryMapping.setDn(db.toDn());
+            entryConfig.setDn(db.toDn());
 
-            entryMapping.addObjectClasses(ocPage.getSelectedObjectClasses());
-            entryMapping.addAttributeMappings(attrPage.getAttributeMappings());
-
+            entryConfig.addObjectClasses(ocPage.getSelectedObjectClasses());
+            entryConfig.addAttributeMappings(attrPage.getAttributeMappings());
+/*
             DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
-            directoryConfig.addEntryMapping(entryMapping);
+            directoryConfig.addEntryConfig(entryConfig);
             project.save(partitionConfig, directoryConfig);
+*/
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            partitionClient.createEntry(entryConfig);
+            partitionClient.store();
 
             return true;
 
@@ -118,28 +129,20 @@ public class StaticEntryWizard extends Wizard {
         return true;
     }
 
-    public EntryMapping getEntryMapping() {
-        return entryMapping;
+    public EntryConfig getEntryConfig() {
+        return entryConfig;
     }
 
-    public void setEntryMapping(EntryMapping entryMapping) {
-        this.entryMapping = entryMapping;
+    public void setEntryConfig(EntryConfig entryConfig) {
+        this.entryConfig = entryConfig;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
-    }
-
-    public EntryMapping getParentMapping() {
-        return parentMapping;
-    }
-
-    public void setParentMapping(EntryMapping parentMapping) {
-        this.parentMapping = parentMapping;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 
     public Project getProject() {

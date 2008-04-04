@@ -28,8 +28,9 @@ import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.PartitionClient;
-import org.safehaus.penrose.management.SourceClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.source.SourceClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
 
 import java.util.*;
 
@@ -113,8 +114,9 @@ public class NISScriptsPage extends FormPage {
            };
 
            Project project = nisFederation.getProject();
-           PenroseClient client = project.getClient();
-           PartitionClient partitionClient = client.getPartitionClient(Federation.FEDERATION);
+           PenroseClient penroseClient = project.getClient();
+           PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
+           PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
            SourceClient sourceClient = partitionClient.getSourceClient("penrose_hosts");
 
            sourceClient.search(request, response);

@@ -27,6 +27,9 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.management.*;
+import org.safehaus.penrose.management.module.ModuleClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
 import org.safehaus.penrose.nis.NIS;
 
 import java.text.DateFormat;
@@ -67,9 +70,10 @@ public class NISLDAPPage extends FormPage {
         this.domain = editor.getDomain();
 
         PenroseClient penroseClient = project.getClient();
+        PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
 
-        partitionClient = penroseClient.getPartitionClient(domain.getName()+"_"+NISFederation.NIS);
-        
+        partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.NIS);
+
         suffix = partitionClient.getSuffixes().iterator().next();
         moduleClient = partitionClient.getModuleClient("NISLDAPSyncModule");
     }

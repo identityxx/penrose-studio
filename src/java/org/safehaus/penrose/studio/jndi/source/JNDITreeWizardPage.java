@@ -33,7 +33,6 @@ import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.ldap.SearchResult;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
@@ -144,10 +143,9 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
             item.setText(suffix);
             item.setData("");
 
-            Collection<SearchResult> results = client.getChildren("");
+            Collection<SearchResult> results = client.findChildren("");
 
-            for (Iterator i=results.iterator(); i.hasNext(); ) {
-                SearchResult entry = (SearchResult)i.next();
+            for (SearchResult entry : results) {
                 String dn = entry.getDn().toString();
 
                 TreeItem it = new TreeItem(item, SWT.NONE);
@@ -179,15 +177,14 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
             String baseDn = (String)item.getData();
 
             TreeItem items[] = item.getItems();
-            for (int i=0; i<items.length; i++) {
-                items[i].dispose();
+            for (TreeItem child : items) {
+                child.dispose();
             }
 
             client = new LDAPClient(connectionConfig.getParameters());
-            Collection<SearchResult> results = client.getChildren(baseDn);
+            Collection<SearchResult> results = client.findChildren(baseDn);
 
-            for (Iterator i=results.iterator(); i.hasNext(); ) {
-                SearchResult entry = (SearchResult)i.next();
+            for (SearchResult entry : results) {
                 String dn = entry.getDn().toString();
                 String rdn = new DN(dn).getRdn().toString();
 

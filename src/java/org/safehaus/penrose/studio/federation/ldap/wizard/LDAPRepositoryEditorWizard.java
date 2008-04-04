@@ -3,7 +3,7 @@ package org.safehaus.penrose.studio.federation.ldap.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.jndi.connection.LDAPConnectionWizardPage;
+import org.safehaus.penrose.studio.ldap.connection.LDAPConnectionWizardPage;
 
 import java.util.Map;
 import java.util.LinkedHashMap;

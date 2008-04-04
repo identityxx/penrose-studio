@@ -18,31 +18,41 @@
 package org.safehaus.penrose.studio.source.wizard;
 
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.studio.mapping.SourceDialog;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.source.SourceClient;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.studio.mapping.SourceDialog;
+import org.safehaus.penrose.studio.project.Project;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
  */
 public class SelectSourcesWizardPage extends WizardPage implements SelectionListener, ModifyListener {
 
+    public Logger log = LoggerFactory.getLogger(getClass());
+
     public final static String NAME = "Data sources";
 
-    PartitionConfig partitionConfig;
+    private Project project;
+    private String partitionName;
+
     Table sourceTable;
 
-    public SelectSourcesWizardPage(PartitionConfig partition) {
+    public SelectSourcesWizardPage() {
         super(NAME);
-        this.partitionConfig = partition;
     }
 
     public void createControl(final Composite parent) {
@@ -76,27 +86,49 @@ public class SelectSourcesWizardPage extends WizardPage implements SelectionList
 
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
+                try {
+                    PenroseClient client = project.getClient();
+                    PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
-                Collection sources = partitionConfig.getSourceConfigs().getSourceConfigs();
-                if (sources.size() == 0) {
-                    System.out.println("There is no sources defined.");
-                    return;
+                    Collection<String> sourceNames = partitionClient.getSourceNames();
+                    if (sourceNames.isEmpty()) {
+                        System.out.println("There is no sources defined.");
+                        return;
+                    }
+
+                    Collection<SourceConfig> sourceConfigs = new ArrayList<SourceConfig>();
+                    for (String sourceName : sourceNames) {
+                        SourceClient sourceClient = partitionClient.getSourceClient(sourceName);
+                        SourceConfig sourceConfig = sourceClient.getSourceConfig();
+                        sourceConfigs.add(sourceConfig);
+                    }
+/*
+                    Collection<SourceConfig> sourceConfigManager = partitionConfig.getSourceConfigManager().getSourceConfigManager();
+                    if (sourceConfigManager.isEmpty()) {
+                        System.out.println("There is no sources defined.");
+                        return;
+                    }
+*/
+                    SourceMapping sourceMapping = new SourceMapping();
+                    SourceDialog dialog = new SourceDialog(parent.getShell(), SWT.NONE);
+                    dialog.setSourceConfigs(sourceConfigs);
+                    dialog.setSourceMapping(sourceMapping);
+                    dialog.setText("Select source...");
+
+                    dialog.open();
+
+                    if (!dialog.isSaved()) return;
+
+                    TableItem item = new TableItem(sourceTable, SWT.NONE);
+                    item.setText(0, sourceMapping.getSourceName());
+                    item.setText(1, sourceMapping.getName());
+                    item.setData(sourceMapping);
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
-
-                SourceMapping sourceMapping = new SourceMapping();
-                SourceDialog dialog = new SourceDialog(parent.getShell(), SWT.NONE);
-                dialog.setSourceConfigs(sources);
-                dialog.setSourceMapping(sourceMapping);
-                dialog.setText("Select source...");
-
-                dialog.open();
-
-                if (!dialog.isSaved()) return;
-
-                TableItem item = new TableItem(sourceTable, SWT.NONE);
-                item.setText(0, sourceMapping.getSourceName());
-                item.setText(1, sourceMapping.getName());
-                item.setData(sourceMapping);
             }
         });
 
@@ -139,5 +171,21 @@ public class SelectSourcesWizardPage extends WizardPage implements SelectionList
 
     public void modifyText(ModifyEvent event) {
         setPageComplete(validatePage());
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public String getPartitionName() {
+        return partitionName;
+    }
+
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 }

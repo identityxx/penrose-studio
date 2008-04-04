@@ -23,7 +23,7 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.util.FileUtil;
+import org.safehaus.penrose.util.FileUtil;
 import org.safehaus.penrose.federation.FederationWriter;
 import org.safehaus.penrose.federation.FederationConfig;
 import org.safehaus.penrose.studio.federation.Federation;
@@ -73,6 +73,7 @@ public class FederationNode extends PluginNode {
                 try {
                     importFederationConfig();
                 } catch (Exception e) {
+                    log.error(e.getMessage(), e);
                     throw new RuntimeException(e.getMessage(), e);
                 }
             }
@@ -83,6 +84,7 @@ public class FederationNode extends PluginNode {
                 try {
                     exportFederationConfig();
                 } catch (Exception e) {
+                    log.error(e.getMessage(), e);
                     throw new RuntimeException(e.getMessage(), e);
                 }
             }

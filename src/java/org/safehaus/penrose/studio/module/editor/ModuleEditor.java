@@ -17,59 +17,68 @@
  */
 package org.safehaus.penrose.studio.module.editor;
 
-import java.util.Collection;
-import java.io.File;
-
+import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
-import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
-import org.eclipse.ui.forms.widgets.*;
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.safehaus.penrose.management.module.ModuleClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
-import org.safehaus.penrose.module.ModuleWriter;
-import org.safehaus.penrose.module.ModuleConfigs;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.apache.log4j.Logger;
+import org.safehaus.penrose.studio.project.Project;
+
+import java.util.Collection;
 
 public class ModuleEditor extends EditorPart {
 
     Logger log = Logger.getLogger(getClass());
 
     Project project;
+    String partitionName;
+    String moduleName;
+
     ModuleConfig origModuleConfig;
     ModuleConfig moduleConfig;
+    Collection<ModuleMapping> moduleMappings;
 
     FormToolkit toolkit;
+    Table parametersTable;
 
-	Table parametersTable;
     Table mappingsTable;
-
-    PartitionConfig partitionConfig;
-
-    Collection mappings;
 
     boolean dirty;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         ModuleEditorInput ei = (ModuleEditorInput)input;
-
         project = ei.getProject();
-
-        partitionConfig = ei.getPartitionConfig();
-        origModuleConfig = ei.getModuleConfig();
+        partitionName = ei.getPartitionName();
+        moduleName = ei.getModuleName();
 
         try {
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+            ModuleClient moduleClient = partitionClient.getModuleClient(moduleName);
+            origModuleConfig = moduleClient.getModuleConfig();
+            moduleMappings = moduleClient.getModuleMappings();
+
             moduleConfig = (ModuleConfig)origModuleConfig.clone();
+
         } catch (Exception e) {
             throw new PartInitException(e.getMessage(), e);
         }
@@ -369,9 +378,8 @@ public class ModuleEditor extends EditorPart {
         tc.setText("Filter");
         tc.setWidth(200);
 
-        Collection<ModuleMapping> mappings = partitionConfig.getModuleConfigs().getModuleMappings(moduleConfig.getName());
-        if (mappings != null) {
-            for (ModuleMapping mapping : mappings) {
+        if (moduleMappings != null) {
+            for (ModuleMapping mapping : moduleMappings) {
                 TableItem tableItem = new TableItem(mappingsTable, SWT.NONE);
                 tableItem.setText(0, mapping.getBaseDn().toString());
                 tableItem.setText(1, mapping.getScope());
@@ -447,32 +455,38 @@ public class ModuleEditor extends EditorPart {
     }
 
     public void store() throws Exception {
-
-        ModuleConfigs moduleConfigs = partitionConfig.getModuleConfigs();
+/*
+        ModuleConfigManager moduleConfigManager = partitionConfig.getModuleConfigManager();
 
         boolean rename = !origModuleConfig.getName().equals(moduleConfig.getName());
         if (rename) {
-            moduleConfigs.removeModuleConfig(origModuleConfig.getName());
+            moduleConfigManager.removeModuleConfig(origModuleConfig.getName());
         }
 
         origModuleConfig.copy(moduleConfig);
 
         if (rename) {
-            moduleConfigs.addModuleConfig(origModuleConfig);
+            moduleConfigManager.addModuleConfig(origModuleConfig);
         }
 
-        moduleConfigs.removeModuleMapping(moduleConfig.getName());
+        moduleConfigManager.removeModuleMapping(moduleConfig.getName());
 
         Item items[] = mappingsTable.getItems();
         for (Item item : items) {
             ModuleMapping mapping = (ModuleMapping) item.getData();
             mapping.setModuleName(moduleConfig.getName());
-            moduleConfigs.addModuleMapping(mapping);
+            moduleConfigManager.addModuleMapping(mapping);
         }
 
-        project.save(partitionConfig, moduleConfigs);
-        
-        setPartName(partitionConfig.getName()+"/"+moduleConfig.getName());
+        project.save(partitionConfig, moduleConfigManager);
+*/
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+        partitionClient.updateModule(origModuleConfig.getName(), moduleConfig);
+
+        setPartName(partitionName+"/"+moduleConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();

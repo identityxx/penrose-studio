@@ -77,7 +77,7 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            ErrorDialog.open(e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -102,9 +102,11 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
 
             } catch (BundleException e) {
                 log.error(e.getMessage(), e);
+                throw new RuntimeException(e.getMessage(), e);
+
             } catch (ClassCastException e) {
                 log.error(e.getMessage(), e);
-                ErrorDialog.open(e);
+                throw new RuntimeException(e.getMessage(), e);
             }
 
 
@@ -192,7 +194,7 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    e.printStackTrace();
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
         });
@@ -219,6 +221,7 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
         });
@@ -242,6 +245,7 @@ public class ConnectionDriverPage extends WizardPage implements SelectionListene
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
         });

@@ -29,7 +29,6 @@ public class NISConflictsNode extends Node {
     public NISConflictsNode(String name, NISDomainNode domainNode) {
         super(
                 name,
-                ServersView.ENTRY,
                 PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 null, 
                 domainNode
@@ -74,7 +73,6 @@ public class NISConflictsNode extends Node {
 
         NISUsersNode usersNode = new NISUsersNode(
                 "Users",
-                "Users",
                 PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 null,
                 this
@@ -86,7 +84,6 @@ public class NISConflictsNode extends Node {
         children.add(usersNode);
 
         NISGroupsNode groupsNode = new NISGroupsNode(
-                "Groups",
                 "Groups",
                 PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 null,

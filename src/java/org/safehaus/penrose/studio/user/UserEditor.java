@@ -17,16 +17,17 @@
  */
 package org.safehaus.penrose.studio.user;
 
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.part.MultiPageEditorPart;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.PartInitException;
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.part.MultiPageEditorPart;
+import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.user.UserConfig;
-import org.apache.log4j.Logger;
 
 /**
  * @author Endi S. Dewata
@@ -69,6 +70,7 @@ public class UserEditor extends MultiPageEditorPart {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -91,6 +93,7 @@ public class UserEditor extends MultiPageEditorPart {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -100,6 +103,9 @@ public class UserEditor extends MultiPageEditorPart {
     public void store() throws Exception {
 
         origUserConfig.copy(userConfig);
+
+        PenroseClient client = project.getClient();
+        client.setRootUserConfig(origUserConfig);
 
         setPartName(userConfig.getDn().toString());
 
@@ -128,6 +134,7 @@ public class UserEditor extends MultiPageEditorPart {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
 
         } finally {
             firePropertyChange(PROP_DIRTY);

@@ -56,7 +56,7 @@ import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.directory.EntryMapping;
+import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.AttributeMapping;
 import org.safehaus.penrose.directory.FieldMapping;
 import org.safehaus.penrose.directory.SourceMapping;
@@ -83,7 +83,7 @@ public class ExpressionEditorDialog extends BaseDialog {
 	boolean ctrlPressed;
 
     private Partition partition;
-	private EntryMapping entry;
+	private EntryConfig entry;
 	
 	public ExpressionEditorDialog(Shell parent, Object obj, String shellTitle, String formTitle) {
 		super(parent);
@@ -373,7 +373,7 @@ public class ExpressionEditorDialog extends BaseDialog {
 				SourceMapping source = (SourceMapping)i.next();
 
                 PartitionConfig partitionConfig = partition.getPartitionConfig();
-				SourceConfig sourceConfig = partitionConfig.getSourceConfigs().getSourceConfig(source.getSourceName());
+				SourceConfig sourceConfig = partitionConfig.getSourceConfigManager().getSourceConfig(source.getSourceName());
 
 				Object[] fields = sourceConfig.getFieldConfigs().toArray();
 				Image icon = PenroseStudioPlugin.getImage(PenroseImage.SOURCE);
@@ -406,10 +406,10 @@ public class ExpressionEditorDialog extends BaseDialog {
 		return new Point(a.x + b.x, a.y + b.y);
 	}
 	
-	public EntryMapping getEntry() {
+	public EntryConfig getEntry() {
 		return entry;
 	}
-	public void setEntry(EntryMapping entry) {
+	public void setEntry(EntryConfig entry) {
 		this.entry = entry;
 	}
 }

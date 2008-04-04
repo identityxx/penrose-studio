@@ -35,9 +35,9 @@ import org.safehaus.penrose.studio.welcome.action.EnterLicenseKeyAction;
 import org.safehaus.penrose.studio.plugin.*;
 import org.safehaus.penrose.studio.federation.nis.NISPlugin;
 import com.identyx.license.*;
-import org.safehaus.penrose.log4j.Log4jConfigReader;
-import org.safehaus.penrose.log4j.Log4jConfig;
-import org.safehaus.penrose.log4j.Log4jConfigWriter;
+import org.safehaus.penrose.logger.log4j.Log4jConfigReader;
+import org.safehaus.penrose.logger.log4j.Log4jConfig;
+import org.safehaus.penrose.logger.log4j.Log4jConfigWriter;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
@@ -224,7 +224,7 @@ public class PenroseStudio implements IPlatformRunnable {
         partitionValidator.setPenroseConfig(penroseConfig);
         partitionValidator.setPenroseContext(penroseContext);
 
-        for (PartitionConfig partitionConfig : partitionConfigs.getPartitionConfigs()) {
+        for (PartitionConfig partitionConfig : partitionConfigManager.getPartitionConfigManager()) {
 
             Collection<PartitionValidationResult> list = partitionValidator.validate(partitionConfig);
 

@@ -17,27 +17,28 @@
  */
 package org.safehaus.penrose.studio.partition.wizard;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.Wizard;
+import org.safehaus.penrose.acl.ACI;
+import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.directory.EntryConfig;
+import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.ldap.LDAP;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionParametersWizardPage;
-import org.safehaus.penrose.studio.jndi.connection.LDAPConnectionWizardPage;
+import org.safehaus.penrose.studio.ldap.connection.LDAPConnectionWizardPage;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.util.ADUtil;
 import org.safehaus.penrose.studio.util.SchemaUtil;
-import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.acl.ACI;
-import org.safehaus.penrose.source.SourceConfigs;
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.ldap.LDAP;
-import org.safehaus.penrose.directory.EntryMapping;
-import org.safehaus.penrose.directory.SourceMapping;
-import org.apache.log4j.Logger;
 
-import javax.naming.InitialContext;
 import javax.naming.Context;
+import javax.naming.InitialContext;
 import java.util.Map;
-import java.util.Iterator;
 import java.util.TreeMap;
 
 /**
@@ -81,69 +82,80 @@ public class CreateLDAPProxyWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            String name = infoPage.getPartitionName();
+            String partitionName = infoPage.getPartitionName();
 
-            PartitionConfig partitionConfig = new PartitionConfig(name);
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+
+            PartitionConfig partitionConfig = new PartitionConfig(partitionName);
+            partitionManagerClient.createPartition(partitionConfig);
+
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
 
             ConnectionConfig connectionConfig = new ConnectionConfig();
-            connectionConfig.setName(name);
+            connectionConfig.setName(partitionName);
             connectionConfig.setAdapterName("LDAP");
             connectionConfig.setParameter(InitialContext.PROVIDER_URL, connectionInfoPage.getProviderUrl());
             connectionConfig.setParameter(InitialContext.SECURITY_PRINCIPAL, connectionInfoPage.getBindDN());
             connectionConfig.setParameter(InitialContext.SECURITY_CREDENTIALS, connectionInfoPage.getPassword());
 
-            Map parameters = connectionParametersPage.getParameters();
-            for (Iterator i=parameters.keySet().iterator(); i.hasNext(); ) {
-                String paramName = (String)i.next();
-                String paramValue = (String)parameters.get(paramName);
+            Map<String,String> parameters = connectionParametersPage.getParameters();
+            for (String paramName : parameters.keySet()) {
+                String paramValue = parameters.get(paramName);
 
                 connectionConfig.setParameter(paramName, paramValue);
             }
 
-            partitionConfig.getConnectionConfigs().addConnectionConfig(connectionConfig);
+            //partitionConfig.getConnectionConfigManager().addConnectionConfig(connectionConfig);
+            partitionClient.createConnection(connectionConfig);
 
-            SourceConfigs sources = partitionConfig.getSourceConfigs();
+            //SourceConfigManager sourceConfigManager = partitionConfig.getSourceConfigManager();
 
-            SourceConfig sourceConfig = new SourceConfig(name, name);
+            SourceConfig sourceConfig = new SourceConfig(partitionName, partitionName);
             sourceConfig.setParameter("baseDn", connectionInfoPage.getSuffix());
             sourceConfig.setParameter("scope", "SUBTREE");
             sourceConfig.setParameter("filter", "(objectClass=*)");
-            sources.addSourceConfig(sourceConfig);
 
-            EntryMapping rootEntry = new EntryMapping(connectionInfoPage.getSuffix());
+            //sourceConfigManager.addSourceConfig(sourceConfig);
+            partitionClient.createSource(sourceConfig);
 
-            SourceMapping sourceMapping = new SourceMapping("DEFAULT", name);
+            EntryConfig rootEntry = new EntryConfig(connectionInfoPage.getSuffix());
+
+            SourceMapping sourceMapping = new SourceMapping("DEFAULT", partitionName);
             rootEntry.addSourceMapping(sourceMapping);
 
             rootEntry.setHandlerName("PROXY");
 
             rootEntry.addACI(new ACI("rs"));
 
-            partitionConfig.getDirectoryConfig().addEntryMapping(rootEntry);
+            //partitionConfig.getDirectoryConfig().addEntryConfig(rootEntry);
+            partitionClient.createEntry(rootEntry);
 
             if (infoPage.getMapRootDse()) {
                 SourceConfig rootDseSourceConfig = new SourceConfig();
-                rootDseSourceConfig.setName(name+" Root DSE");
-                rootDseSourceConfig.setConnectionName(name);
+                rootDseSourceConfig.setName(partitionName+" Root DSE");
+                rootDseSourceConfig.setConnectionName(partitionName);
 
                 rootDseSourceConfig.setParameter("scope", "OBJECT");
                 rootDseSourceConfig.setParameter("filter", "objectClass=*");
 
-                sources.addSourceConfig(rootDseSourceConfig);
+                //sourceConfigManager.addSourceConfig(rootDseSourceConfig);
+                partitionClient.createSource(rootDseSourceConfig);
 
-                EntryMapping rootDseEntryMapping = new EntryMapping();
-                rootDseEntryMapping.setDn("");
+                EntryConfig rootDseEntryConfig = new EntryConfig();
+                rootDseEntryConfig.setDn("");
 
                 SourceMapping rootDseSourceMapping = new SourceMapping("DEFAULT", rootDseSourceConfig.getName());
-                rootDseEntryMapping.addSourceMapping(rootDseSourceMapping);
+                rootDseEntryConfig.addSourceMapping(rootDseSourceMapping);
 
-                rootDseEntryMapping.setHandlerName("PROXY");
+                rootDseEntryConfig.setHandlerName("PROXY");
 
-                rootDseEntryMapping.addACI(new ACI("rs"));
+                rootDseEntryConfig.addACI(new ACI("rs"));
 
-                partitionConfig.getDirectoryConfig().addEntryMapping(rootDseEntryMapping);
+                //partitionConfig.getDirectoryConfig().addEntryConfig(rootDseEntryConfig);
+                partitionClient.createEntry(rootDseEntryConfig);
             }
 
             if (infoPage.getMapADSchema()) {
@@ -151,21 +163,23 @@ public class CreateLDAPProxyWizard extends Wizard {
                 String sourceSchemaDn = "CN=Schema,CN=Configuration,"+connectionInfoPage.getSuffix();
                 String destSchemaDn = LDAP.SCHEMA_DN.toString();
 
-                EntryMapping schemaMapping;
+                EntryConfig schemaMapping;
 
                 if (PartitionProxyPage.LDAP.equals(schemaFormat)) {
                     ADUtil util = new ADUtil();
-                    schemaMapping = util.createSchemaProxy(partitionConfig, connectionConfig, sourceSchemaDn, destSchemaDn);
+                    schemaMapping = util.createSchemaProxy(partitionClient, connectionConfig.getName(), sourceSchemaDn, destSchemaDn);
 
                 } else {
                     SchemaUtil util = new SchemaUtil();
-                    schemaMapping = util.createSchemaProxy(partitionConfig, connectionConfig, sourceSchemaDn, destSchemaDn);
+                    schemaMapping = util.createSchemaProxy(partitionClient, connectionConfig.getName(), sourceSchemaDn, destSchemaDn);
                 }
 
                 schemaMapping.addACI(new ACI("rs"));
             }
 
-            project.save(partitionConfig);
+            //project.save(partitionConfig);
+
+            partitionClient.store();
 
             penroseStudio.notifyChangeListeners();
 
@@ -173,7 +187,7 @@ public class CreateLDAPProxyWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return false;
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

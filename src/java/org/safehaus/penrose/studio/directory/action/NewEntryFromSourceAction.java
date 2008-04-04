@@ -17,27 +17,37 @@
  */
 package org.safehaus.penrose.studio.directory.action;
 
-import org.eclipse.swt.SWT;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
-import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.directory.EntryNode;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.mapping.SourceDialog;
-import org.safehaus.penrose.directory.SourceMapping;
-import org.safehaus.penrose.directory.EntryMapping;
+import org.eclipse.swt.SWT;
 import org.safehaus.penrose.directory.AttributeMapping;
+import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.FieldMapping;
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.filter.*;
+import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.filter.Filter;
+import org.safehaus.penrose.filter.FilterParser;
+import org.safehaus.penrose.filter.FilterProcessor;
+import org.safehaus.penrose.filter.SimpleFilter;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDNBuilder;
-import org.apache.log4j.Logger;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.source.SourceClient;
+import org.safehaus.penrose.source.FieldConfig;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.directory.EntryNode;
+import org.safehaus.penrose.studio.mapping.SourceDialog;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServersView;
 
-import java.util.Collection;
-import java.util.Stack;
 import java.io.StringReader;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
 
 public class NewEntryFromSourceAction extends Action {
 
@@ -59,18 +69,35 @@ public class NewEntryFromSourceAction extends Action {
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             //if (!penroseStudio.isCommercial()) return;
 
-            PartitionConfig partitionConfig = node.getPartitionConfig();
-            EntryMapping entryMapping = node.getEntryMapping();
+            ProjectNode projectNode = node.getProjectNode();
+            Project project = projectNode.getProject();
 
-            Collection sourceConfigs = partitionConfig.getSourceConfigs().getSourceConfigs();
-            if (sourceConfigs.size() == 0) {
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(node.getPartitionName());
+
+            Collection<String> sourceNames = partitionClient.getSourceNames();
+            if (sourceNames.isEmpty()) {
                 System.out.println("There is no sources defined.");
                 return;
             }
 
+            Map<String,SourceConfig> sourceConfigs = new HashMap<String,SourceConfig>();
+            for (String sourceName : sourceNames) {
+                SourceClient sourceClient = partitionClient.getSourceClient(sourceName);
+                SourceConfig sourceConfig = sourceClient.getSourceConfig();
+                sourceConfigs.put(sourceConfig.getName(), sourceConfig);
+            }
+/*
+            Collection<SourceConfig> sourceConfigManager = partitionConfig.getSourceConfigManager().getSourceConfigManager();
+            if (sourceConfigManager.isEmpty()) {
+                System.out.println("There is no sources defined.");
+                return;
+            }
+*/
             SourceMapping sourceMapping = new SourceMapping();
             SourceDialog dialog = new SourceDialog(serversView.getSite().getShell(), SWT.NONE);
-            dialog.setSourceConfigs(sourceConfigs);
+            dialog.setSourceConfigs(sourceConfigs.values());
             dialog.setSourceMapping(sourceMapping);
             dialog.setText("Select source...");
 
@@ -78,9 +105,9 @@ public class NewEntryFromSourceAction extends Action {
 
             if (!dialog.isSaved()) return;
 
-            SourceConfig sourceConfig = partitionConfig.getSourceConfigs().getSourceConfig(sourceMapping.getSourceName());
+            SourceConfig sourceConfig = sourceConfigs.get(sourceMapping.getSourceName());
 
-            final EntryMapping entry = new EntryMapping();
+            final EntryConfig newEntryConfig = new EntryConfig();
 
             DNBuilder db = new DNBuilder();
             RDNBuilder rb = new RDNBuilder();
@@ -91,10 +118,10 @@ public class NewEntryFromSourceAction extends Action {
             }
 
             db.append(rb.toRdn());
-            db.append(entryMapping.getDn());
+            db.append(node.getEntryConfig().getDn());
 
-            entry.setDn(db.toDn());
-            entry.addObjectClass("top");
+            newEntryConfig.setDn(db.toDn());
+            newEntryConfig.addObjectClass("top");
 
             String s = sourceConfig.getParameter("filter");
 
@@ -116,7 +143,7 @@ public class NewEntryFromSourceAction extends Action {
                         Object value = sf.getValue();
                         if (value.equals("*")) return filter;
 
-                        entry.addObjectClass(value.toString());
+                        newEntryConfig.addObjectClass(value.toString());
                         
                         return filter;
                     }
@@ -136,7 +163,7 @@ public class NewEntryFromSourceAction extends Action {
                         pkNames.contains(fieldName)
                 );
 
-                entry.addAttributeMapping(attributeMapping);
+                newEntryConfig.addAttributeMapping(attributeMapping);
 
                 FieldMapping fieldMapping = new FieldMapping(
                         fieldName,
@@ -147,9 +174,13 @@ public class NewEntryFromSourceAction extends Action {
                 sourceMapping.addFieldMapping(fieldMapping);
             }
 
-            entry.addSourceMapping(sourceMapping);
-
-            partitionConfig.getDirectoryConfig().addEntryMapping(entry);
+            newEntryConfig.addSourceMapping(sourceMapping);
+/*
+            DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
+            directoryConfig.addEntryConfig(newEntryConfig);
+*/
+            partitionClient.createEntry(newEntryConfig);
+            partitionClient.store();
 
             penroseStudio.notifyChangeListeners();
 

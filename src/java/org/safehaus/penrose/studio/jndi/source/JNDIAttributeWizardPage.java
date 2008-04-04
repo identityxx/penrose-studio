@@ -27,6 +27,7 @@ import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.schema.ObjectClass;
+import org.safehaus.penrose.schema.SchemaUtil;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.apache.log4j.Logger;
@@ -248,7 +249,9 @@ public class JNDIAttributeWizardPage extends WizardPage {
         try {
             if (schema == null) {
                 client = new LDAPClient(connectionConfig.getParameters());
-                schema = client.getSchema();
+
+                SchemaUtil schemaUtil = new SchemaUtil();
+                schema = schemaUtil.getSchema(client);
             }
 
         } catch (Exception e) {

@@ -17,20 +17,27 @@
  */
 package org.safehaus.penrose.studio.mapping.wizard;
 
-import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.FillLayout;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.schema.Schema;
-import org.safehaus.penrose.schema.ObjectClass;
-import org.safehaus.penrose.schema.SchemaManager;
 import org.apache.log4j.Logger;
+import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.schema.SchemaManagerClient;
+import org.safehaus.penrose.schema.ObjectClass;
+import org.safehaus.penrose.schema.Schema;
+import org.safehaus.penrose.studio.project.Project;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.TreeSet;
 
 /**
  * @author Endi S. Dewata
@@ -79,22 +86,28 @@ public class ObjectClassWizardPage extends WizardPage {
         addButton.setText(">");
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                if (availableTable.getSelectionCount() == 0) return;
+                try {
+                    if (availableTable.getSelectionCount() == 0) return;
 
-                SchemaManager schemaManager = project.getSchemaManager();
+                    PenroseClient client = project.getClient();
+                    SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
 
-                TableItem items[] = availableTable.getSelection();
-                for (TableItem item : items) {
-                    String objectClass = (String) item.getData();
+                    TableItem items[] = availableTable.getSelection();
+                    for (TableItem item : items) {
+                        String objectClass = (String) item.getData();
 
-                    Collection<String> ocNames = schemaManager.getAllObjectClassNames(objectClass);
-                    for (String ocName : ocNames) {
-                        availableOCs.remove(ocName);
-                        selectedOCs.add(ocName);
+                        Collection<String> ocNames = schemaManagerClient.getAllObjectClassNames(objectClass);
+                        for (String ocName : ocNames) {
+                            availableOCs.remove(ocName);
+                            selectedOCs.add(ocName);
+                        }
                     }
-                }
 
-                refresh();
+                    refresh();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
+                }
             }
         });
 
@@ -102,40 +115,46 @@ public class ObjectClassWizardPage extends WizardPage {
         removeButton.setText("<");
         removeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                if (selectedTable.getSelectionCount() == 0) return;
+                try {
+                    if (selectedTable.getSelectionCount() == 0) return;
 
-                SchemaManager schemaManager = project.getSchemaManager();
+                    PenroseClient client = project.getClient();
+                    SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
 
-                TableItem items[] = selectedTable.getSelection();
-                for (TableItem item : items) {
-                    String objectClass = (String) item.getData();
-                    selectedOCs.remove(objectClass);
-                    availableOCs.add(objectClass);
-                }
-
-                Collection<String> list = new ArrayList<String>();
-
-                for (String objectClass : selectedOCs) {
-
-                    boolean missingSuperclass = false;
-                    Collection<String> ocNames = schemaManager.getAllObjectClassNames(objectClass);
-                    for (String ocName : ocNames) {
-                        if (selectedOCs.contains(ocName)) continue;
-                        missingSuperclass = true;
-                        break;
+                    TableItem items[] = selectedTable.getSelection();
+                    for (TableItem item : items) {
+                        String objectClass = (String) item.getData();
+                        selectedOCs.remove(objectClass);
+                        availableOCs.add(objectClass);
                     }
 
-                    if (!missingSuperclass) continue;
+                    Collection<String> list = new ArrayList<String>();
 
-                    list.add(objectClass);
+                    for (String objectClass : selectedOCs) {
+
+                        boolean missingSuperclass = false;
+                        Collection<String> ocNames = schemaManagerClient.getAllObjectClassNames(objectClass);
+                        for (String ocName : ocNames) {
+                            if (selectedOCs.contains(ocName)) continue;
+                            missingSuperclass = true;
+                            break;
+                        }
+
+                        if (!missingSuperclass) continue;
+
+                        list.add(objectClass);
+                    }
+
+                    for (String objectClass : list) {
+                        selectedOCs.remove(objectClass);
+                        availableOCs.add(objectClass);
+                    }
+
+                    refresh();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
-
-                for (String objectClass : list) {
-                    selectedOCs.remove(objectClass);
-                    availableOCs.add(objectClass);
-                }
-
-                refresh();
             }
         });
 
@@ -179,12 +198,9 @@ public class ObjectClassWizardPage extends WizardPage {
 
     public void init() {
         try {
-            Schema schema = project.getSchemaManager().getAllSchema();
-
-            Collection<String> ocNames = new ArrayList<String>();
-            for (ObjectClass objectClass : schema.getObjectClasses()) {
-                ocNames.add(objectClass.getName());
-            }
+            PenroseClient client = project.getClient();
+            SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+            Collection<String> ocNames = schemaManagerClient.getObjectClassNames();
 
             availableOCs.addAll(ocNames);
             availableOCs.removeAll(selectedOCs);
@@ -193,6 +209,7 @@ public class ObjectClassWizardPage extends WizardPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

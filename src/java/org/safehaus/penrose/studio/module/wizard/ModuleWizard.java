@@ -20,13 +20,13 @@ package org.safehaus.penrose.studio.module.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
-import org.safehaus.penrose.module.ModuleConfigs;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
 import org.apache.log4j.Logger;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Collection;
 
@@ -37,9 +37,8 @@ public class ModuleWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Project project;
-    private PartitionConfig partitionConfig;
-    ModuleConfig module;
+    Project project;
+    String partitionName;
 
     public ModuleWizardPage propertyPage = new ModuleWizardPage();
     public ModuleParameterWizardPage parameterPage = new ModuleParameterWizardPage();
@@ -59,29 +58,39 @@ public class ModuleWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            ModuleConfigs moduleConfigs = partitionConfig.getModuleConfigs();
+            ModuleConfig moduleConfig = new ModuleConfig();
+            moduleConfig.setName(propertyPage.getModuleName());
+            moduleConfig.setModuleClass(propertyPage.getModuleClass());
 
-            module = new ModuleConfig();
-            module.setName(propertyPage.getModuleName());
-            module.setModuleClass(propertyPage.getModuleClass());
-
-            Map parameters = parameterPage.getParameters();
-            for (Iterator i=parameters.keySet().iterator(); i.hasNext(); ) {
-                String name = (String)i.next();
-                module.setParameter(name, (String)parameters.get(name));
+            Map<String,String> parameters = parameterPage.getParameters();
+            for (String name : parameters.keySet()) {
+                moduleConfig.setParameter(name, parameters.get(name));
             }
+/*
+            ModuleConfigManager moduleConfigManager = partitionConfig.getModuleConfigManager();
+            moduleConfigManager.addModuleConfig(moduleConfig);
 
-            moduleConfigs.addModuleConfig(module);
-
-            Collection mappings = mappingPage.getMappings();
-            for (Iterator i=mappings.iterator(); i.hasNext(); ) {
-                ModuleMapping mapping = (ModuleMapping)i.next();
+            Collection<ModuleMapping> mappings = mappingPage.getModuleMappings();
+            for (ModuleMapping mapping : mappings) {
                 mapping.setModuleName(propertyPage.getModuleName());
-                moduleConfigs.addModuleMapping(mapping);
+                moduleConfigManager.addModuleMapping(mapping);
             }
 
-            project.save(partitionConfig, moduleConfigs);
-            
+            project.save(partitionConfig, moduleConfigManager);
+*/
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+            Collection<ModuleMapping> moduleMappings = mappingPage.getModuleMappings();
+            for (ModuleMapping moduleMapping : moduleMappings) {
+                moduleMapping.setModuleName(propertyPage.getModuleName());
+            }
+
+            partitionClient.createModule(moduleConfig, moduleMappings);
+
+            partitionClient.store();
+
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 
@@ -111,11 +120,11 @@ public class ModuleWizard extends Wizard {
         this.project = project;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 }

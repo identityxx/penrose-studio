@@ -1,19 +1,18 @@
 package org.safehaus.penrose.studio.connection.editor;
 
-import org.eclipse.ui.forms.editor.FormEditor;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.connection.ConnectionConfigs;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.source.SourceConfig;
 import org.apache.log4j.Logger;
-
-import java.io.File;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.forms.editor.FormEditor;
+import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.management.connection.ConnectionClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.project.Project;
 
 /**
  * @author Endi Sukma Dewata
@@ -24,39 +23,44 @@ public abstract class ConnectionEditor extends FormEditor {
 
     protected boolean dirty;
     protected Project project;
-    protected PartitionConfig partitionConfig;
+    protected String partitionName;
+    protected String origConnectionName;
+
     protected ConnectionConfig origConnectionConfig;
     protected ConnectionConfig connectionConfig;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        setSite(site);
-        setInput(input);
-    }
-
-    public void setInput(IEditorInput input) {
-        super.setInput(input);
+        super.init(site, input);
 
         ConnectionEditorInput ei = (ConnectionEditorInput)input;
-
         project = ei.getProject();
-        partitionConfig = ei.getPartitionConfig();
-        origConnectionConfig = ei.getConnectionConfig();
+        partitionName = ei.getPartitionName();
+        origConnectionName = ei.getConnectionName();
 
         try {
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+            ConnectionClient connectionClient = partitionClient.getConnectionClient(origConnectionName);
+            origConnectionConfig = connectionClient.getConnectionConfig();
+
             connectionConfig = (ConnectionConfig)origConnectionConfig.clone();
+
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         }
 
         setPartName(ei.getName());
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 
     public ConnectionConfig getConnectionConfig() {
@@ -80,6 +84,7 @@ public abstract class ConnectionEditor extends FormEditor {
             store();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -88,21 +93,28 @@ public abstract class ConnectionEditor extends FormEditor {
 
     public void store() throws Exception {
 
-        ConnectionConfigs connectionConfigs = partitionConfig.getConnectionConfigs();
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+/*
+        ConnectionConfigManager connectionConfigManager = partitionConfig.getConnectionConfigManager();
         if (!origConnectionConfig.getName().equals(connectionConfig.getName())) {
-            connectionConfigs.renameConnectionConfig(origConnectionConfig, connectionConfig.getName());
 
-            for (SourceConfig sourceConfig : partitionConfig.getSourceConfigs().getSourceConfigs()) {
+            connectionConfigManager.renameConnectionConfig(origConnectionConfig, connectionConfig.getName());
+
+            for (SourceConfig sourceConfig : partitionConfig.getSourceConfigManager().getSourceConfigManager()) {
                 if (!sourceConfig.getConnectionName().equals(origConnectionConfig.getName())) continue;
                 sourceConfig.setConnectionName(connectionConfig.getName());
             }
         }
 
-        connectionConfigs.modifyConnectionConfig(connectionConfig.getName(), connectionConfig);
+        connectionConfigManager.modifyConnectionConfig(connectionConfig.getName(), connectionConfig);
+        project.save(partitionConfig, connectionConfigManager);
+*/
+        partitionClient.updateConnection(origConnectionName, connectionConfig);
+        partitionClient.store();
 
-        project.save(partitionConfig, connectionConfigs);
-
-        setPartName(partitionConfig.getName()+"/"+connectionConfig.getName());
+        setPartName(partitionName+"/"+connectionConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
@@ -129,6 +141,7 @@ public abstract class ConnectionEditor extends FormEditor {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
 
         } finally {
             firePropertyChange(PROP_DIRTY);

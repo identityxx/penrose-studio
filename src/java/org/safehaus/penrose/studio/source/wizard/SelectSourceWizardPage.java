@@ -17,26 +17,28 @@
  */
 package org.safehaus.penrose.studio.source.wizard;
 
-import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.jface.wizard.WizardDialog;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
-import org.safehaus.penrose.partition.PartitionConfig;
+import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.management.*;
+import org.safehaus.penrose.management.source.SourceClient;
+import org.safehaus.penrose.management.connection.ConnectionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
-import org.apache.log4j.Logger;
 
 import javax.naming.Context;
-import java.util.Iterator;
-import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
@@ -51,11 +53,11 @@ public class SelectSourceWizardPage extends WizardPage {
     Table infoTable;
 
     Project project;
-    PartitionConfig partitionConfig;
+    String partitionName;
 
-    public SelectSourceWizardPage(PartitionConfig partitionConfig) {
+    public SelectSourceWizardPage(String partitionName) {
         super(NAME);
-        this.partitionConfig = partitionConfig;
+        this.partitionName = partitionName;
         setDescription("Select source.");
     }
 
@@ -73,44 +75,56 @@ public class SelectSourceWizardPage extends WizardPage {
 
         sourceTable.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                TableItem ti = sourceTable.getSelection()[0];
-                SourceConfig sourceConfig = (SourceConfig)ti.getData();
-                ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
+                try {
+                    TableItem ti = sourceTable.getSelection()[0];
+                    SourceConfig sourceConfig = (SourceConfig)ti.getData();
 
-                String baseDn = sourceConfig.getParameter("baseDn");
-                baseDn = baseDn == null ? "" : baseDn;
+                    PenroseClient client = project.getClient();
+                    PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
-                infoTable.removeAll();
+                    ConnectionClient connectionClient = partitionClient.getConnectionClient(sourceConfig.getConnectionName());
+                    ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
-                ti = new TableItem(infoTable, SWT.NONE);
-                ti.setText(0, "Connection:");
-                ti.setText(1, connectionConfig.getName());
+                    String baseDn = sourceConfig.getParameter("baseDn");
+                    baseDn = baseDn == null ? "" : baseDn;
 
-                ti = new TableItem(infoTable, SWT.NONE);
-                ti.setText(0, "URL:");
-                ti.setText(1, connectionConfig.getParameter(Context.PROVIDER_URL));
+                    infoTable.removeAll();
 
-                ti = new TableItem(infoTable, SWT.NONE);
-                ti.setText(0, "Bind DN:");
-                ti.setText(1, connectionConfig.getParameter(Context.SECURITY_PRINCIPAL));
+                    ti = new TableItem(infoTable, SWT.NONE);
+                    ti.setText(0, "Connection:");
+                    ti.setText(1, connectionConfig.getName());
 
-                ti = new TableItem(infoTable, SWT.NONE);
-                ti.setText(0, "Password:");
-                ti.setText(1, "********");
+                    ti = new TableItem(infoTable, SWT.NONE);
+                    ti.setText(0, "URL:");
+                    ti.setText(1, connectionConfig.getParameter(Context.PROVIDER_URL));
 
-                ti = new TableItem(infoTable, SWT.NONE);
-                ti.setText(0, "Base DN:");
-                ti.setText(1, baseDn);
+                    ti = new TableItem(infoTable, SWT.NONE);
+                    ti.setText(0, "Bind DN:");
+                    ti.setText(1, connectionConfig.getParameter(Context.SECURITY_PRINCIPAL));
 
-                ti = new TableItem(infoTable, SWT.NONE);
-                ti.setText(0, "Scope:");
-                ti.setText(1, sourceConfig.getParameter("scope"));
+                    ti = new TableItem(infoTable, SWT.NONE);
+                    ti.setText(0, "Password:");
+                    ti.setText(1, "********");
 
-                ti = new TableItem(infoTable, SWT.NONE);
-                ti.setText(0, "Filter:");
-                ti.setText(1, sourceConfig.getParameter("filter"));
+                    ti = new TableItem(infoTable, SWT.NONE);
+                    ti.setText(0, "Base DN:");
+                    ti.setText(1, baseDn);
 
-                setPageComplete(validatePage());
+                    ti = new TableItem(infoTable, SWT.NONE);
+                    ti.setText(0, "Scope:");
+                    ti.setText(1, sourceConfig.getParameter("scope"));
+
+                    ti = new TableItem(infoTable, SWT.NONE);
+                    ti.setText(0, "Filter:");
+                    ti.setText(1, sourceConfig.getParameter("filter"));
+
+                    setPageComplete(validatePage());
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
+                }
             }
         });
 
@@ -136,7 +150,7 @@ public class SelectSourceWizardPage extends WizardPage {
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    SourceWizard wizard = new SourceWizard(partitionConfig);
+                    SourceWizard wizard = new SourceWizard(partitionName);
                     wizard.setProject(project);
 
                     WizardDialog dialog = new WizardDialog(parent.getShell(), wizard);
@@ -159,20 +173,29 @@ public class SelectSourceWizardPage extends WizardPage {
 
         removeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                SourceConfig sourceConfig = getSourceConfig();
-                if (sourceConfig == null) return;
+                try {
+                    SourceConfig sourceConfig = getSourceConfig();
+                    if (sourceConfig == null) return;
 
-                boolean confirm = MessageDialog.openQuestion(parent.getShell(),
-                        "Confirmation", "Remove selected source?");
+                    boolean confirm = MessageDialog.openQuestion(parent.getShell(),
+                            "Confirmation", "Remove selected source?");
 
-                if (!confirm) return;
+                    if (!confirm) return;
 
-                partitionConfig.getSourceConfigs().removeSourceConfig(sourceConfig.getName());
+                    PenroseClient client = project.getClient();
+                    PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
-                refresh();
+                    partitionClient.removeSource(sourceConfig.getName());
 
-                PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                penroseStudio.notifyChangeListeners();
+                    refresh();
+
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    penroseStudio.notifyChangeListeners();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
+                }
             }
         });
 
@@ -180,18 +203,30 @@ public class SelectSourceWizardPage extends WizardPage {
     }
 
     public void refresh() {
-        sourceTable.removeAll();
-        infoTable.removeAll();
+        try {
+            sourceTable.removeAll();
+            infoTable.removeAll();
 
-        Collection sourceConfigs = partitionConfig.getSourceConfigs().getSourceConfigs();
-        for (Iterator i=sourceConfigs.iterator(); i.hasNext(); ) {
-            SourceConfig sourceConfig = (SourceConfig)i.next();
-            ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
-            if (!"LDAP".equals(connectionConfig.getAdapterName())) continue;
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
-            TableItem item = new TableItem(sourceTable, SWT.NONE);
-            item.setText(sourceConfig.getName());
-            item.setData(sourceConfig);
+            for (String name : partitionClient.getSourceNames()) {
+                SourceClient sourceClient = partitionClient.getSourceClient(name);
+                SourceConfig sourceConfig = sourceClient.getSourceConfig();
+
+                ConnectionClient connectionClient = partitionClient.getConnectionClient(sourceConfig.getConnectionName());
+                ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
+
+                if (!"LDAP".equals(connectionConfig.getAdapterName())) continue;
+
+                TableItem item = new TableItem(sourceTable, SWT.NONE);
+                item.setText(sourceConfig.getName());
+                item.setData(sourceConfig);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

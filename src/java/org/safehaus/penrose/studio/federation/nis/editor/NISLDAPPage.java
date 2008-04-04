@@ -24,6 +24,11 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.management.*;
+import org.safehaus.penrose.management.scheduler.SchedulerClient;
+import org.safehaus.penrose.management.scheduler.JobClient;
+import org.safehaus.penrose.management.source.SourceClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
 
 import java.util.ArrayList;
 import java.text.DateFormat;
@@ -150,12 +155,13 @@ public class NISLDAPPage extends FormPage {
                     TableItem[] items = table.getSelection();
 
                     PenroseClient penroseClient = project.getClient();
+                    PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
 
                     for (TableItem ti : items) {
                         try {
                             NISDomain domain = (NISDomain)ti.getData();
 
-                            PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
+                            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
 
                             SourceClient penrose = partitionClient.getSourceClient("Penrose");
                             SourceClient ldap = partitionClient.getSourceClient("LDAP");
@@ -214,12 +220,13 @@ public class NISLDAPPage extends FormPage {
                     TableItem[] items = table.getSelection();
 
                     PenroseClient penroseClient = project.getClient();
+                    PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
 
                     for (TableItem ti : items) {
                         try {
                             NISDomain domain = (NISDomain)ti.getData();
 
-                            PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
+                            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
 
                             ArrayList<DN> dns = new ArrayList<DN>();
                             SourceClient ldap = partitionClient.getSourceClient("LDAP");
@@ -277,12 +284,13 @@ public class NISLDAPPage extends FormPage {
 
                     TableItem[] items = table.getSelection();
 
-                    PenroseClient client = nisFederation.getProject().getClient();
+                    PenroseClient penroseClient = nisFederation.getProject().getClient();
+                    PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
 
                     for (TableItem ti : items) {
                         NISDomain domain = (NISDomain)ti.getData();
 
-                        PartitionClient partitionClient = client.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
+                        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
                         SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
                         JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
                         jobClient.invoke("synchronize", new Object[] {}, new String[] {});
@@ -322,9 +330,10 @@ public class NISLDAPPage extends FormPage {
             table.removeAll();
 
             PenroseClient penroseClient = project.getClient();
+            PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
 
             for (NISDomain domain : nisFederation.getRepositories()) {
-                PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
+                PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
                 SourceClient ldap = partitionClient.getSourceClient("LDAP");
 
                 boolean exists;

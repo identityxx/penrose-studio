@@ -1,16 +1,16 @@
 package org.safehaus.penrose.studio.schema;
 
-import org.eclipse.ui.forms.editor.FormEditor;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.PartInitException;
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.forms.editor.FormEditor;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.schema.SchemaManagerClient;
 import org.safehaus.penrose.schema.Schema;
-import org.safehaus.penrose.schema.SchemaWriter;
-import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
-import org.apache.log4j.Logger;
 
 /**
  * @author Endi S. Dewata
@@ -30,9 +30,12 @@ public class SchemaEditor extends FormEditor {
         SchemaEditorInput ei = (SchemaEditorInput)input;
         project = ei.getProject();
 
-        origSchema = ei.getSchema();
         try {
+            PenroseClient client = project.getClient();
+            SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+            origSchema = schemaManagerClient.getSchema(ei.getSchemaName());
             schema = (Schema)origSchema.clone();
+
         } catch (Exception e) {
             throw new PartInitException(e.getMessage(), e);
         }
@@ -70,17 +73,12 @@ public class SchemaEditor extends FormEditor {
     }
 
     public void store() throws Exception {
-        SchemaManager schemaManager = project.getSchemaManager();
-        schemaManager.removeSchema(origSchema.getName());
+
+        PenroseClient client = project.getClient();
+        SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+        schemaManagerClient.updateSchema(origSchema.getName(), schema);
 
         origSchema.copy(schema);
-
-        schemaManager.addSchema(origSchema);
-
-        log.debug("Writing schema "+origSchema.getName()+" to "+project.getWorkDir());
-
-        SchemaWriter schemaWriter = new SchemaWriter(project.getWorkDir());
-        schemaWriter.write(origSchema);
 
         setPartName("Schema - "+origSchema.getName());
 

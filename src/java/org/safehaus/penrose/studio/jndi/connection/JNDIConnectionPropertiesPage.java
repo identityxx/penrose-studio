@@ -17,23 +17,28 @@
  */
 package org.safehaus.penrose.studio.jndi.connection;
 
-import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.events.*;
-import org.eclipse.ui.forms.widgets.*;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.studio.util.Helper;
-import org.safehaus.penrose.studio.parameter.ParameterDialog;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.forms.widgets.Section;
+import org.safehaus.penrose.ldap.Attribute;
+import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.ldap.SearchResult;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.studio.ldap.connection.editor.LDAPConnectionEditor;
+import org.safehaus.penrose.studio.parameter.ParameterDialog;
+import org.safehaus.penrose.studio.util.Helper;
 
-import javax.naming.InitialContext;
 import javax.naming.Context;
-import java.util.*;
+import javax.naming.InitialContext;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
@@ -52,7 +57,7 @@ public class JNDIConnectionPropertiesPage extends ConnectionEditorPage {
 
     String url;
 
-    public JNDIConnectionPropertiesPage(JNDIConnectionEditor editor) {
+    public JNDIConnectionPropertiesPage(LDAPConnectionEditor editor) {
         super(editor, "PROPERTIES", "  Properties  ");
     }
 
@@ -197,14 +202,20 @@ public class JNDIConnectionPropertiesPage extends ConnectionEditorPage {
             public void widgetSelected(SelectionEvent event) {
                 LDAPClient client = null;
                 try {
-                    client = new LDAPClient(connectionConfig.getParameters());
-                    Collection<String> list = client.getNamingContexts();
-
                     suffixCombo.removeAll();
-                    for (Iterator i=list.iterator(); i.hasNext(); ) {
-                        String baseDn = (String)i.next();
-                        suffixCombo.add(baseDn);
+
+                    client = new LDAPClient(connectionConfig.getParameters());
+
+                    SearchResult rootDse = client.getRootDSE();
+
+                    Attribute namingContexts = rootDse.getAttributes().get("namingContexts");
+                    if (namingContexts != null) {
+                        for (Object value : namingContexts.getValues()) {
+                            String namingContext = (String)value;
+                            suffixCombo.add(namingContext);
+                        }
                     }
+
                     suffixCombo.select(0);
 
                 } catch (Exception ex) {

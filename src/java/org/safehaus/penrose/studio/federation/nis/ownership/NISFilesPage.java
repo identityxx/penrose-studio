@@ -27,8 +27,9 @@ import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.PartitionClient;
-import org.safehaus.penrose.management.SourceClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.source.SourceClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
 
 /**
  * @author Endi S. Dewata
@@ -103,7 +104,8 @@ public class NISFilesPage extends FormPage implements Runnable {
 
            Project project = nisFederation.getProject();
            PenroseClient client = project.getClient();
-           PartitionClient partitionClient = client.getPartitionClient(Federation.FEDERATION);
+           PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+           PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
            SourceClient sourceClient = partitionClient.getSourceClient("penrose_hosts");
 
            sourceClient.search(request, response);
@@ -292,7 +294,8 @@ public class NISFilesPage extends FormPage implements Runnable {
 
         Project project = nisFederation.getProject();
         PenroseClient client = project.getClient();
-        PartitionClient partitionClient = client.getPartitionClient(Federation.FEDERATION);
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
         SourceClient sourceClient = partitionClient.getSourceClient("penrose_files");
 
         sourceClient.search(request, response);

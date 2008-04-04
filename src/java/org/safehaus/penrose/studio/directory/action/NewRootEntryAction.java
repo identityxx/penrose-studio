@@ -44,7 +44,7 @@ public class NewRootEntryAction extends Action {
             ServersView serversView = ServersView.getInstance();
             ProjectNode projectNode = node.getProjectNode();
 
-            RootEntryWizard wizard = new RootEntryWizard(projectNode.getProject(), node.getPartitionConfig());
+            RootEntryWizard wizard = new RootEntryWizard(projectNode.getProject(), node.getPartitionName());
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
             dialog.open();

@@ -6,21 +6,20 @@ import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.logger.LoggingNode;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.plugin.PluginsNode;
 import org.safehaus.penrose.studio.browser.BrowserEditorInput;
 import org.safehaus.penrose.studio.browser.BrowserEditor;
-import org.safehaus.penrose.studio.preview.PreviewEditorInput;
-import org.safehaus.penrose.studio.preview.PreviewEditor;
 import org.safehaus.penrose.studio.properties.SystemPropertiesNode;
 import org.safehaus.penrose.studio.user.AdministratorNode;
-import org.safehaus.penrose.studio.logging.LoggingNode;
 import org.safehaus.penrose.studio.service.ServicesNode;
 import org.safehaus.penrose.studio.schema.SchemasNode;
-import org.safehaus.penrose.service.ServiceConfigs;
 import org.safehaus.penrose.service.ServiceConfig;
-import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.ldap.LDAPService;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.service.ServiceManagerClient;
+import org.safehaus.penrose.user.UserConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
@@ -58,8 +57,8 @@ public class ProjectNode extends Node {
     protected LoggingNode loggingNode;
     protected PluginsNode pluginsNode;
 
-    public ProjectNode(ServersView serversView, String name, String type, Image image, Object object, Object parent) {
-        super(name, type, image, object, parent);
+    public ProjectNode(ServersView serversView, String name, Image image, Object object, Object parent) {
+        super(name, image, object, parent);
 
         this.serversView = serversView;
 
@@ -73,8 +72,13 @@ public class ProjectNode extends Node {
             public void run() {
                 try {
                     open();
+
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    penroseStudio.notifyChangeListeners();
+
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
 
@@ -87,8 +91,13 @@ public class ProjectNode extends Node {
             public void run() {
                 try {
                     close();
+
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    penroseStudio.notifyChangeListeners();
+
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
 
@@ -98,7 +107,7 @@ public class ProjectNode extends Node {
         });
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-
+/*
         manager.add(new Action("Preview") {
             public void run() {
                 try {
@@ -112,7 +121,7 @@ public class ProjectNode extends Node {
                 return project.isConnected();
             }
         });
-
+*/
         manager.add(new Action("Browser") {
             public void run() {
                 try {
@@ -181,33 +190,27 @@ public class ProjectNode extends Node {
     }
 
     public void open() throws Exception {
-        if (!project.isConnected()) connect();
+        if (serversView.isExpanded(this)) {
+            disconnect();
+            serversView.close(this);
 
-        serversView.open(this);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        } else {
+            connect();
+            serversView.open(this);
+        }
     }
 
     public void expand() throws Exception {
-        if (!project.isConnected()) {
-            try {
-                connect();
-            } catch (Exception e) {
-                serversView.close(this);
-            }
-        }
+        connect();
+    }
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+    public void collapse() throws Exception {
+        disconnect();
     }
 
     public void close() throws Exception {
         disconnect();
         serversView.close(this);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public void connect() throws Exception {
@@ -223,19 +226,16 @@ public class ProjectNode extends Node {
                             serversView,
                             "Partitions",
                             "Partitions",
-                            "Partitions",
                             ProjectNode.this);
                     children.add(partitionsNode);
 
                     schemasNode = new SchemasNode(
                             "Schemas",
                             "Schemas",
-                            "Schemas",
                             ProjectNode.this);
                     children.add(schemasNode);
 
                     servicesNode = new ServicesNode(
-                            "Services",
                             "Services",
                             "Services",
                             ProjectNode.this);
@@ -245,12 +245,10 @@ public class ProjectNode extends Node {
                             serversView,
                             "Logging",
                             "Logging",
-                            "Logging",
                             ProjectNode.this);
                     children.add(loggingNode);
 
                     pluginsNode = new PluginsNode(
-                            "Plugins",
                             "Plugins",
                             "Plugins",
                             ProjectNode.this);
@@ -259,19 +257,24 @@ public class ProjectNode extends Node {
                     children.add(new AdministratorNode(
                             "Administrator",
                             "Administrator",
-                            "Administrator",
                             ProjectNode.this
                     ));
 
                     children.add(new SystemPropertiesNode(
                             "System Properties",
                             "System Properties",
-                            "System Properties",
                             ProjectNode.this
                     ));
 
                 } catch (Exception e) {
-                    throw new InvocationTargetException(e);
+
+                    children.add(new ErrorNode(
+                            e.getMessage(),
+                            ProjectNode.this
+                    ));
+
+                    log.error(e.getMessage(), e);
+                    //throw new RuntimeException(e.getMessage(), e);
                 }
             }
         });
@@ -327,7 +330,7 @@ public class ProjectNode extends Node {
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
-
+/*
     public void preview() throws Exception {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -337,7 +340,7 @@ public class ProjectNode extends Node {
 
         page.openEditor(ei, PreviewEditor.class.getName());
     }
-
+*/
     public void browser() throws Exception {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -345,14 +348,17 @@ public class ProjectNode extends Node {
         ProjectConfig projectConfig = project.getProjectConfig();
         String hostname = projectConfig.getHost();
 
-        ServiceConfigs serviceConfigs = project.getServiceConfigs();
-        ServiceConfig serviceConfig = serviceConfigs.getServiceConfig("LDAP");
+        PenroseClient client = project.getClient();
+        ServiceManagerClient serviceManagerClient = client.getServiceManagerClient();
+        ServiceConfig serviceConfig = serviceManagerClient.getServiceConfig("LDAP");
         String s = serviceConfig == null ? null : serviceConfig.getParameter(LDAPService.LDAP_PORT);
         int port = s == null ? LDAPService.DEFAULT_LDAP_PORT : Integer.parseInt(s);
 
-        PenroseConfig penroseConfig = project.getPenroseConfig();
-        String bindDn = penroseConfig.getRootDn().toString();
-        byte[] password = penroseConfig.getRootPassword();
+        PenroseClient penroseClient = project.getClient();
+        UserConfig rootUserConfig = penroseClient.getRootUserConfig();
+
+        String bindDn = rootUserConfig.getDn().toString();
+        byte[] password = rootUserConfig.getPassword();
 
         BrowserEditorInput ei = new BrowserEditorInput();
         ei.setHostname(hostname);
@@ -368,11 +374,6 @@ public class ProjectNode extends Node {
     }
 
     public Collection<Node> getChildren() throws Exception {
-/*
-        if (!project.isConnected()) {
-            connect();
-        }
-*/
         return children;
     }
 

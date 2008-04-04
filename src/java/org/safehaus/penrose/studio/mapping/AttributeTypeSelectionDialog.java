@@ -17,21 +17,23 @@
  */
 package org.safehaus.penrose.studio.mapping;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
+import org.safehaus.penrose.management.schema.SchemaManagerClient;
 import org.safehaus.penrose.schema.ObjectClass;
-import org.safehaus.penrose.schema.AttributeType;
-import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.apache.log4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
@@ -48,7 +50,7 @@ public class AttributeTypeSelectionDialog extends Dialog implements SelectionLis
     Combo objectClassCombo;
     Table attributeTable;
 
-    private SchemaManager schemaManager;
+    private SchemaManagerClient schemaManagerClient;
     private Collection<String> selections = new ArrayList<String>();
 
     private int action = CANCEL;
@@ -146,40 +148,38 @@ public class AttributeTypeSelectionDialog extends Dialog implements SelectionLis
         this.selections = selections;
     }
 
-    public SchemaManager getSchemaManager() {
-        return schemaManager;
+    public SchemaManagerClient getSchemaManagerClient() {
+        return schemaManagerClient;
     }
 
-    public void setSchemaManager(SchemaManager schemaManager) {
-        this.schemaManager = schemaManager;
+    public void setSchemaManagerClient(SchemaManagerClient schemaManagerClient) throws Exception {
+        this.schemaManagerClient = schemaManagerClient;
 
         objectClassCombo.add("");
 
-        Collection<ObjectClass> list = sortObjectClasses(schemaManager.getObjectClasses());
-        for (ObjectClass oc : list) {
-            objectClassCombo.add(oc.getName());
+        for (String ocName : schemaManagerClient.getObjectClassNames()) {
+            objectClassCombo.add(ocName);
         }
 
         objectClassCombo.setText("");
         showAttributes("");
     }
 
-    public void showAttributes(String ocName) {
+    public void showAttributes(String ocName) throws Exception {
         attributeTable.removeAll();
 
         if ("".equals(ocName)) {
 
-            Collection<AttributeType> list = sortAttributeTypes(schemaManager.getAttributeTypes());
-            for (AttributeType at : list) {
+            for (String atName : schemaManagerClient.getAttributeTypeNames()) {
                 TableItem item = new TableItem(attributeTable, SWT.NONE);
-                item.setText(0, at.getName());
+                item.setText(0, atName);
                 item.setText(1, "");
             }
 
             return;
         }
 
-        ObjectClass oc = schemaManager.getObjectClass(ocName);
+        ObjectClass oc = schemaManagerClient.getObjectClass(ocName);
         Collection<String> atNames = oc.getRequiredAttributes();
 
         for (String atName : atNames) {
@@ -203,6 +203,7 @@ public class AttributeTypeSelectionDialog extends Dialog implements SelectionLis
             showAttributes(ocName);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -215,21 +216,5 @@ public class AttributeTypeSelectionDialog extends Dialog implements SelectionLis
 
     public void setAction(int action) {
         this.action = action;
-    }
-
-    public Collection<AttributeType> sortAttributeTypes(Collection<AttributeType> list) {
-        Map<String,AttributeType> map = new TreeMap<String,AttributeType>();
-        for (AttributeType at : list) {
-            map.put(at.getName(), at);
-        }
-        return map.values();
-    }
-
-    public Collection<ObjectClass> sortObjectClasses(Collection<ObjectClass> list) {
-        Map<String,ObjectClass> map = new TreeMap<String,ObjectClass>();
-        for (ObjectClass oc : list) {
-            map.put(oc.getName(), oc);
-        }
-        return map.values();
     }
 }

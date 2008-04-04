@@ -25,6 +25,8 @@ import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.management.*;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.nis.NIS;
 
@@ -62,7 +64,8 @@ public class NISYPPage extends FormPage {
         this.domain = editor.getDomain();
 
         PenroseClient penroseClient = project.getClient();
-        partitionClient = penroseClient.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
+        PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
+        partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
     }
 
     public void createFormContent(IManagedForm managedForm) {

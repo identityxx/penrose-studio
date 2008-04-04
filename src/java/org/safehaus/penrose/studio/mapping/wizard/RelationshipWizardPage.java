@@ -18,37 +18,49 @@
 package org.safehaus.penrose.studio.mapping.wizard;
 
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.mapping.*;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.studio.mapping.RelationshipDialog;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.source.SourceClient;
+import org.safehaus.penrose.mapping.Relationship;
+import org.safehaus.penrose.source.FieldConfig;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.studio.mapping.RelationshipDialog;
+import org.safehaus.penrose.studio.project.Project;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
  */
 public class RelationshipWizardPage extends WizardPage implements SelectionListener, ModifyListener {
 
+    public Logger log = LoggerFactory.getLogger(getClass());
+    
     public final static String NAME = "Data source relationships";
 
-    PartitionConfig partitionConfig;
+    Project project;
+    String partitionName;
     Table relationshipTable;
 
-    private Collection sourceMappings;
+    private Collection<SourceMapping> sourceMappings;
 
-    public RelationshipWizardPage(PartitionConfig partition) {
+    public RelationshipWizardPage(Project project, String partitionName) {
         super(NAME);
-        this.partitionConfig = partition;
+        this.project = project;
+        this.partitionName = partitionName;
         setDescription("Add data source relationships. This step is optional.");
     }
 
@@ -73,30 +85,40 @@ public class RelationshipWizardPage extends WizardPage implements SelectionListe
 
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
+                try {
+                    Relationship relationship = new Relationship();
+                    RelationshipDialog dialog = new RelationshipDialog(parent.getShell(), SWT.NONE);
+                    dialog.setRelationship(relationship);
+                    dialog.setText("Add new relationship...");
 
-                Relationship relationship = new Relationship();
-                RelationshipDialog dialog = new RelationshipDialog(parent.getShell(), SWT.NONE);
-                dialog.setRelationship(relationship);
-                dialog.setText("Add new relationship...");
+                    PenroseClient client = project.getClient();
+                    PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
-                for (Iterator i=sourceMappings.iterator(); i.hasNext(); ) {
-                    SourceMapping source = (SourceMapping)i.next();
+                    for (SourceMapping sourceMapping : sourceMappings) {
 
-                    SourceConfig sourceDefinition = partitionConfig.getSourceConfigs().getSourceConfig(source.getSourceName());
+                        SourceClient sourceClient = partitionClient.getSourceClient(sourceMapping.getSourceName());
+                        SourceConfig sourceConfig = sourceClient.getSourceConfig();
 
-                    Collection fields = sourceDefinition.getFieldConfigs();
-                    for (Iterator j=fields.iterator(); j.hasNext(); ) {
-                        FieldConfig field = (FieldConfig)j.next();
-                        dialog.addField(source.getName()+"."+field.getName(), field.isPrimaryKey());
+                        //SourceConfig sourceConfig = partitionConfig.getSourceConfigManager().getSourceConfig(sourceMapping.getSourceName());
+
+                        Collection<FieldConfig> fields = sourceConfig.getFieldConfigs();
+                        for (FieldConfig fieldConfig : fields) {
+                            dialog.addField(sourceMapping.getName() + "." + fieldConfig.getName(), fieldConfig.isPrimaryKey());
+                        }
                     }
+
+                    dialog.open();
+                    if (dialog.getAction() == RelationshipDialog.CANCEL) return;
+
+                    TableItem item = new TableItem(relationshipTable, SWT.NONE);
+                    item.setText(relationship.getExpression());
+                    item.setData(relationship);
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
-
-                dialog.open();
-                if (dialog.getAction() == RelationshipDialog.CANCEL) return;
-
-                TableItem item = new TableItem(relationshipTable, SWT.NONE);
-                item.setText(relationship.getExpression());
-                item.setData(relationship);
             }
         });
 
@@ -107,8 +129,7 @@ public class RelationshipWizardPage extends WizardPage implements SelectionListe
         removeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 TableItem items[] = relationshipTable.getSelection();
-                for (int i=0; i<items.length; i++) {
-                    TableItem item = items[i];
+                for (TableItem item : items) {
                     item.dispose();
                 }
             }
@@ -146,7 +167,7 @@ public class RelationshipWizardPage extends WizardPage implements SelectionListe
         return sourceMappings;
     }
 
-    public void setSourceMappings(Collection sourceMappings) {
+    public void setSourceMappings(Collection<SourceMapping> sourceMappings) {
         this.sourceMappings = sourceMappings;
     }
 }

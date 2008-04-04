@@ -19,8 +19,8 @@ public class NISFilesNode extends Node {
     private NISFederation nisFederation;
     private NISDomain domain;
 
-    public NISFilesNode(String name, String type, Image image, Object object, Object parent) {
-        super(name, type, image, object, parent);
+    public NISFilesNode(String name, Image image, Object object, Object parent) {
+        super(name, image, object, parent);
     }
 
     public void open() throws Exception {

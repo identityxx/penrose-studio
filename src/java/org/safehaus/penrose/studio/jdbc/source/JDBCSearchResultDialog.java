@@ -35,7 +35,6 @@ public class JDBCSearchResultDialog extends Dialog {
 
     Map texts = new HashMap();
 
-    private PartitionConfig partitionConfig;
     SourceConfig sourceConfig;
 
     private RDN rdn;
@@ -214,13 +213,5 @@ public class JDBCSearchResultDialog extends Dialog {
 
     public void setAttributes(Attributes attributes) {
         this.attributes.set(attributes);
-    }
-
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
-    }
-
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
     }
 }

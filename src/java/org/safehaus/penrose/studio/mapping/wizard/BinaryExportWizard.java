@@ -60,7 +60,7 @@ public class BinaryExportWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return false;
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

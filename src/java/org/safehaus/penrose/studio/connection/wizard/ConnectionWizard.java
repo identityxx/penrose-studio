@@ -20,15 +20,16 @@ package org.safehaus.penrose.studio.connection.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.connection.ConnectionConfigs;
 import org.safehaus.penrose.studio.driver.Driver;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.jdbc.connection.JDBCConnectionWizardPage;
 import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionParametersWizardPage;
-import org.safehaus.penrose.studio.jndi.connection.LDAPConnectionWizardPage;
+import org.safehaus.penrose.studio.ldap.connection.LDAPConnectionWizardPage;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;
@@ -43,18 +44,18 @@ public class ConnectionWizard extends Wizard {
     Logger log = Logger.getLogger(getClass());
 
     private Project project;
-    private PartitionConfig partitionConfig;
+    private String partitionName;
     private ConnectionConfig connectionConfig;
 
     public ConnectionNamePage namePage = new ConnectionNamePage();
     public ConnectionDriverPage driverPage = new ConnectionDriverPage();
     public JDBCConnectionWizardPage jdbcPage = new JDBCConnectionWizardPage();
 
-    public LDAPConnectionWizardPage jndiInfoPage = new LDAPConnectionWizardPage();
+    public LDAPConnectionWizardPage ldapInfoPage = new LDAPConnectionWizardPage();
     public JNDIConnectionParametersWizardPage jndiParametersPage = new JNDIConnectionParametersWizardPage();
 
-    public ConnectionWizard(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public ConnectionWizard(String partitionName) {
+        this.partitionName = partitionName;
         setWindowTitle("New Connection");
 
         Map<String,String> parameters = new TreeMap<String,String>();
@@ -74,7 +75,7 @@ public class ConnectionWizard extends Wizard {
 
         } else if ("LDAP".equals(adapterName)) {
             //if (!jndiPage.isPageComplete()) return false;
-            if (!jndiInfoPage.isPageComplete()) return false;
+            if (!ldapInfoPage.isPageComplete()) return false;
             if (!jndiParametersPage.isPageComplete()) return false;
         }
 
@@ -86,7 +87,7 @@ public class ConnectionWizard extends Wizard {
         addPage(driverPage);
         addPage(jdbcPage);
         //addPage(jndiPage);
-        addPage(jndiInfoPage);
+        addPage(ldapInfoPage);
         addPage(jndiParametersPage);
     }
 
@@ -101,13 +102,13 @@ public class ConnectionWizard extends Wizard {
 
             } else if ("LDAP".equals(adapter)) {
                 //return jndiPage;
-                return jndiInfoPage;
+                return ldapInfoPage;
             }
 
         } else if (page == jdbcPage) {
             return null;
 
-        } else if (page == jndiInfoPage) {
+        } else if (page == ldapInfoPage) {
             return jndiParametersPage;
 
         } else if (page == jndiParametersPage) {
@@ -121,11 +122,11 @@ public class ConnectionWizard extends Wizard {
         if (page == jdbcPage) {
             return driverPage;
 
-        } else if (page == jndiInfoPage) {
+        } else if (page == ldapInfoPage) {
             return driverPage;
 
         } else if (page == jndiParametersPage) {
-            return jndiInfoPage;
+            return ldapInfoPage;
         }
 
         return super.getPreviousPage(page);
@@ -151,21 +152,26 @@ public class ConnectionWizard extends Wizard {
                 connectionConfig.setParameters(parameters);
 
             } else if ("LDAP".equals(adapterName)) {
-                Map<String,String> parameters = jndiInfoPage.getParameters();
+                Map<String,String> parameters = ldapInfoPage.getParameters();
                 parameters.putAll(jndiParametersPage.getParameters());
                 connectionConfig.setParameters(parameters);
             }
-
-            ConnectionConfigs connectionConfigs = partitionConfig.getConnectionConfigs();
-            connectionConfigs.addConnectionConfig(connectionConfig);
-
-            project.save(partitionConfig, connectionConfigs);
+/*
+            ConnectionConfigManager connectionConfigManager = partitionConfig.getConnectionConfigManager();
+            connectionConfigManager.addConnectionConfig(connectionConfig);
+            project.save(partitionConfig, connectionConfigManager);
+*/
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            partitionClient.createConnection(connectionConfig);
+            partitionClient.store();
 
             return true;
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return false;
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -181,12 +187,12 @@ public class ConnectionWizard extends Wizard {
         return true;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 
     public Project getProject() {

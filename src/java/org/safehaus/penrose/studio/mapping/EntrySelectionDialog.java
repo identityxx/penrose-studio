@@ -18,32 +18,40 @@
 package org.safehaus.penrose.studio.mapping;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TreeAdapter;
+import org.eclipse.swt.events.TreeEvent;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.ldap.DN;
+import org.safehaus.penrose.management.directory.EntryClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.directory.EntryMapping;
-import org.safehaus.penrose.partition.PartitionConfig;
-
-import java.util.Collection;
-import java.util.Iterator;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.project.Project;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Endi S. Dewata
  */
 public class EntrySelectionDialog extends Dialog {
 
+    public Logger log = LoggerFactory.getLogger(getClass());
     Shell shell;
 
     Tree tree;
     Button saveButton;
 
-    private PartitionConfig partitionConfig;
-    private EntryMapping entryMapping;
+    private Project project;
+    private String partitionName;
+    private DN dn;
 
 	public EntrySelectionDialog(Shell parent, int style) {
 		super(parent, style);
@@ -81,23 +89,32 @@ public class EntrySelectionDialog extends Dialog {
 
         tree.addTreeListener(new TreeAdapter() {
             public void treeExpanded(TreeEvent event) {
-                if (event.item == null) return;
+                try {
+                    if (event.item == null) return;
 
-                TreeItem item = (TreeItem)event.item;
-                EntryMapping entry = (EntryMapping)item.getData();
+                    TreeItem item = (TreeItem)event.item;
+                    EntryClient entryClient = (EntryClient)item.getData();
 
-                TreeItem items[] = item.getItems();
-                for (TreeItem ti : items) ti.dispose();
+                    TreeItem items[] = item.getItems();
+                    for (TreeItem ti : items) ti.dispose();
 
-                Collection children = partitionConfig.getDirectoryConfig().getChildren(entry);
-                for (Object object : children) {
-                    EntryMapping child = (EntryMapping) object;
+                    PenroseClient client = project.getClient();
+                    PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
-                    TreeItem it = new TreeItem(item, SWT.NONE);
-                    it.setText(child.getRdn().toString());
-                    it.setData(child);
+                    for (String id : entryClient.getChildIds()) {
+                        EntryClient childClient = partitionClient.getEntryClient(id);
 
-                    new TreeItem(it, SWT.NONE);
+                        TreeItem it = new TreeItem(item, SWT.NONE);
+                        it.setText(childClient.getDn().getRdn().toString());
+                        it.setData(childClient);
+
+                        new TreeItem(it, SWT.NONE);
+                    }
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
         });
@@ -119,48 +136,68 @@ public class EntrySelectionDialog extends Dialog {
         saveButton.setEnabled(false);
 
 		saveButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-                TreeItem item = tree.getSelection()[0];
-                entryMapping = (EntryMapping)item.getData();
-                shell.close();
-			}
+			public void widgetSelected(SelectionEvent event) {
+                try {
+                    TreeItem item = tree.getSelection()[0];
+                    EntryClient entryClient = (EntryClient)item.getData();
+                    dn = entryClient.getDn();
+                    shell.close();
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
 		});
 
 		Button cancelButton = new Button(buttons, SWT.PUSH);
         cancelButton.setText("Cancel");
 		cancelButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-                entryMapping = null;
+                dn = null;
                 shell.close();
 			}
 		});
 	}
 
-    public EntryMapping getEntryMapping() {
-        return entryMapping;
+    public DN getDn() {
+        return dn;
     }
 
-    public void setEntryMapping(EntryMapping entryMapping) {
-        this.entryMapping = entryMapping;
+    public void setDn(DN dn) {
+        this.dn = dn;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) throws Exception {
+        this.partitionName = partitionName;
 
-        Collection rootEntries = partitionConfig.getDirectoryConfig().getRootEntryMappings();
-        for (Iterator i=rootEntries.iterator(); i.hasNext(); ) {
-            EntryMapping entry = (EntryMapping)i.next();
-            String dn = entry.getDn().isEmpty() ? "Root DSE" : entry.getDn().toString();
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+        for (String id : partitionClient.getRootEntryIds()) {
+            EntryClient entryClient = partitionClient.getEntryClient(id);
+            DN dn = entryClient.getDn();
+
+            String label = dn.isEmpty() ? "Root DSE" : dn.toString();
 
             TreeItem item = new TreeItem(tree, SWT.NONE);
-            item.setText(dn);
-            item.setData(entry);
+            item.setText(label);
+            item.setData(entryClient);
 
             new TreeItem(item, SWT.NONE);
         }
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

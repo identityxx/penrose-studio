@@ -18,9 +18,10 @@ import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.management.PartitionClient;
-import org.safehaus.penrose.management.SourceClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.source.SourceClient;
 import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
 import org.safehaus.penrose.ldap.SearchResult;
 import org.safehaus.penrose.ldap.SearchRequest;
 import org.safehaus.penrose.ldap.SearchResponse;
@@ -63,7 +64,8 @@ public class NISLDAPChangeLogPage extends FormPage {
         this.domain = editor.getDomain();
 
         PenroseClient penroseClient = project.getClient();
-        partitionClient = penroseClient.getPartitionClient(domain.getName()+"_"+NISFederation.NIS);
+        PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
+        partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.NIS);
         changes = partitionClient.getSourceClient("changes");
     }
 

@@ -5,7 +5,6 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.safehaus.penrose.federation.repository.Repository;
 import org.safehaus.penrose.federation.repository.LDAPRepository;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
@@ -15,7 +14,6 @@ import org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryNode
 import org.safehaus.penrose.studio.federation.linking.LinkingEditor;
 import org.safehaus.penrose.studio.federation.linking.LinkingEditorInput;
 import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 
 /**
@@ -32,7 +30,6 @@ public class LDAPLinkingNode extends Node {
     public LDAPLinkingNode(String name, LDAPRepositoryNode repositoryNode) {
         super(
                 name,
-                ServersView.ENTRY,
                 PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 null, 
                 repositoryNode

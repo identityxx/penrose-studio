@@ -3,8 +3,6 @@ package org.safehaus.penrose.studio.source.editor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.project.Project;
 
 /**
@@ -13,15 +11,10 @@ import org.safehaus.penrose.studio.project.Project;
 public class SourceEditorInput implements IEditorInput {
 
     private Project project;
-    private PartitionConfig partitionConfig;
-    private SourceConfig sourceConfig;
+    private String partitionName;
+    private String sourceName;
 
     public SourceEditorInput() {
-    }
-
-    public SourceEditorInput(PartitionConfig partitionConfig, SourceConfig sourceConfig) {
-        this.partitionConfig = partitionConfig;
-        this.sourceConfig = sourceConfig;
     }
 
     public boolean exists() {
@@ -33,7 +26,7 @@ public class SourceEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return partitionConfig.getName()+"/"+ sourceConfig.getName();
+        return partitionName+"/"+ sourceName;
     }
 
     public IPersistableElement getPersistable() {
@@ -50,8 +43,8 @@ public class SourceEditorInput implements IEditorInput {
 
     public int hashCode() {
         return (project == null ? 0 : project.hashCode()) +
-                (partitionConfig == null ? 0 : partitionConfig.hashCode()) +
-                (sourceConfig == null ? 0 : sourceConfig.hashCode());
+                (partitionName == null ? 0 : partitionName.hashCode()) +
+                (sourceName == null ? 0 : sourceName.hashCode());
     }
 
     boolean equals(Object o1, Object o2) {
@@ -67,26 +60,18 @@ public class SourceEditorInput implements IEditorInput {
 
         SourceEditorInput ei = (SourceEditorInput)object;
         if (!equals(project, ei.project)) return false;
-        if (!equals(partitionConfig, ei.partitionConfig)) return false;
-        if (!equals(sourceConfig, ei.sourceConfig)) return false;
+        if (!equals(partitionName, ei.partitionName)) return false;
+        if (!equals(sourceName, ei.sourceName)) return false;
 
         return true;
     }
 
-    public SourceConfig getSourceConfig() {
-        return sourceConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setSourceConfig(SourceConfig sourceConfig) {
-        this.sourceConfig = sourceConfig;
-    }
-
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
-    }
-
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 
     public Project getProject() {
@@ -95,5 +80,13 @@ public class SourceEditorInput implements IEditorInput {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public String getSourceName() {
+        return sourceName;
+    }
+
+    public void setSourceName(String sourceName) {
+        this.sourceName = sourceName;
     }
 }

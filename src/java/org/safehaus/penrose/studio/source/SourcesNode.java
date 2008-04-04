@@ -17,27 +17,31 @@
  */
 package org.safehaus.penrose.studio.source;
 
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.PenroseStudio;
+import org.apache.log4j.Logger;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.IWorkbenchActionConstants;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.source.SourceClient;
+import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.partition.PartitionsNode;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.partition.PartitionNode;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.source.action.NewSourceAction;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.source.SourceConfigs;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.ui.IWorkbenchActionConstants;
-import org.apache.log4j.Logger;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author Endi S. Dewata
@@ -53,11 +57,11 @@ public class SourcesNode extends Node {
     protected PartitionsNode partitionsNode;
     protected PartitionNode partitionNode;
 
-    private PartitionConfig partitionConfig;
+    private String partitionName;
     private String path;
 
-    public SourcesNode(String name, String type, Image image, Object object, Object parent) {
-        super(name, type, image, object, parent);
+    public SourcesNode(String name, Image image, Object object, Object parent) {
+        super(name, image, object, parent);
 
         if (parent instanceof PartitionNode) {
             partitionNode = (PartitionNode)parent;
@@ -94,24 +98,39 @@ public class SourcesNode extends Node {
 
         if (!(newObject instanceof SourceConfig)) return;
 
-        SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
+        Project project = projectNode.getProject();
 
-        SourceConfig newSourceDefinition = (SourceConfig)((SourceConfig)newObject).clone();
+        SourceConfig newSourceConfig = (SourceConfig)((SourceConfig)newObject).clone();
+        view.setClipboard(null);
+/*
+        SourceConfigManager sourceConfigManager = partitionConfig.getSourceConfigManager();
 
         int counter = 1;
-        String name = newSourceDefinition.getName();
-        while (sourceConfigs.getSourceConfig(name) != null) {
+        String name = newSourceConfig.getName();
+        while (sourceConfigManager.getSourceConfig(name) != null) {
             counter++;
-            name = newSourceDefinition.getName()+" ("+counter+")";
+            name = newSourceConfig.getName()+" ("+counter+")";
         }
+        newSourceConfig.setName(name);
 
-        newSourceDefinition.setName(name);
-        sourceConfigs.addSourceConfig(newSourceDefinition);
+        sourceConfigManager.addSourceConfig(newSourceConfig);
+        project.save(partitionConfig, sourceConfigManager);
+*/
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
-        view.setClipboard(null);
+        Collection<String> sourceNames = partitionClient.getSourceNames();
+        int counter = 1;
+        String name = newSourceConfig.getName();
+        while (sourceNames.contains(name)) {
+            counter++;
+            name = newSourceConfig.getName()+" ("+counter+")";
+        }
+        newSourceConfig.setName(name);
 
-        Project project = projectNode.getProject();
-        project.save(partitionConfig, sourceConfigs);
+        partitionClient.createSource(newSourceConfig);
+        partitionClient.store();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
@@ -125,8 +144,18 @@ public class SourcesNode extends Node {
 
         Map<String,Node> children = new TreeMap<String,Node>();
 
-        for (SourceConfig sourceConfig : partitionConfig.getSourceConfigs().getSourceConfigs()) {
-            String sourceName = sourceConfig.getName();
+        Project project = projectNode.getProject();
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+        //log.debug("Getting sources:");
+
+        for (String sourceName : partitionClient.getSourceNames()) {
+            //log.debug(" - "+sourceName);
+
+            SourceClient sourceClient = partitionClient.getSourceClient(sourceName);
+            String adapterName = sourceClient.getAdapterName();
 
             // log.debug("Checking "+ path +" with "+sourceName);
             if (path != null && !sourceName.startsWith(path + SEPARATOR)) continue;
@@ -140,13 +169,12 @@ public class SourcesNode extends Node {
                     // log.debug("Creating sources node "+label);
                     SourcesNode sourcesNode = new SourcesNode(
                             label,
-                            ServersView.SOURCES,
                             PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                             ServersView.SOURCES,
                             this
                     );
 
-                    sourcesNode.setPartitionConfig(this.partitionConfig);
+                    sourcesNode.setPartitionName(partitionName);
                     sourcesNode.setPath(sourceName.substring(0, p));
 
                     children.put(label, sourcesNode);
@@ -158,14 +186,14 @@ public class SourcesNode extends Node {
                 // log.debug("Creating source node "+label);
                 SourceNode sourceNode = new SourceNode(
                         label,
-                        ServersView.SOURCE,
                         PenroseStudioPlugin.getImage(PenroseImage.SOURCE),
-                        sourceConfig,
+                        sourceName,
                         this
                 );
 
-                sourceNode.setPartitionConfig(this.partitionConfig);
-                sourceNode.setSourceConfig(sourceConfig);
+                sourceNode.setPartitionName(partitionName);
+                sourceNode.setAdapterName(adapterName);
+                sourceNode.setSourceName(sourceName);
 
                 children.put(label, sourceNode);
             }
@@ -174,12 +202,12 @@ public class SourcesNode extends Node {
         return children.values();
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 
     public String getPath() {

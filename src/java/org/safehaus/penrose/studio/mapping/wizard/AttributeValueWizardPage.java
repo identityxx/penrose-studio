@@ -17,30 +17,36 @@
  */
 package org.safehaus.penrose.studio.mapping.wizard;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.*;
+import org.safehaus.penrose.directory.AttributeMapping;
+import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.ldap.RDN;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.schema.SchemaManagerClient;
+import org.safehaus.penrose.management.source.SourceClient;
+import org.safehaus.penrose.mapping.Expression;
+import org.safehaus.penrose.schema.ObjectClass;
+import org.safehaus.penrose.source.FieldConfig;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.mapping.AttributeTypeSelectionDialog;
 import org.safehaus.penrose.studio.mapping.ExpressionDialog;
-import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.schema.ObjectClass;
-import org.safehaus.penrose.schema.SchemaManager;
-import org.safehaus.penrose.mapping.*;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.ldap.RDN;
-import org.safehaus.penrose.directory.AttributeMapping;
-import org.safehaus.penrose.directory.SourceMapping;
-import org.apache.log4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author Endi S. Dewata
@@ -56,7 +62,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
     public final static int EXPRESSION = 2;
 
     Project project;
-    PartitionConfig partitionConfig;
+    String partitionName;
     Table attributeTable;
 
     private Collection<SourceMapping> sourceMappings;
@@ -68,10 +74,10 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
     private boolean needRdn = false;
 
-    public AttributeValueWizardPage(Project project, PartitionConfig partition) {
+    public AttributeValueWizardPage(Project project, String partitionName) {
         super(NAME);
         this.project = project;
-        this.partitionConfig = partition;
+        this.partitionName = partitionName;
         setDescription("Double-click the attribute to enter the values. Select attributes that will be used as RDN.");
     }
 
@@ -105,8 +111,17 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                     if (defaultType == VARIABLE) {
 
                         if (sourceMappings != null) {
+
+                            PenroseClient client = project.getClient();
+                            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+                            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
                             for (SourceMapping sourceMapping : sourceMappings) {
-                                SourceConfig sourceConfig = partitionConfig.getSourceConfigs().getSourceConfig(sourceMapping.getSourceName());
+
+                                SourceClient sourceClient = partitionClient.getSourceClient(sourceMapping.getSourceName());
+                                SourceConfig sourceConfig = sourceClient.getSourceConfig();
+
+                                //SourceConfig sourceConfig = partitionConfig.getSourceConfigManager().getSourceConfig(sourceMapping.getSourceName());
                                 dialog.addVariable(sourceMapping.getName());
 
                                 Collection<FieldConfig> fields = sourceConfig.getFieldConfigs();
@@ -132,6 +147,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
 
@@ -167,7 +183,8 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                     AttributeTypeSelectionDialog dialog = new AttributeTypeSelectionDialog(parent.getShell(), SWT.NONE);
                     dialog.setText("Add attributes...");
 
-                    dialog.setSchemaManager(project.getSchemaManager());
+                    PenroseClient client = project.getClient();
+                    dialog.setSchemaManagerClient(client.getSchemaManagerClient());
 
                     dialog.open();
                     if (dialog.getAction() == AttributeTypeSelectionDialog.CANCEL) return;
@@ -182,6 +199,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
         });
@@ -252,12 +270,13 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
     public void init() {
         try {
 
-            SchemaManager schemaManager = project.getSchemaManager();
+            PenroseClient client = project.getClient();
+            SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
 
             System.out.println("Object classes:");
             for (String objectClass : objectClasses) {
 
-                Collection<ObjectClass> allOcs = schemaManager.getAllObjectClasses(objectClass);
+                Collection<ObjectClass> allOcs = schemaManagerClient.getAllObjectClasses(objectClass);
                 for (ObjectClass oc : allOcs) {
                     System.out.println(" - " + oc.getName());
 
@@ -308,6 +327,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

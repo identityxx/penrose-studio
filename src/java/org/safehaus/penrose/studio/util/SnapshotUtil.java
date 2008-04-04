@@ -1,12 +1,16 @@
 package org.safehaus.penrose.studio.util;
 
 import org.safehaus.penrose.directory.AttributeMapping;
-import org.safehaus.penrose.directory.EntryMapping;
+import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.schema.Schema;
+import org.safehaus.penrose.schema.SchemaUtil;
 import org.safehaus.penrose.schema.attributeSyntax.AttributeSyntax;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,37 +23,54 @@ public class SnapshotUtil {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    public void createSnapshot(PartitionConfig partitionConfig, LDAPClient client) throws Exception {
-        createEntries(partitionConfig, client, "");
+    Project project;
+
+    public SnapshotUtil(Project project) throws Exception {
+        this.project = project;
+    }
+
+    public void createSnapshot(String partitionName, LDAPClient ldapClient) throws Exception {
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+        createEntries(partitionClient, ldapClient, "");
+
+        partitionClient.store();
     }
     
-    public void createEntries(PartitionConfig partitionConfig, LDAPClient client, String baseDn) throws Exception {
+    public void createEntries(PartitionClient partitionClient, LDAPClient ldapClient, String baseDn) throws Exception {
+
         if ("".equals(baseDn)) {
-            SearchResult entry = client.find(baseDn);
+            SearchResult entry = ldapClient.find(baseDn);
             if (entry == null) return;
             
-            EntryMapping entryMapping = createMapping(client, entry);
-            partitionConfig.getDirectoryConfig().addEntryMapping(entryMapping);
+            EntryConfig entryConfig = createMapping(ldapClient, entry);
+            //partitionConfig.getDirectoryConfig().addEntryConfig(entryConfig);
+
+            partitionClient.createEntry(entryConfig);
         }
 
-        Collection<SearchResult> children = client.getChildren(baseDn);
+        Collection<SearchResult> children = ldapClient.findChildren(baseDn);
         for (SearchResult entry : children) {
-            EntryMapping entryMapping = createMapping(client, entry);
-            partitionConfig.getDirectoryConfig().addEntryMapping(entryMapping);
+            EntryConfig entryConfig = createMapping(ldapClient, entry);
+            //partitionConfig.getDirectoryConfig().addEntryConfig(entryConfig);
+            partitionClient.createEntry(entryConfig);
 
-            createEntries(partitionConfig, client, entry.getDn().toString());
+            createEntries(partitionClient, ldapClient, entry.getDn().toString());
         }
 
     }
 
-    public EntryMapping createMapping(LDAPClient client, SearchResult entry) throws Exception {
+    public EntryConfig createMapping(LDAPClient client, SearchResult entry) throws Exception {
 
-        Schema schema = client.getSchema();
+        SchemaUtil schemaUtil = new SchemaUtil();
+        Schema schema = schemaUtil.getSchema(client);
 
         DN dn = entry.getDn();
         RDN rdn = dn.getRdn();
 
-        EntryMapping entryMapping = new EntryMapping(dn);
+        EntryConfig entryConfig = new EntryConfig(dn);
 
         log.debug("Attributes:");
         Attributes attributes = entry.getAttributes();
@@ -66,7 +87,7 @@ public class SnapshotUtil {
             for (Object value : attribute.getValues()) {
 
                 if (oc) {
-                    entryMapping.addObjectClass(value.toString());
+                    entryConfig.addObjectClass(value.toString());
                     continue;
                 }
 
@@ -84,11 +105,11 @@ public class SnapshotUtil {
                 }
 
                 log.debug(" - "+name+": "+value);
-                entryMapping.addAttributeMapping(new AttributeMapping(name, AttributeMapping.CONSTANT, value, rdnAttr));
+                entryConfig.addAttributeMapping(new AttributeMapping(name, AttributeMapping.CONSTANT, value, rdnAttr));
             }
         }
 
-        return entryMapping;
+        return entryConfig;
     }
 
 }

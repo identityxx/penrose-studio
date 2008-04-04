@@ -22,8 +22,9 @@ import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.PartitionClient;
-import org.safehaus.penrose.management.SourceClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.source.SourceClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
 
 import java.util.*;
 
@@ -58,7 +59,8 @@ public class NISDatabaseTablesPage extends FormPage {
         project = nisFederation.getProject();
 
         penroseClient = project.getClient();
-        partitionClient = penroseClient.getPartitionClient(domain.getName()+"_"+NISFederation.DB);
+        PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
+        partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.DB);
 
         sources.addAll(partitionClient.getSourceNames());
     }

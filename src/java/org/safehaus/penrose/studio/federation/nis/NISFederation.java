@@ -9,10 +9,10 @@ import org.safehaus.penrose.federation.repository.GlobalRepository;
 import org.safehaus.penrose.federation.repository.LDAPRepository;
 import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
-import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.PartitionClient;
-import org.safehaus.penrose.management.ConnectionClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.connection.ConnectionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
 import org.apache.tools.ant.filters.ExpandProperties;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.FilterChain;
@@ -82,6 +82,9 @@ public class NISFederation {
         groups    = partition.getSource("penrose_groups");
 */
 
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+
         for (Repository rep : list) {
 
             if (monitor.isCanceled()) throw new InterruptedException();
@@ -90,66 +93,46 @@ public class NISFederation {
             String name = domain.getName();
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Creating NIS Partition
+            // NIS Partition
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            PartitionConfig nisPartitionConfig = project.getPartitionConfigs().getPartitionConfig(name+"_"+NISFederation.NIS);
+            PartitionClient nisPartitionClient = partitionManagerClient.getPartitionClient(name+"_"+NISFederation.NIS);
 
-            if (nisPartitionConfig == null) { // create missing partition config during start
+            if (nisPartitionClient.exists()) {
+                monitor.subTask("Loading "+name+"_"+NISFederation.NIS+"...");
 
+            } else {
                 monitor.subTask("Creating "+name+"_"+NISFederation.NIS+"...");
-
                 createNisPartition(domain);
             }
 
-            monitor.subTask("Loading "+name+"_"+NISFederation.NIS+"...");
-
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Creating YP Partition
+            // YP Partition
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            PartitionConfig ypPartitionConfig = project.getPartitionConfigs().getPartitionConfig(name+"_"+NISFederation.YP);
-            boolean createPartitionConfig = ypPartitionConfig == null;
+            PartitionClient ypPartitionClient = partitionManagerClient.getPartitionClient(name+"_"+NISFederation.YP);
 
-            if (createPartitionConfig) { // create missing partition configs during start
+            if (ypPartitionClient.exists()) {
+                monitor.subTask("Loading "+name+"_"+NISFederation.YP+"...");
 
+            } else {
                 monitor.subTask("Creating "+name+"_"+NISFederation.YP+"...");
-
                 createYpPartition(domain);
             }
 
-            monitor.subTask("Loading "+name+"_"+NISFederation.YP+"...");
-
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Creating DB Partition
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-            PartitionConfig dbPartitionConfig = project.getPartitionConfigs().getPartitionConfig(name+"_"+NISFederation.DB);
-
-            if (dbPartitionConfig == null) { // create missing partition config during start
-                dbPartitionConfig = createDbPartition(domain);
-                project.upload("partitions/"+dbPartitionConfig.getName());
-                penroseClient.startPartition(dbPartitionConfig.getName());
-            }
-
-            monitor.subTask("Loading "+dbPartitionConfig.getName()+"...");
-
-            loadPartition(dbPartitionConfig);
-*/
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Creating NSS Partition
+            // NSS Partition
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            PartitionConfig nssPartitionConfig = project.getPartitionConfigs().getPartitionConfig(name+"_"+NISFederation.NSS);
+            PartitionClient nssPartitionClient = partitionManagerClient.getPartitionClient(name+"_"+NISFederation.NSS);
 
-            if (nssPartitionConfig == null) { // create missing partition config during start
+            if (nssPartitionClient.exists()) {
+                monitor.subTask("Loading "+name+"_"+NISFederation.NSS+"...");
 
+            } else {
                 monitor.subTask("Creating "+name+"_"+NISFederation.NSS+"...");
-
                 createNssPartition(domain);
             }
-
-            monitor.subTask("Loading "+name+"_"+NISFederation.NSS+"...");
 
             monitor.worked(1);
         }
@@ -212,23 +195,30 @@ public class NISFederation {
         filterChain.addExpandProperties(expandProperties);
 
         copy.execute();
-
-        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-        PartitionConfig partitionConfig = partitionConfigs.load(partitionDir);
-        partitionConfigs.addPartitionConfig(partitionConfig);
+/*
+        PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
+        PartitionConfig partitionConfig = partitionConfigManager.load(partitionDir);
+        partitionConfigManager.addPartitionConfig(partitionConfig);
 
         PenroseClient penroseClient = project.getClient();
 
         project.upload("partitions/"+partitionConfig.getName());
         penroseClient.startPartition(partitionConfig.getName());
+*/
+        PartitionConfig partitionConfig = new PartitionConfig(partitionName);
+        partitionConfig.load(partitionDir);
+
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        partitionManagerClient.createPartition(partitionConfig);
+
     }
 
     public void removeNisPartition(NISDomain domain) throws Exception {
 
-        PartitionConfig nisPartitionConfig = getPartitionConfig(domain.getName()+"_"+NISFederation.NIS);
-        if (nisPartitionConfig == null) return;
-
-        removePartition(domain.getName()+"_"+NISFederation.NIS);
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        partitionManagerClient.removePartition(domain.getName()+"_"+NISFederation.NIS);
     }
 
     public void createYpPartition(NISDomain domain) throws Exception {
@@ -273,90 +263,29 @@ public class NISFederation {
         filterChain.addExpandProperties(expandProperties);
 
         copy.execute();
-
-        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-        PartitionConfig partitionConfig = partitionConfigs.load(partitionDir);
-        partitionConfigs.addPartitionConfig(partitionConfig);
+/*
+        PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
+        PartitionConfig partitionConfig = partitionConfigManager.load(partitionDir);
+        partitionConfigManager.addPartitionConfig(partitionConfig);
 
         PenroseClient penroseClient = project.getClient();
         
         project.upload("partitions/"+partitionConfig.getName());
         penroseClient.startPartition(partitionConfig.getName());
+*/
+        PartitionConfig partitionConfig = new PartitionConfig(partitionName);
+        partitionConfig.load(partitionDir);
+
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        partitionManagerClient.createPartition(partitionConfig);
     }
 
     public void removeYpPartition(NISDomain domain) throws Exception {
         
-        PartitionConfig ypPartitionConfig = getPartitionConfig(domain.getName()+"_"+NISFederation.YP);
-        if (ypPartitionConfig == null) return;
-
-        removePartition(domain.getName()+"_"+NISFederation.YP);
-    }
-
-    public PartitionConfig createDbPartition(NISDomain domain) throws Exception {
-
-        String name = domain.getName();
-        String partitionName = name+"_"+NISFederation.DB;
-
-        log.debug("Creating partition "+partitionName+".");
-
-        File sampleDir = new File(project.getWorkDir(), "samples/"+ DB_TEMPLATE);
-
-        if (!sampleDir.exists()) {
-            project.download("samples/"+ DB_TEMPLATE);
-        }
-
-        File partitionDir = new File(project.getWorkDir(), "partitions"+File.separator+ partitionName);
-
         PenroseClient client = project.getClient();
-
-        PartitionClient partitionClient   = client.getPartitionClient(Federation.FEDERATION);
-        ConnectionClient connectionClient = partitionClient.getConnectionClient(Federation.JDBC);
-        ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
-
-        String dbUrl      = connectionConfig.getParameter("url");
-        String dbUser     = connectionConfig.getParameter("user");
-        String dbPassword = connectionConfig.getParameter("password");
-
-        org.apache.tools.ant.Project antProject = new org.apache.tools.ant.Project();
-
-        antProject.setProperty("DOMAIN",           name);
-
-        antProject.setProperty("DB_URL",           dbUrl);
-        antProject.setProperty("DB_USER",          dbUser);
-        antProject.setProperty("DB_PASSWORD",      dbPassword);
-
-        String dbSuffix = domain.getDbSuffix();
-
-        antProject.setProperty("DB_SUFFIX",        dbSuffix);
-
-        Copy copy = new Copy();
-        copy.setOverwrite(true);
-        copy.setProject(antProject);
-
-        FileSet fs = new FileSet();
-        fs.setDir(sampleDir);
-        fs.setIncludes("**/*");
-        copy.addFileset(fs);
-
-        copy.setTodir(partitionDir);
-
-        FilterChain filterChain = copy.createFilterChain();
-        ExpandProperties expandProperties = new ExpandProperties();
-        expandProperties.setProject(antProject);
-        filterChain.addExpandProperties(expandProperties);
-
-        copy.execute();
-
-        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-        PartitionConfig partitionConfig = partitionConfigs.load(partitionDir);
-        partitionConfigs.addPartitionConfig(partitionConfig);
-
-        PenroseClient penroseClient = project.getClient();
-
-        project.upload("partitions/"+partitionConfig.getName());
-        penroseClient.startPartition(partitionConfig.getName());
-
-        return partitionConfig;
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        partitionManagerClient.removePartition(domain.getName()+"_"+NISFederation.YP);
     }
 
     public void createNssPartition(NISDomain domain) throws Exception {
@@ -414,23 +343,29 @@ public class NISFederation {
         filterChain.addExpandProperties(expandProperties);
 
         copy.execute();
-
-        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-        PartitionConfig partitionConfig = partitionConfigs.load(partitionDir);
-        partitionConfigs.addPartitionConfig(partitionConfig);
+/*
+        PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
+        PartitionConfig partitionConfig = partitionConfigManager.load(partitionDir);
+        partitionConfigManager.addPartitionConfig(partitionConfig);
 
         PenroseClient penroseClient = project.getClient();
 
         project.upload("partitions/"+partitionConfig.getName());
         penroseClient.startPartition(partitionConfig.getName());
+*/
+        PartitionConfig partitionConfig = new PartitionConfig(partitionName);
+        partitionConfig.load(partitionDir);
+
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        partitionManagerClient.createPartition(partitionConfig);
     }
 
     public void removeNssPartition(NISDomain domain) throws Exception {
         
-        PartitionConfig nssPartitionConfig = getPartitionConfig(domain.getName()+"_"+NISFederation.NSS);
-        if (nssPartitionConfig == null) return;
-
-        removePartition(domain.getName()+"_"+NISFederation.NSS);
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        partitionManagerClient.removePartition(domain.getName()+"_"+NISFederation.NSS);
     }
 
     public void addRepository(NISDomain repository) throws Exception {
@@ -454,12 +389,8 @@ public class NISFederation {
         federation.update();
     }
 
-    public PartitionConfig getPartitionConfig(String name) throws Exception {
-        return federation.getPartitionConfig(name);
-    }
-
-    public PartitionConfig removePartition(String name) throws Exception {
-        return federation.removePartition(name);
+    public void removePartition(String name) throws Exception {
+        federation.removePartition(name);
     }
 /*
     public Source getActions() {
@@ -535,15 +466,15 @@ public class NISFederation {
     }
 
 
-    public Collection<SourceConfig> getCacheConfigs(SourceConfigs sourceConfigs, SourceConfig sourceConfig) {
+    public Collection<SourceConfig> getCacheConfigs(SourceConfigManager sourceConfigManager, SourceConfig sourceConfig) {
 
         Collection<SourceConfig> cacheConfigs = new ArrayList<SourceConfig>();
 
-        SourceSyncConfig sourceSyncConfig = sourceConfigs.getSourceSyncConfig(sourceConfig.getName());
+        SourceSyncConfig sourceSyncConfig = sourceConfigManager.getSourceSyncConfig(sourceConfig.getName());
         if (sourceSyncConfig == null) return cacheConfigs;
 
         for (String name : sourceSyncConfig.getDestinations()) {
-            SourceConfig cacheConfig = sourceConfigs.getSourceConfig(name);
+            SourceConfig cacheConfig = sourceConfigManager.getSourceConfig(name);
             cacheConfigs.add(cacheConfig);
         }
 
@@ -556,7 +487,8 @@ public class NISFederation {
 
         PenroseClient client = project.getClient();
 
-        PartitionClient partitionClient = client.getPartitionClient(Federation.FEDERATION);
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
 
         ConnectionClient connectionClient = partitionClient.getConnectionClient(Federation.JDBC);
         //JDBCConnection connection = (JDBCConnection)partition.getConnection(Federation.JDBC);
@@ -568,10 +500,10 @@ public class NISFederation {
             log.debug(e.getMessage());
         }
 
-        //PartitionConfig nisPartitionConfig = project.getPartitionConfigs().getPartitionConfig(domain.getName()+" "+NISFederation.NIS);
-        SourceConfigs sourceConfigs = nisPartitionConfig.getSourceConfigs();
+        //PartitionConfig nisPartitionConfig = project.getPartitionConfigManager().getPartitionConfig(domain.getName()+" "+NISFederation.NIS);
+        SourceConfigManager sourceConfigManager = nisPartitionConfig.getSourceConfigManager();
 
-        for (SourceConfig sourceConfig : sourceConfigs.getSourceConfigs()) {
+        for (SourceConfig sourceConfig : sourceConfigManager.getSourceConfigs()) {
             if (!CACHE_CONNECTION_NAME.equals(sourceConfig.getConnectionName())) continue;
 
             try {
@@ -589,7 +521,8 @@ public class NISFederation {
 
         PenroseClient client = project.getClient();
 
-        PartitionClient partitionClient = client.getPartitionClient(Federation.FEDERATION);
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
         ConnectionClient connectionClient = partitionClient.getConnectionClient(Federation.JDBC);
 
         connectionClient.invoke("dropDatabase", new Object[] { domain.getName() }, new String[] { String.class.getName() });

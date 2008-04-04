@@ -17,27 +17,28 @@
  */
 package org.safehaus.penrose.studio.service;
 
-import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.service.ServiceConfig;
-import org.safehaus.penrose.service.ServiceConfigs;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.jface.action.IMenuManager;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.apache.log4j.Logger;
-
-import java.io.File;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.service.ServiceManagerClient;
+import org.safehaus.penrose.service.ServiceConfig;
+import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.service.editor.ServiceEditor;
+import org.safehaus.penrose.studio.service.editor.ServiceEditorInput;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.tree.Node;
 
 /**
  * @author Endi S. Dewata
@@ -50,11 +51,8 @@ public class ServiceNode extends Node {
     ProjectNode projectNode;
     ServicesNode servicesNode;
 
-    private ServiceConfig serviceConfig;
-
-    public ServiceNode(String name, String type, Image image, Object object, Object parent) {
-        super(name, type, image, object, parent);
-        serviceConfig = (ServiceConfig)object;
+    public ServiceNode(String name, Image image, Object object, Object parent) {
+        super(name, image, object, parent);
         servicesNode = (ServicesNode)parent;
         projectNode = servicesNode.getProjectNode();
         view = projectNode.getServersView();
@@ -72,6 +70,27 @@ public class ServiceNode extends Node {
             }
         });
 
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(new Action("Start") {
+            public void run() {
+                try {
+                    start();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Action("Stop") {
+            public void run() {
+                try {
+                    stop();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
@@ -87,9 +106,13 @@ public class ServiceNode extends Node {
     }
 
     public void open() throws Exception {
-        if (serviceConfig == null) {
-            load();
-        }
+
+        log.debug("Opening "+name+" service.");
+
+        Project project = projectNode.getProject();
+        PenroseClient client = project.getClient();
+        ServiceManagerClient serviceManagerClient = client.getServiceManagerClient();
+        ServiceConfig serviceConfig = serviceManagerClient.getServiceConfig(name);
 
         ServiceEditorInput ei = new ServiceEditorInput();
         ei.setProject(projectNode.getProject());
@@ -100,25 +123,40 @@ public class ServiceNode extends Node {
         page.openEditor(ei, ServiceEditor.class.getName());
     }
 
-    public void load() throws Exception {
-        log.debug("Opening "+name+" service.");
+    public void start() throws Exception {
+
+        boolean confirm = MessageDialog.openQuestion(
+                view.getSite().getShell(),
+                "Confirmation",
+                "Start \""+name+"\"?");
+
+        if (!confirm) return;
 
         Project project = projectNode.getProject();
-        project.download("services"+File.separator+name);
+        PenroseClient client = project.getClient();
+        ServiceManagerClient serviceManagerClient = client.getServiceManagerClient();
+        serviceManagerClient.startService(name);
 
-        ServiceConfigs serviceConfigs = project.getServiceConfigs();
-        serviceConfig = serviceConfigs.load(name);
-        serviceConfigs.addServiceConfig(serviceConfig);
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
-    public void save() throws Exception {
-        log.debug("Saving "+name+" service.");
+    public void stop() throws Exception {
+
+        boolean confirm = MessageDialog.openQuestion(
+                view.getSite().getShell(),
+                "Confirmation",
+                "Stop \""+name+"\"?");
+
+        if (!confirm) return;
 
         Project project = projectNode.getProject();
-        ServiceConfigs serviceConfigs = project.getServiceConfigs();
+        PenroseClient client = project.getClient();
+        ServiceManagerClient serviceManagerClient = client.getServiceManagerClient();
+        serviceManagerClient.stopService(name);
 
-        File workDir = project.getWorkDir();
-        //serviceConfigs.store(workDir, serviceConfig);
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public void remove() throws Exception {
@@ -126,25 +164,16 @@ public class ServiceNode extends Node {
         boolean confirm = MessageDialog.openQuestion(
                 view.getSite().getShell(),
                 "Confirmation",
-                "Remove \""+serviceConfig.getName()+"\"?");
+                "Remove \""+name+"\"?");
 
         if (!confirm) return;
 
         Project project = projectNode.getProject();
-        ServiceConfigs serviceConfigs = project.getServiceConfigs();
-        serviceConfigs.removeServiceConfig(serviceConfig.getName());
-
-        serviceConfig = null;
+        PenroseClient client = project.getClient();
+        ServiceManagerClient serviceManagerClient = client.getServiceManagerClient();
+        serviceManagerClient.removeService(name);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
-    }
-
-    public ServiceConfig getServiceConfig() {
-        return serviceConfig;
-    }
-
-    public void setServiceConfig(ServiceConfig serviceConfig) {
-        this.serviceConfig = serviceConfig;
     }
 }

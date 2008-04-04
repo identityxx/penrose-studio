@@ -18,15 +18,13 @@ import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.federation.nis.conflict.NISUsersEditor;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.QueryResponse;
-import org.safehaus.penrose.jdbc.connection.JDBCConnection;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.PartitionConfigs;
-import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.management.*;
+import org.safehaus.penrose.management.source.SourceClient;
+import org.safehaus.penrose.management.connection.ConnectionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
 
-import java.util.*;
 import java.sql.ResultSet;
 
 /**
@@ -74,18 +72,22 @@ public class NISUsersPage extends FormPage {
     public void refresh() {
         try {
             Project project = nisFederation.getProject();
-            PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-
-            PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName()+"_"+NISFederation.YP);
-            SourceConfig sourceConfig = partitionConfig.getSourceConfigs().getSourceConfig(NISFederation.CACHE_USERS);
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName());
+            ConnectionClient connectionClient = partitionClient.getConnectionClient(Federation.JDBC);
+            SourceClient sourceClient = partitionClient.getSourceClient(NISFederation.CACHE_USERS);
+/*
+            PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
+            PartitionConfig partitionConfig = partitionConfigManager.getPartitionConfig(domain.getName()+"_"+NISFederation.YP);
+            SourceConfig sourceConfig = partitionConfig.getSourceConfigManager().getSourceConfig(NISFederation.CACHE_USERS);
 
             Partition partition = nisFederation.getPartition();
             JDBCConnection connection = (JDBCConnection)partition.getConnection(Federation.JDBC);
-
-            String table = connection.getTableName(sourceConfig);
+*/
+            String table = (String)sourceClient.getAttribute("TableName");
+            //String table = connection.getTableName(sourceConfig);
             String sql = "select count(*) from "+table;
-
-            Collection<Assignment> assignments = new ArrayList<Assignment>();
 
             QueryResponse queryResponse = new QueryResponse() {
                 public void add(Object object) throws Exception {
@@ -95,7 +97,18 @@ public class NISUsersPage extends FormPage {
                 }
             };
 
-            connection.executeQuery(sql, assignments, queryResponse);
+            //connection.executeQuery(sql, queryResponse);
+            connectionClient.invoke(
+                    "executeQuery",
+                    new Object[] {
+                            sql,
+                            queryResponse
+                    },
+                    new String[] {
+                            String.class.getName(),
+                            QueryResponse.class.getName()
+                    }
+            );
 
         } catch (Exception e) {
             ErrorDialog.open(e);

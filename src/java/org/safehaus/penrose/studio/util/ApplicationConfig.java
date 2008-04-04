@@ -28,6 +28,7 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.dom4j.tree.DefaultElement;
 import org.safehaus.penrose.studio.project.ProjectConfig;
+import org.safehaus.penrose.util.FileUtil;
 
 public class ApplicationConfig {
 	

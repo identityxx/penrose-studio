@@ -6,7 +6,6 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.studio.project.Project;
 
@@ -22,7 +21,7 @@ public class ConnectionEditorPage extends FormPage {
     protected ConnectionEditor editor;
 
     protected Project project;
-    protected PartitionConfig partitionConfig;
+    protected String partitionName;
     protected ConnectionConfig connectionConfig;
 
     public ConnectionEditorPage(ConnectionEditor editor, String name, String label) {
@@ -31,7 +30,7 @@ public class ConnectionEditorPage extends FormPage {
         this.editor = editor;
 
         project = editor.getProject();
-        partitionConfig = editor.getPartitionConfig();
+        partitionName = editor.getPartitionName();
         connectionConfig = editor.getConnectionConfig();
     }
 
@@ -59,12 +58,12 @@ public class ConnectionEditorPage extends FormPage {
         this.toolkit = toolkit;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 
     public ConnectionConfig getConnectionConfig() {

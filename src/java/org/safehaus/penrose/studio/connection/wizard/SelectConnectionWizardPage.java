@@ -17,21 +17,24 @@
  */
 package org.safehaus.penrose.studio.connection.wizard;
 
-import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.jface.wizard.WizardDialog;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
-import org.safehaus.penrose.partition.PartitionConfig;
+import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.management.connection.ConnectionClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
-import org.apache.log4j.Logger;
 
 import javax.naming.Context;
 
@@ -48,17 +51,17 @@ public class SelectConnectionWizardPage extends WizardPage {
     Table infoTable;
 
     private Project project;
-    private PartitionConfig partitionConfig;
+    String partitionName;
     String adapterType;
 
-    public SelectConnectionWizardPage(PartitionConfig partitionConfig) {
-        this(partitionConfig, null);
+    public SelectConnectionWizardPage(String partitionName) {
+        this(partitionName, null);
     }
 
-    public SelectConnectionWizardPage(PartitionConfig partitionConfig, String adapterType) {
+    public SelectConnectionWizardPage(String partitionName, String adapterType) {
         super(NAME);
 
-        this.partitionConfig = partitionConfig;
+        this.partitionName = partitionName;
         this.adapterType = adapterType;
 
         setDescription("Select connection.");
@@ -146,7 +149,7 @@ public class SelectConnectionWizardPage extends WizardPage {
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
 
-                ConnectionWizard wizard = new ConnectionWizard(partitionConfig);
+                ConnectionWizard wizard = new ConnectionWizard(partitionName);
                 wizard.setProject(project);
 
                 WizardDialog dialog = new WizardDialog(parent.getShell(), wizard);
@@ -165,24 +168,33 @@ public class SelectConnectionWizardPage extends WizardPage {
 
         removeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                if (connectionTable.getSelectionCount() == 0) return;
+                try {
+                    if (connectionTable.getSelectionCount() == 0) return;
 
-                TableItem ti = connectionTable.getSelection()[0];
-                ConnectionConfig connectionConfig = (ConnectionConfig)ti.getData();
+                    TableItem ti = connectionTable.getSelection()[0];
+                    ConnectionConfig connectionConfig = (ConnectionConfig)ti.getData();
 
-                boolean confirm = MessageDialog.openQuestion(
-                        parent.getShell(),
-                        "Confirmation",
-                        "Remove Connection \""+connectionConfig.getName()+"\"?");
+                    boolean confirm = MessageDialog.openQuestion(
+                            parent.getShell(),
+                            "Confirmation",
+                            "Remove Connection \""+connectionConfig.getName()+"\"?");
 
-                if (!confirm) return;
+                    if (!confirm) return;
 
-                partitionConfig.getConnectionConfigs().removeConnectionConfig(connectionConfig.getName());
+                    PenroseClient client = project.getClient();
+                    PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
-                refresh();
+                    partitionClient.removeConnection(connectionConfig.getName());
 
-                PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                penroseStudio.notifyChangeListeners();
+                    refresh();
+
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    penroseStudio.notifyChangeListeners();
+                    
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
             }
         });
 
@@ -190,16 +202,28 @@ public class SelectConnectionWizardPage extends WizardPage {
     }
 
     public void refresh() {
-        connectionTable.removeAll();
-        infoTable.removeAll();
+        try {
+            connectionTable.removeAll();
+            infoTable.removeAll();
 
-        for (ConnectionConfig connectionConfig : partitionConfig.getConnectionConfigs().getConnectionConfigs()) {
-            String adapterName = connectionConfig.getAdapterName();
-            if (adapterType != null && !adapterType.equals(adapterName)) continue;
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
-            TableItem item = new TableItem(connectionTable, SWT.NONE);
-            item.setText(connectionConfig.getName());
-            item.setData(connectionConfig);
+            for (String connectionName : partitionClient.getConnectionNames()) {
+                ConnectionClient connectionClient = partitionClient.getConnectionClient(connectionName);
+                ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
+
+                String adapterName = connectionConfig.getAdapterName();
+                if (adapterType != null && !adapterType.equals(adapterName)) continue;
+
+                TableItem item = new TableItem(connectionTable, SWT.NONE);
+                item.setText(connectionConfig.getName());
+                item.setData(connectionConfig);
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -222,11 +246,11 @@ public class SelectConnectionWizardPage extends WizardPage {
         this.project = project;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 }

@@ -17,17 +17,19 @@
  */
 package org.safehaus.penrose.studio.user;
 
-import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.PenroseImage;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Action;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchPage;
 import org.apache.log4j.Logger;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.tree.Node;
+import org.safehaus.penrose.user.UserConfig;
 
 /**
  * @author Endi S. Dewata
@@ -38,8 +40,8 @@ public class AdministratorNode extends Node {
 
     ProjectNode projectNode;
 
-    public AdministratorNode(String name, String type, Object object, Object parent) {
-        super(name, type, PenroseStudioPlugin.getImage(PenroseImage.ADMINISTRATOR), object, parent);
+    public AdministratorNode(String name, Object object, Object parent) {
+        super(name, PenroseStudioPlugin.getImage(PenroseImage.ADMINISTRATOR), object, parent);
         
         projectNode = (ProjectNode)parent;
     }
@@ -52,6 +54,7 @@ public class AdministratorNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
         });
@@ -59,10 +62,12 @@ public class AdministratorNode extends Node {
 
     public void open() throws Exception {
         Project project = projectNode.getProject();
-
+        PenroseClient penroseClient = project.getClient();
+        UserConfig rootUserConfig = penroseClient.getRootUserConfig();
+                
         UserEditorInput ei = new UserEditorInput();
         ei.setProject(project);
-        ei.setUserConfig(project.getPenroseConfig().getRootUserConfig());
+        ei.setUserConfig(rootUserConfig);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();

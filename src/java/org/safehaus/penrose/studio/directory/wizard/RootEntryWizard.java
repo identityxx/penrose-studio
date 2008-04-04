@@ -19,16 +19,17 @@ package org.safehaus.penrose.studio.directory.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.safehaus.penrose.directory.EntryMapping;
+import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.ldap.DN;
-import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.StaticEntryDNWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.acl.ACI;
-import org.safehaus.penrose.directory.DirectoryConfig;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -41,20 +42,20 @@ public class RootEntryWizard extends Wizard {
     Logger log = Logger.getLogger(getClass());
 
     private Project project;
-    private PartitionConfig partitionConfig;
-    private EntryMapping entryMapping;
+    private String partitionName;
+    private EntryConfig entryConfig;
 
     public StaticEntryDNWizardPage dnPage;
     public ObjectClassWizardPage ocPage;
     public AttributeValueWizardPage attrPage;
 
-    public RootEntryWizard(Project project, PartitionConfig partition) {
+    public RootEntryWizard(Project project, String partitionName) {
         this.project = project;
-        this.partitionConfig = partition;
+        this.partitionName = partitionName;
 
-        dnPage = new StaticEntryDNWizardPage(partition);
+        dnPage = new StaticEntryDNWizardPage();
         ocPage = new ObjectClassWizardPage(project);
-        attrPage = new AttributeValueWizardPage(project, partition);
+        attrPage = new AttributeValueWizardPage(project, partitionName);
         
         setWindowTitle("Adding root entry");
     }
@@ -88,23 +89,30 @@ public class RootEntryWizard extends Wizard {
             return super.getNextPage(page);
             
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     public boolean performFinish() {
         try {
-            entryMapping = new EntryMapping();
-            entryMapping.setDn(dnPage.getDn());
-            entryMapping.addObjectClasses(ocPage.getSelectedObjectClasses());
-            entryMapping.addAttributeMappings(attrPage.getAttributeMappings());
+            entryConfig = new EntryConfig();
+            entryConfig.setDn(dnPage.getDn());
+            entryConfig.addObjectClasses(ocPage.getSelectedObjectClasses());
+            entryConfig.addAttributeMappings(attrPage.getAttributeMappings());
 
-            entryMapping.addACI(new ACI("rs"));
-
+            entryConfig.addACI(new ACI("rs"));
+/*
             DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
-            directoryConfig.addEntryMapping(entryMapping);
+            directoryConfig.addEntryConfig(entryConfig);
             project.save(partitionConfig, directoryConfig);
-
+*/
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            partitionClient.createEntry(entryConfig);
+            partitionClient.store();
+            
             return true;
 
         } catch (Exception e) {
@@ -117,20 +125,20 @@ public class RootEntryWizard extends Wizard {
         return true;
     }
 
-    public EntryMapping getEntryMapping() {
-        return entryMapping;
+    public EntryConfig getEntryConfig() {
+        return entryConfig;
     }
 
-    public void setEntryMapping(EntryMapping entryMapping) {
-        this.entryMapping = entryMapping;
+    public void setEntryConfig(EntryConfig entryConfig) {
+        this.entryConfig = entryConfig;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 
     public Project getProject() {

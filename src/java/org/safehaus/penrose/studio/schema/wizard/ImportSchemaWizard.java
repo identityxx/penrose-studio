@@ -17,14 +17,15 @@
  */
 package org.safehaus.penrose.studio.schema.wizard;
 
-import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.util.FileUtil;
-import org.safehaus.penrose.schema.SchemaConfig;
-import org.safehaus.penrose.schema.SchemaManager;
 import org.apache.log4j.Logger;
+import org.eclipse.jface.wizard.Wizard;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.schema.SchemaManagerClient;
+import org.safehaus.penrose.schema.Schema;
+import org.safehaus.penrose.schema.SchemaReader;
+import org.safehaus.penrose.studio.project.Project;
 
-import java.io.*;
+import java.io.File;
 
 /**
  * @author Endi S. Dewata
@@ -54,23 +55,14 @@ public class ImportSchemaWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            String schemaExtDir = "schema/ext";
-            
-            String name = namePage.getSchemaName();
-            String path = schemaExtDir+"/"+name+".schema";
+            File file = new File(filePage.getFilename());
 
-            File file1 = new File(filePage.getFilename());
-            File file2 = new File(project.getWorkDir(), path);
-            FileUtil.copy(file1, file2);
+            SchemaReader reader = new SchemaReader();
+            Schema schema = reader.read(file);
 
-            SchemaConfig schemaConfig = new SchemaConfig();
-            schemaConfig.setName(name);
-            schemaConfig.setPath(path);
-
-            project.getPenroseConfig().addSchemaConfig(schemaConfig);
-
-            SchemaManager schemaManager = project.getSchemaManager();
-            schemaManager.init(schemaConfig);
+            PenroseClient client = project.getClient();
+            SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+            schemaManagerClient.createSchema(schema);
 
             return true;
 

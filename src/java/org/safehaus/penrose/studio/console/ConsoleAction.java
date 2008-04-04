@@ -43,6 +43,7 @@ public class ConsoleAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
 	}
 }

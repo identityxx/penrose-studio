@@ -18,36 +18,43 @@
 package org.safehaus.penrose.studio.mapping.wizard;
 
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.directory.EntryMapping;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.studio.mapping.EntrySelectionDialog;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.ietf.ldap.LDAPDN;
+import org.safehaus.penrose.ldap.DN;
+import org.safehaus.penrose.studio.mapping.EntrySelectionDialog;
+import org.safehaus.penrose.studio.project.Project;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Endi S. Dewata
  */
 public class StaticEntryRDNWizardPage extends WizardPage implements ModifyListener {
 
+    Logger log = LoggerFactory.getLogger(getClass());
+    
     public final static String NAME = "Entry RDN";
 
     Text rdnText;
     Text parentDnText;
     Button browseButton;
 
-    private PartitionConfig partitionConfig;
-    private EntryMapping parentMapping;
+    private Project project;
+    private String partitionName;
+    private DN parentDn;
 
-    public StaticEntryRDNWizardPage(PartitionConfig partition, EntryMapping parentMapping) {
+    public StaticEntryRDNWizardPage() {
         super(NAME);
-
-        this.partitionConfig = partition;
-        this.parentMapping = parentMapping;
-
         setDescription("Enter the RDN of the entry.");
     }
 
@@ -90,8 +97,8 @@ public class StaticEntryRDNWizardPage extends WizardPage implements ModifyListen
         parentDnLabel.setLayoutData(new GridData());
 
         parentDnText = new Text(composite, SWT.BORDER);
-        if (parentMapping != null) {
-            parentDnText.setText(parentMapping.getDn().toString());
+        if (parentDn != null) {
+            parentDnText.setText(parentDn.toString());
         }
 
         parentDnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -102,15 +109,22 @@ public class StaticEntryRDNWizardPage extends WizardPage implements ModifyListen
 
         browseButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                EntrySelectionDialog dialog = new EntrySelectionDialog(parent.getShell(), SWT.NONE);
-                dialog.setText("Select parent entry...");
-                dialog.setPartitionConfig(partitionConfig);
-                dialog.open();
+                try {
+                    EntrySelectionDialog dialog = new EntrySelectionDialog(parent.getShell(), SWT.NONE);
+                    dialog.setText("Select parent entry...");
+                    dialog.setPartitionName(partitionName);
+                    dialog.setProject(project);
+                    dialog.open();
 
-                EntryMapping parentEntry = dialog.getEntryMapping();
-                if (parentEntry == null) return;
+                    DN dn = dialog.getDn();
+                    if (dn == null) return;
 
-                parentDnText.setText(parentEntry.getDn().toString());
+                    parentDnText.setText(dn.toString());
+                    
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
+                }
             }
         });
 
@@ -135,11 +149,23 @@ public class StaticEntryRDNWizardPage extends WizardPage implements ModifyListen
         setPageComplete(validatePage());
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public void setParentDn(DN parentDn) {
+        this.parentDn = parentDn;
     }
 }

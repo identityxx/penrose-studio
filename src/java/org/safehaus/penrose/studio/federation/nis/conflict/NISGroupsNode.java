@@ -19,8 +19,8 @@ public class NISGroupsNode extends Node {
     private NISFederation nisFederation;
     private NISDomain domain;
 
-    public NISGroupsNode(String name, String type, Image image, Object object, Object parent) {
-        super(name, type, image, object, parent);
+    public NISGroupsNode(String name, Image image, Object object, Object parent) {
+        super(name, image, object, parent);
     }
 
     public void open() throws Exception {

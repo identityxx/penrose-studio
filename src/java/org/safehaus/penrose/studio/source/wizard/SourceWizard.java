@@ -19,7 +19,6 @@ package org.safehaus.penrose.studio.source.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
 import org.safehaus.penrose.studio.jdbc.source.JDBCPrimaryKeyWizardPage;
 import org.safehaus.penrose.studio.jdbc.source.JDBCTableWizardPage;
@@ -32,9 +31,11 @@ import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.Table;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.schema.AttributeType;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -47,7 +48,7 @@ public class SourceWizard extends Wizard {
     Logger log = Logger.getLogger(getClass());
 
     private Project project;
-    private PartitionConfig partitionConfig;
+    private String partitionName;
     private SourceConfig sourceConfig;
 
     public SourceWizardPage propertyPage;
@@ -61,8 +62,8 @@ public class SourceWizard extends Wizard {
     public JNDIAttributeWizardPage jndiAttributesPage;
     public JNDIFieldWizardPage jndiFieldsPage;
 
-    public SourceWizard(PartitionConfig partitionConfig) throws Exception {
-        this.partitionConfig = partitionConfig;
+    public SourceWizard(String partitionName) throws Exception {
+        this.partitionName = partitionName;
 
         setWindowTitle("New Source");
     }
@@ -71,7 +72,7 @@ public class SourceWizard extends Wizard {
 
         propertyPage = new SourceWizardPage();
 
-        connectionPage = new SelectConnectionWizardPage(partitionConfig);
+        connectionPage = new SelectConnectionWizardPage(partitionName);
         connectionPage.setProject(project);
 
         jdbcTablePage = new JDBCTableWizardPage();
@@ -216,11 +217,17 @@ public class SourceWizard extends Wizard {
                 }
 
             }
-
-            SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
-            sourceConfigs.addSourceConfig(sourceConfig);
-            project.save(partitionConfig, sourceConfigs);
-
+/*
+            SourceConfigManager sourceConfigManager = partitionConfig.getSourceConfigManager();
+            sourceConfigManager.addSourceConfig(sourceConfig);
+            project.save(partitionConfig, sourceConfigManager);
+*/
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            partitionClient.createSource(sourceConfig);
+            partitionClient.store();
+            
             return true;
 
         } catch (Exception e) {
@@ -241,12 +248,12 @@ public class SourceWizard extends Wizard {
         return true;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 
     public Project getProject() {

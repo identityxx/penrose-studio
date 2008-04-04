@@ -21,7 +21,7 @@ import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.mapping.editor.MappingEditor;
+import org.safehaus.penrose.studio.directory.editor.EntryEditor;
 import org.safehaus.penrose.studio.validation.ValidationView;
 import org.safehaus.penrose.studio.console.ConsoleView;
 
@@ -29,7 +29,7 @@ public class PenroseStudioPerspective implements IPerspectiveFactory {
 	
 	public final static String PERSPECTIVE_ID = PenroseStudioPerspective.class.getName();
 
-	public final static String ID_MAPPING_VIEW     = MappingEditor.class.getName();
+	public final static String ID_MAPPING_VIEW     = EntryEditor.class.getName();
 	public final static String ID_OBJECTS_VIEW     = ServersView.class.getName();
 	public final static String ID_VALIDATION_VIEW  = ValidationView.class.getName();
     public final static String ID_CONSOLE_VIEW      = ConsoleView.class.getName();

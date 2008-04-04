@@ -7,7 +7,6 @@ import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.server.ServersView;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 
@@ -28,7 +27,6 @@ public class NISOwnershipNode extends Node {
     public NISOwnershipNode(String name, NISDomainNode domainNode) {
         super(
                 name,
-                ServersView.ENTRY,
                 PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 null,
                 domainNode
@@ -71,7 +69,6 @@ public class NISOwnershipNode extends Node {
         Collection<Node> children = new ArrayList<Node>();
 
         NISFilesNode filesNode = new NISFilesNode(
-                "Files",
                 "Files",
                 PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 null,

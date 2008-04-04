@@ -17,21 +17,15 @@
  */
 package org.safehaus.penrose.studio.schema;
 
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.schema.action.ImportSchemaAction;
-import org.safehaus.penrose.studio.schema.action.NewSchemaAction;
-import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.config.PenroseConfig;
-import org.safehaus.penrose.schema.SchemaConfig;
-import org.eclipse.jface.action.IMenuManager;
 import org.apache.log4j.Logger;
+import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.tree.Node;
 
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
@@ -40,47 +34,41 @@ public class SchemasNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    private ServersView view;
-    private ProjectNode projectNode;
+    protected ServersView view;
+    protected ProjectNode projectNode;
 
-    public SchemasNode(String name, String type, Object object, Object parent) {
-        super(name, type, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), object, parent);
-        projectNode = (ProjectNode)parent;
-        view = projectNode.getServersView();
-    }
+    public SchemasNode(String name, Object object, ProjectNode projectNode) {
+        super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), object, projectNode);
 
-    public void showMenu(IMenuManager manager) {
-        manager.add(new NewSchemaAction());
-        manager.add(new ImportSchemaAction());
+        this.projectNode = projectNode;
+        this.view = this.projectNode.getServersView();
     }
 
     public boolean hasChildren() throws Exception {
-        Project project = projectNode.getProject();
-        PenroseConfig penroseConfig = project.getPenroseConfig();
-        return !penroseConfig.getSchemaConfigs().isEmpty();
+        return true;
     }
 
     public Collection<Node> getChildren() throws Exception {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        Project project = projectNode.getProject();
-        PenroseConfig penroseConfig = project.getPenroseConfig();
+        BuiltinSchemasNode builtinSchemas = new BuiltinSchemasNode(
+                "Built-in Schemas",
+                ServersView.BUILTIN_SCHEMA,
+                PenroseStudioPlugin.getImage(PenroseImage.SCHEMA),
+                this
+        );
 
-        for (SchemaConfig schemaConfig : penroseConfig.getSchemaConfigs()) {
+        children.add(builtinSchemas);
 
-            SchemaNode schemaNode = new SchemaNode(
-                    schemaConfig.getName(),
-                    ServersView.SCHEMA,
-                    PenroseStudioPlugin.getImage(PenroseImage.SCHEMA),
-                    schemaConfig,
-                    this
-            );
+        CustomSchemasNode customSchemasNode = new CustomSchemasNode(
+                "Custom Schemas",
+                ServersView.CUSTOM_SCHEMA,
+                PenroseStudioPlugin.getImage(PenroseImage.SCHEMA),
+                this
+        );
 
-            schemaNode.setSchemaConfig(schemaConfig);
-
-            children.add(schemaNode);
-        }
+        children.add(customSchemasNode);
 
         return children;
     }

@@ -17,23 +17,28 @@
  */
 package org.safehaus.penrose.studio.jdbc.source;
 
-import java.util.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
-import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.IManagedForm;
-import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.forms.widgets.Section;
+import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.management.connection.ConnectionClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.jdbc.source.JDBCFieldDialog;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.source.FieldDialog;
 import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
-import org.safehaus.penrose.jdbc.JDBCClient;
-import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.connection.ConnectionConfig;
+
+import java.util.Collection;
+import java.util.Iterator;
 
 public class JDBCSourcePropertyPage extends SourceEditorPage {
 
@@ -115,8 +120,18 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
         gd.widthHint = 200;
 		connectionNameCombo.setLayoutData(gd);
 
-        for (ConnectionConfig connectionConfig : partitionConfig.getConnectionConfigs().getConnectionConfigs()) {
-            connectionNameCombo.add(connectionConfig.getName());
+        try {
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+    
+            for (String connectionName : partitionClient.getConnectionNames()) {
+                connectionNameCombo.add(connectionName);
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
 
         connectionNameCombo.setText(sourceConfig.getConnectionName());
@@ -246,19 +261,24 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
                     FieldConfig fieldConfig = (FieldConfig)item.getData();
                     String oldName = fieldConfig.getName();
 
-                    PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-                    PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(sourceConfig);
+                    PenroseClient client = project.getClient();
+                    PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+                    ConnectionClient connectionClient = partitionClient.getConnectionClient(sourceConfig.getConnectionName());
+                    ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
-                    ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
+                    //PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
+                    //PartitionConfig partitionConfig = partitionConfigManager.getPartitionConfig(sourceConfig);
+                    //ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigManager().getConnectionConfig(sourceConfig.getConnectionName());
 
-                    JDBCClient client = new JDBCClient(connectionConfig.getParameters());
+                    JDBCClient jdbcClient = new JDBCClient(connectionConfig.getParameters());
                     
                     String catalog = sourceConfig.getParameter(JDBCClient.CATALOG);
                     String schema = sourceConfig.getParameter(JDBCClient.SCHEMA);
                     String table = sourceConfig.getParameter(JDBCClient.TABLE);
 
-                    Collection<FieldConfig> fields = client.getColumns(catalog, schema, table);
-                    client.close();
+                    Collection<FieldConfig> fields = jdbcClient.getColumns(catalog, schema, table);
+                    jdbcClient.close();
 
                     JDBCFieldDialog dialog = new JDBCFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setColumns(fields);
@@ -331,19 +351,24 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
                 try {
                     FieldConfig fieldDefinition = new FieldConfig();
 
-                    PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-                    PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(sourceConfig);
+                    PenroseClient client = project.getClient();
+                    PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+                    ConnectionClient connectionClient = partitionClient.getConnectionClient(sourceConfig.getConnectionName());
+                    ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
-                    ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
+                    //PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
+                    //PartitionConfig partitionConfig = partitionConfigManager.getPartitionConfig(sourceConfig);
+                    //ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigManager().getConnectionConfig(sourceConfig.getConnectionName());
 
-                    JDBCClient client = new JDBCClient(connectionConfig.getParameters());
+                    JDBCClient jdbcClient = new JDBCClient(connectionConfig.getParameters());
 
                     String catalog = sourceConfig.getParameter(JDBCClient.CATALOG);
                     String schema = sourceConfig.getParameter(JDBCClient.SCHEMA);
                     String table = sourceConfig.getParameter(JDBCClient.TABLE);
 
-                    Collection<FieldConfig> fields = client.getColumns(catalog, schema, table);
-                    client.close();
+                    Collection<FieldConfig> fields = jdbcClient.getColumns(catalog, schema, table);
+                    jdbcClient.close();
 
                     JDBCFieldDialog dialog = new JDBCFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setColumns(fields);
@@ -376,19 +401,24 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     String oldName = fieldDefinition.getName();
 
-                    PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-                    PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(sourceConfig);
+                    PenroseClient client = project.getClient();
+                    PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+                    ConnectionClient connectionClient = partitionClient.getConnectionClient(sourceConfig.getConnectionName());
+                    ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
-                    ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
+                    //PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
+                    //PartitionConfig partitionConfig = partitionConfigManager.getPartitionConfig(sourceConfig);
+                    //ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigManager().getConnectionConfig(sourceConfig.getConnectionName());
 
-                    JDBCClient client = new JDBCClient(connectionConfig.getParameters());
+                    JDBCClient jdbcClient = new JDBCClient(connectionConfig.getParameters());
 
                     String catalog = sourceConfig.getParameter(JDBCClient.CATALOG);
                     String schema = sourceConfig.getParameter(JDBCClient.SCHEMA);
                     String table = sourceConfig.getParameter(JDBCClient.TABLE);
 
-                    Collection<FieldConfig> fields = client.getColumns(catalog, schema, table);
-                    client.close();
+                    Collection<FieldConfig> fields = jdbcClient.getColumns(catalog, schema, table);
+                    jdbcClient.close();
 
                     JDBCFieldDialog dialog = new JDBCFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setColumns(fields);

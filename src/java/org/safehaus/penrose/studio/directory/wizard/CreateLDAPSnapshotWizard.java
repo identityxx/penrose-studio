@@ -34,13 +34,13 @@ public class CreateLDAPSnapshotWizard extends Wizard {
     Logger log = Logger.getLogger(getClass());
 
     private Project project;
-    private PartitionConfig partitionConfig;
+    private String partitionName;
     SelectConnectionWizardPage connectionPage;
 
     public CreateLDAPSnapshotWizard() {
         setWindowTitle("Create LDAP Snapshot");
 
-        connectionPage = new SelectConnectionWizardPage(partitionConfig, "LDAP");
+        connectionPage = new SelectConnectionWizardPage(partitionName, "LDAP");
     }
 
     public boolean canFinish() {
@@ -55,16 +55,16 @@ public class CreateLDAPSnapshotWizard extends Wizard {
 
             client = new LDAPClient(connectionConfig.getParameters());
 
-            SnapshotUtil snapshotUtil = new SnapshotUtil();
-            snapshotUtil.createSnapshot(partitionConfig, client);
+            SnapshotUtil snapshotUtil = new SnapshotUtil(project);
+            snapshotUtil.createSnapshot(partitionName, client);
 
-            project.save(partitionConfig);
+            //project.save(partitionConfig);
             
             return true;
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return false;
+            throw new RuntimeException(e.getMessage(), e);
 
         } finally {
             if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
@@ -87,11 +87,11 @@ public class CreateLDAPSnapshotWizard extends Wizard {
         this.project = project;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 }

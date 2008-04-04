@@ -22,8 +22,6 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.source.SourceConfigs;
-import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.jndi.source.JNDIFieldWizardPage;
 import org.safehaus.penrose.studio.jndi.source.JNDIAttributeWizardPage;
 import org.safehaus.penrose.studio.project.Project;
@@ -31,6 +29,9 @@ import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.schema.AttributeType;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -45,7 +46,7 @@ public class JNDISourceWizard extends Wizard {
 
     private Project project;
     private LDAPClient client;
-    private PartitionConfig partitionConfig;
+    private String partitionName;
     private ConnectionConfig connectionConfig;
     private String baseDn;
     private String filter;
@@ -57,13 +58,13 @@ public class JNDISourceWizard extends Wizard {
     public JNDIAttributeWizardPage attributesPage;
     public JNDIFieldWizardPage fieldsPage = new JNDIFieldWizardPage();
 
-    public JNDISourceWizard(LDAPClient client, PartitionConfig partition, ConnectionConfig connectionConfig, String baseDn) throws Exception {
-        this(client, partition, connectionConfig, baseDn, "(objectClass=*)", "OBJECT", new ArrayList<String>());
+    public JNDISourceWizard(LDAPClient client, String partitionName, ConnectionConfig connectionConfig, String baseDn) throws Exception {
+        this(client, partitionName, connectionConfig, baseDn, "(objectClass=*)", "OBJECT", new ArrayList<String>());
     }
     
     public JNDISourceWizard(
             LDAPClient client,
-            PartitionConfig partition,
+            String partitionName,
             ConnectionConfig connectionConfig,
             String baseDn,
             String filter,
@@ -71,7 +72,7 @@ public class JNDISourceWizard extends Wizard {
             Collection<String> attributeNames) throws Exception {
 
         this.client = client;
-        this.partitionConfig = partition;
+        this.partitionName = partitionName;
         this.connectionConfig = connectionConfig;
         this.baseDn = baseDn;
         this.filter = filter;
@@ -114,9 +115,15 @@ public class JNDISourceWizard extends Wizard {
                 sourceConfig.addFieldConfig(field);
             }
 
-            SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
-            sourceConfigs.addSourceConfig(sourceConfig);
-            project.save(partitionConfig, sourceConfigs);
+            //SourceConfigManager sourceConfigManager = partitionConfig.getSourceConfigManager();
+            //sourceConfigManager.addSourceConfig(sourceConfig);
+            //project.save(partitionConfig, sourceConfigManager);
+
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            partitionClient.createSource(sourceConfig);
+            partitionClient.store();
 
             return true;
 
@@ -166,12 +173,12 @@ public class JNDISourceWizard extends Wizard {
         this.connectionConfig = connectionConfig;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 
     public Project getProject() {

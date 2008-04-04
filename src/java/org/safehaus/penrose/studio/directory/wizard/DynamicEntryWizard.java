@@ -17,19 +17,25 @@
  */
 package org.safehaus.penrose.studio.directory.wizard;
 
-import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.jface.wizard.IWizardPage;
-import org.safehaus.penrose.mapping.*;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.studio.source.wizard.SelectSourcesWizardPage;
-import org.safehaus.penrose.studio.mapping.wizard.RelationshipWizardPage;
-import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
-import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.ldap.RDNBuilder;
-import org.safehaus.penrose.ldap.DNBuilder;
-import org.safehaus.penrose.directory.*;
 import org.apache.log4j.Logger;
+import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.jface.wizard.Wizard;
+import org.safehaus.penrose.directory.AttributeMapping;
+import org.safehaus.penrose.directory.EntryConfig;
+import org.safehaus.penrose.directory.FieldMapping;
+import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.ldap.DN;
+import org.safehaus.penrose.ldap.DNBuilder;
+import org.safehaus.penrose.ldap.RDNBuilder;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.mapping.Relationship;
+import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
+import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
+import org.safehaus.penrose.studio.mapping.wizard.RelationshipWizardPage;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.source.wizard.SelectSourcesWizardPage;
 
 import java.util.Collection;
 
@@ -41,9 +47,9 @@ public class DynamicEntryWizard extends Wizard {
     Logger log = Logger.getLogger(getClass());
 
     private Project project;
-    private PartitionConfig partitionConfig;
-    private EntryMapping parentMapping;
-    private EntryMapping entryMapping = new EntryMapping();
+    private String partitionName;
+    private DN parentDn;
+    private EntryConfig entryConfig = new EntryConfig();
 
     public SelectSourcesWizardPage sourcesPage;
     public RelationshipWizardPage relationshipPage;
@@ -56,15 +62,17 @@ public class DynamicEntryWizard extends Wizard {
 
     public void addPages() {
 
-        sourcesPage = new SelectSourcesWizardPage(partitionConfig);
+        sourcesPage = new SelectSourcesWizardPage();
         sourcesPage.setDescription("Add data sources. This step is optional.");
+        sourcesPage.setProject(project);
+        sourcesPage.setPartitionName(partitionName);
 
-        relationshipPage = new RelationshipWizardPage(partitionConfig);
+        relationshipPage = new RelationshipWizardPage(project, partitionName);
 
         ocPage = new ObjectClassWizardPage(project);
-        //ocPage.setSelecteObjectClasses(entryMapping.getObjectClasses());
+        //ocPage.setSelecteObjectClasses(entryConfig.getObjectClasses());
 
-        attrPage = new AttributeValueWizardPage(project, partitionConfig);
+        attrPage = new AttributeValueWizardPage(project, partitionName);
         attrPage.setDefaultType(AttributeValueWizardPage.VARIABLE);
 
         addPage(sourcesPage);
@@ -100,19 +108,19 @@ public class DynamicEntryWizard extends Wizard {
         try {
             Collection<SourceMapping> sourceMappings = sourcesPage.getSourceMappings();
             for (SourceMapping sourceMapping : sourceMappings) {
-                entryMapping.addSourceMapping(sourceMapping);
+                entryConfig.addSourceMapping(sourceMapping);
             }
 
             Collection<Relationship> relationships = relationshipPage.getRelationships();
             for (Relationship relationship : relationships) {
 
                 String lfield = relationship.getLeftField();
-                SourceMapping lsource = entryMapping.getSourceMapping(relationship.getLeftSource());
-                int lindex = entryMapping.getSourceMappingIndex(lsource);
+                SourceMapping lsource = entryConfig.getSourceMapping(relationship.getLeftSource());
+                int lindex = entryConfig.getSourceMappingIndex(lsource);
 
                 String rfield = relationship.getRightField();
-                SourceMapping rsource = entryMapping.getSourceMapping(relationship.getRightSource());
-                int rindex = entryMapping.getSourceMappingIndex(rsource);
+                SourceMapping rsource = entryConfig.getSourceMapping(relationship.getRightSource());
+                int rindex = entryConfig.getSourceMappingIndex(rsource);
 
                 if (lindex < rindex) { // rhs is dependent on lhs
                     rsource.addFieldMapping(new FieldMapping(rfield, FieldMapping.VARIABLE, relationship.getLhs()));
@@ -121,13 +129,13 @@ public class DynamicEntryWizard extends Wizard {
                 }
             }
 
-            entryMapping.addObjectClasses(ocPage.getSelectedObjectClasses());
+            entryConfig.addObjectClasses(ocPage.getSelectedObjectClasses());
 
             log.debug("Attribute mappings:");
             Collection<AttributeMapping> attributeMappings = attrPage.getAttributeMappings();
             for (AttributeMapping attributeMapping : attributeMappings) {
                 log.debug(" - " + attributeMapping.getName() + " <= " + attributeMapping.getVariable());
-                entryMapping.addAttributeMapping(attributeMapping);
+                entryConfig.addAttributeMapping(attributeMapping);
             }
 
             RDNBuilder rb = new RDNBuilder();
@@ -139,11 +147,11 @@ public class DynamicEntryWizard extends Wizard {
 
             DNBuilder db = new DNBuilder();
             db.append(rb.toRdn());
-            db.append(parentMapping.getDn());
-            entryMapping.setDn(db.toDn());
+            db.append(parentDn);
+            entryConfig.setDn(db.toDn());
 
             log.debug("Reverse mappings:");
-            for (AttributeMapping attributeMapping : entryMapping.getAttributeMappings()) {
+            for (AttributeMapping attributeMapping : entryConfig.getAttributeMappings()) {
                 String name = attributeMapping.getName();
 
                 String variable = attributeMapping.getVariable();
@@ -156,7 +164,7 @@ public class DynamicEntryWizard extends Wizard {
                 String sourceName = variable.substring(0, j);
                 String fieldName = variable.substring(j + 1);
 
-                SourceMapping sourceMapping = entryMapping.getSourceMapping(sourceName);
+                SourceMapping sourceMapping = entryConfig.getSourceMapping(sourceName);
                 Collection fieldMappings = sourceMapping.getFieldMappings(fieldName);
                 if (fieldMappings != null && !fieldMappings.isEmpty()) {
                     log.debug("Attribute " + name + " has been reverse mapped.");
@@ -168,16 +176,22 @@ public class DynamicEntryWizard extends Wizard {
                 FieldMapping fieldMapping = new FieldMapping(fieldName, FieldMapping.VARIABLE, attributeMapping.getName());
                 sourceMapping.addFieldMapping(fieldMapping);
             }
-
+/*
             DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
-            directoryConfig.addEntryMapping(entryMapping);
+            directoryConfig.addEntryConfig(entryConfig);
             project.save(partitionConfig, directoryConfig);
+*/
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            partitionClient.createEntry(entryConfig);
+            partitionClient.store();
 
             return true;
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return false;
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -185,28 +199,28 @@ public class DynamicEntryWizard extends Wizard {
         return true;
     }
 
-    public EntryMapping getParentMapping() {
-        return parentMapping;
+    public DN getParentDn() {
+        return parentDn;
     }
 
-    public void setParentMapping(EntryMapping parentMapping) {
-        this.parentMapping = parentMapping;
+    public void setParentDn(DN parentDn) {
+        this.parentDn = parentDn;
     }
 
-    public EntryMapping getEntryMapping() {
-        return entryMapping;
+    public EntryConfig getEntryConfig() {
+        return entryConfig;
     }
 
-    public void setEntryMapping(EntryMapping entryMapping) {
-        this.entryMapping = entryMapping;
+    public void setEntryConfig(EntryConfig entryConfig) {
+        this.entryConfig = entryConfig;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 
     public Project getProject() {

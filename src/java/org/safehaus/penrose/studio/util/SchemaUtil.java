@@ -1,43 +1,47 @@
 package org.safehaus.penrose.studio.util;
 
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.directory.EntryMapping;
+import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.management.partition.PartitionClient;
 
 /**
  * @author Endi S. Dewata
  */
 public class SchemaUtil {
-    
-    public EntryMapping createSchemaProxy(
-            PartitionConfig partitionConfig,
-            ConnectionConfig connectionConfig,
+
+    public SchemaUtil() {
+    }
+
+    public EntryConfig createSchemaProxy(
+            PartitionClient partitionClient,
+            String connectionName,
             String sourceSchemaDn,
             String destSchemaDn
-            ) throws Exception {
+    ) throws Exception {
 
         SourceConfig sourceConfig = new SourceConfig();
-        sourceConfig.setName(connectionConfig.getName()+" Schema");
-        sourceConfig.setConnectionName(connectionConfig.getName());
+        sourceConfig.setName(connectionName+" Schema");
+        sourceConfig.setConnectionName(connectionName);
 
         sourceConfig.setParameter("baseDn", sourceSchemaDn);
         sourceConfig.setParameter("scope", "SUBTREE");
         sourceConfig.setParameter("filter", "(objectClass=*)");
 
-        partitionConfig.getSourceConfigs().addSourceConfig(sourceConfig);
+        //partitionConfig.getSourceConfigManager().addSourceConfig(sourceConfig);
+        partitionClient.createSource(sourceConfig);
 
-        EntryMapping entryMapping = new EntryMapping();
-        entryMapping.setDn(destSchemaDn);
+        EntryConfig entryConfig = new EntryConfig();
+        entryConfig.setDn(destSchemaDn);
 
         SourceMapping sourceMapping = new SourceMapping("DEFAULT", sourceConfig.getName());
-        entryMapping.addSourceMapping(sourceMapping);
+        entryConfig.addSourceMapping(sourceMapping);
 
-        entryMapping.setHandlerName("PROXY");
+        entryConfig.setHandlerName("PROXY");
 
-        partitionConfig.getDirectoryConfig().addEntryMapping(entryMapping);
+        //partitionConfig.getDirectoryConfig().addEntryConfig(entryConfig);
+        partitionClient.createEntry(entryConfig);
 
-        return entryMapping;
+        return entryConfig;
     }
 }

@@ -38,8 +38,8 @@ public class SystemPropertiesNode extends Node {
 
     ProjectNode projectNode;
 
-    public SystemPropertiesNode(String name, String type, Object object, Object parent) {
-        super(name, type, PenroseStudioPlugin.getImage(PenroseImage.SYSTEM_PROPERTIES), object, parent);
+    public SystemPropertiesNode(String name, Object object, Object parent) {
+        super(name, PenroseStudioPlugin.getImage(PenroseImage.SYSTEM_PROPERTIES), object, parent);
 
         projectNode = (ProjectNode)parent;
     }

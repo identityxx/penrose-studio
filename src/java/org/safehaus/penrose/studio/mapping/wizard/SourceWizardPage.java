@@ -26,7 +26,7 @@ import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.mapping.SourceDialog;
-import org.safehaus.penrose.directory.EntryMapping;
+import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.SourceMapping;
 
 import java.util.Collection;
@@ -39,13 +39,13 @@ public class SourceWizardPage extends WizardPage implements SelectionListener, M
     public final static String NAME = "Data sources";
 
     Partition partition;
-    EntryMapping entryMapping;
+    EntryConfig entryConfig;
     Table sourceTable;
 
-    public SourceWizardPage(Partition partition, EntryMapping entry) {
+    public SourceWizardPage(Partition partition, EntryConfig entry) {
         super(NAME);
         this.partition = partition;
-        this.entryMapping = entry;
+        this.entryConfig = entry;
     }
 
     public void createControl(final Composite parent) {
@@ -81,7 +81,7 @@ public class SourceWizardPage extends WizardPage implements SelectionListener, M
             public void widgetSelected(SelectionEvent event) {
 
                 PartitionConfig partitionConfig = partition.getPartitionConfig();
-                Collection sources = partitionConfig.getSourceConfigs().getSourceConfigs();
+                Collection sources = partitionConfig.getSourceConfigManager().getSourceConfigs();
                 if (sources.size() == 0) {
                     System.out.println("There is no sources defined.");
                     return;
@@ -97,7 +97,7 @@ public class SourceWizardPage extends WizardPage implements SelectionListener, M
 
                 if (!dialog.isSaved()) return;
 
-                entryMapping.addSourceMapping(source);
+                entryConfig.addSourceMapping(source);
 
                 TableItem item = new TableItem(sourceTable, SWT.NONE);
                 item.setText(0, source.getSourceName());
@@ -116,7 +116,7 @@ public class SourceWizardPage extends WizardPage implements SelectionListener, M
                 for (int i=0; i<items.length; i++) {
                     TableItem item = items[i];
                     SourceMapping source = (SourceMapping)item.getData();
-                    entryMapping.removeSourceMapping(source.getName());
+                    entryConfig.removeSourceMapping(source.getName());
                     item.dispose();
                 }
             }

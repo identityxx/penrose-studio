@@ -17,11 +17,10 @@ import org.safehaus.penrose.ldap.Attributes;
 import org.safehaus.penrose.ldap.Attribute;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.filter.Filter;
-import org.safehaus.penrose.filter.FilterTool;
 import org.safehaus.penrose.filter.SubstringFilter;
 import org.safehaus.penrose.studio.federation.wizard.BrowserWizard;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
 
 import java.util.Collection;
 import java.util.ArrayList;

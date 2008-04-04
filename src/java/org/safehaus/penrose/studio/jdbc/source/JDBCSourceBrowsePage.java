@@ -1,27 +1,27 @@
 package org.safehaus.penrose.studio.jdbc.source;
 
-import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
-import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.*;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.partition.*;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.*;
+import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.source.Source;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.source.SourceClient;
 import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.ldap.LDAP;
-import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.config.PenroseConfig;
-import org.safehaus.penrose.naming.PenroseContext;
-import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
+import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
 
-import java.util.Iterator;
 import java.util.Collection;
+import java.util.Iterator;
 
 public class JDBCSourceBrowsePage extends SourceEditorPage {
 
@@ -149,7 +149,6 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
     public void add(final Shell parent) {
         try {
             JDBCSearchResultDialog dialog = new JDBCSearchResultDialog(parent.getShell(), SWT.NONE);
-            dialog.setPartitionConfig(partitionConfig);
             dialog.setSourceConfig(sourceConfig);
             dialog.open();
 
@@ -158,7 +157,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
             RDN rdn = dialog.getRdn();
             DN dn = new DN(rdn);
             Attributes attributes = dialog.getAttributes();
-
+/*
             PenroseConfig penroseConfig = project.getPenroseConfig();
             PenroseContext penroseContext = project.getPenroseContext();
 
@@ -175,6 +174,13 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
             source.add(null, dn, attributes);
 
             partition.destroy();
+*/
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+            SourceClient sourceClient = partitionClient.getSourceClient(sourceConfig.getName());
+            sourceClient.add(dn, attributes);
 
             refresh();
 
@@ -195,7 +201,6 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
             RDN rdn = dn.getRdn();
 
             JDBCSearchResultDialog dialog = new JDBCSearchResultDialog(parent, SWT.NONE);
-            dialog.setPartitionConfig(partitionConfig);
             dialog.setSourceConfig(sourceConfig);
             dialog.setRdn(rdn);
             dialog.setAttributes(searchResult.getAttributes());
@@ -209,7 +214,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
                     searchResult.getAttributes(),
                     dialog.getAttributes()
             );
-
+/*
             PenroseConfig penroseConfig = project.getPenroseConfig();
             PenroseContext penroseContext = project.getPenroseContext();
 
@@ -235,6 +240,22 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
             source.modify(null, dn, modifications);
 
             partition.destroy();
+*/
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+            SourceClient sourceClient = partitionClient.getSourceClient(sourceConfig.getName());
+            if (!rdn.equals(newRdn)) {
+                sourceClient.modrdn(dn, newRdn, true);
+
+                DNBuilder db = new DNBuilder();
+                db.append(newRdn);
+                db.append(dn.getParentDn());
+                dn = db.toDn();
+            }
+
+            sourceClient.modify(dn, modifications);
 
             refresh();
 
@@ -253,7 +274,7 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
             SearchResult searchResult = (SearchResult)item.getData();
 
             DN dn = searchResult.getDn();
-
+/*
             PenroseConfig penroseConfig = project.getPenroseConfig();
             PenroseContext penroseContext = project.getPenroseContext();
 
@@ -270,6 +291,13 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
             source.delete(null, dn);
 
             partition.destroy();
+*/
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+            SourceClient sourceClient = partitionClient.getSourceClient(sourceConfig.getName());
+            sourceClient.delete(dn);
 
             refresh();
 
@@ -280,18 +308,27 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
     }
 
     public void refresh() {
-        final Collection fields = sourceConfig.getFieldConfigs();
+        try {
+            final Collection fields = sourceConfig.getFieldConfigs();
 
-        table.removeAll();
+            table.removeAll();
 
-        SearchRequest request = new SearchRequest();
+            SearchRequest request = new SearchRequest();
 
-        int size = Integer.parseInt(maxSizeText.getText());
-        request.setSizeLimit(size);
+            int size = Integer.parseInt(maxSizeText.getText());
+            request.setSizeLimit(size);
 
-        SearchResponse response = new SearchResponse() {
-            public void add(SearchResult searchResult) throws Exception {
-                super.add(searchResult);
+            SearchResponse response = new SearchResponse();
+
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+            SourceClient sourceClient = partitionClient.getSourceClient(sourceConfig.getName());
+            sourceClient.search(request, response);
+
+            while (response.hasNext()) {
+                SearchResult searchResult = response.next();
 
                 Attributes attributes = searchResult.getAttributes();
                 //log.debug(" - "+av);
@@ -320,25 +357,6 @@ public class JDBCSourceBrowsePage extends SourceEditorPage {
 
                 item.setData(searchResult);
             }
-        };
-
-        try {
-            PenroseConfig penroseConfig = project.getPenroseConfig();
-            PenroseContext penroseContext = project.getPenroseContext();
-
-            PartitionFactory partitionFactory = new PartitionFactory();
-            partitionFactory.setPenroseConfig(penroseConfig);
-            partitionFactory.setPenroseContext(penroseContext);
-
-            Partition partition = partitionFactory.createPartition(partitionConfig);
-
-            Connection connection = partition.getConnection(sourceConfig.getConnectionName());
-
-            Source source = connection.createSource(sourceConfig);
-
-            source.search(null, request, response);
-
-            partition.destroy();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

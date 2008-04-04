@@ -29,7 +29,6 @@ import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.preview.PreviewEditorInput;
-import org.safehaus.penrose.studio.preview.PreviewEditor;
 import org.apache.log4j.Logger;
 
 /**
@@ -60,7 +59,7 @@ public class PreviewAction extends Action {
             PreviewEditorInput ei = new PreviewEditorInput();
             ei.setProject(project);
             
-            page.openEditor(ei, PreviewEditor.class.getName());
+            //page.openEditor(ei, PreviewEditor.class.getName());
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

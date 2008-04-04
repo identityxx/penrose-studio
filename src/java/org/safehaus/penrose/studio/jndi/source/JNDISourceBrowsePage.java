@@ -9,16 +9,14 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.config.PenroseConfig;
-import org.safehaus.penrose.naming.PenroseContext;
 import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.source.SourceClient;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -110,6 +108,8 @@ public class JNDISourceBrowsePage extends SourceEditorPage {
         int size = Integer.parseInt(maxSizeText.getText());
         sc.setSizeLimit(size);
 
+        SearchResponse sr = new SearchResponse();
+/*
         SearchResponse sr = new SearchResponse() {
             public void add(SearchResult searchResult) throws Exception {
                 super.add(searchResult);
@@ -140,8 +140,9 @@ public class JNDISourceBrowsePage extends SourceEditorPage {
                 }
             }
         };
-
+*/
         try {
+/*
             PenroseConfig penroseConfig = project.getPenroseConfig();
             PenroseContext penroseContext = project.getPenroseContext();
 
@@ -158,6 +159,42 @@ public class JNDISourceBrowsePage extends SourceEditorPage {
             source.search(null, sc, sr);
 
             partition.destroy();
+*/
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+            SourceClient sourceClient = partitionClient.getSourceClient(sourceConfig.getName());
+            sourceClient.search(sc, sr);
+
+            while (sr.hasNext()) {
+                SearchResult searchResult = sr.next();
+
+                Attributes attributes = searchResult.getAttributes();
+                //log.debug(" - "+av);
+
+                TableItem item = new TableItem(table, SWT.NONE);
+                int counter = 0;
+                for (Iterator i=fields.iterator(); i.hasNext(); counter++) {
+                    FieldConfig fieldDefinition = (FieldConfig)i.next();
+
+                    Attribute attribute = attributes.get(fieldDefinition.getName());
+                    if (attribute == null) continue;
+
+                    Collection values = attribute.getValues();
+
+                    String value;
+                    if (values == null) {
+                        value = null;
+                    } else if (values.size() > 1) {
+                        value = values.toString();
+                    } else {
+                        value = values.iterator().next().toString();
+                    }
+
+                    item.setText(counter, value == null ? "" : value);
+                }
+            }
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

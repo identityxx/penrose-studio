@@ -27,7 +27,7 @@ public class GlobalNode extends Node {
     private LDAPFederation ldapFederation;
 
     public GlobalNode(String name, FederationNode federationNode) {
-        super(name, null, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), null, federationNode);
+        super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), null, federationNode);
 
         this.federationNode = federationNode;
         this.projectNode = federationNode.getProjectNode();

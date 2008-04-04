@@ -1,33 +1,33 @@
 package org.safehaus.penrose.studio.federation.nis.editor;
 
+import org.apache.log4j.Logger;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.apache.log4j.Logger;
+import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.jdbc.QueryResponse;
+import org.safehaus.penrose.management.*;
+import org.safehaus.penrose.management.source.SourceClient;
+import org.safehaus.penrose.management.connection.ConnectionClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
+import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.conflict.NISGroupsEditor;
-import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.federation.repository.NISDomain;
-import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.jdbc.Assignment;
-import org.safehaus.penrose.jdbc.QueryResponse;
-import org.safehaus.penrose.jdbc.connection.JDBCConnection;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.PartitionConfigs;
-import org.safehaus.penrose.partition.PartitionConfig;
 
-import java.util.Collection;
-import java.util.ArrayList;
 import java.sql.ResultSet;
 
 /**
@@ -77,18 +77,23 @@ public class NISGroupsPage extends FormPage {
     public void refresh() {
         try {
             Project project = nisFederation.getProject();
-            PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName());
+            ConnectionClient connectionClient = partitionClient.getConnectionClient(Federation.JDBC);
+            SourceClient sourceClient = partitionClient.getSourceClient(NISFederation.CACHE_GROUPS);
+/*
+            PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
 
-            PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName()+"_"+NISFederation.YP);
-            SourceConfig sourceConfig = partitionConfig.getSourceConfigs().getSourceConfig(NISFederation.CACHE_GROUPS);
+            PartitionConfig partitionConfig = partitionConfigManager.getPartitionConfig(domain.getName()+"_"+NISFederation.YP);
+            SourceConfig sourceConfig = partitionConfig.getSourceConfigManager().getSourceConfig(NISFederation.CACHE_GROUPS);
 
             Partition partition = nisFederation.getPartition();
             JDBCConnection connection = (JDBCConnection)partition.getConnection(Federation.JDBC);
-
-            String table = connection.getTableName(sourceConfig);
+*/
+            String table = (String)sourceClient.getAttribute("TableName");
+            //String table = connection.getTableName(sourceConfig);
             String sql = "select count(*) from "+table;
-
-            Collection<Assignment> assignments = new ArrayList<Assignment>();
 
             QueryResponse queryResponse = new QueryResponse() {
                 public void add(Object object) throws Exception {
@@ -98,7 +103,18 @@ public class NISGroupsPage extends FormPage {
                 }
             };
 
-            connection.executeQuery(sql, assignments, queryResponse);
+            //connection.executeQuery(sql, queryResponse);
+            connectionClient.invoke(
+                    "executeQuery",
+                    new Object[] {
+                            sql,
+                            queryResponse
+                    },
+                    new String[] {
+                            String.class.getName(),
+                            QueryResponse.class.getName()
+                    }
+            );
 
         } catch (Exception e) {
             ErrorDialog.open(e);

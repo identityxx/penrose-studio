@@ -20,14 +20,14 @@ package org.safehaus.penrose.studio.directory.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.source.SourceConfigs;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.directory.DirectoryConfig;
-import org.safehaus.penrose.directory.EntryMapping;
+import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
 import org.apache.log4j.Logger;
 
 /**
@@ -40,7 +40,7 @@ public class CreateRootDSEProxyWizard extends Wizard {
     public SelectConnectionWizardPage connectionPage;
 
     private Project project;
-    private PartitionConfig partitionConfig;
+    private String partitionName;
 
     public CreateRootDSEProxyWizard() {
         setWindowTitle("New Root DSE Proxy");
@@ -48,7 +48,7 @@ public class CreateRootDSEProxyWizard extends Wizard {
 
     public void addPages() {
 
-        connectionPage = new SelectConnectionWizardPage(partitionConfig);
+        connectionPage = new SelectConnectionWizardPage(partitionName);
         connectionPage.setProject(project);
 
         addPage(connectionPage);
@@ -69,23 +69,32 @@ public class CreateRootDSEProxyWizard extends Wizard {
             sourceConfig.setParameter("scope", "OBJECT");
             sourceConfig.setParameter("filter", "objectClass=*");
 
-            SourceConfigs sourceConfigs = partitionConfig.getSourceConfigs();
-            sourceConfigs.addSourceConfig(sourceConfig);
+            //SourceConfigManager sourceConfigManager = partitionConfig.getSourceConfigManager();
+            //sourceConfigManager.addSourceConfig(sourceConfig);
 
-            EntryMapping entryMapping = new EntryMapping();
+            EntryConfig entryConfig = new EntryConfig();
 
             SourceMapping sourceMapping = new SourceMapping("DEFAULT", sourceConfig.getName());
-            entryMapping.addSourceMapping(sourceMapping);
+            entryConfig.addSourceMapping(sourceMapping);
 
-            entryMapping.setHandlerName("PROXY");
+            entryConfig.setHandlerName("PROXY");
 
-            entryMapping.addACI(new ACI("rs"));
+            entryConfig.addACI(new ACI("rs"));
 
-            DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
-            directoryConfig.addEntryMapping(entryMapping);
+            //DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
+            //directoryConfig.addEntryConfig(entryConfig);
 
-            project.save(partitionConfig, sourceConfigs);
-            project.save(partitionConfig, directoryConfig);
+            //project.save(partitionConfig, sourceConfigManager);
+            //project.save(partitionConfig, directoryConfig);
+
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+            partitionClient.createSource(sourceConfig);
+            partitionClient.createEntry(entryConfig);
+
+            partitionClient.store();
 
             return true;
 
@@ -107,11 +116,11 @@ public class CreateRootDSEProxyWizard extends Wizard {
         this.project = project;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 }

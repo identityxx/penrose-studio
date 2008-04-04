@@ -49,7 +49,7 @@ public class RelationshipDialog extends Dialog {
     private int action;
     Relationship relationship;
 
-	String[] comparisons = new String[] { "=", ">", ">=", "<", "<=" };
+	String[] comparisons = new String[] { "=" }; //, ">", ">=", "<", "<=" };
 	
 	public RelationshipDialog(Shell parent, int style) {
         super(parent, style);
@@ -131,9 +131,9 @@ public class RelationshipDialog extends Dialog {
 		operatorCombo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
 		operatorCombo.setLayoutData(new GridData(GridData.FILL));
 
-		for (int i=0; i<comparisons.length; i++) {
-			operatorCombo.add(comparisons[i]);
-		}
+        for (String comparison : comparisons) {
+            operatorCombo.add(comparison);
+        }
 		operatorCombo.select(0);
 /*
 		operatorCombo.addSelectionListener(new SelectionAdapter() {
@@ -162,7 +162,7 @@ public class RelationshipDialog extends Dialog {
 		Button saveButton = new Button(buttons, SWT.PUSH);
         saveButton.setText("Save");
 		saveButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(SelectionEvent event) {
                 try {
                     if (leftTable.getSelectionCount() == 0) return;
                     if (rightTable.getSelectionCount() == 0) return;
@@ -173,15 +173,17 @@ public class RelationshipDialog extends Dialog {
                     String expression = leftItem.getText()+" "+operatorCombo.getText()+" "+rightItem.getText();
                     System.out.println("Expression: "+expression);
 
-                    relationship.setExpression(expression);
+                    relationship.setLhs(leftItem.getText());
+                    relationship.setRhs(rightItem.getText());
                     System.out.println("Relationship: "+relationship.getExpression());
 
                     action = OK;
 
                     shell.close();
 
-                } catch (Exception ex) {
-                    log.debug(ex.getMessage(), ex);
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
 			}
 		});

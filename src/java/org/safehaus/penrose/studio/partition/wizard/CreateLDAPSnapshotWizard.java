@@ -19,9 +19,9 @@ package org.safehaus.penrose.studio.partition.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.ldap.connection.LDAPConnectionWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionParametersWizardPage;
-import org.safehaus.penrose.studio.jndi.connection.LDAPConnectionWizardPage;
 import org.safehaus.penrose.studio.util.SnapshotUtil;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.ldap.LDAPClient;
@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
 
 import javax.naming.Context;
 import java.util.Map;
-import java.util.Iterator;
 import java.util.TreeMap;
 
 /**
@@ -86,22 +85,21 @@ public class CreateLDAPSnapshotWizard extends Wizard {
             connectionConfig.setParameter(Context.SECURITY_PRINCIPAL, connectionInfoPage.getBindDN());
             connectionConfig.setParameter(Context.SECURITY_CREDENTIALS, connectionInfoPage.getPassword());
 
-            Map parameters = connectionParametersPage.getParameters();
-            for (Iterator i=parameters.keySet().iterator(); i.hasNext(); ) {
-                String paramName = (String)i.next();
-                String paramValue = (String)parameters.get(paramName);
+            Map<String,String> parameters = connectionParametersPage.getParameters();
+            for (String paramName : parameters.keySet()) {
+                String paramValue = parameters.get(paramName);
 
                 connectionConfig.setParameter(paramName, paramValue);
             }
 
-            partitionConfig.getConnectionConfigs().addConnectionConfig(connectionConfig);
+            partitionConfig.getConnectionConfigManager().addConnectionConfig(connectionConfig);
 
             client = new LDAPClient(connectionConfig.getParameters());
 
-            SnapshotUtil snapshotUtil = new SnapshotUtil();
-            snapshotUtil.createSnapshot(partitionConfig, client);
+            SnapshotUtil snapshotUtil = new SnapshotUtil(project);
+            snapshotUtil.createSnapshot(partitionConfig.getName(), client);
 
-            project.save(partitionConfig);
+            //project.save(partitionConfig);
             
             penroseStudio.notifyChangeListeners();
 
@@ -109,7 +107,7 @@ public class CreateLDAPSnapshotWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return false;
+            throw new RuntimeException(e.getMessage(), e);
 
         } finally {
             if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }

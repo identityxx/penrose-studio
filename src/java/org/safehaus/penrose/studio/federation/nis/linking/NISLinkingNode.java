@@ -14,7 +14,6 @@ import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
 import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
 import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 
 /**
@@ -30,7 +29,6 @@ public class NISLinkingNode extends Node {
     public NISLinkingNode(String name, NISDomainNode domainNode) {
         super(
                 name,
-                ServersView.ENTRY,
                 PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 null,
                 domainNode

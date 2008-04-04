@@ -19,6 +19,11 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.management.*;
+import org.safehaus.penrose.management.scheduler.JobClient;
+import org.safehaus.penrose.management.scheduler.SchedulerClient;
+import org.safehaus.penrose.management.source.SourceClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
 import org.safehaus.penrose.ldap.*;
 
 import java.text.DateFormat;
@@ -120,8 +125,9 @@ public class NISLDAPTrackerPage extends FormPage {
                     TableItem[] items = trackerTable.getSelection();
 
                     Project project = nisFederation.getProject();
-                    PenroseClient client = project.getClient();
-                    PartitionClient partitionClient = client.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
+                    PenroseClient penroseClient = project.getClient();
+                    PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
+                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
                     SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
 
                     JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
@@ -168,7 +174,8 @@ public class NISLDAPTrackerPage extends FormPage {
             trackerTable.removeAll();
 
             PenroseClient penroseClient = project.getClient();
-            PartitionClient partitionClient = penroseClient.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
+            PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
             SourceClient tracker = partitionClient.getSourceClient("tracker");
 
             SearchRequest request = new SearchRequest();

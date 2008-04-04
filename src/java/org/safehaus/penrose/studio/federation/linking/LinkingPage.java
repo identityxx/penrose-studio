@@ -27,8 +27,9 @@ import org.safehaus.penrose.filter.FilterTool;
 import org.safehaus.penrose.filter.SimpleFilter;
 import org.safehaus.penrose.filter.SubstringFilter;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.management.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
 import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.federation.wizard.BrowserWizard;
@@ -88,8 +89,9 @@ public class LinkingPage extends FormPage {
 
         PenroseClient penroseClient = project.getClient();
 
-        localPartitionClient = penroseClient.getPartitionClient(partitionName);
-        globalPartitionClient = penroseClient.getPartitionClient(Federation.GLOBAL);
+        PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
+        localPartitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        globalPartitionClient = partitionManagerClient.getPartitionClient(Federation.GLOBAL);
 
         localBaseDn = localPartitionClient.getSuffixes().iterator().next();
         globalBaseDn = globalPartitionClient.getSuffixes().iterator().next();
@@ -1311,6 +1313,8 @@ public class LinkingPage extends FormPage {
             attributes.addValue(globalAttribute, localValue);
         }
 
+        log.debug("Adding "+dn);
+        
         globalPartitionClient.add(dn, attributes);
 
         return globalResult;

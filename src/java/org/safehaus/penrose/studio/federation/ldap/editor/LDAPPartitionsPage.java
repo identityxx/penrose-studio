@@ -1,30 +1,30 @@
 package org.safehaus.penrose.studio.federation.ldap.editor;
 
-import org.eclipse.ui.forms.editor.FormPage;
-import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
-import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.widgets.Hyperlink;
-import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.forms.events.HyperlinkAdapter;
-import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.RowLayout;
+import org.apache.log4j.Logger;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.*;
+import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.forms.editor.FormPage;
+import org.eclipse.ui.forms.events.HyperlinkAdapter;
+import org.eclipse.ui.forms.events.HyperlinkEvent;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.Hyperlink;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.federation.repository.LDAPRepository;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.partition.PartitionConfigs;
-import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
+import org.safehaus.penrose.studio.project.Project;
 
 /**
  * @author Endi S. Dewata
@@ -214,17 +214,17 @@ public class LDAPPartitionsPage extends FormPage {
             table.removeAll();
 
             Project project = ldapFederation.getProject();
-            PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 
             for (LDAPRepository repository : ldapFederation.getRepositories()) {
-                PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(repository.getName());
 
                 TableItem ti = new TableItem(table, SWT.NONE);
-
-                ti.setText(0, repository.getName());
-                ti.setText(1, partitionConfig == null ? "Missing" : "OK");
-
                 ti.setData(repository);
+                ti.setText(0, repository.getName());
+
+                PartitionClient partitionClient = partitionManagerClient.getPartitionClient(repository.getName());
+                ti.setText(1, partitionClient.exists() ? "OK" : "Missing");
             }
 
             table.select(indices);

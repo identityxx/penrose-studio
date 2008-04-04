@@ -21,7 +21,6 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.server.ServersView;
 import org.apache.log4j.Logger;
 
 public class ServersLabelProvider extends LabelProvider implements ITableLabelProvider {

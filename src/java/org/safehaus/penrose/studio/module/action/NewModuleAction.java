@@ -46,7 +46,7 @@ public class NewModuleAction extends Action {
 
             ModuleWizard wizard = new ModuleWizard();
             wizard.setProject(project);
-            wizard.setPartitionConfig(node.getPartitionConfig());
+            wizard.setPartitionName(node.getPartitionName());
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);

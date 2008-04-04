@@ -22,7 +22,9 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.progress.IProgressService;
 import org.safehaus.penrose.federation.repository.NISDomain;
-import org.safehaus.penrose.partition.PartitionConfigs;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
@@ -267,24 +269,25 @@ public class NISPartitionsPage extends FormPage {
             table.removeAll();
 
             Project project = nisFederation.getProject();
-            PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 
             for (NISDomain domain : nisFederation.getRepositories()) {
 
                 TableItem ti = new TableItem(table, SWT.NONE);
                 ti.setText(0, domain.getName());
 
-                boolean ypPartition = partitionConfigs.getPartitionConfig(domain.getName()+"_"+NISFederation.YP) != null;
-                String status = domain.isYpEnabled() ? (ypPartition ? "OK" : "Missing") : "Disabled";
-                ti.setText(1, status);
+                PartitionClient ypPartitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
+                String ypStatus = ypPartitionClient.exists() ? domain.isYpEnabled() ? "OK" : "Disabled" : "Missing";
+                ti.setText(1, ypStatus);
 
-                boolean nisPartition = partitionConfigs.getPartitionConfig(domain.getName()+"_"+NISFederation.NIS) != null;
-                status = domain.isNisEnabled() ? (nisPartition ? "OK" : "Missing") : "Disabled";
-                ti.setText(2, status);
+                PartitionClient nisPartitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.NIS);
+                String nisStatus = nisPartitionClient.exists() ? domain.isNisEnabled() ? "OK" : "Disabled" : "Missing";
+                ti.setText(2, nisStatus);
 
-                boolean nssPartition = partitionConfigs.getPartitionConfig(domain.getName()+"_"+NISFederation.NSS) != null;
-                status = domain.isNssEnabled() ? (nssPartition ? "OK" : "Missing") : "Disabled";
-                ti.setText(3, status);
+                PartitionClient nssPartitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.NSS);
+                String nssStatus = nssPartitionClient.exists() ? domain.isNssEnabled() ? "OK" : "Disabled" : "Missing";
+                ti.setText(3, nssStatus);
 
                 ti.setData(domain);
             }

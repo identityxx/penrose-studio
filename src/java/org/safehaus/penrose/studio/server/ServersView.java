@@ -64,6 +64,8 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
     public final static String MODULES           = "Modules";
     public final static String MODULE            = "Module";
     public final static String SCHEMA            = "Schema";
+    public final static String BUILTIN_SCHEMA    = "Built-In Schema";
+    public final static String CUSTOM_SCHEMA     = "Custom Schema";
     public final static String OBJECT_CLASSES    = "Object Classes";
     public final static String OBJECT_CLASS      = "Object Class";
     public final static String ATTRIBUTE_TYPES   = "Attribute Types";
@@ -111,6 +113,7 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
 
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
+                        ErrorDialog.open(e);
                     }
 				}
 			});
@@ -125,7 +128,10 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
                         Node node = (Node)object;
                         node.open();
 
-                        treeViewer.refresh();
+                        //treeViewer.refresh();
+
+                        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                        penroseStudio.notifyChangeListeners();
 
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
@@ -144,7 +150,10 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
 
                         treeViewer.setExpandedState(object, true);
 
-                        treeViewer.refresh();
+                        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                        penroseStudio.notifyChangeListeners();
+
+                        //treeViewer.refresh();
 
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
@@ -160,7 +169,10 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
 
                         treeViewer.setExpandedState(object, false);
 
-                        treeViewer.refresh();
+                        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                        penroseStudio.notifyChangeListeners();
+
+                        //treeViewer.refresh();
 
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
@@ -196,12 +208,18 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
         treeViewer.refresh();
 	}
 
+    public boolean isExpanded(Object object) {
+        return treeViewer.getExpandedState(object);
+    }
+    
     public void open(Object object) {
         treeViewer.setExpandedState(object, true);
+        treeViewer.refresh();
     }
 
     public void close(Object object) {
         treeViewer.setExpandedState(object, false);
+        treeViewer.refresh();
     }
 
     public TreeViewer getTreeViewer() {

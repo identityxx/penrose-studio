@@ -11,8 +11,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.management.PartitionClient;
-import org.safehaus.penrose.studio.dialog.ErrorDialog;
+import org.safehaus.penrose.management.partition.PartitionClient;
 
 /**
  * @author Endi Sukma Dewata
@@ -54,7 +53,7 @@ public class BrowserPage extends WizardPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    ErrorDialog.open(e);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
         });
@@ -78,6 +77,7 @@ public class BrowserPage extends WizardPage {
             expand(item);
             
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         }
 

@@ -37,8 +37,8 @@ public class AttributeTypeNode extends Node {
 
     ServersView view;
     
-    public AttributeTypeNode(ServersView view, String name, String type, Image image, Object object, Object parent) {
-        super(name, type, image, object, parent);
+    public AttributeTypeNode(ServersView view, String name, Image image, Object object, Object parent) {
+        super(name, image, object, parent);
         this.view = view;
     }
 
@@ -50,6 +50,7 @@ public class AttributeTypeNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
         });

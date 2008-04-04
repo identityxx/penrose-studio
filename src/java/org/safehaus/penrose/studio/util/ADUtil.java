@@ -1,31 +1,33 @@
 package org.safehaus.penrose.studio.util;
 
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.directory.EntryMapping;
 import org.safehaus.penrose.directory.AttributeMapping;
+import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.SourceMapping;
-import org.safehaus.penrose.mapping.Expression;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.RDN;
+import org.safehaus.penrose.mapping.Expression;
+import org.safehaus.penrose.source.FieldConfig;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.management.partition.PartitionClient;
 
 /**
  * @author Endi S. Dewata
  */
 public class ADUtil {
-    
-    public EntryMapping createSchemaProxy(
-            PartitionConfig partitionConfig,
-            ConnectionConfig connectionConfig,
+
+    public ADUtil() {
+    }
+
+    public EntryConfig createSchemaProxy(
+            PartitionClient partitionClient,
+            String connectionName,
             String sourceSchemaDn,
             String destSchemaDn
-            ) throws Exception {
+    ) throws Exception {
         
         SourceConfig sourceConfig = new SourceConfig();
-        sourceConfig.setName(connectionConfig.getName()+" Schema");
-        sourceConfig.setConnectionName(connectionConfig.getName());
+        sourceConfig.setName(connectionName+" Schema");
+        sourceConfig.setConnectionName(connectionName);
 
         sourceConfig.addFieldConfig(new FieldConfig("lDAPDisplayName", true));
         sourceConfig.addFieldConfig(new FieldConfig("objectClass"));
@@ -43,19 +45,20 @@ public class ADUtil {
         sourceConfig.setParameter("scope", "ONELEVEL");
         sourceConfig.setParameter("filter", "(objectClass=*)");
 
-        partitionConfig.getSourceConfigs().addSourceConfig(sourceConfig);
+        //partitionConfig.getSourceConfigManager().addSourceConfig(sourceConfig);
+        partitionClient.createSource(sourceConfig);
 
         DN dn = new DN(destSchemaDn);
 
-        EntryMapping entryMapping = new EntryMapping();
-        entryMapping.setDn(dn);
-        entryMapping.addObjectClass("top");
-        entryMapping.addObjectClass("subschema");
+        EntryConfig entryConfig = new EntryConfig();
+        entryConfig.setDn(dn);
+        entryConfig.addObjectClass("top");
+        entryConfig.addObjectClass("subschema");
 
         RDN rdn = dn.getRdn();
         for (String name : rdn.getNames()) {
             String value = rdn.get(name).toString();
-            entryMapping.addAttributeMapping(new AttributeMapping(name, AttributeMapping.CONSTANT, value, true));
+            entryConfig.addAttributeMapping(new AttributeMapping(name, AttributeMapping.CONSTANT, value, true));
         }
 
         Expression atExpression = new Expression(
@@ -72,7 +75,7 @@ public class ADUtil {
                 "return \"( \"+at+\" )\";"
         );
 
-        entryMapping.addAttributeMapping(
+        entryConfig.addAttributeMapping(
                 new AttributeMapping(
                         "attributeTypes",
                         AttributeMapping.EXPRESSION,
@@ -121,7 +124,7 @@ public class ADUtil {
                 "return \"( \"+oc+\" )\";"
         );
 
-        entryMapping.addAttributeMapping(
+        entryConfig.addAttributeMapping(
                 new AttributeMapping(
                         "objectClasses",
                         AttributeMapping.EXPRESSION,
@@ -130,10 +133,11 @@ public class ADUtil {
         );
 
         SourceMapping sourceMapping = new SourceMapping("s", sourceConfig.getName());
-        entryMapping.addSourceMapping(sourceMapping);
+        entryConfig.addSourceMapping(sourceMapping);
 
-        partitionConfig.getDirectoryConfig().addEntryMapping(entryMapping);
+        //partitionConfig.getDirectoryConfig().addEntryConfig(entryConfig);
+        partitionClient.createEntry(entryConfig);
 
-        return entryMapping;
+        return entryConfig;
     }
 }

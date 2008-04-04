@@ -17,11 +17,17 @@
  */
 package org.safehaus.penrose.studio.connection;
 
-import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.schema.*;
-import org.safehaus.penrose.studio.project.Project;
 import org.apache.log4j.Logger;
+import org.eclipse.jface.wizard.Wizard;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.schema.SchemaManagerClient;
+import org.safehaus.penrose.schema.AttributeType;
+import org.safehaus.penrose.schema.ObjectClass;
+import org.safehaus.penrose.schema.Schema;
+import org.safehaus.penrose.schema.SchemaWriter;
+import org.safehaus.penrose.studio.project.Project;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Map;
 
@@ -42,7 +48,7 @@ public class SchemaExportWizard extends Wizard {
         this.project = project;
         this.schema = schema;
 
-        syntaxMappingPage = new SchemaSyntaxMappingPage(schema);
+        syntaxMappingPage = new SchemaSyntaxMappingPage();
 
         setWindowTitle("Export Partition");
         page.setDescription("Enter the location to which the schema will be exported.");
@@ -56,17 +62,16 @@ public class SchemaExportWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-
-            String path = page.getPath();
+            File path = new File(page.getPath());
 
             if (page.getExcludeDuplicate()) {
-                removeDuplicates();
+                removeDuplicates(schema);
             }
 
-            mapSyntaxes();
+            mapSyntaxes(schema);
 
-            SchemaWriter schemaWriter = new SchemaWriter();
-            schemaWriter.write(path, schema);
+            SchemaWriter writer = new SchemaWriter();
+            writer.write(path, schema);
 
             return true;
 
@@ -76,11 +81,12 @@ public class SchemaExportWizard extends Wizard {
         }
     }
 
-    public void removeDuplicates() {
+    public void removeDuplicates(Schema schema) throws Exception {
 
-        SchemaManager schemaManager = project.getSchemaManager();
+        PenroseClient client = project.getClient();
+        SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
 
-        Collection<AttributeType> attributeTypes = schemaManager.getAttributeTypes();
+        Collection<AttributeType> attributeTypes = schemaManagerClient.getAttributeTypes();
         for (AttributeType at : attributeTypes) {
             String oid = at.getOid();
             String name = at.getName();
@@ -98,7 +104,7 @@ public class SchemaExportWizard extends Wizard {
             }
         }
 
-        Collection<ObjectClass> objectClasses = schemaManager.getObjectClasses();
+        Collection<ObjectClass> objectClasses = schemaManagerClient.getObjectClasses();
         for (ObjectClass oc : objectClasses) {
             String oid = oc.getOid();
             String name = oc.getName();
@@ -117,7 +123,7 @@ public class SchemaExportWizard extends Wizard {
         }
     }
 
-    public void mapSyntaxes() {
+    public void mapSyntaxes(Schema schema) {
         Map syntaxMapping = syntaxMappingPage.getSyntaxMapping();
         Collection<AttributeType> attributeTypes = schema.getAttributeTypes();
         for (AttributeType at : attributeTypes) {

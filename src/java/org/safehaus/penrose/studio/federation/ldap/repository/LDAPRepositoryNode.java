@@ -1,7 +1,6 @@
 package org.safehaus.penrose.studio.federation.ldap.repository;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -39,7 +38,6 @@ public class LDAPRepositoryNode extends Node {
     public LDAPRepositoryNode(String name, LDAPRepository repository, LDAPNode ldapNode) {
         super(
                 name,
-                ServersView.ENTRY,
                 PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 repository,
                 ldapNode

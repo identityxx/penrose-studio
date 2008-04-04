@@ -5,7 +5,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.IManagedForm;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.project.Project;
 
@@ -21,7 +20,7 @@ public class SourceEditorPage extends FormPage {
     protected SourceEditor editor;
 
     protected Project project;
-    protected PartitionConfig partitionConfig;
+    protected String partitionName;
     protected SourceConfig sourceConfig;
 
     public SourceEditorPage(SourceEditor editor, String name, String label) {
@@ -30,7 +29,7 @@ public class SourceEditorPage extends FormPage {
         this.editor = editor;
 
         project = editor.getProject();
-        partitionConfig = editor.getPartitionConfig();
+        partitionName = editor.getPartitionName();
         sourceConfig = editor.getSourceConfig();
     }
 
@@ -58,12 +57,12 @@ public class SourceEditorPage extends FormPage {
         this.toolkit = toolkit;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 
     public Project getProject() {

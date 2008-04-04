@@ -1,20 +1,19 @@
 package org.safehaus.penrose.studio.nis.action;
 
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.ldap.Attributes;
-import org.safehaus.penrose.jdbc.QueryResponse;
-import org.safehaus.penrose.jdbc.Assignment;
-import org.safehaus.penrose.jdbc.connection.JDBCConnection;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.PartitionConfigs;
-import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.federation.repository.NISDomain;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.jdbc.QueryResponse;
+import org.safehaus.penrose.jdbc.connection.JDBCConnection;
+import org.safehaus.penrose.ldap.Attributes;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.federation.Federation;
+import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.project.Project;
 
-import java.util.Collection;
-import java.util.ArrayList;
 import java.sql.ResultSet;
 
 /**
@@ -54,13 +53,22 @@ public class ConflictingGIDFinderAction extends NISAction {
         log.debug("Checking conflicts between "+domain1.getName()+" and "+domain2.getName()+".");
 
         Project project = nisFederation.getProject();
-        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 
-        PartitionConfig partitionConfig1 = partitionConfigs.getPartitionConfig(domain1.getName()+"_"+NISFederation.YP);
-        SourceConfig sourceConfig1 = partitionConfig1.getSourceConfigs().getSourceConfig(NISFederation.CACHE_GROUPS);
+        PartitionClient partitionClient1 = partitionManagerClient.getPartitionClient(domain1.getName()+"_"+NISFederation.YP);
+        PartitionConfig partitionConfig1 = partitionClient1.getPartitionConfig();
 
-        PartitionConfig partitionConfig2 = partitionConfigs.getPartitionConfig(domain2.getName()+"_"+NISFederation.YP);
-        SourceConfig sourceConfig2 = partitionConfig2.getSourceConfigs().getSourceConfig(NISFederation.CACHE_GROUPS);
+        PartitionClient partitionClient2 = partitionManagerClient.getPartitionClient(domain2.getName()+"_"+NISFederation.YP);
+        PartitionConfig partitionConfig2 = partitionClient2.getPartitionConfig();
+
+        //PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
+
+        //PartitionConfig partitionConfig1 = partitionConfigManager.getPartitionConfig(domain1.getName()+"_"+NISFederation.YP);
+        SourceConfig sourceConfig1 = partitionConfig1.getSourceConfigManager().getSourceConfig(NISFederation.CACHE_GROUPS);
+
+        //PartitionConfig partitionConfig2 = partitionConfigManager.getPartitionConfig(domain2.getName()+"_"+NISFederation.YP);
+        SourceConfig sourceConfig2 = partitionConfig2.getSourceConfigManager().getSourceConfig(NISFederation.CACHE_GROUPS);
 
         Partition partition = nisFederation.getPartition();
         JDBCConnection connection = (JDBCConnection)partition.getConnection(Federation.JDBC);
@@ -78,10 +86,6 @@ public class ConflictingGIDFinderAction extends NISAction {
                     " or d.gidNumber is null and b.gidNumber = c.gidNumber"+
                     " or b.gidNumber = d.gidNumber" +
                 " order by a.cn";
-
-        Collection<Assignment> assignments = new ArrayList<Assignment>();
-        assignments.add(new Assignment(domain1.getName()));
-        assignments.add(new Assignment(domain2.getName()));
 
         QueryResponse queryResponse = new QueryResponse() {
             public void add(Object object) throws Exception {
@@ -111,6 +115,10 @@ public class ConflictingGIDFinderAction extends NISAction {
             }
         };
 
-        connection.executeQuery(sql, assignments, queryResponse);
+        connection.executeQuery(
+                sql,
+                new Object[] { domain1.getName(), domain2.getName() },
+                queryResponse
+        );
     }
 }

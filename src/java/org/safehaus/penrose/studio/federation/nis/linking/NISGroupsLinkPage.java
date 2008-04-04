@@ -20,12 +20,12 @@ import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.source.Source;
+import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.filter.SubstringFilter;
 import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.filter.FilterTool;
 import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 
@@ -79,14 +79,15 @@ public class NISGroupsLinkPage extends FormPage {
         domain = editor.getDomain();
         nisFederation = editor.getNisTool();
 
-        partition = null; // nisFederation.getPartitions().getPartition(domain.getName()+"_"+NISFederation.NIS);
+        partition = null; // nisFederation.getPartitionManager().getPartition(domain.getName()+"_"+NISFederation.NIS);
+        SourceManager sourceManager = partition.getSourceManager();
 
         Connection connection = partition.getConnection(NISFederation.CACHE_CONNECTION_NAME);
         jdbcConnection = (JDBCConnection)connection;
 
-        localGroups = partition.getSource("local_groups");
-        globalGroups = partition.getSource("global_groups");
-        groupsLink = partition.getSource("cache_groups_link");
+        localGroups = sourceManager.getSource("local_groups");
+        globalGroups = sourceManager.getSource("global_groups");
+        groupsLink = sourceManager.getSource("cache_groups_link");
 
         Display display = Display.getDefault();
 
@@ -724,8 +725,6 @@ public class NISGroupsLinkPage extends FormPage {
     }
 
     public String getLink(String cn) throws Exception {
-        Collection<Assignment> assignments = new ArrayList<Assignment>();
-        assignments.add(new Assignment(cn));
 
         QueryResponse queryResponse = new QueryResponse() {
             public void add(Object object) throws Exception {
@@ -737,7 +736,7 @@ public class NISGroupsLinkPage extends FormPage {
 
         jdbcConnection.executeQuery(
                 "select globalCn from "+ jdbcConnection.getTableName(groupsLink)+" where cn=?",
-                assignments,
+                new Object[] { cn },
                 queryResponse
         );
 
@@ -746,36 +745,25 @@ public class NISGroupsLinkPage extends FormPage {
 
     public void createLink(String cn, String globalCn) throws Exception {
 
-        Collection<Assignment> assignments = new ArrayList<Assignment>();
-        assignments.add(new Assignment(cn));
-        assignments.add(new Assignment(globalCn));
-
         jdbcConnection.executeUpdate(
                 "insert into "+ jdbcConnection.getTableName(groupsLink)+" (cn, globalCn) values (?, ?)",
-                assignments
+                new Object[] { cn, globalCn }
         );
     }
 
     public void updateLink(String cn, String globalCn) throws Exception {
 
-        Collection<Assignment> assignments = new ArrayList<Assignment>();
-        assignments.add(new Assignment(globalCn));
-        assignments.add(new Assignment(cn));
-
         jdbcConnection.executeUpdate(
                 "update "+ jdbcConnection.getTableName(groupsLink)+" set globalCn=? where cn=?",
-                assignments
+                new Object[] { globalCn, cn }
         );
     }
 
     public void removeLink(String cn) throws Exception {
 
-        Collection<Assignment> assignments = new ArrayList<Assignment>();
-        assignments.add(new Assignment(cn));
-
         jdbcConnection.executeUpdate(
                 "delete from "+ jdbcConnection.getTableName(groupsLink)+" where cn=?",
-                assignments
+                new Object[] { cn }
         );
     }
 

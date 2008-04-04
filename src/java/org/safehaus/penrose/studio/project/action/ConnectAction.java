@@ -1,10 +1,7 @@
 package org.safehaus.penrose.studio.project.action;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -27,17 +24,15 @@ public class ConnectAction extends Action {
     }
 
     public void run() {
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-
         try {
             ServersView serversView = ServersView.getInstance();
             ProjectNode projectNode = serversView.getSelectedProjectNode();
             if (projectNode == null) return;
 
             Project project = projectNode.getProject();
+            if (project.isConnected()) return;
 
-            if (!project.isConnected()) projectNode.connect();
-
+            projectNode.connect();
             serversView.open(projectNode);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -59,7 +54,7 @@ public class ConnectAction extends Action {
             return !project.isConnected();
 
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
             return false;
         }
     }

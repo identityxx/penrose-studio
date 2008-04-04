@@ -33,8 +33,8 @@ public class RootDSENode extends Node {
 
     ServersView view;
 
-    public RootDSENode(ServersView view, String name, String type, Image image, Object object, Object parent) {
-        super(name, type, image, object, parent);
+    public RootDSENode(ServersView view, String name, Image image, Object object, Object parent) {
+        super(name, image, object, parent);
         this.view = view;
     }
 

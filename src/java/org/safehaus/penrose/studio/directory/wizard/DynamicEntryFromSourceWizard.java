@@ -19,21 +19,19 @@ package org.safehaus.penrose.studio.directory.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.safehaus.penrose.directory.EntryMapping;
-import org.safehaus.penrose.directory.AttributeMapping;
-import org.safehaus.penrose.directory.FieldMapping;
-import org.safehaus.penrose.directory.SourceMapping;
-import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.source.wizard.SelectSourcesWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDNBuilder;
-import org.safehaus.penrose.directory.DirectoryConfig;
+import org.safehaus.penrose.directory.*;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
 import org.apache.log4j.Logger;
 
-import java.util.Iterator;
 import java.util.Collection;
 
 /**
@@ -44,29 +42,31 @@ public class DynamicEntryFromSourceWizard extends Wizard {
     Logger log = Logger.getLogger(getClass());
 
     private Project project;
-    private PartitionConfig partitionConfig;
-    private EntryMapping parentMapping;
-    private EntryMapping entryMapping = new EntryMapping();
+    private String partitionName;
+    private EntryConfig parentConfig;
+    private EntryConfig entryConfig = new EntryConfig();
 
     public SelectSourcesWizardPage sourcesPage;
     public ObjectClassWizardPage ocPage;
     public AttributeValueWizardPage attrPage;
 
-    public DynamicEntryFromSourceWizard(PartitionConfig partitionConfig, EntryMapping parentMapping) {
-        this.partitionConfig = partitionConfig;
-        this.parentMapping = parentMapping;
+    public DynamicEntryFromSourceWizard(String partitionName, EntryConfig parentConfig) {
+        this.partitionName = partitionName;
+        this.parentConfig = parentConfig;
         setWindowTitle("Mapping Active Directory Users");
     }
 
     public void addPages() {
 
-        sourcesPage = new SelectSourcesWizardPage(partitionConfig);
+        sourcesPage = new SelectSourcesWizardPage();
         sourcesPage.setDescription("Select a source.");
+        sourcesPage.setProject(project);
+        sourcesPage.setPartitionName(partitionName);
 
         ocPage = new ObjectClassWizardPage(project);
-        //ocPage.setSelecteObjectClasses(entryMapping.getObjectClasses());
+        //ocPage.setSelecteObjectClasses(entryConfig.getObjectClasses());
 
-        attrPage = new AttributeValueWizardPage(project, partitionConfig);
+        attrPage = new AttributeValueWizardPage(project, partitionName);
         attrPage.setDefaultType(AttributeValueWizardPage.VARIABLE);
 
         addPage(sourcesPage);
@@ -84,11 +84,11 @@ public class DynamicEntryFromSourceWizard extends Wizard {
 
     public IWizardPage getNextPage(IWizardPage page) {
         if (sourcesPage == page) {
-            Collection sourceMappings = sourcesPage.getSourceMappings();
+            Collection<SourceMapping> sourceMappings = sourcesPage.getSourceMappings();
             attrPage.setSourceMappings(sourceMappings);
 
         } else if (ocPage == page) {
-            Collection objectClasses = ocPage.getSelectedObjectClasses();
+            Collection<String> objectClasses = ocPage.getSelectedObjectClasses();
             attrPage.setObjectClasses(objectClasses);
         }
 
@@ -97,20 +97,18 @@ public class DynamicEntryFromSourceWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            Collection sourceMappings = sourcesPage.getSourceMappings();
-            for (Iterator i=sourceMappings.iterator(); i.hasNext(); ) {
-                SourceMapping sourceMapping = (SourceMapping)i.next();
-                entryMapping.addSourceMapping(sourceMapping);
+            Collection<SourceMapping> sourceMappings = sourcesPage.getSourceMappings();
+            for (SourceMapping sourceMapping : sourceMappings) {
+                entryConfig.addSourceMapping(sourceMapping);
             }
 
-            entryMapping.addObjectClasses(ocPage.getSelectedObjectClasses());
+            entryConfig.addObjectClasses(ocPage.getSelectedObjectClasses());
 
-            Collection attributeMappings = attrPage.getAttributeMappings();
-            entryMapping.addAttributeMappings(attributeMappings);
+            Collection<AttributeMapping> attributeMappings = attrPage.getAttributeMappings();
+            entryConfig.addAttributeMappings(attributeMappings);
 
             RDNBuilder rb = new RDNBuilder();
-            for (Iterator i=attributeMappings.iterator(); i.hasNext(); ) {
-                AttributeMapping attributeMapping = (AttributeMapping)i.next();
+            for (AttributeMapping attributeMapping : attributeMappings) {
                 if (!attributeMapping.isRdn()) continue;
 
                 rb.set(attributeMapping.getName(), "...");
@@ -118,37 +116,41 @@ public class DynamicEntryFromSourceWizard extends Wizard {
 
             DNBuilder db = new DNBuilder();
             db.append(rb.toRdn());
-            db.append(parentMapping.getDn());
+            db.append(parentConfig.getDn());
 
-            entryMapping.setDn(db.toDn());
+            entryConfig.setDn(db.toDn());
 
             // add reverse mappings
-            for (Iterator i=entryMapping.getAttributeMappings().iterator(); i.hasNext(); ) {
-                AttributeMapping attributeMapping = (AttributeMapping)i.next();
+            for (AttributeMapping attributeMapping : entryConfig.getAttributeMappings()) {
 
                 String variable = attributeMapping.getVariable();
                 if (variable == null) continue;
 
                 int j = variable.indexOf(".");
                 String sourceName = variable.substring(0, j);
-                String fieldName = variable.substring(j+1);
+                String fieldName = variable.substring(j + 1);
 
                 FieldMapping fieldMapping = new FieldMapping(fieldName, FieldMapping.VARIABLE, attributeMapping.getName());
 
-                SourceMapping sourceMapping = entryMapping.getSourceMapping(sourceName);
+                SourceMapping sourceMapping = entryConfig.getSourceMapping(sourceName);
                 sourceMapping.addFieldMapping(fieldMapping);
             }
-
+/*
             DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
-            directoryConfig.addEntryMapping(entryMapping);
-
+            directoryConfig.addEntryConfig(entryConfig);
             project.save(partitionConfig, directoryConfig);
+*/
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            partitionClient.createEntry(entryConfig);
+            partitionClient.store();
 
             return true;
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return false;
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -156,28 +158,28 @@ public class DynamicEntryFromSourceWizard extends Wizard {
         return true;
     }
 
-    public EntryMapping getParentMapping() {
-        return parentMapping;
+    public EntryConfig getParentConfig() {
+        return parentConfig;
     }
 
-    public void setParentMapping(EntryMapping parentMapping) {
-        this.parentMapping = parentMapping;
+    public void setParentConfig(EntryConfig parentConfig) {
+        this.parentConfig = parentConfig;
     }
 
-    public EntryMapping getEntryMapping() {
-        return entryMapping;
+    public EntryConfig getEntryConfig() {
+        return entryConfig;
     }
 
-    public void setEntryMapping(EntryMapping entryMapping) {
-        this.entryMapping = entryMapping;
+    public void setEntryConfig(EntryConfig entryConfig) {
+        this.entryConfig = entryConfig;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 
     public Project getProject() {

@@ -18,13 +18,12 @@
 package org.safehaus.penrose.studio.welcome.action;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.util.FileUtil;
+import org.safehaus.penrose.util.FileUtil;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioWorkbenchAdvisor;
 import org.safehaus.penrose.studio.PenroseStudioWorkbenchWindowAdvisor;

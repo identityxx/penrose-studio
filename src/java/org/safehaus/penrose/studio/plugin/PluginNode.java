@@ -21,7 +21,6 @@ public class PluginNode extends Node {
     public PluginNode(String name, Object parent) {
         super(
                 name,
-                ServersView.SERVICE,
                 PenroseStudioPlugin.getImage(PenroseImage.MODULE),
                 null,
                 parent

@@ -1,7 +1,6 @@
 package org.safehaus.penrose.studio.federation.nis.domain;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.*;
 import org.safehaus.penrose.studio.federation.nis.conflict.NISConflictsNode;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISOwnershipNode;
@@ -46,7 +45,6 @@ public class NISDomainNode extends Node {
     public NISDomainNode(String name, NISDomain domain, NISNode nisNode) {
         super(
                 name,
-                ServersView.ENTRY,
                 PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
                 domain,
                 nisNode
@@ -112,11 +110,11 @@ public class NISDomainNode extends Node {
     public Image getImage() {
 /*
         Project project = nisFederation.getProject();
-        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
-        PartitionConfig partitionConfig = partitionConfigs.getPartitionConfig(domain.getName()+"_"+NISFederation.YP);
+        PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
+        PartitionConfig partitionConfig = partitionConfigManager.getPartitionConfig(domain.getName()+"_"+NISFederation.YP);
         return PenroseStudioPlugin.getImage(partitionConfig == null ? PenroseImage.RED_FOLDER : PenroseImage.FOLDER);
 */
-        //Partition partition = nisFederation.getPartitions().getPartition(domain.getName());
+        //Partition partition = nisFederation.getPartitionManager().getPartition(domain.getName());
         //return PenroseStudioPlugin.getImage(partition == null ? PenroseImage.RED_FOLDER : PenroseImage.FOLDER);
 
         return PenroseStudioPlugin.getImage(PenroseImage.FOLDER);

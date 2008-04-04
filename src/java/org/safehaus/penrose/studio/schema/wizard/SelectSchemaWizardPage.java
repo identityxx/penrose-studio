@@ -54,6 +54,8 @@ public class SelectSchemaWizardPage extends WizardPage {
 
     private ConnectionConfig connectionConfig;
 
+    SearchResult rootDse;
+
     public SelectSchemaWizardPage() {
         super(NAME);
 
@@ -142,7 +144,10 @@ public class SelectSchemaWizardPage extends WizardPage {
         LDAPClient client = null;
         try {
             client = new LDAPClient(connectionConfig.getParameters());
-            SearchResult rootDse = client.getRootDSE();
+
+            if (rootDse == null) {
+                rootDse = client.getRootDSE();
+            }
 
             Attribute schemaNamingContexts = rootDse.getAttributes().get("schemaNamingContext");
             if (schemaNamingContexts != null) {

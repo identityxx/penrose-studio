@@ -30,7 +30,6 @@ import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 
 import javax.naming.Context;
-import java.util.Iterator;
 import java.util.Collection;
 
 /**
@@ -64,9 +63,8 @@ public class SelectJNDIConnectionWizardPage extends WizardPage {
         connectionTable.setLayoutData(gd);
 
         PartitionConfig partitionConfig = partition.getPartitionConfig();
-        Collection connectionConfigs = partitionConfig.getConnectionConfigs().getConnectionConfigs();
-        for (Iterator i=connectionConfigs.iterator(); i.hasNext(); ) {
-            ConnectionConfig connectionConfig = (ConnectionConfig)i.next();
+        Collection<ConnectionConfig> connectionConfigs = partitionConfig.getConnectionConfigManager().getConnectionConfigs();
+        for (ConnectionConfig connectionConfig : connectionConfigs) {
             if (!"LDAP".equals(connectionConfig.getAdapterName())) continue;
 
             TableItem item = new TableItem(connectionTable, SWT.NONE);

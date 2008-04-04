@@ -17,35 +17,36 @@
  */
 package org.safehaus.penrose.studio.connection;
 
-import org.eclipse.jface.action.IMenuManager;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.swt.graphics.Image;
+import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.management.connection.ConnectionClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.partition.PartitionsNode;
-import org.safehaus.penrose.studio.partition.PartitionNode;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.plugin.PluginManager;
-import org.safehaus.penrose.studio.plugin.Plugin;
-import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.connection.action.NewSourceAction;
-import org.safehaus.penrose.studio.connection.editor.*;
+import org.safehaus.penrose.studio.connection.editor.ConnectionEditorInput;
+import org.safehaus.penrose.studio.partition.PartitionNode;
+import org.safehaus.penrose.studio.partition.PartitionsNode;
+import org.safehaus.penrose.studio.plugin.Plugin;
+import org.safehaus.penrose.studio.plugin.PluginManager;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.connection.ConnectionConfigs;
-import org.apache.log4j.Logger;
 
 import java.util.Collection;
-import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
@@ -60,11 +61,12 @@ public class ConnectionNode extends Node {
     private PartitionNode partitionNode;
     private ConnectionsNode connectionsNode;
 
-    private PartitionConfig partitionConfig;
-    private ConnectionConfig connectionConfig;
+    private String partitionName;
+    private String adapterName;
+    private String connectionName;
 
-    public ConnectionNode(String name, String type, Image image, Object object, Object parent) {
-        super(name, type, image, object, parent);
+    public ConnectionNode(String name, Image image, Object object, Object parent) {
+        super(name, image, object, parent);
         connectionsNode = (ConnectionsNode)parent;
         partitionNode = connectionsNode.getPartitionNode();
         partitionsNode = partitionNode.getPartitionsNode();
@@ -80,6 +82,7 @@ public class ConnectionNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
         });
@@ -96,6 +99,7 @@ public class ConnectionNode extends Node {
                     copy();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
         });
@@ -106,6 +110,7 @@ public class ConnectionNode extends Node {
                     paste();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
         });
@@ -116,6 +121,7 @@ public class ConnectionNode extends Node {
                     remove();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
         });
@@ -123,21 +129,20 @@ public class ConnectionNode extends Node {
 
     public void open() throws Exception {
 
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        IWorkbenchPage page = window.getActivePage();
-
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         PluginManager pluginManager = penroseStudio.getPluginManager();
-        Plugin plugin = pluginManager.getPlugin(connectionConfig.getAdapterName());
+        Plugin plugin = pluginManager.getPlugin(adapterName);
 
         ConnectionEditorInput ei = plugin.createConnectionEditorInput();
         ei.setProject(projectNode.getProject());
-        ei.setPartitionConfig(partitionConfig);
-        ei.setConnectionConfig(connectionConfig);
+        ei.setPartitionName(partitionName);
+        ei.setConnectionName(connectionName);
 
         String connectionEditorClass = plugin.getConnectionEditorClass();
 
         log.debug("Opening "+connectionEditorClass);
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        IWorkbenchPage page = window.getActivePage();
         page.openEditor(ei, connectionEditorClass);
     }
 
@@ -146,22 +151,40 @@ public class ConnectionNode extends Node {
         boolean confirm = MessageDialog.openQuestion(
                 view.getSite().getShell(),
                 "Confirmation",
-                "Remove Connection \""+connectionConfig.getName()+"\"?");
+                "Remove selected connections?");
 
         if (!confirm) return;
 
-        ConnectionConfigs connectionConfigs = partitionConfig.getConnectionConfigs();
-        connectionConfigs.removeConnectionConfig(connectionConfig.getName());
-
         Project project = projectNode.getProject();
-        project.save(partitionConfig, connectionConfigs);
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+        //ConnectionConfigManager connectionConfigManager = partitionConfig.getConnectionConfigManager();
+
+        for (Node node : view.getSelectedNodes()) {
+            if (!(node instanceof ConnectionNode)) continue;
+
+            ConnectionNode connectionNode = (ConnectionNode)node;
+            partitionClient.removeConnection(connectionNode.getConnectionName());
+        }
+
+        partitionClient.store();
+        //project.save(partitionConfig, connectionConfigManager);
         
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
 
     public void copy() throws Exception {
-        view.setClipboard(connectionConfig);
+
+        Project project = projectNode.getProject();
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+        ConnectionClient connectionClient = partitionClient.getConnectionClient(connectionName);
+        view.setClipboard(connectionClient.getConnectionConfig());
     }
 
     public void paste() throws Exception {
@@ -170,54 +193,57 @@ public class ConnectionNode extends Node {
 
         if (!(newObject instanceof ConnectionConfig)) return;
 
-        ConnectionConfigs connectionConfigs = partitionConfig.getConnectionConfigs();
+        Project project = projectNode.getProject();
 
         ConnectionConfig newConnectionConfig = (ConnectionConfig)((ConnectionConfig)newObject).clone();
-
+        view.setClipboard(null);
+/*
+        ConnectionConfigManager connectionConfigManager = partitionConfig.getConnectionConfigManager();
         int counter = 1;
         String name = newConnectionConfig.getName();
-        while (connectionConfigs.getConnectionConfig(name) != null) {
+        while (connectionConfigManager.getConnectionConfig(name) != null) {
             counter++;
             name = newConnectionConfig.getName()+" ("+counter+")";
         }
-
         newConnectionConfig.setName(name);
-        connectionConfigs.addConnectionConfig(newConnectionConfig);
 
-        view.setClipboard(null);
+        connectionConfigManager.addConnectionConfig(newConnectionConfig);
+        project.save(partitionConfig, connectionConfigManager);
+*/
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
-        Project project = projectNode.getProject();
-        project.save(partitionConfig, connectionConfigs);
+        Collection<String> connectionNames = partitionClient.getConnectionNames();
+        int counter = 1;
+        String name = newConnectionConfig.getName();
+        while (connectionNames.contains(name)) {
+            counter++;
+            name = newConnectionConfig.getName()+" ("+counter+")";
+        }
+        newConnectionConfig.setName(name);
+
+        partitionClient.createConnection(newConnectionConfig);
+        partitionClient.store();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
 
-    public boolean hasChildren() throws Exception {
-        return false;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public Collection<Node> getChildren() throws Exception {
-
-        Collection<Node> children = new ArrayList<Node>();
-
-        return children;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getConnectionName() {
+        return connectionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
-    }
-
-    public ConnectionConfig getConnectionConfig() {
-        return connectionConfig;
-    }
-
-    public void setConnectionConfig(ConnectionConfig connectionConfig) {
-        this.connectionConfig = connectionConfig;
+    public void setConnectionName(String connectionName) {
+        this.connectionName = connectionName;
     }
 
     public ServersView getView() {
@@ -258,5 +284,13 @@ public class ConnectionNode extends Node {
 
     public void setConnectionsNode(ConnectionsNode connectionsNode) {
         this.connectionsNode = connectionsNode;
+    }
+
+    public String getAdapterName() {
+        return adapterName;
+    }
+
+    public void setAdapterName(String adapterName) {
+        this.adapterName = adapterName;
     }
 }

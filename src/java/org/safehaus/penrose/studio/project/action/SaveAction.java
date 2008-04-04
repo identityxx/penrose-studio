@@ -61,7 +61,7 @@ public class SaveAction extends Action {
 
             Project project = projectNode.getProject();
 
-            project.save();
+            //project.save();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

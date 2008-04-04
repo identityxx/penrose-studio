@@ -17,13 +17,14 @@
  */
 package org.safehaus.penrose.studio.partition.action;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.partition.wizard.ExportPartitionWizard;
 import org.safehaus.penrose.studio.partition.PartitionNode;
+import org.safehaus.penrose.studio.partition.wizard.ExportPartitionWizard;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.project.ProjectNode;
-import org.apache.log4j.Logger;
+import org.safehaus.penrose.studio.server.ServersView;
 
 public class ExportPartitionAction extends Action {
 
@@ -41,12 +42,14 @@ public class ExportPartitionAction extends Action {
         try {
             ServersView serversView = ServersView.getInstance();
 
-            ExportPartitionWizard wizard = new ExportPartitionWizard(partitionNode.getPartitionConfig());
+            ProjectNode projectNode = serversView.getSelectedProjectNode();
+            Project project = projectNode.getProject();
+
+            ExportPartitionWizard wizard = new ExportPartitionWizard(project, partitionNode.getPartitionName());
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
             dialog.open();
 
-            ProjectNode projectNode = serversView.getSelectedProjectNode();
             serversView.open(projectNode.getPartitionsNode());
 
         } catch (Exception e) {

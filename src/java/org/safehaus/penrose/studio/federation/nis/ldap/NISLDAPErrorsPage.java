@@ -23,9 +23,10 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.management.PartitionClient;
-import org.safehaus.penrose.management.SourceClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.source.SourceClient;
 import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -67,7 +68,8 @@ public class NISLDAPErrorsPage extends FormPage {
         this.domain = editor.getDomain();
 
         PenroseClient penroseClient = project.getClient();
-        partitionClient = penroseClient.getPartitionClient(domain.getName()+"_"+NISFederation.NIS);
+        PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
+        partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.NIS);
         errors = partitionClient.getSourceClient("errors");
     }
 

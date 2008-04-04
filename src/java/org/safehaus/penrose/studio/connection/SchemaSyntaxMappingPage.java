@@ -24,7 +24,6 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.schema.Schema;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -40,13 +39,10 @@ public class SchemaSyntaxMappingPage extends WizardPage implements ModifyListene
 
     Table table;
 
-    private Map syntaxMapping = new LinkedHashMap();
-    Schema schema;
+    private Map<String,String> syntaxMapping = new LinkedHashMap<String,String>();
 
-    public SchemaSyntaxMappingPage(Schema schema) {
+    public SchemaSyntaxMappingPage() {
         super(NAME);
-
-        this.schema = schema;
 
         // Object(DN-DN) => DN
         syntaxMapping.put("2.5.5.1", "1.3.6.1.4.1.1466.115.121.1.12");
@@ -122,9 +118,8 @@ public class SchemaSyntaxMappingPage extends WizardPage implements ModifyListene
         tc.setText("New Syntax");
         tc.setWidth(250);
 
-        for (Iterator i=syntaxMapping.keySet().iterator(); i.hasNext(); ) {
-            String oldSyntax = (String)i.next();
-            String newSyntax = (String)syntaxMapping.get(oldSyntax);
+        for (String oldSyntax : syntaxMapping.keySet()) {
+            String newSyntax = syntaxMapping.get(oldSyntax);
 
             TableItem ti = new TableItem(table, SWT.NONE);
             ti.setText(0, oldSyntax);
@@ -146,7 +141,7 @@ public class SchemaSyntaxMappingPage extends WizardPage implements ModifyListene
         return syntaxMapping;
     }
 
-    public void setSyntaxMapping(Map syntaxMapping) {
+    public void setSyntaxMapping(Map<String,String> syntaxMapping) {
         this.syntaxMapping = syntaxMapping;
     }
 }

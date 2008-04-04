@@ -17,25 +17,23 @@
  */
 package org.safehaus.penrose.studio.schema;
 
-import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.schema.SchemaConfig;
-import org.safehaus.penrose.schema.SchemaManager;
-import org.safehaus.penrose.schema.Schema;
-import org.safehaus.penrose.config.PenroseConfig;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchPage;
 import org.apache.log4j.Logger;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.schema.SchemaManagerClient;
+import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.tree.Node;
 
 /**
  * @author Endi S. Dewata
@@ -48,12 +46,13 @@ public class SchemaNode extends Node {
     protected ProjectNode projectNode;
     protected SchemasNode schemasNode;
 
-    private SchemaConfig schemaConfig;
+    private String schemaName;
 
-    public SchemaNode(String name, String type, Image image, Object object, Object parent) {
-        super(name, type, image, object, parent);
+    public SchemaNode(String name, Image image, Object object, SchemasNode parent) {
+        super(name, image, object, parent);
         schemasNode = (SchemasNode)parent;
         projectNode = schemasNode.getProjectNode();
+        schemaName = (String)object;
         view = projectNode.getServersView();
     }
 
@@ -93,11 +92,10 @@ public class SchemaNode extends Node {
     public void open() throws Exception {
 
         Project project = projectNode.getProject();
-        SchemaManager schemaManager = project.getSchemaManager();
-        Schema schema = schemaManager.getSchema(schemaConfig.getName());
 
-        SchemaEditorInput ei = new SchemaEditorInput(schemaConfig, schema);
+        SchemaEditorInput ei = new SchemaEditorInput();
         ei.setProject(project);
+        ei.setSchemaName(schemaName);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -109,16 +107,14 @@ public class SchemaNode extends Node {
         boolean confirm = MessageDialog.openQuestion(
                 view.getSite().getShell(),
                 "Confirmation",
-                "Remove Schema \""+schemaConfig.getName()+"\"?");
+                "Remove Schema \""+ schemaName+"\"?");
 
         if (!confirm) return;
 
         Project project = projectNode.getProject();
-        PenroseConfig penroseConfig = project.getPenroseConfig();
-        penroseConfig.removeSchemaConfig(schemaConfig.getName());
-
-        SchemaManager schemaManager = project.getSchemaManager();
-        schemaManager.removeSchema(schemaConfig.getName());
+        PenroseClient client = project.getClient();
+        SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+        schemaManagerClient.removeSchema(schemaName);
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
@@ -161,12 +157,12 @@ public class SchemaNode extends Node {
         return children;
     }
 */
-    public SchemaConfig getSchemaConfig() {
-        return schemaConfig;
+    public String getSchemaName() {
+        return schemaName;
     }
 
-    public void setSchemaConfig(SchemaConfig schemaConfig) {
-        this.schemaConfig = schemaConfig;
+    public void setSchemaName(String schemaName) {
+        this.schemaName = schemaName;
     }
 
     public ProjectNode getProjectNode() {

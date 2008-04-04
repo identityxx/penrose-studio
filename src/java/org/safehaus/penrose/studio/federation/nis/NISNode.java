@@ -41,7 +41,7 @@ public class NISNode extends Node {
     NISOwnershipNode ownershipNode;
 
     public NISNode(String name, FederationNode federationNode) throws Exception {
-        super(name, null, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), null, federationNode);
+        super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), null, federationNode);
 
         this.federationNode = federationNode;
         this.projectNode = federationNode.getProjectNode();

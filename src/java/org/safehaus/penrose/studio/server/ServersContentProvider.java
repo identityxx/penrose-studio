@@ -66,6 +66,7 @@ public class ServersContentProvider implements ITreeContentProvider {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
 
         return list.toArray();
@@ -87,16 +88,14 @@ public class ServersContentProvider implements ITreeContentProvider {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
-
-        return false;
     }
 
     public void addProjectConfig(ProjectConfig projectConfig) {
         ProjectNode projectNode = new ProjectNode(
                 view,
                 projectConfig.getName(),
-                "Project",
                 PenroseStudioPlugin.getImage(PenroseImage.LOGO16),
                 projectConfig,
                 null

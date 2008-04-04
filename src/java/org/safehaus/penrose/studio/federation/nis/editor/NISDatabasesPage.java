@@ -25,7 +25,6 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 
 /**
@@ -141,7 +140,7 @@ public class NISDatabasesPage extends FormPage {
                     for (TableItem ti : items) {
                         NISDomain domain = (NISDomain)ti.getData();
                         String name = domain.getName();
-                        PartitionConfig nisPartitionConfig = project.getPartitionConfigs().getPartitionConfig(name+"_"+NISFederation.YP);
+                        //PartitionConfig nisPartitionConfig = project.getPartitionConfigManager().getPartitionConfig(name+"_"+NISFederation.YP);
                         //nisFederation.createDatabase(domain, nisPartitionConfig);
                     }
 

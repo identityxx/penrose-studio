@@ -17,30 +17,36 @@
  */
 package org.safehaus.penrose.studio.jndi.source;
 
-import java.util.*;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
-import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.forms.widgets.Section;
+import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.directory.EntryConfig;
+import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.management.*;
+import org.safehaus.penrose.management.schema.SchemaManagerClient;
+import org.safehaus.penrose.management.directory.EntryClient;
+import org.safehaus.penrose.management.connection.ConnectionClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.schema.AttributeType;
+import org.safehaus.penrose.schema.Schema;
+import org.safehaus.penrose.schema.SchemaUtil;
+import org.safehaus.penrose.source.FieldConfig;
+import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.jndi.source.JNDIFieldDialog;
 import org.safehaus.penrose.studio.source.FieldDialog;
 import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
-import org.safehaus.penrose.schema.SchemaManager;
-import org.safehaus.penrose.schema.Schema;
-import org.safehaus.penrose.schema.AttributeType;
-import org.safehaus.penrose.ldap.LDAPClient;
-import org.safehaus.penrose.source.SourceConfigs;
-import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.directory.EntryMapping;
-import org.safehaus.penrose.directory.SourceMapping;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class JNDISourcePropertyPage extends SourceEditorPage {
 
@@ -125,8 +131,18 @@ public class JNDISourcePropertyPage extends SourceEditorPage {
         gd.widthHint = 200;
 		connectionNameCombo.setLayoutData(gd);
 
-        for (ConnectionConfig connectionConfig : partitionConfig.getConnectionConfigs().getConnectionConfigs()) {
-            connectionNameCombo.add(connectionConfig.getName());
+        try {
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+            for (String connectionName : partitionClient.getConnectionNames()) {
+                connectionNameCombo.add(connectionName);
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
 
         connectionNameCombo.setText(sourceConfig.getConnectionName());
@@ -247,7 +263,7 @@ public class JNDISourcePropertyPage extends SourceEditorPage {
 
 		fieldTable.addMouseListener(new MouseAdapter() {
             public void mouseDoubleClick(MouseEvent event) {
-                LDAPClient client = null;
+                LDAPClient ldapClient = null;
                 try {
                     if (fieldTable.getSelectionCount() == 0) return;
 
@@ -258,14 +274,22 @@ public class JNDISourcePropertyPage extends SourceEditorPage {
 
                     Collection<AttributeType> attributeTypes;
 
-                    ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
+                    PenroseClient client = project.getClient();
+                    PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+                    ConnectionClient connectionClient = partitionClient.getConnectionClient(sourceConfig.getConnectionName());
+                    ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
+                    
                     if (connectionConfig != null) {
-                        client = new LDAPClient(connectionConfig.getParameters());
+                        ldapClient = new LDAPClient(connectionConfig.getParameters());
                     }
-                    if (client == null) {
+                    if (ldapClient == null) {
                         attributeTypes = new ArrayList<AttributeType>();
                     } else {
-                        Schema schema = client.getSchema();
+
+                        SchemaUtil schemaUtil = new SchemaUtil();
+                        Schema schema = schemaUtil.getSchema(ldapClient);
                         attributeTypes = schema.getAttributeTypes();
                     }
 
@@ -290,7 +314,7 @@ public class JNDISourcePropertyPage extends SourceEditorPage {
                     log.error(e.getMessage(), e);
 
                 } finally {
-                    if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
+                    if (ldapClient != null) try { ldapClient.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
                 }
             }
 
@@ -343,8 +367,10 @@ public class JNDISourcePropertyPage extends SourceEditorPage {
                 try {
                     FieldConfig fieldDefinition = new FieldConfig();
 
-                    SchemaManager schemaManager = project.getSchemaManager();
-                    Collection<AttributeType> attributeTypes = schemaManager.getAttributeTypes();
+                    PenroseClient client = project.getClient();
+                    SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+
+                    Collection<AttributeType> attributeTypes = schemaManagerClient.getAttributeTypes();
 
                     JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setAttributeTypes(attributeTypes);
@@ -377,8 +403,9 @@ public class JNDISourcePropertyPage extends SourceEditorPage {
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     String oldName = fieldDefinition.getName();
 
-                    SchemaManager schemaManager = project.getSchemaManager();
-                    Collection<AttributeType> attributeTypes = schemaManager.getAttributeTypes();
+                    PenroseClient client = project.getClient();
+                    SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+                    Collection<AttributeType> attributeTypes = schemaManagerClient.getAttributeTypes();
 
                     JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setAttributeTypes(attributeTypes);
@@ -433,26 +460,34 @@ public class JNDISourcePropertyPage extends SourceEditorPage {
 
     public void store() throws Exception {
 
-        SourceConfigs sources = partitionConfig.getSourceConfigs();
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
-        if (!sourceNameText.getText().equals(sourceConfig.getName())) {
+        //SourceConfigManager sourceConfigManager = partitionConfig.getSourceConfigManager();
+        String oldName = sourceConfig.getName();
 
-            String oldName = sourceConfig.getName();
+        if (!sourceNameText.getText().equals(oldName)) {
+
             String newName = sourceNameText.getText();
 
-            Collection<EntryMapping> entries = partitionConfig.getDirectoryConfig().getEntryMappings();
-            for (EntryMapping entry : entries) {
+            for (String id : partitionClient.getEntryIds()) {
+                EntryClient entryClient = partitionClient.getEntryClient(id);
+                EntryConfig entryConfig = entryClient.getEntryConfig();
 
-                SourceMapping s = entry.removeSourceMapping(oldName);
+                SourceMapping s = entryConfig.removeSourceMapping(oldName);
                 if (s == null) continue;
 
                 s.setName(newName);
-                entry.addSourceMapping(s);
+                entryConfig.addSourceMapping(s);
+
+                partitionClient.updateEntry(id, entryConfig);
             }
 
-            sources.removeSourceConfig(oldName);
+            //sourceConfigManager.removeSourceConfig(oldName);
             sourceConfig.setName(newName);
-            sources.addSourceConfig(sourceConfig);
+            //sourceConfigManager.addSourceConfig(sourceConfig);
+
         }
 
         sourceConfig.setParameter("baseDn", baseDnText.getText());
@@ -471,6 +506,9 @@ public class JNDISourcePropertyPage extends SourceEditorPage {
             field.setPrimaryKey(item.getChecked());
             sourceConfig.addFieldConfig(field);
         }
+
+        partitionClient.updateSource(oldName, sourceConfig);
+        partitionClient.store();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();

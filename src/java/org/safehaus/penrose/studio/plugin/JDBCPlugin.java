@@ -4,8 +4,8 @@ import org.safehaus.penrose.studio.jdbc.source.JDBCSourceEditorInput;
 import org.safehaus.penrose.studio.jdbc.source.JDBCSourceEditor;
 import org.safehaus.penrose.studio.source.editor.SourceEditorInput;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorInput;
-import org.safehaus.penrose.studio.jdbc.connection.JDBCConnectionEditorInput;
-import org.safehaus.penrose.studio.jdbc.connection.JDBCConnectionEditor;
+import org.safehaus.penrose.studio.jdbc.connection.editor.JDBCConnectionEditorInput;
+import org.safehaus.penrose.studio.jdbc.connection.editor.JDBCConnectionEditor;
 
 /**
  * @author Endi S. Dewata

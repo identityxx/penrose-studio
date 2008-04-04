@@ -18,8 +18,8 @@ public class NISConnectionEditor extends ConnectionEditor {
 
             //if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
 
-                //addPage(new JNDIConnectionBrowserPage(this));
-                //addPage(new JNDIConnectionSchemaPage(this));
+                //addPage(new LDAPConnectionBrowserPage(this));
+                //addPage(new LDAPConnectionSchemaPage(this));
             //}
 
         } catch (Exception e) {

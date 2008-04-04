@@ -24,10 +24,12 @@ import org.safehaus.penrose.studio.schema.wizard.SelectSchemaWizardPage;
 import org.safehaus.penrose.studio.util.ADUtil;
 import org.safehaus.penrose.studio.util.SchemaUtil;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.directory.EntryMapping;
+import org.safehaus.penrose.directory.EntryConfig;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
 import org.apache.log4j.Logger;
 
 /**
@@ -41,12 +43,12 @@ public class CreateADSchemaProxyWizard extends Wizard {
     SelectSchemaWizardPage schemaPage;
 
     private Project project;
-    private PartitionConfig partitionConfig;
+    private String partitionName;
 
     public CreateADSchemaProxyWizard() {
         setWindowTitle("New Active Directory Schema Proxy");
 
-        connectionPage = new SelectConnectionWizardPage(partitionConfig, "LDAP");
+        connectionPage = new SelectConnectionWizardPage(partitionName, "LDAP");
         connectionPage.setDescription(
                 "Select Active Directory connection. "+
                 "The connection URL should point to the Root DSE (empty base DN)."
@@ -77,31 +79,37 @@ public class CreateADSchemaProxyWizard extends Wizard {
 
     public boolean performFinish() {
         try {
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
             ConnectionConfig connectionConfig = connectionPage.getConnectionConfig();
             String sourceSchemaDn = schemaPage.getSourceSchemaDn();
             String destSchemaDn = schemaPage.getDestSchemaDn();
             String schemaFormat = schemaPage.getSchemaFormat();
 
-            EntryMapping schemaMapping;
+            EntryConfig schemaMapping;
 
             if (SelectSchemaWizardPage.LDAP_SCHEMA.equals(schemaFormat)) {
                 ADUtil util = new ADUtil();
-                schemaMapping = util.createSchemaProxy(partitionConfig, connectionConfig, sourceSchemaDn, destSchemaDn);
+                schemaMapping = util.createSchemaProxy(partitionClient, connectionConfig.getName(), sourceSchemaDn, destSchemaDn);
 
             } else {
                 SchemaUtil util = new SchemaUtil();
-                schemaMapping = util.createSchemaProxy(partitionConfig, connectionConfig, sourceSchemaDn, destSchemaDn);
+                schemaMapping = util.createSchemaProxy(partitionClient, connectionConfig.getName(), sourceSchemaDn, destSchemaDn);
             }
 
             schemaMapping.addACI(new ACI("rs"));
 
-            project.save(partitionConfig);
+            partitionClient.store();
+
+            //project.save(partitionConfig);
 
             return true;
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return false;
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -117,11 +125,11 @@ public class CreateADSchemaProxyWizard extends Wizard {
         this.project = project;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 }

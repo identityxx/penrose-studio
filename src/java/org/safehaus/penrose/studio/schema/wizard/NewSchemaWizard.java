@@ -20,9 +20,10 @@ package org.safehaus.penrose.studio.schema.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.schema.SchemaConfig;
-import org.safehaus.penrose.schema.SchemaManager;
 import org.safehaus.penrose.schema.SchemaWriter;
 import org.safehaus.penrose.schema.Schema;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.schema.SchemaManagerClient;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -79,21 +80,17 @@ public class NewSchemaWizard extends Wizard {
             schemaConfig.setName(name);
             schemaConfig.setPath(path);
 
-            Schema schema = new Schema(schemaConfig);
+            Schema schema = new Schema(name);
 
-            SchemaWriter schemaWriter = new SchemaWriter(project.getWorkDir());
-            schemaWriter.write(schema);
-
-            project.getPenroseConfig().addSchemaConfig(schemaConfig);
-
-            SchemaManager schemaManager = project.getSchemaManager();
-            schemaManager.addSchema(schema);
+            PenroseClient client = project.getClient();
+            SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+            schemaManagerClient.createSchema(schema);
 
             return true;
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return false;
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

@@ -17,24 +17,28 @@
  */
 package org.safehaus.penrose.studio.directory;
 
-import org.safehaus.penrose.studio.*;
-import org.safehaus.penrose.studio.partition.PartitionsNode;
-import org.safehaus.penrose.studio.partition.PartitionNode;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.directory.action.*;
-import org.safehaus.penrose.directory.EntryMapping;
-import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.eclipse.swt.graphics.Image;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.apache.log4j.Logger;
+import org.safehaus.penrose.directory.EntryConfig;
+import org.safehaus.penrose.management.directory.EntryClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.directory.action.*;
+import org.safehaus.penrose.studio.partition.PartitionNode;
+import org.safehaus.penrose.studio.partition.PartitionsNode;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.tree.Node;
 
-import java.util.Collection;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
@@ -48,10 +52,10 @@ public class DirectoryNode extends Node {
     protected PartitionsNode partitionsNode;
     protected PartitionNode partitionNode;
 
-    private PartitionConfig partitionConfig;
+    private String partitionName;
 
-    public DirectoryNode(String name, String type, Image image, Object object, Object parent) {
-        super(name, type, image, object, parent);
+    public DirectoryNode(String name, Image image, Object object, Object parent) {
+        super(name, image, object, parent);
         partitionNode = (PartitionNode)parent;
         partitionsNode = partitionNode.getPartitionsNode();
         projectNode = partitionsNode.getProjectNode();
@@ -77,34 +81,38 @@ public class DirectoryNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        return !partitionConfig.getDirectoryConfig().getRootEntryMappings().isEmpty();
+        return !getChildren().isEmpty();
     }
 
     public Collection<Node> getChildren() throws Exception {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        Collection rootEntryMappings = partitionConfig.getDirectoryConfig().getRootEntryMappings();
-        for (Iterator i=rootEntryMappings.iterator(); i.hasNext(); ) {
-            EntryMapping entryMapping = (EntryMapping)i.next();
+        Project project = projectNode.getProject();
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
-            String dn;
-            if (entryMapping.getDn().isEmpty()) {
-                dn = "Root DSE";
+        for (String id : partitionClient.getRootEntryIds()) {
+            EntryClient entryClient = partitionClient.getEntryClient(id);
+            EntryConfig entryConfig = entryClient.getEntryConfig();
+
+            String label;
+            if (entryConfig.getDn().isEmpty()) {
+                label = "Root DSE";
             } else {
-                dn = entryMapping.getDn().toString();
+                label = entryConfig.getDn().toString();
             }
 
             EntryNode entryNode = new EntryNode(
-                    dn,
-                    ServersView.ENTRY,
+                    label,
                     PenroseStudioPlugin.getImage(PenroseImage.HOME_NODE),
-                    entryMapping,
+                    entryConfig,
                     this
             );
 
-            entryNode.setPartitionConfig(this.partitionConfig);
-            entryNode.setEntryMapping(entryMapping);
+            entryNode.setPartitionName(partitionName);
+            entryNode.setEntryConfig(entryConfig);
 
             children.add(entryNode);
         }
@@ -112,12 +120,12 @@ public class DirectoryNode extends Node {
         return children;
     }
 
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 
     public ServersView getView() {

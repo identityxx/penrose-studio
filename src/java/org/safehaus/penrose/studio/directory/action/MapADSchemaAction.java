@@ -19,7 +19,6 @@ package org.safehaus.penrose.studio.directory.action;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.studio.directory.wizard.CreateADSchemaProxyWizard;
@@ -50,7 +49,7 @@ public class MapADSchemaAction extends Action {
 
             CreateADSchemaProxyWizard wizard = new CreateADSchemaProxyWizard();
             wizard.setProject(project);
-            wizard.setPartitionConfig(node.getPartitionConfig());
+            wizard.setPartitionName(node.getPartitionName());
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);

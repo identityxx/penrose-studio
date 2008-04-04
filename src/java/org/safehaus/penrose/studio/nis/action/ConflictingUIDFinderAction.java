@@ -2,7 +2,6 @@ package org.safehaus.penrose.studio.nis.action;
 
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.jdbc.QueryResponse;
-import org.safehaus.penrose.jdbc.Assignment;
 import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 import org.safehaus.penrose.ldap.Attributes;
 import org.safehaus.penrose.partition.*;
@@ -10,8 +9,10 @@ import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
 
-import java.util.*;
 import java.sql.ResultSet;
 
 /**
@@ -51,13 +52,22 @@ public class ConflictingUIDFinderAction extends NISAction {
         log.debug("Checking conflicts between "+domain1.getName()+" and "+domain2.getName()+".");
 
         Project project = nisFederation.getProject();
-        PartitionConfigs partitionConfigs = project.getPartitionConfigs();
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 
-        PartitionConfig partitionConfig1 = partitionConfigs.getPartitionConfig(domain1.getName()+"_"+NISFederation.YP);
-        SourceConfig sourceConfig1 = partitionConfig1.getSourceConfigs().getSourceConfig(NISFederation.CACHE_USERS);
+        PartitionClient partitionClient1 = partitionManagerClient.getPartitionClient(domain1.getName()+"_"+NISFederation.YP);
+        PartitionConfig partitionConfig1 = partitionClient1.getPartitionConfig();
 
-        PartitionConfig partitionConfig2 = partitionConfigs.getPartitionConfig(domain2.getName()+"_"+NISFederation.YP);
-        SourceConfig sourceConfig2 = partitionConfig2.getSourceConfigs().getSourceConfig(NISFederation.CACHE_USERS);
+        PartitionClient partitionClient2 = partitionManagerClient.getPartitionClient(domain2.getName()+"_"+NISFederation.YP);
+        PartitionConfig partitionConfig2 = partitionClient2.getPartitionConfig();
+
+        //PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
+
+        //PartitionConfig partitionConfig1 = partitionConfigManager.getPartitionConfig(domain1.getName()+"_"+NISFederation.YP);
+        SourceConfig sourceConfig1 = partitionConfig1.getSourceConfigManager().getSourceConfig(NISFederation.CACHE_USERS);
+
+        //PartitionConfig partitionConfig2 = partitionConfigManager.getPartitionConfig(domain2.getName()+"_"+NISFederation.YP);
+        SourceConfig sourceConfig2 = partitionConfig2.getSourceConfigManager().getSourceConfig(NISFederation.CACHE_USERS);
 
         Partition partition = nisFederation.getPartition();
         JDBCConnection connection = (JDBCConnection)partition.getConnection(Federation.JDBC);
@@ -75,10 +85,6 @@ public class ConflictingUIDFinderAction extends NISAction {
                     " or d.uidNumber is null and b.uidNumber = c.uidNumber"+
                     " or b.uidNumber = d.uidNumber" +
                 " order by a.uid";
-
-        Collection<Assignment> assignments = new ArrayList<Assignment>();
-        assignments.add(new Assignment(domain1.getName()));
-        assignments.add(new Assignment(domain2.getName()));
 
         QueryResponse queryResponse = new QueryResponse() {
             public void add(Object object) throws Exception {
@@ -108,6 +114,10 @@ public class ConflictingUIDFinderAction extends NISAction {
             }
         };
 
-        connection.executeQuery(sql, assignments, queryResponse);
+        connection.executeQuery(
+                sql,
+                new Object[] { domain1.getName(), domain2.getName() },
+                queryResponse
+        );
     }
 }

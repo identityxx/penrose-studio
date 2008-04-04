@@ -1,30 +1,34 @@
 package org.safehaus.penrose.studio.nis.source;
 
-import org.eclipse.ui.forms.widgets.ScrolledForm;
-import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.*;
+import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.schema.SchemaManager;
+import org.safehaus.penrose.directory.EntryConfig;
+import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.management.*;
+import org.safehaus.penrose.management.schema.SchemaManagerClient;
+import org.safehaus.penrose.management.directory.EntryClient;
+import org.safehaus.penrose.management.connection.ConnectionClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.nis.*;
 import org.safehaus.penrose.schema.AttributeType;
+import org.safehaus.penrose.source.FieldConfig;
+import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.jndi.source.JNDIFieldDialog;
 import org.safehaus.penrose.studio.source.FieldDialog;
 import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.source.SourceConfigs;
-import org.safehaus.penrose.directory.EntryMapping;
-import org.safehaus.penrose.directory.SourceMapping;
-import org.safehaus.penrose.nis.*;
 
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class NISSourcePropertyPage extends SourceEditorPage {
 
@@ -40,30 +44,36 @@ public class NISSourcePropertyPage extends SourceEditorPage {
     Button editButton;
     Button removeButton;
 
-	NISClient client;
+	NISClient nisClient;
 
 	String[] scopes = new String[] { "OBJECT", "ONELEVEL", "SUBTREE" };
 
     public NISSourcePropertyPage(NISSourceEditor editor) throws Exception {
         super(editor, "PROPERTIES", "  Properties  ");
 
-        ConnectionConfig connectionConfig = partitionConfig.getConnectionConfigs().getConnectionConfig(sourceConfig.getConnectionName());
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+        ConnectionClient connectionClient = partitionClient.getConnectionClient(sourceConfig.getConnectionName());
+
+        ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
         if (connectionConfig == null) return;
 
         String method = connectionConfig.getParameter(NIS.METHOD);
         if (method == null) method = NIS.DEFAULT_METHOD;
 
         if (NIS.LOCAL.equals(method)) {
-            client = new NISLocalClient();
+            nisClient = new NISLocalClient();
 
         } else if (NIS.YP.equals(method)) {
-            client = new NISYPClient();
+            nisClient = new NISYPClient();
 
         } else { // if (METHOD_JNDI.equals(method)) {
-            client = new NISJNDIClient();
+            nisClient = new NISJNDIClient();
         }
 
-        client.init(connectionConfig.getParameters());
+        nisClient.init(connectionConfig.getParameters());
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -127,8 +137,18 @@ public class NISSourcePropertyPage extends SourceEditorPage {
         gd.widthHint = 200;
 		connectionNameCombo.setLayoutData(gd);
 
-        for (ConnectionConfig connectionConfig : partitionConfig.getConnectionConfigs().getConnectionConfigs()) {
-            connectionNameCombo.add(connectionConfig.getName());
+        try {
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+            for (String connectionName : partitionClient.getConnectionNames()) {
+                connectionNameCombo.add(connectionName);
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
 
         connectionNameCombo.setText(sourceConfig.getConnectionName());
@@ -286,8 +306,9 @@ public class NISSourcePropertyPage extends SourceEditorPage {
                 try {
                     FieldConfig fieldDefinition = new FieldConfig();
 
-                    SchemaManager schemaManager = project.getSchemaManager();
-                    Collection<AttributeType> attributeTypes = schemaManager.getAttributeTypes();
+                    PenroseClient client = project.getClient();
+                    SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+                    Collection<AttributeType> attributeTypes = schemaManagerClient.getAttributeTypes();
 
                     JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setAttributeTypes(attributeTypes);
@@ -320,8 +341,9 @@ public class NISSourcePropertyPage extends SourceEditorPage {
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     String oldName = fieldDefinition.getName();
 
-                    SchemaManager schemaManager = project.getSchemaManager();
-                    Collection<AttributeType> attributeTypes = schemaManager.getAttributeTypes();
+                    PenroseClient client = project.getClient();
+                    SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+                    Collection<AttributeType> attributeTypes = schemaManagerClient.getAttributeTypes();
 
                     JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setAttributeTypes(attributeTypes);
@@ -376,26 +398,33 @@ public class NISSourcePropertyPage extends SourceEditorPage {
 
     public void store() throws Exception {
 
-        SourceConfigs sources = partitionConfig.getSourceConfigs();
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
-        if (!sourceNameText.getText().equals(sourceConfig.getName())) {
+        //SourceConfigManager sources = partitionConfig.getSourceConfigManager();
+        String oldName = sourceConfig.getName();
 
-            String oldName = sourceConfig.getName();
+        if (!sourceNameText.getText().equals(oldName)) {
+
             String newName = sourceNameText.getText();
 
-            Collection<EntryMapping> entries = partitionConfig.getDirectoryConfig().getEntryMappings();
-            for (EntryMapping entry : entries) {
+            for (String id : partitionClient.getEntryIds()) {
+                EntryClient entryClient = partitionClient.getEntryClient(id);
+                EntryConfig entryConfig = entryClient.getEntryConfig();
 
-                SourceMapping s = entry.removeSourceMapping(oldName);
+                SourceMapping s = entryConfig.removeSourceMapping(oldName);
                 if (s == null) continue;
 
                 s.setName(newName);
-                entry.addSourceMapping(s);
+                entryConfig.addSourceMapping(s);
+
+                partitionClient.updateEntry(id, entryConfig);
             }
 
-            sources.removeSourceConfig(oldName);
+            //sources.removeSourceConfig(oldName);
             sourceConfig.setName(newName);
-            sources.addSourceConfig(sourceConfig);
+            //sources.addSourceConfig(sourceConfig);
         }
 
         sourceConfig.setParameter("base", baseText.getText());
@@ -412,6 +441,9 @@ public class NISSourcePropertyPage extends SourceEditorPage {
             field.setPrimaryKey(item.getChecked());
             sourceConfig.addFieldConfig(field);
         }
+
+        partitionClient.updateSource(oldName, sourceConfig);
+        partitionClient.store();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();

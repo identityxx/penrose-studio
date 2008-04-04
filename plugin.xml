@@ -46,15 +46,15 @@
             icon="images/server.png"
             class="org.safehaus.penrose.studio.connection.editor.ConnectionEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.jdbc.connection.JDBCConnectionEditor"
+            id="org.safehaus.penrose.studio.jdbc.connection.editor.JDBCConnectionEditor"
             name="JDBC Connection"
             icon="images/server.png"
-            class="org.safehaus.penrose.studio.jdbc.connection.JDBCConnectionEditor"/>
+            class="org.safehaus.penrose.studio.jdbc.connection.editor.JDBCConnectionEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.jndi.connection.JNDIConnectionEditor"
-            name="JNDI Connection"
+            id="org.safehaus.penrose.studio.ldap.connection.editor.LDAPConnectionEditor"
+            name="LDAP Connection"
             icon="images/server.png"
-            class="org.safehaus.penrose.studio.jndi.connection.JNDIConnectionEditor"/>
+            class="org.safehaus.penrose.studio.ldap.connection.editor.LDAPConnectionEditor"/>
         <editor
             id="org.safehaus.penrose.studio.nis.connection.NISConnectionEditor"
             name="NIS Connection"
@@ -81,20 +81,22 @@
             icon="images/source.gif"
             class="org.safehaus.penrose.studio.nis.source.NISSourceEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.mapping.editor.MappingEditor"
+            id="org.safehaus.penrose.studio.directory.editor.EntryEditor"
             name="Mapping"
             icon="images/penrose16.ico"
-            class="org.safehaus.penrose.studio.mapping.editor.MappingEditor"/>
+            class="org.safehaus.penrose.studio.directory.editor.EntryEditor"/>
         <editor
             id="org.safehaus.penrose.studio.browser.BrowserEditor"
             name="Browser"
             icon="images/browser_22x22.png"
             class="org.safehaus.penrose.studio.browser.BrowserEditor"/>
+<!--
         <editor
             id="org.safehaus.penrose.studio.preview.PreviewEditor"
             name="Preview"
             icon="images/dirpreview_22x22.png"
             class="org.safehaus.penrose.studio.preview.PreviewEditor"/>
+-->
         <editor
             id="org.safehaus.penrose.studio.properties.SystemPropertiesEditor"
             name="System Properties"
@@ -126,10 +128,10 @@
             icon="images/root.png"
             class="org.safehaus.penrose.studio.user.UserEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.service.ServiceEditor"
+            id="org.safehaus.penrose.studio.service.editor.ServiceEditor"
             name="Service"
             icon="images/service.png"
-            class="org.safehaus.penrose.studio.service.ServiceEditor"/>
+            class="org.safehaus.penrose.studio.service.editor.ServiceEditor"/>
 
         <editor
             id="org.safehaus.penrose.studio.federation.editor.FederationEditor"

@@ -155,11 +155,11 @@ public class ModuleMappingWizardPage extends WizardPage implements SelectionList
         setPageComplete(validatePage());
     }
 
-    public Collection getMappings() {
-        Collection mappings = new ArrayList();
+    public Collection<ModuleMapping> getModuleMappings() {
+        Collection<ModuleMapping> mappings = new ArrayList<ModuleMapping>();
         TableItem items[] = mappingsTable.getItems();
-        for (int i=0; i<items.length; i++) {
-        	ModuleMapping moduleMapping = (ModuleMapping)items[i].getData();
+        for (TableItem item : items) {
+            ModuleMapping moduleMapping = (ModuleMapping) item.getData();
             mappings.add(moduleMapping);
         }
         return mappings;

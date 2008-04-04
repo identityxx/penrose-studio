@@ -3,8 +3,6 @@ package org.safehaus.penrose.studio.connection.editor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.studio.project.Project;
 
 /**
@@ -13,15 +11,10 @@ import org.safehaus.penrose.studio.project.Project;
 public class ConnectionEditorInput implements IEditorInput {
 
     private Project project;
-    private PartitionConfig partitionConfig;
-    private ConnectionConfig connectionConfig;
+    private String partitionName;
+    private String connectionName;
 
     public ConnectionEditorInput() {
-    }
-
-    public ConnectionEditorInput(PartitionConfig partitionConfig, ConnectionConfig connectionConfig) {
-        this.partitionConfig = partitionConfig;
-        this.connectionConfig = connectionConfig;
     }
 
     public boolean exists() {
@@ -33,7 +26,7 @@ public class ConnectionEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return partitionConfig.getName()+"/"+connectionConfig.getName();
+        return partitionName+"/"+connectionName;
     }
 
     public IPersistableElement getPersistable() {
@@ -50,8 +43,8 @@ public class ConnectionEditorInput implements IEditorInput {
 
     public int hashCode() {
         return (project == null ? 0 : project.hashCode()) +
-                (partitionConfig == null ? 0 : partitionConfig.hashCode()) +
-                (connectionConfig == null ? 0 : connectionConfig.hashCode());
+                (partitionName == null ? 0 : partitionName.hashCode()) +
+                (connectionName == null ? 0 : connectionName.hashCode());
     }
 
     boolean equals(Object o1, Object o2) {
@@ -67,26 +60,18 @@ public class ConnectionEditorInput implements IEditorInput {
 
         ConnectionEditorInput ei = (ConnectionEditorInput)object;
         if (!equals(project, ei.project)) return false;
-        if (!equals(partitionConfig, ei.partitionConfig)) return false;
-        if (!equals(connectionConfig, ei.connectionConfig)) return false;
+        if (!equals(partitionName, ei.partitionName)) return false;
+        if (!equals(connectionName, ei.connectionName)) return false;
 
         return true;
     }
 
-    public ConnectionConfig getConnectionConfig() {
-        return connectionConfig;
+    public String getPartitionName() {
+        return partitionName;
     }
 
-    public void setConnectionConfig(ConnectionConfig connectionConfig) {
-        this.connectionConfig = connectionConfig;
-    }
-
-    public PartitionConfig getPartitionConfig() {
-        return partitionConfig;
-    }
-
-    public void setPartitionConfig(PartitionConfig partitionConfig) {
-        this.partitionConfig = partitionConfig;
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 
     public Project getProject() {
@@ -95,5 +80,13 @@ public class ConnectionEditorInput implements IEditorInput {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public String getConnectionName() {
+        return connectionName;
+    }
+
+    public void setConnectionName(String connectionName) {
+        this.connectionName = connectionName;
     }
 }
