@@ -310,7 +310,8 @@
         </copy>
     </target>
 
-    <target name="dist-linux" depends="build-linux">
+    <target name="dist-linux" depends="build-linux" if="isLinux">
+        <mkdir dir="${project.dist}"/>
         <tar destfile="${project.dist}/${project.name}-${product.version}.tar.gz" compression="gzip">
             <tarfileset dir="target/dist" prefix="${project.name}-${product.version}" mode="755">
                 <include name="penrose-studio"/>
