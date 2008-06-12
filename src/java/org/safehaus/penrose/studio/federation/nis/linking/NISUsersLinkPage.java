@@ -1,37 +1,39 @@
 package org.safehaus.penrose.studio.federation.nis.linking;
 
+import org.apache.log4j.Logger;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.*;
+import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.federation.repository.NISDomain;
-import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.partition.Partition;
-import org.safehaus.penrose.source.Source;
-import org.safehaus.penrose.source.SourceManager;
-import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.connection.Connection;
-import org.safehaus.penrose.jdbc.QueryResponse;
-import org.safehaus.penrose.jdbc.connection.JDBCConnection;
+import org.safehaus.penrose.connection.ConnectionManager;
+import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.filter.FilterTool;
 import org.safehaus.penrose.filter.SubstringFilter;
+import org.safehaus.penrose.jdbc.QueryResponse;
+import org.safehaus.penrose.jdbc.connection.JDBCConnection;
+import org.safehaus.penrose.jdbc.source.JDBCSource;
+import org.safehaus.penrose.ldap.*;
+import org.safehaus.penrose.partition.Partition;
+import org.safehaus.penrose.source.Source;
+import org.safehaus.penrose.source.SourceManager;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
+import org.safehaus.penrose.studio.federation.nis.NISFederation;
 
-import java.util.Collection;
-import java.util.ArrayList;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
@@ -72,7 +74,7 @@ public class NISUsersLinkPage extends FormPage {
 
     Source localUsers;
     Source globalUsers;
-    Source usersLink;
+    JDBCSource usersLink;
 
     public NISUsersLinkPage(NISLinkEditor editor) {
         super(editor, "USERS", "  Users  ");
@@ -84,12 +86,13 @@ public class NISUsersLinkPage extends FormPage {
         partition = null; // nisFederation.getPartitionManager().getPartition(domain.getName()+"_"+NISFederation.NIS);
         SourceManager sourceManager = partition.getSourceManager();
 
-        Connection connection = partition.getConnection(NISFederation.CACHE_CONNECTION_NAME);
+        ConnectionManager connectionManager = partition.getConnectionManager();
+        Connection connection = connectionManager.getConnection(NISFederation.CACHE_CONNECTION_NAME);
         jdbcConnection = (JDBCConnection)connection;
 
         localUsers = sourceManager.getSource("local_users");
         globalUsers = sourceManager.getSource("global_users");
-        usersLink = sourceManager.getSource("cache_users_link");
+        usersLink = (JDBCSource)sourceManager.getSource("cache_users_link");
 
         Display display = Display.getDefault();
 
@@ -771,7 +774,7 @@ public class NISUsersLinkPage extends FormPage {
         };
 
         jdbcConnection.executeQuery(
-                "select globalUid from "+ jdbcConnection.getTableName(usersLink)+" where uid=?",
+                "select globalUid from "+usersLink.getTableName()+" where uid=?",
                 new Object[] { uid },
                 queryResponse
         );
@@ -782,7 +785,7 @@ public class NISUsersLinkPage extends FormPage {
     public void createLink(String uid, String globalUid) throws Exception {
 
         jdbcConnection.executeUpdate(
-                "insert into "+ jdbcConnection.getTableName(usersLink)+" (uid, globalUid) values (?, ?)",
+                "insert into "+usersLink.getTableName()+" (uid, globalUid) values (?, ?)",
                 new Object[] { uid, globalUid }
         );
     }
@@ -790,7 +793,7 @@ public class NISUsersLinkPage extends FormPage {
     public void updateLink(String uid, String globalUid) throws Exception {
 
         jdbcConnection.executeUpdate(
-                "update "+ jdbcConnection.getTableName(usersLink)+" set globalUid=? where uid=?",
+                "update "+usersLink.getTableName()+" set globalUid=? where uid=?",
                 new Object[] { globalUid, uid }
         );
     }
@@ -798,7 +801,7 @@ public class NISUsersLinkPage extends FormPage {
     public void removeLink(String uid) throws Exception {
 
         jdbcConnection.executeUpdate(
-                "delete from "+ jdbcConnection.getTableName(usersLink)+" where uid=?",
+                "delete from "+usersLink.getTableName()+" where uid=?",
                 new Object[] { uid }
         );
     }

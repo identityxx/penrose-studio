@@ -221,7 +221,7 @@ public class PreviewEditor extends EditorPart {
 
         SessionContext sessionContext = penrose.getSessionContext();
         SessionManager sessionManager = sessionContext.getSessionManager();
-        session = sessionManager.newSession();
+        session = sessionManager.createSession();
         session.bind(bindDn, password);
 
         baseDn = baseDn == null ? "" : baseDn;

@@ -302,7 +302,8 @@ public class NISYPPage extends FormPage {
 
             partitionClient.search(request, response);
 
-            if (response.getReturnCode() != LDAP.SUCCESS) {
+            int rc = response.waitFor();
+            if (rc != LDAP.SUCCESS) {
                 return "N/A";
             }
 

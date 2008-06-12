@@ -25,6 +25,7 @@ import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.directory.ProxyEntry;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.partition.PartitionManagerClient;
 import org.safehaus.penrose.management.partition.PartitionClient;
@@ -77,7 +78,7 @@ public class CreateRootDSEProxyWizard extends Wizard {
             SourceMapping sourceMapping = new SourceMapping("DEFAULT", sourceConfig.getName());
             entryConfig.addSourceMapping(sourceMapping);
 
-            entryConfig.setHandlerName("PROXY");
+            entryConfig.setEntryClass(ProxyEntry.class.getName());
 
             entryConfig.addACI(new ACI("rs"));
 

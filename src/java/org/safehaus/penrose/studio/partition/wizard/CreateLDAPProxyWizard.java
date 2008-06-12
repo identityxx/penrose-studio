@@ -23,6 +23,7 @@ import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.directory.ProxyEntry;
 import org.safehaus.penrose.ldap.LDAP;
 import org.safehaus.penrose.management.partition.PartitionClient;
 import org.safehaus.penrose.management.partition.PartitionManagerClient;
@@ -126,7 +127,7 @@ public class CreateLDAPProxyWizard extends Wizard {
             SourceMapping sourceMapping = new SourceMapping("DEFAULT", partitionName);
             rootEntry.addSourceMapping(sourceMapping);
 
-            rootEntry.setHandlerName("PROXY");
+            rootEntry.setEntryClass(ProxyEntry.class.getName());
 
             rootEntry.addACI(new ACI("rs"));
 
@@ -150,7 +151,7 @@ public class CreateLDAPProxyWizard extends Wizard {
                 SourceMapping rootDseSourceMapping = new SourceMapping("DEFAULT", rootDseSourceConfig.getName());
                 rootDseEntryConfig.addSourceMapping(rootDseSourceMapping);
 
-                rootDseEntryConfig.setHandlerName("PROXY");
+                rootDseEntryConfig.setEntryClass(ProxyEntry.class.getName());
 
                 rootDseEntryConfig.addACI(new ACI("rs"));
 

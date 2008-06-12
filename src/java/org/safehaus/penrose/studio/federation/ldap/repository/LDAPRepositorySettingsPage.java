@@ -167,14 +167,7 @@ public class LDAPRepositorySettingsPage extends FormPage {
                     dialog.setPageSize(600, 300);
 
                     if (dialog.open() != Window.OK) return;
-/*
-                    LDAPRepositoryDialog dialog = new LDAPRepositoryDialog(editor.getSite().getShell(), SWT.NONE);
-                    dialog.setRepository(repository);
-                    dialog.open();
 
-                    int action = dialog.getAction();
-                    if (action == LDAPRepositoryDialog.CANCEL) return;
-*/
                     Map<String,String> newParameters = wizard.getParameters();
                     repository.setUrl(newParameters.get(Context.PROVIDER_URL));
                     repository.setUser(newParameters.get(Context.SECURITY_PRINCIPAL));

@@ -184,17 +184,11 @@ public class LDAPRepositoriesPage extends FormPage {
                     dialog.setPageSize(600, 300);
 
                     if (dialog.open() != Window.OK) return;
-/*
-                    LDAPRepositoryDialog dialog = new LDAPRepositoryDialog(editor.getSite().getShell(), SWT.NONE);
-                    dialog.setRepository(repository);
-                    dialog.open();
 
-                    int action = dialog.getAction();
-                    if (action == LDAPRepositoryDialog.CANCEL) return;
-*/
-                    repository.setUrl(parameters.get(Context.PROVIDER_URL));
-                    repository.setUser(parameters.get(Context.SECURITY_PRINCIPAL));
-                    repository.setPassword(parameters.get(Context.SECURITY_CREDENTIALS));
+                    Map<String,String> newParameters = wizard.getParameters();
+                    repository.setUrl(newParameters.get(Context.PROVIDER_URL));
+                    repository.setUser(newParameters.get(Context.SECURITY_PRINCIPAL));
+                    repository.setPassword(newParameters.get(Context.SECURITY_CREDENTIALS));
                     repository.setSuffix(wizard.getSuffix());
 
                     ldapFederation.updateRepository(repository);

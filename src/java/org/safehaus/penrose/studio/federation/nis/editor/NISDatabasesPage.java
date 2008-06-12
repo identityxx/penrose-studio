@@ -26,6 +26,7 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.jdbc.connection.JDBCConnection;
+import org.safehaus.penrose.connection.ConnectionManager;
 
 /**
  * @author Endi S. Dewata
@@ -218,7 +219,8 @@ public class NISDatabasesPage extends FormPage {
             table.removeAll();
 
             Partition nisPartition = nisFederation.getPartition();
-            JDBCConnection connection = (JDBCConnection)nisPartition.getConnection(Federation.JDBC);
+            ConnectionManager connectionManager = nisPartition.getConnectionManager();
+            JDBCConnection connection = (JDBCConnection)connectionManager.getConnection(Federation.JDBC);
 
             for (NISDomain domain : nisFederation.getRepositories()) {
                 boolean exists = connection.checkDatabase(domain.getName());

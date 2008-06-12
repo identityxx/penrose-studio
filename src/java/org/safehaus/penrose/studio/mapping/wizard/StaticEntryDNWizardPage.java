@@ -18,12 +18,16 @@
 package org.safehaus.penrose.studio.mapping.wizard;
 
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.ietf.ldap.LDAPDN;
+import org.safehaus.penrose.directory.ProxyEntry;
 
 /**
  * @author Endi S. Dewata
@@ -33,11 +37,12 @@ public class StaticEntryDNWizardPage extends WizardPage implements ModifyListene
     public final static String NAME = "Entry DN";
 
     Text dnText;
+    Text classNameText;
 
     public StaticEntryDNWizardPage() {
         super(NAME);
 
-        setDescription("Enter the DN of the entry.");
+        setDescription("Enter the DN and optionally the class name of the entry.");
     }
 
     public void createControl(final Composite parent) {
@@ -62,17 +67,45 @@ public class StaticEntryDNWizardPage extends WizardPage implements ModifyListene
 
         new Label(composite, SWT.NONE);
 
-        Label exampleLabel = new Label(composite, SWT.NONE);
+        Label exampleDnLabel = new Label(composite, SWT.NONE);
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
-        exampleLabel.setLayoutData(gd);
-        exampleLabel.setText("Example: dc=Example,dc=com");
+        exampleDnLabel.setLayoutData(gd);
+        exampleDnLabel.setText("Example: dc=Example,dc=com");
+
+        new Label(composite, SWT.NONE);
+        new Label(composite, SWT.NONE);
+        new Label(composite, SWT.NONE);
+
+        Label classLabel = new Label(composite, SWT.NONE);
+        classLabel.setText("Class:");
+        gd = new GridData();
+        gd.widthHint = 50;
+        classLabel.setLayoutData(gd);
+
+        classNameText = new Text(composite, SWT.BORDER);
+        gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.horizontalSpan = 2;
+        classNameText.setLayoutData(gd);
+        classNameText.addModifyListener(this);
+
+        new Label(composite, SWT.NONE);
+
+        Label exampleClassLabel = new Label(composite, SWT.NONE);
+        gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.horizontalSpan = 2;
+        exampleClassLabel.setLayoutData(gd);
+        exampleClassLabel.setText("Example: "+ ProxyEntry.class.getName());
 
         setPageComplete(validatePage());
     }
 
     public String getDn() {
         return dnText.getText();
+    }
+
+    public String getClassName() {
+        return "".equals(classNameText.getText()) ? null : classNameText.getText();
     }
 
     public boolean validatePage() {

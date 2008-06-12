@@ -31,6 +31,7 @@ import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.StaticEntryRDNWizardPage;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.util.Collection;
 
@@ -104,6 +105,7 @@ public class StaticEntryWizard extends Wizard {
             db.append(rdnPage.getParentDn());
             entryConfig.setDn(db.toDn());
 
+            entryConfig.setEntryClass(rdnPage.getClassName());
             entryConfig.addObjectClasses(ocPage.getSelectedObjectClasses());
             entryConfig.addAttributeMappings(attrPage.getAttributeMappings());
 /*
@@ -121,6 +123,7 @@ public class StaticEntryWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
             return false;
         }
     }

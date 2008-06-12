@@ -293,8 +293,15 @@
 -->
 
     <target name="dist-src" depends="init">
-        <echo message="Creating ${project.name}-${product.version}-src.tar.gz"/>
         <mkdir dir="${project.dist}"/>
+        <echo message="Creating ${project.name}-${product.version}-src.zip"/>
+        <zip destfile="${project.dist}/${project.name}-${product.version}-src.zip">
+            <zipfileset dir=".">
+                <exclude name="${project.dist}/**"/>
+                <exclude name="target/**"/>
+            </zipfileset>
+        </zip>
+        <echo message="Creating ${project.name}-${product.version}-src.tar.gz"/>
         <tar destfile="${project.dist}/${project.name}-${product.version}-src.tar.gz" compression="gzip">
             <tarfileset dir="." prefix="${project.name}-${product.version}">
                 <exclude name="${project.dist}/**"/>

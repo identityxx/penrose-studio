@@ -33,9 +33,8 @@ public class DisconnectAction extends Action {
             if (projectNode == null) return;
 
             Project project = projectNode.getProject();
-            if (!project.isConnected()) return;
-
-            projectNode.disconnect();
+            if (project.isConnected()) projectNode.disconnect();
+            
             serversView.close(projectNode);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();

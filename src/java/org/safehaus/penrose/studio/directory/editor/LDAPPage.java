@@ -68,6 +68,7 @@ public class LDAPPage extends FormPage {
 
     Text parentDnText;
     Text rdnText;
+    Text classNameText;
 
     Table objectClassTable;
     Table attributeTable;
@@ -96,7 +97,7 @@ public class LDAPPage extends FormPage {
             section.setText("Distinguished Name");
             section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-            Control entrySection = createEntrySection(section);
+            Control entrySection = createMainSection(section);
             section.setClient(entrySection);
 
             section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
@@ -120,7 +121,7 @@ public class LDAPPage extends FormPage {
         }
     }
 
-    public Composite createEntrySection(final Composite parent) {
+    public Composite createMainSection(final Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(3, false));
@@ -178,6 +179,21 @@ public class LDAPPage extends FormPage {
 
         rdnText.setEditable(false);
         rdnText.setEnabled(false);
+
+        toolkit.createLabel(composite, "Class:");
+
+        classNameText = toolkit.createText(composite, "", SWT.BORDER);
+        classNameText .setText(entryConfig.getEntryClass() == null ? "" : entryConfig.getEntryClass());
+        gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.horizontalSpan = 2;
+        classNameText .setLayoutData(gd);
+
+        classNameText.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent event) {
+                entryConfig.setEntryClass("".equals(classNameText.getText()) ? null : classNameText.getText());
+                checkDirty();
+            }
+        });
 
         return composite;
     }

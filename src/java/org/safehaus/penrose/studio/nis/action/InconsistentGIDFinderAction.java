@@ -13,6 +13,7 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.partition.PartitionManagerClient;
 import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.connection.ConnectionManager;
 
 import java.sql.ResultSet;
 
@@ -71,7 +72,8 @@ public class InconsistentGIDFinderAction extends NISAction {
         SourceConfig sourceConfig2 = partitionConfig2.getSourceConfigManager().getSourceConfig(NISFederation.CACHE_GROUPS);
 
         Partition partition = nisFederation.getPartition();
-        JDBCConnection connection = (JDBCConnection)partition.getConnection(Federation.JDBC);
+        ConnectionManager connectionManager = partition.getConnectionManager();
+        JDBCConnection connection = (JDBCConnection)connectionManager.getConnection(Federation.JDBC);
 
         String table1 = connection.getTableName(sourceConfig1);
         String table2 = connection.getTableName(sourceConfig2);

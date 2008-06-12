@@ -373,7 +373,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
     }
 
     public boolean validatePage() {
-
+/*
         if (attributeMappings.isEmpty()) return false;
 
         boolean rdn = false;
@@ -397,7 +397,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
             log.debug("RDN not found.");
             return false;
         }
-
+*/
         return true;
     }
 

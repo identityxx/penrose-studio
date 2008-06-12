@@ -21,14 +21,15 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.directory.EntryConfig;
+import org.safehaus.penrose.directory.ProxyEntry;
 import org.safehaus.penrose.directory.SourceMapping;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDN;
+import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.connection.ConnectionClient;
 import org.safehaus.penrose.management.partition.PartitionClient;
 import org.safehaus.penrose.management.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.source.wizard.SelectSourceWizardPage;
@@ -118,7 +119,7 @@ public class CreateLDAPProxyWizard extends Wizard {
             SourceMapping sourceMapping = new SourceMapping("DEFAULT", sourceConfig.getName());
             entryConfig.addSourceMapping(sourceMapping);
 
-            entryConfig.setHandlerName("PROXY");
+            entryConfig.setEntryClass(ProxyEntry.class.getName());
 /*
             DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
             directoryConfig.addEntryConfig(entryConfig);

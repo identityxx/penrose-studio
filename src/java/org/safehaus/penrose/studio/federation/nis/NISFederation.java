@@ -465,22 +465,6 @@ public class NISFederation {
         this.partition = partition;
     }
 
-
-    public Collection<SourceConfig> getCacheConfigs(SourceConfigManager sourceConfigManager, SourceConfig sourceConfig) {
-
-        Collection<SourceConfig> cacheConfigs = new ArrayList<SourceConfig>();
-
-        SourceSyncConfig sourceSyncConfig = sourceConfigManager.getSourceSyncConfig(sourceConfig.getName());
-        if (sourceSyncConfig == null) return cacheConfigs;
-
-        for (String name : sourceSyncConfig.getDestinations()) {
-            SourceConfig cacheConfig = sourceConfigManager.getSourceConfig(name);
-            cacheConfigs.add(cacheConfig);
-        }
-
-        return cacheConfigs;
-    }
-
     public void  createDatabase(NISDomain domain, PartitionConfig nisPartitionConfig) throws Exception {
 
         log.debug("Creating database "+domain.getName()+".");

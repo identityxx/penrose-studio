@@ -29,6 +29,7 @@ import org.safehaus.penrose.studio.jndi.source.JNDIFieldWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.Table;
+import org.safehaus.penrose.jdbc.source.JDBCSource;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
@@ -187,13 +188,13 @@ public class SourceWizard extends Wizard {
                 String schema    = table.getSchema();
                 String tableName = table.getName();
 
-                sourceConfig.setParameter(JDBCClient.CATALOG, catalog);
-                sourceConfig.setParameter(JDBCClient.SCHEMA, schema);
-                sourceConfig.setParameter(JDBCClient.TABLE, tableName);
+                sourceConfig.setParameter(JDBCSource.CATALOG, catalog);
+                sourceConfig.setParameter(JDBCSource.SCHEMA, schema);
+                sourceConfig.setParameter(JDBCSource.TABLE, tableName);
 
                 String filter = jdbcFieldsPage.getFilter();
                 if (filter != null) {
-                    sourceConfig.setParameter(JDBCClient.FILTER, filter);
+                    sourceConfig.setParameter(JDBCSource.FILTER, filter);
                 }
 
                 Collection<FieldConfig> fields = jdbcPrimaryKeyPage.getFields();

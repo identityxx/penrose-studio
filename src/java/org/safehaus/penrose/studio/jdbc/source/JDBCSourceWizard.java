@@ -17,19 +17,20 @@
  */
 package org.safehaus.penrose.studio.jdbc.source;
 
-import org.eclipse.jface.wizard.Wizard;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.jface.wizard.Wizard;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.Table;
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.studio.source.wizard.SourceWizardPage;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.jdbc.source.JDBCSource;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
 import org.safehaus.penrose.management.partition.PartitionClient;
-import org.apache.log4j.Logger;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.source.FieldConfig;
+import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.source.wizard.SourceWizardPage;
 
 import java.util.Collection;
 
@@ -106,13 +107,13 @@ public class JDBCSourceWizard extends Wizard {
             String schema    = table.getSchema();
             String tableName = table.getName();
 
-            sourceConfig.setParameter(JDBCClient.CATALOG, catalog);
-            sourceConfig.setParameter(JDBCClient.SCHEMA, schema);
-            sourceConfig.setParameter(JDBCClient.TABLE, tableName);
+            sourceConfig.setParameter(JDBCSource.CATALOG, catalog);
+            sourceConfig.setParameter(JDBCSource.SCHEMA, schema);
+            sourceConfig.setParameter(JDBCSource.TABLE, tableName);
 
             String filter = jdbcFieldsPage.getFilter();
             if (filter != null) {
-                sourceConfig.setParameter(JDBCClient.FILTER, filter);
+                sourceConfig.setParameter(JDBCSource.FILTER, filter);
             }
 
             System.out.println("Saving fields :");

@@ -33,6 +33,7 @@ import org.ietf.ldap.LDAPDN;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.studio.mapping.EntrySelectionDialog;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.directory.ProxyEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +49,7 @@ public class StaticEntryRDNWizardPage extends WizardPage implements ModifyListen
     Text rdnText;
     Text parentDnText;
     Button browseButton;
+    Text classNameText;
 
     private Project project;
     private String partitionName;
@@ -55,7 +57,7 @@ public class StaticEntryRDNWizardPage extends WizardPage implements ModifyListen
 
     public StaticEntryRDNWizardPage() {
         super(NAME);
-        setDescription("Enter the RDN of the entry.");
+        setDescription("Enter the RDN, parent DN, and optionally the class name of the entry.");
     }
 
     public void createControl(final Composite parent) {
@@ -80,11 +82,11 @@ public class StaticEntryRDNWizardPage extends WizardPage implements ModifyListen
 
         new Label(composite, SWT.NONE);
 
-        Label exampleLabel = new Label(composite, SWT.NONE);
+        Label exampleRdnLabel = new Label(composite, SWT.NONE);
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
-        exampleLabel.setLayoutData(gd);
-        exampleLabel.setText("Example: ou=Users");
+        exampleRdnLabel.setLayoutData(gd);
+        exampleRdnLabel.setText("Example: ou=Users");
 
         new Label(composite, SWT.NONE);
 
@@ -128,6 +130,30 @@ public class StaticEntryRDNWizardPage extends WizardPage implements ModifyListen
             }
         });
 
+        new Label(composite, SWT.NONE);
+        new Label(composite, SWT.NONE);
+        new Label(composite, SWT.NONE);
+
+        Label classLabel = new Label(composite, SWT.NONE);
+        classLabel.setText("Class:");
+        gd = new GridData();
+        gd.widthHint = 50;
+        classLabel.setLayoutData(gd);
+
+        classNameText = new Text(composite, SWT.BORDER);
+        gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.horizontalSpan = 2;
+        classNameText.setLayoutData(gd);
+        classNameText.addModifyListener(this);
+
+        new Label(composite, SWT.NONE);
+
+        Label exampleClassLabel = new Label(composite, SWT.NONE);
+        gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.horizontalSpan = 2;
+        exampleClassLabel.setLayoutData(gd);
+        exampleClassLabel.setText("Example: "+ ProxyEntry.class.getName());
+
         setPageComplete(validatePage());
     }
 
@@ -137,6 +163,10 @@ public class StaticEntryRDNWizardPage extends WizardPage implements ModifyListen
 
     public String getParentDn() {
         return "".equals(parentDnText.getText()) ? null : parentDnText.getText();
+    }
+
+    public String getClassName() {
+        return "".equals(classNameText.getText()) ? null : classNameText.getText();
     }
 
     public boolean validatePage() {

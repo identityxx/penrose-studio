@@ -27,6 +27,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.jdbc.source.JDBCSource;
 import org.safehaus.penrose.management.connection.ConnectionClient;
 import org.safehaus.penrose.management.partition.PartitionClient;
 import org.safehaus.penrose.management.partition.PartitionManagerClient;
@@ -156,7 +157,7 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
         gd.widthHint = 100;
         catalogLabel.setLayoutData(gd);
 
-        catalogText = toolkit.createText(composite, sourceConfig.getParameter(JDBCClient.CATALOG), SWT.BORDER);
+        catalogText = toolkit.createText(composite, sourceConfig.getParameter(JDBCSource.CATALOG), SWT.BORDER);
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
         catalogText.setLayoutData(gd);
@@ -164,9 +165,9 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
         catalogText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(catalogText.getText())) {
-                    sourceConfig.removeParameter(JDBCClient.CATALOG);
+                    sourceConfig.removeParameter(JDBCSource.CATALOG);
                 } else {
-                    sourceConfig.setParameter(JDBCClient.CATALOG, catalogText.getText());
+                    sourceConfig.setParameter(JDBCSource.CATALOG, catalogText.getText());
                 }
                 checkDirty();
             }
@@ -177,7 +178,7 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
         gd.widthHint = 100;
         schemaLabel.setLayoutData(gd);
 
-        schemaText = toolkit.createText(composite, sourceConfig.getParameter(JDBCClient.SCHEMA), SWT.BORDER);
+        schemaText = toolkit.createText(composite, sourceConfig.getParameter(JDBCSource.SCHEMA), SWT.BORDER);
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
         schemaText.setLayoutData(gd);
@@ -185,9 +186,9 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
         schemaText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(schemaText.getText())) {
-                    sourceConfig.removeParameter(JDBCClient.SCHEMA);
+                    sourceConfig.removeParameter(JDBCSource.SCHEMA);
                 } else {
-                    sourceConfig.setParameter(JDBCClient.SCHEMA, schemaText.getText());
+                    sourceConfig.setParameter(JDBCSource.SCHEMA, schemaText.getText());
                 }
                 checkDirty();
             }
@@ -198,7 +199,7 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
         gd.widthHint = 100;
         tableLabel.setLayoutData(gd);
 
-        String tableName = sourceConfig.getParameter(JDBCClient.TABLE);
+        String tableName = sourceConfig.getParameter(JDBCSource.TABLE);
 
 		tableText = toolkit.createText(composite, tableName, SWT.BORDER);
         gd = new GridData(GridData.FILL);
@@ -208,9 +209,9 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
         tableText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 if ("".equals(tableText.getText())) {
-                    sourceConfig.removeParameter(JDBCClient.TABLE);
+                    sourceConfig.removeParameter(JDBCSource.TABLE);
                 } else {
-                    sourceConfig.setParameter(JDBCClient.TABLE, tableText.getText());
+                    sourceConfig.setParameter(JDBCSource.TABLE, tableText.getText());
                 }
                 checkDirty();
             }
@@ -273,9 +274,9 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
 
                     JDBCClient jdbcClient = new JDBCClient(connectionConfig.getParameters());
                     
-                    String catalog = sourceConfig.getParameter(JDBCClient.CATALOG);
-                    String schema = sourceConfig.getParameter(JDBCClient.SCHEMA);
-                    String table = sourceConfig.getParameter(JDBCClient.TABLE);
+                    String catalog = sourceConfig.getParameter(JDBCSource.CATALOG);
+                    String schema = sourceConfig.getParameter(JDBCSource.SCHEMA);
+                    String table = sourceConfig.getParameter(JDBCSource.TABLE);
 
                     Collection<FieldConfig> fields = jdbcClient.getColumns(catalog, schema, table);
                     jdbcClient.close();
@@ -363,9 +364,9 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
 
                     JDBCClient jdbcClient = new JDBCClient(connectionConfig.getParameters());
 
-                    String catalog = sourceConfig.getParameter(JDBCClient.CATALOG);
-                    String schema = sourceConfig.getParameter(JDBCClient.SCHEMA);
-                    String table = sourceConfig.getParameter(JDBCClient.TABLE);
+                    String catalog = sourceConfig.getParameter(JDBCSource.CATALOG);
+                    String schema = sourceConfig.getParameter(JDBCSource.SCHEMA);
+                    String table = sourceConfig.getParameter(JDBCSource.TABLE);
 
                     Collection<FieldConfig> fields = jdbcClient.getColumns(catalog, schema, table);
                     jdbcClient.close();
@@ -413,9 +414,9 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
 
                     JDBCClient jdbcClient = new JDBCClient(connectionConfig.getParameters());
 
-                    String catalog = sourceConfig.getParameter(JDBCClient.CATALOG);
-                    String schema = sourceConfig.getParameter(JDBCClient.SCHEMA);
-                    String table = sourceConfig.getParameter(JDBCClient.TABLE);
+                    String catalog = sourceConfig.getParameter(JDBCSource.CATALOG);
+                    String schema = sourceConfig.getParameter(JDBCSource.SCHEMA);
+                    String table = sourceConfig.getParameter(JDBCSource.TABLE);
 
                     Collection<FieldConfig> fields = jdbcClient.getColumns(catalog, schema, table);
                     jdbcClient.close();

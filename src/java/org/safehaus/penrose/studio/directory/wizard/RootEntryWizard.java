@@ -17,20 +17,21 @@
  */
 package org.safehaus.penrose.studio.directory.wizard;
 
-import org.eclipse.jface.wizard.Wizard;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.jface.wizard.Wizard;
+import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.directory.EntryConfig;
-import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.ldap.DN;
-import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
+import org.safehaus.penrose.ldap.RDN;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
+import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.mapping.wizard.StaticEntryDNWizardPage;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.acl.ACI;
-import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.partition.PartitionClient;
-import org.apache.log4j.Logger;
 
 import java.util.Collection;
 
@@ -98,6 +99,7 @@ public class RootEntryWizard extends Wizard {
         try {
             entryConfig = new EntryConfig();
             entryConfig.setDn(dnPage.getDn());
+            entryConfig.setEntryClass(dnPage.getClassName());
             entryConfig.addObjectClasses(ocPage.getSelectedObjectClasses());
             entryConfig.addAttributeMappings(attrPage.getAttributeMappings());
 
@@ -117,6 +119,7 @@ public class RootEntryWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
             return false;
         }
     }

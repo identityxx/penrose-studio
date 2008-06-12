@@ -25,6 +25,7 @@ import org.safehaus.penrose.studio.jdbc.source.JDBCFieldWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.Table;
+import org.safehaus.penrose.jdbc.source.JDBCSource;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
@@ -81,13 +82,13 @@ public class JDBCSourceWizard extends Wizard {
             String schema = table.getSchema();
             String table = this.table.getName();
 
-            sourceConfig.setParameter(JDBCClient.CATALOG, catalog);
-            sourceConfig.setParameter(JDBCClient.SCHEMA, schema);
-            sourceConfig.setParameter(JDBCClient.TABLE, table);
+            sourceConfig.setParameter(JDBCSource.CATALOG, catalog);
+            sourceConfig.setParameter(JDBCSource.SCHEMA, schema);
+            sourceConfig.setParameter(JDBCSource.TABLE, table);
 
             String filter = fieldsPage.getFilter();
             if (filter != null) {
-                sourceConfig.setParameter(JDBCClient.FILTER, filter);
+                sourceConfig.setParameter(JDBCSource.FILTER, filter);
             }
 
             System.out.println("Saving fields :");

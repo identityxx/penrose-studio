@@ -50,16 +50,10 @@ public class ADUtil {
 
         DN dn = new DN(destSchemaDn);
 
-        EntryConfig entryConfig = new EntryConfig();
-        entryConfig.setDn(dn);
+        EntryConfig entryConfig = new EntryConfig(dn);
         entryConfig.addObjectClass("top");
         entryConfig.addObjectClass("subschema");
-
-        RDN rdn = dn.getRdn();
-        for (String name : rdn.getNames()) {
-            String value = rdn.get(name).toString();
-            entryConfig.addAttributeMapping(new AttributeMapping(name, AttributeMapping.CONSTANT, value, true));
-        }
+        entryConfig.addAttributeMappingsFromRdn();
 
         Expression atExpression = new Expression(
                 "import org.safehaus.penrose.schema.*;\n" +

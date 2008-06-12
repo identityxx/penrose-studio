@@ -105,7 +105,7 @@ public class SnapshotUtil {
                 }
 
                 log.debug(" - "+name+": "+value);
-                entryConfig.addAttributeMapping(new AttributeMapping(name, AttributeMapping.CONSTANT, value, rdnAttr));
+                entryConfig.addAttributeMapping(new AttributeMapping(name, value, rdnAttr));
             }
         }
 

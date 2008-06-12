@@ -286,7 +286,7 @@ public class ProjectNode extends Node {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            ErrorDialog.open(e);
+            //ErrorDialog.open(e);
         }
 
         children.clear();

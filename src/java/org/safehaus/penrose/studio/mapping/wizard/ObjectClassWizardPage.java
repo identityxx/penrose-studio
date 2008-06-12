@@ -31,8 +31,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.schema.SchemaManagerClient;
-import org.safehaus.penrose.schema.ObjectClass;
-import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.studio.project.Project;
 
 import java.util.ArrayList;
@@ -236,7 +234,7 @@ public class ObjectClassWizardPage extends WizardPage {
     }
 
     public boolean validatePage() {
-        return !selectedOCs.isEmpty();
+        return true; // !selectedOCs.isEmpty();
     }
 
     public void setSelecteObjectClasses(Collection<String> list) {
