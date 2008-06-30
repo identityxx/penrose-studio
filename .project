@@ -3,9 +3,7 @@
 	<name>penrose-studio</name>
 	<comment></comment>
 	<projects>
-		<project>license</project>
 		<project>penrose</project>
-		<project>penrose-pro</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

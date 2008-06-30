@@ -6,7 +6,6 @@
 	<classpathentry kind="con" path="SWT_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/agent-1.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/agent-client-1.2.2.jar"/>
-	<classpathentry kind="lib" path="lib/bcprov-jdk14-132.jar"/>
 	<classpathentry kind="lib" path="lib/bsh-2.0b4.jar"/>
 	<classpathentry kind="lib" path="lib/commons-beanutils-1.6.jar"/>
 	<classpathentry kind="lib" path="lib/commons-cli-1.0.jar"/>
@@ -34,7 +33,6 @@
 	<classpathentry kind="lib" path="lib/mysql-connector-java-3.0.16-ga-bin.jar"/>
 	<classpathentry kind="lib" path="lib/nis.jar"/>
 	<classpathentry kind="lib" path="lib/penrose-1.2.2.jar"/>
-	<classpathentry kind="lib" path="lib/penrose-pro-1.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/postgresql-8.1-405.jdbc3.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-log4j12.jar"/>
 	<classpathentry kind="lib" path="lib/xercesImpl-2.8.0.jar"/>
