@@ -17,9 +17,7 @@ import org.safehaus.penrose.studio.federation.nis.conflict.NISConflictsNode;
 import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchPage;
 
@@ -60,18 +58,6 @@ public class NISNode extends Node {
                 }
             }
         });
-
-        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-
-        manager.add(new Action("Properties") {
-            public void run() {
-                try {
-                    edit();
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        });
     }
 
     public void open() throws Exception {
@@ -84,11 +70,6 @@ public class NISNode extends Node {
         IWorkbenchPage page = window.getActivePage();
         page.openEditor(ei, NISEditor.class.getName());
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
-    }
-
-    public void edit() throws Exception {
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }

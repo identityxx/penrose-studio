@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Action;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
@@ -43,8 +45,17 @@ public class LDAPNode extends Node {
         ldapFederation = federationNode.getFederation().getLdapFederation();
     }
 
-    public void removeRepository(String name) {
-        //children.remove(name);
+    public void showMenu(IMenuManager manager) throws Exception {
+
+        manager.add(new Action("Open") {
+            public void run() {
+                try {
+                    open();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
     }
 
     public void open() throws Exception {

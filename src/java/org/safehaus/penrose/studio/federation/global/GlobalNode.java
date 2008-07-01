@@ -4,6 +4,10 @@ import org.apache.log4j.Logger;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.Separator;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
@@ -33,11 +37,19 @@ public class GlobalNode extends Node {
         this.projectNode = federationNode.getProjectNode();
 
         ldapFederation = federationNode.getFederation().getLdapFederation();
-
-        refresh();
     }
 
-    public void refresh() {
+    public void showMenu(IMenuManager manager) throws Exception {
+
+        manager.add(new Action("Open") {
+            public void run() {
+                try {
+                    open();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
     }
 
     public void open() throws Exception {

@@ -29,8 +29,6 @@ import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.welcome.WelcomeEditorInput;
 import org.safehaus.penrose.studio.welcome.WelcomeEditor;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
@@ -57,13 +55,6 @@ public class PenroseStudioWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor 
 
     public void preWindowOpen() {
         // log.debug("preWindowOpen");
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        try {
-            penroseStudio.loadLicense();
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
 
         try {
             IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
@@ -137,13 +128,6 @@ public class PenroseStudioWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor 
 
     public void postWindowOpen() {
         // log.debug("postWindowOpen");
-        try {
-            //PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            //penroseStudio.validatePartitions();
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            ErrorDialog.open(e);
-        }
     }
 
     public PenroseStudioActionBarAdvisor getActionBarAdvisor() {

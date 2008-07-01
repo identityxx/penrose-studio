@@ -21,28 +21,20 @@ import java.io.*;
 import java.util.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.security.PublicKey;
 
 import org.eclipse.core.runtime.IPlatformRunnable;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.SWT;
 import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.studio.util.ApplicationConfig;
 import org.safehaus.penrose.studio.util.ChangeListener;
-import org.safehaus.penrose.studio.license.LicenseDialog;
-import org.safehaus.penrose.studio.welcome.action.EnterLicenseKeyAction;
 import org.safehaus.penrose.studio.plugin.*;
 import org.safehaus.penrose.studio.federation.nis.NISPlugin;
-import com.identyx.license.*;
 import org.safehaus.penrose.logger.log4j.Log4jConfigReader;
 import org.safehaus.penrose.logger.log4j.Log4jConfig;
 import org.safehaus.penrose.logger.log4j.Log4jConfigWriter;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
-
-import javax.crypto.Cipher;
 
 public class PenroseStudio implements IPlatformRunnable {
 
@@ -68,7 +60,6 @@ public class PenroseStudio implements IPlatformRunnable {
     PenroseStudioWorkbenchAdvisor workbenchAdvisor;
     ArrayList<ChangeListener> changeListeners = new ArrayList<ChangeListener>();
 
-    License license;
     Log4jConfig loggingConfig;
 
     boolean dirty = false;
@@ -283,114 +274,8 @@ public class PenroseStudio implements IPlatformRunnable {
         }
     }
 
-    public boolean isCommercial() {
-        if (license != null) return true;
-
-        Shell shell = new Shell(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-
-        LicenseDialog licenseDialog = new LicenseDialog(shell);
-        licenseDialog.setText(FEATURE_NOT_AVAILABLE);
-        licenseDialog.open();
-
-        if (licenseDialog.getAction() == LicenseDialog.CANCEL) return false;
-
-        EnterLicenseKeyAction a = new EnterLicenseKeyAction();
-        a.run();
-
-        return license != null;
-/*
-        MessageDialog.openError(
-                shell,
-                "Feature Not Available",
-                FEATURE_NOT_AVAILABLE
-        );
-*/
-    }
-
-    public boolean isFreeware() {
-        if (license == null) return true;
-
-        String type = license.getParameter("type");
-        if (type != null && "FREEWARE".equals(type)) return true;
-
-        return false;
-    }
-
-    public void loadLicense() throws Exception {
-
-        PenroseStudio penroseStudio = getInstance();
-
-        String filename = "penrose.license";
-
-        File file = new File(filename);
-
-        LicenseManager licenseManager = LicenseManager.getInstance();
-        Licenses licenses = licenseManager.loadLicenses(file);
-        licenseManager.addLicenses(licenses);
-        License license = licenses.getLicense("Penrose Studio");
-
-        boolean valid = licenseManager.isValid(license);
-        if (!valid) throw new Exception("Invalid license.");
-
-        String type = license.getParameter("type");
-        if (type != null && "FREEWARE".equals(type)) throw new Exception("Invalid license.");
-
-        penroseStudio.setLicense(license);
-    }
-
-    public License getLicense() {
-        return license;
-    }
-
-    public void setLicense(License license) throws Exception {
-
-        Date today = new Date();
-        Date createDate = license.getCreateDate();
-        Date expiryDate = license.getExpiryDate();
-
-        if (expiryDate != null) {
-            if (!today.before(expiryDate)) {
-                throw new Exception("Expired license: "+DATE_FORMAT.format(expiryDate));
-            }
-
-        } else if (createDate != null) {
-            Calendar firstYear = Calendar.getInstance();
-            firstYear.setTime(createDate);
-            firstYear.add(Calendar.YEAR, 1);
-
-            Calendar releaseDate = Calendar.getInstance();
-            releaseDate.setTime(DATE_FORMAT.parse(RELEASE_DATE));
-
-            if (!releaseDate.before(firstYear)) {
-                throw new Exception("Invalid license.");
-            }
-        }
-
-        this.license = license;
-    }
-
     public PenroseStudioWorkbenchAdvisor getWorkbenchAdvisor() {
         return workbenchAdvisor;
-    }
-
-    public PublicKey getPublicKey() throws Exception {
-        return (PublicKey)LicenseUtil.unwrap(getWrappedPublicKey(), "penrose", Cipher.PUBLIC_KEY);
-    }
-
-    byte[] getWrappedPublicKey() {
-        return new byte[] {
-              24,  81, -41, -32, -22, 110,-107, 123, 112,  93,  90, -16, -42,  60,-110,  57,
-              98,  96, -18,-100, -48,  48, -33,  73, -66,  58, 122,  -4, -55, -91, -79,  44,
-             -41, -24,  28, -52, 126, -55, -94,  90,  35, -20, -71,  -4, -19,-106, -94,-101,
-            -112, 121, 126, 119,  87,  89, -81, -94, -24, -38, -17,-109,  -6,   1,  21,  61,
-              21,  37,  58, 117,  91, -11,  93,   0,  16, -17,  53, -10,  56, -27, -32,  82,
-             121, -61,  37,  21,-103,  34,  -6,  43,-105, -47,  86,  29,-116, 105, -93,-112,
-              25,  46,-128,-114,  82, -80, -11, -61,  95,-125, 119, -86,  76,  69, -56,  56,
-              69,  22, -83,  27,-125,  74, -71, -30,  19, 109,  67, -62,  73, 113,  -8,  45,
-            -105, 121,   4, -72,-107, -36,  -1,  26,  70, 105, -51,  32,-111,  60,  -2,  33,
-             -37, -80,  64,  33,   6,  76, -45,  69, 100,  85, -49,   9, -52, -35,  21,  23,
-             -91, -29,  12, -55,  -3,  76,   9,-104,  17,  82,  29,  25, -71, -83, -19, -56
-        };
     }
 
     public Log4jConfig getLoggingConfig() {

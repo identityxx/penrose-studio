@@ -31,11 +31,8 @@ public class PluginsNode extends Node {
         view = projectNode.getServersView();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        if (penroseStudio.getLicense() != null) {
-
-            FederationNode pluginNode = new FederationNode(this);
-            children.add(pluginNode);
-        }
+        FederationNode pluginNode = new FederationNode(this);
+        children.add(pluginNode);
     }
 
     public boolean hasChildren() throws Exception {

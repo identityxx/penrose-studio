@@ -26,8 +26,6 @@ import org.eclipse.swt.SWT;
 import org.safehaus.penrose.studio.preview.action.RestartAction;
 import org.safehaus.penrose.studio.welcome.action.WelcomeAction;
 import org.safehaus.penrose.studio.welcome.action.AboutAction;
-import org.safehaus.penrose.studio.welcome.action.ShowCommercialFeaturesAction;
-import org.safehaus.penrose.studio.welcome.action.EnterLicenseKeyAction;
 import org.safehaus.penrose.studio.server.action.ServersAction;
 import org.safehaus.penrose.studio.validation.ValidationAction;
 import org.safehaus.penrose.studio.console.ConsoleAction;
@@ -73,9 +71,6 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
     RestartAction restartAction;
 
     WelcomeAction welcomeAction;
-
-    ShowCommercialFeaturesAction showCommercialFeaturesAction;
-    EnterLicenseKeyAction enterLicenseKeyAction;
 
     AboutAction aboutAction;
 
@@ -130,8 +125,6 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
             restartAction = new RestartAction();
 
             welcomeAction = new WelcomeAction();
-            showCommercialFeaturesAction = new ShowCommercialFeaturesAction();
-            enterLicenseKeyAction = new EnterLicenseKeyAction();
             aboutAction = new AboutAction();
 
         } catch (Exception e) {
@@ -147,11 +140,9 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
         partitionMenu.add(newPartitionAction);
         partitionMenu.add(importPartitionAction);
 
-        if (showCommercialFeaturesAction.isChecked()) {
-            partitionMenu.add(new Separator());
-            partitionMenu.add(newLDAPSnapshotPartitionAction);
-            partitionMenu.add(newLDAPProxyPartitionAction);
-        }
+        partitionMenu.add(new Separator());
+        partitionMenu.add(newLDAPSnapshotPartitionAction);
+        partitionMenu.add(newLDAPProxyPartitionAction);
     }
 
     public void fillHelpMenu() {
@@ -162,9 +153,6 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
 
         helpMenu.add(new Separator());
 
-        helpMenu.add(enterLicenseKeyAction);
-
-        helpMenu.add(new Separator());
         helpMenu.add(aboutAction);
     }
 
@@ -259,13 +247,5 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         }
-    }
-
-    public ShowCommercialFeaturesAction getShowCommercialFeaturesAction() {
-        return showCommercialFeaturesAction;
-    }
-
-    public void setShowCommercialFeaturesAction(ShowCommercialFeaturesAction showCommercialFeaturesAction) {
-        this.showCommercialFeaturesAction = showCommercialFeaturesAction;
     }
 }
