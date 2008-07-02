@@ -70,13 +70,23 @@
     </target>
 
     <target name="import" depends="init">
-<!--
-        <copy todir="lib" file="../penrose-${product.specification}/agent/target/penrose-agent-${penrose.version}.jar"/>
-        <copy todir="lib" file="../penrose-${product.specification}/agent/target/penrose-agent-client-${penrose.version}.jar"/>
--->
+        <antcall target="import-core"/>
+        <antcall target="import-server"/>
+        <antcall target="import-agent"/>
+    </target>
+
+    <target name="import-core" depends="init">
         <copy todir="lib" file="../penrose-${product.specification}/lib/penrose-${penrose.version}.jar"/>
+    </target>
+
+    <target name="import-server" depends="init">
         <copy todir="lib" file="../penrose-${product.specification}/server/target/penrose-server-${penrose.version}.jar"/>
         <copy todir="lib" file="../penrose-${product.specification}/services/JMX/SERVICE-INF/lib/penrose-jmx-service-${penrose.version}.jar"/>
+    </target>
+
+    <target name="import-agent" depends="init">
+        <copy todir="lib" file="../penrose-${product.specification}/agent/target/penrose-agent-${penrose.version}.jar"/>
+        <copy todir="lib" file="../penrose-${product.specification}/agent/target/penrose-agent-client-${penrose.version}.jar"/>
     </target>
 
     <target name="clean" depends="init">
