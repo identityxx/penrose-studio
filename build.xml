@@ -10,14 +10,10 @@
     <property file="build.properties"/>
 
     <property name="project.name" value="penrose-studio"/>
-    <property name="project.dist" value="dist"/>
 
     <property name="prefix" value=""/>
     <property name="penrose.studio.home" value="${prefix}/usr/local/${project.name}-${product.version}"/>
-
-    <property name="rcp.prefix" value="eclipse-RCP-3.2.2"/>
-    <property name="iscc.path" value="ISCC.exe"/>
-    <property name="cygwin.home" value="c:/cygwin"/>
+    <property name="plugin.path" value="target/dist/plugins/org.safehaus.penrose.studio_${plugin.version}"/>
 
     <tstamp>
         <format property="TIMESTAMP" pattern="yyyyMMddHHmmss"/>
@@ -27,6 +23,12 @@
         <fileset dir="lib">
             <include name="*.jar"/>
             <include name="plugins/*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="tool.path">
+        <fileset dir="tools/target">
+            <include name="*.jar"/>
         </fileset>
     </path>
 
@@ -94,7 +96,7 @@
     </target>
 
     <target name="clean" depends="init">
-        <delete dir="${project.dist}" failonerror="false"/>
+        <delete dir="dist" failonerror="false"/>
         <delete dir="target" failonerror="false"/>
         <ant dir="tools" target="clean"/>
     </target>
@@ -110,7 +112,7 @@
         <taskdef
             name="manifest-generator"
             classname="org.safehaus.penrose.studio.tools.ManifestTask"
-            classpath="tools/target/penrose-studio-tools-${product.version}.jar"
+            classpathref="tool.path"
         />
         <manifest-generator
             file="META-INF/MANIFEST.MF"
@@ -142,9 +144,6 @@
             </fileset>
         </copy>
         <jar basedir="target/classes" destfile="target/${project.name}-${product.version}.jar">
-            <patternset>
-                <exclude name="**/.svn"/>
-            </patternset>
             <manifest>
                 <attribute name="Specification-Version"  value="${product.specification}"/>
                 <attribute name="Implementation-Title"   value="${product.title}"/>
@@ -156,33 +155,48 @@
     </target>
 
     <target name="build" depends="compile">
-        <property name="plugin.path" value="target/dist/plugins/org.safehaus.penrose.studio_${plugin.version}"/>
+
         <copy todir="target" file="LICENSE.txt"/>
+
         <mkdir dir="target/dist"/>
+
         <copy todir="target/dist" file="LICENSE.txt"/>
+        <copy todir="target/dist" file="README.txt">
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+        <copy todir="target/dist" file="COPYING.txt"/>
+        <copy todir="target/dist" file="INSTALL-BINARY.txt"/>
+        <copy todir="target/dist" file="THIRDPARTY.txt"/>
+
+        <copy todir="target/dist" file="images/penrose.ico"/>
+
         <copy todir="target/dist/conf">
             <fileset dir="conf">
                 <include name="*.*"/>
-                <exclude name=".svn/**"/>
             </fileset>
         </copy>
-<!--
-        <mkdir dir="target/dist/conf/lib"/>
--->
         <copy todir="target/dist/configuration">
             <fileset dir="configuration">
                 <include name="*.*"/>
-                <exclude name=".svn/**"/>
             </fileset>
         </copy>
+
+        <copy todir="target/dist/docs">
+            <fileset dir="docs" includes="*.url"/>
+        </copy>
+
         <mkdir dir="target/dist/logs"/>
-        <mkdir dir="${plugin.path}"/>
+
         <copy todir="target/dist/plugins">
             <fileset dir="lib/plugins">
                 <include name="org.eclipse.core.runtime.compatibility_3.1.1.jar"/>
                 <include name="org.eclipse.ui.forms_3.2.0.jar"/>
             </fileset>
         </copy>
+
+        <mkdir dir="${plugin.path}"/>
         <copy todir="${plugin.path}">
             <fileset dir=".">
                 <include name="images/**"/>
@@ -197,6 +211,7 @@
                 <include name="${project.name}-${product.version}.jar"/>
             </fileset>
         </copy>
+
         <copy todir="${plugin.path}/META-INF" file="MANIFEST.MF" overwrite="true">
             <filterchain>
                 <expandproperties/>
@@ -205,26 +220,29 @@
         <taskdef
             name="manifest-generator"
             classname="org.safehaus.penrose.studio.tools.ManifestTask"
-            classpath="tools/target/penrose-studio-tools-${product.version}.jar"
+            classpathref="tool.path"
         />
         <manifest-generator
             file="${plugin.path}/META-INF/MANIFEST.MF"
             dir="${plugin.path}/lib"
             newDir="lib"
         />
-        <copy todir="target/dist" file="README.txt">
-            <filterchain>
-                <expandproperties/>
-            </filterchain>
-        </copy>
-        <copy todir="target/dist" file="COPYING.txt"/>
-        <copy todir="target/dist" file="INSTALL-BINARY.txt"/>
-        <copy todir="target/dist" file="THIRDPARTY.txt"/>
-        <copy todir="target/dist/docs">
-            <fileset dir="docs" includes="*.url"/>
-        </copy>
-        <copy todir="target/dist" file="images/penrose.ico"/>
-        <fixcrlf srcdir="target" includes="**/*.txt" eol="unix"/>
+
+        <fixcrlf srcdir="target/dist" includes="**/*.txt" eol="unix"/>
+
+        <mkdir dir="dist"/>
+        <tar destfile="dist/${project.name}-${product.version}.tar.gz" compression="gzip">
+            <tarfileset dir="target/dist" prefix="${project.name}-${product.version}" mode="755">
+                <include name="penrose-studio"/>
+                <include name="penrose-studio.exe"/>
+            </tarfileset>
+            <tarfileset dir="target/dist" prefix="${project.name}-${product.version}">
+                <include name="**/*"/>
+                <exclude name="penrose-studio"/>
+                <exclude name="penrose-studio.exe"/>
+            </tarfileset>
+        </tar>
+
     </target>
 
     <target name="dist" depends="init">
@@ -306,18 +324,18 @@
 -->
 
     <target name="dist-src" depends="init">
-        <mkdir dir="${project.dist}"/>
+        <mkdir dir="dist"/>
         <echo message="Creating ${project.name}-${product.version}-src.zip"/>
-        <zip destfile="${project.dist}/${project.name}-${product.version}-src.zip">
+        <zip destfile="dist/${project.name}-${product.version}-src.zip">
             <zipfileset dir=".">
-                <exclude name="${project.dist}/**"/>
+                <exclude name="dist/**"/>
                 <exclude name="target/**"/>
             </zipfileset>
         </zip>
         <echo message="Creating ${project.name}-${product.version}-src.tar.gz"/>
-        <tar destfile="${project.dist}/${project.name}-${product.version}-src.tar.gz" compression="gzip">
+        <tar destfile="dist/${project.name}-${product.version}-src.tar.gz" compression="gzip">
             <tarfileset dir="." prefix="${project.name}-${product.version}">
-                <exclude name="${project.dist}/**"/>
+                <exclude name="dist/**"/>
                 <exclude name="target/**"/>
             </tarfileset>
         </tar>
@@ -325,22 +343,12 @@
 
     <target name="dist-all" depends="dist-linux,dist-macosx,dist-win32">
         <copy
-            todir="${project.dist}"
+            todir="dist"
             file="target/${project.name}-${product.version}.jar">
         </copy>
     </target>
 
     <target name="dist-linux" depends="build-linux" if="isLinux">
-        <mkdir dir="${project.dist}"/>
-        <tar destfile="${project.dist}/${project.name}-${product.version}.tar.gz" compression="gzip">
-            <tarfileset dir="target/dist" prefix="${project.name}-${product.version}" mode="755">
-                <include name="penrose-studio"/>
-            </tarfileset>
-            <tarfileset dir="target/dist" prefix="${project.name}-${product.version}">
-                <include name="**/*"/>
-                <exclude name="penrose-studio"/>
-            </tarfileset>
-        </tar>
     </target>
 
     <target name="dist-macosx" depends="build-macosx" if="isMac">
@@ -378,7 +386,7 @@
         <mkdir dir="target/dist/.background"/>
 
         <echo message="Creating ${project.name}-${product.version}.dmg"/>
-        <mkdir dir="${project.dist}"/>
+        <mkdir dir="dist"/>
         <exec executable="bin/pkg-dmg">
             <arg line="--source target/dist"/>
             <arg line="--target dist/${project.name}-${product.version}.dmg"/>
@@ -399,7 +407,7 @@
     </target>
 
     <target name="dist-win32" depends="build-win32" if="isWindows">
-        <echo message="Creating ${project.dist}/${project.name}-${product.version}.exe"/>
+        <echo message="Creating dist/${project.name}-${product.version}.exe"/>
         <copy todir="target" file="installer/penrose-studio.iss">
             <filterchain>
                 <expandproperties/>
@@ -408,7 +416,7 @@
         <exec executable="${iscc.path}">
             <arg line="/Q target/penrose-studio.iss"/>
         </exec>
-        <zip destfile="${project.dist}/${project.name}-${product.version}.zip">
+        <zip destfile="dist/${project.name}-${product.version}.zip">
             <zipfileset dir="target/dist" prefix="${project.name}-${product.version}" filemode="755">
                 <include name="penrose-studio.exe"/>
             </zipfileset>
@@ -445,8 +453,8 @@
             <param name="rpm.name" value="${project.name}-${product.version}-1.${arch}.rpm"/>
         </antcall>
         <move
-                file="${project.dist}/${project.name}-${product.version}-1.${arch}.rpm.bin"
-                tofile="${project.dist}/${project.name}-${product.version}-1.intel.rpm.bin"
+                file="dist/${project.name}-${product.version}-1.${arch}.rpm.bin"
+                tofile="dist/${project.name}-${product.version}-1.intel.rpm.bin"
         />
     </target>
 
@@ -460,8 +468,8 @@
             <param name="rpm.name" value="${project.name}-${product.version}-1.x86_64.rpm"/>
         </antcall>
         <move
-                file="${project.dist}/${project.name}-${product.version}-1.x86_64.rpm.bin"
-                tofile="${project.dist}/${project.name}-${product.version}-1.amd64.rpm.bin"
+                file="dist/${project.name}-${product.version}-1.x86_64.rpm.bin"
+                tofile="dist/${project.name}-${product.version}-1.amd64.rpm.bin"
         />
     </target>
 
@@ -483,54 +491,37 @@
         </condition>
     </target>
 
-    <target name="rpm-build" depends="dist-src" if="hasRpmBuilder">
-        <copy todir="target" file="installer/penrose-studio.spec">
+    <target name="rpm-build" depends="dist" if="hasRpmBuilder">
+        <copy todir="target" file="installer/${project.name}.spec">
             <filterchain>
                 <expandproperties/>
             </filterchain>
         </copy>
         <copy todir="${rpm.home}/SOURCES" overwrite="true"
-            file="${project.dist}/${project.name}-${product.version}-src.tar.gz">
+            file="dist/${project.name}-${product.version}.tar.gz">
         </copy>
         <exec executable="${rpm.builder}">
             <arg line="-bb target/penrose-studio.spec"/>
         </exec>
-        <copy todir="${project.dist}" failonerror="false"
+        <copy todir="dist" failonerror="false"
             file="${rpm.home}/RPMS/${rpm.arch}/${rpm.name}">
         </copy>
+<!--
+        <copy file="bin/sfx-header" tofile="dist/${rpm.name}.bin" overwrite="true"/>
 
-        <copy file="bin/sfx-header" tofile="${project.dist}/${rpm.name}.bin" overwrite="true"/>
-
-        <echo message="__LICENSE__${line.separator}" file="${project.dist}/${rpm.name}.bin" append="true"/>
-        <concat destfile="${project.dist}/${rpm.name}.bin" append="true">
+        <echo message="__LICENSE__${line.separator}" file="dist/${rpm.name}.bin" append="true"/>
+        <concat destfile="dist/${rpm.name}.bin" append="true">
             <fileset dir="." includes="LICENSE.txt"/>
         </concat>
 
-        <echo message="__CONTENT__${line.separator}" file="${project.dist}/${rpm.name}.bin" append="true"/>
-<!--
-        <concat destfile="${project.dist}/${rpm.name}.bin" append="true" binary="true">
-            <fileset dir="${project.dist}" includes="${rpm.name}"/>
-        </concat>
+        <echo message="__CONTENT__${line.separator}" file="dist/${rpm.name}.bin" append="true"/>
+        <exec executable="${rpm.prefix}/bin/sh">
+            <arg value="-c"/>
+            <arg value="cat dist/${rpm.name} &gt;&gt; dist/${rpm.name}.bin"/>
+        </exec>
 
-        <exec executable="${rpm.prefix}/bin/sh">
-            <arg value="-c"/>
-            <arg value="echo __LICENSE__ &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
-        </exec>
-        <exec executable="${rpm.prefix}/bin/sh">
-            <arg value="-c"/>
-            <arg value="cat LICENSE.txt &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
-        </exec>
-        <exec executable="${rpm.prefix}/bin/sh">
-            <arg value="-c"/>
-            <arg value="echo __CONTENT__ &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
-        </exec>
+        <chmod file="dist/${rpm.name}.bin" perm="a+rx"/>
 -->
-        <exec executable="${rpm.prefix}/bin/sh">
-            <arg value="-c"/>
-            <arg value="cat ${project.dist}/${rpm.name} &gt;&gt; ${project.dist}/${rpm.name}.bin"/>
-        </exec>
-
-        <chmod file="${project.dist}/${rpm.name}.bin" perm="a+rx"/>
     </target>
 
     <target name="rpm" depends="rpm-check,rpm-build">

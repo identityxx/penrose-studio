@@ -17,15 +17,15 @@
  */
 package org.safehaus.penrose.studio.tools;
 
-import org.apache.tools.ant.Task;
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Task;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.TreeSet;
 
 /**
  * @author Endi S. Dewata
@@ -51,7 +51,7 @@ public class ManifestTask extends Task {
         File libDir = new File(dir);
         File files[] = libDir.listFiles();
 
-        Collection<String> list = new ArrayList<String>();
+        Collection<String> list = new TreeSet<String>();
         for (File f : files) {
             if (!f.isFile()) continue;
             if (!f.getName().endsWith(".jar")) continue;
