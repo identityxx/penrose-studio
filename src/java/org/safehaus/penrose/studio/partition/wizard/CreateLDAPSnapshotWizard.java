@@ -41,15 +41,24 @@ public class CreateLDAPSnapshotWizard extends Wizard {
 
     private Project project;
 
-    public PartitionNamePage namePage = new PartitionNamePage();
-    public LDAPConnectionWizardPage connectionInfoPage = new LDAPConnectionWizardPage();
-    public JNDIConnectionParametersWizardPage connectionParametersPage = new JNDIConnectionParametersWizardPage();
+    public PartitionNamePage namePage;
+    public LDAPConnectionWizardPage connectionInfoPage;
+    public JNDIConnectionParametersWizardPage connectionParametersPage;
 
     public CreateLDAPSnapshotWizard() {
-        Map<String,String> parameters = new TreeMap<String,String>();
-        parameters.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        connectionParametersPage.setParameters(parameters);
         setWindowTitle("Create LDAP Snapshot");
+    }
+
+    public void addPages() {
+
+        namePage = new PartitionNamePage();
+        addPage(namePage);
+
+        connectionInfoPage = new LDAPConnectionWizardPage();
+        addPage(connectionInfoPage);
+
+        connectionParametersPage = new JNDIConnectionParametersWizardPage();
+        addPage(connectionParametersPage);
     }
 
     public boolean canFinish() {
@@ -57,12 +66,6 @@ public class CreateLDAPSnapshotWizard extends Wizard {
         if (!connectionInfoPage.isPageComplete()) return false;
         if (!connectionParametersPage.isPageComplete()) return false;
         return true;
-    }
-
-    public void addPages() {
-        addPage(namePage);
-        addPage(connectionInfoPage);
-        addPage(connectionParametersPage);
     }
 
     public boolean needsPreviousAndNextButtons() {
@@ -82,8 +85,8 @@ public class CreateLDAPSnapshotWizard extends Wizard {
             connectionConfig.setName(name);
             connectionConfig.setAdapterName("LDAP");
             connectionConfig.setParameter(Context.PROVIDER_URL, connectionInfoPage.getProviderUrl());
-            connectionConfig.setParameter(Context.SECURITY_PRINCIPAL, connectionInfoPage.getBindDN());
-            connectionConfig.setParameter(Context.SECURITY_CREDENTIALS, connectionInfoPage.getPassword());
+            connectionConfig.setParameter(Context.SECURITY_PRINCIPAL, connectionInfoPage.getBindDn());
+            connectionConfig.setParameter(Context.SECURITY_CREDENTIALS, connectionInfoPage.getBindPassword());
 
             Map<String,String> parameters = connectionParametersPage.getParameters();
             for (String paramName : parameters.keySet()) {

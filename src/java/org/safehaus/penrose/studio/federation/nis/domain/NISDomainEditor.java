@@ -7,6 +7,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.studio.federation.linking.editor.LinkingSettingsPage;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -30,6 +31,8 @@ public class NISDomainEditor extends FormEditor {
     public void addPages() {
         try {
             addPage(new NISDomainSettingsPage(this));
+            addPage(new NISDomainPartitionsPage(this));
+            addPage(new LinkingSettingsPage(this, domain));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

@@ -81,8 +81,13 @@
             icon="images/source.gif"
             class="org.safehaus.penrose.studio.nis.source.NISSourceEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.directory.editor.EntryEditor"
+            id="org.safehaus.penrose.studio.mapping.editor.MappingEditor"
             name="Mapping"
+            icon="images/mapping.png"
+            class="org.safehaus.penrose.studio.mapping.editor.MappingEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.directory.editor.EntryEditor"
+            name="Entry"
             icon="images/penrose16.ico"
             class="org.safehaus.penrose.studio.directory.editor.EntryEditor"/>
         <editor
@@ -154,10 +159,10 @@
             icon="images/object.gif"
             class="org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.federation.linking.LinkingEditor"
+            id="org.safehaus.penrose.studio.federation.linking.editor.LinkingEditor"
             name="Identity Linking"
             icon="images/object.gif"
-            class="org.safehaus.penrose.studio.federation.linking.LinkingEditor"/>
+            class="org.safehaus.penrose.studio.federation.linking.editor.LinkingEditor"/>
         <editor
             id="org.safehaus.penrose.studio.federation.nis.editor.NISEditor"
             name="NIS"

@@ -22,7 +22,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.directory.EntryConfig;
-import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.directory.ProxyEntry;
 import org.safehaus.penrose.ldap.LDAP;
 import org.safehaus.penrose.management.partition.PartitionClient;
@@ -51,17 +51,24 @@ public class CreateLDAPProxyWizard extends Wizard {
 
     private Project project;
 
-    public PartitionProxyPage infoPage = new PartitionProxyPage();
-    public LDAPConnectionWizardPage connectionInfoPage = new LDAPConnectionWizardPage();
-    public JNDIConnectionParametersWizardPage connectionParametersPage = new JNDIConnectionParametersWizardPage();
+    public PartitionProxyPage infoPage;
+    public LDAPConnectionWizardPage connectionInfoPage;
+    public JNDIConnectionParametersWizardPage connectionParametersPage;
 
     public CreateLDAPProxyWizard() {
-
-        Map<String,String> parameters = new TreeMap<String,String>();
-        parameters.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        connectionParametersPage.setParameters(parameters);
-
         setWindowTitle("New LDAP Proxy");
+    }
+
+    public void addPages() {
+
+        infoPage = new PartitionProxyPage();
+        addPage(infoPage);
+
+        connectionInfoPage = new LDAPConnectionWizardPage();
+        addPage(connectionInfoPage);
+
+        connectionParametersPage = new JNDIConnectionParametersWizardPage();
+        addPage(connectionParametersPage);
     }
 
     public boolean canFinish() {
@@ -69,12 +76,6 @@ public class CreateLDAPProxyWizard extends Wizard {
         if (!connectionInfoPage.isPageComplete()) return false;
         if (!connectionParametersPage.isPageComplete()) return false;
         return true;
-    }
-
-    public void addPages() {
-        addPage(infoPage);
-        addPage(connectionInfoPage);
-        addPage(connectionParametersPage);
     }
 
     public boolean needsPreviousAndNextButtons() {
@@ -99,8 +100,8 @@ public class CreateLDAPProxyWizard extends Wizard {
             connectionConfig.setName(partitionName);
             connectionConfig.setAdapterName("LDAP");
             connectionConfig.setParameter(InitialContext.PROVIDER_URL, connectionInfoPage.getProviderUrl());
-            connectionConfig.setParameter(InitialContext.SECURITY_PRINCIPAL, connectionInfoPage.getBindDN());
-            connectionConfig.setParameter(InitialContext.SECURITY_CREDENTIALS, connectionInfoPage.getPassword());
+            connectionConfig.setParameter(InitialContext.SECURITY_PRINCIPAL, connectionInfoPage.getBindDn());
+            connectionConfig.setParameter(InitialContext.SECURITY_CREDENTIALS, connectionInfoPage.getBindPassword());
 
             Map<String,String> parameters = connectionParametersPage.getParameters();
             for (String paramName : parameters.keySet()) {
@@ -124,8 +125,8 @@ public class CreateLDAPProxyWizard extends Wizard {
 
             EntryConfig rootEntry = new EntryConfig(connectionInfoPage.getSuffix());
 
-            SourceMapping sourceMapping = new SourceMapping("DEFAULT", partitionName);
-            rootEntry.addSourceMapping(sourceMapping);
+            EntrySourceConfig sourceMapping = new EntrySourceConfig("DEFAULT", partitionName);
+            rootEntry.addSourceConfig(sourceMapping);
 
             rootEntry.setEntryClass(ProxyEntry.class.getName());
 
@@ -148,8 +149,8 @@ public class CreateLDAPProxyWizard extends Wizard {
                 EntryConfig rootDseEntryConfig = new EntryConfig();
                 rootDseEntryConfig.setDn("");
 
-                SourceMapping rootDseSourceMapping = new SourceMapping("DEFAULT", rootDseSourceConfig.getName());
-                rootDseEntryConfig.addSourceMapping(rootDseSourceMapping);
+                EntrySourceConfig rootDseSourceMapping = new EntrySourceConfig("DEFAULT", rootDseSourceConfig.getName());
+                rootDseEntryConfig.addSourceConfig(rootDseSourceMapping);
 
                 rootDseEntryConfig.setEntryClass(ProxyEntry.class.getName());
 

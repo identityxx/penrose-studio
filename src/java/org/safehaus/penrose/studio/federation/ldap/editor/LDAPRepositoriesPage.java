@@ -23,15 +23,11 @@ import org.eclipse.jface.window.Window;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.federation.repository.LDAPRepository;
-import org.safehaus.penrose.studio.federation.ldap.wizard.LDAPRepositoryWizard;
-import org.safehaus.penrose.studio.federation.ldap.wizard.LDAPRepositoryEditorWizard;
+import org.safehaus.penrose.studio.federation.ldap.wizard.AddLDAPRepositoryWizard;
+import org.safehaus.penrose.studio.federation.ldap.wizard.EditLDAPRepositoryWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
-
-import javax.naming.Context;
-import java.util.Map;
-import java.util.LinkedHashMap;
 
 /**
  * @author Endi S. Dewata
@@ -135,10 +131,16 @@ public class LDAPRepositoriesPage extends FormPage {
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
-                    LDAPRepositoryWizard wizard = new LDAPRepositoryWizard(ldapFederation);
+                    AddLDAPRepositoryWizard wizard = new AddLDAPRepositoryWizard();
                     WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
-                    dialog.open();
+
+                    if (dialog.open() == Window.CANCEL) return;
+
+                    LDAPRepository repository = wizard.getRepository();
+
+                    ldapFederation.addRepository(repository);
+                    ldapFederation.createPartitions(repository);
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
@@ -165,43 +167,22 @@ public class LDAPRepositoriesPage extends FormPage {
 
                     LDAPRepository repository = (LDAPRepository)ti.getData();
 
-                    LDAPRepositoryEditorWizard wizard = new LDAPRepositoryEditorWizard();
-                    wizard.setWindowTitle("LDAP Repository");
-
-                    wizard.setSuffix(repository.getSuffix());
-
-                    Map<String,String> parameters = new LinkedHashMap<String,String>();
-                    parameters.put(Context.PROVIDER_URL, repository.getUrl());
-                    parameters.put(Context.SECURITY_PRINCIPAL, repository.getUser());
-                    parameters.put(Context.SECURITY_CREDENTIALS, repository.getPassword());
-                    wizard.setParameters(parameters);
-
-                    wizard.setProject(project);
+                    EditLDAPRepositoryWizard wizard = new EditLDAPRepositoryWizard(repository);
 
                     IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-
                     WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
                     dialog.setPageSize(600, 300);
 
-                    if (dialog.open() != Window.OK) return;
-
-                    Map<String,String> newParameters = wizard.getParameters();
-                    repository.setUrl(newParameters.get(Context.PROVIDER_URL));
-                    repository.setUser(newParameters.get(Context.SECURITY_PRINCIPAL));
-                    repository.setPassword(newParameters.get(Context.SECURITY_CREDENTIALS));
-                    repository.setSuffix(wizard.getSuffix());
+                    if (dialog.open() == Window.CANCEL) return;
 
                     ldapFederation.updateRepository(repository);
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
+                    refresh();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     ErrorDialog.open(e);
                 }
-
-                refresh();
             }
         });
 

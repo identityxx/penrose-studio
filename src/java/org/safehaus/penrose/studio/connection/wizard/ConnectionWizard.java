@@ -47,21 +47,36 @@ public class ConnectionWizard extends Wizard {
     private String partitionName;
     private ConnectionConfig connectionConfig;
 
-    public ConnectionNamePage namePage = new ConnectionNamePage();
-    public ConnectionDriverPage driverPage = new ConnectionDriverPage();
-    public JDBCConnectionWizardPage jdbcPage = new JDBCConnectionWizardPage();
+    public ConnectionNamePage namePage;
+    public ConnectionDriverPage driverPage;
+    public JDBCConnectionWizardPage jdbcPage;
 
-    public LDAPConnectionWizardPage ldapInfoPage = new LDAPConnectionWizardPage();
-    public JNDIConnectionParametersWizardPage jndiParametersPage = new JNDIConnectionParametersWizardPage();
+    public LDAPConnectionWizardPage ldapInfoPage;
+    public JNDIConnectionParametersWizardPage jndiParametersPage;
 
     public ConnectionWizard(String partitionName) {
         this.partitionName = partitionName;
         setWindowTitle("New Connection");
+    }
 
-        Map<String,String> parameters = new TreeMap<String,String>();
-        parameters.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        jndiParametersPage.setParameters(parameters);
+    public void addPages() {
 
+        namePage = new ConnectionNamePage();
+        addPage(namePage);
+
+        driverPage = new ConnectionDriverPage();
+        addPage(driverPage);
+
+        jdbcPage = new JDBCConnectionWizardPage();
+        addPage(jdbcPage);
+
+        //addPage(jndiPage);
+
+        ldapInfoPage = new LDAPConnectionWizardPage();
+        addPage(ldapInfoPage);
+
+        jndiParametersPage = new JNDIConnectionParametersWizardPage();
+        addPage(jndiParametersPage);
     }
 
     public boolean canFinish() {
@@ -80,15 +95,6 @@ public class ConnectionWizard extends Wizard {
         }
 
         return true;
-    }
-
-    public void addPages() {
-        addPage(namePage);
-        addPage(driverPage);
-        addPage(jdbcPage);
-        //addPage(jndiPage);
-        addPage(ldapInfoPage);
-        addPage(jndiParametersPage);
     }
 
     public IWizardPage getNextPage(IWizardPage page) {

@@ -1,10 +1,9 @@
 package org.safehaus.penrose.studio.util;
 
-import org.safehaus.penrose.directory.AttributeMapping;
+import org.safehaus.penrose.directory.EntryAttributeConfig;
 import org.safehaus.penrose.directory.EntryConfig;
-import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.ldap.DN;
-import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.mapping.Expression;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
@@ -53,7 +52,7 @@ public class ADUtil {
         EntryConfig entryConfig = new EntryConfig(dn);
         entryConfig.addObjectClass("top");
         entryConfig.addObjectClass("subschema");
-        entryConfig.addAttributeMappingsFromRdn();
+        entryConfig.addAttributesFromRdn();
 
         Expression atExpression = new Expression(
                 "import org.safehaus.penrose.schema.*;\n" +
@@ -69,10 +68,10 @@ public class ADUtil {
                 "return \"( \"+at+\" )\";"
         );
 
-        entryConfig.addAttributeMapping(
-                new AttributeMapping(
+        entryConfig.addAttributeConfig(
+                new EntryAttributeConfig(
                         "attributeTypes",
-                        AttributeMapping.EXPRESSION,
+                        EntryAttributeConfig.EXPRESSION,
                         atExpression
                 )
         );
@@ -118,16 +117,16 @@ public class ADUtil {
                 "return \"( \"+oc+\" )\";"
         );
 
-        entryConfig.addAttributeMapping(
-                new AttributeMapping(
+        entryConfig.addAttributeConfig(
+                new EntryAttributeConfig(
                         "objectClasses",
-                        AttributeMapping.EXPRESSION,
+                        EntryAttributeConfig.EXPRESSION,
                         ocExpression
                 )
         );
 
-        SourceMapping sourceMapping = new SourceMapping("s", sourceConfig.getName());
-        entryConfig.addSourceMapping(sourceMapping);
+        EntrySourceConfig sourceMapping = new EntrySourceConfig("s", sourceConfig.getName());
+        entryConfig.addSourceConfig(sourceMapping);
 
         //partitionConfig.getDirectoryConfig().addEntryConfig(entryConfig);
         partitionClient.createEntry(entryConfig);

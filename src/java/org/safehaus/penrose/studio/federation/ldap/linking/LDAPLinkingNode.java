@@ -11,8 +11,8 @@ import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
 import org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryNode;
-import org.safehaus.penrose.studio.federation.linking.LinkingEditor;
-import org.safehaus.penrose.studio.federation.linking.LinkingEditorInput;
+import org.safehaus.penrose.studio.federation.linking.editor.LinkingEditor;
+import org.safehaus.penrose.studio.federation.linking.editor.LinkingEditorInput;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.tree.Node;
 

@@ -23,12 +23,8 @@ import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.federation.repository.LDAPRepository;
-import org.safehaus.penrose.studio.federation.ldap.wizard.LDAPRepositoryEditorWizard;
+import org.safehaus.penrose.studio.federation.ldap.wizard.EditLDAPRepositoryWizard;
 import org.safehaus.penrose.studio.project.Project;
-
-import javax.naming.Context;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * @author Endi S. Dewata
@@ -42,7 +38,6 @@ public class LDAPRepositorySettingsPage extends FormPage {
     Label urlText;
     Label bindDnText;
     Label bindPasswordText;
-    Label suffixText;
 
     LDAPRepositoryEditor editor;
     LDAPRepository repository;
@@ -75,15 +70,6 @@ public class LDAPRepositorySettingsPage extends FormPage {
 
         Control settingsControl = createSettingsControl(settingsSection);
         settingsSection.setClient(settingsControl);
-
-        new Label(body, SWT.NONE);
-
-        Section partitionSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        partitionSection.setText("Partition");
-        partitionSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        Control partitionControl = createPartitionControl(partitionSection);
-        partitionSection.setClient(partitionControl);
 
         refresh();
     }
@@ -148,127 +134,17 @@ public class LDAPRepositorySettingsPage extends FormPage {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    LDAPRepositoryEditorWizard wizard = new LDAPRepositoryEditorWizard();
-                    wizard.setWindowTitle("LDAP Repository");
+                    EditLDAPRepositoryWizard wizard = new EditLDAPRepositoryWizard(repository);
 
-                    wizard.setSuffix(repository.getSuffix());
-
-                    Map<String,String> parameters = new LinkedHashMap<String,String>();
-                    parameters.put(Context.PROVIDER_URL, repository.getUrl());
-                    parameters.put(Context.SECURITY_PRINCIPAL, repository.getUser());
-                    parameters.put(Context.SECURITY_CREDENTIALS, repository.getPassword());
-                    wizard.setParameters(parameters);
-
-                    wizard.setProject(project);
-                    
                     IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-
                     WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
                     dialog.setPageSize(600, 300);
 
-                    if (dialog.open() != Window.OK) return;
-
-                    Map<String,String> newParameters = wizard.getParameters();
-                    repository.setUrl(newParameters.get(Context.PROVIDER_URL));
-                    repository.setUser(newParameters.get(Context.SECURITY_PRINCIPAL));
-                    repository.setPassword(newParameters.get(Context.SECURITY_CREDENTIALS));
-                    repository.setSuffix(wizard.getSuffix());
+                    if (dialog.open() == Window.CANCEL) return;
 
                     ldapFederation.updateRepository(repository);
 
                     refresh();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    ErrorDialog.open(e);
-                }
-            }
-        });
-
-        return composite;
-    }
-
-    public Composite createPartitionControl(Composite parent) {
-
-        Composite composite = toolkit.createComposite(parent);
-        GridLayout layout = new GridLayout(2, false);
-        layout.marginWidth = 0;
-        composite.setLayout(layout);
-
-        Composite left = createPartitionLeftPanel(composite);
-        left.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-        Composite right = createPartitionRightPanel(composite);
-        GridData gd = new GridData(GridData.FILL_VERTICAL);
-        gd.widthHint = 100;
-        right.setLayoutData(gd);
-
-        return composite;
-    }
-
-    public Composite createPartitionLeftPanel(Composite parent) {
-
-        Composite composite = toolkit.createComposite(parent);
-        GridLayout layout = new GridLayout(2, false);
-        layout.marginWidth = 0;
-        composite.setLayout(layout);
-
-        Label suffixLabel = toolkit.createLabel(composite, "Suffix:");
-        GridData gd = new GridData();
-        gd.widthHint = 100;
-        suffixLabel.setLayoutData(gd);
-
-        suffixText = toolkit.createLabel(composite, "");
-        suffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        return composite;
-    }
-
-    public Composite createPartitionRightPanel(Composite parent) {
-
-        Composite composite = toolkit.createComposite(parent);
-        GridLayout layout = new GridLayout();
-        layout.marginWidth = 0;
-        composite.setLayout(layout);
-
-        Button createButton = toolkit.createButton(composite, "Create", SWT.PUSH);
-        createButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        createButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                try {
-                    boolean confirm = MessageDialog.openQuestion(
-                            editor.getSite().getShell(),
-                            "Creating Partition",
-                            "Are you sure?"
-                    );
-
-                    if (!confirm) return;
-
-                    ldapFederation.createPartitions(repository);
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    ErrorDialog.open(e);
-                }
-            }
-        });
-
-        Button removeButton = toolkit.createButton(composite, "Remove", SWT.PUSH);
-        removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        removeButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                try {
-                    boolean confirm = MessageDialog.openQuestion(
-                            editor.getSite().getShell(),
-                            "Removing Partition",
-                            "Are you sure?"
-                    );
-
-                    if (!confirm) return;
-
-                    ldapFederation.removePartitions(repository);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -290,9 +166,6 @@ public class LDAPRepositorySettingsPage extends FormPage {
 
             String bindPassword = repository.getPassword();
             bindPasswordText.setText(bindPassword == null ? "" : "*****");
-
-            String suffix = repository.getSuffix();
-            suffixText.setText(suffix == null ? "" : suffix);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

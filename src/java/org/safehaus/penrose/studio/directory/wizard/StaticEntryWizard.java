@@ -28,8 +28,8 @@ import org.safehaus.penrose.management.partition.PartitionClient;
 import org.safehaus.penrose.management.partition.PartitionManagerClient;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
-import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
-import org.safehaus.penrose.studio.mapping.wizard.StaticEntryRDNWizardPage;
+import org.safehaus.penrose.studio.directory.wizard.ObjectClassWizardPage;
+import org.safehaus.penrose.studio.directory.wizard.StaticEntryRDNWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
@@ -107,7 +107,7 @@ public class StaticEntryWizard extends Wizard {
 
             entryConfig.setEntryClass(rdnPage.getClassName());
             entryConfig.addObjectClasses(ocPage.getSelectedObjectClasses());
-            entryConfig.addAttributeMappings(attrPage.getAttributeMappings());
+            entryConfig.addAttributeConfigs(attrPage.getAttributeMappings());
 /*
             DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
             directoryConfig.addEntryConfig(entryConfig);

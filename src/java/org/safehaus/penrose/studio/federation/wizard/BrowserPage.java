@@ -94,7 +94,14 @@ public class BrowserPage extends WizardPage {
 
         DN parentDn = (DN)parent.getData();
 
-        SearchResponse response = partitionClient.search(parentDn, null, SearchRequest.SCOPE_ONE);
+        SearchRequest request = new SearchRequest();
+        request.setDn(parentDn);
+        request.setScope(SearchRequest.SCOPE_ONE);
+        request.setAttributes(new String[] { "dn" });
+
+        SearchResponse response = new SearchResponse();
+
+        response = partitionClient.search(request, response);
 
         while (response.hasNext()) {
             SearchResult result = response.next();

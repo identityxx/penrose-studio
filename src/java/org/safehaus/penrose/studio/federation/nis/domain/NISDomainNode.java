@@ -10,11 +10,14 @@ import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.federation.nis.database.NISDatabaseNode;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.studio.federation.nis.wizard.EditNISDomainWizard;
 import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.yp.NISYPNode;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
@@ -108,15 +111,6 @@ public class NISDomainNode extends Node {
     }
 
     public Image getImage() {
-/*
-        Project project = nisFederation.getProject();
-        PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
-        PartitionConfig partitionConfig = partitionConfigManager.getPartitionConfig(domain.getName()+"_"+NISFederation.YP);
-        return PenroseStudioPlugin.getImage(partitionConfig == null ? PenroseImage.RED_FOLDER : PenroseImage.FOLDER);
-*/
-        //Partition partition = nisFederation.getPartitionManager().getPartition(domain.getName());
-        //return PenroseStudioPlugin.getImage(partition == null ? PenroseImage.RED_FOLDER : PenroseImage.FOLDER);
-
         return PenroseStudioPlugin.getImage(PenroseImage.FOLDER);
     }
 
@@ -126,6 +120,16 @@ public class NISDomainNode extends Node {
             public void run() {
                 try {
                     open();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Action("Edit") {
+            public void run() {
+                try {
+                    edit();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
@@ -143,6 +147,19 @@ public class NISDomainNode extends Node {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
         page.openEditor(ei, NISDomainEditor.class.getName());
+    }
+
+    public void edit() throws Exception {
+        
+        EditNISDomainWizard wizard = new EditNISDomainWizard(domain);
+
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
+        dialog.setPageSize(600, 300);
+
+        if (dialog.open() == Window.CANCEL) return;
+
+        nisFederation.updateRepository(domain);
     }
 
     public NISDomain getDomain() {

@@ -10,7 +10,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.directory.EntryConfig;
-import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.management.*;
 import org.safehaus.penrose.management.schema.SchemaManagerClient;
 import org.safehaus.penrose.management.directory.EntryClient;
@@ -413,11 +413,11 @@ public class NISSourcePropertyPage extends SourceEditorPage {
                 EntryClient entryClient = partitionClient.getEntryClient(id);
                 EntryConfig entryConfig = entryClient.getEntryConfig();
 
-                SourceMapping s = entryConfig.removeSourceMapping(oldName);
+                EntrySourceConfig s = entryConfig.removeSourceConfig(oldName);
                 if (s == null) continue;
 
                 s.setName(newName);
-                entryConfig.addSourceMapping(s);
+                entryConfig.addSourceConfig(s);
 
                 partitionClient.updateEntry(id, entryConfig);
             }

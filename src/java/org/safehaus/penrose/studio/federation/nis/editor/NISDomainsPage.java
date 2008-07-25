@@ -17,11 +17,12 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.federation.repository.NISDomain;
-import org.safehaus.penrose.studio.federation.nis.wizard.NISRepositoryWizard;
-import org.safehaus.penrose.studio.nis.dialog.NISUserDialog;
+import org.safehaus.penrose.studio.federation.nis.wizard.AddNISDomainWizard;
+import org.safehaus.penrose.studio.federation.nis.wizard.EditNISDomainWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
@@ -125,10 +126,16 @@ public class NISDomainsPage extends FormPage {
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
-                    NISRepositoryWizard wizard = new NISRepositoryWizard(nisFederation);
+                    AddNISDomainWizard wizard = new AddNISDomainWizard();
                     WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
-                    dialog.open();
+
+                    if (dialog.open() == Window.CANCEL) return;
+
+                    NISDomain domain = wizard.getRepository();
+
+                    nisFederation.addRepository(domain);
+                    nisFederation.createPartitions(domain);
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
@@ -155,13 +162,19 @@ public class NISDomainsPage extends FormPage {
 
                     NISDomain domain = (NISDomain)item.getData();
 
+                    EditNISDomainWizard wizard = new EditNISDomainWizard(domain);
+                    WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
+                    dialog.setPageSize(600, 300);
+
+                    if (dialog.open() == Window.CANCEL) return;
+/*
                     NISDomainDialog dialog = new NISDomainDialog(editor.getSite().getShell(), SWT.NONE);
                     dialog.setDomain(domain);
                     dialog.open();
 
                     int action = dialog.getAction();
                     if (action == NISUserDialog.CANCEL) return;
-
+*/
                     nisFederation.updateRepository(domain);
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();

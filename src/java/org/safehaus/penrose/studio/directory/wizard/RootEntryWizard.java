@@ -29,8 +29,8 @@ import org.safehaus.penrose.management.partition.PartitionClient;
 import org.safehaus.penrose.management.partition.PartitionManagerClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
-import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
-import org.safehaus.penrose.studio.mapping.wizard.StaticEntryDNWizardPage;
+import org.safehaus.penrose.studio.directory.wizard.ObjectClassWizardPage;
+import org.safehaus.penrose.studio.directory.wizard.StaticEntryDNWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 
 import java.util.Collection;
@@ -101,7 +101,7 @@ public class RootEntryWizard extends Wizard {
             entryConfig.setDn(dnPage.getDn());
             entryConfig.setEntryClass(dnPage.getClassName());
             entryConfig.addObjectClasses(ocPage.getSelectedObjectClasses());
-            entryConfig.addAttributeMappings(attrPage.getAttributeMappings());
+            entryConfig.addAttributeConfigs(attrPage.getAttributeMappings());
 
             entryConfig.addACI(new ACI("rs"));
 /*

@@ -24,7 +24,6 @@ public class LDAPPartitionsWizardPage extends WizardPage implements ModifyListen
 
     public final static String NAME = "LDAP PARTITIONS";
 
-
     Button ldapEnabledButton;
     Text ldapSuffixText;
 

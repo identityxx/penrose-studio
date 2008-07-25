@@ -638,7 +638,7 @@ public class NISUsersLinkPage extends FormPage {
 
         globalUsers.search(null, request, response);
 
-        return response.getAll();
+        return response.getResults();
     }
 
     public Collection<SearchResult> findGlobal(String uid) throws Exception {
@@ -653,7 +653,7 @@ public class NISUsersLinkPage extends FormPage {
 
         try {
             globalUsers.search(null, request, response);
-            return response.getAll();
+            return response.getResults();
 
         } catch (Exception e) {
             return new ArrayList<SearchResult>();

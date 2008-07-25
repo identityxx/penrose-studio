@@ -95,9 +95,7 @@ public class EntryCachePage extends FormPage {
         gd.widthHint = 100;
         filterCacheSizeLabel.setLayoutData(gd);
 
-        String value = entry.getParameter(EntryConfig.QUERY_CACHE_SIZE);
-        value = value == null ? ""+ EntryConfig.DEFAULT_QUERY_CACHE_SIZE : value;
-		filterCacheSizeText = toolkit.createText(composite, value, SWT.BORDER);
+		filterCacheSizeText = toolkit.createText(composite, "", SWT.BORDER);
 
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
@@ -105,11 +103,6 @@ public class EntryCachePage extends FormPage {
 
         filterCacheSizeText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                if ("".equals(filterCacheSizeText.getText())) {
-                    entry.removeParameter(EntryConfig.QUERY_CACHE_SIZE);
-                } else {
-                    entry.setParameter(EntryConfig.QUERY_CACHE_SIZE, filterCacheSizeText.getText());
-                }
                 checkDirty();
             }
         });
@@ -119,9 +112,7 @@ public class EntryCachePage extends FormPage {
         gd.widthHint = 100;
         filterCacheExpirationLabel.setLayoutData(gd);
 
-        value = entry.getParameter(EntryConfig.QUERY_CACHE_EXPIRATION);
-        value = value == null ? ""+ EntryConfig.DEFAULT_QUERY_CACHE_EXPIRATION : value;
-        filterCacheExpirationText = toolkit.createText(composite, value, SWT.BORDER);
+        filterCacheExpirationText = toolkit.createText(composite, "", SWT.BORDER);
 
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
@@ -129,11 +120,6 @@ public class EntryCachePage extends FormPage {
 
         filterCacheExpirationText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                if ("".equals(filterCacheExpirationText.getText())) {
-                    entry.removeParameter(EntryConfig.QUERY_CACHE_EXPIRATION);
-                } else {
-                    entry.setParameter(EntryConfig.QUERY_CACHE_EXPIRATION, filterCacheExpirationText.getText());
-                }
                 checkDirty();
             }
         });
@@ -151,9 +137,7 @@ public class EntryCachePage extends FormPage {
         gd.widthHint = 100;
         dataCacheSizeLabel.setLayoutData(gd);
 
-        String value = entry.getParameter(EntryConfig.DATA_CACHE_SIZE);
-        value = value == null ? ""+ EntryConfig.DEFAULT_DATA_CACHE_SIZE : value;
-        dataCacheSizeText = toolkit.createText(composite, value, SWT.BORDER);
+        dataCacheSizeText = toolkit.createText(composite, "", SWT.BORDER);
 
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
@@ -161,11 +145,6 @@ public class EntryCachePage extends FormPage {
 
         dataCacheSizeText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                if ("".equals(dataCacheSizeText.getText())) {
-                    entry.removeParameter(EntryConfig.DATA_CACHE_SIZE);
-                } else {
-                    entry.setParameter(EntryConfig.DATA_CACHE_SIZE, dataCacheSizeText.getText());
-                }
                 checkDirty();
             }
         });
@@ -175,9 +154,7 @@ public class EntryCachePage extends FormPage {
         gd.widthHint = 100;
         dataCacheExpirationLabel.setLayoutData(gd);
 
-        value = entry.getParameter(EntryConfig.DATA_CACHE_EXPIRATION);
-        value = value == null ? ""+ EntryConfig.DEFAULT_DATA_CACHE_EXPIRATION : value;
-        dataCacheExpirationText = toolkit.createText(composite, value, SWT.BORDER);
+        dataCacheExpirationText = toolkit.createText(composite, "", SWT.BORDER);
 
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
@@ -185,11 +162,6 @@ public class EntryCachePage extends FormPage {
 
         dataCacheExpirationText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                if ("".equals(dataCacheExpirationText.getText())) {
-                    entry.removeParameter(EntryConfig.DATA_CACHE_EXPIRATION);
-                } else {
-                    entry.setParameter(EntryConfig.DATA_CACHE_EXPIRATION, dataCacheExpirationText.getText());
-                }
                 checkDirty();
             }
         });
@@ -208,9 +180,7 @@ public class EntryCachePage extends FormPage {
         gd.widthHint = 100;
         dataCacheSizeLabel.setLayoutData(gd);
 
-        String value = entry.getParameter(EntryConfig.BATCH_SIZE);
-        value = value == null ? ""+ EntryConfig.DEFAULT_BATCH_SIZE : value;
-        batchSizeText = toolkit.createText(composite, value, SWT.BORDER);
+        batchSizeText = toolkit.createText(composite, "", SWT.BORDER);
 
         gd = new GridData(GridData.FILL);
         gd.widthHint = 200;
@@ -218,11 +188,6 @@ public class EntryCachePage extends FormPage {
 
         batchSizeText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
-                if ("".equals(batchSizeText.getText())) {
-                    entry.removeParameter(EntryConfig.BATCH_SIZE);
-                } else {
-                    entry.setParameter(EntryConfig.BATCH_SIZE, batchSizeText.getText());
-                }
                 checkDirty();
             }
         });

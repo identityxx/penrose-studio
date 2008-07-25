@@ -6,9 +6,7 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.federation.repository.Repository;
 import org.safehaus.penrose.federation.repository.GlobalRepository;
-import org.safehaus.penrose.federation.repository.LDAPRepository;
 import org.safehaus.penrose.federation.repository.NISDomain;
-import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.partition.PartitionClient;
 import org.safehaus.penrose.management.connection.ConnectionClient;
@@ -171,12 +169,19 @@ public class NISFederation {
         org.apache.tools.ant.Project antProject = new org.apache.tools.ant.Project();
 
         antProject.setProperty("DOMAIN",        name);
+        
         antProject.setProperty("NIS_DOMAIN",    domain.getFullName());
 
         antProject.setProperty("LDAP_URL",      globalRepository.getUrl());
         antProject.setProperty("LDAP_USER",     globalRepository.getUser());
         antProject.setProperty("LDAP_PASSWORD", globalRepository.getPassword());
-        antProject.setProperty("LDAP_SUFFIX",   domain.getNisSuffix());
+
+        antProject.setProperty("SUFFIX",        domain.getNisSuffix());
+
+        for (String paramName : domain.getParameterNames()) {
+            String paramValue = domain.getParameter(paramName);
+            antProject.setProperty(paramName, paramValue);
+        }
 
         Copy copy = new Copy();
         copy.setOverwrite(true);
@@ -244,7 +249,7 @@ public class NISFederation {
         antProject.setProperty("NIS_DOMAIN",     domain.getFullName());
         antProject.setProperty("NIS_URL",        domain.getUrl());
 
-        antProject.setProperty("YP_SUFFIX",      domain.getYpSuffix());
+        antProject.setProperty("SUFFIX",      domain.getYpSuffix());
 
         Copy copy = new Copy();
         copy.setOverwrite(true);
@@ -307,24 +312,9 @@ public class NISFederation {
         antProject.setProperty("DOMAIN",           name);
 
         antProject.setProperty("NIS_DOMAIN",       domain.getFullName());
-
-        LDAPFederation ldapFederation = federation.getLdapFederation();
-        LDAPRepository adRepository = ldapFederation.getRepository("ad");
-
-        antProject.setProperty("AD_URL",           adRepository.getUrl());
-        antProject.setProperty("AD_USER",          adRepository.getUser());
-        antProject.setProperty("AD_PASSWORD",      adRepository.getPassword());
-        antProject.setProperty("AD_SUFFIX",        adRepository.getSuffix());
-
-        GlobalRepository globalRepository = federation.getGlobalRepository();
-
-        antProject.setProperty("LDAP_URL",         globalRepository.getUrl());
-        antProject.setProperty("LDAP_USER",        globalRepository.getUser());
-        antProject.setProperty("LDAP_PASSWORD",    globalRepository.getPassword());
-
-        antProject.setProperty("NSS_SUFFIX",       domain.getNssSuffix());
         antProject.setProperty("NIS_SUFFIX",       domain.getNisSuffix());
-        antProject.setProperty("GLOBAL_SUFFIX",    globalRepository.getSuffix());
+
+        antProject.setProperty("SUFFIX",       domain.getNssSuffix());
 
         Copy copy = new Copy();
         copy.setOverwrite(true);

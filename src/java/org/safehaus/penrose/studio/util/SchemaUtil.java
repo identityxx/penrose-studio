@@ -1,7 +1,7 @@
 package org.safehaus.penrose.studio.util;
 
 import org.safehaus.penrose.directory.EntryConfig;
-import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.directory.ProxyEntry;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.management.partition.PartitionClient;
@@ -35,8 +35,8 @@ public class SchemaUtil {
         EntryConfig entryConfig = new EntryConfig();
         entryConfig.setDn(destSchemaDn);
 
-        SourceMapping sourceMapping = new SourceMapping("DEFAULT", sourceConfig.getName());
-        entryConfig.addSourceMapping(sourceMapping);
+        EntrySourceConfig sourceMapping = new EntrySourceConfig("DEFAULT", sourceConfig.getName());
+        entryConfig.addSourceConfig(sourceMapping);
 
         entryConfig.setEntryClass(ProxyEntry.class.getName());
 

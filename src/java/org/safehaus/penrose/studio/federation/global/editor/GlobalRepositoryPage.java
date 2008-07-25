@@ -1,10 +1,11 @@
 package org.safehaus.penrose.studio.federation.global.editor;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -16,23 +17,22 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.progress.IProgressService;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ui.progress.IProgressService;
+import org.safehaus.penrose.federation.repository.GlobalRepository;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.federation.Federation;
-import org.safehaus.penrose.federation.repository.GlobalRepository;
-import org.safehaus.penrose.studio.federation.ldap.wizard.LDAPRepositoryEditorWizard;
+import org.safehaus.penrose.studio.federation.global.wizard.GlobalRepositoryEditorWizard;
 import org.safehaus.penrose.studio.project.Project;
 
 import javax.naming.Context;
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Endi S. Dewata
@@ -148,60 +148,15 @@ public class GlobalRepositoryPage extends FormPage {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    LDAPRepositoryEditorWizard wizard = new LDAPRepositoryEditorWizard();
-                    wizard.setWindowTitle("Global Repository");
-
-                    Map<String,String> parameters = new LinkedHashMap<String,String>();
-
-                    GlobalRepository globalRepository = federation.getGlobalRepository();
-                    if (globalRepository != null) {
-                        wizard.setSuffix(globalRepository.getSuffix());
-
-                        parameters.put(Context.PROVIDER_URL, globalRepository.getUrl());
-                        parameters.put(Context.SECURITY_PRINCIPAL, globalRepository.getUser());
-                        parameters.put(Context.SECURITY_CREDENTIALS, globalRepository.getPassword());
-                        wizard.setParameters(parameters);
-                    }
-
-                    wizard.setProject(project);
+                    GlobalRepositoryEditorWizard wizard = new GlobalRepositoryEditorWizard(federation.getGlobalRepository());
 
                     IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-
                     WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
                     dialog.setPageSize(600, 300);
 
-                    if (dialog.open() != Window.OK) return;
+                    if (dialog.open() == Window.CANCEL) return;
 
-                    parameters = wizard.getParameters();
-
-                    if (globalRepository == null) {
-                        globalRepository = new GlobalRepository();
-                        globalRepository.setName(Federation.GLOBAL);
-                        globalRepository.setType("GLOBAL");
-
-                    } else {
-                        federation.removeGlobalPartition();
-                    }
-
-                    globalRepository.setUrl(parameters.get(Context.PROVIDER_URL));
-                    globalRepository.setUser(parameters.get(Context.SECURITY_PRINCIPAL));
-                    globalRepository.setPassword(parameters.get(Context.SECURITY_CREDENTIALS));
-                    globalRepository.setSuffix(wizard.getSuffix());
-
-                    final GlobalRepository repository = globalRepository;
-
-                    IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
-
-                    progressService.busyCursorWhile(new IRunnableWithProgress() {
-                        public void run(IProgressMonitor monitor) throws InvocationTargetException {
-                            try {
-                                federation.updateGlobalRepository(monitor, repository);
-
-                            } catch (Exception e) {
-                                throw new InvocationTargetException(e, e.getMessage());
-                            }
-                        }
-                    });
+                    federation.updateGlobalRepository(wizard.getRepository());
 
                     refresh();
                     

@@ -8,9 +8,12 @@ import org.safehaus.penrose.studio.federation.ldap.linking.LDAPLinkingNode;
 import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
 import org.safehaus.penrose.federation.repository.LDAPRepository;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
+import org.safehaus.penrose.studio.federation.ldap.wizard.EditLDAPRepositoryWizard;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
@@ -68,6 +71,16 @@ public class LDAPRepositoryNode extends Node {
                 }
             }
         });
+
+        manager.add(new Action("Edit") {
+            public void run() {
+                try {
+                    edit();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
     }
 
     public void open() throws Exception {
@@ -80,6 +93,19 @@ public class LDAPRepositoryNode extends Node {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
         page.openEditor(ei, LDAPRepositoryEditor.class.getName());
+    }
+
+    public void edit() throws Exception {
+
+        EditLDAPRepositoryWizard wizard = new EditLDAPRepositoryWizard(repository);
+
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
+        dialog.setPageSize(600, 300);
+
+        if (dialog.open() == Window.CANCEL) return;
+
+        ldapFederation.updateRepository(repository);
     }
 
     public ProjectNode getProjectNode() {

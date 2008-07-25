@@ -82,7 +82,7 @@ public abstract class SourceEditor extends FormEditor {
 
             for (EntryConfig entryConfig : partitionConfig.getDirectoryConfig().getEntryConfigs()) {
 
-                for (SourceMapping sourceMapping : entryConfig.getSourceMappings()) {
+                for (SourceMapping sourceMapping : entryConfig.getSourceConfigs()) {
                     if (!sourceMapping.getSourceName().equals(origSourceConfig.getName())) continue;
                     sourceMapping.setSourceName(sourceConfig.getName());
                 }

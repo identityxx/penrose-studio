@@ -33,6 +33,7 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.connection.ConnectionsNode;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
+import org.safehaus.penrose.studio.mapping.MappingsNode;
 import org.safehaus.penrose.studio.module.ModulesNode;
 import org.safehaus.penrose.studio.partition.action.ExportPartitionAction;
 import org.safehaus.penrose.studio.project.Project;
@@ -80,6 +81,17 @@ public class PartitionNode extends Node {
         directoryNode.setPartitionName(partitionName);
 
         children.add(directoryNode);
+
+        MappingsNode mappingsNode = new MappingsNode(
+                ServersView.MAPPINGS,
+                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
+                ServersView.MAPPINGS,
+                this
+        );
+
+        mappingsNode.setPartitionName(partitionName);
+
+        children.add(mappingsNode);
 
         ConnectionsNode connectionsNode = new ConnectionsNode(
                 ServersView.CONNECTIONS,

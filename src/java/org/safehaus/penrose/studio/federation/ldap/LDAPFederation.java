@@ -6,16 +6,13 @@ import org.apache.tools.ant.taskdefs.Copy;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.FilterChain;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.federation.repository.GlobalRepository;
 import org.safehaus.penrose.federation.repository.LDAPRepository;
-import org.safehaus.penrose.federation.repository.NISDomain;
 import org.safehaus.penrose.federation.repository.Repository;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.partition.PartitionClient;
 import org.safehaus.penrose.management.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.federation.Federation;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.project.Project;
 
 import java.io.File;
@@ -92,28 +89,20 @@ public class LDAPFederation {
         String ldapPassword = repository.getPassword();
         String ldapSuffix = repository.getSuffix();
 
-        GlobalRepository globalRepository = federation.getGlobalRepository();
-
-        String globalUrl = globalRepository.getUrl();
-        String globalUser = globalRepository.getUser();
-        String globalPassword = globalRepository.getPassword();
-        String globalSuffix = globalRepository.getSuffix();
-
         log.debug("Replacing parameter values.");
 
         org.apache.tools.ant.Project antProject = new org.apache.tools.ant.Project();
 
-        antProject.setProperty("DOMAIN", partitionName);
-
         antProject.setProperty("LDAP_URL",        ldapUrl);
         antProject.setProperty("LDAP_USER",       ldapUser);
         antProject.setProperty("LDAP_PASSWORD",   ldapPassword);
-        antProject.setProperty("LDAP_SUFFIX",     ldapSuffix);
 
-        antProject.setProperty("GLOBAL_URL",      globalUrl);
-        antProject.setProperty("GLOBAL_USER",     globalUser);
-        antProject.setProperty("GLOBAL_PASSWORD", globalPassword);
-        antProject.setProperty("GLOBAL_SUFFIX",   globalSuffix);
+        antProject.setProperty("SUFFIX",          ldapSuffix);
+
+        for (String paramName : repository.getParameterNames()) {
+            String paramValue = repository.getParameter(paramName);
+            antProject.setProperty(paramName, paramValue);
+        }
 
         Copy copy = new Copy();
         copy.setOverwrite(true);
@@ -219,12 +208,12 @@ public class LDAPFederation {
         federation.removeRepository(repository.getName());
         federation.addRepository(repository);
         federation.update();
-
+/*
         NISFederation nisFederation = federation.getNisFederation();
         for (NISDomain nisDomain : nisFederation.getRepositories()) {
             nisFederation.createPartitions(nisDomain);
         }
-
+*/
         createPartitions(repository);
     }
 

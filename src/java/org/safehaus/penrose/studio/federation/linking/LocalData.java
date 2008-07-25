@@ -37,6 +37,10 @@ public class LocalData {
         return links;
     }
 
+    public boolean hasLinks() {
+        return !links.isEmpty();
+    }
+
     public void addLink(DN dn) {
         links.add(dn);
     }
@@ -53,6 +57,10 @@ public class LocalData {
         this.links.addAll(links);
     }
 
+    public void removeLink(DN dn) {
+        links.remove(dn);
+    }
+    
     public void removeLinks() {
         links.clear();
     }
@@ -77,6 +85,10 @@ public class LocalData {
         this.matches.addAll(matches);
     }
 
+    public void removeMatch(DN dn) {
+        matches.remove(dn);
+    }
+    
     public void removeMatches() {
         matches.clear();
     }

@@ -604,7 +604,7 @@ public class NISGroupsLinkPage extends FormPage {
 
         globalGroups.search(null, request, response);
 
-        return response.getAll();
+        return response.getResults();
     }
 
     public Collection<SearchResult> findGlobal(String cn) throws Exception {
@@ -619,7 +619,7 @@ public class NISGroupsLinkPage extends FormPage {
 
         try {
             globalGroups.search(null, request, response);
-            return response.getAll();
+            return response.getResults();
 
         } catch (Exception e) {
             return new ArrayList<SearchResult>();

@@ -20,10 +20,10 @@ package org.safehaus.penrose.studio.directory.action;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.SWT;
-import org.safehaus.penrose.directory.AttributeMapping;
+import org.safehaus.penrose.directory.EntryAttributeConfig;
 import org.safehaus.penrose.directory.EntryConfig;
-import org.safehaus.penrose.directory.FieldMapping;
-import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.directory.EntryFieldConfig;
+import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.filter.FilterParser;
 import org.safehaus.penrose.filter.FilterProcessor;
@@ -38,7 +38,7 @@ import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.directory.EntryNode;
-import org.safehaus.penrose.studio.mapping.SourceDialog;
+import org.safehaus.penrose.studio.directory.dialog.SourceDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.server.ServersView;
@@ -95,7 +95,7 @@ public class NewEntryFromSourceAction extends Action {
                 return;
             }
 */
-            SourceMapping sourceMapping = new SourceMapping();
+            EntrySourceConfig sourceMapping = new EntrySourceConfig();
             SourceDialog dialog = new SourceDialog(serversView.getSite().getShell(), SWT.NONE);
             dialog.setSourceConfigs(sourceConfigs.values());
             dialog.setSourceMapping(sourceMapping);
@@ -156,25 +156,25 @@ public class NewEntryFromSourceAction extends Action {
             for (FieldConfig fieldConfig : sourceConfig.getFieldConfigs()) {
                 String fieldName = fieldConfig.getName();
 
-                AttributeMapping attributeMapping = new AttributeMapping(
+                EntryAttributeConfig attributeMapping = new EntryAttributeConfig(
                         fieldName,
-                        AttributeMapping.VARIABLE,
+                        EntryAttributeConfig.VARIABLE,
                         sourceAlias + "." + fieldName,
                         pkNames.contains(fieldName)
                 );
 
-                newEntryConfig.addAttributeMapping(attributeMapping);
+                newEntryConfig.addAttributeConfig(attributeMapping);
 
-                FieldMapping fieldMapping = new FieldMapping(
+                EntryFieldConfig fieldMapping = new EntryFieldConfig(
                         fieldName,
-                        FieldMapping.VARIABLE,
+                        EntryFieldConfig.VARIABLE,
                         fieldName
                 );
 
-                sourceMapping.addFieldMapping(fieldMapping);
+                sourceMapping.addFieldConfig(fieldMapping);
             }
 
-            newEntryConfig.addSourceMapping(sourceMapping);
+            newEntryConfig.addSourceConfig(sourceMapping);
 /*
             DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
             directoryConfig.addEntryConfig(newEntryConfig);

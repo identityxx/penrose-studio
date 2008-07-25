@@ -50,6 +50,8 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
     public final static String DATA_SOURCES      = "Data Sources";
     public final static String CONNECTIONS       = "Connections";
     public final static String CONNECTION        = "Connection";
+    public final static String MAPPINGS          = "Mappings";
+    public final static String MAPPING           = "Mapping";
     public final static String SOURCES           = "Sources";
     public final static String SOURCE            = "Source";
     public final static String CACHES            = "Caches";

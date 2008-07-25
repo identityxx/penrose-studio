@@ -35,7 +35,7 @@ import org.safehaus.penrose.management.directory.EntryClient;
 import org.safehaus.penrose.management.partition.PartitionClient;
 import org.safehaus.penrose.management.partition.PartitionManagerClient;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.studio.mapping.ACIDialog;
+import org.safehaus.penrose.studio.directory.dialog.ACIDialog;
 import org.safehaus.penrose.studio.project.Project;
 
 import java.util.Collection;

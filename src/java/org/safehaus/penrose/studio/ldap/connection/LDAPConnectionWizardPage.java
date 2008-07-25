@@ -48,29 +48,19 @@ public class LDAPConnectionWizardPage extends WizardPage implements ModifyListen
 
     private Collection<String> urls = new ArrayList<String>();
 
-    //private String protocol;
-    //private String hostname;
-    //private String port;
-    //private String baseDn;
-
     private String suffix;
     private String bindDn;
     private String bindPassword;
 
     List urlList;
 
-    //Combo protocolCombo;
-
-    //Text hostText;
-    //Text portText;
-
     Combo suffixCombo;
     Text bindDnText;
-    Text passwordText;
+    Text bindPasswordText;
 
     public LDAPConnectionWizardPage() {
         super(NAME);
-        setDescription("Enter connection information.");
+        setDescription("Enter LDAP connection parameters.");
     }
 
     public void createControl(final Composite parent) {
@@ -127,8 +117,8 @@ public class LDAPConnectionWizardPage extends WizardPage implements ModifyListen
             public void widgetSelected(SelectionEvent e) {
 
                 JNDIConnectionURLDialog dialog = new JNDIConnectionURLDialog(getShell(), SWT.NONE);
-                dialog.setBindDn(getBindDN());
-                dialog.setBindPassword(getPassword());
+                dialog.setBindDn(getBindDn());
+                dialog.setBindPassword(getBindPassword());
                 dialog.open();
 
                 int action = dialog.getAction();
@@ -187,82 +177,7 @@ public class LDAPConnectionWizardPage extends WizardPage implements ModifyListen
                 urlList.setSelection(i+1);
             }
         });
-/*
-        Label protocolLabel = new Label(composite, SWT.NONE);
-        protocolLabel.setText("URL:");
 
-        protocolCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
-        protocolCombo.add("ldap");
-        protocolCombo.add("ldaps");
-        protocolCombo.setText(protocol);
-
-        protocolCombo.setLayoutData(new GridData());
-        protocolCombo.addModifyListener(this);
-
-        Label hostLabel = new Label(composite, SWT.NONE);
-        hostLabel.setText("://");
-
-        hostText = new Text(composite, SWT.BORDER);
-        hostText.setText(hostname);
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        hostText.setLayoutData(gd);
-        hostText.addModifyListener(this);
-
-        Label portLabel = new Label(composite, SWT.NONE);
-        portLabel.setText(":");
-        portLabel.setLayoutData(new GridData());
-
-        portText = new Text(composite, SWT.BORDER);
-        portText.setText(port);
-        gd = new GridData();
-        gd.widthHint = 50;
-        portText.setLayoutData(gd);
-        portText.addModifyListener(this);
-
-        Label suffixLabel = new Label(composite, SWT.NONE);
-        suffixLabel.setText("Suffix:");
-
-        suffixCombo = new Combo(composite, SWT.BORDER);
-        if (baseDn != null) suffixCombo.setText(baseDn);
-
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalSpan = 3;
-        suffixCombo.setLayoutData(gd);
-
-        suffixCombo.addModifyListener(this);
-
-        Button fetchButton = new Button(composite, SWT.PUSH);
-        fetchButton.setText("Fetch Base DNs");
-        gd = new GridData();
-        gd.horizontalSpan = 2;
-        gd.widthHint = 120;
-        fetchButton.setLayoutData(gd);
-
-        fetchButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
-                try {
-                    Map<String,String> properties = new HashMap<String,String>();
-                    properties.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-                    properties.put(Context.PROVIDER_URL, getURL());
-                    properties.put(Context.SECURITY_PRINCIPAL, bindDnText.getText());
-                    properties.put(Context.SECURITY_CREDENTIALS, passwordText.getText());
-
-                    LDAPClient client = new LDAPClient(properties);
-                    Collection<String> baseDns = client.getNamingContexts();
-
-                    suffixCombo.removeAll();
-                    for (String baseDn : baseDns) {
-                        suffixCombo.add(baseDn);
-                    }
-                    suffixCombo.select(0);
-
-                } catch (Exception ex) {
-                    log.debug(ex.getMessage(), ex);
-                    ErrorDialog.open(ex);
-                }
-            }
-        });
-*/
         return composite;
     }
 
@@ -292,8 +207,8 @@ public class LDAPConnectionWizardPage extends WizardPage implements ModifyListen
                     Map<String,String> properties = new HashMap<String,String>();
                     properties.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
                     properties.put(Context.PROVIDER_URL, getProviderUrl());
-                    properties.put(Context.SECURITY_PRINCIPAL, getBindDN());
-                    properties.put(Context.SECURITY_CREDENTIALS, getPassword());
+                    properties.put(Context.SECURITY_PRINCIPAL, getBindDn());
+                    properties.put(Context.SECURITY_CREDENTIALS, getBindPassword());
 
                     client = new LDAPClient(properties);
 
@@ -336,14 +251,14 @@ public class LDAPConnectionWizardPage extends WizardPage implements ModifyListen
         Label passwordLabel = new Label(composite, SWT.NONE);
         passwordLabel.setText("Password:");
 
-        passwordText = new Text(composite, SWT.BORDER  | SWT.PASSWORD);
-        passwordText.setText(bindPassword == null ? "" : bindPassword);
+        bindPasswordText = new Text(composite, SWT.BORDER  | SWT.PASSWORD);
+        bindPasswordText.setText(bindPassword == null ? "" : bindPassword);
 
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
-        passwordText.setLayoutData(gd);
+        bindPasswordText.setLayoutData(gd);
 
-        passwordText.addModifyListener(this);
+        bindPasswordText.addModifyListener(this);
 
         new Label(composite, SWT.NONE);
 
@@ -357,8 +272,8 @@ public class LDAPConnectionWizardPage extends WizardPage implements ModifyListen
 
                 try {
                     String providerUrl = getProviderUrl();
-                    String bindDn = getBindDN();
-                    byte[] bindPassword = getPassword().getBytes("UTF-8");
+                    String bindDn = getBindDn();
+                    byte[] bindPassword = getBindPassword().getBytes("UTF-8");
 
                     BindRequest request = new BindRequest();
                     request.setDn(bindDn);
@@ -392,62 +307,22 @@ public class LDAPConnectionWizardPage extends WizardPage implements ModifyListen
         }
         return sb.toString();
     }
-/*
-    public String getProtocol() {
-        return protocolCombo.getText();
-    }
 
-    public String getHost() {
-        return hostText.getText();
-    }
-
-    public int getPort() {
-        if ("".equals(portText.getText().trim())) return 0;
-        return Integer.parseInt(portText.getText());
-    }
-*/
     public String getSuffix() {
-/*
-        String url = getURL();
-        int i = url.indexOf("://");
-        int j = url.indexOf("/", i+3);
-        return url.substring(j+1);
-*/
-        //return suffixCombo.getText();
         return suffixCombo.getText();
     }
 
-    public String getBindDN() {
+    public String getBindDn() {
         return bindDnText.getText();
     }
 
-    public String getPassword() {
-        return passwordText.getText();
+    public String getBindPassword() {
+        return bindPasswordText.getText();
     }
 
     public String getURL() {
         if (urlList.getItemCount() == 0) return null;
         return urlList.getItem(0);
-/*
-        String protocol = getProtocol();
-        String host = getHost();
-        int port = getPort();
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(protocol);
-        sb.append("://");
-        sb.append(host);
-
-        if (port != 0 &&
-                ("ldap".equals(protocol) && 389 != port ||
-                "ldaps".equals(protocol) && 636 != port)
-        ) {
-            sb.append(":");
-            sb.append(port);
-        }
-
-        return sb.toString();
-*/
     }
 
     public boolean validatePage() {
@@ -463,73 +338,28 @@ public class LDAPConnectionWizardPage extends WizardPage implements ModifyListen
         Map<String,String> map = new HashMap<String,String>();
 
         map.put(Context.PROVIDER_URL, getProviderUrl());
-        map.put(Context.SECURITY_PRINCIPAL, getBindDN());
-        map.put(Context.SECURITY_CREDENTIALS, getPassword());
+        map.put(Context.SECURITY_PRINCIPAL, getBindDn());
+        map.put(Context.SECURITY_CREDENTIALS, getBindPassword());
 
         return map;
     }
 
     public void setParameters(Map<String,String> parameters) {
+        setProviderUrl(parameters.get(Context.PROVIDER_URL));
+        setBindDn(parameters.get(Context.SECURITY_PRINCIPAL));
+        setBindPassword(parameters.get(Context.SECURITY_CREDENTIALS));
+    }
 
-        String providerUrl = parameters.get(Context.PROVIDER_URL);
+    public void setProviderUrl(String providerUrl) {
+        if (providerUrl == null) return;
 
-        if (providerUrl != null) {
-            StringTokenizer st = new StringTokenizer(providerUrl);
-            while (st.hasMoreTokens()) {
-                String url = st.nextToken();
-                urls.add(url);
-            }
+        StringTokenizer st = new StringTokenizer(providerUrl);
+        while (st.hasMoreTokens()) {
+            String url = st.nextToken();
+            urls.add(url);
         }
-/*
-        if (url == null) {
-            protocol = "ldap";
-            hostname = "localhost";
-            port = "389";
-            baseDn = "";
-
-        } else {
-            int i = url.indexOf("://");
-            protocol = url.substring(0, i);
-
-            int j = url.indexOf("/", i+3);
-            String hostPort = url.substring(i+3, j);
-
-            int k = hostPort.indexOf(":");
-            if (k < 0) {
-                hostname = hostPort;
-                port = "389";
-            } else {
-                hostname = hostPort.substring(0, k);
-                port = hostPort.substring(k+1);
-            }
-
-            baseDn = url.substring(j+1);
-        }
-*/
-        bindDn = parameters.get(Context.SECURITY_PRINCIPAL);
-        if (bindDn == null) bindDn = "";
-
-        bindPassword = parameters.get(Context.SECURITY_CREDENTIALS);
-        if (bindPassword == null) bindPassword = "";
-
-    }
-/*
-    public void setProtocol(String protocol) {
-        this.protocol = protocol;
     }
 
-    public void setHostname(String hostname) {
-        this.hostname = hostname;
-    }
-
-    public void setPort(String port) {
-        this.port = port;
-    }
-
-    public void setBaseDn(String baseDn) {
-        this.baseDn = baseDn;
-    }
-*/
     public void setBindDn(String bindDn) {
         this.bindDn = bindDn;
     }

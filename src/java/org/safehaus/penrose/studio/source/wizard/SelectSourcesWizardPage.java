@@ -23,13 +23,13 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
-import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.management.partition.PartitionClient;
 import org.safehaus.penrose.management.partition.PartitionManagerClient;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.source.SourceClient;
 import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.studio.mapping.SourceDialog;
+import org.safehaus.penrose.studio.directory.dialog.SourceDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,7 +110,7 @@ public class SelectSourcesWizardPage extends WizardPage implements SelectionList
                         return;
                     }
 */
-                    SourceMapping sourceMapping = new SourceMapping();
+                    EntrySourceConfig sourceMapping = new EntrySourceConfig();
                     SourceDialog dialog = new SourceDialog(parent.getShell(), SWT.NONE);
                     dialog.setSourceConfigs(sourceConfigs);
                     dialog.setSourceMapping(sourceMapping);
@@ -148,11 +148,11 @@ public class SelectSourcesWizardPage extends WizardPage implements SelectionList
         setPageComplete(validatePage());
     }
 
-    public Collection<SourceMapping> getSourceMappings() {
-        Collection<SourceMapping> results = new ArrayList<SourceMapping>();
+    public Collection<EntrySourceConfig> getSourceMappings() {
+        Collection<EntrySourceConfig> results = new ArrayList<EntrySourceConfig>();
         TableItem items[] = sourceTable.getItems();
         for (TableItem item : items) {
-            SourceMapping sourceMapping = (SourceMapping) item.getData();
+            EntrySourceConfig sourceMapping = (EntrySourceConfig) item.getData();
             results.add(sourceMapping);
         }
         return results;

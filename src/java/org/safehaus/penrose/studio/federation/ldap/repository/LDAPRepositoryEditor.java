@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
+import org.safehaus.penrose.studio.federation.linking.editor.LinkingSettingsPage;
 import org.safehaus.penrose.federation.repository.LDAPRepository;
 
 public class LDAPRepositoryEditor extends FormEditor {
@@ -30,6 +31,8 @@ public class LDAPRepositoryEditor extends FormEditor {
     public void addPages() {
         try {
             addPage(new LDAPRepositorySettingsPage(this));
+            addPage(new LDAPRepositoryPartitionsPage(this));
+            addPage(new LinkingSettingsPage(this, repository));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

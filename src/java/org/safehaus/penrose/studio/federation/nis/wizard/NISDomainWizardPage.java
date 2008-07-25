@@ -24,6 +24,9 @@ public class NISDomainWizardPage extends WizardPage implements ModifyListener {
     Text domainText;
     Text serverText;
 
+    String domain;
+    String server;
+
     public NISDomainWizardPage() {
         super(NAME);
 
@@ -45,6 +48,7 @@ public class NISDomainWizardPage extends WizardPage implements ModifyListener {
         domainLabel.setLayoutData(gd);
 
         domainText = new Text(composite, SWT.BORDER);
+        domainText.setText(domain);
         domainText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         domainText.addModifyListener(this);
 
@@ -53,6 +57,7 @@ public class NISDomainWizardPage extends WizardPage implements ModifyListener {
         serverLabel.setLayoutData(new GridData());
 
         serverText = new Text(composite, SWT.BORDER);
+        serverText.setText(server);
         serverText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         serverText.addModifyListener(this);
 
@@ -66,7 +71,7 @@ public class NISDomainWizardPage extends WizardPage implements ModifyListener {
     }
 
     public void setDomain(String domain) {
-        domainText.setText(domain);
+        this.domain = domain;
     }
 
     public String getDomain() {
@@ -74,7 +79,7 @@ public class NISDomainWizardPage extends WizardPage implements ModifyListener {
     }
 
     public void setServer(String server) {
-        serverText.setText(server);
+        this.server = server;
     }
 
     public String getServer() {

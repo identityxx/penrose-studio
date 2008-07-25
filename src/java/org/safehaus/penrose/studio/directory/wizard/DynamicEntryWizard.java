@@ -20,10 +20,10 @@ package org.safehaus.penrose.studio.directory.wizard;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.directory.AttributeMapping;
+import org.safehaus.penrose.directory.EntryAttributeConfig;
 import org.safehaus.penrose.directory.EntryConfig;
-import org.safehaus.penrose.directory.FieldMapping;
-import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.directory.EntryFieldConfig;
+import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDNBuilder;
@@ -32,8 +32,8 @@ import org.safehaus.penrose.management.partition.PartitionManagerClient;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.mapping.Relationship;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
-import org.safehaus.penrose.studio.mapping.wizard.ObjectClassWizardPage;
-import org.safehaus.penrose.studio.mapping.wizard.RelationshipWizardPage;
+import org.safehaus.penrose.studio.directory.wizard.ObjectClassWizardPage;
+import org.safehaus.penrose.studio.directory.wizard.RelationshipWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.source.wizard.SelectSourcesWizardPage;
 
@@ -92,7 +92,7 @@ public class DynamicEntryWizard extends Wizard {
 
     public IWizardPage getNextPage(IWizardPage page) {
         if (sourcesPage == page) {
-            Collection<SourceMapping> sourceMappings = sourcesPage.getSourceMappings();
+            Collection<EntrySourceConfig> sourceMappings = sourcesPage.getSourceMappings();
             relationshipPage.setSourceMappings(sourceMappings);
             attrPage.setSourceMappings(sourceMappings);
 
@@ -106,40 +106,40 @@ public class DynamicEntryWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            Collection<SourceMapping> sourceMappings = sourcesPage.getSourceMappings();
-            for (SourceMapping sourceMapping : sourceMappings) {
-                entryConfig.addSourceMapping(sourceMapping);
+            Collection<EntrySourceConfig> sourceMappings = sourcesPage.getSourceMappings();
+            for (EntrySourceConfig sourceMapping : sourceMappings) {
+                entryConfig.addSourceConfig(sourceMapping);
             }
 
             Collection<Relationship> relationships = relationshipPage.getRelationships();
             for (Relationship relationship : relationships) {
 
                 String lfield = relationship.getLeftField();
-                SourceMapping lsource = entryConfig.getSourceMapping(relationship.getLeftSource());
-                int lindex = entryConfig.getSourceMappingIndex(lsource);
+                EntrySourceConfig lsource = entryConfig.getSourceConfig(relationship.getLeftSource());
+                int lindex = entryConfig.getSourceConfigIndex(lsource);
 
                 String rfield = relationship.getRightField();
-                SourceMapping rsource = entryConfig.getSourceMapping(relationship.getRightSource());
-                int rindex = entryConfig.getSourceMappingIndex(rsource);
+                EntrySourceConfig rsource = entryConfig.getSourceConfig(relationship.getRightSource());
+                int rindex = entryConfig.getSourceConfigIndex(rsource);
 
                 if (lindex < rindex) { // rhs is dependent on lhs
-                    rsource.addFieldMapping(new FieldMapping(rfield, FieldMapping.VARIABLE, relationship.getLhs()));
+                    rsource.addFieldConfig(new EntryFieldConfig(rfield, EntryFieldConfig.VARIABLE, relationship.getLhs()));
                 } else {
-                    lsource.addFieldMapping(new FieldMapping(lfield, FieldMapping.VARIABLE, relationship.getRhs()));
+                    lsource.addFieldConfig(new EntryFieldConfig(lfield, EntryFieldConfig.VARIABLE, relationship.getRhs()));
                 }
             }
 
             entryConfig.addObjectClasses(ocPage.getSelectedObjectClasses());
 
             log.debug("Attribute mappings:");
-            Collection<AttributeMapping> attributeMappings = attrPage.getAttributeMappings();
-            for (AttributeMapping attributeMapping : attributeMappings) {
+            Collection<EntryAttributeConfig> attributeMappings = attrPage.getAttributeMappings();
+            for (EntryAttributeConfig attributeMapping : attributeMappings) {
                 log.debug(" - " + attributeMapping.getName() + " <= " + attributeMapping.getVariable());
-                entryConfig.addAttributeMapping(attributeMapping);
+                entryConfig.addAttributeConfig(attributeMapping);
             }
 
             RDNBuilder rb = new RDNBuilder();
-            for (AttributeMapping attributeMapping : attributeMappings) {
+            for (EntryAttributeConfig attributeMapping : attributeMappings) {
                 if (!attributeMapping.isRdn()) continue;
 
                 rb.set(attributeMapping.getName(), "...");
@@ -151,7 +151,7 @@ public class DynamicEntryWizard extends Wizard {
             entryConfig.setDn(db.toDn());
 
             log.debug("Reverse mappings:");
-            for (AttributeMapping attributeMapping : entryConfig.getAttributeMappings()) {
+            for (EntryAttributeConfig attributeMapping : entryConfig.getAttributeConfigs()) {
                 String name = attributeMapping.getName();
 
                 String variable = attributeMapping.getVariable();
@@ -164,8 +164,8 @@ public class DynamicEntryWizard extends Wizard {
                 String sourceName = variable.substring(0, j);
                 String fieldName = variable.substring(j + 1);
 
-                SourceMapping sourceMapping = entryConfig.getSourceMapping(sourceName);
-                Collection fieldMappings = sourceMapping.getFieldMappings(fieldName);
+                EntrySourceConfig sourceMapping = entryConfig.getSourceConfig(sourceName);
+                Collection fieldMappings = sourceMapping.getFieldConfigs(fieldName);
                 if (fieldMappings != null && !fieldMappings.isEmpty()) {
                     log.debug("Attribute " + name + " has been reverse mapped.");
                     continue;
@@ -173,8 +173,8 @@ public class DynamicEntryWizard extends Wizard {
 
                 log.debug(" - " + sourceName + "." + fieldName + " <= " + name);
 
-                FieldMapping fieldMapping = new FieldMapping(fieldName, FieldMapping.VARIABLE, attributeMapping.getName());
-                sourceMapping.addFieldMapping(fieldMapping);
+                EntryFieldConfig fieldMapping = new EntryFieldConfig(fieldName, EntryFieldConfig.VARIABLE, attributeMapping.getName());
+                sourceMapping.addFieldConfig(fieldMapping);
             }
 /*
             DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();

@@ -35,10 +35,10 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.safehaus.penrose.directory.AttributeMapping;
+import org.safehaus.penrose.directory.EntryAttributeConfig;
 import org.safehaus.penrose.directory.EntryConfig;
-import org.safehaus.penrose.directory.FieldMapping;
-import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.directory.EntryFieldConfig;
+import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.management.partition.PartitionClient;
 import org.safehaus.penrose.management.partition.PartitionManagerClient;
 import org.safehaus.penrose.management.PenroseClient;
@@ -48,9 +48,9 @@ import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.mapping.ExpressionDialog;
-import org.safehaus.penrose.studio.mapping.FieldSelectionDialog;
-import org.safehaus.penrose.studio.mapping.SourceDialog;
+import org.safehaus.penrose.studio.directory.dialog.ExpressionDialog;
+import org.safehaus.penrose.studio.directory.dialog.FieldSelectionDialog;
+import org.safehaus.penrose.studio.directory.dialog.SourceDialog;
 import org.safehaus.penrose.studio.project.Project;
 
 import java.util.ArrayList;
@@ -141,7 +141,7 @@ public class SourcesPage extends FormPage implements ModifyListener {
                         sourceConfigs.add(sourceConfig);
                     }
 
-                    SourceMapping source = new SourceMapping();
+                    EntrySourceConfig source = new EntrySourceConfig();
                     SourceDialog dialog = new SourceDialog(editor.getParent().getShell(), SWT.NONE);
                     dialog.setSourceConfigs(sourceConfigs);
                     dialog.setSourceMapping(source);
@@ -151,7 +151,7 @@ public class SourcesPage extends FormPage implements ModifyListener {
 
                     if (!dialog.isSaved()) return;
 
-                    entryConfig.addSourceMapping(source);
+                    entryConfig.addSourceConfig(source);
 
                     createSourceTab(tabFolder, source);
                     tabFolder.setSelection(tabFolder.getItemCount()-1);
@@ -196,7 +196,7 @@ public class SourcesPage extends FormPage implements ModifyListener {
                         sourceConfigs.add(sourceConfig);
                     }
 
-                    SourceMapping source = (SourceMapping)item.getData();
+                    EntrySourceConfig source = (EntrySourceConfig)item.getData();
                     SourceDialog dialog = new SourceDialog(editor.getParent().getShell(), SWT.NONE);
                     dialog.setSourceConfigs(sourceConfigs);
                     dialog.setSourceMapping(source);
@@ -207,7 +207,7 @@ public class SourcesPage extends FormPage implements ModifyListener {
                     if (!dialog.isSaved()) return;
 
                     refresh();
-                    int i = entryConfig.getSourceMappingIndex(source);
+                    int i = entryConfig.getSourceConfigIndex(source);
                     tabFolder.setSelection(i);
 
                     checkDirty();
@@ -227,8 +227,8 @@ public class SourcesPage extends FormPage implements ModifyListener {
                 CTabItem item = tabFolder.getSelection();
                 if (item == null) return;
 
-                SourceMapping source = (SourceMapping)item.getData();
-                entryConfig.removeSourceMapping(source.getName());
+                EntrySourceConfig source = (EntrySourceConfig)item.getData();
+                entryConfig.removeSourceConfig(source.getName());
                 item.dispose();
 
                 checkDirty();
@@ -245,8 +245,8 @@ public class SourcesPage extends FormPage implements ModifyListener {
                 CTabItem item = tabFolder.getSelection();
                 if (item == null) return;
 
-                SourceMapping source = (SourceMapping)item.getData();
-                int i = entryConfig.getSourceMappingIndex(source);
+                EntrySourceConfig source = (EntrySourceConfig)item.getData();
+                int i = entryConfig.getSourceConfigIndex(source);
                 if (i == 0) return;
 
                 entryConfig.setSourceIndex(source, i-1);
@@ -265,9 +265,9 @@ public class SourcesPage extends FormPage implements ModifyListener {
                 CTabItem item = tabFolder.getSelection();
                 if (item == null) return;
 
-                SourceMapping source = (SourceMapping)item.getData();
-                int i = entryConfig.getSourceMappingIndex(source);
-                if (i >= entryConfig.getSourceMappings().size()-1) return;
+                EntrySourceConfig source = (EntrySourceConfig)item.getData();
+                int i = entryConfig.getSourceConfigIndex(source);
+                if (i >= entryConfig.getSourceConfigs().size()-1) return;
 
                 entryConfig.setSourceIndex(source, i+1);
                 refresh();
@@ -280,7 +280,7 @@ public class SourcesPage extends FormPage implements ModifyListener {
         return composite;
     }
 
-    public void createSourceTab(CTabFolder tabFolder, final SourceMapping sourceMapping) {
+    public void createSourceTab(CTabFolder tabFolder, final EntrySourceConfig sourceMapping) {
         final CTabItem item = new CTabItem(tabFolder, SWT.NONE);
         item.setData(sourceMapping);
         item.setText(sourceMapping.getName());
@@ -316,23 +316,23 @@ public class SourcesPage extends FormPage implements ModifyListener {
                 try {
                     if (fieldTable.getSelectionCount() == 0) return;
                     TableItem item = fieldTable.getSelection()[0];
-                    FieldMapping field = (FieldMapping)item.getData();
+                    EntryFieldConfig field = (EntryFieldConfig)item.getData();
                     String name = item.getText(0);
 
                     if (field == null) {
-                        field = new FieldMapping();
+                        field = new EntryFieldConfig();
                         field.setName(name);
                     }
 
                     ExpressionDialog dialog = new ExpressionDialog(editor.getParent().getShell(), SWT.NONE);
                     dialog.setText("Edit field value/expression...");
 
-                    for (AttributeMapping attributeMapping : entryConfig.getAttributeMappings()) {
+                    for (EntryAttributeConfig attributeMapping : entryConfig.getAttributeConfigs()) {
                         dialog.addVariable(attributeMapping.getName());
                     }
 
-                    for (SourceMapping sourceMapping : entryConfig.getSourceMappings()) {
-                        for (FieldMapping fieldMapping : sourceMapping.getFieldMappings()) {
+                    for (EntrySourceConfig sourceMapping : entryConfig.getSourceConfigs()) {
+                        for (EntryFieldConfig fieldMapping : sourceMapping.getFieldConfigs()) {
                             dialog.addVariable(sourceMapping.getName()+"."+fieldMapping.getName());
                         }
                     }
@@ -405,8 +405,8 @@ public class SourcesPage extends FormPage implements ModifyListener {
 
                     for (String fieldName : dialog.getSelections()) {
 
-                        FieldMapping fieldMapping = new FieldMapping(fieldName);
-                        sourceMapping.addFieldMapping(fieldMapping);
+                        EntryFieldConfig fieldMapping = new EntryFieldConfig(fieldName);
+                        sourceMapping.addFieldConfig(fieldMapping);
                     }
 
                     refreshFields(sourceMapping, fieldTable);
@@ -427,8 +427,8 @@ public class SourcesPage extends FormPage implements ModifyListener {
 
                 TableItem items[] = fieldTable.getSelection();
                 for (TableItem item : items) {
-                    FieldMapping fieldMapping = (FieldMapping) item.getData();
-                    sourceMapping.removeFieldMapping(fieldMapping);
+                    EntryFieldConfig fieldMapping = (EntryFieldConfig) item.getData();
+                    sourceMapping.removeFieldConfig(fieldMapping);
                 }
 
                 refreshFields(sourceMapping, fieldTable);
@@ -441,14 +441,17 @@ public class SourcesPage extends FormPage implements ModifyListener {
         refreshFields(sourceMapping, fieldTable);
     }
 
-    public void refreshFields(SourceMapping sourceMapping, Table table) {
+    public void refreshFields(EntrySourceConfig sourceMapping, Table table) {
         try {
             table.removeAll();
 
             Project project = editor.getProject();
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(editor.getPartitionName());
+
+            String partitionName = sourceMapping.getPartitionName();
+            if (partitionName == null) partitionName = editor.getPartitionName();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
             SourceClient sourceClient = partitionClient.getSourceClient(sourceMapping.getSourceName());
             SourceConfig sourceConfig = sourceClient.getSourceConfig();
@@ -460,13 +463,13 @@ public class SourcesPage extends FormPage implements ModifyListener {
             for (FieldConfig fieldConfig : sourceConfig.getFieldConfigs()) {
                 String fieldName = fieldConfig.getName();
 
-                Collection<FieldMapping> fieldMappings = sourceMapping.getFieldMappings(fieldName);
+                Collection<EntryFieldConfig> fieldMappings = sourceMapping.getFieldConfigs(fieldName);
                 if (fieldMappings == null) {
                     log.debug("Field " + fieldName + " is not used in the mapping.");
                     continue;
                 }
 
-                for (FieldMapping fieldMapping : fieldMappings) {
+                for (EntryFieldConfig fieldMapping : fieldMappings) {
 
                     String value;
 
@@ -515,7 +518,7 @@ public class SourcesPage extends FormPage implements ModifyListener {
     public void load() {
         refresh();
 
-        Collection sources = entryConfig.getSourceMappings();
+        Collection sources = entryConfig.getSourceConfigs();
         if (sources.size() > 0) tabFolder.setSelection(0);
     }
 
@@ -526,8 +529,8 @@ public class SourcesPage extends FormPage implements ModifyListener {
         }
 
         try {
-            Collection<SourceMapping> sources = entryConfig.getSourceMappings();
-            for (SourceMapping source : sources) {
+            Collection<EntrySourceConfig> sources = entryConfig.getSourceConfigs();
+            for (EntrySourceConfig source : sources) {
                 log.debug("Creating source tab for " + source.getName());
                 createSourceTab(tabFolder, source);
             }

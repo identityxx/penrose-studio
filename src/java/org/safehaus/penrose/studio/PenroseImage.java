@@ -39,6 +39,7 @@ public class PenroseImage {
 	public final static String NOKEY             = "images/nokey.gif";
 	public final static String SOURCE            = "images/source.gif";
     public final static String CONNECTION        = "images/server.png";
+    public final static String MAPPING           = "images/mapping.png";
 	public final static String FOLDER            = "images/folder_yellow.png";
     public final static String OPEN_FOLDER       = "images/folder_yellow_open.png";
     public final static String RED_FOLDER        = "images/folder_red.png";

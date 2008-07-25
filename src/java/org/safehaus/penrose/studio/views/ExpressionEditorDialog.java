@@ -57,9 +57,9 @@ import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.directory.EntryConfig;
-import org.safehaus.penrose.directory.AttributeMapping;
-import org.safehaus.penrose.directory.FieldMapping;
-import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.directory.EntryAttributeConfig;
+import org.safehaus.penrose.directory.EntryFieldConfig;
+import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.apache.log4j.Logger;
 
 public class ExpressionEditorDialog extends BaseDialog {
@@ -89,9 +89,9 @@ public class ExpressionEditorDialog extends BaseDialog {
 		super(parent);
 		this.obj = obj;
 		//
-		if (obj instanceof FieldMapping) {
+		if (obj instanceof EntryFieldConfig) {
 			type = EXPRESSION;
-		} else if (obj instanceof AttributeMapping) {
+		} else if (obj instanceof EntryAttributeConfig) {
 			type = EXPRESSION;
 		} else if (obj instanceof Pair) {
 			type = NAME_VALUE;
@@ -114,12 +114,12 @@ public class ExpressionEditorDialog extends BaseDialog {
 	public void load(Object obj) {
 		if (obj == null) return;
 
-		if (obj instanceof FieldMapping) {
-			FieldMapping field = (FieldMapping) obj;
+		if (obj instanceof EntryFieldConfig) {
+			EntryFieldConfig field = (EntryFieldConfig) obj;
 			if (field.getExpression() != null) expression.setText(field.getExpression().getScript());
 
-		} else if (obj instanceof AttributeMapping) {
-			AttributeMapping attr = (AttributeMapping) obj;
+		} else if (obj instanceof EntryAttributeConfig) {
+			EntryAttributeConfig attr = (EntryAttributeConfig) obj;
 			if (attr.getExpression() != null) expression.setText(attr.getExpression().getScript());
 
 		} else if (obj instanceof Pair) {
@@ -134,17 +134,17 @@ public class ExpressionEditorDialog extends BaseDialog {
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.setDirty(true);
 
-		if (obj instanceof FieldMapping) {
+		if (obj instanceof EntryFieldConfig) {
             String s = expression.getText().trim();
             if (s.equals("")) s = null;
 
-			FieldMapping field = (FieldMapping) obj;
+			EntryFieldConfig field = (EntryFieldConfig) obj;
 			Expression exp = new Expression();
 			exp.setScript(s);
 			field.setExpression(exp);
 
-		} else if (obj instanceof AttributeMapping) {
-			AttributeMapping attr = (AttributeMapping) obj;
+		} else if (obj instanceof EntryAttributeConfig) {
+			EntryAttributeConfig attr = (EntryAttributeConfig) obj;
 			attr.getExpression().setScript(expression.getText());
 
 		} else if (obj instanceof Pair) {
@@ -368,9 +368,9 @@ public class ExpressionEditorDialog extends BaseDialog {
 			if (entry == null) return;
 			
 			// add all sources
-			Collection sources = entry.getSourceMappings();
+			Collection sources = entry.getSourceConfigs();
 			for (Iterator i=sources.iterator(); i.hasNext(); ) {
-				SourceMapping source = (SourceMapping)i.next();
+				EntrySourceConfig source = (EntrySourceConfig)i.next();
 
                 PartitionConfig partitionConfig = partition.getPartitionConfig();
 				SourceConfig sourceConfig = partitionConfig.getSourceConfigManager().getSourceConfig(source.getSourceName());
@@ -384,9 +384,9 @@ public class ExpressionEditorDialog extends BaseDialog {
 				}
 			}
 			// add all attributes
-			Object[] attributes = entry.getAttributeMappings().toArray();
+			Object[] attributes = entry.getAttributeConfigs().toArray();
 			for (int i=0; i<attributes.length; i++) {
-				AttributeMapping attribute = (AttributeMapping) attributes[i];
+				EntryAttributeConfig attribute = (EntryAttributeConfig) attributes[i];
 				addHint(PenroseStudioPlugin.getImage(PenroseImage.NOKEY), attribute.getName());
 			}
 		}

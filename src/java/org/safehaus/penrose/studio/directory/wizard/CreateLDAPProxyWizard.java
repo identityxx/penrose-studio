@@ -22,7 +22,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.ProxyEntry;
-import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDN;
@@ -116,8 +116,8 @@ public class CreateLDAPProxyWizard extends Wizard {
                 entryConfig.setDn(db.toDn());
             }
 
-            SourceMapping sourceMapping = new SourceMapping("DEFAULT", sourceConfig.getName());
-            entryConfig.addSourceMapping(sourceMapping);
+            EntrySourceConfig sourceMapping = new EntrySourceConfig("DEFAULT", sourceConfig.getName());
+            entryConfig.addSourceConfig(sourceMapping);
 
             entryConfig.setEntryClass(ProxyEntry.class.getName());
 /*

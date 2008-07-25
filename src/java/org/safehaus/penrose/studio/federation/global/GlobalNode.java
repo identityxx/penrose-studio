@@ -1,22 +1,29 @@
 package org.safehaus.penrose.studio.federation.global;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.window.Window;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.Separator;
+import org.eclipse.ui.progress.IProgressService;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.federation.FederationNode;
 import org.safehaus.penrose.studio.federation.global.editor.GlobalEditor;
 import org.safehaus.penrose.studio.federation.global.editor.GlobalEditorInput;
+import org.safehaus.penrose.studio.federation.global.wizard.GlobalRepositoryEditorWizard;
 import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.tree.Node;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Endi S. Dewata
@@ -50,6 +57,16 @@ public class GlobalNode extends Node {
                 }
             }
         });
+
+        manager.add(new Action("Edit") {
+            public void run() {
+                try {
+                    edit();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
     }
 
     public void open() throws Exception {
@@ -66,6 +83,20 @@ public class GlobalNode extends Node {
         penroseStudio.notifyChangeListeners();
     }
 
+    public void edit() throws Exception {
+
+        Federation federation = federationNode.getFederation();
+        GlobalRepositoryEditorWizard wizard = new GlobalRepositoryEditorWizard(federation.getGlobalRepository());
+
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
+        dialog.setPageSize(600, 300);
+
+        if (dialog.open() == Window.CANCEL) return;
+
+        federation.updateGlobalRepository(wizard.getRepository());
+    }
+    
     public ProjectNode getProjectNode() {
         return projectNode;
     }

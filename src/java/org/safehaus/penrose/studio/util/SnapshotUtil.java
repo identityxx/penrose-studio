@@ -1,6 +1,6 @@
 package org.safehaus.penrose.studio.util;
 
-import org.safehaus.penrose.directory.AttributeMapping;
+import org.safehaus.penrose.directory.EntryAttributeConfig;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.schema.AttributeType;
@@ -105,7 +105,7 @@ public class SnapshotUtil {
                 }
 
                 log.debug(" - "+name+": "+value);
-                entryConfig.addAttributeMapping(new AttributeMapping(name, value, rdnAttr));
+                entryConfig.addAttributeConfig(new EntryAttributeConfig(name, value, rdnAttr));
             }
         }
 

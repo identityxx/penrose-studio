@@ -25,8 +25,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
-import org.safehaus.penrose.directory.AttributeMapping;
-import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.directory.EntryAttributeConfig;
+import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.partition.PartitionClient;
@@ -39,8 +39,8 @@ import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.mapping.AttributeTypeSelectionDialog;
-import org.safehaus.penrose.studio.mapping.ExpressionDialog;
+import org.safehaus.penrose.studio.directory.dialog.AttributeTypeSelectionDialog;
+import org.safehaus.penrose.studio.directory.dialog.ExpressionDialog;
 import org.safehaus.penrose.studio.project.Project;
 
 import java.util.ArrayList;
@@ -65,10 +65,10 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
     String partitionName;
     Table attributeTable;
 
-    private Collection<SourceMapping> sourceMappings;
+    private Collection<EntrySourceConfig> sourceMappings;
 
     private Collection<String> objectClasses;
-    private Map<String,Collection<AttributeMapping>> attributeMappings = new TreeMap<String,Collection<AttributeMapping>>();
+    private Map<String,Collection<EntryAttributeConfig>> attributeMappings = new TreeMap<String,Collection<EntryAttributeConfig>>();
 
     private int defaultType = CONSTANT;
 
@@ -103,7 +103,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                     if (attributeTable.getSelectionCount() == 0) return;
 
                     TableItem item = attributeTable.getSelection()[0];
-                    AttributeMapping ad = (AttributeMapping)item.getData();
+                    EntryAttributeConfig ad = (EntryAttributeConfig)item.getData();
 
                     ExpressionDialog dialog = new ExpressionDialog(parent.getShell(), SWT.NONE);
                     dialog.setText("Edit attribute value/expression...");
@@ -116,7 +116,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
-                            for (SourceMapping sourceMapping : sourceMappings) {
+                            for (EntrySourceConfig sourceMapping : sourceMappings) {
 
                                 SourceClient sourceClient = partitionClient.getSourceClient(sourceMapping.getSourceName());
                                 SourceConfig sourceConfig = sourceClient.getSourceConfig();
@@ -190,7 +190,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
                     if (dialog.getAction() == AttributeTypeSelectionDialog.CANCEL) return;
 
                     for (String name : dialog.getSelections()) {
-                        AttributeMapping ad = new AttributeMapping();
+                        EntryAttributeConfig ad = new EntryAttributeConfig();
                         ad.setName(name);
                         addAttributeMapping(ad);
                     }
@@ -213,7 +213,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
                 TableItem items[] = attributeTable.getSelection();
                 for (TableItem item : items) {
-                    AttributeMapping ad = (AttributeMapping) item.getData();
+                    EntryAttributeConfig ad = (EntryAttributeConfig) item.getData();
                     removeAttributeMapping(ad);
                 }
 
@@ -224,19 +224,19 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
         setPageComplete(validatePage());
     }
 
-    public void addAttributeMapping(AttributeMapping attributeMapping) {
+    public void addAttributeMapping(EntryAttributeConfig attributeMapping) {
         String name = attributeMapping.getName().toLowerCase();
-        Collection<AttributeMapping> list = attributeMappings.get(name);
+        Collection<EntryAttributeConfig> list = attributeMappings.get(name);
         if (list == null) {
-            list = new ArrayList<AttributeMapping>();
+            list = new ArrayList<EntryAttributeConfig>();
             attributeMappings.put(name, list);
         }
         list.add(attributeMapping);
     }
 
-    public void removeAttributeMapping(AttributeMapping attributeMapping) {
+    public void removeAttributeMapping(EntryAttributeConfig attributeMapping) {
         String name = attributeMapping.getName().toLowerCase();
-        Collection<AttributeMapping> list = attributeMappings.get(name);
+        Collection<EntryAttributeConfig> list = attributeMappings.get(name);
         if (list == null) return;
 
         list.remove(attributeMapping);
@@ -251,7 +251,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
         for (String name : rdn.getNames()) {
             String value = (String) rdn.get(name);
 
-            AttributeMapping ad = new AttributeMapping();
+            EntryAttributeConfig ad = new EntryAttributeConfig();
             ad.setName(name);
             ad.setRdn(true);
 
@@ -286,7 +286,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
 
                         if (attributeMappings.containsKey(attrName.toLowerCase())) continue;
 
-                        AttributeMapping ad = new AttributeMapping();
+                        EntryAttributeConfig ad = new EntryAttributeConfig();
                         ad.setName(attrName);
 
                         addAttributeMapping(ad);
@@ -335,9 +335,9 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
         attributeTable.removeAll();
 
         log.debug("Attributes:");
-        for (Collection<AttributeMapping> list : attributeMappings.values()) {
+        for (Collection<EntryAttributeConfig> list : attributeMappings.values()) {
 
-            for (AttributeMapping ad : list) {
+            for (EntryAttributeConfig ad : list) {
 
                 String value;
 
@@ -383,7 +383,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
             for (AttributeMapping ad : list) {
                 if (ad.isRdn()) rdn = true;
 
-                if (ad.getConstant() != null) continue;
+                if (ad.getText() != null) continue;
                 if (ad.getBinary() != null) continue;
                 if (ad.getVariable() != null) continue;
                 if (ad.getExpression() != null) continue;
@@ -404,7 +404,7 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
     public void updateImages() {
         TableItem items[] = attributeTable.getItems();
         for (TableItem item : items) {
-            AttributeMapping ad = (AttributeMapping) item.getData();
+            EntryAttributeConfig ad = (EntryAttributeConfig) item.getData();
             ad.setRdn(item.getChecked());
             item.setImage(PenroseStudioPlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
         }
@@ -426,23 +426,23 @@ public class AttributeValueWizardPage extends WizardPage implements SelectionLis
         this.defaultType = defaultType;
     }
 
-    public Collection<SourceMapping> getSourceMappings() {
+    public Collection<EntrySourceConfig> getSourceMappings() {
         return sourceMappings;
     }
 
-    public void setSourceMappings(Collection<SourceMapping> sourceMappings) {
+    public void setSourceMappings(Collection<EntrySourceConfig> sourceMappings) {
         this.sourceMappings = sourceMappings;
     }
 
-    public Collection<AttributeMapping> getAttributeMappings() {
-        Collection<AttributeMapping> results = new ArrayList<AttributeMapping>();
-        for (Collection<AttributeMapping> list : attributeMappings.values()) {
+    public Collection<EntryAttributeConfig> getAttributeMappings() {
+        Collection<EntryAttributeConfig> results = new ArrayList<EntryAttributeConfig>();
+        for (Collection<EntryAttributeConfig> list : attributeMappings.values()) {
             results.addAll(list);
         }
         return results;
     }
 
-    public void setAttributeMappings(Map<String,Collection<AttributeMapping>> attributeMappings) {
+    public void setAttributeMappings(Map<String,Collection<EntryAttributeConfig>> attributeMappings) {
         this.attributeMappings = attributeMappings;
     }
 

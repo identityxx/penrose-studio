@@ -28,9 +28,9 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.safehaus.penrose.directory.AttributeMapping;
+import org.safehaus.penrose.directory.EntryAttributeConfig;
 import org.safehaus.penrose.directory.EntryConfig;
-import org.safehaus.penrose.directory.SourceMapping;
+import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDN;
@@ -46,10 +46,10 @@ import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.mapping.AttributeTypeSelectionDialog;
-import org.safehaus.penrose.studio.mapping.EntrySelectionDialog;
-import org.safehaus.penrose.studio.mapping.ExpressionDialog;
-import org.safehaus.penrose.studio.mapping.ObjectClassSelectionDialog;
+import org.safehaus.penrose.studio.directory.dialog.AttributeTypeSelectionDialog;
+import org.safehaus.penrose.studio.directory.dialog.ExpressionDialog;
+import org.safehaus.penrose.studio.directory.dialog.*;
+import org.safehaus.penrose.studio.directory.dialog.ObjectClassSelectionDialog;
 import org.safehaus.penrose.studio.project.Project;
 
 import java.util.Collection;
@@ -302,7 +302,7 @@ public class LDAPPage extends FormPage {
                     //boolean found = false;
                     for (int i=0; i<attributeTable.getItemCount(); i++) {
                         TableItem item = attributeTable.getItem(i);
-                        AttributeMapping ad = (AttributeMapping)item.getData();
+                        EntryAttributeConfig ad = (EntryAttributeConfig)item.getData();
 
                         item.setImage(PenroseStudioPlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
                         ad.setRdn(item.getChecked());
@@ -322,7 +322,7 @@ public class LDAPPage extends FormPage {
                 try {
                     for (int i=0; i<attributeTable.getItemCount(); i++) {
                         TableItem item = attributeTable.getItem(i);
-                        AttributeMapping ad = (AttributeMapping)item.getData();
+                        EntryAttributeConfig ad = (EntryAttributeConfig)item.getData();
 
                         item.setImage(PenroseStudioPlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
                         ad.setRdn(item.getChecked());
@@ -381,9 +381,9 @@ public class LDAPPage extends FormPage {
                     if (dialog.getAction() == AttributeTypeSelectionDialog.CANCEL) return;
 
                     for (String name : dialog.getSelections()) {
-                        AttributeMapping ad = new AttributeMapping();
+                        EntryAttributeConfig ad = new EntryAttributeConfig();
                         ad.setName(name);
-                        entryConfig.addAttributeMapping(ad);
+                        entryConfig.addAttributeConfig(ad);
                     }
 
                     refresh();
@@ -419,8 +419,8 @@ public class LDAPPage extends FormPage {
 
                     TableItem items[] = attributeTable.getSelection();
                     for (TableItem item : items) {
-                        AttributeMapping attributeMapping = (AttributeMapping) item.getData();
-                        entryConfig.removeAttributeMapping(attributeMapping);
+                        EntryAttributeConfig attributeMapping = (EntryAttributeConfig) item.getData();
+                        entryConfig.removeAttributeConfig(attributeMapping);
                     }
 
                     refresh();
@@ -440,7 +440,7 @@ public class LDAPPage extends FormPage {
         if (attributeTable.getSelectionCount() == 0) return;
 
         TableItem item = attributeTable.getSelection()[0];
-        AttributeMapping ad = (AttributeMapping)item.getData();
+        EntryAttributeConfig ad = (EntryAttributeConfig)item.getData();
 
         ExpressionDialog dialog = new ExpressionDialog(editor.getParent().getShell(), SWT.NONE);
         dialog.setText("Edit attribute value/expression...");
@@ -451,9 +451,9 @@ public class LDAPPage extends FormPage {
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(editor.getPartitionName());
 
         //PartitionConfig partitionConfig = editor.getPartitionConfig();
-        Collection<SourceMapping> sources = entryConfig.getSourceMappings();
+        Collection<EntrySourceConfig> sources = entryConfig.getSourceConfigs();
 
-        for (SourceMapping sourceMapping : sources) {
+        for (EntrySourceConfig sourceMapping : sources) {
 
             SourceClient sourceClient = partitionClient.getSourceClient(sourceMapping.getSourceName());
             SourceConfig sourceConfig = sourceClient.getSourceConfig();
@@ -472,7 +472,7 @@ public class LDAPPage extends FormPage {
 
         if (dialog.getAction() == ExpressionDialog.CANCEL) return;
 
-        //entry.addAttributeMapping(ad);
+        //entry.addEntryAttributeConfig(ad);
 
         refresh();
         refreshRdn();
@@ -505,11 +505,11 @@ public class LDAPPage extends FormPage {
             item.setData(ocName);
         }
 
-        for (AttributeMapping attributeMapping : entryConfig.getAttributeMappings()) {
+        for (EntryAttributeConfig attributeConfig : entryConfig.getAttributeConfigs()) {
 
             String value;
 
-            Object constant = attributeMapping.getConstant();
+            Object constant = attributeConfig.getConstant();
             if (constant != null) {
                 if (constant instanceof byte[]) {
                     value = "(binary)";
@@ -518,20 +518,20 @@ public class LDAPPage extends FormPage {
                 }
 
             } else {
-                value = attributeMapping.getVariable();
+                value = attributeConfig.getVariable();
             }
 
             if (value == null) {
-                Expression expression = attributeMapping.getExpression();
+                Expression expression = attributeConfig.getExpression();
                 value = expression == null ? null : expression.getScript();
             }
 
             TableItem item = new TableItem(attributeTable, SWT.CHECK);
-            item.setChecked(attributeMapping.isRdn());
+            item.setChecked(attributeConfig.isRdn());
             item.setImage(PenroseStudioPlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
-            item.setText(0, attributeMapping.getName());
+            item.setText(0, attributeConfig.getName());
             item.setText(1, value == null ? "" : value);
-            item.setData(attributeMapping);
+            item.setData(attributeConfig);
         }
     }
 
@@ -558,7 +558,7 @@ public class LDAPPage extends FormPage {
         return objectClasses;
     }
 
-    public void completeAttributeTypes(Map<String,ObjectClass> objectClasses, Map<String,AttributeMapping> attributes) {
+    public void completeAttributeTypes(Map<String,ObjectClass> objectClasses, Map<String, EntryAttributeConfig> attributes) {
 
         for (ObjectClass oc : objectClasses.values()) {
 
@@ -571,7 +571,7 @@ public class LDAPPage extends FormPage {
 
                 if (attributes.containsKey(atName)) continue;
 
-                AttributeMapping ad = new AttributeMapping();
+                EntryAttributeConfig ad = new EntryAttributeConfig();
                 ad.setName(atName);
                 attributes.put(atName, ad);
             }
@@ -583,7 +583,7 @@ public class LDAPPage extends FormPage {
         //log.debug("Rdn:");
 
         RDNBuilder rb = new RDNBuilder();
-        for (AttributeMapping ad : entryConfig.getAttributeMappings()) {
+        for (EntryAttributeConfig ad : entryConfig.getAttributeConfigs()) {
             if (!ad.isRdn()) continue;
             String name = ad.getName();
             Object constant = ad.getConstant();
