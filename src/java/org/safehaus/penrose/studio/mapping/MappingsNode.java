@@ -21,9 +21,9 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.management.mapping.MappingClient;
 import org.safehaus.penrose.management.partition.PartitionClient;
@@ -33,6 +33,7 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.mapping.action.NewMappingAction;
+import org.safehaus.penrose.studio.mapping.wizard.PasteMappingWizard;
 import org.safehaus.penrose.studio.partition.PartitionNode;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.project.Project;
@@ -95,19 +96,20 @@ public class MappingsNode extends Node {
         MappingConfig newMappingConfig = (MappingConfig)((MappingConfig)newObject).clone();
         view.setClipboard(null);
 
+        PasteMappingWizard wizard = new PasteMappingWizard();
+
+        ServersView serversView = ServersView.getInstance();
+        WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
+        dialog.setPageSize(600, 300);
+        int rc = dialog.open();
+
+        if (rc == WizardDialog.CANCEL) return;
+
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
-        Collection<String> mappingNames = partitionClient.getMappingNames();
-
-        int counter = 1;
-        String name = newMappingConfig.getName();
-        while (mappingNames.contains(name)) {
-            counter++;
-            name = newMappingConfig.getName()+" ("+counter+")";
-        }
-        newMappingConfig.setName(name);
+        newMappingConfig.setName(wizard.getMappingName());
 
         partitionClient.createMapping(newMappingConfig);
         partitionClient.store();
