@@ -32,6 +32,7 @@ import org.safehaus.penrose.mapping.MappingConfig;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.mapping.action.ImportMappingsAction;
 import org.safehaus.penrose.studio.mapping.action.NewMappingAction;
 import org.safehaus.penrose.studio.mapping.wizard.PasteMappingWizard;
 import org.safehaus.penrose.studio.partition.PartitionNode;
@@ -69,6 +70,7 @@ public class MappingsNode extends Node {
     public void showMenu(IMenuManager manager) {
 
         manager.add(new NewMappingAction(this));
+        manager.add(new ImportMappingsAction(this));
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 

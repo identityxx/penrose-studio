@@ -18,7 +18,7 @@ public class AddMappingWizard extends Wizard {
 
     public AddMappingWizard() {
 
-        setWindowTitle("Add mapping");
+        setWindowTitle("Add Mapping");
 
         propertyPage = new MappingPropertyWizardPage();
         propertyPage.setDescription("Enter the mapping name.");

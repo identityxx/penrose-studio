@@ -27,8 +27,8 @@ public class LinkingParametersWizardPage extends WizardPage implements ModifyLis
     Text importMappingNameText;
     Text importMappingPrefixText;
 
-    String localAttribute;
-    String globalAttribute;
+    String localAttribute = "dn";
+    String globalAttribute = "seeAlso";
 
     String importMappingName;
     String importMappingPrefix;
@@ -36,7 +36,7 @@ public class LinkingParametersWizardPage extends WizardPage implements ModifyLis
     public LinkingParametersWizardPage() {
         super(NAME);
 
-        setDescription("Enter identity linking parameters.");
+        setDescription("Enter identity linking and import parameters.");
     }
 
     public void createControl(final Composite parent) {
@@ -47,23 +47,27 @@ public class LinkingParametersWizardPage extends WizardPage implements ModifyLis
         sectionLayout.numColumns = 2;
         composite.setLayout(sectionLayout);
 
-        Label localAttributeLabel = new Label(composite, SWT.NONE);
-        localAttributeLabel.setText("Local Attribute:");
+        Label linkingLabel = new Label(composite, SWT.NONE);
+        linkingLabel.setText("Identity Linking:");
         GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        linkingLabel.setLayoutData(gd);
+
+        Label localAttributeLabel = new Label(composite, SWT.NONE);
+        localAttributeLabel.setText(" - Local Attribute:");
+        gd = new GridData();
         gd.widthHint = 100;
         localAttributeLabel.setLayoutData(gd);
 
         localAttributeText = new Text(composite, SWT.BORDER);
-        localAttributeText.setText(localAttribute == null ? "" : localAttribute);
         localAttributeText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         localAttributeText.addModifyListener(this);
 
         Label globalAttributeLabel = new Label(composite, SWT.NONE);
-        globalAttributeLabel.setText("Global Attribute:");
+        globalAttributeLabel.setText(" - Global Attribute:");
         globalAttributeLabel.setLayoutData(new GridData());
 
         globalAttributeText = new Text(composite, SWT.BORDER);
-        globalAttributeText.setText(globalAttribute == null ? "" : globalAttribute);
         globalAttributeText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         globalAttributeText.addModifyListener(this);
 
@@ -72,27 +76,45 @@ public class LinkingParametersWizardPage extends WizardPage implements ModifyLis
         gd.horizontalSpan = 2;
         separator.setLayoutData(gd);
 
+        Label importLabel = new Label(composite, SWT.NONE);
+        importLabel.setText("Import:");
+        gd = new GridData();
+        gd.horizontalSpan = 2;
+        importLabel.setLayoutData(gd);
+
         Label importMappingNameLabel = new Label(composite, SWT.NONE);
-        importMappingNameLabel.setText("Import mapping name:");
+        importMappingNameLabel.setText(" - Mapping name:");
         gd = new GridData();
         gd.widthHint = 100;
         importMappingNameLabel.setLayoutData(gd);
 
         importMappingNameText = new Text(composite, SWT.BORDER);
-        importMappingNameText.setText(importMappingName == null ? "" : importMappingName);
         importMappingNameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         importMappingNameText.addModifyListener(this);
 
         Label importMappingPrefixLabel = new Label(composite, SWT.NONE);
-        importMappingPrefixLabel.setText("Import mapping prefix:");
+        importMappingPrefixLabel.setText(" - Mapping prefix:");
         gd = new GridData();
         gd.widthHint = 100;
         importMappingPrefixLabel.setLayoutData(gd);
 
         importMappingPrefixText = new Text(composite, SWT.BORDER);
-        importMappingPrefixText.setText(importMappingPrefix == null ? "" : importMappingPrefix);
         importMappingPrefixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         importMappingPrefixText.addModifyListener(this);
+
+        refresh();
+    }
+
+    public void setVisible(boolean b) {
+        super.setVisible(b);
+        if (b) refresh();
+    }
+
+    public void refresh() {
+        localAttributeText.setText(localAttribute == null ? "" : localAttribute);
+        globalAttributeText.setText(globalAttribute == null ? "" : globalAttribute);
+        importMappingNameText.setText(importMappingName == null ? "" : importMappingName);
+        importMappingPrefixText.setText(importMappingPrefix == null ? "" : importMappingPrefix);
 
         setPageComplete(validatePage());
     }

@@ -51,11 +51,11 @@ public class AddNISDomainWizard extends Wizard {
 
     public IWizardPage getNextPage(IWizardPage page) {
         if (repositoryPage == page) {
-            String name = repositoryPage.getRepository();
+            String name = repositoryPage.getRepositoryName();
             connectionPage.setDomain(name);
             
         } else if (connectionPage == page) {
-            String name = repositoryPage.getRepository();
+            String name = repositoryPage.getRepositoryName();
             String domainName = connectionPage.getDomain();
 
             String nisSuffix = "ou="+name+",ou=nis";
@@ -80,7 +80,7 @@ public class AddNISDomainWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            repository.setName(repositoryPage.getRepository());
+            repository.setName(repositoryPage.getRepositoryName());
             
             repository.setFullName(connectionPage.getDomain());
             repository.setServer(connectionPage.getServer());

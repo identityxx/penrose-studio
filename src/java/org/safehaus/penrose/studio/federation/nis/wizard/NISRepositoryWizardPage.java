@@ -21,7 +21,9 @@ public class NISRepositoryWizardPage extends WizardPage implements ModifyListene
 
     public final static String NAME = "NIS Domain";
 
-    Text repositoryText;
+    Text repositoryNameText;
+
+    String repositoryName;
 
     public NISRepositoryWizardPage() {
         super(NAME);
@@ -43,24 +45,38 @@ public class NISRepositoryWizardPage extends WizardPage implements ModifyListene
         gd.widthHint = 100;
         repositoryLabel.setLayoutData(gd);
 
-        repositoryText = new Text(composite, SWT.BORDER);
-        repositoryText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        repositoryText.addModifyListener(this);
+        repositoryNameText = new Text(composite, SWT.BORDER);
+        repositoryNameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        repositoryNameText.addModifyListener(this);
+
+        refresh();
+    }
+
+    public void setVisible(boolean b) {
+        super.setVisible(b);
+        if (b) {
+            refresh();
+        }
+    }
+
+    public void refresh() {
+        repositoryNameText.setText(repositoryName == null ? "" : repositoryName);
 
         setPageComplete(validatePage());
     }
 
     public boolean validatePage() {
-        if ("".equals(getRepository())) return false;
+        if (getRepositoryName() == null) return false;
         return true;
     }
 
-    public void setRepository(String repository) {
-        repositoryText.setText(repository);
+    public void setRepositoryName(String repositoryName) {
+        this.repositoryName = repositoryName;
     }
 
-    public String getRepository() {
-        return repositoryText.getText();
+    public String getRepositoryName() {
+        String s = repositoryNameText.getText();
+        return s.equals("") ? null : s;
     }
 
     public void modifyText(ModifyEvent event) {
