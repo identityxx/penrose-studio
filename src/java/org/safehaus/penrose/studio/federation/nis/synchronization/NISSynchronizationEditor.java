@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.federation.nis.ldap;
+package org.safehaus.penrose.studio.federation.nis.synchronization;
 
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.IEditorSite;
@@ -7,25 +7,29 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationPage;
+import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditorInput;
+import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationChangeLogPage;
+import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationErrorsPage;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.partition.PartitionClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
 
 import java.util.Collection;
 
-public class NISLDAPEditor extends FormEditor {
+public class NISSynchronizationEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
     Project project;
-    NISFederation nisFederation;
+    NISFederationClient nisFederation;
     NISDomain domain;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        NISLDAPEditorInput ei = (NISLDAPEditorInput)input;
+        NISSynchronizationEditorInput ei = (NISSynchronizationEditorInput)input;
         project = ei.getProject();
         nisFederation = ei.getNisTool();
         domain = ei.getDomain();
@@ -40,14 +44,14 @@ public class NISLDAPEditor extends FormEditor {
 
             PenroseClient penroseClient = project.getClient();
             PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.NIS);
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.NIS);
             Collection<String> sourceNames = partitionClient.getSourceNames();
 
-            addPage(new NISLDAPPage(this));
+            addPage(new NISSynchronizationPage(this));
             if (sourceNames.contains("changes")) {
-                addPage(new NISLDAPChangeLogPage(this));
+                addPage(new NISSynchronizationChangeLogPage(this));
             }
-            addPage(new NISLDAPErrorsPage(this));
+            addPage(new NISSynchronizationErrorsPage(this));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -76,7 +80,7 @@ public class NISLDAPEditor extends FormEditor {
         this.domain = domain;
     }
 
-    public NISFederation getNisTool() {
+    public NISFederationClient getNisTool() {
         return nisFederation;
     }
 

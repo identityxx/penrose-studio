@@ -1,23 +1,25 @@
 package org.safehaus.penrose.studio.federation.ldap.editor;
 
-import org.eclipse.ui.forms.editor.FormEditor;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.forms.editor.FormEditor;
+import org.safehaus.penrose.federation.LDAPFederationClient;
+import org.safehaus.penrose.studio.project.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
-import org.safehaus.penrose.studio.federation.ldap.editor.LDAPRepositoriesPage;
 
 public class LDAPEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    LDAPFederation ldapFederation;
+    Project project;
+    LDAPFederationClient ldapFederation;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         LDAPEditorInput ei = (LDAPEditorInput)input;
+        project = ei.getProject();
         ldapFederation = ei.getLdapFederation();
 
         setSite(site);
@@ -49,7 +51,7 @@ public class LDAPEditor extends FormEditor {
         return false;
     }
 
-    public LDAPFederation getLdapFederation() {
+    public LDAPFederationClient getLdapFederation() {
         return ldapFederation;
     }
 }

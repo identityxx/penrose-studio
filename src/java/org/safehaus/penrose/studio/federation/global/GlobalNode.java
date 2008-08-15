@@ -1,29 +1,23 @@
 package org.safehaus.penrose.studio.federation.global;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.progress.IProgressService;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.federation.Federation;
+import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.federation.FederationNode;
 import org.safehaus.penrose.studio.federation.global.editor.GlobalEditor;
 import org.safehaus.penrose.studio.federation.global.editor.GlobalEditorInput;
 import org.safehaus.penrose.studio.federation.global.wizard.GlobalRepositoryEditorWizard;
-import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.tree.Node;
-
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Endi S. Dewata
@@ -35,15 +29,11 @@ public class GlobalNode extends Node {
     private ProjectNode projectNode;
     private FederationNode federationNode;
 
-    private LDAPFederation ldapFederation;
-
     public GlobalNode(String name, FederationNode federationNode) {
         super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), null, federationNode);
 
         this.federationNode = federationNode;
         this.projectNode = federationNode.getProjectNode();
-
-        ldapFederation = federationNode.getFederation().getLdapFederation();
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -85,7 +75,7 @@ public class GlobalNode extends Node {
 
     public void edit() throws Exception {
 
-        Federation federation = federationNode.getFederation();
+        FederationClient federation = federationNode.getFederation();
         GlobalRepositoryEditorWizard wizard = new GlobalRepositoryEditorWizard(federation.getGlobalRepository());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -111,13 +101,5 @@ public class GlobalNode extends Node {
 
     public void setFederationNode(FederationNode federationNode) {
         this.federationNode = federationNode;
-    }
-
-    public LDAPFederation getLdapFederation() {
-        return ldapFederation;
-    }
-
-    public void setLdapFederation(LDAPFederation ldapFederation) {
-        this.ldapFederation = ldapFederation;
     }
 }

@@ -21,12 +21,12 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.management.*;
-import org.safehaus.penrose.management.partition.PartitionClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.nis.NIS;
 
@@ -48,7 +48,7 @@ public class NISYPPage extends FormPage {
 
     Project project;
     NISYPEditor editor;
-    NISFederation nisFederation;
+    NISFederationClient nisFederation;
     NISDomain domain;
 
     Table table;
@@ -60,12 +60,12 @@ public class NISYPPage extends FormPage {
 
         this.editor = editor;
         this.nisFederation = editor.getNisFederation();
-        this.project = this.nisFederation.getProject();
+        this.project = editor.project;
         this.domain = editor.getDomain();
 
         PenroseClient penroseClient = project.getClient();
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-        partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
+        partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.YP);
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -108,7 +108,7 @@ public class NISYPPage extends FormPage {
         gd.widthHint = 80;
         suffixLabel.setLayoutData(gd);
 
-        Label suffixText = toolkit.createLabel(leftPanel, domain.getYpSuffix());
+        Label suffixText = toolkit.createLabel(leftPanel, domain.getParameter(NISDomain.YP_SUFFIX));
         suffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Composite rightPanel = toolkit.createComposite(composite);

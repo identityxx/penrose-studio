@@ -19,11 +19,10 @@ package org.safehaus.penrose.studio.partition.wizard;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.management.partition.PartitionClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.partition.PartitionWriter;
 import org.safehaus.penrose.studio.project.Project;
 
 import java.io.File;

@@ -24,26 +24,32 @@ public class NISPartitionsWizardPage extends WizardPage implements ModifyListene
 
     public final static String NAME = "NIS PARTITIONS";
 
-
     Button ypEnabledButton;
     Text ypSuffixText;
+    Text ypTemplateText;
 
     Button nisEnabledButton;
     Text nisSuffixText;
+    Text nisTemplateText;
 
     Button nssEnabledButton;
     Text nssSuffixText;
+    Text nssTemplateText;
 
     boolean visited;
 
-    String ypSuffix;
-    String nisSuffix;
-    String nssSuffix;
-
     boolean ypEnabled = true;
+    String ypSuffix;
+    String ypTemplate;
+
     boolean nisEnabled = true;
+    String nisTemplate;
+    String nisSuffix;
+
     boolean nssEnabled = true;
-    
+    String nssSuffix;
+    String nssTemplate;
+
     public NISPartitionsWizardPage() {
         super(NAME);
 
@@ -75,6 +81,14 @@ public class NISPartitionsWizardPage extends WizardPage implements ModifyListene
         ypSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         ypSuffixText.addModifyListener(this);
 
+        Label ypTemplateLabel = new Label(composite, SWT.NONE);
+        ypTemplateLabel.setText("YP Template:");
+        ypTemplateLabel.setLayoutData(new GridData());
+
+        ypTemplateText = new Text(composite, SWT.BORDER);
+        ypTemplateText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        ypTemplateText.addModifyListener(this);
+
         new Label(composite, SWT.NONE);
         new Label(composite, SWT.NONE);
 
@@ -84,12 +98,19 @@ public class NISPartitionsWizardPage extends WizardPage implements ModifyListene
         nisEnabledButton = new Button(composite, SWT.CHECK);
         nisEnabledButton.addSelectionListener(this);
 
-        Label suffixLabel = new Label(composite, SWT.NONE);
-        suffixLabel.setText("NIS Suffix:");
+        Label nisSuffixLabel = new Label(composite, SWT.NONE);
+        nisSuffixLabel.setText("NIS Suffix:");
 
         nisSuffixText = new Text(composite, SWT.BORDER);
         nisSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         nisSuffixText.addModifyListener(this);
+
+        Label nisTemplateLabel = new Label(composite, SWT.NONE);
+        nisTemplateLabel.setText("NIS Template:");
+
+        nisTemplateText = new Text(composite, SWT.BORDER);
+        nisTemplateText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        nisTemplateText.addModifyListener(this);
 
         new Label(composite, SWT.NONE);
         new Label(composite, SWT.NONE);
@@ -108,6 +129,14 @@ public class NISPartitionsWizardPage extends WizardPage implements ModifyListene
         nssSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         nssSuffixText.addModifyListener(this);
 
+        Label nssTemplateLabel = new Label(composite, SWT.NONE);
+        nssTemplateLabel.setText("NSS Template:");
+        nssTemplateLabel.setLayoutData(new GridData());
+
+        nssTemplateText = new Text(composite, SWT.BORDER);
+        nssTemplateText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        nssTemplateText.addModifyListener(this);
+
         refresh();
     }
 
@@ -122,12 +151,15 @@ public class NISPartitionsWizardPage extends WizardPage implements ModifyListene
     public void refresh() {
         ypEnabledButton.setSelection(ypEnabled);
         ypSuffixText.setText(ypSuffix == null ? "" : ypSuffix);
+        ypTemplateText.setText(ypTemplate == null ? "" : ypTemplate);
 
         nisEnabledButton.setSelection(nisEnabled);
         nisSuffixText.setText(nisSuffix == null ? "" : nisSuffix);
+        nisTemplateText.setText(nisTemplate == null ? "" : nisTemplate);
 
         nssEnabledButton.setSelection(nssEnabled);
         nssSuffixText.setText(nssSuffix == null ? "" : nssSuffix);
+        nssTemplateText.setText(nssTemplate == null ? "" : nssTemplate);
 
         setPageComplete(validatePage());
     }
@@ -148,6 +180,15 @@ public class NISPartitionsWizardPage extends WizardPage implements ModifyListene
         return s.equals("") ? null : s;
     }
 
+    public void setNisTemplate(String nisTemplate) {
+        this.nisTemplate = nisTemplate;
+    }
+
+    public String getNisTemplate() {
+        String s = nisTemplateText.getText();
+        return s.equals("") ? null : s;
+    }
+
     public boolean isNisEnabled() {
         return nisEnabledButton.getSelection();
     }
@@ -165,6 +206,15 @@ public class NISPartitionsWizardPage extends WizardPage implements ModifyListene
         return s.equals("") ? null : s;
     }
 
+    public void setYpTemplate(String ypTemplate) {
+        this.ypTemplate = ypTemplate;
+    }
+
+    public String getYpTemplate() {
+        String s = ypTemplateText.getText();
+        return s.equals("") ? null : s;
+    }
+
     public boolean isYpEnabled() {
         return ypEnabledButton.getSelection();
     }
@@ -179,6 +229,15 @@ public class NISPartitionsWizardPage extends WizardPage implements ModifyListene
 
     public String getNssSuffix() {
         String s = nssSuffixText.getText();
+        return s.equals("") ? null : s;
+    }
+
+    public void setNssTemplate(String nssTemplate) {
+        this.nssTemplate = nssTemplate;
+    }
+
+    public String getNssTemplate() {
+        String s = nssTemplateText.getText();
         return s.equals("") ? null : s;
     }
 

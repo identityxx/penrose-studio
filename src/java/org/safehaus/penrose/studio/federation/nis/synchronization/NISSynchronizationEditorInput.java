@@ -1,22 +1,22 @@
-package org.safehaus.penrose.studio.federation.nis.ldap;
+package org.safehaus.penrose.studio.federation.nis.synchronization;
 
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISDomain;
 
 /**
  * @author Endi S. Dewata
  */
-public class NISLDAPEditorInput implements IEditorInput {
+public class NISSynchronizationEditorInput implements IEditorInput {
 
     private Project project;
-    private NISFederation nisFederation;
+    private NISFederationClient nisFederation;
     private NISDomain domain;
 
-    public NISLDAPEditorInput() {
+    public NISSynchronizationEditorInput() {
     }
 
     public boolean exists() {
@@ -59,7 +59,7 @@ public class NISLDAPEditorInput implements IEditorInput {
         if (object == null) return false;
         if (object.getClass() != this.getClass()) return false;
 
-        NISLDAPEditorInput cei = (NISLDAPEditorInput)object;
+        NISSynchronizationEditorInput cei = (NISSynchronizationEditorInput)object;
         if (!equals(project, cei.project)) return false;
         if (!equals(domain, cei.domain)) return false;
 
@@ -74,11 +74,11 @@ public class NISLDAPEditorInput implements IEditorInput {
         this.domain = domain;
     }
 
-    public NISFederation getNisTool() {
+    public NISFederationClient getNisTool() {
         return nisFederation;
     }
 
-    public void setNisTool(NISFederation nisFederation) {
+    public void setNisTool(NISFederationClient nisFederation) {
         this.nisFederation = nisFederation;
     }
 

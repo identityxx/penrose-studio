@@ -27,10 +27,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.safehaus.penrose.directory.EntrySourceConfig;
-import org.safehaus.penrose.management.partition.PartitionClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.source.SourceClient;
+import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.mapping.Relationship;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
@@ -104,7 +104,7 @@ public class RelationshipWizardPage extends WizardPage implements SelectionListe
 
                         Collection<FieldConfig> fields = sourceConfig.getFieldConfigs();
                         for (FieldConfig fieldConfig : fields) {
-                            dialog.addField(sourceMapping.getName() + "." + fieldConfig.getName(), fieldConfig.isPrimaryKey());
+                            dialog.addField(sourceMapping.getAlias() + "." + fieldConfig.getName(), fieldConfig.isPrimaryKey());
                         }
                     }
 

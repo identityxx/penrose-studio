@@ -17,7 +17,8 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.connection.ConnectionManager;
-import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.filter.FilterTool;
 import org.safehaus.penrose.filter.SubstringFilter;
@@ -29,7 +30,6 @@ import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -66,7 +66,7 @@ public class NISUsersLinkPage extends FormPage {
 
     NISLinkEditor editor;
     NISDomain domain;
-    NISFederation nisFederation;
+    NISFederationClient nisFederation;
 
     Partition partition;
 
@@ -87,7 +87,7 @@ public class NISUsersLinkPage extends FormPage {
         SourceManager sourceManager = partition.getSourceManager();
 
         ConnectionManager connectionManager = partition.getConnectionManager();
-        Connection connection = connectionManager.getConnection(NISFederation.CACHE_CONNECTION_NAME);
+        Connection connection = connectionManager.getConnection(NISFederationClient.CACHE_CONNECTION_NAME);
         jdbcConnection = (JDBCConnection)connection;
 
         localUsers = sourceManager.getSource("local_users");

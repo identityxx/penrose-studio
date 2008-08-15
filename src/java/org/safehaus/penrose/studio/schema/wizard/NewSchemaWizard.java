@@ -20,10 +20,9 @@ package org.safehaus.penrose.studio.schema.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.schema.SchemaConfig;
-import org.safehaus.penrose.schema.SchemaWriter;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.schema.SchemaManagerClient;
+import org.safehaus.penrose.schema.SchemaManagerClient;
 import org.apache.log4j.Logger;
 
 import java.io.*;

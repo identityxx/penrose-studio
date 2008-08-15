@@ -2,11 +2,8 @@ package org.safehaus.penrose.studio.federation.linking.editor;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -16,9 +13,8 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.safehaus.penrose.federation.repository.Repository;
+import org.safehaus.penrose.federation.Repository;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.project.Project;
 
 /**
@@ -186,16 +182,16 @@ public class LinkingSettingsPage extends FormPage {
             for (String name : repository.getParameterNames()) {
                 String value = repository.getParameter(name);
 
-                if (name.equals(Federation.LINKING_LOCAL_ATTRIBUTE)) {
+                if (name.equals(Repository.LINKING_LOCAL_ATTRIBUTE)) {
                     localAttributeText.setText(value == null ? "" : value);
 
-                } else if (name.equals(Federation.LINKING_GLOBAL_ATTRIBUTE)) {
+                } else if (name.equals(Repository.LINKING_GLOBAL_ATTRIBUTE)) {
                     globalAttributeText.setText(value == null ? "" : value);
 
-                } else if (name.equals(Federation.IMPORT_MAPPING_NAME)) {
+                } else if (name.equals(Repository.IMPORT_MAPPING_NAME)) {
                     mappingNameText.setText(value == null ? "" : value);
 
-                } else if (name.equals(Federation.IMPORT_MAPPING_PREFIX)) {
+                } else if (name.equals(Repository.IMPORT_MAPPING_PREFIX)) {
                     mappingPrefixText.setText(value == null ? "" : value);
                 }
             }

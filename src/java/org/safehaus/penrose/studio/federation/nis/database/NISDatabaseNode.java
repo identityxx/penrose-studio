@@ -3,7 +3,7 @@ package org.safehaus.penrose.studio.federation.nis.database;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -22,7 +22,7 @@ public class NISDatabaseNode extends Node {
     NISNode nisNode;
     NISDomainNode domainNode;
 
-    private NISFederation nisFederation;
+    private NISFederationClient nisFederation;
 
     public NISDatabaseNode(String name, NISDomainNode domainNode) {
         super(
@@ -66,11 +66,11 @@ public class NISDatabaseNode extends Node {
     }
 
 
-    public NISFederation getNisTool() {
+    public NISFederationClient getNisTool() {
         return nisFederation;
     }
 
-    public void setNisTool(NISFederation nisFederation) {
+    public void setNisTool(NISFederationClient nisFederation) {
         this.nisFederation = nisFederation;
     }
 }

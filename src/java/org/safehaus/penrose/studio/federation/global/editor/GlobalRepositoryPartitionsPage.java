@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.federation.ldap.repository;
+package org.safehaus.penrose.studio.federation.global.editor;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -16,43 +16,41 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
+import org.safehaus.penrose.federation.GlobalRepository;
+import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.federation.LDAPFederationClient;
-import org.safehaus.penrose.federation.LDAPRepository;
 import org.safehaus.penrose.studio.project.Project;
 
 /**
  * @author Endi S. Dewata
  */
-public class LDAPRepositoryPartitionsPage extends FormPage {
+public class GlobalRepositoryPartitionsPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
     FormToolkit toolkit;
 
+    GlobalEditor editor;
+
     Label suffixText;
     Label templateText;
 
-    LDAPRepositoryEditor editor;
-    LDAPRepository repository;
-    LDAPFederationClient ldapFederation;
-
+    FederationClient federation;
     Project project;
 
-    public LDAPRepositoryPartitionsPage(LDAPRepositoryEditor editor) {
+    public GlobalRepositoryPartitionsPage(GlobalEditor editor) {
         super(editor, "PARTITIONS", "  Partitions  ");
 
         this.editor = editor;
+        this.federation = editor.federation;
         this.project = editor.project;
-        this.ldapFederation = editor.ldapFederation;
-        this.repository = editor.getRepository();
     }
 
     public void createFormContent(IManagedForm managedForm) {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Settings");
+        form.setText("Global Repository");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
@@ -129,7 +127,7 @@ public class LDAPRepositoryPartitionsPage extends FormPage {
 
                     if (!confirm) return;
 
-                    ldapFederation.createPartitions(repository.getName());
+                    federation.createPartitions(FederationClient.GLOBAL);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -152,7 +150,7 @@ public class LDAPRepositoryPartitionsPage extends FormPage {
 
                     if (!confirm) return;
 
-                    ldapFederation.removePartitions(repository.getName());
+                    federation.removePartitions(FederationClient.GLOBAL);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -166,10 +164,13 @@ public class LDAPRepositoryPartitionsPage extends FormPage {
 
     public void refresh() {
         try {
-            String suffix = repository.getParameter(LDAPRepository.SUFFIX);
+            GlobalRepository globalRepository = federation.getGlobalRepository();
+            if (globalRepository == null) return;
+
+            String suffix = globalRepository.getParameter(GlobalRepository.SUFFIX);
             suffixText.setText(suffix == null ? "" : suffix);
 
-            String template = repository.getParameter(LDAPRepository.TEMPLATE);
+            String template = globalRepository.getParameter(GlobalRepository.TEMPLATE);
             templateText.setText(template == null ? "" : template);
 
         } catch (Exception e) {
@@ -177,4 +178,5 @@ public class LDAPRepositoryPartitionsPage extends FormPage {
             ErrorDialog.open(e);
         }
     }
+
 }

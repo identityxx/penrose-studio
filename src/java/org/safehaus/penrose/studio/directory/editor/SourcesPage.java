@@ -39,10 +39,10 @@ import org.safehaus.penrose.directory.EntryAttributeConfig;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.EntryFieldConfig;
 import org.safehaus.penrose.directory.EntrySourceConfig;
-import org.safehaus.penrose.management.partition.PartitionClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.source.SourceClient;
+import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.mapping.Expression;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
@@ -228,7 +228,7 @@ public class SourcesPage extends FormPage implements ModifyListener {
                 if (item == null) return;
 
                 EntrySourceConfig source = (EntrySourceConfig)item.getData();
-                entryConfig.removeSourceConfig(source.getName());
+                entryConfig.removeSourceConfig(source.getAlias());
                 item.dispose();
 
                 checkDirty();
@@ -283,7 +283,7 @@ public class SourcesPage extends FormPage implements ModifyListener {
     public void createSourceTab(CTabFolder tabFolder, final EntrySourceConfig sourceMapping) {
         final CTabItem item = new CTabItem(tabFolder, SWT.NONE);
         item.setData(sourceMapping);
-        item.setText(sourceMapping.getName());
+        item.setText(sourceMapping.getAlias());
         //item.setText(" "+source.getConnectionName()+" - "+source.getSourceName()+" ["+source.getName()+"]");
         //item.setFont(boldFont);
 
@@ -333,7 +333,7 @@ public class SourcesPage extends FormPage implements ModifyListener {
 
                     for (EntrySourceConfig sourceMapping : entryConfig.getSourceConfigs()) {
                         for (EntryFieldConfig fieldMapping : sourceMapping.getFieldConfigs()) {
-                            dialog.addVariable(sourceMapping.getName()+"."+fieldMapping.getName());
+                            dialog.addVariable(sourceMapping.getAlias()+"."+fieldMapping.getName());
                         }
                     }
 
@@ -459,7 +459,7 @@ public class SourcesPage extends FormPage implements ModifyListener {
             //PartitionConfig partitionConfig = editor.getPartitionConfig();
             //SourceConfig sourceConfig = partitionConfig.getSourceConfigManager().getSourceConfig(sourceMapping.getSourceName());
 
-            log.debug("Source "+sourceMapping.getName()+" "+sourceConfig.getName()+":");
+            log.debug("Source "+sourceMapping.getAlias()+" "+sourceConfig.getName()+":");
             for (FieldConfig fieldConfig : sourceConfig.getFieldConfigs()) {
                 String fieldName = fieldConfig.getName();
 
@@ -531,7 +531,7 @@ public class SourcesPage extends FormPage implements ModifyListener {
         try {
             Collection<EntrySourceConfig> sources = entryConfig.getSourceConfigs();
             for (EntrySourceConfig source : sources) {
-                log.debug("Creating source tab for " + source.getName());
+                log.debug("Creating source tab for " + source.getAlias());
                 createSourceTab(tabFolder, source);
             }
         } catch (Exception e) {

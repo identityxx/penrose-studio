@@ -22,15 +22,15 @@ import org.safehaus.penrose.ldap.SearchResult;
 import org.safehaus.penrose.ldap.SearchResponse;
 import org.safehaus.penrose.ldap.Attributes;
 //import org.safehaus.penrose.agent.client.FindClient;
-import org.safehaus.penrose.federation.repository.NISDomain;
-import org.safehaus.penrose.studio.federation.Federation;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.FederationClient;
+import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.partition.PartitionClient;
-import org.safehaus.penrose.management.source.SourceClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.source.SourceClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
 
 import java.util.*;
 
@@ -52,8 +52,10 @@ public class NISScriptsPage extends FormPage {
     Table table;
 
     NISFilesEditor editor;
+
+    Project project;
+    NISFederationClient nisFederation;
     NISDomain domain;
-    NISFederation nisFederation;
 
     Map<String,String> actions = new LinkedHashMap<String,String>();
 
@@ -61,8 +63,9 @@ public class NISScriptsPage extends FormPage {
         super(editor, "SCRIPTS", "  Scripts  ");
 
         this.editor = editor;
-        domain = editor.getDomain();
-        nisFederation = editor.getNisTool();
+        this.project = editor.project;
+        this.domain = editor.getDomain();
+        this.nisFederation = editor.getNisTool();
 
         actions.put("Change file UID number", "changeUid");
         actions.put("Change file GID number", "changeGid");
@@ -113,10 +116,9 @@ public class NISScriptsPage extends FormPage {
                }
            };
 
-           Project project = nisFederation.getProject();
            PenroseClient penroseClient = project.getClient();
            PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-           PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
+           PartitionClient partitionClient = partitionManagerClient.getPartitionClient(FederationClient.FEDERATION);
            SourceClient sourceClient = partitionClient.getSourceClient("penrose_hosts");
 
            sourceClient.search(request, response);

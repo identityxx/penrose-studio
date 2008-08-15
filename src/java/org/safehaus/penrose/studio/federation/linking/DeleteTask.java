@@ -2,7 +2,7 @@ package org.safehaus.penrose.studio.federation.linking;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.safehaus.penrose.federation.repository.Repository;
+import org.safehaus.penrose.federation.Repository;
 import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.studio.federation.linking.editor.LinkingPage;

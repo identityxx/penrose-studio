@@ -12,18 +12,18 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.federation.repository.NISDomain;
-import org.safehaus.penrose.studio.federation.Federation;
+import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.federation.nis.conflict.NISUsersEditor;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.management.*;
-import org.safehaus.penrose.management.source.SourceClient;
-import org.safehaus.penrose.management.connection.ConnectionClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.source.SourceClient;
+import org.safehaus.penrose.connection.ConnectionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
 
 import java.sql.ResultSet;
 
@@ -39,15 +39,18 @@ public class NISUsersPage extends FormPage {
     Label entriesText;
 
     NISUsersEditor editor;
+
+    Project project;
+    NISFederationClient nisFederation;
     NISDomain domain;
-    NISFederation nisFederation;
 
     public NISUsersPage(NISUsersEditor editor) {
         super(editor, "USERS", "  Users  ");
 
         this.editor = editor;
-        domain = editor.getDomain();
+        project = editor.project;
         nisFederation = editor.getNisTool();
+        domain = editor.getDomain();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -71,12 +74,11 @@ public class NISUsersPage extends FormPage {
 
     public void refresh() {
         try {
-            Project project = nisFederation.getProject();
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName());
-            ConnectionClient connectionClient = partitionClient.getConnectionClient(Federation.JDBC);
-            SourceClient sourceClient = partitionClient.getSourceClient(NISFederation.CACHE_USERS);
+            ConnectionClient connectionClient = partitionClient.getConnectionClient(FederationClient.JDBC);
+            SourceClient sourceClient = partitionClient.getSourceClient(NISFederationClient.CACHE_USERS);
 /*
             PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
             PartitionConfig partitionConfig = partitionConfigManager.getPartitionConfig(domain.getName()+"_"+NISFederation.YP);

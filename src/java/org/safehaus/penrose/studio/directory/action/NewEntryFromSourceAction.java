@@ -30,10 +30,10 @@ import org.safehaus.penrose.filter.FilterProcessor;
 import org.safehaus.penrose.filter.SimpleFilter;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDNBuilder;
-import org.safehaus.penrose.management.partition.PartitionClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.source.SourceClient;
+import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -152,7 +152,7 @@ public class NewEntryFromSourceAction extends Action {
                 fp.process(filter);
             }
 
-            String sourceAlias = sourceMapping.getName();
+            String sourceAlias = sourceMapping.getAlias();
             for (FieldConfig fieldConfig : sourceConfig.getFieldConfigs()) {
                 String fieldName = fieldConfig.getName();
 

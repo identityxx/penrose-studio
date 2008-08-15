@@ -17,9 +17,9 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.wizard.EditNISDomainWizard;
 import org.safehaus.penrose.studio.project.Project;
 
@@ -32,11 +32,11 @@ public class NISDomainSettingsPage extends FormPage {
 
     FormToolkit toolkit;
 
-    Label domainText;
     Label serverText;
+    Label domainText;
 
     NISDomainEditor editor;
-    NISFederation nisFederation;
+    NISFederationClient nisFederation;
     NISDomain domain;
 
     Project project;
@@ -45,10 +45,9 @@ public class NISDomainSettingsPage extends FormPage {
         super(editor, "SETTINGS", "  Settings  ");
 
         this.editor = editor;
+        this.project = editor.project;
         this.nisFederation = editor.getNisFederation();
         this.domain = editor.getDomain();
-
-        this.project = nisFederation.getProject();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -93,20 +92,20 @@ public class NISDomainSettingsPage extends FormPage {
         layout.marginWidth = 0;
         composite.setLayout(layout);
 
-        Label domainLabel = toolkit.createLabel(composite, "Domain:");
-        domainLabel.setLayoutData(new GridData());
+        Label serverLabel = toolkit.createLabel(composite, "Server:");
         GridData gd = new GridData();
         gd.widthHint = 100;
-        domainLabel.setLayoutData(gd);
-
-        domainText = toolkit.createLabel(composite, "");
-        domainText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        Label serverLabel = toolkit.createLabel(composite, "Server:");
-        serverLabel.setLayoutData(new GridData());
+        serverLabel.setLayoutData(gd);
 
         serverText = toolkit.createLabel(composite, "");
         serverText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label domainLabel = toolkit.createLabel(composite, "Domain:");
+        domainLabel.setLayoutData(new GridData());
+        domainLabel.setLayoutData(new GridData());
+
+        domainText = toolkit.createLabel(composite, "");
+        domainText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         return composite;
     }
@@ -146,11 +145,11 @@ public class NISDomainSettingsPage extends FormPage {
 
     public void refresh() {
         try {
-            String fullName = domain.getFullName();
-            domainText.setText(fullName == null ? "" : fullName);
-
-            String server = domain.getServer();
+            String server = domain.getParameter(NISDomain.NIS_SERVER);
             serverText.setText(server == null ? "" : server);
+
+            String fullName = domain.getParameter(NISDomain.NIS_DOMAIN);
+            domainText.setText(fullName == null ? "" : fullName);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

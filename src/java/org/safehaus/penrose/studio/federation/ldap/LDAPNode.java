@@ -9,10 +9,10 @@ import org.eclipse.jface.action.Action;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.federation.FederationNode;
-import org.safehaus.penrose.federation.repository.Repository;
-import org.safehaus.penrose.federation.repository.LDAPRepository;
+import org.safehaus.penrose.federation.LDAPFederationClient;
+import org.safehaus.penrose.federation.FederationClient;
+import org.safehaus.penrose.federation.*;
 import org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditor;
 import org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditorInput;
 import org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryNode;
@@ -32,7 +32,7 @@ public class LDAPNode extends Node {
     private ProjectNode projectNode;
     private FederationNode federationNode;
 
-    private LDAPFederation ldapFederation;
+    private LDAPFederationClient ldapFederation;
 
     //Map<String,Node> children = new TreeMap<String,Node>();
 
@@ -42,7 +42,7 @@ public class LDAPNode extends Node {
         this.federationNode = federationNode;
         this.projectNode = federationNode.getProjectNode();
 
-        ldapFederation = federationNode.getFederation().getLdapFederation();
+        ldapFederation = new LDAPFederationClient(federationNode.getFederation());
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -73,7 +73,7 @@ public class LDAPNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        Federation federation = federationNode.getFederation();
+        FederationClient federation = federationNode.getFederation();
         Collection<Repository> children = federation.getRepositories("LDAP");
         return !children.isEmpty();
     }
@@ -82,7 +82,7 @@ public class LDAPNode extends Node {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        Federation federation = federationNode.getFederation();
+        FederationClient federation = federationNode.getFederation();
         for (Repository repository : federation.getRepositories("LDAP")) {
             LDAPRepositoryNode node = new LDAPRepositoryNode(
                     repository.getName(),
@@ -111,11 +111,11 @@ public class LDAPNode extends Node {
         this.federationNode = federationNode;
     }
 
-    public LDAPFederation getLdapFederation() {
+    public LDAPFederationClient getLdapFederation() {
         return ldapFederation;
     }
 
-    public void setLdapFederation(LDAPFederation ldapFederation) {
+    public void setLdapFederation(LDAPFederationClient ldapFederation) {
         this.ldapFederation = ldapFederation;
     }
 }

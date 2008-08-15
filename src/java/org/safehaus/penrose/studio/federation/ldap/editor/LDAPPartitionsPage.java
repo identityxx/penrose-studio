@@ -17,13 +17,13 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.safehaus.penrose.federation.repository.LDAPRepository;
+import org.safehaus.penrose.federation.LDAPRepository;
+import org.safehaus.penrose.federation.LDAPFederationClient;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.partition.PartitionClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.studio.project.Project;
 
 /**
@@ -36,14 +36,16 @@ public class LDAPPartitionsPage extends FormPage {
     FormToolkit toolkit;
 
     LDAPEditor editor;
-    LDAPFederation ldapFederation;
+    Project project;
+    LDAPFederationClient ldapFederation;
 
     Table table;
 
-    public LDAPPartitionsPage(LDAPEditor editor, LDAPFederation ldapFederation) {
+    public LDAPPartitionsPage(LDAPEditor editor, LDAPFederationClient ldapFederation) {
         super(editor, "PARTITONS", "  Partitions  ");
 
         this.editor = editor;
+        this.project = editor.project;
         this.ldapFederation = ldapFederation;
     }
 
@@ -134,13 +136,10 @@ public class LDAPPartitionsPage extends FormPage {
 
                     TableItem[] items = table.getSelection();
 
-                    Project project = ldapFederation.getProject();
-                    PenroseClient penroseClient = project.getClient();
-
                     for (TableItem ti : items) {
                         LDAPRepository repository = (LDAPRepository)ti.getData();
 
-                        ldapFederation.createPartitions(repository);
+                        ldapFederation.createPartitions(repository.getName());
                     }
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -177,7 +176,7 @@ public class LDAPPartitionsPage extends FormPage {
                     for (TableItem ti : items) {
                         LDAPRepository repository = (LDAPRepository)ti.getData();
 
-                        ldapFederation.removePartitions(repository);
+                        ldapFederation.removePartitions(repository.getName());
                     }
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -213,7 +212,6 @@ public class LDAPPartitionsPage extends FormPage {
 
             table.removeAll();
 
-            Project project = ldapFederation.getProject();
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 

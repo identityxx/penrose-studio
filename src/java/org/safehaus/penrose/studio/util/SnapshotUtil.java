@@ -9,8 +9,8 @@ import org.safehaus.penrose.schema.SchemaUtil;
 import org.safehaus.penrose.schema.attributeSyntax.AttributeSyntax;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

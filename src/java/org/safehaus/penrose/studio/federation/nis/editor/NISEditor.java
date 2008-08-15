@@ -10,10 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.studio.federation.nis.conflict.NISUserChangesPage;
 import org.safehaus.penrose.studio.federation.nis.conflict.NISGroupChangesPage;
 import org.safehaus.penrose.studio.federation.nis.editor.NISDomainsPage;
-import org.safehaus.penrose.studio.federation.nis.editor.NISDatabasesPage;
 import org.safehaus.penrose.studio.federation.nis.editor.NISPartitionsPage;
-import org.safehaus.penrose.studio.federation.nis.editor.NISLDAPPage;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.studio.federation.nis.editor.NISEditorInput;
 import org.safehaus.penrose.studio.project.Project;
 
@@ -21,12 +19,12 @@ public class NISEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    Project project;
-    NISFederation nisFederation;
+    public Project project;
+    public NISFederationClient nisFederation;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         NISEditorInput ei = (NISEditorInput)input;
-        setProject(ei.getProject());
+        project = ei.getProject();
         nisFederation = ei.getNisTool();
 
         setSite(site);
@@ -63,7 +61,7 @@ public class NISEditor extends FormEditor {
         return false;
     }
 
-    public NISFederation getNisTool() {
+    public NISFederationClient getNisTool() {
         return nisFederation;
     }
 

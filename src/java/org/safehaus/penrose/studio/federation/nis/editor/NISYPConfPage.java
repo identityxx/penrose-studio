@@ -12,8 +12,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 /**
@@ -26,11 +26,11 @@ public class NISYPConfPage extends FormPage {
     FormToolkit toolkit;
 
     NISEditor editor;
-    NISFederation nisFederation;
+    NISFederationClient nisFederation;
 
     Text text;
 
-    public NISYPConfPage(NISEditor editor, NISFederation nisFederation) {
+    public NISYPConfPage(NISEditor editor, NISFederationClient nisFederation) {
         super(editor, "YP_CONF", "  yp.conf  ");
 
         this.editor = editor;
@@ -113,9 +113,9 @@ public class NISYPConfPage extends FormPage {
             
             for (NISDomain domain : nisFederation.getRepositories()) {
                 sb.append("domain ");
-                sb.append(domain.getFullName());
+                sb.append(domain.getParameter(NISDomain.NIS_DOMAIN));
                 sb.append(" server ");
-                sb.append(domain.getServer());
+                sb.append(domain.getParameter(NISDomain.NIS_SERVER));
                 sb.append("\n");
             }
 

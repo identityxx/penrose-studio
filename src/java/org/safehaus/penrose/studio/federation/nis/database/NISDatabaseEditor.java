@@ -7,17 +7,17 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.studio.project.Project;
 
 public class NISDatabaseEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    NISFederation nisFederation;
+    Project project;
+    NISFederationClient nisFederation;
     NISDomain domain;
-    private Project project;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         NISDatabaseEditorInput ei = (NISDatabaseEditorInput)input;
@@ -63,7 +63,7 @@ public class NISDatabaseEditor extends FormEditor {
         this.domain = domain;
     }
 
-    public NISFederation getNisTool() {
+    public NISFederationClient getNisFederation() {
         return nisFederation;
     }
 

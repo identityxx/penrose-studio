@@ -1,7 +1,6 @@
 package org.safehaus.penrose.studio.federation.ldap.repository;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
@@ -21,8 +20,8 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
-import org.safehaus.penrose.federation.repository.LDAPRepository;
+import org.safehaus.penrose.federation.LDAPFederationClient;
+import org.safehaus.penrose.federation.LDAPRepository;
 import org.safehaus.penrose.studio.federation.ldap.wizard.EditLDAPRepositoryWizard;
 import org.safehaus.penrose.studio.project.Project;
 
@@ -36,12 +35,13 @@ public class LDAPRepositorySettingsPage extends FormPage {
     FormToolkit toolkit;
 
     Label urlText;
+    Label suffixText;
     Label bindDnText;
     Label bindPasswordText;
 
     LDAPRepositoryEditor editor;
     LDAPRepository repository;
-    LDAPFederation ldapFederation;
+    LDAPFederationClient ldapFederation;
 
     Project project;
 
@@ -49,10 +49,9 @@ public class LDAPRepositorySettingsPage extends FormPage {
         super(editor, "SETTINGS", "  Settings  ");
 
         this.editor = editor;
+        this.project = editor.project;
         this.ldapFederation = editor.ldapFederation;
         this.repository = editor.getRepository();
-
-        this.project = ldapFederation.getProject();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -106,6 +105,12 @@ public class LDAPRepositorySettingsPage extends FormPage {
         urlText = toolkit.createLabel(composite, "");
         urlText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+        Label suffixLabel = toolkit.createLabel(composite, "Suffix:");
+        suffixLabel.setLayoutData(new GridData());
+
+        suffixText = toolkit.createLabel(composite, "");
+        suffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
         Label bindDnLabel = toolkit.createLabel(composite, "Bind DN:");
         bindDnLabel.setLayoutData(new GridData());
 
@@ -158,13 +163,16 @@ public class LDAPRepositorySettingsPage extends FormPage {
 
     public void refresh() {
         try {
-            String url = repository.getUrl();
+            String url = repository.getParameter(LDAPRepository.LDAP_URL);
             urlText.setText(url == null ? "" : url);
 
-            String bindDn = repository.getUser();
+            String suffix = repository.getParameter(LDAPRepository.LDAP_SUFFIX);
+            suffixText.setText(suffix == null ? "" : suffix);
+
+            String bindDn = repository.getParameter(LDAPRepository.LDAP_USER);
             bindDnText.setText(bindDn == null ? "" : bindDn);
 
-            String bindPassword = repository.getPassword();
+            String bindPassword = repository.getParameter(LDAPRepository.LDAP_PASSWORD);
             bindPasswordText.setText(bindPassword == null ? "" : "*****");
 
         } catch (Exception e) {

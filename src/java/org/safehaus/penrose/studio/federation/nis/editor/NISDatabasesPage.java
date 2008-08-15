@@ -17,12 +17,11 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.federation.repository.NISDomain;
-import org.safehaus.penrose.studio.federation.Federation;
+import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.federation.nis.editor.NISEditor;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.jdbc.connection.JDBCConnection;
@@ -38,11 +37,11 @@ public class NISDatabasesPage extends FormPage {
     FormToolkit toolkit;
 
     NISEditor editor;
-    NISFederation nisFederation;
+    NISFederationClient nisFederation;
 
     Table table;
 
-    public NISDatabasesPage(NISEditor editor, NISFederation nisFederation) {
+    public NISDatabasesPage(NISEditor editor, NISFederationClient nisFederation) {
         super(editor, "DATABASES", "  Databases  ");
 
         this.editor = editor;
@@ -136,8 +135,6 @@ public class NISDatabasesPage extends FormPage {
 
                     TableItem[] items = table.getSelection();
 
-                    Project project = nisFederation.getProject();
-                    
                     for (TableItem ti : items) {
                         NISDomain domain = (NISDomain)ti.getData();
                         String name = domain.getName();
@@ -218,9 +215,9 @@ public class NISDatabasesPage extends FormPage {
 
             table.removeAll();
 
-            Partition nisPartition = nisFederation.getPartition();
+            Partition nisPartition = null; // nisFederation.getPartition();
             ConnectionManager connectionManager = nisPartition.getConnectionManager();
-            JDBCConnection connection = (JDBCConnection)connectionManager.getConnection(Federation.JDBC);
+            JDBCConnection connection = (JDBCConnection)connectionManager.getConnection(FederationClient.JDBC);
 
             for (NISDomain domain : nisFederation.getRepositories()) {
                 boolean exists = connection.checkDatabase(domain.getName());

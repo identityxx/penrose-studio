@@ -28,13 +28,11 @@ import org.safehaus.penrose.studio.ldap.connection.LDAPConnectionWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
 import org.apache.log4j.Logger;
 
-import javax.naming.Context;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * @author Endi S. Dewata

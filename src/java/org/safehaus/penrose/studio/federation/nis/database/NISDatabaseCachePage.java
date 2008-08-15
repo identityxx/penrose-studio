@@ -21,14 +21,14 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.federation.repository.NISDomain;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.management.*;
-import org.safehaus.penrose.management.module.ModuleClient;
-import org.safehaus.penrose.management.partition.PartitionClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.module.ModuleClient;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.nis.NIS;
 
@@ -48,7 +48,7 @@ public class NISDatabaseCachePage extends FormPage {
 
     NISDatabaseEditor editor;
     NISDomain domain;
-    NISFederation nisFederation;
+    NISFederationClient nisFederation;
 
     Project project;
 
@@ -60,13 +60,13 @@ public class NISDatabaseCachePage extends FormPage {
 
         this.editor = editor;
         this.project = editor.getProject();
-        this.nisFederation = editor.getNisTool();
+        this.nisFederation = editor.getNisFederation();
         this.domain = editor.getDomain();
 
         PenroseClient penroseClient = project.getClient();
 
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-        partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.DB);
+        partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.DB);
         moduleClient = partitionClient.getModuleClient("NISDBSyncModule");
     }
 

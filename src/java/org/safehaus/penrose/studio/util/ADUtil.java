@@ -7,7 +7,7 @@ import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.mapping.Expression;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionClient;
 
 /**
  * @author Endi S. Dewata

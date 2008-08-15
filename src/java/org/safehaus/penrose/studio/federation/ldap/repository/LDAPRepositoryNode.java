@@ -6,8 +6,8 @@ import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.federation.ldap.linking.LDAPLinkingNode;
 import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
-import org.safehaus.penrose.federation.repository.LDAPRepository;
-import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
+import org.safehaus.penrose.federation.LDAPRepository;
+import org.safehaus.penrose.federation.LDAPFederationClient;
 import org.safehaus.penrose.studio.federation.ldap.wizard.EditLDAPRepositoryWizard;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IMenuManager;
@@ -31,7 +31,7 @@ public class LDAPRepositoryNode extends Node {
     private ProjectNode projectNode;
     private LDAPNode ldapNode;
 
-    private LDAPFederation ldapFederation;
+    private LDAPFederationClient ldapFederation;
     private LDAPRepository repository;
 
     Collection<Node> children = new ArrayList<Node>();

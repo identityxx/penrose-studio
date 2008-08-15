@@ -5,10 +5,10 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.safehaus.penrose.federation.repository.LDAPRepository;
+import org.safehaus.penrose.federation.LDAPRepository;
+import org.safehaus.penrose.federation.LDAPFederationClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
 import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
 import org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryNode;
 import org.safehaus.penrose.studio.federation.linking.editor.LinkingEditor;
@@ -25,7 +25,7 @@ public class LDAPLinkingNode extends Node {
     LDAPNode ldapNode;
     LDAPRepositoryNode repositoryNode;
 
-    private LDAPFederation ldapFederation;
+    private LDAPFederationClient ldapFederation;
 
     public LDAPLinkingNode(String name, LDAPRepositoryNode repositoryNode) {
         super(
@@ -69,11 +69,11 @@ public class LDAPLinkingNode extends Node {
         page.openEditor(ei, LinkingEditor.class.getName());
     }
 
-    public LDAPFederation getLdapFederation() {
+    public LDAPFederationClient getLdapFederation() {
         return ldapFederation;
     }
 
-    public void setLdapFederation(LDAPFederation ldapFederation) {
+    public void setLdapFederation(LDAPFederationClient ldapFederation) {
         this.ldapFederation = ldapFederation;
     }
 }

@@ -1,10 +1,12 @@
-package org.safehaus.penrose.studio.federation.nis.ldap;
+package org.safehaus.penrose.studio.federation.nis.synchronization;
 
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.IProgressService;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
@@ -12,29 +14,32 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.federation.repository.NISDomain;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditor;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.management.partition.PartitionClient;
-import org.safehaus.penrose.management.source.SourceClient;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.ldap.*;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
-import org.safehaus.penrose.ldap.SearchResult;
-import org.safehaus.penrose.ldap.SearchRequest;
-import org.safehaus.penrose.ldap.SearchResponse;
-import org.safehaus.penrose.ldap.Attributes;
+import org.safehaus.penrose.partition.PartitionManagerClient;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.sql.Timestamp;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
  */
-public class NISLDAPChangeLogPage extends FormPage {
+public class NISSynchronizationErrorsPage extends FormPage {
 
     public DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -42,8 +47,8 @@ public class NISLDAPChangeLogPage extends FormPage {
 
     FormToolkit toolkit;
 
-    NISLDAPEditor editor;
-    NISFederation nisFederation;
+    NISSynchronizationEditor editor;
+    NISFederationClient nisFederation;
     NISDomain domain;
 
     Table table;
@@ -53,10 +58,10 @@ public class NISLDAPChangeLogPage extends FormPage {
 
     Project project;
     PartitionClient partitionClient;
-    SourceClient changes;
+    SourceClient errors;
 
-    public NISLDAPChangeLogPage(NISLDAPEditor editor) throws Exception {
-        super(editor, "CHANGELOG", "  Change Log  ");
+    public NISSynchronizationErrorsPage(NISSynchronizationEditor editor) throws Exception {
+        super(editor, "ERRORS", "  Errors  ");
 
         this.editor = editor;
         this.project = editor.getProject();
@@ -65,30 +70,30 @@ public class NISLDAPChangeLogPage extends FormPage {
 
         PenroseClient penroseClient = project.getClient();
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-        partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.NIS);
-        changes = partitionClient.getSourceClient("changes");
+        partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.NIS);
+        errors = partitionClient.getSourceClient("errors");
     }
 
     public void createFormContent(IManagedForm managedForm) {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Change Log");
+        form.setText("Errors");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-        Section changesSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        changesSection.setText("Change Log");
-        changesSection.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Section errorsSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        errorsSection.setText("Errors");
+        errorsSection.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Control changesControl = createChangesSection(changesSection);
-        changesSection.setClient(changesControl);
+        Control errorsControl = createErrorsControl(errorsSection);
+        errorsSection.setClient(errorsControl);
 
         refresh();
     }
 
-    public Composite createChangesSection(Composite parent) {
+    public Composite createErrorsControl(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
@@ -116,11 +121,12 @@ public class NISLDAPChangeLogPage extends FormPage {
 
         table.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
-                showChange();
+                showError();
             }
         });
 
         totalLabel = toolkit.createLabel(leftPanel, "Total:");
+        totalLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         new Label(leftPanel, SWT.NONE);
 
@@ -156,7 +162,7 @@ public class NISLDAPChangeLogPage extends FormPage {
 
                     boolean confirm = MessageDialog.openQuestion(
                             editor.getSite().getShell(),
-                            "Removing Change Log",
+                            "Removing Error",
                             "Are you sure?"
                     );
 
@@ -164,15 +170,39 @@ public class NISLDAPChangeLogPage extends FormPage {
 
                     TableItem[] items = table.getSelection();
 
+                    final Collection<DN> dns = new ArrayList<DN>();
                     for (TableItem ti : items) {
                         SearchResult result = (SearchResult)ti.getData();
-                        try {
-                            changes.delete(result.getDn());
-
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
+                        dns.add(result.getDn());
                     }
+
+                    IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+                    progressService.busyCursorWhile(new IRunnableWithProgress() {
+                        public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                            try {
+                                monitor.beginTask("Loading...", dns.size());
+
+                                for (DN dn : dns) {
+                                    
+                                    if (monitor.isCanceled()) throw new InterruptedException();
+
+                                    errors.delete(dn);   
+
+                                    monitor.worked(1);
+                                }
+
+                            } catch (InterruptedException e) {
+                                // ignore
+
+                            } catch (Exception e) {
+                                throw new InvocationTargetException(e);
+
+                            } finally {
+                                monitor.done();
+                            }
+                        }
+                    });
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
@@ -207,10 +237,29 @@ public class NISLDAPChangeLogPage extends FormPage {
 
             table.removeAll();
 
-            SearchRequest request = new SearchRequest();
-            SearchResponse response = new SearchResponse();
+            final SearchRequest request = new SearchRequest();
+            final SearchResponse response = new SearchResponse();
 
-            changes.search(request, response);
+            IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+            progressService.busyCursorWhile(new IRunnableWithProgress() {
+                public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                    try {
+                        monitor.beginTask("Loading...", IProgressMonitor.UNKNOWN);
+
+                        errors.search(request, response);
+
+                    } catch (InterruptedException e) {
+                        // ignore
+
+                    } catch (Exception e) {
+                        throw new InvocationTargetException(e);
+
+                    } finally {
+                        monitor.done();
+                    }
+                }
+            });
 
             while (response.hasNext()) {
                 SearchResult result = response.next();
@@ -230,10 +279,10 @@ public class NISLDAPChangeLogPage extends FormPage {
             }
 
             totalLabel.setText("Total: "+response.getTotalCount());
-
+            
             table.select(indices);
 
-            showChange();
+            showError();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -241,7 +290,7 @@ public class NISLDAPChangeLogPage extends FormPage {
         }
     }
 
-    public void showChange() {
+    public void showError() {
 
         if (table.getSelectionCount() !=  1) {
             descriptionText.setText("");

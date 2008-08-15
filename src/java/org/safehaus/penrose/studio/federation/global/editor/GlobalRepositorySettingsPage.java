@@ -1,9 +1,6 @@
 package org.safehaus.penrose.studio.federation.global.editor;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
@@ -22,22 +19,18 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.progress.IProgressService;
-import org.safehaus.penrose.federation.repository.GlobalRepository;
+import org.safehaus.penrose.federation.FederationClient;
+import org.safehaus.penrose.federation.GlobalRepository;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.federation.global.wizard.GlobalRepositoryEditorWizard;
 import org.safehaus.penrose.studio.project.Project;
 
-import javax.naming.Context;
-import java.lang.reflect.InvocationTargetException;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.net.URI;
 
 /**
  * @author Endi S. Dewata
  */
-public class GlobalRepositoryPage extends FormPage {
+public class GlobalRepositorySettingsPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -46,19 +39,19 @@ public class GlobalRepositoryPage extends FormPage {
     GlobalEditor editor;
 
     Label urlText;
+    Label suffixText;
     Label bindDnText;
     Label bindPasswordText;
-    Label suffixText;
 
-    Federation federation;
+    FederationClient federation;
     Project project;
 
-    public GlobalRepositoryPage(GlobalEditor editor) {
+    public GlobalRepositorySettingsPage(GlobalEditor editor) {
         super(editor, "SETTINGS", "  Settings  ");
 
         this.editor = editor;
         this.federation = editor.federation;
-        this.project = federation.getProject();
+        this.project = editor.project;
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -76,15 +69,6 @@ public class GlobalRepositoryPage extends FormPage {
 
         Control settingsControl = createSettingsControl(settingsSection);
         settingsSection.setClient(settingsControl);
-
-        new Label(body, SWT.NONE);
-
-        Section partitionSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        partitionSection.setText("Partition");
-        partitionSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        Control partitionControl = createPartitionControl(partitionSection);
-        partitionSection.setClient(partitionControl);
 
         refresh();
     }
@@ -119,6 +103,12 @@ public class GlobalRepositoryPage extends FormPage {
 
         urlText = toolkit.createLabel(composite, "");
         urlText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label suffixLabel = toolkit.createLabel(composite, "Suffix:");
+        suffixLabel.setLayoutData(new GridData());
+
+        suffixText = toolkit.createLabel(composite, "");
+        suffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label bindDnLabel = toolkit.createLabel(composite, "Bind DN:");
         bindDnLabel.setLayoutData(new GridData());
@@ -170,115 +160,23 @@ public class GlobalRepositoryPage extends FormPage {
         return composite;
     }
 
-    public Composite createPartitionControl(Composite parent) {
-
-        Composite composite = toolkit.createComposite(parent);
-        GridLayout layout = new GridLayout(2, false);
-        layout.marginWidth = 0;
-        composite.setLayout(layout);
-
-        Composite left = createPartitionLeftPanel(composite);
-        left.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-        Composite right = createPartitionRightPanel(composite);
-        GridData gd = new GridData(GridData.FILL_VERTICAL);
-        gd.widthHint = 100;
-        right.setLayoutData(gd);
-
-        return composite;
-    }
-
-    public Composite createPartitionLeftPanel(Composite parent) {
-
-        Composite composite = toolkit.createComposite(parent);
-        GridLayout layout = new GridLayout(2, false);
-        layout.marginWidth = 0;
-        composite.setLayout(layout);
-
-        Label suffixLabel = toolkit.createLabel(composite, "Suffix:");
-        GridData gd = new GridData();
-        gd.widthHint = 100;
-        suffixLabel.setLayoutData(gd);
-
-        suffixText = toolkit.createLabel(composite, "");
-        suffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        return composite;
-    }
-
-    public Composite createPartitionRightPanel(Composite parent) {
-
-        Composite composite = toolkit.createComposite(parent);
-        GridLayout layout = new GridLayout();
-        layout.marginWidth = 0;
-        composite.setLayout(layout);
-
-        Button createButton = toolkit.createButton(composite, "Create", SWT.PUSH);
-        createButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        createButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                try {
-                    boolean confirm = MessageDialog.openQuestion(
-                            editor.getSite().getShell(),
-                            "Creating Partition",
-                            "Are you sure?"
-                    );
-
-                    if (!confirm) return;
-
-                    federation.createGlobalPartition();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    ErrorDialog.open(e);
-                }
-            }
-        });
-
-        Button removeButton = toolkit.createButton(composite, "Remove", SWT.PUSH);
-        removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        removeButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                try {
-                    boolean confirm = MessageDialog.openQuestion(
-                            editor.getSite().getShell(),
-                            "Removing Partition",
-                            "Are you sure?"
-                    );
-
-                    if (!confirm) return;
-
-                    federation.removeGlobalPartition();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    ErrorDialog.open(e);
-                }
-            }
-        });
-
-        return composite;
-    }
-
     public void refresh() {
         try {
-            GlobalRepository globalRepository = federation.getGlobalRepository();
-            if (globalRepository == null) return;
+            GlobalRepository repository = federation.getGlobalRepository();
+            if (repository == null) return;
 
-            String url = globalRepository.getUrl();
+            String url = repository.getParameter(GlobalRepository.LDAP_URL);
             urlText.setText(url == null ? "" : url);
 
-            String bindDn = globalRepository.getUser();
+            String suffix = repository.getParameter(GlobalRepository.LDAP_SUFFIX);
+            suffixText.setText(suffix == null ? "" : suffix);
+
+            String bindDn = repository.getParameter(GlobalRepository.LDAP_USER);
             bindDnText.setText(bindDn == null ? "" : bindDn);
 
-            String bindPassword = globalRepository.getPassword();
+            String bindPassword = repository.getParameter(GlobalRepository.LDAP_PASSWORD);
             bindPasswordText.setText(bindPassword == null ? "" : "*****");
 
-            String suffix = globalRepository.getSuffix();
-            suffixText.setText(suffix == null ? "" : suffix);
-            
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);

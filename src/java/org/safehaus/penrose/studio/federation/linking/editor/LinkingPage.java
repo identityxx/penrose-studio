@@ -22,19 +22,19 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.progress.IProgressService;
 import org.ietf.ldap.LDAPException;
-import org.safehaus.penrose.federation.repository.Repository;
+import org.safehaus.penrose.federation.Repository;
+import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.federation.module.LinkingException;
 import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.filter.FilterTool;
 import org.safehaus.penrose.filter.SubstringFilter;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.module.ModuleClient;
-import org.safehaus.penrose.management.partition.PartitionClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.module.ModuleClient;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.ldap.dialog.EntryDialog;
-import org.safehaus.penrose.studio.federation.Federation;
 import org.safehaus.penrose.studio.federation.linking.*;
 import org.safehaus.penrose.studio.federation.wizard.BrowserWizard;
 import org.safehaus.penrose.studio.project.Project;
@@ -100,7 +100,7 @@ public class LinkingPage extends FormPage {
 
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
         localPartitionClient = partitionManagerClient.getPartitionClient(partitionName);
-        globalPartitionClient = partitionManagerClient.getPartitionClient(Federation.GLOBAL);
+        globalPartitionClient = partitionManagerClient.getPartitionClient(FederationClient.GLOBAL);
 
         localBaseDn = localPartitionClient.getSuffixes().iterator().next();
         globalBaseDn = globalPartitionClient.getSuffixes().iterator().next();
@@ -801,7 +801,7 @@ public class LinkingPage extends FormPage {
                 if ("objectGUID".equalsIgnoreCase(attributeName)) {
                     s = ActiveDirectoryUtil.getGUID((byte[])value);
 
-                } else if ("seeAlsoObjectGUID".equalsIgnoreCase(attributeName)) {
+                } else if ("adiSeeAlsoObjectGUID".equalsIgnoreCase(attributeName)) {
                     if (value instanceof String) {
                         s = ActiveDirectoryUtil.getGUID(((String)value).getBytes());
 
@@ -1101,7 +1101,8 @@ public class LinkingPage extends FormPage {
                     );
 
                     LocalData data = map.get(le.getSourceDn());
-                    editEntry(data, le.getTargetDn(), le.getTargetAttributes());
+                    int rc = editEntry(data, le.getTargetDn(), le.getTargetAttributes());
+                    if (rc == EntryDialog.CANCEL) break;
                 }
             }
 
@@ -1122,14 +1123,19 @@ public class LinkingPage extends FormPage {
         }
     }
 
-    public void editEntry(LocalData data, DN dn, Attributes attributes) {
+    public int editEntry(LocalData data, DN dn, Attributes attributes) {
         while (true) {
             EntryDialog dialog = new EntryDialog(getSite().getShell(), SWT.NONE);
             dialog.setText("Import Entry");
             dialog.setDn(dn);
             dialog.setAttributes(attributes);
 
-            if (dialog.open() == EntryDialog.CANCEL) break;
+            dialog.addGUIDAttribute("objectGUID");
+            dialog.addGUIDAttribute("adiSeeAlsoObjectGUID");
+            dialog.addSIDAttribute("objectSid");
+
+            int rc = dialog.open();
+            if (rc == EntryDialog.SKIP || rc == EntryDialog.CANCEL) return rc;
 
             try {
                 dn = dialog.getDn();
@@ -1152,6 +1158,8 @@ public class LinkingPage extends FormPage {
                 ErrorDialog.open(e);
             }
         }
+
+        return EntryDialog.OK;
     }
 
     public void deleteEntries() {

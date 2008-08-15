@@ -1,22 +1,24 @@
 package org.safehaus.penrose.studio.federation.nis.ownership;
 
-import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.federation.repository.NISDomain;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.tree.Node;
 
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
  */
 public class NISFilesNode extends Node {
 
-    private NISFederation nisFederation;
+    private Project project;
+    private NISFederationClient nisFederation;
     private NISDomain domain;
 
     public NISFilesNode(String name, Image image, Object object, Object parent) {
@@ -26,6 +28,7 @@ public class NISFilesNode extends Node {
     public void open() throws Exception {
 
         NISFilesEditorInput ei = new NISFilesEditorInput();
+        ei.setProject(project);
         ei.setNisTool(nisFederation);
         ei.setDomain(domain);
 
@@ -42,11 +45,11 @@ public class NISFilesNode extends Node {
         return new ArrayList<Node>();
     }
 
-    public NISFederation getNisTool() {
+    public NISFederationClient getNisTool() {
         return nisFederation;
     }
 
-    public void setNisTool(NISFederation nisFederation) {
+    public void setNisTool(NISFederationClient nisFederation) {
         this.nisFederation = nisFederation;
     }
 
@@ -56,5 +59,13 @@ public class NISFilesNode extends Node {
 
     public void setDomain(NISDomain domain) {
         this.domain = domain;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

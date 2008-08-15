@@ -24,10 +24,15 @@ public class LDAPPartitionsWizardPage extends WizardPage implements ModifyListen
 
     public final static String NAME = "LDAP PARTITIONS";
 
-    Button ldapEnabledButton;
-    Text ldapSuffixText;
+    Button enabledButton;
+    Text suffixText;
+    Text templateText;
 
     boolean visited;
+
+    boolean enabled = true;
+    String suffix;
+    String template;
 
     public LDAPPartitionsWizardPage() {
         super(NAME);
@@ -42,7 +47,7 @@ public class LDAPPartitionsWizardPage extends WizardPage implements ModifyListen
         GridLayout sectionLayout = new GridLayout();
         sectionLayout.numColumns = 2;
         composite.setLayout(sectionLayout);
-
+/*
         Label enabledLabel = new Label(composite, SWT.NONE);
         enabledLabel.setText("Enabled:");
         GridData gd = new GridData();
@@ -52,14 +57,33 @@ public class LDAPPartitionsWizardPage extends WizardPage implements ModifyListen
         ldapEnabledButton = new Button(composite, SWT.CHECK);
         ldapEnabledButton.setSelection(true);
         ldapEnabledButton.addSelectionListener(this);
-
+*/
         Label suffixLabel = new Label(composite, SWT.NONE);
         suffixLabel.setText("Suffix:");
-        suffixLabel.setLayoutData(new GridData());
+        GridData gd = new GridData();
+        gd.widthHint = 100;
+        suffixLabel.setLayoutData(gd);
 
-        ldapSuffixText = new Text(composite, SWT.BORDER);
-        ldapSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        ldapSuffixText.addModifyListener(this);
+        suffixText = new Text(composite, SWT.BORDER);
+        suffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        suffixText.addModifyListener(this);
+
+        Label templateLabel = new Label(composite, SWT.NONE);
+        templateLabel.setText("Template:");
+        templateLabel.setLayoutData(new GridData());
+
+        templateText = new Text(composite, SWT.BORDER);
+        templateText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        templateText.addModifyListener(this);
+
+        refresh();
+    }
+
+    public void refresh() {
+
+        //enabledButton.setSelection(enabled);
+        suffixText.setText(suffix == null ? "" : suffix);
+        templateText.setText(template == null ? "" : template);
 
         setPageComplete(validatePage());
     }
@@ -78,19 +102,29 @@ public class LDAPPartitionsWizardPage extends WizardPage implements ModifyListen
     }
 
     public void setSuffix(String suffix) {
-        ldapSuffixText.setText(suffix);
+        this.suffix = suffix;
     }
 
     public String getSuffix() {
-        return ldapSuffixText.getText();
+        String s = suffixText.getText();
+        return "".equals(s) ? null : s;
+    }
+
+    public void setTemplate(String template) {
+        this.template = template;
+    }
+
+    public String getTemplate() {
+        String s = templateText.getText();
+        return "".equals(s) ? null : s;
     }
 
     public boolean isEnabled() {
-        return ldapEnabledButton.getSelection();
+        return enabledButton.getSelection();
     }
 
     public void setEnabled(boolean enabled) {
-        ldapEnabledButton.setSelection(enabled);
+        this.enabled = enabled;
     }
 
     public void modifyText(ModifyEvent event) {

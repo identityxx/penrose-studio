@@ -35,11 +35,11 @@ import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.ldap.RDNBuilder;
-import org.safehaus.penrose.management.partition.PartitionClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.schema.SchemaManagerClient;
-import org.safehaus.penrose.management.source.SourceClient;
+import org.safehaus.penrose.schema.SchemaManagerClient;
+import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.mapping.Expression;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.source.FieldConfig;
@@ -459,10 +459,10 @@ public class LDAPPage extends FormPage {
             SourceConfig sourceConfig = sourceClient.getSourceConfig();
 
             //SourceConfig sourceConfig = partitionConfig.getSourceConfigManager().getSourceConfig(sourceMapping.getSourceName());
-            dialog.addVariable(sourceMapping.getName());
+            dialog.addVariable(sourceMapping.getAlias());
 
             for (FieldConfig fieldDefinition : sourceConfig.getFieldConfigs()) {
-                dialog.addVariable(sourceMapping.getName() + "." + fieldDefinition.getName());
+                dialog.addVariable(sourceMapping.getAlias() + "." + fieldDefinition.getName());
             }
         }
 

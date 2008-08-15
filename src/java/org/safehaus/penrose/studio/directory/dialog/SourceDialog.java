@@ -241,7 +241,7 @@ public class SourceDialog extends Dialog {
 
                 SourceConfig sourceConfig = (SourceConfig)item.getData();
 
-                sourceMapping.setName(aliasText.getText());
+                sourceMapping.setAlias(aliasText.getText());
                 sourceMapping.setSourceName(sourceConfig.getName());
 
                 sourceMapping.setSearch("".equals(searchCombo.getText()) ? null : searchCombo.getText());
@@ -324,7 +324,7 @@ public class SourceDialog extends Dialog {
         if (item != null) {
             sourceTree.setSelection(new TreeItem[] { item });
         }
-        aliasText.setText(source.getName() == null ? "" : source.getName());
+        aliasText.setText(source.getAlias() == null ? "" : source.getAlias());
 
         searchCombo.setText(source.getSearch() == null ? "" : source.getSearch());
         bindCombo.setText(source.getBind() == null ? "" : source.getBind());

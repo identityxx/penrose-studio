@@ -35,12 +35,16 @@ import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.util.ActiveDirectoryUtil;
 import org.safehaus.penrose.util.BinaryUtil;
 
+import java.util.Collection;
+import java.util.HashSet;
+
 public class EntryDialog extends Dialog {
 
     Logger log = Logger.getLogger(getClass());
 
-    public final static int CANCEL = 0;
-    public final static int OK = 1;
+    public final static int OK     = 0;
+    public final static int SKIP   = 1;
+    public final static int CANCEL = 2;
 
     Shell shell;
 
@@ -52,7 +56,10 @@ public class EntryDialog extends Dialog {
 
     int action;
 
-	public EntryDialog(Shell parent, int style) {
+    public Collection<String> guidAttributes = new HashSet<String>();
+    public Collection<String> sidAttributes = new HashSet<String>();
+
+    public EntryDialog(Shell parent, int style) {
         super(parent, style);
     }
 
@@ -228,6 +235,16 @@ public class EntryDialog extends Dialog {
             }
         });
 
+        Button skipButton = new Button(composite, SWT.PUSH);
+        skipButton.setText("  Skip  ");
+
+        skipButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+                action = SKIP;
+                shell.close();
+            }
+        });
+
         Button cancelButton = new Button(composite, SWT.PUSH);
         cancelButton.setText("  Cancel  ");
 
@@ -271,20 +288,31 @@ public class EntryDialog extends Dialog {
 
         ti.setText(0, name);
 
+        String normalizedName = name.toLowerCase();
         String s;
-        if ("objectGUID".equalsIgnoreCase(name)) {
-            s = ActiveDirectoryUtil.getGUID((byte[])value);
 
-        } else if ("seeAlsoObjectGUID".equalsIgnoreCase(name)) {
+        if (guidAttributes.contains(normalizedName)) {
             if (value instanceof String) {
                 s = ActiveDirectoryUtil.getGUID(((String)value).getBytes());
 
-            } else {
+            } else if (value instanceof byte[]) {
                 s = ActiveDirectoryUtil.getGUID((byte[])value);
+
+            } else {
+                s = value.toString();
             }
 
-        } else if ("objectSid".equalsIgnoreCase(name)) {
-            s = ActiveDirectoryUtil.getSID((byte[])value);
+        } else if (sidAttributes.contains(normalizedName)) {
+            if (value instanceof String) {
+                s = ActiveDirectoryUtil.getSID(((String)value).getBytes());
+
+            } else if (value instanceof byte[]) {
+                s = ActiveDirectoryUtil.getSID((byte[])value);
+
+            } else {
+                s = value.toString();
+            }
+
 
         } else if (value instanceof byte[]) {
             s = BinaryUtil.encode(BinaryUtil.BIG_INTEGER, (byte[])value);
@@ -319,5 +347,13 @@ public class EntryDialog extends Dialog {
 
     public void setAttributes(Attributes attributes) {
         this.attributes = attributes;
+    }
+
+    public void addGUIDAttribute(String name) {
+        guidAttributes.add(name.toLowerCase());
+    }
+
+    public void addSIDAttribute(String name) {
+        sidAttributes.add(name.toLowerCase());
     }
 }

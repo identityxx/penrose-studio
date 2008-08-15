@@ -184,10 +184,10 @@
             icon="images/object.gif"
             class="org.safehaus.penrose.studio.federation.nis.database.NISDatabaseEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.federation.nis.ldap.NISLDAPEditor"
+            id="org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditor"
             name="NIS LDAP Server"
             icon="images/object.gif"
-            class="org.safehaus.penrose.studio.federation.nis.ldap.NISLDAPEditor"/>
+            class="org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditor"/>
         <editor
             id="org.safehaus.penrose.studio.federation.nis.linking.NISLinkEditor"
             name="NIS Users"

@@ -16,9 +16,8 @@ import org.safehaus.penrose.studio.user.AdministratorNode;
 import org.safehaus.penrose.studio.service.ServicesNode;
 import org.safehaus.penrose.studio.schema.SchemasNode;
 import org.safehaus.penrose.service.ServiceConfig;
-import org.safehaus.penrose.ldap.LDAPService;
+import org.safehaus.penrose.service.ServiceManagerClient;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.service.ServiceManagerClient;
 import org.safehaus.penrose.user.UserConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.SWT;
@@ -351,8 +350,8 @@ public class ProjectNode extends Node {
         PenroseClient client = project.getClient();
         ServiceManagerClient serviceManagerClient = client.getServiceManagerClient();
         ServiceConfig serviceConfig = serviceManagerClient.getServiceConfig("LDAP");
-        String s = serviceConfig == null ? null : serviceConfig.getParameter(LDAPService.LDAP_PORT);
-        int port = s == null ? LDAPService.DEFAULT_LDAP_PORT : Integer.parseInt(s);
+        String s = serviceConfig == null ? null : serviceConfig.getParameter("ldapPort");
+        int port = s == null ? 10389 : Integer.parseInt(s);
 
         PenroseClient penroseClient = project.getClient();
         UserConfig rootUserConfig = penroseClient.getRootUserConfig();

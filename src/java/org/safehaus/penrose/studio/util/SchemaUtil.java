@@ -4,7 +4,7 @@ import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.directory.ProxyEntry;
 import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionClient;
 
 /**
  * @author Endi S. Dewata

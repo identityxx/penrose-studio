@@ -6,9 +6,9 @@ import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.federation.FederationNode;
-import org.safehaus.penrose.studio.federation.Federation;
-import org.safehaus.penrose.federation.repository.Repository;
-import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.FederationClient;
+import org.safehaus.penrose.federation.*;
 import org.safehaus.penrose.studio.federation.nis.editor.NISEditorInput;
 import org.safehaus.penrose.studio.federation.nis.editor.NISEditor;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISOwnershipNode;
@@ -32,7 +32,7 @@ public class NISNode extends Node {
     private ProjectNode projectNode;
     private FederationNode federationNode;
 
-    NISFederation nisFederation;
+    NISFederationClient nisFederation;
 
     NISLinkingNode linkingNode;
     NISConflictsNode conflictsNode;
@@ -44,7 +44,7 @@ public class NISNode extends Node {
         this.federationNode = federationNode;
         this.projectNode = federationNode.getProjectNode();
 
-        nisFederation = federationNode.getFederation().getNisFederation();
+        nisFederation = new NISFederationClient(federationNode.getFederation());
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -75,7 +75,7 @@ public class NISNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        Federation federation = federationNode.getFederation();
+        FederationClient federation = federationNode.getFederation();
         Collection<Repository> children = federation.getRepositories("NIS");
         return !children.isEmpty();
     }
@@ -84,7 +84,7 @@ public class NISNode extends Node {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        Federation federation = federationNode.getFederation();
+        FederationClient federation = federationNode.getFederation();
         for (Repository repository : federation.getRepositories("NIS")) {
             NISDomainNode node = new NISDomainNode(
                     repository.getName(),
@@ -97,11 +97,11 @@ public class NISNode extends Node {
         return children;
     }
 
-    public NISFederation getNisFederation() {
+    public NISFederationClient getNisFederation() {
         return nisFederation;
     }
 
-    public void setNisTool(NISFederation nisFederation) {
+    public void setNisTool(NISFederationClient nisFederation) {
         this.nisFederation = nisFederation;
     }
 

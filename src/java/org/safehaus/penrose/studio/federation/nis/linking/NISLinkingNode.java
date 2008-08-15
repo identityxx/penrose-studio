@@ -5,12 +5,12 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.federation.linking.editor.LinkingEditor;
 import org.safehaus.penrose.studio.federation.linking.editor.LinkingEditorInput;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
 import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
 import org.safehaus.penrose.studio.project.ProjectNode;
@@ -24,7 +24,7 @@ public class NISLinkingNode extends Node {
     private ProjectNode projectNode;
     private NISNode nisNode;
     private NISDomainNode domainNode;
-    private NISFederation nisFederation;
+    private NISFederationClient nisFederation;
 
     public NISLinkingNode(String name, NISDomainNode domainNode) {
         super(
@@ -62,18 +62,18 @@ public class NISLinkingNode extends Node {
         LinkingEditorInput ei = new LinkingEditorInput();
         ei.setProject(projectNode.getProject());
         ei.setRepository(domain);
-        ei.setPartitionName(domain.getName()+"_"+NISFederation.NIS);
+        ei.setPartitionName(domain.getName()+"_"+ NISDomain.NIS);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
         page.openEditor(ei, LinkingEditor.class.getName());
     }
 
-    public NISFederation getNisFederation() {
+    public NISFederationClient getNisFederation() {
         return nisFederation;
     }
 
-    public void setNisTool(NISFederation nisFederation) {
+    public void setNisTool(NISFederationClient nisFederation) {
         this.nisFederation = nisFederation;
     }
 }

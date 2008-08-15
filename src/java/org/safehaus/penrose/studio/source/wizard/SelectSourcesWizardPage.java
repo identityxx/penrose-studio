@@ -24,10 +24,10 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.directory.EntrySourceConfig;
-import org.safehaus.penrose.management.partition.PartitionClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.source.SourceClient;
+import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.directory.dialog.SourceDialog;
 import org.safehaus.penrose.studio.project.Project;
@@ -122,7 +122,7 @@ public class SelectSourcesWizardPage extends WizardPage implements SelectionList
 
                     TableItem item = new TableItem(sourceTable, SWT.NONE);
                     item.setText(0, sourceMapping.getSourceName());
-                    item.setText(1, sourceMapping.getName());
+                    item.setText(1, sourceMapping.getAlias());
                     item.setData(sourceMapping);
 
                 } catch (Exception e) {

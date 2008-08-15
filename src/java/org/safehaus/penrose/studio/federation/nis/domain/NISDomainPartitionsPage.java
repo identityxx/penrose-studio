@@ -16,9 +16,9 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.project.Project;
 
 /**
@@ -30,17 +30,20 @@ public class NISDomainPartitionsPage extends FormPage {
 
     FormToolkit toolkit;
 
-    Label ypSuffixText;
     Label ypEnabledText;
+    Label ypSuffixText;
+    Label ypTemplateText;
 
-    Label nisSuffixText;
     Label nisEnabledText;
+    Label nisSuffixText;
+    Label nisTemplateText;
 
-    Label nssSuffixText;
     Label nssEnabledText;
+    Label nssSuffixText;
+    Label nssTemplateText;
 
     NISDomainEditor editor;
-    NISFederation nisFederation;
+    NISFederationClient nisFederation;
     NISDomain domain;
 
     Project project;
@@ -49,10 +52,9 @@ public class NISDomainPartitionsPage extends FormPage {
         super(editor, "PARTITIONS", "  Partitions  ");
 
         this.editor = editor;
+        this.project = editor.project;
         this.nisFederation = editor.getNisFederation();
         this.domain = editor.getDomain();
-
-        this.project = nisFederation.getProject();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -131,6 +133,11 @@ public class NISDomainPartitionsPage extends FormPage {
         nisSuffixText = toolkit.createLabel(composite, "");
         nisSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+        toolkit.createLabel(composite, "Template:");
+
+        nisTemplateText = toolkit.createLabel(composite, "");
+        nisTemplateText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
         return composite;
     }
 
@@ -155,7 +162,7 @@ public class NISDomainPartitionsPage extends FormPage {
 
                     if (!confirm) return;
 
-                    nisFederation.createNisPartition(domain);
+                    nisFederation.createNISPartition(domain.getName());
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -178,7 +185,7 @@ public class NISDomainPartitionsPage extends FormPage {
 
                     if (!confirm) return;
 
-                    nisFederation.removeNisPartition(domain);
+                    nisFederation.removeNISPartition(domain.getName());
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -228,6 +235,11 @@ public class NISDomainPartitionsPage extends FormPage {
         ypSuffixText = toolkit.createLabel(composite, "");
         ypSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+        toolkit.createLabel(composite, "Template:");
+
+        ypTemplateText = toolkit.createLabel(composite, "");
+        ypTemplateText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
         return composite;
     }
 
@@ -252,7 +264,7 @@ public class NISDomainPartitionsPage extends FormPage {
 
                     if (!confirm) return;
 
-                    nisFederation.createYpPartition(domain);
+                    nisFederation.createYPPartition(domain.getName());
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -275,7 +287,7 @@ public class NISDomainPartitionsPage extends FormPage {
 
                     if (!confirm) return;
 
-                    nisFederation.removeYpPartition(domain);
+                    nisFederation.removeYPPartition(domain.getName());
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -325,6 +337,11 @@ public class NISDomainPartitionsPage extends FormPage {
         nssSuffixText = toolkit.createLabel(composite, "");
         nssSuffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+        toolkit.createLabel(composite, "Template:");
+
+        nssTemplateText = toolkit.createLabel(composite, "");
+        nssTemplateText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
         return composite;
     }
 
@@ -349,7 +366,7 @@ public class NISDomainPartitionsPage extends FormPage {
 
                     if (!confirm) return;
 
-                    nisFederation.createNssPartition(domain);
+                    nisFederation.createNSSPartition(domain.getName());
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -372,7 +389,7 @@ public class NISDomainPartitionsPage extends FormPage {
 
                     if (!confirm) return;
 
-                    nisFederation.removeNssPartition(domain);
+                    nisFederation.removeNSSPartition(domain.getName());
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -386,20 +403,29 @@ public class NISDomainPartitionsPage extends FormPage {
 
     public void refresh() {
         try {
-            String nisSuffix = domain.getNisSuffix();
-            nisSuffixText.setText(nisSuffix == null ? "" : nisSuffix);
+            ypEnabledText.setText(domain.getBooleanParameter(NISDomain.YP_ENABLED) ? "Yes" : "No");
 
-            nisEnabledText.setText(domain.isNisEnabled() ? "Yes" : "No");
-
-            String ypSuffix = domain.getYpSuffix();
+            String ypSuffix = domain.getParameter(NISDomain.YP_SUFFIX);
             ypSuffixText.setText(ypSuffix == null ? "" : ypSuffix);
 
-            ypEnabledText.setText(domain.isYpEnabled() ? "Yes" : "No");
+            String ypTemplate = domain.getParameter(NISDomain.YP_TEMPLATE);
+            ypTemplateText.setText(ypTemplate == null ? "" : ypTemplate);
 
-            String nssSuffix = domain.getNssSuffix();
+            nisEnabledText.setText(domain.getBooleanParameter(NISDomain.NIS_ENABLED) ? "Yes" : "No");
+
+            String nisSuffix = domain.getParameter(NISDomain.NIS_SUFFIX);
+            nisSuffixText.setText(nisSuffix == null ? "" : nisSuffix);
+
+            String nisTemplate = domain.getParameter(NISDomain.NIS_TEMPLATE);
+            nisTemplateText.setText(nisTemplate == null ? "" : nisTemplate);
+
+            nssEnabledText.setText(domain.getBooleanParameter(NISDomain.NSS_ENABLED) ? "Yes" : "No");
+
+            String nssSuffix = domain.getParameter(NISDomain.NSS_SUFFIX);
             nssSuffixText.setText(nssSuffix == null ? "" : nssSuffix);
 
-            nssEnabledText.setText(domain.isNssEnabled() ? "Yes" : "No");
+            String nssTemplate = domain.getParameter(NISDomain.NSS_TEMPLATE);
+            nssTemplateText.setText(nssTemplate == null ? "" : nssTemplate);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

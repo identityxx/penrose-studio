@@ -25,8 +25,8 @@ import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.directory.ProxyEntry;
 import org.safehaus.penrose.ldap.LDAP;
-import org.safehaus.penrose.management.partition.PartitionClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
@@ -37,10 +37,8 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.util.ADUtil;
 import org.safehaus.penrose.studio.util.SchemaUtil;
 
-import javax.naming.Context;
 import javax.naming.InitialContext;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * @author Endi S. Dewata

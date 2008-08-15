@@ -1,34 +1,35 @@
 package org.safehaus.penrose.studio.federation.nis.conflict;
 
-import org.eclipse.ui.forms.editor.FormPage;
-import org.eclipse.ui.forms.editor.FormEditor;
-import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
-import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.GridData;
+import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.apache.log4j.Logger;
-import org.safehaus.penrose.federation.repository.NISDomain;
-import org.safehaus.penrose.studio.federation.Federation;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.*;
+import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.forms.editor.FormEditor;
+import org.eclipse.ui.forms.editor.FormPage;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.forms.widgets.Section;
+import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.FederationClient;
+import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
+import org.safehaus.penrose.source.SourceClient;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
+import org.safehaus.penrose.studio.federation.nis.editor.NISEditor;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISFilesPage;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISScriptsPage;
 import org.safehaus.penrose.studio.nis.dialog.NISChangeDialog;
-import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.partition.PartitionClient;
-import org.safehaus.penrose.management.source.SourceClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
 
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
@@ -44,26 +45,30 @@ public class NISGroupChangesPage extends FormPage {
     Button activateButton;
 
     FormEditor editor;
+
+    Project project;
+    NISFederationClient nisFederation;
     NISDomain domain;
-    NISFederation nisFederation;
 
     String title;
 
-    public NISGroupChangesPage(FormEditor editor, NISFederation nisFederation) throws Exception {
+    public NISGroupChangesPage(NISEditor editor, NISFederationClient nisFederation) throws Exception {
         super(editor, "GROUPS", "  Groups ");
         title = "Groups";
 
         this.editor = editor;
+        this.project = editor.project;
         this.nisFederation = nisFederation;
     }
 
-    public NISGroupChangesPage(FormEditor editor, NISDomain domain, NISFederation nisFederation) throws Exception {
+    public NISGroupChangesPage(NISGroupsEditor editor, NISDomain domain, NISFederationClient nisFederation) throws Exception {
         super(editor, "CHANGES", "  Changes ");
         title = "Changes";
 
         this.editor = editor;
-        this.domain = domain;
+        this.project = editor.getProject();
         this.nisFederation = nisFederation;
+        this.domain = domain;
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -126,10 +131,9 @@ public class NISGroupChangesPage extends FormPage {
                 }
             };
 
-            Project project = nisFederation.getProject();
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(FederationClient.FEDERATION);
             SourceClient sourceClient = partitionClient.getSourceClient("penrose_groups");
 
             sourceClient.search(request, response);
@@ -311,10 +315,9 @@ public class NISGroupChangesPage extends FormPage {
                     modifications.add(new Modification(Modification.REPLACE, new Attribute("gidNumber", gidNumber)));
                     modifications.add(new Modification(Modification.REPLACE, new Attribute("message", message)));
 
-                    Project project = nisFederation.getProject();
                     PenroseClient client = project.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
+                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(FederationClient.FEDERATION);
                     SourceClient sourceClient = partitionClient.getSourceClient("penrose_groups");
 
                     sourceClient.modify(result.getDn(), modifications);
@@ -340,10 +343,9 @@ public class NISGroupChangesPage extends FormPage {
 
                     int index = changesTable.getSelectionIndex();
 
-                    Project project = nisFederation.getProject();
                     PenroseClient client = project.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
+                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(FederationClient.FEDERATION);
                     SourceClient sourceClient = partitionClient.getSourceClient("penrose_groups");
 
                     TableItem[] items = changesTable.getSelection();
@@ -477,10 +479,9 @@ public class NISGroupChangesPage extends FormPage {
                         modifications.add(new Modification(Modification.REPLACE, new Attribute("active", true)));
                     }
 
-                    Project project = nisFederation.getProject();
                     PenroseClient client = project.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
+                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(FederationClient.FEDERATION);
                     SourceClient sourceClient = partitionClient.getSourceClient("penrose_groups");
 
                     sourceClient.modify(result.getDn(), modifications);

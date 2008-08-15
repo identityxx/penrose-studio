@@ -5,14 +5,13 @@ import org.safehaus.penrose.studio.*;
 import org.safehaus.penrose.studio.federation.nis.conflict.NISConflictsNode;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISOwnershipNode;
 import org.safehaus.penrose.studio.federation.nis.linking.NISLinkingNode;
-import org.safehaus.penrose.studio.federation.nis.ldap.NISLDAPNode;
+import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationNode;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.federation.nis.database.NISDatabaseNode;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.studio.federation.nis.wizard.EditNISDomainWizard;
-import org.safehaus.penrose.federation.repository.NISDomain;
-import org.safehaus.penrose.studio.federation.nis.yp.NISYPNode;
+import org.safehaus.penrose.federation.NISDomain;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
@@ -33,14 +32,13 @@ public class NISDomainNode extends Node {
     private ProjectNode projectNode;
     private NISNode nisNode;
 
-    private NISFederation nisFederation;
+    private NISFederationClient nisFederation;
     private NISDomain domain;
 
     Collection<Node> children = new ArrayList<Node>();
 
     NISDatabaseNode  databaseNode;
-    NISYPNode serverNode;
-    NISLDAPNode ldapNode;
+    NISSynchronizationNode synchronizationNode;
     NISLinkingNode   linkingNode;
     NISConflictsNode conflictsNode;
     NISOwnershipNode ownershipNode;
@@ -59,24 +57,14 @@ public class NISDomainNode extends Node {
         nisFederation = nisNode.getNisFederation();
         projectNode = nisNode.getProjectNode();
 
-        if (domain.isYpEnabled()) {
+        if (domain.getBooleanParameter(NISDomain.NIS_ENABLED)) {
 
-            serverNode = new NISYPNode(
-                    "YP Server",
+            synchronizationNode = new NISSynchronizationNode(
+                    "Synchronization",
                     this
             );
 
-            children.add(serverNode);
-        }
-
-        if (domain.isNisEnabled()) {
-
-            ldapNode = new NISLDAPNode(
-                    "LDAP Server",
-                    this
-            );
-
-            children.add(ldapNode);
+            children.add(synchronizationNode);
 
             linkingNode = new NISLinkingNode(
                     "Identity Linking",
@@ -170,11 +158,11 @@ public class NISDomainNode extends Node {
         this.domain = domain;
     }
 
-    public NISFederation getNisTool() {
+    public NISFederationClient getNisTool() {
         return nisFederation;
     }
 
-    public void setNisTool(NISFederation nisFederation) {
+    public void setNisTool(NISFederationClient nisFederation) {
         this.nisFederation = nisFederation;
     }
 

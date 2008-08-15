@@ -4,8 +4,8 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
-import org.safehaus.penrose.federation.repository.LDAPRepository;
+import org.safehaus.penrose.federation.LDAPFederationClient;
+import org.safehaus.penrose.federation.LDAPRepository;
 
 /**
  * @author Endi S. Dewata
@@ -13,7 +13,7 @@ import org.safehaus.penrose.federation.repository.LDAPRepository;
 public class LDAPRepositoryEditorInput implements IEditorInput {
 
     private Project project;
-    private LDAPFederation ldapFederation;
+    private LDAPFederationClient ldapFederation;
     private LDAPRepository repository;
 
     public LDAPRepositoryEditorInput() {
@@ -74,11 +74,11 @@ public class LDAPRepositoryEditorInput implements IEditorInput {
         this.repository = repository;
     }
 
-    public LDAPFederation getLdapFederation() {
+    public LDAPFederationClient getLdapFederation() {
         return ldapFederation;
     }
 
-    public void setLdapFederation(LDAPFederation nisFederation) {
+    public void setLdapFederation(LDAPFederationClient nisFederation) {
         this.ldapFederation = nisFederation;
     }
 

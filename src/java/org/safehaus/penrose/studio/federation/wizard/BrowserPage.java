@@ -11,7 +11,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionClient;
 
 /**
  * @author Endi Sukma Dewata

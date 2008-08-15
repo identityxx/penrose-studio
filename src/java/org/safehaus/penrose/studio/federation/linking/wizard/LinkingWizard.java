@@ -4,7 +4,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.studio.federation.linking.wizard.LinkingResultsPage;
 import org.safehaus.penrose.studio.federation.linking.wizard.LinkingSearchPage;

@@ -6,13 +6,12 @@ import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.federation.repository.NISDomain;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.Federation;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.FederationClient;
+import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.connection.ConnectionManager;
 
 import java.sql.ResultSet;
@@ -53,36 +52,35 @@ public class InconsistentGIDFinderAction extends NISAction {
 
         log.debug("Checking conflicts between "+domain1.getName()+" and "+domain2.getName()+".");
 
-        Project project = nisFederation.getProject();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 
-        PartitionClient partitionClient1 = partitionManagerClient.getPartitionClient(domain1.getName()+"_"+NISFederation.YP);
+        PartitionClient partitionClient1 = partitionManagerClient.getPartitionClient(domain1.getName()+"_"+ NISDomain.YP);
         PartitionConfig partitionConfig1 = partitionClient1.getPartitionConfig();
 
-        PartitionClient partitionClient2 = partitionManagerClient.getPartitionClient(domain2.getName()+"_"+NISFederation.YP);
+        PartitionClient partitionClient2 = partitionManagerClient.getPartitionClient(domain2.getName()+"_"+ NISDomain.YP);
         PartitionConfig partitionConfig2 = partitionClient2.getPartitionConfig();
 
         //PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
 
         //PartitionConfig partitionConfig1 = partitionConfigManager.getPartitionConfig(domain1.getName()+"_"+NISFederation.YP);
-        SourceConfig sourceConfig1 = partitionConfig1.getSourceConfigManager().getSourceConfig(NISFederation.CACHE_GROUPS);
+        SourceConfig sourceConfig1 = partitionConfig1.getSourceConfigManager().getSourceConfig(NISFederationClient.CACHE_GROUPS);
 
         //PartitionConfig partitionConfig2 = partitionConfigManager.getPartitionConfig(domain2.getName()+"_"+NISFederation.YP);
-        SourceConfig sourceConfig2 = partitionConfig2.getSourceConfigManager().getSourceConfig(NISFederation.CACHE_GROUPS);
+        SourceConfig sourceConfig2 = partitionConfig2.getSourceConfigManager().getSourceConfig(NISFederationClient.CACHE_GROUPS);
 
-        Partition partition = nisFederation.getPartition();
+        Partition partition = null; // nisFederation.getPartition();
         ConnectionManager connectionManager = partition.getConnectionManager();
-        JDBCConnection connection = (JDBCConnection)connectionManager.getConnection(Federation.JDBC);
+        JDBCConnection connection = (JDBCConnection)connectionManager.getConnection(FederationClient.JDBC);
 
         String table1 = connection.getTableName(sourceConfig1);
         String table2 = connection.getTableName(sourceConfig2);
 
         String sql = "select a.cn, a.gidNumber, b.gidNumber, c.cn, c.gidNumber, d.gidNumber" +
                 " from "+table1+" a"+
-                " left join "+ NISFederation.NIS_TOOL +".groups b on b.domain=? and a.cn=b.cn"+
+                " left join "+ NISFederationClient.NIS_TOOL +".groups b on b.domain=? and a.cn=b.cn"+
                 " join "+table2+" c on a.cn = c.cn "+
-                " left join "+ NISFederation.NIS_TOOL +".groups d on d.domain=? and c.cn=d.cn"+
+                " left join "+ NISFederationClient.NIS_TOOL +".groups d on d.domain=? and c.cn=d.cn"+
                 " where b.gidNumber is null and d.gidNumber is null and a.gidNumber <> c.gidNumber"+
                     " or b.gidNumber is null and a.gidNumber <> d.gidNumber"+
                     " or d.gidNumber is null and b.gidNumber <> c.gidNumber"+

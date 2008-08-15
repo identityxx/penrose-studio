@@ -14,7 +14,7 @@ import org.safehaus.penrose.ldap.Attribute;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.filter.SubstringFilter;
-import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.util.Collection;

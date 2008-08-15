@@ -14,9 +14,9 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.federation.repository.NISDomain;
-import org.safehaus.penrose.studio.federation.Federation;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.FederationClient;
+import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.studio.nis.dialog.NISUserDialog;
 import org.safehaus.penrose.studio.nis.action.*;
 import org.safehaus.penrose.studio.project.Project;
@@ -25,12 +25,12 @@ import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.source.SourceManager;
+import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.management.*;
-import org.safehaus.penrose.management.source.SourceClient;
-import org.safehaus.penrose.management.connection.ConnectionClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.connection.ConnectionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
 
 import java.util.Collection;
 import java.util.Map;
@@ -55,8 +55,10 @@ public class NISUserScriptsPage extends FormPage {
     Table matchesTable;
 
     NISUsersEditor editor;
+
+    Project project;
+    NISFederationClient nisFederation;
     NISDomain domain;
-    NISFederation nisFederation;
 
     Map<String,Collection<Conflict>> conflicts = new TreeMap<String,Collection<Conflict>>();
 
@@ -64,8 +66,9 @@ public class NISUserScriptsPage extends FormPage {
         super(editor, "SCRIPTS", "  Scripts  ");
 
         this.editor = editor;
-        domain = editor.getDomain();
-        nisFederation = editor.getNisTool();
+        this.project = editor.project;
+        this.nisFederation = editor.getNisTool();
+        this.domain = editor.getDomain();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -345,11 +348,10 @@ public class NISUserScriptsPage extends FormPage {
         Integer uidNumber = (Integer) attributes.getValue("uidNumber");
         if (uidNumber == null) uidNumber = (Integer) attributes.getValue("origUidNumber");
 
-        Project project = nisFederation.getProject();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName());
-        ConnectionClient connectionClient = partitionClient.getConnectionClient(Federation.JDBC);
+        ConnectionClient connectionClient = partitionClient.getConnectionClient(FederationClient.JDBC);
 /*
         PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
         Partition partition = nisFederation.getPartition();
@@ -359,7 +361,7 @@ public class NISUserScriptsPage extends FormPage {
             final String name = repository.getName();
             if (domain.getName().equals(name)) continue;
 
-            SourceClient sourceClient = partitionClient.getSourceClient(NISFederation.CACHE_USERS);
+            SourceClient sourceClient = partitionClient.getSourceClient(NISFederationClient.CACHE_USERS);
 
             //PartitionConfig partitionConfig = partitionConfigManager.getPartitionConfig(name+"_"+NISFederation.YP);
             //SourceConfig sourceConfig = partitionConfig.getSourceConfigManager().getSourceConfig(NISFederation.CACHE_USERS);
@@ -369,7 +371,7 @@ public class NISUserScriptsPage extends FormPage {
 
             String sql = "select a.uid, a.uidNumber, b.uidNumber" +
                     " from "+table+" a"+
-                    " left join "+ NISFederation.NIS_TOOL +".users b on b.domain=? and a.uid=b.uid"+
+                    " left join "+ NISFederationClient.NIS_TOOL +".users b on b.domain=? and a.uid=b.uid"+
                     " where a.uid = ? and (b.uidNumber is null and a.uidNumber = ? or b.uidNumber = ?)"+
                     " order by a.uid";
 
@@ -431,7 +433,8 @@ public class NISUserScriptsPage extends FormPage {
 
         Class clazz = Class.forName(className);
         NISAction action = (NISAction) clazz.newInstance();
-        action.setNisTool(nisFederation);
+        action.setProject(project);
+        action.setNisFederation(nisFederation);
 
         NISActionRequest request = new NISActionRequest();
         request.setDomain(domain.getName());
@@ -485,11 +488,11 @@ public class NISUserScriptsPage extends FormPage {
             Integer origUidNumber
     ) throws Exception {
 
-        PenroseClient penroseClient = nisFederation.getProject().getClient();
+        PenroseClient penroseClient = project.getClient();
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
 
-        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domainName+"_"+NISFederation.YP);
-        SourceClient sourceClient = partitionClient.getSourceClient(NISFederation.CHANGE_USERS);
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domainName+"_"+ NISDomain.YP);
+        SourceClient sourceClient = partitionClient.getSourceClient(NISFederationClient.CHANGE_USERS);
 
         Partition partition = null; // nisFederation.getPartitionManager().getPartition(domainName);
         SourceManager sourceManager = partition.getSourceManager();
@@ -504,7 +507,7 @@ public class NISUserScriptsPage extends FormPage {
         dialog.setUid(uid);
         dialog.setOrigUidNumber(origUidNumber);
 
-        Source penroseUsers = sourceManager.getSource(NISFederation.CHANGE_USERS);
+        Source penroseUsers = sourceManager.getSource(NISFederationClient.CHANGE_USERS);
 
         SearchRequest request = new SearchRequest();
         request.setDn(dn);
@@ -560,11 +563,10 @@ public class NISUserScriptsPage extends FormPage {
 
     public void checkUidNumber(String uid, Integer uidNumber) throws Exception {
 
-        Project project = nisFederation.getProject();
         PenroseClient penroseClient = project.getClient();
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
 
-        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(FederationClient.FEDERATION);
         //Partition partition = nisFederation.getPartition();
 
         SearchRequest request = new SearchRequest();
@@ -572,7 +574,7 @@ public class NISUserScriptsPage extends FormPage {
 
         SearchResponse response = new SearchResponse();
 
-        SourceClient users = partitionClient.getSourceClient(NISFederation.CHANGE_USERS);
+        SourceClient users = partitionClient.getSourceClient(NISFederationClient.CHANGE_USERS);
         //Source users = partition.getSource(NISFederation.CHANGE_USERS);
         users.search(request, response);
 
@@ -590,12 +592,12 @@ public class NISUserScriptsPage extends FormPage {
         for (NISDomain repository : nisFederation.getRepositories()) {
             String name = repository.getName();
 
-            PartitionClient partitionClient2 = partitionManagerClient.getPartitionClient(name+"_"+NISFederation.YP);
+            PartitionClient partitionClient2 = partitionManagerClient.getPartitionClient(name+"_"+ NISDomain.YP);
             //Partition partition2 = nisFederation.getPartitionManager().getPartition(name);
 
             response = new SearchResponse();
 
-            SourceClient users2 = partitionClient.getSourceClient(NISFederation.CACHE_USERS);
+            SourceClient users2 = partitionClient.getSourceClient(NISFederationClient.CACHE_USERS);
             //Source users2 = partition2.getSource(NISFederation.CACHE_USERS);
             users2.search(request, response);
 

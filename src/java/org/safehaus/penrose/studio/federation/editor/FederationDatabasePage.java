@@ -9,10 +9,8 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.federation.Federation;
+import org.safehaus.penrose.federation.FederationClient;
 
 /**
  * @author Endi S. Dewata
@@ -24,9 +22,9 @@ public class FederationDatabasePage extends FormPage {
     FormToolkit toolkit;
 
     FederationEditor editor;
-    Federation federation;
+    FederationClient federation;
 
-    public FederationDatabasePage(FederationEditor editor, Federation federation) {
+    public FederationDatabasePage(FederationEditor editor, FederationClient federation) {
         super(editor, "DATABASE", "  Database  ");
 
         this.editor = editor;
@@ -60,10 +58,10 @@ public class FederationDatabasePage extends FormPage {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
-
+/*
         Project project = federation.getProject();
         PenroseClient client = project.getClient();
-/*
+
         PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
         ConnectionClient connectionClient = partitionClient.getConnectionClient(Federation.JDBC);
         ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();

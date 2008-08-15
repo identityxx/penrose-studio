@@ -14,20 +14,20 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.management.*;
-import org.safehaus.penrose.management.source.SourceClient;
-import org.safehaus.penrose.management.connection.ConnectionClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.source.SourceClient;
+import org.safehaus.penrose.connection.ConnectionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.source.Source;
 import org.safehaus.penrose.source.SourceManager;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.federation.Federation;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.nis.action.*;
 import org.safehaus.penrose.studio.nis.dialog.NISGroupDialog;
 import org.safehaus.penrose.studio.nis.dialog.NISUserDialog;
@@ -56,8 +56,10 @@ public class NISGroupScriptsPage extends FormPage {
     Table matchesTable;
 
     NISGroupsEditor editor;
+
+    Project project;
+    NISFederationClient nisFederation;
     NISDomain domain;
-    NISFederation nisFederation;
 
     Map<String,Collection<Conflict>> conflicts = new TreeMap<String,Collection<Conflict>>();
 
@@ -65,6 +67,7 @@ public class NISGroupScriptsPage extends FormPage {
         super(editor, "SCRIPTS", "  Scripts  ");
 
         this.editor = editor;
+        this.project = editor.getProject();
         domain = editor.getDomain();
         nisFederation = editor.getNisTool();
     }
@@ -344,11 +347,10 @@ public class NISGroupScriptsPage extends FormPage {
         Integer gidNumber = (Integer) attributes.getValue("gidNumber");
         if (gidNumber == null) gidNumber = (Integer) attributes.getValue("origGidNumber");
 
-        Project project = nisFederation.getProject();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName());
-        ConnectionClient connection = partitionClient.getConnectionClient(Federation.JDBC);
+        ConnectionClient connection = partitionClient.getConnectionClient(FederationClient.JDBC);
         
         //PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
         //Partition partition = nisFederation.getPartition();
@@ -360,14 +362,14 @@ public class NISGroupScriptsPage extends FormPage {
 
             //PartitionConfig partitionConfig = partitionConfigManager.getPartitionConfig(name+"_"+NISFederation.YP);
             //SourceConfig sourceConfig = partitionConfig.getSourceConfigManager().getSourceConfig(NISFederation.CACHE_GROUPS);
-            SourceClient sourceClient = partitionClient.getSourceClient(NISFederation.CACHE_GROUPS);
+            SourceClient sourceClient = partitionClient.getSourceClient(NISFederationClient.CACHE_GROUPS);
 
             String table = (String)sourceClient.getAttribute("TableName");
             //String table = connection.getTableName(sourceConfig);
 
             String sql = "select a.cn, a.gidNumber, b.gidNumber" +
                     " from "+table+" a"+
-                    " left join "+ NISFederation.NIS_TOOL +".groups b on b.domain=? and a.cn=b.cn"+
+                    " left join "+ NISFederationClient.NIS_TOOL +".groups b on b.domain=? and a.cn=b.cn"+
                     " where a.cn = ? and (b.gidNumber is null and a.gidNumber = ? or b.gidNumber = ?)"+
                     " order by a.cn";
 
@@ -423,7 +425,8 @@ public class NISGroupScriptsPage extends FormPage {
 
         Class clazz = Class.forName(className);
         NISAction action = (NISAction) clazz.newInstance();
-        action.setNisTool(nisFederation);
+        action.setProject(project);
+        action.setNisFederation(nisFederation);
 
         NISActionRequest request = new NISActionRequest();
         request.setDomain(domain.getName());
@@ -490,7 +493,7 @@ public class NISGroupScriptsPage extends FormPage {
         dialog.setName(cn);
         dialog.setOrigGidNumber(origGidNumber);
 
-        Source penroseGroups = sourceManager.getSource(NISFederation.CHANGE_GROUPS);
+        Source penroseGroups = sourceManager.getSource(NISFederationClient.CHANGE_GROUPS);
 
         SearchRequest request = new SearchRequest();
         request.setDn(dn);
@@ -505,7 +508,7 @@ public class NISGroupScriptsPage extends FormPage {
             dialog.setNewGidNumber((Integer)attributes.getValue("gidNumber"));
         }
 
-        Source members = sourceManager.getSource(NISFederation.CACHE_GROUPS +"_memberUid");
+        Source members = sourceManager.getSource(NISFederationClient.CACHE_GROUPS +"_memberUid");
 
         request = new SearchRequest();
         request.setFilter("(cn="+cn+")");
@@ -561,10 +564,9 @@ public class NISGroupScriptsPage extends FormPage {
 
     public void checkGidNumber(String cn, Integer gidNumber) throws Exception {
 
-        Project project = nisFederation.getProject();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(FederationClient.FEDERATION);
 
         //Partition partition = nisFederation.getPartition();
 
@@ -573,7 +575,7 @@ public class NISGroupScriptsPage extends FormPage {
 
         SearchResponse response = new SearchResponse();
 
-        SourceClient groups = partitionClient.getSourceClient(NISFederation.CHANGE_GROUPS);
+        SourceClient groups = partitionClient.getSourceClient(NISFederationClient.CHANGE_GROUPS);
         //Source groups = partition.getSource(NISFederation.CHANGE_GROUPS);
         groups.search(request, response);
 
@@ -591,12 +593,12 @@ public class NISGroupScriptsPage extends FormPage {
         for (NISDomain repository : nisFederation.getRepositories()) {
             String name = repository.getName();
 
-            PartitionClient partitionClient2 = partitionManagerClient.getPartitionClient(name+"_"+NISFederation.YP);
+            PartitionClient partitionClient2 = partitionManagerClient.getPartitionClient(name+"_"+ NISDomain.YP);
             //Partition partition2 = nisFederation.getPartitionManager().getPartition(name);
 
             response = new SearchResponse();
 
-            SourceClient groups2 = partitionClient2.getSourceClient(NISFederation.CACHE_GROUPS);
+            SourceClient groups2 = partitionClient2.getSourceClient(NISFederationClient.CACHE_GROUPS);
             //Source groups2 = partition2.getSource(NISFederation.CACHE_GROUPS);
             groups2.search(request, response);
 

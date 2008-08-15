@@ -1,25 +1,28 @@
 package org.safehaus.penrose.studio.federation.nis.domain;
 
-import org.eclipse.ui.forms.editor.FormEditor;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.safehaus.penrose.federation.repository.NISDomain;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.forms.editor.FormEditor;
+import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.studio.federation.linking.editor.LinkingSettingsPage;
-import org.slf4j.LoggerFactory;
+import org.safehaus.penrose.studio.project.Project;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NISDomainEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    NISFederation nisFederation;
-    NISDomain domain;
+    public Project project;
+    public NISFederationClient nisFederation;
+    public NISDomain domain;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         NISDomainEditorInput ei = (NISDomainEditorInput)input;
+        project = ei.getProject();
         nisFederation = ei.getNisFederation();
         domain = ei.getDomain();
 
@@ -61,7 +64,7 @@ public class NISDomainEditor extends FormEditor {
         this.domain = domain;
     }
 
-    public NISFederation getNisFederation() {
+    public NISFederationClient getNisFederation() {
         return nisFederation;
     }
 }

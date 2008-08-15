@@ -21,8 +21,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.federation.ldap.LDAPFederation;
-import org.safehaus.penrose.federation.repository.LDAPRepository;
+import org.safehaus.penrose.federation.LDAPFederationClient;
+import org.safehaus.penrose.federation.LDAPRepository;
 import org.safehaus.penrose.studio.federation.ldap.wizard.AddLDAPRepositoryWizard;
 import org.safehaus.penrose.studio.federation.ldap.wizard.EditLDAPRepositoryWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -39,17 +39,17 @@ public class LDAPRepositoriesPage extends FormPage {
     FormToolkit toolkit;
 
     LDAPEditor editor;
-    LDAPFederation ldapFederation;
+    LDAPFederationClient ldapFederation;
     Project project;
 
     Table table;
 
-    public LDAPRepositoriesPage(LDAPEditor editor, LDAPFederation ldapFederation) {
+    public LDAPRepositoriesPage(LDAPEditor editor, LDAPFederationClient ldapFederation) {
         super(editor, "REPOSITORIES", "  Repositories  ");
 
         this.editor = editor;
+        this.project = editor.project;
         this.ldapFederation = ldapFederation;
-        this.project = ldapFederation.getProject();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -91,7 +91,7 @@ public class LDAPRepositoriesPage extends FormPage {
 
         tc = new TableColumn(table, SWT.NONE);
         tc.setWidth(150);
-        tc.setText("Server");
+        tc.setText("Servers");
 
         tc = new TableColumn(table, SWT.NONE);
         tc.setWidth(250);
@@ -140,7 +140,7 @@ public class LDAPRepositoriesPage extends FormPage {
                     LDAPRepository repository = wizard.getRepository();
 
                     ldapFederation.addRepository(repository);
-                    ldapFederation.createPartitions(repository);
+                    ldapFederation.createPartitions(repository.getName());
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
@@ -209,7 +209,7 @@ public class LDAPRepositoriesPage extends FormPage {
                     for (TableItem ti : items) {
                         LDAPRepository repository = (LDAPRepository)ti.getData();
 
-                        ldapFederation.removePartitions(repository);
+                        ldapFederation.removePartitions(repository.getName());
                         ldapFederation.removeRepository(repository.getName());
                     }
 
@@ -253,8 +253,8 @@ public class LDAPRepositoriesPage extends FormPage {
                 TableItem ti = new TableItem(table, SWT.NONE);
 
                 ti.setText(0, repository.getName());
-                ti.setText(1, repository.getServer());
-                ti.setText(2, repository.getSuffix());
+                ti.setText(1, repository.getParameter(LDAPRepository.LDAP_URL));
+                ti.setText(2, repository.getParameter(LDAPRepository.LDAP_SUFFIX));
 
                 ti.setData(repository);
             }

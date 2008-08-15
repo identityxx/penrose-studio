@@ -12,10 +12,12 @@ import org.eclipse.ui.*;
 import org.eclipse.ui.progress.IProgressService;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.safehaus.penrose.federation.*;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.federation.global.GlobalNode;
 import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
+import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
 import org.safehaus.penrose.studio.plugin.PluginNode;
 import org.safehaus.penrose.studio.plugin.PluginsNode;
@@ -23,10 +25,7 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.util.FileUtil;
-import org.safehaus.penrose.federation.FederationWriter;
-import org.safehaus.penrose.federation.FederationConfig;
-import org.safehaus.penrose.studio.federation.Federation;
+import org.safehaus.penrose.management.PenroseClient;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -42,7 +41,7 @@ public class FederationNode extends PluginNode {
     protected boolean started;
 
     private Project project;
-    private Federation federation;
+    private FederationClient federation;
 
     ServersView serversView;
 
@@ -166,21 +165,8 @@ public class FederationNode extends PluginNode {
 
     public void start() throws Exception {
 
-        federation = new Federation(project);
-
-        IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
-
-        progressService.busyCursorWhile(new IRunnableWithProgress() {
-            public void run(IProgressMonitor monitor) throws InvocationTargetException {
-                try {
-                    federation.load(monitor);
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    throw new InvocationTargetException(e, e.getMessage());
-                }
-            }
-        });
+        PenroseClient client = project.getClient();
+        federation = new FederationClient(client);
 
         children.add(new GlobalNode(
                 "Global",
@@ -200,41 +186,6 @@ public class FederationNode extends PluginNode {
         started = true;
     }
 
-/*
-    public boolean createPartition() throws Exception {
-
-        FederationWizard wizard = new FederationWizard();
-        wizard.init(project);
-
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-
-        WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
-        dialog.setPageSize(600, 300);
-
-        if (dialog.open() != Window.OK) return false;
-
-        ConnectionConfig connectionConfig = new ConnectionConfig();
-
-        Map<String,String> allParameters = wizard.getAllParameters();
-        String url = allParameters.get(JDBCClient.URL);
-        url = Helper.replace(url, allParameters);
-
-        Map<String,String> parameters = wizard.getParameters();
-        parameters.put(JDBCClient.URL, url);
-        
-        connectionConfig.setParameters(parameters);
-
-        ConnectionContext connectionContext = new ConnectionContext();
-        //connectionContext.setPartition(partition);
-        //connectionContext.setAdapter(adapter);
-
-        JDBCConnection connection = new JDBCConnection();
-        connection.init(connectionConfig, connectionContext);
-
-        return true;
-    }
-*/
-
     public boolean hasChildren() throws Exception {
         return true;
     }
@@ -243,11 +194,11 @@ public class FederationNode extends PluginNode {
         return children;
     }
 
-    public Federation getFederation() {
+    public FederationClient getFederation() {
         return federation;
     }
 
-    public void setFederation(Federation federation) {
+    public void setFederation(FederationClient federation) {
         this.federation = federation;
     }
 
@@ -266,24 +217,54 @@ public class FederationNode extends PluginNode {
         dialog.setText("Import");
         dialog.setFilterExtensions(new String[] { "*.xml" });
 
-        String filename = dialog.open();
+        final String filename = dialog.open();
         if (filename == null) return;
-
-        File file1 = new File(filename);
-        File file2 = new File(project.getWorkDir(), "conf"+File.separator+"federation.xml");
-
-        log.debug("Copying "+file1+" to "+file2);
-        FileUtil.copy(file1, file2);
 
         IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
         progressService.busyCursorWhile(new IRunnableWithProgress() {
             public void run(IProgressMonitor monitor) throws InvocationTargetException {
                 try {
-                    federation.importFederationConfig(monitor);
+                    monitor.beginTask("Importing Federation configuration...", IProgressMonitor.UNKNOWN);
+
+                    monitor.subTask("Loading "+filename+"...");
+
+                    File file = new File(filename);
+
+                    FederationReader reader = new FederationReader();
+                    FederationConfig federationConfig = reader.read(file);
+
+                    monitor.worked(1);
+
+                    monitor.subTask("Uploading Federation configuration...");
+
+                    federation.setFederationConfig(federationConfig);
+                    federation.storeFederationConfig();
+
+                    monitor.worked(1);
+
+                    monitor.subTask("Creating global partition...");
+
+                    federation.createPartitions(FederationClient.GLOBAL);
+
+                    monitor.worked(1);
+
+                    for (Repository repository : federation.getRepositories()) {
+
+                        if (FederationClient.GLOBAL.equals(repository.getName())) continue;
+
+                        monitor.subTask("Creating "+repository.getName()+" partition...");
+
+                        federation.createPartitions(repository.getName());
+
+                        monitor.worked(1);
+                    }
 
                 } catch (Exception e) {
                     throw new InvocationTargetException(e, e.getMessage());
+
+                } finally {
+                    monitor.done();
                 }
             }
         });
@@ -303,25 +284,7 @@ public class FederationNode extends PluginNode {
         if (filename == null) return;
 
         FederationConfig federationConfig = federation.getFederationConfig();
-/*
-        FederationConfig federationConfig = new FederationConfig();
 
-        Repository globalRepository = federation.getGlobalRepository();
-        globalRepository.setName(Federation.GLOBAL);
-        globalRepository.setType("GLOBAL");
-
-        federationConfig.addRepository(globalRepository);
-
-        LDAPFederation ldapFederation = federation.getLdapFederation();
-        for (LDAPRepository repository : ldapFederation.getRepositories()) {
-            federationConfig.addRepository(repository);
-        }
-
-        NISFederation nisFederation = federation.getNisFederation();
-        for (NISDomain repository : nisFederation.getRepositories()) {
-            federationConfig.addRepository(repository);
-        }
-*/
         File file = new File(filename);
 
         if (file.exists()) {

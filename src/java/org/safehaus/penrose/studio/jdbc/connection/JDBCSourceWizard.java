@@ -23,15 +23,14 @@ import org.safehaus.penrose.studio.source.wizard.SourceWizardPage;
 import org.safehaus.penrose.studio.jdbc.source.JDBCPrimaryKeyWizardPage;
 import org.safehaus.penrose.studio.jdbc.source.JDBCFieldWizardPage;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.Table;
 import org.safehaus.penrose.jdbc.source.JDBCSource;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;

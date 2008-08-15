@@ -17,16 +17,16 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.source.SourceClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.source.SourceClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -44,7 +44,7 @@ public class NISDatabaseChangeLogPage extends FormPage {
 
     Project project;
     NISDatabaseEditor editor;
-    NISFederation nisFederation;
+    NISFederationClient nisFederation;
     NISDomain domain;
 
     PenroseClient penroseClient;
@@ -58,13 +58,13 @@ public class NISDatabaseChangeLogPage extends FormPage {
         super(editor, "CHANGE_LOG", "  Change Log  ");
 
         this.editor = editor;
-        this.nisFederation = editor.getNisTool();
-        this.project = nisFederation.getProject();
+        this.project = editor.project;
+        this.nisFederation = editor.getNisFederation();
         this.domain = editor.getDomain();
 
         penroseClient = project.getClient();
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-        partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
+        partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.YP);
 
         changelog = partitionClient.getSourceClient("changelog");
     }

@@ -15,16 +15,16 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.FederationClient;
+import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.management.*;
-import org.safehaus.penrose.management.source.SourceClient;
-import org.safehaus.penrose.management.connection.ConnectionClient;
-import org.safehaus.penrose.management.partition.PartitionClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.source.SourceClient;
+import org.safehaus.penrose.connection.ConnectionClient;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.federation.Federation;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
 import org.safehaus.penrose.studio.federation.nis.conflict.NISGroupsEditor;
 import org.safehaus.penrose.studio.project.Project;
 
@@ -44,15 +44,18 @@ public class NISGroupsPage extends FormPage {
     Label entriesText;
 
     NISGroupsEditor editor;
+
+    Project project;
+    NISFederationClient nisFederation;
     NISDomain domain;
-    NISFederation nisFederation;
 
     public NISGroupsPage(NISGroupsEditor editor) {
         super(editor, "GROUPS", "  Groups  ");
 
         this.editor = editor;
-        domain = editor.getDomain();
-        nisFederation = editor.getNisTool();
+        this.project = editor.getProject();
+        this.nisFederation = editor.getNisTool();
+        this.domain = editor.getDomain();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -76,12 +79,11 @@ public class NISGroupsPage extends FormPage {
 
     public void refresh() {
         try {
-            Project project = nisFederation.getProject();
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName());
-            ConnectionClient connectionClient = partitionClient.getConnectionClient(Federation.JDBC);
-            SourceClient sourceClient = partitionClient.getSourceClient(NISFederation.CACHE_GROUPS);
+            ConnectionClient connectionClient = partitionClient.getConnectionClient(FederationClient.JDBC);
+            SourceClient sourceClient = partitionClient.getSourceClient(NISFederationClient.CACHE_GROUPS);
 /*
             PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
 

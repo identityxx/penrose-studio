@@ -101,7 +101,7 @@ public class SourceWizardPage extends WizardPage implements SelectionListener, M
 
                 TableItem item = new TableItem(sourceTable, SWT.NONE);
                 item.setText(0, source.getSourceName());
-                item.setText(1, source.getName());
+                item.setText(1, source.getAlias());
                 item.setData(source);
             }
         });
@@ -116,7 +116,7 @@ public class SourceWizardPage extends WizardPage implements SelectionListener, M
                 for (int i=0; i<items.length; i++) {
                     TableItem item = items[i];
                     EntrySourceConfig source = (EntrySourceConfig)item.getData();
-                    entryConfig.removeSourceConfig(source.getName());
+                    entryConfig.removeSourceConfig(source.getAlias());
                     item.dispose();
                 }
             }

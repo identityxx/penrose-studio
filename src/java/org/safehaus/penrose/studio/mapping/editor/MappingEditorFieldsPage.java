@@ -262,7 +262,7 @@ public class MappingEditorFieldsPage extends FormPage {
         TableItem ti = fieldMappings.getSelection()[0];
         MappingFieldConfig fieldMapping = (MappingFieldConfig)ti.getData();
 
-        mappingConfig.removeMappingFieldConfig(fieldMapping);
+        mappingConfig.removeFieldConfig(fieldMapping);
 
         refresh();
         checkDirty();
@@ -274,10 +274,10 @@ public class MappingEditorFieldsPage extends FormPage {
         TableItem ti = fieldMappings.getSelection()[0];
         MappingFieldConfig fieldMapping = (MappingFieldConfig)ti.getData();
 
-        int i = mappingConfig.getMappingFieldConfigIndex(fieldMapping);
+        int i = mappingConfig.getFieldConfigIndex(fieldMapping);
         if (i == 0) return;
 
-        mappingConfig.removeMappingFieldConfig(fieldMapping);
+        mappingConfig.removeFieldConfig(fieldMapping);
         mappingConfig.addFieldConfig(i-1, fieldMapping);
 
         refresh();
@@ -290,10 +290,10 @@ public class MappingEditorFieldsPage extends FormPage {
         TableItem ti = fieldMappings.getSelection()[0];
         MappingFieldConfig fieldMapping = (MappingFieldConfig)ti.getData();
 
-        int i = mappingConfig.getMappingFieldConfigIndex(fieldMapping);
+        int i = mappingConfig.getFieldConfigIndex(fieldMapping);
         if (i == mappingConfig.getFieldConfigs().size()-1) return;
 
-        mappingConfig.removeMappingFieldConfig(fieldMapping);
+        mappingConfig.removeFieldConfig(fieldMapping);
         mappingConfig.addFieldConfig(i+1, fieldMapping);
 
         refresh();

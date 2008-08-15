@@ -380,7 +380,7 @@ public class ExpressionEditorDialog extends BaseDialog {
 
 				for (int j=0; j<fields.length; j++) {
 					FieldConfig field = (FieldConfig) fields[j];
-					addHint(icon, source.getName()+"."+field.getName());
+					addHint(icon, source.getAlias()+"."+field.getName());
 				}
 			}
 			// add all attributes

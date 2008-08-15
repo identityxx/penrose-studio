@@ -1,7 +1,8 @@
 package org.safehaus.penrose.studio.nis.action;
 
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.studio.project.Project;
 
 /**
  * @author Endi S. Dewata
@@ -12,7 +13,9 @@ public class NISAction {
 
     protected String name;
     protected String description;
-    protected NISFederation nisFederation;
+
+    protected Project project;
+    protected NISFederationClient nisFederation;
 
     public void execute(NISActionRequest request, NISActionResponse response) throws Exception {
     }
@@ -33,11 +36,19 @@ public class NISAction {
         this.description = description;
     }
 
-    public NISFederation getNisTool() {
+    public NISFederationClient getNisFederation() {
         return nisFederation;
     }
 
-    public void setNisTool(NISFederation nisFederation) {
+    public void setNisFederation(NISFederationClient nisFederation) {
         this.nisFederation = nisFederation;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

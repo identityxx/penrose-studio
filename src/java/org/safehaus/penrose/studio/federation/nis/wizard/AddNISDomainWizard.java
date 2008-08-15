@@ -4,10 +4,10 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.Repository;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.federation.linking.wizard.LinkingParametersWizardPage;
-import org.safehaus.penrose.studio.federation.Federation;
 
 /**
  * @author Endi Sukma Dewata
@@ -16,9 +16,9 @@ public class AddNISDomainWizard extends Wizard {
     
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    NISRepositoryWizardPage repositoryPage;
-    NISDomainWizardPage     connectionPage;
-    NISPartitionsWizardPage partitionsPage;
+    NISRepositoryWizardPage     repositoryPage;
+    NISDomainWizardPage         connectionPage;
+    NISPartitionsWizardPage     partitionsPage;
     LinkingParametersWizardPage linkingPage;
 
     NISDomain repository = new NISDomain();
@@ -81,23 +81,23 @@ public class AddNISDomainWizard extends Wizard {
     public boolean performFinish() {
         try {
             repository.setName(repositoryPage.getRepositoryName());
-            
-            repository.setFullName(connectionPage.getDomain());
-            repository.setServer(connectionPage.getServer());
 
-            repository.setYpEnabled(partitionsPage.isYpEnabled());
-            repository.setYpSuffix(partitionsPage.getYpSuffix());
+            repository.setParameter(NISDomain.NIS_SERVER, connectionPage.getServer());
+            repository.setParameter(NISDomain.NIS_DOMAIN, connectionPage.getDomain());
 
-            repository.setNisEnabled(partitionsPage.isNisEnabled());
-            repository.setNisSuffix(partitionsPage.getNisSuffix());
+            repository.setParameter(NISDomain.YP_ENABLED, partitionsPage.isYpEnabled());
+            repository.setParameter(NISDomain.YP_SUFFIX, partitionsPage.getYpSuffix());
 
-            repository.setNssEnabled(partitionsPage.isNssEnabled());
-            repository.setNssSuffix(partitionsPage.getNssSuffix());
+            repository.setParameter(NISDomain.NIS_ENABLED, partitionsPage.isNisEnabled());
+            repository.setParameter(NISDomain.NIS_SUFFIX, partitionsPage.getNisSuffix());
 
-            repository.setParameter(Federation.LINKING_LOCAL_ATTRIBUTE, linkingPage.getLocalAttribute());
-            repository.setParameter(Federation.LINKING_GLOBAL_ATTRIBUTE, linkingPage.getGlobalAttribute());
-            repository.setParameter(Federation.IMPORT_MAPPING_NAME, linkingPage.getImportMappingName());
-            repository.setParameter(Federation.IMPORT_MAPPING_PREFIX, linkingPage.getImportMappingPrefix());
+            repository.setParameter(NISDomain.NSS_ENABLED, partitionsPage.isNssEnabled());
+            repository.setParameter(NISDomain.NSS_SUFFIX, partitionsPage.getNssSuffix());
+
+            repository.setParameter(Repository.LINKING_LOCAL_ATTRIBUTE, linkingPage.getLocalAttribute());
+            repository.setParameter(Repository.LINKING_GLOBAL_ATTRIBUTE, linkingPage.getGlobalAttribute());
+            repository.setParameter(Repository.IMPORT_MAPPING_NAME, linkingPage.getImportMappingName());
+            repository.setParameter(Repository.IMPORT_MAPPING_PREFIX, linkingPage.getImportMappingPrefix());
 
             return true;
 

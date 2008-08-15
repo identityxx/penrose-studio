@@ -21,8 +21,8 @@ public class NISDomainWizardPage extends WizardPage implements ModifyListener {
 
     public final static String NAME = "NIS Domain";
 
-    Text domainText;
     Text serverText;
+    Text domainText;
 
     String domain;
     String server;
@@ -30,7 +30,7 @@ public class NISDomainWizardPage extends WizardPage implements ModifyListener {
     public NISDomainWizardPage() {
         super(NAME);
 
-        setDescription("Enter NIS domain name and NIS server name.");
+        setDescription("Enter NIS server name and NIS domain name.");
     }
 
     public void createControl(final Composite parent) {
@@ -41,23 +41,23 @@ public class NISDomainWizardPage extends WizardPage implements ModifyListener {
         sectionLayout.numColumns = 2;
         composite.setLayout(sectionLayout);
 
-        Label domainLabel = new Label(composite, SWT.NONE);
-        domainLabel.setText("NIS Domain:");
-        GridData gd = new GridData();
-        gd.widthHint = 100;
-        domainLabel.setLayoutData(gd);
-
-        domainText = new Text(composite, SWT.BORDER);
-        domainText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        domainText.addModifyListener(this);
-
         Label serverLabel = new Label(composite, SWT.NONE);
         serverLabel.setText("NIS Server:");
-        serverLabel.setLayoutData(new GridData());
+        GridData gd = new GridData();
+        gd.widthHint = 100;
+        serverLabel.setLayoutData(gd);
 
         serverText = new Text(composite, SWT.BORDER);
         serverText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         serverText.addModifyListener(this);
+
+        Label domainLabel = new Label(composite, SWT.NONE);
+        domainLabel.setText("NIS Domain:");
+        domainLabel.setLayoutData(new GridData());
+
+        domainText = new Text(composite, SWT.BORDER);
+        domainText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        domainText.addModifyListener(this);
 
         refresh();
     }

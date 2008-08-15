@@ -4,7 +4,7 @@ import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -24,7 +24,7 @@ public class NISConflictsNode extends Node {
     NISNode nisNode;
     NISDomainNode domainNode;
 
-    private NISFederation nisFederation;
+    private NISFederationClient nisFederation;
 
     public NISConflictsNode(String name, NISDomainNode domainNode) {
         super(
@@ -56,11 +56,11 @@ public class NISConflictsNode extends Node {
         });
     }
 
-    public NISFederation getNisTool() {
+    public NISFederationClient getNisTool() {
         return nisFederation;
     }
 
-    public void setNisTool(NISFederation nisFederation) {
+    public void setNisTool(NISFederationClient nisFederation) {
         this.nisFederation = nisFederation;
     }
 
@@ -78,6 +78,7 @@ public class NISConflictsNode extends Node {
                 this
         );
 
+        usersNode.setProject(projectNode.getProject());
         usersNode.setNisTool(nisFederation);
         usersNode.setDomain(domainNode.getDomain());
 
@@ -90,6 +91,7 @@ public class NISConflictsNode extends Node {
                 this
         );
 
+        groupsNode.setProject(projectNode.getProject());
         groupsNode.setNisTool(nisFederation);
         groupsNode.setDomain(domainNode.getDomain());
 

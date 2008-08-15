@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.federation.nis.ldap;
+package org.safehaus.penrose.studio.federation.nis.synchronization;
 
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -13,17 +13,18 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditor;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.management.*;
-import org.safehaus.penrose.management.scheduler.JobClient;
-import org.safehaus.penrose.management.scheduler.SchedulerClient;
-import org.safehaus.penrose.management.source.SourceClient;
-import org.safehaus.penrose.management.partition.PartitionClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.scheduler.JobClient;
+import org.safehaus.penrose.scheduler.SchedulerClient;
+import org.safehaus.penrose.source.SourceClient;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.ldap.*;
 
 import java.text.DateFormat;
@@ -33,7 +34,7 @@ import java.sql.Timestamp;
 /**
  * @author Endi S. Dewata
  */
-public class NISLDAPTrackerPage extends FormPage {
+public class NISSynchronizationTrackerPage extends FormPage {
 
     public DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -42,13 +43,13 @@ public class NISLDAPTrackerPage extends FormPage {
     FormToolkit toolkit;
 
     Project project;
-    NISLDAPEditor editor;
-    NISFederation nisFederation;
+    NISSynchronizationEditor editor;
+    NISFederationClient nisFederation;
     NISDomain domain;
 
     Table trackerTable;
 
-    public NISLDAPTrackerPage(NISLDAPEditor editor) {
+    public NISSynchronizationTrackerPage(NISSynchronizationEditor editor) {
         super(editor, "TRACKER", "  Tracker  ");
 
         this.editor = editor;
@@ -124,10 +125,9 @@ public class NISLDAPTrackerPage extends FormPage {
 
                     TableItem[] items = trackerTable.getSelection();
 
-                    Project project = nisFederation.getProject();
                     PenroseClient penroseClient = project.getClient();
                     PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
+                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.YP);
                     SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
 
                     JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
@@ -175,7 +175,7 @@ public class NISLDAPTrackerPage extends FormPage {
 
             PenroseClient penroseClient = project.getClient();
             PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.YP);
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.YP);
             SourceClient tracker = partitionClient.getSourceClient("tracker");
 
             SearchRequest request = new SearchRequest();

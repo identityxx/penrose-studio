@@ -1,6 +1,6 @@
 package org.safehaus.penrose.studio.federation.event;
 
-import org.safehaus.penrose.federation.repository.Repository;
+import org.safehaus.penrose.federation.Repository;
 
 /**
  * @author Endi Sukma Dewata

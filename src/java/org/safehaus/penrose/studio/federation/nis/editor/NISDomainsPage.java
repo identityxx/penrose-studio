@@ -19,8 +19,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.studio.federation.nis.wizard.AddNISDomainWizard;
 import org.safehaus.penrose.studio.federation.nis.wizard.EditNISDomainWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -36,11 +36,11 @@ public class NISDomainsPage extends FormPage {
     FormToolkit toolkit;
 
     NISEditor editor;
-    NISFederation nisFederation;
+    NISFederationClient nisFederation;
 
     Table table;
 
-    public NISDomainsPage(NISEditor editor, NISFederation nisFederation) {
+    public NISDomainsPage(NISEditor editor, NISFederationClient nisFederation) {
         super(editor, "DOMAINS", "  Domains  ");
 
         this.editor = editor;
@@ -86,11 +86,11 @@ public class NISDomainsPage extends FormPage {
 
         tc = new TableColumn(table, SWT.NONE);
         tc.setWidth(150);
-        tc.setText("NIS Domain Name");
+        tc.setText("Server");
 
         tc = new TableColumn(table, SWT.NONE);
         tc.setWidth(250);
-        tc.setText("NIS Server");
+        tc.setText("Domain");
 
         Composite links = toolkit.createComposite(leftPanel);
         links.setLayout(new RowLayout());
@@ -135,7 +135,7 @@ public class NISDomainsPage extends FormPage {
                     NISDomain domain = wizard.getRepository();
 
                     nisFederation.addRepository(domain);
-                    nisFederation.createPartitions(domain);
+                    nisFederation.createPartitions(domain.getName());
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
@@ -213,7 +213,7 @@ public class NISDomainsPage extends FormPage {
                         NISDomain repository = (NISDomain)ti.getData();
 
                         try {
-                            nisFederation.removePartitions(repository);
+                            nisFederation.removePartitions(repository.getName());
                             nisFederation.removeRepository(repository.getName());
 
                         } catch (Exception e) {
@@ -261,8 +261,8 @@ public class NISDomainsPage extends FormPage {
                 TableItem ti = new TableItem(table, SWT.NONE);
 
                 ti.setText(0, domain.getName());
-                ti.setText(1, domain.getFullName());
-                ti.setText(2, domain.getServer());
+                ti.setText(1, domain.getParameter(NISDomain.NIS_SERVER));
+                ti.setText(2, domain.getParameter(NISDomain.NIS_DOMAIN));
 
                 ti.setData(domain);
             }

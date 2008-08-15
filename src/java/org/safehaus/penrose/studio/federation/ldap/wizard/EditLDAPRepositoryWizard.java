@@ -4,8 +4,8 @@ import org.eclipse.jface.wizard.Wizard;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.ldap.connection.LDAPConnectionWizardPage;
 import org.safehaus.penrose.studio.federation.linking.wizard.LinkingParametersWizardPage;
-import org.safehaus.penrose.studio.federation.Federation;
-import org.safehaus.penrose.federation.repository.LDAPRepository;
+import org.safehaus.penrose.federation.LDAPRepository;
+import org.safehaus.penrose.federation.Repository;
 
 /**
  * @author Endi S. Dewata
@@ -14,7 +14,8 @@ public class EditLDAPRepositoryWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    LDAPConnectionWizardPage connectionPage;
+    LDAPConnectionWizardPage    connectionPage;
+    LDAPPartitionsWizardPage    partitionsPage;
     LinkingParametersWizardPage linkingPage;
 
     LDAPRepository repository;
@@ -29,41 +30,51 @@ public class EditLDAPRepositoryWizard extends Wizard {
 
         connectionPage = new LDAPConnectionWizardPage();
 
-        connectionPage.setProviderUrl(repository.getUrl());
-        connectionPage.setBindDn(repository.getUser());
-        connectionPage.setBindPassword(repository.getPassword());
-        connectionPage.setSuffix(repository.getSuffix());
+        connectionPage.setProviderUrl(repository.getParameter(LDAPRepository.LDAP_URL));
+        connectionPage.setSuffix(repository.getParameter(LDAPRepository.LDAP_SUFFIX));
+        connectionPage.setBindDn(repository.getParameter(LDAPRepository.LDAP_USER));
+        connectionPage.setBindPassword(repository.getParameter(LDAPRepository.LDAP_PASSWORD));
 
         addPage(connectionPage);
 
+        partitionsPage = new LDAPPartitionsWizardPage();
+
+        partitionsPage.setSuffix(repository.getParameter(LDAPRepository.SUFFIX));
+        partitionsPage.setTemplate(repository.getParameter(LDAPRepository.TEMPLATE));
+
+        addPage(partitionsPage);
+
         linkingPage = new LinkingParametersWizardPage();
 
-        linkingPage.setLocalAttribute(repository.getParameter(Federation.LINKING_LOCAL_ATTRIBUTE));
-        linkingPage.setGlobalAttribute(repository.getParameter(Federation.LINKING_GLOBAL_ATTRIBUTE));
-        linkingPage.setImportMappingName(repository.getParameter(Federation.IMPORT_MAPPING_NAME));
-        linkingPage.setImportMappingPrefix(repository.getParameter(Federation.IMPORT_MAPPING_PREFIX));
+        linkingPage.setLocalAttribute(repository.getParameter(Repository.LINKING_LOCAL_ATTRIBUTE));
+        linkingPage.setGlobalAttribute(repository.getParameter(Repository.LINKING_GLOBAL_ATTRIBUTE));
+        linkingPage.setImportMappingName(repository.getParameter(Repository.IMPORT_MAPPING_NAME));
+        linkingPage.setImportMappingPrefix(repository.getParameter(Repository.IMPORT_MAPPING_PREFIX));
 
         addPage(linkingPage);
     }
 
     public boolean canFinish() {
         if (!connectionPage.isPageComplete()) return false;
+        if (!partitionsPage.isPageComplete()) return false;
         if (!linkingPage.isPageComplete()) return false;
         return true;
     }
 
     public boolean performFinish() {
         try {
-            repository.setSuffix(connectionPage.getSuffix());
+            repository.setParameter(LDAPRepository.LDAP_URL, connectionPage.getProviderUrl());
+            repository.setParameter(LDAPRepository.LDAP_SUFFIX, connectionPage.getSuffix());
+            repository.setParameter(LDAPRepository.LDAP_USER, connectionPage.getBindDn());
+            repository.setParameter(LDAPRepository.LDAP_PASSWORD, connectionPage.getBindPassword());
 
-            repository.setUrl(connectionPage.getProviderUrl());
-            repository.setUser(connectionPage.getBindDn());
-            repository.setPassword(connectionPage.getBindPassword());
+            repository.setParameter(LDAPRepository.SUFFIX, partitionsPage.getSuffix());
+            repository.setParameter(LDAPRepository.TEMPLATE, partitionsPage.getTemplate());
 
-            repository.setParameter(Federation.LINKING_LOCAL_ATTRIBUTE, linkingPage.getLocalAttribute());
-            repository.setParameter(Federation.LINKING_GLOBAL_ATTRIBUTE, linkingPage.getGlobalAttribute());
-            repository.setParameter(Federation.IMPORT_MAPPING_NAME, linkingPage.getImportMappingName());
-            repository.setParameter(Federation.IMPORT_MAPPING_PREFIX, linkingPage.getImportMappingPrefix());
+            repository.setParameter(Repository.LINKING_LOCAL_ATTRIBUTE, linkingPage.getLocalAttribute());
+            repository.setParameter(Repository.LINKING_GLOBAL_ATTRIBUTE, linkingPage.getGlobalAttribute());
+            repository.setParameter(Repository.IMPORT_MAPPING_NAME, linkingPage.getImportMappingName());
+            repository.setParameter(Repository.IMPORT_MAPPING_PREFIX, linkingPage.getImportMappingPrefix());
 
             return true;
 

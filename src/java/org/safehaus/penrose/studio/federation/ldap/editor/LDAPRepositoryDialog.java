@@ -9,7 +9,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.graphics.Point;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.federation.repository.LDAPRepository;
+import org.safehaus.penrose.federation.LDAPRepository;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 
@@ -69,16 +69,16 @@ public class LDAPRepositoryDialog extends Dialog {
     }
 
     public void reset() {
-        String url = repository.getUrl();
+        String url = repository.getParameter(LDAPRepository.LDAP_URL);
         urlText.setText(url == null ? "" : url);
 
-        String suffix = repository.getSuffix();
+        String suffix = repository.getParameter(LDAPRepository.LDAP_SUFFIX);
         suffixText.setText(suffix == null ? "" : suffix);
 
-        String user = repository.getUser();
+        String user = repository.getParameter(LDAPRepository.LDAP_USER);
         userText.setText(user == null ? "" : user);
 
-        String password = repository.getPassword();
+        String password = repository.getParameter(LDAPRepository.LDAP_PASSWORD);
         passwordText.setText(password == null ? "" : password);
     }
 
@@ -154,16 +154,16 @@ public class LDAPRepositoryDialog extends Dialog {
             public void widgetSelected(SelectionEvent e) {
 
                 String url = urlText.getText();
-                repository.setUrl("".equals(url) ? null : url);
+                repository.setParameter(LDAPRepository.LDAP_URL, "".equals(url) ? null : url);
 
                 String suffix = suffixText.getText();
-                repository.setSuffix("".equals(suffix) ? null : suffix);
+                repository.setParameter(LDAPRepository.LDAP_SUFFIX, "".equals(suffix) ? null : suffix);
 
                 String user = userText.getText();
-                repository.setUser("".equals(user) ? null : user);
+                repository.setParameter(LDAPRepository.LDAP_USER, "".equals(user) ? null : user);
 
                 String password = passwordText.getText();
-                repository.setPassword("".equals(password) ? null : password);
+                repository.setParameter(LDAPRepository.LDAP_PASSWORD, "".equals(password) ? null : password);
 
                 action = OK;
                 shell.close();

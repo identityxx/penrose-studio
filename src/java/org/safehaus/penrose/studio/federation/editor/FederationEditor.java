@@ -7,13 +7,13 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.safehaus.penrose.studio.federation.Federation;
+import org.safehaus.penrose.federation.FederationClient;
 
 public class FederationEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    Federation federation;
+    FederationClient federation;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         FederationEditorInput ei = (FederationEditorInput)input;
@@ -47,7 +47,7 @@ public class FederationEditor extends FormEditor {
         return false;
     }
 
-    public Federation getFederation() {
+    public FederationClient getFederation() {
         return federation;
     }
 }

@@ -74,7 +74,6 @@
     <target name="import" depends="init">
         <antcall target="import-common"/>
         <antcall target="import-core"/>
-        <antcall target="import-server"/>
         <antcall target="import-client"/>
     </target>
 
@@ -84,11 +83,6 @@
 
     <target name="import-core" depends="init">
         <copy todir="lib" file="../penrose-${product.specification}/core/target/penrose-${penrose.version}.jar"/>
-    </target>
-
-    <target name="import-server" depends="init">
-        <copy todir="lib" file="../penrose-${product.specification}/server/target/penrose-server-${penrose.version}.jar"/>
-        <copy todir="lib" file="../penrose-${product.specification}/services/JMX/SERVICE-INF/lib/penrose-jmx-service-${penrose.version}.jar"/>
     </target>
 
     <target name="import-client" depends="init">

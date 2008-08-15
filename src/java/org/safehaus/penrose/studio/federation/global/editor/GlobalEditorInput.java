@@ -4,7 +4,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.federation.Federation;
+import org.safehaus.penrose.federation.FederationClient;
 
 /**
  * @author Endi S. Dewata
@@ -12,7 +12,7 @@ import org.safehaus.penrose.studio.federation.Federation;
 public class GlobalEditorInput implements IEditorInput {
 
     private Project project;
-    private Federation federation;
+    private FederationClient federation;
 
     public GlobalEditorInput() {
     }
@@ -62,11 +62,11 @@ public class GlobalEditorInput implements IEditorInput {
         return true;
     }
 
-    public Federation getFederation() {
+    public FederationClient getFederation() {
         return federation;
     }
 
-    public void setFederation(Federation federation) {
+    public void setFederation(FederationClient federation) {
         this.federation = federation;
     }
 

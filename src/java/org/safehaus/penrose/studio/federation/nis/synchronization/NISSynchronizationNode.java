@@ -1,9 +1,11 @@
-package org.safehaus.penrose.studio.federation.nis.ldap;
+package org.safehaus.penrose.studio.federation.nis.synchronization;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
+import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditor;
+import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditorInput;
+import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -16,15 +18,15 @@ import org.eclipse.ui.IWorkbenchPage;
 /**
  * @author Endi S. Dewata
  */
-public class NISLDAPNode extends Node {
+public class NISSynchronizationNode extends Node {
 
     ProjectNode projectNode;
     NISNode nisNode;
     NISDomainNode domainNode;
 
-    private NISFederation nisFederation;
+    private NISFederationClient nisFederation;
 
-    public NISLDAPNode(String name, NISDomainNode domainNode) {
+    public NISSynchronizationNode(String name, NISDomainNode domainNode) {
         super(
                 name,
                 PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
@@ -55,22 +57,22 @@ public class NISLDAPNode extends Node {
 
     public void open() throws Exception {
 
-        NISLDAPEditorInput ei = new NISLDAPEditorInput();
+        NISSynchronizationEditorInput ei = new NISSynchronizationEditorInput();
         ei.setProject(projectNode.getProject());
         ei.setNisTool(nisFederation);
         ei.setDomain(domainNode.getDomain());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
-        page.openEditor(ei, NISLDAPEditor.class.getName());
+        page.openEditor(ei, NISSynchronizationEditor.class.getName());
     }
 
 
-    public NISFederation getNisTool() {
+    public NISFederationClient getNisTool() {
         return nisFederation;
     }
 
-    public void setNisTool(NISFederation nisFederation) {
+    public void setNisTool(NISFederationClient nisFederation) {
         this.nisFederation = nisFederation;
     }
 }

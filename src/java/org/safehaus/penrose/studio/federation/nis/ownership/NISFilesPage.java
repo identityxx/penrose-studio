@@ -18,18 +18,18 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.filter.OrFilter;
 import org.safehaus.penrose.filter.SimpleFilter;
 import org.safehaus.penrose.filter.AndFilter;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.studio.federation.Federation;
+import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
-import org.safehaus.penrose.management.partition.PartitionClient;
-import org.safehaus.penrose.management.source.SourceClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.source.SourceClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
 
 /**
  * @author Endi S. Dewata
@@ -48,15 +48,18 @@ public class NISFilesPage extends FormPage implements Runnable {
     Table table;
 
     NISFilesEditor editor;
+
+    Project project;
+    NISFederationClient nisFederation;
     NISDomain domain;
-    NISFederation nisFederation;
 
     public NISFilesPage(NISFilesEditor editor) {
         super(editor, "FILES", "  Files  ");
 
         this.editor = editor;
-        domain = editor.getDomain();
-        nisFederation = editor.getNisTool();
+        this.project = editor.project;
+        this.domain = editor.getDomain();
+        this.nisFederation = editor.getNisTool();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -102,10 +105,9 @@ public class NISFilesPage extends FormPage implements Runnable {
                }
            };
 
-           Project project = nisFederation.getProject();
            PenroseClient client = project.getClient();
            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-           PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
+           PartitionClient partitionClient = partitionManagerClient.getPartitionClient(FederationClient.FEDERATION);
            SourceClient sourceClient = partitionClient.getSourceClient("penrose_hosts");
 
            sourceClient.search(request, response);
@@ -292,10 +294,9 @@ public class NISFilesPage extends FormPage implements Runnable {
             }
         };
 
-        Project project = nisFederation.getProject();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(FederationClient.FEDERATION);
         SourceClient sourceClient = partitionClient.getSourceClient("penrose_files");
 
         sourceClient.search(request, response);

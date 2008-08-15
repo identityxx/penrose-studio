@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.federation.nis.ldap;
+package org.safehaus.penrose.studio.federation.nis.synchronization;
 
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -21,15 +21,15 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.federation.nis.NISFederation;
-import org.safehaus.penrose.federation.repository.NISDomain;
+import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.management.*;
-import org.safehaus.penrose.management.module.ModuleClient;
-import org.safehaus.penrose.management.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.partition.PartitionClient;
+import org.safehaus.penrose.module.ModuleClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.nis.NIS;
 
 import java.text.DateFormat;
@@ -40,7 +40,7 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * @author Endi S. Dewata
  */
-public class NISLDAPPage extends FormPage {
+public class NISSynchronizationPage extends FormPage {
 
     public DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -49,19 +49,23 @@ public class NISLDAPPage extends FormPage {
     FormToolkit toolkit;
 
     Project project;
-    NISLDAPEditor editor;
-    NISFederation nisFederation;
+    NISSynchronizationEditor editor;
+    NISFederationClient nisFederation;
     NISDomain domain;
 
     Label statusText;
     Button baseButton;
     Table table;
 
-    PartitionClient partitionClient;
-    DN suffix;
+    PartitionClient sourcePartitionClient;
+    PartitionClient targetPartitionClient;
+
+    DN sourceSuffix;
+    DN targetSuffix;
+
     ModuleClient moduleClient;
 
-    public NISLDAPPage(NISLDAPEditor editor) throws Exception {
+    public NISSynchronizationPage(NISSynchronizationEditor editor) throws Exception {
         super(editor, "Content", "  Content  ");
 
         this.editor = editor;
@@ -72,17 +76,20 @@ public class NISLDAPPage extends FormPage {
         PenroseClient penroseClient = project.getClient();
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
 
-        partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+NISFederation.NIS);
+        sourcePartitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.YP);
+        targetPartitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.NIS);
 
-        suffix = partitionClient.getSuffixes().iterator().next();
-        moduleClient = partitionClient.getModuleClient("NISLDAPSyncModule");
+        sourceSuffix = new DN(domain.getParameter(NISDomain.YP_SUFFIX));
+        targetSuffix = new DN(domain.getParameter(NISDomain.NIS_SUFFIX));
+        //targetSuffix = partitionClient.getSuffixes().iterator().next();
+        moduleClient = targetPartitionClient.getModuleClient("NISLDAPSyncModule");
     }
 
     public void createFormContent(IManagedForm managedForm) {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("NIS LDAP Server");
+        form.setText("NIS Synchronization");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
@@ -102,7 +109,6 @@ public class NISLDAPPage extends FormPage {
         contentSection.setClient(contentControl);
 
         refreshBase();
-        refresh();
     }
 
     public Composite createBaseSection(Composite parent) {
@@ -114,13 +120,19 @@ public class NISLDAPPage extends FormPage {
         leftPanel.setLayout(new GridLayout(2, false));
         leftPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Label suffixLabel = toolkit.createLabel(leftPanel, "Base DN:");
+        Label sourceLabel = toolkit.createLabel(leftPanel, "Source:");
         GridData gd = new GridData();
         gd.widthHint = 80;
-        suffixLabel.setLayoutData(gd);
+        sourceLabel.setLayoutData(gd);
 
-        Label suffixText = toolkit.createLabel(leftPanel, suffix.toString());
-        suffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Label sourceText = toolkit.createLabel(leftPanel, sourceSuffix.toString());
+        sourceText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label targetLabel = toolkit.createLabel(leftPanel, "Target:");
+        targetLabel.setLayoutData(new GridData());
+
+        Label targetText = toolkit.createLabel(leftPanel, targetSuffix.toString());
+        targetText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label statusLabel = toolkit.createLabel(leftPanel, "Status:");
         gd = new GridData();
@@ -184,8 +196,17 @@ public class NISLDAPPage extends FormPage {
 
         tc = new TableColumn(table, SWT.NONE);
         tc.setWidth(100);
-        tc.setText("Entries");
-        tc.setAlignment(SWT.RIGHT);
+        tc.setText("Source");
+
+        tc = new TableColumn(table, SWT.NONE);
+        tc.setWidth(100);
+        tc.setText("Target");
+
+        for (String mapName : NIS.mapLabels.values()) {
+            TableItem ti = new TableItem(table, SWT.NONE);
+            ti.setText(0, mapName);
+            ti.setData(mapName);
+        }
 
         Composite links = toolkit.createComposite(leftPanel);
         links.setLayout(new RowLayout());
@@ -223,17 +244,7 @@ public class NISLDAPPage extends FormPage {
                 create();
             }
         });
-/*
-        Button loadButton = new Button(rightPanel, SWT.PUSH);
-        loadButton.setText("Load");
-        loadButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        loadButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                load();
-            }
-        });
-*/
         Button clearButton = new Button(rightPanel, SWT.PUSH);
         clearButton.setText("Clear");
         clearButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -268,13 +279,23 @@ public class NISLDAPPage extends FormPage {
 
         new Label(rightPanel, SWT.NONE);
 
-        Button refreshButton = new Button(rightPanel, SWT.PUSH);
-        refreshButton.setText("Refresh");
-        refreshButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Button refreshSourceButton = new Button(rightPanel, SWT.PUSH);
+        refreshSourceButton.setText("Refresh Source");
+        refreshSourceButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        refreshButton.addSelectionListener(new SelectionAdapter() {
+        refreshSourceButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
-                refresh();
+                refreshSource();
+            }
+        });
+
+        Button refreshTargetButton = new Button(rightPanel, SWT.PUSH);
+        refreshTargetButton.setText("Refresh Target");
+        refreshTargetButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        refreshTargetButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                refreshTarget();
             }
         });
 
@@ -333,7 +354,7 @@ public class NISLDAPPage extends FormPage {
 
     public void refreshBase() {
         try {
-            partitionClient.find(suffix);
+            targetPartitionClient.find(targetSuffix);
             statusText.setText("Created");
             baseButton.setText("Remove Base");
 
@@ -360,7 +381,7 @@ public class NISLDAPPage extends FormPage {
             final Collection<String> mapNames = new ArrayList<String>();
 
             for (TableItem item : items) {
-                String mapName = (String)item.getData("mapName");
+                String mapName = (String)item.getData();
                 mapNames.add(mapName);
             }
 
@@ -400,83 +421,13 @@ public class NISLDAPPage extends FormPage {
                 }
             });
 
-            Map<String,String> statuses = refresh(mapNames);
+            Map<String,String> statuses = refreshTarget(mapNames);
 
             for (TableItem ti : items) {
-                String mapName = (String)ti.getData("mapName");
+                String mapName = (String)ti.getData();
 
                 String status = statuses.get(mapName);
-                ti.setText(1, status);
-            }
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            ErrorDialog.open(e);
-        }
-    }
-
-    public void load() {
-        try {
-            if (table.getSelectionCount() == 0) return;
-
-            boolean confirm = MessageDialog.openQuestion(
-                    editor.getSite().getShell(),
-                    "Loading LDAP Subtree",
-                    "Are you sure?"
-            );
-
-            if (!confirm) return;
-
-            TableItem[] items = table.getSelection();
-
-            final Collection<String> mapNames = new ArrayList<String>();
-
-            for (TableItem ti : items) {
-                String mapName = (String)ti.getData("mapName");
-                mapNames.add(mapName);
-            }
-
-            IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
-
-            progressService.busyCursorWhile(new IRunnableWithProgress() {
-                public void run(IProgressMonitor monitor) throws InvocationTargetException {
-                    try {
-                        monitor.beginTask("Loading LDAP...", mapNames.size() == 1 ? IProgressMonitor.UNKNOWN : mapNames.size());
-
-                        for (String mapName : mapNames) {
-                            if (monitor.isCanceled()) throw new InterruptedException();
-
-                            DN dn = getDn(mapName);
-                            monitor.subTask("Loading "+dn+"...");
-
-                            moduleClient.invoke(
-                                    "load",
-                                    new Object[] { dn },
-                                    new String[] { DN.class.getName() }
-                            );
-
-                            monitor.worked(1);
-                        }
-
-                    } catch (InterruptedException e) {
-                        // ignore
-
-                    } catch (Exception e) {
-                        throw new InvocationTargetException(e);
-
-                    } finally {
-                        monitor.done();
-                    }
-                }
-            });
-
-            Map<String,String> statuses = refresh(mapNames);
-
-            for (TableItem ti : items) {
-                String mapName = (String)ti.getData("mapName");
-
-                String status = statuses.get(mapName);
-                ti.setText(1, status);
+                ti.setText(2, status);
             }
 
         } catch (Exception e) {
@@ -502,7 +453,7 @@ public class NISLDAPPage extends FormPage {
             final Collection<String> mapNames = new ArrayList<String>();
 
             for (TableItem ti : items) {
-                String mapName = (String)ti.getData("mapName");
+                String mapName = (String)ti.getData();
                 mapNames.add(mapName);
             }
 
@@ -539,13 +490,13 @@ public class NISLDAPPage extends FormPage {
                 }
             });
 
-            Map<String,String> statuses = refresh(mapNames);
+            Map<String,String> statuses = refreshTarget(mapNames);
 
             for (TableItem ti : items) {
-                String mapName = (String)ti.getData("mapName");
+                String mapName = (String)ti.getData();
 
                 String status = statuses.get(mapName);
-                ti.setText(1, status);
+                ti.setText(2, status);
             }
 
         } catch (Exception e) {
@@ -571,7 +522,7 @@ public class NISLDAPPage extends FormPage {
             final Collection<String> mapNames = new ArrayList<String>();
 
             for (TableItem item : items) {
-                String mapName = (String)item.getData("mapName");
+                String mapName = (String)item.getData();
                 mapNames.add(mapName);
             }
 
@@ -611,13 +562,13 @@ public class NISLDAPPage extends FormPage {
                 }
             });
 
-            Map<String,String> statuses = refresh(mapNames);
+            Map<String,String> statuses = refreshTarget(mapNames);
 
             for (TableItem ti : items) {
-                String mapName = (String)ti.getData("mapName");
+                String mapName = (String)ti.getData();
 
                 String status = statuses.get(mapName);
-                ti.setText(1, status);
+                ti.setText(2, status);
             }
 
         } catch (Exception e) {
@@ -640,7 +591,7 @@ public class NISLDAPPage extends FormPage {
 
             final Collection<String> mapNames = new ArrayList<String>();
             for (TableItem ti : items) {
-                String mapName = (String)ti.getData("mapName");
+                String mapName = (String)ti.getData();
                 mapNames.add(mapName);
             }
 
@@ -682,13 +633,13 @@ public class NISLDAPPage extends FormPage {
                 }
             });
 
-            Map<String,String> statuses = refresh(mapNames);
+            Map<String,String> statuses = refreshTarget(mapNames);
 
             for (TableItem ti : items) {
-                String mapName = (String)ti.getData("mapName");
+                String mapName = (String)ti.getData();
 
                 String status = statuses.get(mapName);
-                ti.setText(1, status);
+                ti.setText(2, status);
             }
 
             if (!errors.isEmpty()) {
@@ -701,51 +652,26 @@ public class NISLDAPPage extends FormPage {
         }
     }
 
-    public void refresh() {
+    public void refreshSource() {
         try {
-            int[] indices = table.getSelectionIndices();
             TableItem[] items = table.getSelection();
+            if (items.length == 0) items = table.getItems();
 
-            final Collection<String> mapNames = new ArrayList<String>();
+            Collection<String> mapNames = new ArrayList<String>();
 
-            if (items.length == 0) {
-                for (String mapName : NIS.mapLabels.values()) {
-                    mapNames.add(mapName);
-                }
-
-                table.removeAll();
-
-            } else {
-                for (TableItem ti : items) {
-                    String mapName = (String)ti.getData("mapName");
-                    mapNames.add(mapName);
-                }
+            for (TableItem ti : items) {
+                String mapName = (String)ti.getData();
+                mapNames.add(mapName);
             }
 
-            Map<String,String> statuses = refresh(mapNames);
+            Map<String,String> statuses = refreshSource(mapNames);
 
-            if (items.length == 0) {
-                for (String mapName : mapNames) {
+            for (TableItem ti : items) {
+                String mapName = (String)ti.getData();
 
-                    String status = statuses.get(mapName);
-
-                    TableItem ti = new TableItem(table, SWT.NONE);
-                    ti.setText(0, mapName);
-                    ti.setText(1, status == null ? "" : status);
-
-                    ti.setData("mapName", mapName);
-                }
-
-            } else {
-                for (TableItem ti : items) {
-                    String mapName = (String)ti.getData("mapName");
-
-                    String status = statuses.get(mapName);
-                    ti.setText(1, status == null ? "" : status);
-                }
+                String status = statuses.get(mapName);
+                ti.setText(1, status == null ? "" : status);
             }
-
-            table.select(indices);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -753,9 +679,36 @@ public class NISLDAPPage extends FormPage {
         }
     }
 
-    public Map<String,String> refresh(final Collection<String> mapNames) throws Exception {
+    public void refreshTarget() {
+        try {
+            TableItem[] items = table.getSelection();
+            if (items.length == 0) items = table.getItems();
 
-        final Map<String,String> statuses = new TreeMap<String,String>();
+            Collection<String> mapNames = new ArrayList<String>();
+
+            for (TableItem ti : items) {
+                String mapName = (String)ti.getData();
+                mapNames.add(mapName);
+            }
+
+            Map<String,String> statuses = refreshTarget(mapNames);
+
+            for (TableItem ti : items) {
+                String mapName = (String)ti.getData();
+
+                String status = statuses.get(mapName);
+                ti.setText(2, status == null ? "" : status);
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
+        }
+    }
+
+    public Map<String,String> refreshSource(final Collection<String> mapNames) throws Exception {
+
+        final Map<String,String> statuses = new LinkedHashMap<String,String>();
 
         IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
@@ -770,7 +723,44 @@ public class NISLDAPPage extends FormPage {
 
                         monitor.subTask("Checking "+mapName+"...");
 
-                        statuses.put(mapName, getStatus(mapName));
+                        statuses.put(mapName, getSourceStatus(mapName));
+
+                        monitor.worked(1);
+                    }
+
+                } catch (InterruptedException e) {
+                    // ignore
+
+                } catch (Exception e) {
+                    throw new InvocationTargetException(e);
+
+                } finally {
+                    monitor.done();
+                }
+            }
+        });
+
+        return statuses;
+    }
+
+    public Map<String,String> refreshTarget(final Collection<String> mapNames) throws Exception {
+
+        final Map<String,String> statuses = new LinkedHashMap<String,String>();
+
+        IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+        progressService.busyCursorWhile(new IRunnableWithProgress() {
+            public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                try {
+                    monitor.beginTask("Refreshing...", mapNames.size() == 1 ? IProgressMonitor.UNKNOWN : mapNames.size());
+
+                    for (String mapName : mapNames) {
+
+                        if (monitor.isCanceled()) throw new InterruptedException();
+
+                        monitor.subTask("Checking "+mapName+"...");
+
+                        statuses.put(mapName, getTargetStatus(mapName));
 
                         monitor.worked(1);
                     }
@@ -797,25 +787,12 @@ public class NISLDAPPage extends FormPage {
 
         DNBuilder db = new DNBuilder();
         db.append(rdn);
-        db.append(suffix);
+        db.append(targetSuffix);
 
         return db.toDn();
     }
 
-    public String getStatus(String mapName) {
-/*
-        try {
-            return ""+moduleClient.invoke(
-                    "getCount",
-                    new Object[] { getDn(mapName) },
-                    new String[] { DN.class.getName() }
-            );
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return "N/A";
-        }
-*/
+    public String getSourceStatus(String mapName) {
         try {
             SearchRequest request = new SearchRequest();
             request.setDn(getDn(mapName));
@@ -824,7 +801,31 @@ public class NISLDAPPage extends FormPage {
 
             SearchResponse response = new SearchResponse();
 
-            partitionClient.search(request, response);
+            sourcePartitionClient.search(request, response);
+
+            int rc = response.waitFor();
+            if (rc != LDAP.SUCCESS) {
+                return "N/A";
+            }
+
+            return ""+(response.getTotalCount()-1);
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return "N/A";
+        }
+    }
+
+    public String getTargetStatus(String mapName) {
+        try {
+            SearchRequest request = new SearchRequest();
+            request.setDn(getDn(mapName));
+            request.setAttributes(new String[] { "dn" });
+            request.setTypesOnly(true);
+
+            SearchResponse response = new SearchResponse();
+
+            targetPartitionClient.search(request, response);
 
             int rc = response.waitFor();
             if (rc != LDAP.SUCCESS) {
