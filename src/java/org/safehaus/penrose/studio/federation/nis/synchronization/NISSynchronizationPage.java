@@ -89,7 +89,7 @@ public class NISSynchronizationPage extends FormPage {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("NIS Synchronization");
+        form.setText("Synchronization");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
