@@ -306,7 +306,7 @@ public class NISSynchronizationPage extends FormPage {
         try {
             boolean confirm = MessageDialog.openQuestion(
                     editor.getSite().getShell(),
-                    "Creating base LDAP entry",
+                    "Creating base entry",
                     "Are you sure?"
             );
 
@@ -331,7 +331,7 @@ public class NISSynchronizationPage extends FormPage {
         try {
             boolean confirm = MessageDialog.openQuestion(
                     editor.getSite().getShell(),
-                    "Removing base LDAP entry",
+                    "Removing base entry",
                     "Are you sure?"
             );
 
@@ -370,7 +370,7 @@ public class NISSynchronizationPage extends FormPage {
 
             boolean confirm = MessageDialog.openQuestion(
                     editor.getSite().getShell(),
-                    "Creating LDAP Subtree",
+                    "Creating Target Subtree",
                     "Are you sure?"
             );
 
@@ -398,7 +398,7 @@ public class NISSynchronizationPage extends FormPage {
 
                             monitor.subTask("Creating "+mapName+"...");
 
-                            DN dn = getDn(mapName);
+                            DN dn = getTargetDn(mapName);
 
                             moduleClient.invoke(
                                     "create",
@@ -442,7 +442,7 @@ public class NISSynchronizationPage extends FormPage {
 
             boolean confirm = MessageDialog.openQuestion(
                     editor.getSite().getShell(),
-                    "Clearing LDAP Subtree",
+                    "Clearing Target Subtree",
                     "Are you sure?"
             );
 
@@ -462,12 +462,12 @@ public class NISSynchronizationPage extends FormPage {
             progressService.busyCursorWhile(new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor) throws InvocationTargetException {
                     try {
-                        monitor.beginTask("Clearing LDAP...", mapNames.size() == 1 ? IProgressMonitor.UNKNOWN : mapNames.size());
+                        monitor.beginTask("Clearing...", mapNames.size() == 1 ? IProgressMonitor.UNKNOWN : mapNames.size());
 
                         for (String mapName : mapNames) {
                             if (monitor.isCanceled()) throw new InterruptedException();
 
-                            DN dn = getDn(mapName);
+                            DN dn = getTargetDn(mapName);
 
                             monitor.subTask("Clearing "+dn+"...");
 
@@ -511,7 +511,7 @@ public class NISSynchronizationPage extends FormPage {
 
             boolean confirm = MessageDialog.openQuestion(
                     editor.getSite().getShell(),
-                    "Removing LDAP Subtree",
+                    "Removing Target Subtree",
                     "Are you sure?"
             );
 
@@ -539,7 +539,7 @@ public class NISSynchronizationPage extends FormPage {
 
                             monitor.subTask("Removing "+mapName+"...");
 
-                            DN dn = getDn(mapName);
+                            DN dn = getTargetDn(mapName);
 
                             moduleClient.invoke(
                                     "remove",
@@ -581,7 +581,7 @@ public class NISSynchronizationPage extends FormPage {
         try {
             boolean confirm = MessageDialog.openQuestion(
                     editor.getSite().getShell(),
-                    "Synchronize LDAP",
+                    "Synchronize",
                     "Are you sure?"
             );
 
@@ -602,12 +602,12 @@ public class NISSynchronizationPage extends FormPage {
             progressService.busyCursorWhile(new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor) throws InvocationTargetException {
                     try {
-                        monitor.beginTask("Synchronizing LDAP...", mapNames.size() == 1 ? IProgressMonitor.UNKNOWN : mapNames.size());
+                        monitor.beginTask("Synchronizing...", mapNames.size() == 1 ? IProgressMonitor.UNKNOWN : mapNames.size());
 
                         for (String mapName : mapNames) {
                             if (monitor.isCanceled()) throw new InterruptedException();
 
-                            DN dn = getDn(mapName);
+                            DN dn = getTargetDn(mapName);
                             monitor.subTask("Synchronizing "+dn+"...");
 
                             Boolean status = (Boolean)moduleClient.invoke(
@@ -780,7 +780,19 @@ public class NISSynchronizationPage extends FormPage {
         return statuses;
     }
 
-    public DN getDn(String mapName) throws Exception {
+    public DN getSourceDn(String mapName) throws Exception {
+        RDNBuilder rb = new RDNBuilder();
+        rb.set("ou", mapName);
+        RDN rdn = rb.toRdn();
+
+        DNBuilder db = new DNBuilder();
+        db.append(rdn);
+        db.append(sourceSuffix);
+
+        return db.toDn();
+    }
+
+    public DN getTargetDn(String mapName) throws Exception {
         RDNBuilder rb = new RDNBuilder();
         rb.set("ou", mapName);
         RDN rdn = rb.toRdn();
@@ -795,7 +807,7 @@ public class NISSynchronizationPage extends FormPage {
     public String getSourceStatus(String mapName) {
         try {
             SearchRequest request = new SearchRequest();
-            request.setDn(getDn(mapName));
+            request.setDn(getSourceDn(mapName));
             request.setAttributes(new String[] { "dn" });
             request.setTypesOnly(true);
 
@@ -819,7 +831,7 @@ public class NISSynchronizationPage extends FormPage {
     public String getTargetStatus(String mapName) {
         try {
             SearchRequest request = new SearchRequest();
-            request.setDn(getDn(mapName));
+            request.setDn(getTargetDn(mapName));
             request.setAttributes(new String[] { "dn" });
             request.setTypesOnly(true);
 
