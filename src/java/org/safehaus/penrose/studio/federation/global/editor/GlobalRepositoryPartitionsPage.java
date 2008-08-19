@@ -128,6 +128,7 @@ public class GlobalRepositoryPartitionsPage extends FormPage {
                     if (!confirm) return;
 
                     federation.createPartitions(FederationClient.GLOBAL);
+                    federation.startPartitions(FederationClient.GLOBAL);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -150,6 +151,7 @@ public class GlobalRepositoryPartitionsPage extends FormPage {
 
                     if (!confirm) return;
 
+                    federation.stopPartitions(FederationClient.GLOBAL);
                     federation.removePartitions(FederationClient.GLOBAL);
 
                 } catch (Exception e) {

@@ -163,6 +163,7 @@ public class NISDomainPartitionsPage extends FormPage {
                     if (!confirm) return;
 
                     nisFederation.createNISPartition(domain.getName());
+                    nisFederation.startNISPartition(domain.getName());
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -185,6 +186,7 @@ public class NISDomainPartitionsPage extends FormPage {
 
                     if (!confirm) return;
 
+                    nisFederation.stopNISPartition(domain.getName());
                     nisFederation.removeNISPartition(domain.getName());
 
                 } catch (Exception e) {
@@ -265,6 +267,7 @@ public class NISDomainPartitionsPage extends FormPage {
                     if (!confirm) return;
 
                     nisFederation.createYPPartition(domain.getName());
+                    nisFederation.startYPPartition(domain.getName());
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -287,6 +290,7 @@ public class NISDomainPartitionsPage extends FormPage {
 
                     if (!confirm) return;
 
+                    nisFederation.stopYPPartition(domain.getName());
                     nisFederation.removeYPPartition(domain.getName());
 
                 } catch (Exception e) {
@@ -367,6 +371,7 @@ public class NISDomainPartitionsPage extends FormPage {
                     if (!confirm) return;
 
                     nisFederation.createNSSPartition(domain.getName());
+                    nisFederation.startNSSPartition(domain.getName());
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -389,6 +394,7 @@ public class NISDomainPartitionsPage extends FormPage {
 
                     if (!confirm) return;
 
+                    nisFederation.stopNSSPartition(domain.getName());
                     nisFederation.removeNSSPartition(domain.getName());
 
                 } catch (Exception e) {

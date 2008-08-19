@@ -246,6 +246,7 @@ public class FederationNode extends PluginNode {
                     monitor.subTask("Creating global partition...");
 
                     federation.createPartitions(FederationClient.GLOBAL);
+                    federation.startPartitions(FederationClient.GLOBAL);
 
                     monitor.worked(1);
 
@@ -256,6 +257,7 @@ public class FederationNode extends PluginNode {
                         monitor.subTask("Creating "+repository.getName()+" partition...");
 
                         federation.createPartitions(repository.getName());
+                        federation.startPartitions(repository.getName());
 
                         monitor.worked(1);
                     }
