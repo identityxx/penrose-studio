@@ -2,7 +2,7 @@ package org.safehaus.penrose.studio.mapping.wizard;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.mapping.MappingFieldConfig;
+import org.safehaus.penrose.mapping.MappingRuleConfig;
 import org.safehaus.penrose.mapping.Expression;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
@@ -17,7 +17,7 @@ public class AddFieldMappingWizard extends Wizard {
     public FieldValueWizardPage valuePage;
     public FieldConditionWizardPage conditionPage;
 
-    public MappingFieldConfig fieldConfig = new MappingFieldConfig();
+    public MappingRuleConfig ruleConfig = new MappingRuleConfig();
 
     public AddFieldMappingWizard() {
 
@@ -53,33 +53,33 @@ public class AddFieldMappingWizard extends Wizard {
     public boolean performFinish() {
         try {
             String fieldName = propertyPage.getFieldName();
-            fieldConfig.setName(fieldName);
+            ruleConfig.setName(fieldName);
 
             int type = valuePage.getType();
             switch (type) {
                 case FieldValueWizardPage.TEXT:
                     String text = valuePage.getText();
-                    fieldConfig.setConstant(text);
+                    ruleConfig.setConstant(text);
                     break;
                 case FieldValueWizardPage.BINARY:
                     byte[] binary = valuePage.getBinary();
-                    fieldConfig.setBinary(binary);
+                    ruleConfig.setBinary(binary);
                     break;
                 case FieldValueWizardPage.VARIABLE:
                     String variable = valuePage.getVariable();
-                    fieldConfig.setVariable(variable);
+                    ruleConfig.setVariable(variable);
                     break;
                 case FieldValueWizardPage.EXPRESSION:
                     Expression expression = valuePage.getExpression();
-                    fieldConfig.setExpression(expression);
+                    ruleConfig.setExpression(expression);
                     break;
             }
 
             boolean required = conditionPage.isRequired();
-            fieldConfig.setRequired(required);
+            ruleConfig.setRequired(required);
 
             String condition = conditionPage.getCondition();
-            fieldConfig.setCondition(condition);
+            ruleConfig.setCondition(condition);
 
             return true;
 
@@ -90,7 +90,7 @@ public class AddFieldMappingWizard extends Wizard {
         }
     }
 
-    public MappingFieldConfig getFieldConfig() {
-        return fieldConfig;
+    public MappingRuleConfig getFieldConfig() {
+        return ruleConfig;
     }
 }

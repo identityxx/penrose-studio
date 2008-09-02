@@ -32,7 +32,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.mapping.Expression;
-import org.safehaus.penrose.mapping.MappingFieldConfig;
+import org.safehaus.penrose.mapping.MappingRuleConfig;
 import org.safehaus.penrose.mapping.MappingConfig;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.mapping.wizard.AddFieldMappingWizard;
@@ -234,8 +234,8 @@ public class MappingEditorFieldsPage extends FormPage {
         dialog.setPageSize(600, 300);
         dialog.open();
 
-        MappingFieldConfig fieldMapping = wizard.getFieldConfig();
-        mappingConfig.addFieldConfig(fieldMapping);
+        MappingRuleConfig fieldMapping = wizard.getFieldConfig();
+        mappingConfig.addRuleConfig(fieldMapping);
         
         refresh();
         checkDirty();
@@ -245,7 +245,7 @@ public class MappingEditorFieldsPage extends FormPage {
         if (fieldMappings.getSelectionCount() == 0) return;
 
         TableItem ti = fieldMappings.getSelection()[0];
-        MappingFieldConfig fieldMapping = (MappingFieldConfig)ti.getData();
+        MappingRuleConfig fieldMapping = (MappingRuleConfig)ti.getData();
 
         EditFieldMappingWizard wizard = new EditFieldMappingWizard(fieldMapping);
         WizardDialog dialog = new WizardDialog(getSite().getShell(), wizard);
@@ -260,9 +260,9 @@ public class MappingEditorFieldsPage extends FormPage {
         if (fieldMappings.getSelectionCount() == 0) return;
 
         TableItem ti = fieldMappings.getSelection()[0];
-        MappingFieldConfig fieldMapping = (MappingFieldConfig)ti.getData();
+        MappingRuleConfig fieldMapping = (MappingRuleConfig)ti.getData();
 
-        mappingConfig.removeFieldConfig(fieldMapping);
+        mappingConfig.removeRuleConfig(fieldMapping);
 
         refresh();
         checkDirty();
@@ -272,13 +272,13 @@ public class MappingEditorFieldsPage extends FormPage {
         if (fieldMappings.getSelectionCount() == 0) return;
 
         TableItem ti = fieldMappings.getSelection()[0];
-        MappingFieldConfig fieldMapping = (MappingFieldConfig)ti.getData();
+        MappingRuleConfig fieldMapping = (MappingRuleConfig)ti.getData();
 
-        int i = mappingConfig.getFieldConfigIndex(fieldMapping);
+        int i = mappingConfig.getRuleConfigIndex(fieldMapping);
         if (i == 0) return;
 
-        mappingConfig.removeFieldConfig(fieldMapping);
-        mappingConfig.addFieldConfig(i-1, fieldMapping);
+        mappingConfig.removeRuleConfig(fieldMapping);
+        mappingConfig.addRuleConfig(i-1, fieldMapping);
 
         refresh();
         checkDirty();
@@ -288,13 +288,13 @@ public class MappingEditorFieldsPage extends FormPage {
         if (fieldMappings.getSelectionCount() == 0) return;
 
         TableItem ti = fieldMappings.getSelection()[0];
-        MappingFieldConfig fieldMapping = (MappingFieldConfig)ti.getData();
+        MappingRuleConfig fieldMapping = (MappingRuleConfig)ti.getData();
 
-        int i = mappingConfig.getFieldConfigIndex(fieldMapping);
-        if (i == mappingConfig.getFieldConfigs().size()-1) return;
+        int i = mappingConfig.getRuleConfigIndex(fieldMapping);
+        if (i == mappingConfig.getRuleConfigs().size()-1) return;
 
-        mappingConfig.removeFieldConfig(fieldMapping);
-        mappingConfig.addFieldConfig(i+1, fieldMapping);
+        mappingConfig.removeRuleConfig(fieldMapping);
+        mappingConfig.addRuleConfig(i+1, fieldMapping);
 
         refresh();
         checkDirty();
@@ -304,10 +304,10 @@ public class MappingEditorFieldsPage extends FormPage {
 
         fieldMappings.removeAll();
         
-        for (MappingFieldConfig fieldConfig : mappingConfig.getFieldConfigs()) {
+        for (MappingRuleConfig ruleConfig : mappingConfig.getRuleConfigs()) {
             String value;
 
-            Object constant = fieldConfig.getConstant();
+            Object constant = ruleConfig.getConstant();
             if (constant != null) {
                 if (constant instanceof byte[]) {
                     value = "(binary)";
@@ -316,23 +316,23 @@ public class MappingEditorFieldsPage extends FormPage {
                 }
 
             } else {
-                value = fieldConfig.getVariable();
+                value = ruleConfig.getVariable();
             }
 
             if (value == null) {
-                Expression expression = fieldConfig.getExpression();
+                Expression expression = ruleConfig.getExpression();
                 value = expression == null ? null : expression.getScript();
             }
 
-            boolean required = fieldConfig.isRequired();
-            String condition = fieldConfig.getCondition();
+            boolean required = ruleConfig.isRequired();
+            String condition = ruleConfig.getCondition();
 
             TableItem item = new TableItem(fieldMappings, SWT.NONE);
-            item.setText(0, fieldConfig.getName());
+            item.setText(0, ruleConfig.getName());
             item.setText(1, value == null ? "" : value);
             item.setText(2, required ? "Yes" : "");
             item.setText(3, condition == null ? "" : condition);
-            item.setData(fieldConfig);
+            item.setData(ruleConfig);
         }
     }
 
