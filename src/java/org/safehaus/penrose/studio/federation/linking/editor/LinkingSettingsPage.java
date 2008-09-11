@@ -28,6 +28,7 @@ public class LinkingSettingsPage extends FormPage {
 
     Label localAttributeText;
     Label globalAttributeText;
+    Label linkingStorageText;
 
     Label mappingNameText;
     Label mappingPrefixText;
@@ -110,6 +111,14 @@ public class LinkingSettingsPage extends FormPage {
         globalAttributeText = toolkit.createLabel(composite, "");
         globalAttributeText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+        Label linkingStorageLabel = toolkit.createLabel(composite, "Link Storage:");
+        gd = new GridData();
+        gd.widthHint = 100;
+        linkingStorageLabel.setLayoutData(gd);
+
+        linkingStorageText = toolkit.createLabel(composite, "");
+        linkingStorageText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
         return composite;
     }
 
@@ -187,6 +196,9 @@ public class LinkingSettingsPage extends FormPage {
 
                 } else if (name.equals(Repository.LINKING_GLOBAL_ATTRIBUTE)) {
                     globalAttributeText.setText(value == null ? "" : value);
+
+                } else if (name.equals(Repository.LINKING_STORAGE)) {
+                    linkingStorageText.setText(value == null ? "" : value);
 
                 } else if (name.equals(Repository.IMPORT_MAPPING_NAME)) {
                     mappingNameText.setText(value == null ? "" : value);
