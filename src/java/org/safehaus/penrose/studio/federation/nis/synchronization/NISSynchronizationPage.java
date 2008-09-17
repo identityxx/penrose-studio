@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.Federation;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.ldap.*;
@@ -82,7 +83,7 @@ public class NISSynchronizationPage extends FormPage {
         sourceSuffix = new DN(domain.getParameter(NISDomain.YP_SUFFIX));
         targetSuffix = new DN(domain.getParameter(NISDomain.NIS_SUFFIX));
         //targetSuffix = partitionClient.getSuffixes().iterator().next();
-        moduleClient = targetPartitionClient.getModuleClient("NISLDAPSyncModule");
+        moduleClient = targetPartitionClient.getModuleClient(Federation.SYNCHRONIZATION_MODULE);
     }
 
     public void createFormContent(IManagedForm managedForm) {

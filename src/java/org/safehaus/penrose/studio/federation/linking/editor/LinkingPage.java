@@ -55,37 +55,37 @@ public class LinkingPage extends FormPage {
 
     public Logger log = Logger.getLogger(getClass());
 
-    FormToolkit toolkit;
+    public FormToolkit toolkit;
 
-    Text localBaseText;
-    Text localFilterText;
-    Combo localScopeCombo;
+    public Text localBaseText;
+    public Text localFilterText;
+    public Combo localScopeCombo;
 
-    TableViewer localTableViewer;
-    Table localTable;
-    Table localAttributeTable;
+    public TableViewer localTableViewer;
+    public Table localTable;
+    public Table localAttributeTable;
 
-    Text globalBaseText;
-    Text globalFilterText;
-    Combo globalScopeCombo;
+    public Text globalBaseText;
+    public Text globalFilterText;
+    public Combo globalScopeCombo;
 
-    Table globalTable;
-    Table globalAttributeTable;
+    public Table globalTable;
+    public Table globalAttributeTable;
 
-    Project project;
-    Repository repository;
-    String partitionName;
+    public Project project;
+    public Repository repository;
+    public String partitionName;
 
-    PartitionClient localPartitionClient;
-    PartitionClient globalPartitionClient;
+    public PartitionClient localPartitionClient;
+    public PartitionClient globalPartitionClient;
 
-    ModuleClient linkingModuleClient;
+    public ModuleClient linkingModuleClient;
 
-    DN localBaseDn;
-    DN globalBaseDn;
+    public DN localBaseDn;
+    public DN globalBaseDn;
 
-    DNSorter dnSorter         = new DNSorter();
-    StatusSorter statusSorter = new StatusSorter();
+    public DNSorter dnSorter         = new DNSorter();
+    public StatusSorter statusSorter = new StatusSorter();
 
     public LinkingPage(LinkingEditor editor) throws Exception {
         super(editor, "LINKING", "  Linking  ");
@@ -271,8 +271,7 @@ public class LinkingPage extends FormPage {
                     TableItem item = localTable.getSelection()[0];
 
                     LocalData data = (LocalData)item.getData();
-                    updateAttributes(localAttributeTable, localPartitionClient, data.getEntry());
-
+                    updateLocal(data);
                     updateGlobal(data);
 
                 } catch (Exception e) {
@@ -706,7 +705,7 @@ public class LinkingPage extends FormPage {
 
                             data.setSearched(true);
 
-                            Collection<DN> list = searchLinks(data.getEntry().getDn());
+                            Collection<DN> list = searchLinks(data.getDn());
                             if (list != null && !list.isEmpty()) {
                                 data.setLinks(list);
 
@@ -777,12 +776,13 @@ public class LinkingPage extends FormPage {
         }
     }
 
-    public void updateAttributes(Table table, PartitionClient partitionClient, DN dn) throws Exception {
-        SearchResult entry = partitionClient.find(dn);
-        updateAttributes(table, partitionClient, entry);
+    public void updateLocal(LocalData data) throws Exception {
+        updateAttributes(localAttributeTable, localPartitionClient, data.getDn());
     }
 
-    public void updateAttributes(Table table, PartitionClient partitionClient, SearchResult entry) throws Exception {
+    public void updateAttributes(Table table, PartitionClient partitionClient, DN dn) throws Exception {
+
+        SearchResult entry = partitionClient.find(dn);
 
         Attributes attributes = entry.getAttributes();
         log.debug("Attributes:");
@@ -929,6 +929,9 @@ public class LinkingPage extends FormPage {
                 data.addLink(globalDn);
                 data.removeMatches();
 
+                localAttributeTable.removeAll();
+                updateLocal(data);
+
             } else {
 
                 for (TableItem item : localTable.getSelection()) {
@@ -976,11 +979,11 @@ public class LinkingPage extends FormPage {
             data.addLink(globalDn);
             data.removeMatches();
 
-            localTableViewer.refresh();
+            localAttributeTable.removeAll();
+            updateLocal(data);
 
             globalTable.removeAll();
             globalAttributeTable.removeAll();
-
             updateGlobal(data);
 
         } catch (Exception e) {
@@ -1036,15 +1039,22 @@ public class LinkingPage extends FormPage {
                 }
             }
 
-            localTableViewer.refresh();
-
-            globalTable.removeAll();
-            globalAttributeTable.removeAll();
-
             if (count == 1) {
                 TableItem item = localTable.getSelection()[0];
                 LocalData data = (LocalData)item.getData();
+
+                localTableViewer.refresh();
+                localAttributeTable.removeAll();
+                updateLocal(data);
+
+                globalTable.removeAll();
+                globalAttributeTable.removeAll();
                 updateGlobal(data);
+
+            } else {
+                localTableViewer.refresh();
+                globalTable.removeAll();
+                globalAttributeTable.removeAll();
             }
 
         } catch (Exception e) {
@@ -1106,15 +1116,23 @@ public class LinkingPage extends FormPage {
                 }
             }
 
-            localTableViewer.refresh();
-
-            globalTable.removeAll();
-            globalAttributeTable.removeAll();
 
             if (count == 1) {
                 TableItem item = localTable.getSelection()[0];
                 LocalData data = (LocalData)item.getData();
+
+                localTableViewer.refresh();
+                localAttributeTable.removeAll();
+                updateLocal(data);
+
+                globalTable.removeAll();
+                globalAttributeTable.removeAll();
                 updateGlobal(data);
+
+            } else {
+                localTableViewer.refresh();
+                globalTable.removeAll();
+                globalAttributeTable.removeAll();
             }
 
         } catch (Exception e) {
@@ -1123,12 +1141,12 @@ public class LinkingPage extends FormPage {
         }
     }
 
-    public int editEntry(LocalData data, DN dn, Attributes attributes) {
+    public int editEntry(LocalData data, DN targetDn, Attributes targetAttributes) {
         while (true) {
             EntryDialog dialog = new EntryDialog(getSite().getShell(), SWT.NONE);
             dialog.setText("Import Entry");
-            dialog.setDn(dn);
-            dialog.setAttributes(attributes);
+            dialog.setDn(targetDn);
+            dialog.setAttributes(targetAttributes);
 
             dialog.addGUIDAttribute("objectGUID");
             dialog.addGUIDAttribute("adiSeeAlsoObjectGUID");
@@ -1138,18 +1156,21 @@ public class LinkingPage extends FormPage {
             if (rc == EntryDialog.SKIP || rc == EntryDialog.CANCEL) return rc;
 
             try {
-                dn = dialog.getDn();
-                attributes = dialog.getAttributes();
-                addEntry(dn, attributes);
+                targetDn = dialog.getDn();
+                targetAttributes = dialog.getAttributes();
 
-                data.addLink(dn);
+                SearchResult targetEntry = new SearchResult(targetDn, targetAttributes);
+
+                importEntry(data.getDn(), targetEntry);
+
+                data.addLink(targetDn);
                 data.removeMatches();
 
                 break;
 
             } catch (LDAPException e) {
                 ErrorDialog.open(
-                        "Failed adding "+dn,
+                        "Failed adding "+targetDn,
                         e.getLDAPErrorMessage()
                 );
 
@@ -1255,6 +1276,18 @@ public class LinkingPage extends FormPage {
                     "importEntry",
                     new Object[] { sourceDn },
                     new String[] { DN.class.getName() }
+            );
+        } catch (MBeanException e) {
+            throw (Exception)e.getCause();
+        }
+    }
+
+    public void importEntry(DN sourceDn, SearchResult targetEntry) throws Exception {
+        try {
+            linkingModuleClient.invoke(
+                    "importEntry",
+                    new Object[] { sourceDn, targetEntry },
+                    new String[] { DN.class.getName(), SearchResult.class.getName() }
             );
         } catch (MBeanException e) {
             throw (Exception)e.getCause();
