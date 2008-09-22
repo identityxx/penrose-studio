@@ -2,11 +2,12 @@ package org.safehaus.penrose.studio.federation.linking;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.SearchResult;
 import org.safehaus.penrose.studio.federation.linking.editor.LinkingPage;
 import org.safehaus.penrose.federation.Repository;
+import org.safehaus.penrose.federation.LinkingData;
 
+import javax.management.MBeanException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class ImportTask implements IRunnableWithProgress {
     LinkingPage page;
     Repository repository;
 
-    private List<LocalData> results;
+    private List<LinkingData> results;
 
     public ImportTask(LinkingPage page, Repository repository) {
         this.page = page;
@@ -32,21 +33,26 @@ public class ImportTask implements IRunnableWithProgress {
             while (!results.isEmpty()) {
                 if (monitor.isCanceled()) throw new InterruptedException();
 
-                LocalData data = results.remove(0);
+                LinkingData data = results.remove(0);
+                SearchResult entry = data.getEntry();
 
-                DN dn = data.getDn();
+                monitor.subTask("Processing "+entry.getDn()+"...");
 
-                monitor.subTask("Processing "+dn+"...");
+                SearchResult importedEntry = page.linkingModuleClient.importEntry(entry);
 
-                DN targetDn = page.importEntry(dn);
-                data.addLink(targetDn);
-                data.removeMatches();
+                data.setSearched(false);
+                data.addLinkedEntry(importedEntry);
+                data.removeMatchedEntries();
+                page.updateLocal(data);
 
                 monitor.worked(1);
             }
 
         } catch (InterruptedException e) {
             // ignore
+
+        } catch (MBeanException e) {
+            throw new InvocationTargetException(e.getCause());
 
         } catch (Exception e) {
             throw new InvocationTargetException(e);
@@ -56,11 +62,11 @@ public class ImportTask implements IRunnableWithProgress {
         }
     }
 
-    public List<LocalData> getResults() {
+    public List<LinkingData> getResults() {
         return results;
     }
 
-    public void setResults(List<LocalData> results) {
+    public void setResults(List<LinkingData> results) {
         this.results = results;
     }
 }

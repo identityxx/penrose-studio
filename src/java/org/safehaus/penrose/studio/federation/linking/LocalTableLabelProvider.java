@@ -8,6 +8,8 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.SWT;
 import org.safehaus.penrose.ldap.DN;
+import org.safehaus.penrose.ldap.SearchResult;
+import org.safehaus.penrose.federation.LinkingData;
 
 import java.util.Collection;
 
@@ -38,13 +40,14 @@ public class LocalTableLabelProvider implements ITableLabelProvider, ITableColor
 
     public String getColumnText(Object object, int index) {
 
-        LocalData data = (LocalData)object;
+        LinkingData data = (LinkingData)object;
 
         switch (index) {
             case 0:
                 return data.getDn().toString();
             case 1:
-                return data.getStatus();
+                String status = data.getStatus();
+                return status == null ? "" : status;
         }
 
         return "";
@@ -61,13 +64,11 @@ public class LocalTableLabelProvider implements ITableLabelProvider, ITableColor
     }
 
     public Color getForeground(Object object, int index) {
-        LocalData data = (LocalData)object;
+        LinkingData data = (LinkingData)object;
 
         if (index == 0) return null;
 
-        if (!data.isSearched()) return null;
-
-        Collection<DN> links = data.getLinks();
+        Collection<SearchResult> links = data.getLinkedEntries();
 
         if (!links.isEmpty()) {
 
@@ -79,7 +80,9 @@ public class LocalTableLabelProvider implements ITableLabelProvider, ITableColor
             }
         }
 
-        Collection<DN> matches = data.getMatches();
+        if (!data.isSearched()) return null;
+
+        Collection<SearchResult> matches = data.getMatchedEntries();
 
         if (!matches.isEmpty()) {
 

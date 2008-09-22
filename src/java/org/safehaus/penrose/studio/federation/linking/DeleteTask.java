@@ -3,10 +3,11 @@ package org.safehaus.penrose.studio.federation.linking;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.safehaus.penrose.federation.Repository;
-import org.safehaus.penrose.filter.Filter;
-import org.safehaus.penrose.ldap.DN;
+import org.safehaus.penrose.federation.LinkingData;
+import org.safehaus.penrose.ldap.SearchResult;
 import org.safehaus.penrose.studio.federation.linking.editor.LinkingPage;
 
+import javax.management.MBeanException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
@@ -18,13 +19,13 @@ public class DeleteTask implements IRunnableWithProgress {
     LinkingPage page;
     Repository repository;
 
-    private LocalData data;
+    private LinkingData data;
 
     private String baseDn;
     private String filter;
     private int scope;
 
-    private Collection<DN> dns;
+    private Collection<SearchResult> globalEntries;
     
     public DeleteTask(LinkingPage page, Repository repository) {
         this.page = page;
@@ -33,29 +34,34 @@ public class DeleteTask implements IRunnableWithProgress {
 
     public void run(final IProgressMonitor monitor) throws InvocationTargetException {
         try {
-            monitor.beginTask("Deleting "+repository.getName()+"...", dns.size());
+            monitor.beginTask("Deleting "+repository.getName()+"...", globalEntries.size());
 
-            for (DN dn : dns) {
+            for (SearchResult globalEntry : globalEntries) {
                 if (monitor.isCanceled()) throw new InterruptedException();
 
-                monitor.subTask("Deleting "+dn+"...");
+                monitor.subTask("Deleting "+globalEntry+"...");
 
-                page.deleteEntry(dn);
+                page.linkingModuleClient.deleteEntry(globalEntry.getDn());
 
-                data.removeLink(dn);
-                data.removeMatch(dn);
+                data.setSearched(false);
+                data.removeLinkedEntry(globalEntry.getDn());
+                data.removeMatchedEntry(globalEntry.getDn());
+                page.updateStatus(data);
 
                 monitor.worked(1);
             }
-
+/*
             if (!data.hasLinks()) {
                 Filter f = page.createFilter(data.getEntry(), filter);
                 Collection<DN> matches = page.searchMatches(baseDn, f, scope);
                 data.setMatches(matches);
             }
-
+*/
         } catch (InterruptedException e) {
             // ignore
+
+        } catch (MBeanException e) {
+            throw new InvocationTargetException(e.getCause());
 
         } catch (Exception e) {
             throw new InvocationTargetException(e);
@@ -65,11 +71,11 @@ public class DeleteTask implements IRunnableWithProgress {
         }
     }
 
-    public LocalData getData() {
+    public LinkingData getData() {
         return data;
     }
 
-    public void setData(LocalData data) {
+    public void setData(LinkingData data) {
         this.data = data;
     }
 
@@ -97,11 +103,11 @@ public class DeleteTask implements IRunnableWithProgress {
         this.scope = scope;
     }
 
-    public Collection<DN> getDns() {
-        return dns;
+    public Collection<SearchResult> getGlobalEntries() {
+        return globalEntries;
     }
 
-    public void setDns(Collection<DN> dns) {
-        this.dns = dns;
+    public void setGlobalEntries(Collection<SearchResult> globalEntries) {
+        this.globalEntries = globalEntries;
     }
 }
