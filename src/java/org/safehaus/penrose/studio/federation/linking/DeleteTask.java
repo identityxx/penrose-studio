@@ -41,7 +41,7 @@ public class DeleteTask implements IRunnableWithProgress {
 
                 monitor.subTask("Deleting "+globalEntry+"...");
 
-                page.linkingModuleClient.deleteEntry(globalEntry.getDn());
+                page.linkingClient.deleteEntry(globalEntry.getDn());
 
                 data.setSearched(false);
                 data.removeLinkedEntry(globalEntry.getDn());

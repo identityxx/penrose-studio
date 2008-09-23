@@ -22,12 +22,9 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.progress.IProgressService;
 import org.ietf.ldap.LDAPException;
-import org.safehaus.penrose.federation.Repository;
-import org.safehaus.penrose.federation.FederationClient;
-import org.safehaus.penrose.federation.Federation;
-import org.safehaus.penrose.federation.LinkingData;
+import org.safehaus.penrose.federation.*;
 import org.safehaus.penrose.federation.module.LinkingException;
-import org.safehaus.penrose.federation.module.LinkingModuleClient;
+import org.safehaus.penrose.federation.LinkingClient;
 import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.filter.FilterTool;
 import org.safehaus.penrose.filter.SubstringFilter;
@@ -83,7 +80,7 @@ public class LinkingPage extends FormPage {
     public PartitionClient localPartitionClient;
     public PartitionClient globalPartitionClient;
 
-    public LinkingModuleClient linkingModuleClient;
+    public LinkingClient linkingClient;
 
     public DN localBaseDn;
     public DN globalBaseDn;
@@ -109,7 +106,7 @@ public class LinkingPage extends FormPage {
         localBaseDn = localPartitionClient.getSuffixes().iterator().next();
         globalBaseDn = globalPartitionClient.getSuffixes().iterator().next();
 
-        linkingModuleClient = new LinkingModuleClient(penroseClient, partitionName, Federation.LINKING_MODULE);
+        linkingClient = new LinkingClient(penroseClient, partitionName, Federation.LINKING_MODULE);
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -566,7 +563,7 @@ public class LinkingPage extends FormPage {
                     try {
                         monitor.beginTask("Searching "+ repository.getName()+"...", IProgressMonitor.UNKNOWN);
 
-                        Collection<LinkingData> list = linkingModuleClient.search(request);
+                        Collection<LinkingData> list = linkingClient.search(request);
 
                         for (LinkingData data : list) {
                             updateStatus(data);
@@ -1017,7 +1014,7 @@ public class LinkingPage extends FormPage {
                 }
 
                 SearchResult matchedEntry = matchedEntries.iterator().next();
-                linkingModuleClient.linkEntry(data.getDn(), matchedEntry.getDn());
+                linkingClient.linkEntry(data.getDn(), matchedEntry.getDn());
 
                 data.removeMatchedEntries();
                 data.removeLinkedEntries();
@@ -1050,7 +1047,7 @@ public class LinkingPage extends FormPage {
                     if (matchedEntries.isEmpty() || matchedEntries.size() > 1) continue;
 
                     SearchResult matchedEntry = matchedEntries.iterator().next();
-                    linkingModuleClient.linkEntry(data.getDn(), matchedEntry.getDn());
+                    linkingClient.linkEntry(data.getDn(), matchedEntry.getDn());
 
                     data.removeMatchedEntries();
                     data.removeLinkedEntries();
@@ -1094,7 +1091,7 @@ public class LinkingPage extends FormPage {
 
             SearchResult matchedEntry = (SearchResult)globalItem.getData();
 
-            linkingModuleClient.linkEntry(data.getDn(), matchedEntry.getDn());
+            linkingClient.linkEntry(data.getDn(), matchedEntry.getDn());
 
             data.removeMatchedEntries();
             data.removeLinkedEntries();
@@ -1153,14 +1150,14 @@ public class LinkingPage extends FormPage {
                 if (globalTable.getSelectionCount() == 0) {
 
                     for (SearchResult linkedEntry : linkedEntries) {
-                        linkingModuleClient.unlinkEntry(data.getDn(), linkedEntry.getDn());
+                        linkingClient.unlinkEntry(data.getDn(), linkedEntry.getDn());
                     }
                     data.removeLinkedEntries();
 
                 } else {
                     for (TableItem globalItem : globalTable.getSelection()) {
                         SearchResult linkedEntry = (SearchResult)globalItem.getData();
-                        linkingModuleClient.unlinkEntry(data.getDn(), linkedEntry.getDn());
+                        linkingClient.unlinkEntry(data.getDn(), linkedEntry.getDn());
 
                         data.removeLinkedEntry(linkedEntry.getDn());
                     }
@@ -1302,7 +1299,7 @@ public class LinkingPage extends FormPage {
 
                 SearchResult newEntry = new SearchResult(targetDn, targetAttributes);
 
-                newEntry = linkingModuleClient.importEntry(data.getDn(), newEntry);
+                newEntry = linkingClient.importEntry(data.getDn(), newEntry);
 
                 data.setSearched(false);
                 data.removeMatchedEntries();

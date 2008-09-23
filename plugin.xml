@@ -185,7 +185,7 @@
             class="org.safehaus.penrose.studio.federation.nis.database.NISDatabaseEditor"/>
         <editor
             id="org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditor"
-            name="NIS LDAP Server"
+            name="Synchronization"
             icon="images/object.gif"
             class="org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditor"/>
         <editor

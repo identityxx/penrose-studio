@@ -38,7 +38,7 @@ public class ImportTask implements IRunnableWithProgress {
 
                 monitor.subTask("Processing "+entry.getDn()+"...");
 
-                SearchResult importedEntry = page.linkingModuleClient.importEntry(entry);
+                SearchResult importedEntry = page.linkingClient.importEntry(entry);
 
                 data.setSearched(false);
                 data.addLinkedEntry(importedEntry);
