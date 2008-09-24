@@ -236,6 +236,28 @@ public class NISSynchronizationPage extends FormPage {
         gd.widthHint = 120;
         rightPanel.setLayoutData(gd);
 
+        Button refreshSourceButton = new Button(rightPanel, SWT.PUSH);
+        refreshSourceButton.setText("Refresh Source");
+        refreshSourceButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        refreshSourceButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                refreshSource();
+            }
+        });
+
+        Button refreshTargetButton = new Button(rightPanel, SWT.PUSH);
+        refreshTargetButton.setText("Refresh Target");
+        refreshTargetButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        refreshTargetButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                refreshTarget();
+            }
+        });
+
+        new Label(rightPanel, SWT.NONE);
+
         Button createButton = new Button(rightPanel, SWT.PUSH);
         createButton.setText("Create");
         createButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -275,28 +297,6 @@ public class NISSynchronizationPage extends FormPage {
         synchronizeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 synchronize();
-            }
-        });
-
-        new Label(rightPanel, SWT.NONE);
-
-        Button refreshSourceButton = new Button(rightPanel, SWT.PUSH);
-        refreshSourceButton.setText("Refresh Source");
-        refreshSourceButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        refreshSourceButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                refreshSource();
-            }
-        });
-
-        Button refreshTargetButton = new Button(rightPanel, SWT.PUSH);
-        refreshTargetButton.setText("Refresh Target");
-        refreshTargetButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        refreshTargetButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent selectionEvent) {
-                refreshTarget();
             }
         });
 
@@ -589,6 +589,7 @@ public class NISSynchronizationPage extends FormPage {
             if (!confirm) return;
 
             TableItem[] items = table.getSelection();
+            if (items == null || items.length == 0) items = table.getItems();
 
             final Collection<String> mapNames = new ArrayList<String>();
             for (TableItem ti : items) {

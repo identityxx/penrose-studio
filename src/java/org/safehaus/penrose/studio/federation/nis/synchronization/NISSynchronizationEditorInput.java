@@ -28,7 +28,7 @@ public class NISSynchronizationEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "NIS LDAP - "+domain.getName();
+        return "Synchronization - "+domain.getName();
     }
 
     public IPersistableElement getPersistable() {
