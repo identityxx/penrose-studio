@@ -174,16 +174,6 @@
             icon="images/object.gif"
             class="org.safehaus.penrose.studio.federation.nis.domain.NISDomainEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.federation.nis.yp.NISYPEditor"
-            name="NIS YP Server"
-            icon="images/object.gif"
-            class="org.safehaus.penrose.studio.federation.nis.yp.NISYPEditor"/>
-        <editor
-            id="org.safehaus.penrose.studio.federation.nis.database.NISDatabaseEditor"
-            name="NIS Database"
-            icon="images/object.gif"
-            class="org.safehaus.penrose.studio.federation.nis.database.NISDatabaseEditor"/>
-        <editor
             id="org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditor"
             name="Synchronization"
             icon="images/object.gif"

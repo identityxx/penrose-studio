@@ -203,10 +203,23 @@ public class NISSynchronizationPage extends FormPage {
         tc.setWidth(100);
         tc.setText("Target");
 
-        for (String mapName : NIS.mapLabels.values()) {
-            TableItem ti = new TableItem(table, SWT.NONE);
-            ti.setText(0, mapName);
-            ti.setData(mapName);
+
+        try {
+            Map<String,String> nisMapRDNs = (Map<String,String>)moduleClient.getAttribute("NisMapRDNs");
+
+            for (String nisMap : nisMapRDNs.keySet()) {
+                RDN rdn = new RDN(nisMapRDNs.get(nisMap));
+                String name = rdn.getNames().iterator().next();
+                String label = (String)rdn.get(name);
+
+                TableItem ti = new TableItem(table, SWT.NONE);
+                ti.setText(0, label);
+                ti.setData(label);
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 
         Composite links = toolkit.createComposite(leftPanel);

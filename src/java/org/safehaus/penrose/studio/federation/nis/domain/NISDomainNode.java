@@ -7,7 +7,6 @@ import org.safehaus.penrose.studio.federation.nis.ownership.NISOwnershipNode;
 import org.safehaus.penrose.studio.federation.nis.linking.NISLinkingNode;
 import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationNode;
 import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.federation.nis.database.NISDatabaseNode;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.studio.federation.nis.wizard.EditNISDomainWizard;
@@ -37,7 +36,6 @@ public class NISDomainNode extends Node {
 
     Collection<Node> children = new ArrayList<Node>();
 
-    NISDatabaseNode  databaseNode;
     NISSynchronizationNode synchronizationNode;
     NISLinkingNode   linkingNode;
     NISConflictsNode conflictsNode;
