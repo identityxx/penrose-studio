@@ -31,7 +31,6 @@ import org.safehaus.penrose.management.*;
 import org.safehaus.penrose.module.ModuleClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
-import org.safehaus.penrose.nis.NIS;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -821,8 +820,11 @@ public class NISSynchronizationPage extends FormPage {
 
     public String getSourceStatus(String mapName) {
         try {
+            DN dn = getSourceDn(mapName);
+            log.debug("Searching "+dn+".");
+
             SearchRequest request = new SearchRequest();
-            request.setDn(getSourceDn(mapName));
+            request.setDn(dn);
             request.setAttributes(new String[] { "dn" });
             request.setTypesOnly(true);
 
@@ -831,11 +833,17 @@ public class NISSynchronizationPage extends FormPage {
             sourcePartitionClient.search(request, response);
 
             int rc = response.waitFor();
-            if (rc != LDAP.SUCCESS) {
-                return "N/A";
+
+            String status;
+            if (rc == LDAP.SUCCESS) {
+                status = ""+(response.getTotalCount()-1);
+            } else {
+                status = "N/A";
             }
 
-            return ""+(response.getTotalCount()-1);
+            log.debug("Status: "+status);
+
+            return status;
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -845,8 +853,11 @@ public class NISSynchronizationPage extends FormPage {
 
     public String getTargetStatus(String mapName) {
         try {
+            DN dn = getTargetDn(mapName);
+            log.debug("Searching "+dn+".");
+
             SearchRequest request = new SearchRequest();
-            request.setDn(getTargetDn(mapName));
+            request.setDn(dn);
             request.setAttributes(new String[] { "dn" });
             request.setTypesOnly(true);
 
@@ -855,11 +866,17 @@ public class NISSynchronizationPage extends FormPage {
             targetPartitionClient.search(request, response);
 
             int rc = response.waitFor();
-            if (rc != LDAP.SUCCESS) {
-                return "N/A";
+
+            String status;
+            if (rc == LDAP.SUCCESS) {
+                status = ""+(response.getTotalCount()-1);
+            } else {
+                status = "N/A";
             }
 
-            return ""+(response.getTotalCount()-1);
+            log.debug("Status: "+status);
+            
+            return status;
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
