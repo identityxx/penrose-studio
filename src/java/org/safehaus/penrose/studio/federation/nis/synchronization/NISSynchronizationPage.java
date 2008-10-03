@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.Federation;
+import org.safehaus.penrose.federation.SynchronizationResult;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.ldap.*;
@@ -70,7 +71,7 @@ public class NISSynchronizationPage extends FormPage {
 
         this.editor = editor;
         this.project = editor.getProject();
-        this.nisFederation = editor.getNisTool();
+        this.nisFederation = editor.getNISFederationClient();
         this.domain = editor.getDomain();
 
         PenroseClient penroseClient = project.getClient();
@@ -79,9 +80,9 @@ public class NISSynchronizationPage extends FormPage {
         sourcePartitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.YP);
         targetPartitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.NIS);
 
-        sourceSuffix = new DN(domain.getParameter(NISDomain.YP_SUFFIX));
-        targetSuffix = new DN(domain.getParameter(NISDomain.NIS_SUFFIX));
-        //targetSuffix = partitionClient.getSuffixes().iterator().next();
+        sourceSuffix = sourcePartitionClient.getSuffix();
+        targetSuffix = targetPartitionClient.getSuffix();
+
         moduleClient = targetPartitionClient.getModuleClient(Federation.SYNCHRONIZATION_MODULE);
     }
 
@@ -191,17 +192,36 @@ public class NISSynchronizationPage extends FormPage {
         table.setLinesVisible(true);
 
         TableColumn tc = new TableColumn(table, SWT.NONE);
-        tc.setWidth(150);
+        tc.setWidth(100);
         tc.setText("Name");
 
         tc = new TableColumn(table, SWT.NONE);
-        tc.setWidth(100);
+        tc.setWidth(80);
         tc.setText("Source");
 
         tc = new TableColumn(table, SWT.NONE);
-        tc.setWidth(100);
+        tc.setWidth(80);
         tc.setText("Target");
 
+        tc = new TableColumn(table, SWT.NONE);
+        tc.setWidth(70);
+        tc.setText("Duration");
+
+        tc = new TableColumn(table, SWT.NONE);
+        tc.setWidth(50);
+        tc.setText("Added");
+
+        tc = new TableColumn(table, SWT.NONE);
+        tc.setWidth(60);
+        tc.setText("Modified");
+
+        tc = new TableColumn(table, SWT.NONE);
+        tc.setWidth(50);
+        tc.setText("Deleted");
+
+        tc = new TableColumn(table, SWT.NONE);
+        tc.setWidth(50);
+        tc.setText("Failed");
 
         try {
             Map<String,String> nisMapRDNs = (Map<String,String>)moduleClient.getAttribute("NisMapRDNs");
@@ -609,7 +629,8 @@ public class NISSynchronizationPage extends FormPage {
                 mapNames.add(mapName);
             }
 
-            final Collection<Boolean> errors = new ArrayList<Boolean>();
+            final Map<String,SynchronizationResult> results = new HashMap<String,SynchronizationResult>();
+            final SynchronizationResult totalResult = new SynchronizationResult();
 
             IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
@@ -624,13 +645,23 @@ public class NISSynchronizationPage extends FormPage {
                             DN dn = getTargetDn(mapName);
                             monitor.subTask("Synchronizing "+dn+"...");
 
-                            Boolean status = (Boolean)moduleClient.invoke(
+                            SynchronizationResult result = (SynchronizationResult)moduleClient.invoke(
                                     "synchronize",
                                     new Object[] { dn },
                                     new String[] { DN.class.getName() }
                             );
 
-                            if (!status) errors.add(status);
+                            log.warn("Synchronization Result:");
+                            log.warn(" - added     : "+result.getAddedEntries());
+                            log.warn(" - modified  : "+result.getModifiedEntries());
+                            log.warn(" - deleted   : "+result.getDeletedEntries());
+                            log.warn(" - unchanged : "+result.getUnchangedEntries());
+                            log.warn(" - failed    : "+result.getFailedEntries());
+                            log.warn(" - total     : "+result.getTotalEntries());
+                            log.warn(" - time      : "+result.getDuration()/1000.0+" s");
+
+                            results.put(mapName, result);
+                            totalResult.add(result);
 
                             monitor.worked(1);
                         }
@@ -654,9 +685,21 @@ public class NISSynchronizationPage extends FormPage {
 
                 String status = statuses.get(mapName);
                 ti.setText(2, status);
+
+                SynchronizationResult result = results.get(mapName);
+
+                long duration = result.getDuration()/1000;
+                long minutes = duration / 60;
+                long seconds = duration % 60;
+
+                ti.setText(3, minutes+":"+seconds);
+                ti.setText(4, ""+result.getAddedEntries());
+                ti.setText(5, ""+result.getModifiedEntries());
+                ti.setText(6, ""+result.getDeletedEntries());
+                ti.setText(7, ""+result.getFailedEntries());
             }
 
-            if (!errors.isEmpty()) {
+            if (totalResult.getFailedEntries() > 0) {
                 ErrorDialog.open("ERROR", "Error(s) occured during synchronization. See Errors tab.");
             }
 

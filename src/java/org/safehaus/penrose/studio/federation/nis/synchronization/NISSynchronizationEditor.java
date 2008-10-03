@@ -10,10 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationPage;
-import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditorInput;
-import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationChangeLogPage;
-import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationErrorsPage;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
@@ -25,13 +21,13 @@ public class NISSynchronizationEditor extends FormEditor {
     public Logger log = LoggerFactory.getLogger(getClass());
 
     Project project;
-    NISFederationClient nisFederation;
+    NISFederationClient nisFederationClient;
     NISDomain domain;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         NISSynchronizationEditorInput ei = (NISSynchronizationEditorInput)input;
         project = ei.getProject();
-        nisFederation = ei.getNisTool();
+        nisFederationClient = ei.getNisTool();
         domain = ei.getDomain();
 
         setSite(site);
@@ -80,8 +76,8 @@ public class NISSynchronizationEditor extends FormEditor {
         this.domain = domain;
     }
 
-    public NISFederationClient getNisTool() {
-        return nisFederation;
+    public NISFederationClient getNISFederationClient() {
+        return nisFederationClient;
     }
 
     public Project getProject() {

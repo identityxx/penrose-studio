@@ -54,7 +54,7 @@ public class NISSynchronizationTrackerPage extends FormPage {
 
         this.editor = editor;
         this.project = editor.getProject();
-        this.nisFederation = editor.getNisTool();
+        this.nisFederation = editor.getNISFederationClient();
         this.domain = editor.getDomain();
     }
 
