@@ -32,6 +32,7 @@ import org.safehaus.penrose.management.*;
 import org.safehaus.penrose.module.ModuleClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.source.SourceClient;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -61,6 +62,9 @@ public class NISSynchronizationPage extends FormPage {
     PartitionClient sourcePartitionClient;
     PartitionClient targetPartitionClient;
 
+    SourceClient sourceClient;
+    SourceClient targetClient;
+
     DN sourceSuffix;
     DN targetSuffix;
 
@@ -80,8 +84,11 @@ public class NISSynchronizationPage extends FormPage {
         sourcePartitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.YP);
         targetPartitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.NIS);
 
-        sourceSuffix = sourcePartitionClient.getSuffix();
-        targetSuffix = targetPartitionClient.getSuffix();
+        sourceClient  = sourcePartitionClient.getSourceClient("LDAP");
+        targetClient  = targetPartitionClient.getSourceClient("LDAP");
+
+        sourceSuffix = new DN(sourceClient.getParameter("baseDn"));
+        targetSuffix = new DN(targetClient.getParameter("baseDn"));
 
         moduleClient = targetPartitionClient.getModuleClient(Federation.SYNCHRONIZATION_MODULE);
     }
@@ -387,7 +394,7 @@ public class NISSynchronizationPage extends FormPage {
 
     public void refreshBase() {
         try {
-            targetPartitionClient.find(targetSuffix);
+            targetClient.find(targetSuffix);
             statusText.setText("Created");
             baseButton.setText("Remove Base");
 
@@ -873,7 +880,7 @@ public class NISSynchronizationPage extends FormPage {
 
             SearchResponse response = new SearchResponse();
 
-            sourcePartitionClient.search(request, response);
+            sourceClient.search(request, response);
 
             int rc = response.waitFor();
 
@@ -906,7 +913,7 @@ public class NISSynchronizationPage extends FormPage {
 
             SearchResponse response = new SearchResponse();
 
-            targetPartitionClient.search(request, response);
+            targetClient.search(request, response);
 
             int rc = response.waitFor();
 
