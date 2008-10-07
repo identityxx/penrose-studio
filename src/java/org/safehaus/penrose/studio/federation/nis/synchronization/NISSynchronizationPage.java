@@ -87,8 +87,8 @@ public class NISSynchronizationPage extends FormPage {
         sourceClient  = sourcePartitionClient.getSourceClient("LDAP");
         targetClient  = targetPartitionClient.getSourceClient("LDAP");
 
-        sourceSuffix = new DN(sourceClient.getParameter("baseDn"));
-        targetSuffix = new DN(targetClient.getParameter("baseDn"));
+        sourceSuffix = (DN)sourceClient.getAttribute("BaseDn");
+        targetSuffix = (DN)targetClient.getAttribute("BaseDn");
 
         moduleClient = targetPartitionClient.getModuleClient(Federation.SYNCHRONIZATION_MODULE);
     }
