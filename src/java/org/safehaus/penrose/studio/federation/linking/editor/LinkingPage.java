@@ -39,6 +39,7 @@ import org.safehaus.penrose.studio.federation.wizard.BrowserWizard;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.util.ActiveDirectoryUtil;
 import org.safehaus.penrose.util.BinaryUtil;
+import org.safehaus.penrose.source.SourceClient;
 
 import javax.management.MBeanException;
 import java.lang.reflect.InvocationTargetException;
@@ -80,6 +81,9 @@ public class LinkingPage extends FormPage {
     public PartitionClient localPartitionClient;
     public PartitionClient globalPartitionClient;
 
+    public SourceClient localSourceClient;
+    public SourceClient globalSourceClient;
+
     public LinkingClient linkingClient;
 
     public DN localBaseDn;
@@ -103,8 +107,14 @@ public class LinkingPage extends FormPage {
         localPartitionClient = partitionManagerClient.getPartitionClient(partitionName);
         globalPartitionClient = partitionManagerClient.getPartitionClient(FederationClient.GLOBAL);
 
-        localBaseDn = localPartitionClient.getSuffixes().iterator().next();
-        globalBaseDn = globalPartitionClient.getSuffixes().iterator().next();
+        localSourceClient = localPartitionClient.getSourceClient("LDAP");
+        globalSourceClient = globalPartitionClient.getSourceClient("LDAP");
+
+        //localBaseDn = localPartitionClient.getSuffix();
+        localBaseDn = new DN(localSourceClient.getParameter("baseDn"));
+
+        //globalBaseDn = globalPartitionClient.getSuffix();
+        globalBaseDn = new DN(globalSourceClient.getParameter("baseDn"));
 
         linkingClient = new LinkingClient(penroseClient, partitionName, Federation.LINKING_MODULE);
     }
@@ -712,7 +722,8 @@ public class LinkingPage extends FormPage {
 
     public void updateLocal(LinkingData data) throws Exception {
         try {
-            SearchResult entry = localPartitionClient.find(data.getDn());
+            //SearchResult entry = localPartitionClient.find(data.getDn());
+            SearchResult entry = localSourceClient.find(data.getDn());
             data.setEntry(entry);
             updateStatus(data);
 
@@ -832,7 +843,8 @@ public class LinkingPage extends FormPage {
 
         SearchResponse response = new SearchResponse();
 
-        globalPartitionClient.search(request, response);
+        //globalPartitionClient.search(request, response);
+        globalSourceClient.search(request, response);
 
         Collection<SearchResult> results = new ArrayList<SearchResult>();
 
@@ -849,7 +861,8 @@ public class LinkingPage extends FormPage {
             BrowserWizard wizard = new BrowserWizard();
             wizard.setBaseDn(localBaseDn);
             wizard.setDn(localBaseText.getText());
-            wizard.setPartitionClient(localPartitionClient);
+            //wizard.setPartitionClient(localPartitionClient);
+            wizard.setSourceClient(localSourceClient);
 
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
@@ -870,7 +883,8 @@ public class LinkingPage extends FormPage {
             BrowserWizard wizard = new BrowserWizard();
             wizard.setBaseDn(globalBaseDn);
             wizard.setDn(globalBaseText.getText());
-            wizard.setPartitionClient(globalPartitionClient);
+            //wizard.setPartitionClient(globalPartitionClient);
+            wizard.setSourceClient(globalSourceClient);
 
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
@@ -1020,12 +1034,14 @@ public class LinkingPage extends FormPage {
                 data.removeLinkedEntries();
 
                 if (LinkingData.LOCAL_STORAGE == data.getStorage()) {
-                    SearchResult entry = localPartitionClient.find(data.getDn());
+                    //SearchResult entry = localPartitionClient.find(data.getDn());
+                    SearchResult entry = localSourceClient.find(data.getDn());
                     data.setEntry(entry);
                     data.addLinkedEntry(matchedEntry);
 
                 } else {
-                    SearchResult linkedEntry = globalPartitionClient.find(matchedEntry.getDn());
+                    //SearchResult linkedEntry = globalPartitionClient.find(matchedEntry.getDn());
+                    SearchResult linkedEntry = globalSourceClient.find(matchedEntry.getDn());
                     data.addLinkedEntry(linkedEntry);
                 }
 
@@ -1053,12 +1069,14 @@ public class LinkingPage extends FormPage {
                     data.removeLinkedEntries();
 
                     if (LinkingData.LOCAL_STORAGE == data.getStorage()) {
-                        SearchResult entry = localPartitionClient.find(data.getDn());
+                        //SearchResult entry = localPartitionClient.find(data.getDn());
+                        SearchResult entry = localSourceClient.find(data.getDn());
                         data.setEntry(entry);
                         data.addLinkedEntry(matchedEntry);
 
                     } else {
-                        SearchResult linkedEntry = globalPartitionClient.find(matchedEntry.getDn());
+                        //SearchResult linkedEntry = globalPartitionClient.find(matchedEntry.getDn());
+                        SearchResult linkedEntry = globalSourceClient.find(matchedEntry.getDn());
                         data.addLinkedEntry(linkedEntry);
                     }
 
@@ -1097,12 +1115,14 @@ public class LinkingPage extends FormPage {
             data.removeLinkedEntries();
 
             if (LinkingData.LOCAL_STORAGE == data.getStorage()) {
-                SearchResult entry = localPartitionClient.find(data.getDn());
+                //SearchResult entry = localPartitionClient.find(data.getDn());
+                SearchResult entry = localSourceClient.find(data.getDn());
                 data.setEntry(entry);
                 data.addLinkedEntry(matchedEntry);
 
             } else {
-                SearchResult linkedEntry = globalPartitionClient.find(matchedEntry.getDn());
+                //SearchResult linkedEntry = globalPartitionClient.find(matchedEntry.getDn());
+                SearchResult linkedEntry = globalSourceClient.find(matchedEntry.getDn());
                 data.addLinkedEntry(linkedEntry);
             }
 
@@ -1164,7 +1184,8 @@ public class LinkingPage extends FormPage {
                 }
 
                 if (LinkingData.LOCAL_STORAGE == data.getStorage()) {
-                    SearchResult entry = localPartitionClient.find(data.getDn());
+                    //SearchResult entry = localPartitionClient.find(data.getDn());
+                    SearchResult entry = localSourceClient.find(data.getDn());
                     data.setEntry(entry);
                 }
 

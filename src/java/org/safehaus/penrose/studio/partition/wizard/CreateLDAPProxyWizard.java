@@ -113,7 +113,9 @@ public class CreateLDAPProxyWizard extends Wizard {
 
             //SourceConfigManager sourceConfigManager = partitionConfig.getSourceConfigManager();
 
-            SourceConfig sourceConfig = new SourceConfig(partitionName, partitionName);
+            SourceConfig sourceConfig = new SourceConfig();
+            sourceConfig.setName(partitionName);
+            sourceConfig.setConnectionName(partitionName);
             sourceConfig.setParameter("baseDn", connectionInfoPage.getSuffix());
             sourceConfig.setParameter("scope", "SUBTREE");
             sourceConfig.setParameter("filter", "(objectClass=*)");

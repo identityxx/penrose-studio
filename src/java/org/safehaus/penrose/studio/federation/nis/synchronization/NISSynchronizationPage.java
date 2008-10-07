@@ -216,7 +216,7 @@ public class NISSynchronizationPage extends FormPage {
         tc.setText("Modified");
 
         tc = new TableColumn(table, SWT.NONE);
-        tc.setWidth(50);
+        tc.setWidth(60);
         tc.setText("Deleted");
 
         tc = new TableColumn(table, SWT.NONE);

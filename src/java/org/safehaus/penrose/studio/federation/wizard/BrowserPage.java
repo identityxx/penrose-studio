@@ -12,6 +12,7 @@ import org.eclipse.swt.layout.GridData;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.source.SourceClient;
 
 /**
  * @author Endi Sukma Dewata
@@ -27,6 +28,7 @@ public class BrowserPage extends WizardPage {
 
     private DN baseDn;
     private PartitionClient partitionClient;
+    private SourceClient sourceClient;
 
     DN dn;
 
@@ -101,7 +103,8 @@ public class BrowserPage extends WizardPage {
 
         SearchResponse response = new SearchResponse();
 
-        response = partitionClient.search(request, response);
+        //response = partitionClient.search(request, response);
+        response = sourceClient.search(request, response);
 
         while (response.hasNext()) {
             SearchResult result = response.next();
@@ -129,6 +132,14 @@ public class BrowserPage extends WizardPage {
 
     public void setPartitionClient(PartitionClient partitionClient) {
         this.partitionClient = partitionClient;
+    }
+
+    public SourceClient getSourceClient() {
+        return sourceClient;
+    }
+
+    public void setSourceClient(SourceClient sourceClient) {
+        this.sourceClient = sourceClient;
     }
 
     public String getDn() {

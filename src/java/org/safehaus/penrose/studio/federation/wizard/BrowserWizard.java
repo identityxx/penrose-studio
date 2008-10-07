@@ -4,6 +4,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.ldap.DN;
+import org.safehaus.penrose.source.SourceClient;
 
 /**
  * @author Endi Sukma Dewata
@@ -14,6 +15,7 @@ public class BrowserWizard extends Wizard {
 
     private DN baseDn;
     private PartitionClient partitionClient;
+    private SourceClient sourceClient;
 
     BrowserPage browserPage;
 
@@ -26,7 +28,8 @@ public class BrowserWizard extends Wizard {
     public void addPages() {
         browserPage = new BrowserPage();
         browserPage.setBaseDn(baseDn);
-        browserPage.setPartitionClient(partitionClient);
+        //browserPage.setPartitionClient(partitionClient);
+        browserPage.setSourceClient(sourceClient);
         browserPage.setDn(dn);
         addPage(browserPage);
     }
@@ -56,6 +59,14 @@ public class BrowserWizard extends Wizard {
 
     public void setPartitionClient(PartitionClient partitionClient) {
         this.partitionClient = partitionClient;
+    }
+
+    public SourceClient getSourceClient() {
+        return sourceClient;
+    }
+
+    public void setSourceClient(SourceClient sourceClient) {
+        this.sourceClient = sourceClient;
     }
 
     public String getDn() {
