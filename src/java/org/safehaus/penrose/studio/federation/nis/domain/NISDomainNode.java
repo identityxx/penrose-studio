@@ -7,10 +7,12 @@ import org.safehaus.penrose.studio.federation.nis.ownership.NISOwnershipNode;
 import org.safehaus.penrose.studio.federation.nis.linking.NISLinkingNode;
 import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationNode;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.studio.federation.nis.wizard.EditNISDomainWizard;
 import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
@@ -28,11 +30,11 @@ import java.util.ArrayList;
  */
 public class NISDomainNode extends Node {
 
-    private ProjectNode projectNode;
     private NISNode nisNode;
 
+    Project project;
     private NISFederationClient nisFederation;
-    private NISDomain domain;
+    private FederationRepositoryConfig domain;
 
     Collection<Node> children = new ArrayList<Node>();
 
@@ -41,7 +43,7 @@ public class NISDomainNode extends Node {
     NISConflictsNode conflictsNode;
     NISOwnershipNode ownershipNode;
 
-    public NISDomainNode(String name, NISDomain domain, NISNode nisNode) {
+    public NISDomainNode(String name, FederationRepositoryConfig domain, NISNode nisNode) {
         super(
                 name,
                 PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
@@ -53,38 +55,35 @@ public class NISDomainNode extends Node {
         this.nisNode = nisNode;
 
         nisFederation = nisNode.getNisFederation();
-        projectNode = nisNode.getProjectNode();
+        project = nisNode.getProject();
 
-        if (domain.getBooleanParameter(NISDomain.NIS_ENABLED)) {
+        synchronizationNode = new NISSynchronizationNode(
+                "Synchronization",
+                this
+        );
 
-            synchronizationNode = new NISSynchronizationNode(
-                    "Synchronization",
-                    this
-            );
+        children.add(synchronizationNode);
 
-            children.add(synchronizationNode);
+        linkingNode = new NISLinkingNode(
+                "Identity Linking",
+                this
+        );
 
-            linkingNode = new NISLinkingNode(
-                    "Identity Linking",
-                    this
-            );
+        children.add(linkingNode);
 
-            children.add(linkingNode);
+        conflictsNode = new NISConflictsNode(
+                "Conflict Resolution",
+                this
+        );
 
-            conflictsNode = new NISConflictsNode(
-                    "Conflict Resolution",
-                    this
-            );
+        children.add(conflictsNode);
 
-            children.add(conflictsNode);
+        ownershipNode = new NISOwnershipNode(
+                "Ownership Alignment",
+                this
+        );
 
-            ownershipNode = new NISOwnershipNode(
-                    "Ownership Alignment",
-                    this
-            );
-
-            children.add(ownershipNode);
-        }
+        children.add(ownershipNode);
 
 /*
         consolidationNode = new NISConsolidationNode(
@@ -126,7 +125,7 @@ public class NISDomainNode extends Node {
     public void open() throws Exception {
 
         NISDomainEditorInput ei = new NISDomainEditorInput();
-        ei.setProject(projectNode.getProject());
+        ei.setProject(project);
         ei.setNisFederation(nisFederation);
         ei.setDomain(domain);
 
@@ -148,11 +147,11 @@ public class NISDomainNode extends Node {
         nisFederation.updateRepository(domain);
     }
 
-    public NISDomain getDomain() {
+    public FederationRepositoryConfig getDomain() {
         return domain;
     }
 
-    public void setDomain(NISDomain domain) {
+    public void setDomain(FederationRepositoryConfig domain) {
         this.domain = domain;
     }
 
@@ -180,11 +179,11 @@ public class NISDomainNode extends Node {
         return children;
     }
 
-    public ProjectNode getProjectNode() {
-        return projectNode;
+    public Project getProject() {
+        return project;
     }
 
-    public void setProjectNode(ProjectNode projectNode) {
-        this.projectNode = projectNode;
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

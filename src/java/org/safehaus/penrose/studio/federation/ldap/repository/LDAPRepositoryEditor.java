@@ -5,8 +5,8 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
-import org.safehaus.penrose.federation.LDAPRepository;
 import org.safehaus.penrose.federation.LDAPFederationClient;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.federation.linking.editor.LinkingSettingsPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.slf4j.Logger;
@@ -18,7 +18,7 @@ public class LDAPRepositoryEditor extends FormEditor {
 
     Project project;
     LDAPFederationClient ldapFederation;
-    LDAPRepository repository;
+    FederationRepositoryConfig repository;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         LDAPRepositoryEditorInput ei = (LDAPRepositoryEditorInput)input;
@@ -34,8 +34,6 @@ public class LDAPRepositoryEditor extends FormEditor {
     public void addPages() {
         try {
             addPage(new LDAPRepositorySettingsPage(this));
-            addPage(new LDAPRepositoryPartitionsPage(this));
-            addPage(new LinkingSettingsPage(this, repository));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -56,11 +54,11 @@ public class LDAPRepositoryEditor extends FormEditor {
         return false;
     }
 
-    public LDAPRepository getRepository() {
+    public FederationRepositoryConfig getRepository() {
         return repository;
     }
 
-    public void setRepository(LDAPRepository repository) {
+    public void setRepository(FederationRepositoryConfig repository) {
         this.repository = repository;
     }
 

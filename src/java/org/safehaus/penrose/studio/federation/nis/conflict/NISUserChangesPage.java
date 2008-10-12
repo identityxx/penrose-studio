@@ -13,11 +13,11 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.source.SourceClient;
@@ -48,7 +48,7 @@ public class NISUserChangesPage extends FormPage {
 
     Project project;
     NISFederationClient nisFederation;
-    NISDomain domain;
+    FederationRepositoryConfig domain;
 
     String title;
 
@@ -61,7 +61,7 @@ public class NISUserChangesPage extends FormPage {
         this.nisFederation = nisFederation;
     }
 
-    public NISUserChangesPage(NISUsersEditor editor, NISDomain domain, NISFederationClient nisFederation) throws Exception {
+    public NISUserChangesPage(NISUsersEditor editor, FederationRepositoryConfig domain, NISFederationClient nisFederation) throws Exception {
         super(editor, "CHANGES", "  Changes ");
         title = "Changes";
 

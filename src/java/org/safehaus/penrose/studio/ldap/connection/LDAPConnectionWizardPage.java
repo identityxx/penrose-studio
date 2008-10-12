@@ -300,24 +300,31 @@ public class LDAPConnectionWizardPage extends WizardPage implements ModifyListen
     }
 
     public String getProviderUrl() {
+
+        if (urlList.getItemCount() == 0) return null;
+
         StringBuilder sb = new StringBuilder();
         for (String url : urlList.getItems()) {
             if (sb.length() > 0) sb.append(" ");
             sb.append(url);
         }
+
         return sb.toString();
     }
 
     public String getSuffix() {
-        return suffixCombo.getText();
+        String s = suffixCombo.getText();
+        return "".equals(s) ? null : s;
     }
 
     public String getBindDn() {
-        return bindDnText.getText();
+        String s = bindDnText.getText();
+        return "".equals(s) ? null : s;
     }
 
     public String getBindPassword() {
-        return bindPasswordText.getText();
+        String s = bindPasswordText.getText();
+        return "".equals(s) ? null : s;
     }
 
     public String getURL() {

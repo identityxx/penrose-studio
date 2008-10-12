@@ -16,6 +16,7 @@ import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISHostDialog;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISFilesEditor;
 import org.safehaus.penrose.studio.nis.dialog.NISUserDialog;
@@ -45,7 +46,7 @@ public class NISHostsPage extends FormPage {
 
     Project project;
     NISFederationClient nisFederation;
-    NISDomain domain;
+    FederationRepositoryConfig domain;
 
     Table hostsTable;
 

@@ -22,9 +22,9 @@ import org.safehaus.penrose.ldap.SearchResult;
 import org.safehaus.penrose.ldap.SearchResponse;
 import org.safehaus.penrose.ldap.Attributes;
 //import org.safehaus.penrose.agent.client.FindClient;
-import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
@@ -55,7 +55,7 @@ public class NISScriptsPage extends FormPage {
 
     Project project;
     NISFederationClient nisFederation;
-    NISDomain domain;
+    FederationRepositoryConfig domain;
 
     Map<String,String> actions = new LinkedHashMap<String,String>();
 

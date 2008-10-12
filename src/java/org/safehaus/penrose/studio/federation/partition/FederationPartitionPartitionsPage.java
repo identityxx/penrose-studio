@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.federation.ldap.editor;
+package org.safehaus.penrose.studio.federation.partition;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -17,8 +17,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.safehaus.penrose.federation.LDAPRepository;
-import org.safehaus.penrose.federation.LDAPFederationClient;
+import org.safehaus.penrose.federation.FederationClient;
+import org.safehaus.penrose.federation.FederationPartitionConfig;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
@@ -29,24 +29,24 @@ import org.safehaus.penrose.studio.project.Project;
 /**
  * @author Endi S. Dewata
  */
-public class LDAPPartitionsPage extends FormPage {
+public class FederationPartitionPartitionsPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
     FormToolkit toolkit;
 
-    LDAPEditor editor;
+    FederationPartitionEditor editor;
     Project project;
-    LDAPFederationClient ldapFederation;
+    FederationClient federationClient;
 
     Table table;
 
-    public LDAPPartitionsPage(LDAPEditor editor, LDAPFederationClient ldapFederation) {
+    public FederationPartitionPartitionsPage(FederationPartitionEditor editor) {
         super(editor, "PARTITONS", "  Partitions  ");
 
         this.editor = editor;
         this.project = editor.project;
-        this.ldapFederation = ldapFederation;
+        this.federationClient = editor.getFederationClient();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -83,7 +83,7 @@ public class LDAPPartitionsPage extends FormPage {
         table.setLinesVisible(true);
 
         TableColumn tc = new TableColumn(table, SWT.NONE);
-        tc.setWidth(100);
+        tc.setWidth(150);
         tc.setText("Name");
 
         tc = new TableColumn(table, SWT.NONE);
@@ -128,7 +128,7 @@ public class LDAPPartitionsPage extends FormPage {
 
                     boolean confirm = MessageDialog.openQuestion(
                             editor.getSite().getShell(),
-                            "Creating Partition",
+                            "Creating Partitions",
                             "Are you sure?"
                     );
 
@@ -137,9 +137,9 @@ public class LDAPPartitionsPage extends FormPage {
                     TableItem[] items = table.getSelection();
 
                     for (TableItem ti : items) {
-                        LDAPRepository repository = (LDAPRepository)ti.getData();
+                        FederationPartitionConfig partitionConfig = (FederationPartitionConfig)ti.getData();
 
-                        ldapFederation.createPartitions(repository.getName());
+                        federationClient.createPartition(partitionConfig.getName());
                     }
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -165,7 +165,7 @@ public class LDAPPartitionsPage extends FormPage {
 
                     boolean confirm = MessageDialog.openQuestion(
                             editor.getSite().getShell(),
-                            "Removing Partition",
+                            "Removing Partitions",
                             "Are you sure?"
                     );
 
@@ -174,9 +174,9 @@ public class LDAPPartitionsPage extends FormPage {
                     TableItem[] items = table.getSelection();
 
                     for (TableItem ti : items) {
-                        LDAPRepository repository = (LDAPRepository)ti.getData();
+                        FederationPartitionConfig partitionConfig = (FederationPartitionConfig)ti.getData();
 
-                        ldapFederation.removePartitions(repository.getName());
+                        federationClient.removePartition(partitionConfig.getName());
                     }
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -215,13 +215,14 @@ public class LDAPPartitionsPage extends FormPage {
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 
-            for (LDAPRepository repository : ldapFederation.getRepositories()) {
+            for (FederationPartitionConfig partitionConfig : federationClient.getPartitions()) {
 
                 TableItem ti = new TableItem(table, SWT.NONE);
-                ti.setData(repository);
-                ti.setText(0, repository.getName());
+                ti.setData(partitionConfig);
 
-                PartitionClient partitionClient = partitionManagerClient.getPartitionClient(repository.getName());
+                ti.setText(0, partitionConfig.getName());
+
+                PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionConfig.getName());
                 ti.setText(1, partitionClient.exists() ? "OK" : "Missing");
             }
 

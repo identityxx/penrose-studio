@@ -4,8 +4,8 @@ import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.federation.FederationNode;
+import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.federation.FederationPartitionNode;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.federation.*;
@@ -15,8 +15,11 @@ import org.safehaus.penrose.studio.federation.nis.ownership.NISOwnershipNode;
 import org.safehaus.penrose.studio.federation.nis.linking.NISLinkingNode;
 import org.safehaus.penrose.studio.federation.nis.conflict.NISConflictsNode;
 import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
+import org.safehaus.penrose.studio.federation.nis.wizard.AddNISDomainWizard;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchPage;
@@ -29,22 +32,22 @@ import java.util.ArrayList;
  */
 public class NISNode extends Node {
 
-    private ProjectNode projectNode;
-    private FederationNode federationNode;
+    private FederationPartitionNode federationPartitionNode;
 
+    Project project;
     NISFederationClient nisFederation;
 
     NISLinkingNode linkingNode;
     NISConflictsNode conflictsNode;
     NISOwnershipNode ownershipNode;
 
-    public NISNode(String name, FederationNode federationNode) throws Exception {
-        super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), null, federationNode);
+    public NISNode(String name, FederationPartitionNode federationPartitionNode) throws Exception {
+        super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), null, federationPartitionNode);
 
-        this.federationNode = federationNode;
-        this.projectNode = federationNode.getProjectNode();
+        this.federationPartitionNode = federationPartitionNode;
+        this.project = federationPartitionNode.getProject();
 
-        nisFederation = new NISFederationClient(federationNode.getFederation());
+        nisFederation = new NISFederationClient(federationPartitionNode.getFederationClient());
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -58,13 +61,23 @@ public class NISNode extends Node {
                 }
             }
         });
+
+        manager.add(new Action("New NIS Repository...") {
+            public void run() {
+                try {
+                    addNisDomain();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
     }
 
     public void open() throws Exception {
 
         NISEditorInput ei = new NISEditorInput();
-        ei.setProject(projectNode.getProject());
-        ei.setNisTool(nisFederation);
+        ei.setProject(project);
+        ei.setNISFederation(nisFederation);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -74,21 +87,40 @@ public class NISNode extends Node {
         penroseStudio.notifyChangeListeners();
     }
 
+    public void addNisDomain() throws Exception {
+
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+
+        AddNISDomainWizard wizard = new AddNISDomainWizard();
+        WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
+        dialog.setPageSize(600, 300);
+
+        if (dialog.open() == Window.CANCEL) return;
+
+        FederationRepositoryConfig domain = wizard.getRepository();
+
+        nisFederation.addRepository(domain);
+        nisFederation.createPartitions(domain.getName());
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
+    }
+
     public boolean hasChildren() throws Exception {
-        FederationClient federation = federationNode.getFederation();
-        Collection<Repository> children = federation.getRepositories("NIS");
-        return !children.isEmpty();
+        //FederationClient federation = federationPartitionNode.getFederationClient();
+        //Collection<FederationRepositoryConfig> children = federation.getRepositories("NIS");
+        return true;
     }
 
     public Collection<Node> getChildren() throws Exception {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        FederationClient federation = federationNode.getFederation();
-        for (Repository repository : federation.getRepositories("NIS")) {
+        FederationClient federation = federationPartitionNode.getFederationClient();
+        for (FederationRepositoryConfig repository : federation.getRepositories("NIS")) {
             NISDomainNode node = new NISDomainNode(
                     repository.getName(),
-                    (NISDomain)repository,
+                    repository,
                     this
             );
             children.add(node);
@@ -105,19 +137,15 @@ public class NISNode extends Node {
         this.nisFederation = nisFederation;
     }
 
-    public ProjectNode getProjectNode() {
-        return projectNode;
+    public Project getProject() {
+        return project;
     }
 
-    public void setProjectNode(ProjectNode projectNode) {
-        this.projectNode = projectNode;
+    public FederationPartitionNode getFederationNode() {
+        return federationPartitionNode;
     }
 
-    public FederationNode getFederationNode() {
-        return federationNode;
-    }
-
-    public void setFederationNode(FederationNode federationNode) {
-        this.federationNode = federationNode;
+    public void setFederationNode(FederationPartitionNode federationPartitionNode) {
+        this.federationPartitionNode = federationPartitionNode;
     }
 }

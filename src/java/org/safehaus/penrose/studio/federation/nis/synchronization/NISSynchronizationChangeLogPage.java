@@ -15,6 +15,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditor;
@@ -45,7 +46,7 @@ public class NISSynchronizationChangeLogPage extends FormPage {
 
     NISSynchronizationEditor editor;
     NISFederationClient nisFederation;
-    NISDomain domain;
+    FederationRepositoryConfig domain;
 
     Table table;
     Label totalLabel;

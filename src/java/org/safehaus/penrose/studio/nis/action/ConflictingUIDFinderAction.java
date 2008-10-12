@@ -8,6 +8,7 @@ import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
@@ -31,12 +32,12 @@ public class ConflictingUIDFinderAction extends NISAction {
     ) throws Exception {
 
         String domainName1 = request.getDomain();
-        NISDomain domain1 = nisFederation.getRepository(domainName1);
+        FederationRepositoryConfig domain1 = nisFederation.getRepository(domainName1);
 
         for (String domainName2 : nisFederation.getRepositoryNames()) {
             if (domainName1.equals(domainName2)) continue;
 
-            NISDomain domain2 = nisFederation.getRepository(domainName2);
+            FederationRepositoryConfig domain2 = nisFederation.getRepository(domainName2);
             execute(domain1, domain2, response);
         }
 
@@ -44,8 +45,8 @@ public class ConflictingUIDFinderAction extends NISAction {
     }
 
     public void execute(
-            final NISDomain domain1,
-            final NISDomain domain2,
+            final FederationRepositoryConfig domain1,
+            final FederationRepositoryConfig domain2,
             final NISActionResponse response
     ) throws Exception {
 

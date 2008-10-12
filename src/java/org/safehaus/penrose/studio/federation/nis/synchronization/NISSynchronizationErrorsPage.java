@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditor;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
@@ -49,7 +50,7 @@ public class NISSynchronizationErrorsPage extends FormPage {
 
     NISSynchronizationEditor editor;
     NISFederationClient nisFederation;
-    NISDomain domain;
+    FederationRepositoryConfig domain;
 
     Table table;
     Label totalLabel;

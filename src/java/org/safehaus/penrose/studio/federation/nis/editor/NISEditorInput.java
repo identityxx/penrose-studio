@@ -62,11 +62,11 @@ public class NISEditorInput implements IEditorInput {
         return true;
     }
 
-    public NISFederationClient getNisTool() {
+    public NISFederationClient getNISFederation() {
         return nisFederation;
     }
 
-    public void setNisTool(NISFederationClient nisFederation) {
+    public void setNISFederation(NISFederationClient nisFederation) {
         this.nisFederation = nisFederation;
     }
 

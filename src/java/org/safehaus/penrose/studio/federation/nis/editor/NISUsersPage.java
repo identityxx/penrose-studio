@@ -13,8 +13,8 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.federation.NISFederationClient;
-import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.FederationClient;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.federation.nis.conflict.NISUsersEditor;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
@@ -42,7 +42,7 @@ public class NISUsersPage extends FormPage {
 
     Project project;
     NISFederationClient nisFederation;
-    NISDomain domain;
+    FederationRepositoryConfig domain;
 
     public NISUsersPage(NISUsersEditor editor) {
         super(editor, "USERS", "  Users  ");

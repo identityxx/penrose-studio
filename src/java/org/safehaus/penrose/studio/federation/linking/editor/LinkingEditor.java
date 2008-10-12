@@ -7,7 +7,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.safehaus.penrose.federation.Repository;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.project.Project;
 
 public class LinkingEditor extends FormEditor {
@@ -15,14 +15,16 @@ public class LinkingEditor extends FormEditor {
     public Logger log = LoggerFactory.getLogger(getClass());
 
     private Project project;
-    private Repository repository;
-    private String partitionName;
+    private FederationRepositoryConfig repository;
+    private String localPartition;
+    private String globalPartition;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         LinkingEditorInput ei = (LinkingEditorInput)input;
         project = ei.getProject();
         repository = ei.getRepository();
-        partitionName = ei.getPartitionName();
+        localPartition = ei.getLocalPartition();
+        globalPartition = ei.getGlobalPartition();
 
         setSite(site);
         setInput(input);
@@ -52,11 +54,11 @@ public class LinkingEditor extends FormEditor {
         return false;
     }
 
-    public Repository getRepository() {
+    public FederationRepositoryConfig getRepository() {
         return repository;
     }
 
-    public void setRepository(Repository repository) {
+    public void setRepository(FederationRepositoryConfig repository) {
         this.repository = repository;
     }
 
@@ -68,11 +70,19 @@ public class LinkingEditor extends FormEditor {
         this.project = project;
     }
 
-    public String getPartitionName() {
-        return partitionName;
+    public String getLocalPartition() {
+        return localPartition;
     }
 
-    public void setPartitionName(String partitionName) {
-        this.partitionName = partitionName;
+    public void setLocalPartition(String localPartition) {
+        this.localPartition = localPartition;
+    }
+
+    public String getGlobalPartition() {
+        return globalPartition;
+    }
+
+    public void setGlobalPartition(String globalPartition) {
+        this.globalPartition = globalPartition;
     }
 }

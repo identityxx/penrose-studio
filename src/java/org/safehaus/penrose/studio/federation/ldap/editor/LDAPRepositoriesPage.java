@@ -23,6 +23,7 @@ import org.eclipse.jface.window.Window;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.federation.LDAPFederationClient;
 import org.safehaus.penrose.federation.LDAPRepository;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.federation.ldap.wizard.AddLDAPRepositoryWizard;
 import org.safehaus.penrose.studio.federation.ldap.wizard.EditLDAPRepositoryWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -137,7 +138,7 @@ public class LDAPRepositoriesPage extends FormPage {
 
                     if (dialog.open() == Window.CANCEL) return;
 
-                    LDAPRepository repository = wizard.getRepository();
+                    FederationRepositoryConfig repository = wizard.getRepository();
 
                     ldapFederation.addRepository(repository);
                     ldapFederation.createPartitions(repository.getName());
@@ -165,7 +166,7 @@ public class LDAPRepositoriesPage extends FormPage {
 
                     TableItem ti = table.getSelection()[0];
 
-                    LDAPRepository repository = (LDAPRepository)ti.getData();
+                    FederationRepositoryConfig repository = (FederationRepositoryConfig)ti.getData();
 
                     EditLDAPRepositoryWizard wizard = new EditLDAPRepositoryWizard(repository);
 
@@ -207,7 +208,7 @@ public class LDAPRepositoriesPage extends FormPage {
 
                     TableItem[] items = table.getSelection();
                     for (TableItem ti : items) {
-                        LDAPRepository repository = (LDAPRepository)ti.getData();
+                        FederationRepositoryConfig repository = (FederationRepositoryConfig)ti.getData();
 
                         ldapFederation.removePartitions(repository.getName());
                         ldapFederation.removeRepository(repository.getName());
@@ -248,15 +249,19 @@ public class LDAPRepositoriesPage extends FormPage {
 
             table.removeAll();
 
-            for (LDAPRepository repository : ldapFederation.getRepositories()) {
+            for (FederationRepositoryConfig repositoryConfig : ldapFederation.getRepositories()) {
 
                 TableItem ti = new TableItem(table, SWT.NONE);
 
-                ti.setText(0, repository.getName());
-                ti.setText(1, repository.getParameter(LDAPRepository.LDAP_URL));
-                ti.setText(2, repository.getParameter(LDAPRepository.LDAP_SUFFIX));
+                ti.setText(0, repositoryConfig.getName());
 
-                ti.setData(repository);
+                String url = repositoryConfig.getParameter(LDAPRepository.URL);
+                ti.setText(1, url == null ? "" : url);
+
+                String suffix = repositoryConfig.getParameter(LDAPRepository.SUFFIX);
+                ti.setText(2, suffix == null ? "" : suffix);
+
+                ti.setData(repositoryConfig);
             }
 
             table.select(indices);

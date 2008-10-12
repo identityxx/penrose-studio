@@ -3,8 +3,8 @@ package org.safehaus.penrose.studio.federation.nis.domain;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.project.Project;
 
 /**
@@ -14,7 +14,7 @@ public class NISDomainEditorInput implements IEditorInput {
 
     private Project project;
     private NISFederationClient nisFederation;
-    private NISDomain domain;
+    private FederationRepositoryConfig domain;
 
     public NISDomainEditorInput() {
     }
@@ -66,11 +66,11 @@ public class NISDomainEditorInput implements IEditorInput {
         return true;
     }
 
-    public NISDomain getDomain() {
+    public FederationRepositoryConfig getDomain() {
         return domain;
     }
 
-    public void setDomain(NISDomain domain) {
+    public void setDomain(FederationRepositoryConfig domain) {
         this.domain = domain;
     }
 

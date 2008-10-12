@@ -2,12 +2,13 @@ package org.safehaus.penrose.studio.federation.ldap.repository;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.federation.ldap.linking.LDAPLinkingNode;
 import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
-import org.safehaus.penrose.federation.LDAPRepository;
 import org.safehaus.penrose.federation.LDAPFederationClient;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.federation.ldap.wizard.EditLDAPRepositoryWizard;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IMenuManager;
@@ -28,17 +29,17 @@ public class LDAPRepositoryNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    private ProjectNode projectNode;
     private LDAPNode ldapNode;
 
+    private Project project;
     private LDAPFederationClient ldapFederation;
-    private LDAPRepository repository;
+    private FederationRepositoryConfig repository;
 
     Collection<Node> children = new ArrayList<Node>();
 
     LDAPLinkingNode   linkingNode;
 
-    public LDAPRepositoryNode(String name, LDAPRepository repository, LDAPNode ldapNode) {
+    public LDAPRepositoryNode(String name, FederationRepositoryConfig repository, LDAPNode ldapNode) {
         super(
                 name,
                 PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
@@ -50,7 +51,7 @@ public class LDAPRepositoryNode extends Node {
         this.ldapNode = ldapNode;
         this.ldapFederation = ldapNode.getLdapFederation();
 
-        projectNode = ldapNode.getProjectNode();
+        project = ldapNode.getProject();
 
         linkingNode = new LDAPLinkingNode(
                 "Identity Linking",
@@ -86,7 +87,7 @@ public class LDAPRepositoryNode extends Node {
     public void open() throws Exception {
 
         LDAPRepositoryEditorInput ei = new LDAPRepositoryEditorInput();
-        ei.setProject(projectNode.getProject());
+        ei.setProject(project);
         ei.setLdapFederation(ldapFederation);
         ei.setRepository(repository);
 
@@ -108,12 +109,12 @@ public class LDAPRepositoryNode extends Node {
         ldapFederation.updateRepository(repository);
     }
 
-    public ProjectNode getProjectNode() {
-        return projectNode;
+    public Project getProject() {
+        return project;
     }
 
-    public void setProjectNode(ProjectNode projectNode) {
-        this.projectNode = projectNode;
+    public void setProject(Project project) {
+        this.project = project;
     }
 
     public LDAPNode getLdapNode() {
@@ -124,11 +125,11 @@ public class LDAPRepositoryNode extends Node {
         this.ldapNode = ldapNode;
     }
 
-    public LDAPRepository getRepository() {
+    public FederationRepositoryConfig getRepository() {
         return repository;
     }
 
-    public void setRepository(LDAPRepository repository) {
+    public void setRepository(FederationRepositoryConfig repository) {
         this.repository = repository;
     }
 

@@ -23,6 +23,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.progress.IProgressService;
 import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
@@ -152,10 +153,10 @@ public class NISPartitionsPage extends FormPage {
                     if (!confirm) return;
 
                     TableItem[] items = table.getSelection();
-                    final Collection<NISDomain> domains = new ArrayList<NISDomain>();
+                    final Collection<FederationRepositoryConfig> domains = new ArrayList<FederationRepositoryConfig>();
 
                     for (TableItem ti : items) {
-                        NISDomain domain = (NISDomain)ti.getData();
+                        FederationRepositoryConfig domain = (FederationRepositoryConfig)ti.getData();
                         domains.add(domain);
                     }
 
@@ -166,7 +167,7 @@ public class NISPartitionsPage extends FormPage {
                             try {
                                 monitor.beginTask("Creating partitions...", domains.size());
 
-                                for (NISDomain domain : domains) {
+                                for (FederationRepositoryConfig domain : domains) {
 
                                     monitor.subTask("Creating "+domain.getName()+" partitions.");
                                     nisFederation.createPartitions(domain.getName());
@@ -210,10 +211,10 @@ public class NISPartitionsPage extends FormPage {
                     if (!confirm) return;
 
                     TableItem[] items = table.getSelection();
-                    final Collection<NISDomain> domains = new ArrayList<NISDomain>();
+                    final Collection<FederationRepositoryConfig> domains = new ArrayList<FederationRepositoryConfig>();
 
                     for (TableItem ti : items) {
-                        NISDomain domain = (NISDomain)ti.getData();
+                        FederationRepositoryConfig domain = (FederationRepositoryConfig)ti.getData();
                         domains.add(domain);
                     }
 
@@ -224,7 +225,7 @@ public class NISPartitionsPage extends FormPage {
                             try {
                                 monitor.beginTask("Removing partitions...", domains.size());
 
-                                for (NISDomain domain : domains) {
+                                for (FederationRepositoryConfig domain : domains) {
 
                                     monitor.subTask("Removing "+domain.getName()+" partitions.");
                                     nisFederation.removePartitions(domain.getName());
@@ -274,23 +275,13 @@ public class NISPartitionsPage extends FormPage {
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 
-            for (NISDomain domain : nisFederation.getRepositories()) {
+            for (FederationRepositoryConfig domain : nisFederation.getRepositories()) {
 
                 TableItem ti = new TableItem(table, SWT.NONE);
                 ti.setText(0, domain.getName());
-
-                PartitionClient ypPartitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.YP);
-                String ypStatus = ypPartitionClient.exists() ? domain.getBooleanParameter(NISDomain.YP_ENABLED) ? "OK" : "Disabled" : "Missing";
-                ti.setText(1, ypStatus);
-
-                PartitionClient nisPartitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.NIS);
-                String nisStatus = nisPartitionClient.exists() ? domain.getBooleanParameter(NISDomain.NIS_ENABLED) ? "OK" : "Disabled" : "Missing";
-                ti.setText(2, nisStatus);
-
-                PartitionClient nssPartitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.NSS);
-                String nssStatus = nssPartitionClient.exists() ? domain.getBooleanParameter(NISDomain.NSS_ENABLED) ? "OK" : "Disabled" : "Missing";
-                ti.setText(3, nssStatus);
-
+                ti.setText(1, "OK");
+                ti.setText(2, "OK");
+                ti.setText(3, "OK");
                 ti.setData(domain);
             }
 

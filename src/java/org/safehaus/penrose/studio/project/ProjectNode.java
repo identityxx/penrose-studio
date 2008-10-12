@@ -6,9 +6,9 @@ import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.federation.FederationNode;
 import org.safehaus.penrose.studio.logger.LoggingNode;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.plugin.PluginsNode;
 import org.safehaus.penrose.studio.browser.BrowserEditorInput;
 import org.safehaus.penrose.studio.browser.BrowserEditor;
 import org.safehaus.penrose.studio.properties.SystemPropertiesNode;
@@ -54,7 +54,7 @@ public class ProjectNode extends Node {
     protected SchemasNode schemasNode;
     protected ServicesNode servicesNode;
     protected LoggingNode loggingNode;
-    protected PluginsNode pluginsNode;
+    protected FederationNode federationNode;
 
     public ProjectNode(ServersView serversView, String name, Image image, Object object, Object parent) {
         super(name, image, object, parent);
@@ -247,11 +247,11 @@ public class ProjectNode extends Node {
                             ProjectNode.this);
                     children.add(loggingNode);
 
-                    pluginsNode = new PluginsNode(
-                            "Plugins",
-                            "Plugins",
+                    federationNode = new FederationNode(
+                            "Federation",
+                            "Federation",
                             ProjectNode.this);
-                    children.add(pluginsNode);
+                    children.add(federationNode);
 
                     children.add(new AdministratorNode(
                             "Administrator",

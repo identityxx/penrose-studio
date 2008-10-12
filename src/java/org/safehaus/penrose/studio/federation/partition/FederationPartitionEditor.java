@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.federation.global.editor;
+package org.safehaus.penrose.studio.federation.partition;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ui.IEditorInput;
@@ -10,17 +10,17 @@ import org.safehaus.penrose.studio.project.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GlobalEditor extends FormEditor {
+public class FederationPartitionEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
     Project project;
-    FederationClient federation;
+    FederationClient federationClient;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        GlobalEditorInput ei = (GlobalEditorInput)input;
+        FederationPartitionEditorInput ei = (FederationPartitionEditorInput)input;
         project = ei.getProject();
-        federation = ei.getFederation();
+        federationClient = ei.getFederationClient();
 
         setSite(site);
         setInput(input);
@@ -29,8 +29,8 @@ public class GlobalEditor extends FormEditor {
 
     public void addPages() {
         try {
-            addPage(new GlobalRepositorySettingsPage(this));
-            addPage(new GlobalRepositoryPartitionsPage(this));
+            addPage(new FederationPartitionSettingsPage(this));
+            addPage(new FederationPartitionPartitionsPage(this));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -51,7 +51,11 @@ public class GlobalEditor extends FormEditor {
         return false;
     }
 
-    public FederationClient getFederation() {
-        return federation;
+    public FederationClient getFederationClient() {
+        return federationClient;
+    }
+
+    public Project getProject() {
+        return project;
     }
 }

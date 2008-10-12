@@ -13,7 +13,7 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.safehaus.penrose.federation.Repository;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
 
@@ -33,11 +33,11 @@ public class LinkingSettingsPage extends FormPage {
     Label mappingNameText;
     Label mappingPrefixText;
 
-    Repository repository;
+    FederationRepositoryConfig repository;
 
     Project project;
 
-    public LinkingSettingsPage(FormEditor editor, Repository repository) {
+    public LinkingSettingsPage(FormEditor editor, FederationRepositoryConfig repository) {
         super(editor, "LINKING", "  Linking  ");
 
         this.repository = repository;
@@ -191,19 +191,19 @@ public class LinkingSettingsPage extends FormPage {
             for (String name : repository.getParameterNames()) {
                 String value = repository.getParameter(name);
 
-                if (name.equals(Repository.LINKING_LOCAL_ATTRIBUTE)) {
+                if (name.equals(FederationRepositoryConfig.LINKING_LOCAL_ATTRIBUTE)) {
                     localAttributeText.setText(value == null ? "" : value);
 
-                } else if (name.equals(Repository.LINKING_GLOBAL_ATTRIBUTE)) {
+                } else if (name.equals(FederationRepositoryConfig.LINKING_GLOBAL_ATTRIBUTE)) {
                     globalAttributeText.setText(value == null ? "" : value);
 
-                } else if (name.equals(Repository.LINKING_STORAGE)) {
+                } else if (name.equals(FederationRepositoryConfig.LINKING_STORAGE)) {
                     linkingStorageText.setText(value == null ? "" : value);
 
-                } else if (name.equals(Repository.IMPORT_MAPPING_NAME)) {
+                } else if (name.equals(FederationRepositoryConfig.IMPORT_MAPPING_NAME)) {
                     mappingNameText.setText(value == null ? "" : value);
 
-                } else if (name.equals(Repository.IMPORT_MAPPING_PREFIX)) {
+                } else if (name.equals(FederationRepositoryConfig.IMPORT_MAPPING_PREFIX)) {
                     mappingPrefixText.setText(value == null ? "" : value);
                 }
             }

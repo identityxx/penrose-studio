@@ -5,7 +5,7 @@ import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.federation.LDAPFederationClient;
-import org.safehaus.penrose.federation.LDAPRepository;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 
 /**
  * @author Endi S. Dewata
@@ -14,7 +14,7 @@ public class LDAPRepositoryEditorInput implements IEditorInput {
 
     private Project project;
     private LDAPFederationClient ldapFederation;
-    private LDAPRepository repository;
+    private FederationRepositoryConfig repository;
 
     public LDAPRepositoryEditorInput() {
     }
@@ -66,11 +66,11 @@ public class LDAPRepositoryEditorInput implements IEditorInput {
         return true;
     }
 
-    public LDAPRepository getRepository() {
+    public FederationRepositoryConfig getRepository() {
         return repository;
     }
 
-    public void setRepository(LDAPRepository repository) {
+    public void setRepository(FederationRepositoryConfig repository) {
         this.repository = repository;
     }
 

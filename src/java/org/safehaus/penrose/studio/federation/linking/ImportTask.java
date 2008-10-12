@@ -4,7 +4,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.safehaus.penrose.ldap.SearchResult;
 import org.safehaus.penrose.studio.federation.linking.editor.LinkingPage;
-import org.safehaus.penrose.federation.Repository;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.LinkingData;
 
 import javax.management.MBeanException;
@@ -17,11 +17,11 @@ import java.util.List;
 public class ImportTask implements IRunnableWithProgress {
 
     LinkingPage page;
-    Repository repository;
+    FederationRepositoryConfig repository;
 
     private List<LinkingData> results;
 
-    public ImportTask(LinkingPage page, Repository repository) {
+    public ImportTask(LinkingPage page, FederationRepositoryConfig repository) {
         this.page = page;
         this.repository = repository;
     }

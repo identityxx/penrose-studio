@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.federation.global.editor;
+package org.safehaus.penrose.studio.federation.partition;
 
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
@@ -9,12 +9,12 @@ import org.safehaus.penrose.federation.FederationClient;
 /**
  * @author Endi S. Dewata
  */
-public class GlobalEditorInput implements IEditorInput {
+public class FederationPartitionEditorInput implements IEditorInput {
 
     private Project project;
-    private FederationClient federation;
+    private FederationClient federationClient;
 
-    public GlobalEditorInput() {
+    public FederationPartitionEditorInput() {
     }
 
     public boolean exists() {
@@ -26,7 +26,7 @@ public class GlobalEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "Global Repository";
+        return federationClient.getName();
     }
 
     public IPersistableElement getPersistable() {
@@ -56,18 +56,18 @@ public class GlobalEditorInput implements IEditorInput {
         if (object == null) return false;
         if (object.getClass() != this.getClass()) return false;
 
-        GlobalEditorInput ei = (GlobalEditorInput)object;
+        FederationPartitionEditorInput ei = (FederationPartitionEditorInput)object;
         if (!equals(project, ei.project)) return false;
 
         return true;
     }
 
-    public FederationClient getFederation() {
-        return federation;
+    public FederationClient getFederationClient() {
+        return federationClient;
     }
 
-    public void setFederation(FederationClient federation) {
-        this.federation = federation;
+    public void setFederationClient(FederationClient federationClient) {
+        this.federationClient = federationClient;
     }
 
     public Project getProject() {

@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.federation.global.editor;
+package org.safehaus.penrose.studio.federation.partition;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.window.Window;
@@ -20,37 +20,41 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.federation.FederationClient;
-import org.safehaus.penrose.federation.GlobalRepository;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.federation.global.wizard.GlobalRepositoryEditorWizard;
+import org.safehaus.penrose.studio.federation.partition.FederationPartitionEditorWizard;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.connection.ConnectionClient;
+import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.source.SourceClient;
+import org.safehaus.penrose.source.SourceConfig;
 
-import java.net.URI;
+import javax.naming.Context;
 
 /**
  * @author Endi S. Dewata
  */
-public class GlobalRepositorySettingsPage extends FormPage {
+public class FederationPartitionSettingsPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
     FormToolkit toolkit;
 
-    GlobalEditor editor;
+    FederationPartitionEditor editor;
 
     Label urlText;
     Label suffixText;
     Label bindDnText;
     Label bindPasswordText;
 
-    FederationClient federation;
+    FederationClient federationClient;
     Project project;
 
-    public GlobalRepositorySettingsPage(GlobalEditor editor) {
+    public FederationPartitionSettingsPage(FederationPartitionEditor editor) {
         super(editor, "SETTINGS", "  Settings  ");
 
         this.editor = editor;
-        this.federation = editor.federation;
+        this.federationClient = editor.federationClient;
         this.project = editor.project;
     }
 
@@ -58,7 +62,7 @@ public class GlobalRepositorySettingsPage extends FormPage {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("Global Repository");
+        form.setText(federationClient.getName());
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
@@ -138,7 +142,7 @@ public class GlobalRepositorySettingsPage extends FormPage {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    GlobalRepositoryEditorWizard wizard = new GlobalRepositoryEditorWizard(federation.getGlobalRepository());
+                    FederationPartitionEditorWizard wizard = new FederationPartitionEditorWizard(federationClient);
 
                     IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
                     WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
@@ -146,7 +150,7 @@ public class GlobalRepositorySettingsPage extends FormPage {
 
                     if (dialog.open() == Window.CANCEL) return;
 
-                    federation.updateGlobalRepository(wizard.getRepository());
+                    //federationClient.updateGlobalRepository(wizard.getRepository());
 
                     refresh();
                     
@@ -162,19 +166,22 @@ public class GlobalRepositorySettingsPage extends FormPage {
 
     public void refresh() {
         try {
-            GlobalRepository repository = federation.getGlobalRepository();
-            if (repository == null) return;
+            PartitionClient partitionClient = federationClient.getPartitionClient();
 
-            String url = repository.getParameter(GlobalRepository.LDAP_URL);
+            ConnectionClient connectionClient = partitionClient.getConnectionClient("LDAP");
+            ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
+
+            SourceClient sourceClient = partitionClient.getSourceClient("LDAP");
+            SourceConfig sourceConfig = sourceClient.getSourceConfig();
+
+            String url = connectionConfig.getParameter(Context.PROVIDER_URL);
+            String suffix = sourceConfig.getParameter("baseDn");
+            String bindDn = connectionConfig.getParameter(Context.SECURITY_PRINCIPAL);
+            String bindPassword = connectionConfig.getParameter(Context.SECURITY_CREDENTIALS);
+
             urlText.setText(url == null ? "" : url);
-
-            String suffix = repository.getParameter(GlobalRepository.LDAP_SUFFIX);
             suffixText.setText(suffix == null ? "" : suffix);
-
-            String bindDn = repository.getParameter(GlobalRepository.LDAP_USER);
             bindDnText.setText(bindDn == null ? "" : bindDn);
-
-            String bindPassword = repository.getParameter(GlobalRepository.LDAP_PASSWORD);
             bindPasswordText.setText(bindPassword == null ? "" : "*****");
 
         } catch (Exception e) {

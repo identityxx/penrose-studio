@@ -18,12 +18,12 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.filter.OrFilter;
 import org.safehaus.penrose.filter.SimpleFilter;
 import org.safehaus.penrose.filter.AndFilter;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.FederationClient;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
@@ -51,7 +51,7 @@ public class NISFilesPage extends FormPage implements Runnable {
 
     Project project;
     NISFederationClient nisFederation;
-    NISDomain domain;
+    FederationRepositoryConfig domain;
 
     public NISFilesPage(NISFilesEditor editor) {
         super(editor, "FILES", "  Files  ");

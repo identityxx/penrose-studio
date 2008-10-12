@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.nis.dialog.NISUserDialog;
 import org.safehaus.penrose.studio.nis.action.*;
 import org.safehaus.penrose.studio.project.Project;
@@ -58,7 +59,7 @@ public class NISUserScriptsPage extends FormPage {
 
     Project project;
     NISFederationClient nisFederation;
-    NISDomain domain;
+    FederationRepositoryConfig domain;
 
     Map<String,Collection<Conflict>> conflicts = new TreeMap<String,Collection<Conflict>>();
 
@@ -357,7 +358,7 @@ public class NISUserScriptsPage extends FormPage {
         Partition partition = nisFederation.getPartition();
         JDBCConnection connection = (JDBCConnection)partition.getConnection(Federation.JDBC);
 */
-        for (NISDomain repository : nisFederation.getRepositories()) {
+        for (FederationRepositoryConfig repository : nisFederation.getRepositories()) {
             final String name = repository.getName();
             if (domain.getName().equals(name)) continue;
 
@@ -439,7 +440,7 @@ public class NISUserScriptsPage extends FormPage {
         NISActionRequest request = new NISActionRequest();
         request.setDomain(domain.getName());
 
-        for (NISDomain repository : nisFederation.getRepositories()) {
+        for (FederationRepositoryConfig repository : nisFederation.getRepositories()) {
             String name = repository.getName();
             request.addDomain(name);
         }
@@ -589,7 +590,7 @@ public class NISUserScriptsPage extends FormPage {
             throw new Exception("UID number "+uidNumber+" is already allocated for user "+uid2+" in domain "+domainName);
         }
 
-        for (NISDomain repository : nisFederation.getRepositories()) {
+        for (FederationRepositoryConfig repository : nisFederation.getRepositories()) {
             String name = repository.getName();
 
             PartitionClient partitionClient2 = partitionManagerClient.getPartitionClient(name+"_"+ NISDomain.YP);

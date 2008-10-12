@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.ldap.connection.LDAPConnectionWizardPage;
 import org.safehaus.penrose.studio.federation.linking.wizard.LinkingParametersWizardPage;
 import org.safehaus.penrose.federation.LDAPRepository;
-import org.safehaus.penrose.federation.Repository;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 
 /**
  * @author Endi S. Dewata
@@ -15,12 +15,12 @@ public class EditLDAPRepositoryWizard extends Wizard {
     Logger log = Logger.getLogger(getClass());
 
     LDAPConnectionWizardPage    connectionPage;
-    LDAPPartitionsWizardPage    partitionsPage;
-    LinkingParametersWizardPage linkingPage;
+    //LDAPPartitionsWizardPage    partitionsPage;
+    //LinkingParametersWizardPage linkingPage;
 
-    LDAPRepository repository;
+    FederationRepositoryConfig repository;
 
-    public EditLDAPRepositoryWizard(LDAPRepository repository) {
+    public EditLDAPRepositoryWizard(FederationRepositoryConfig repository) {
         this.repository = repository;
 
         setWindowTitle("Edit LDAP Repository");
@@ -30,13 +30,13 @@ public class EditLDAPRepositoryWizard extends Wizard {
 
         connectionPage = new LDAPConnectionWizardPage();
 
-        connectionPage.setProviderUrl(repository.getParameter(LDAPRepository.LDAP_URL));
-        connectionPage.setSuffix(repository.getParameter(LDAPRepository.LDAP_SUFFIX));
-        connectionPage.setBindDn(repository.getParameter(LDAPRepository.LDAP_USER));
-        connectionPage.setBindPassword(repository.getParameter(LDAPRepository.LDAP_PASSWORD));
+        connectionPage.setProviderUrl(repository.getParameter(LDAPRepository.URL));
+        connectionPage.setSuffix(repository.getParameter(LDAPRepository.SUFFIX));
+        connectionPage.setBindDn(repository.getParameter(LDAPRepository.USER));
+        connectionPage.setBindPassword(repository.getParameter(LDAPRepository.PASSWORD));
 
         addPage(connectionPage);
-
+/*
         partitionsPage = new LDAPPartitionsWizardPage();
 
         partitionsPage.setSuffix(repository.getParameter(LDAPRepository.SUFFIX));
@@ -46,36 +46,37 @@ public class EditLDAPRepositoryWizard extends Wizard {
 
         linkingPage = new LinkingParametersWizardPage();
 
-        linkingPage.setLocalAttribute(repository.getParameter(Repository.LINKING_LOCAL_ATTRIBUTE));
-        linkingPage.setGlobalAttribute(repository.getParameter(Repository.LINKING_GLOBAL_ATTRIBUTE));
-        linkingPage.setImportMappingName(repository.getParameter(Repository.IMPORT_MAPPING_NAME));
-        linkingPage.setImportMappingPrefix(repository.getParameter(Repository.IMPORT_MAPPING_PREFIX));
+        linkingPage.setLocalAttribute(repository.getParameter(FederationRepositoryConfig.LINKING_LOCAL_ATTRIBUTE));
+        linkingPage.setGlobalAttribute(repository.getParameter(FederationRepositoryConfig.LINKING_GLOBAL_ATTRIBUTE));
+        linkingPage.setImportMappingName(repository.getParameter(FederationRepositoryConfig.IMPORT_MAPPING_NAME));
+        linkingPage.setImportMappingPrefix(repository.getParameter(FederationRepositoryConfig.IMPORT_MAPPING_PREFIX));
 
         addPage(linkingPage);
+*/
     }
 
     public boolean canFinish() {
         if (!connectionPage.isPageComplete()) return false;
-        if (!partitionsPage.isPageComplete()) return false;
-        if (!linkingPage.isPageComplete()) return false;
+        //if (!partitionsPage.isPageComplete()) return false;
+        //if (!linkingPage.isPageComplete()) return false;
         return true;
     }
 
     public boolean performFinish() {
         try {
-            repository.setParameter(LDAPRepository.LDAP_URL, connectionPage.getProviderUrl());
-            repository.setParameter(LDAPRepository.LDAP_SUFFIX, connectionPage.getSuffix());
-            repository.setParameter(LDAPRepository.LDAP_USER, connectionPage.getBindDn());
-            repository.setParameter(LDAPRepository.LDAP_PASSWORD, connectionPage.getBindPassword());
-
+            repository.setParameter(LDAPRepository.URL, connectionPage.getProviderUrl());
+            repository.setParameter(LDAPRepository.SUFFIX, connectionPage.getSuffix());
+            repository.setParameter(LDAPRepository.USER, connectionPage.getBindDn());
+            repository.setParameter(LDAPRepository.PASSWORD, connectionPage.getBindPassword());
+/*
             repository.setParameter(LDAPRepository.SUFFIX, partitionsPage.getSuffix());
             repository.setParameter(LDAPRepository.TEMPLATE, partitionsPage.getTemplate());
 
-            repository.setParameter(Repository.LINKING_LOCAL_ATTRIBUTE, linkingPage.getLocalAttribute());
-            repository.setParameter(Repository.LINKING_GLOBAL_ATTRIBUTE, linkingPage.getGlobalAttribute());
-            repository.setParameter(Repository.IMPORT_MAPPING_NAME, linkingPage.getImportMappingName());
-            repository.setParameter(Repository.IMPORT_MAPPING_PREFIX, linkingPage.getImportMappingPrefix());
-
+            repository.setParameter(FederationRepositoryConfig.LINKING_LOCAL_ATTRIBUTE, linkingPage.getLocalAttribute());
+            repository.setParameter(FederationRepositoryConfig.LINKING_GLOBAL_ATTRIBUTE, linkingPage.getGlobalAttribute());
+            repository.setParameter(FederationRepositoryConfig.IMPORT_MAPPING_NAME, linkingPage.getImportMappingName());
+            repository.setParameter(FederationRepositoryConfig.IMPORT_MAPPING_PREFIX, linkingPage.getImportMappingPrefix());
+*/
             return true;
 
         } catch (Exception e) {
@@ -88,11 +89,11 @@ public class EditLDAPRepositoryWizard extends Wizard {
         return true;
     }
 
-    public LDAPRepository getRepository() {
+    public FederationRepositoryConfig getRepository() {
         return repository;
     }
 
-    public void setRepository(LDAPRepository repository) {
+    public void setRepository(FederationRepositoryConfig repository) {
         this.repository = repository;
     }
 }

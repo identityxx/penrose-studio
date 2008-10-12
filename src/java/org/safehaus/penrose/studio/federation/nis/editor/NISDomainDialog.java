@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 
 /**
  * @author Endi S. Dewata
@@ -39,7 +40,7 @@ public class NISDomainDialog extends Dialog {
 
     int action;
 
-    private NISDomain domain;
+    private FederationRepositoryConfig domain;
 
     public NISDomainDialog(Shell parent, int style) {
 		super(parent, style);
@@ -76,26 +77,23 @@ public class NISDomainDialog extends Dialog {
     }
 
     public void refresh() {
-        String fullName = domain.getParameter(NISDomain.NIS_DOMAIN);
+        String fullName = domain.getParameter(NISDomain.DOMAIN);
         domainText.setText(fullName == null ? "" : fullName);
 
-        String server = domain.getParameter(NISDomain.NIS_SERVER);
+        String server = domain.getParameter(NISDomain.SERVER);
         serverText.setText(server == null ? "" : server);
 
-        boolean ypEnabled = domain.getBooleanParameter(NISDomain.YP_ENABLED);
-        ypEnabledButton.setSelection(ypEnabled);
+        ypEnabledButton.setSelection(true);
 
         String ypSuffix = domain.getParameter(NISDomain.YP_SUFFIX);
         ypSuffixText.setText(ypSuffix == null ? "" : ypSuffix);
 
-        boolean nisEnabled = domain.getBooleanParameter(NISDomain.NIS_ENABLED);
-        nisEnabledButton.setSelection(nisEnabled);
+        nisEnabledButton.setSelection(true);
 
         String nisSuffix = domain.getParameter(NISDomain.NIS_SUFFIX);
         nisSuffixText.setText(nisSuffix == null ? "" : nisSuffix);
 
-        boolean nssEnabled = domain.getBooleanParameter(NISDomain.NSS_ENABLED);
-        nssEnabledButton.setSelection(nssEnabled);
+        nssEnabledButton.setSelection(true);
 
         String nssSuffix = domain.getParameter(NISDomain.NSS_SUFFIX);
         nssSuffixText.setText(nssSuffix == null ? "" : nssSuffix);
@@ -200,22 +198,16 @@ public class NISDomainDialog extends Dialog {
             public void widgetSelected(SelectionEvent e) {
 
                 String fullName = domainText.getText();
-                domain.setParameter(NISDomain.NIS_DOMAIN, "".equals(fullName) ? null : fullName);
+                domain.setParameter(NISDomain.DOMAIN, "".equals(fullName) ? null : fullName);
 
                 String server = serverText.getText();
-                domain.setParameter(NISDomain.NIS_SERVER, "".equals(server) ? null : server);
-
-                domain.setParameter(NISDomain.NIS_ENABLED, nisEnabledButton.getSelection());
+                domain.setParameter(NISDomain.SERVER, "".equals(server) ? null : server);
 
                 String nisSuffix = nisSuffixText.getText();
                 domain.setParameter(NISDomain.NIS_SUFFIX, "".equals(nisSuffix) ? null : nisSuffix);
 
-                domain.setParameter(NISDomain.YP_ENABLED, ypEnabledButton.getSelection());
-
                 String ypSuffix = ypSuffixText.getText();
                 domain.setParameter(NISDomain.YP_SUFFIX, "".equals(ypSuffix) ? null : ypSuffix);
-
-                domain.setParameter(NISDomain.NSS_ENABLED, nssEnabledButton.getSelection());
 
                 String nssSuffix = nssSuffixText.getText();
                 domain.setParameter(NISDomain.NSS_SUFFIX, "".equals(nssSuffix) ? null : nssSuffix);
@@ -236,11 +228,11 @@ public class NISDomainDialog extends Dialog {
         this.action = action;
     }
 
-    public void setDomain(NISDomain domain) {
+    public void setDomain(FederationRepositoryConfig domain) {
         this.domain = domain;
     }
 
-    public NISDomain getDomain() {
+    public FederationRepositoryConfig getDomain() {
         return domain;
     }
 }

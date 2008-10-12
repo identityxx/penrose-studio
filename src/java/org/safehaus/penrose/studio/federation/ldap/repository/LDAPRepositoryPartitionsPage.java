@@ -19,6 +19,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.federation.LDAPFederationClient;
 import org.safehaus.penrose.federation.LDAPRepository;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.project.Project;
 
 /**
@@ -34,7 +35,7 @@ public class LDAPRepositoryPartitionsPage extends FormPage {
     Label templateText;
 
     LDAPRepositoryEditor editor;
-    LDAPRepository repository;
+    FederationRepositoryConfig repository;
     LDAPFederationClient ldapFederation;
 
     Project project;

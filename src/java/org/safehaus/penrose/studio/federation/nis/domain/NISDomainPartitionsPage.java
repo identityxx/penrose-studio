@@ -18,6 +18,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
 
@@ -44,7 +45,7 @@ public class NISDomainPartitionsPage extends FormPage {
 
     NISDomainEditor editor;
     NISFederationClient nisFederation;
-    NISDomain domain;
+    FederationRepositoryConfig domain;
 
     Project project;
 
@@ -409,7 +410,7 @@ public class NISDomainPartitionsPage extends FormPage {
 
     public void refresh() {
         try {
-            ypEnabledText.setText(domain.getBooleanParameter(NISDomain.YP_ENABLED) ? "Yes" : "No");
+            ypEnabledText.setText("Yes");
 
             String ypSuffix = domain.getParameter(NISDomain.YP_SUFFIX);
             ypSuffixText.setText(ypSuffix == null ? "" : ypSuffix);
@@ -417,7 +418,7 @@ public class NISDomainPartitionsPage extends FormPage {
             String ypTemplate = domain.getParameter(NISDomain.YP_TEMPLATE);
             ypTemplateText.setText(ypTemplate == null ? "" : ypTemplate);
 
-            nisEnabledText.setText(domain.getBooleanParameter(NISDomain.NIS_ENABLED) ? "Yes" : "No");
+            nisEnabledText.setText("Yes");
 
             String nisSuffix = domain.getParameter(NISDomain.NIS_SUFFIX);
             nisSuffixText.setText(nisSuffix == null ? "" : nisSuffix);
@@ -425,7 +426,7 @@ public class NISDomainPartitionsPage extends FormPage {
             String nisTemplate = domain.getParameter(NISDomain.NIS_TEMPLATE);
             nisTemplateText.setText(nisTemplate == null ? "" : nisTemplate);
 
-            nssEnabledText.setText(domain.getBooleanParameter(NISDomain.NSS_ENABLED) ? "Yes" : "No");
+            nssEnabledText.setText("Yes");
 
             String nssSuffix = domain.getParameter(NISDomain.NSS_SUFFIX);
             nssSuffixText.setText(nssSuffix == null ? "" : nssSuffix);

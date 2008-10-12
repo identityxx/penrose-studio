@@ -17,8 +17,8 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.connection.Connection;
 import org.safehaus.penrose.connection.ConnectionManager;
-import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.filter.FilterTool;
 import org.safehaus.penrose.filter.SubstringFilter;
@@ -63,7 +63,7 @@ public class NISGroupsLinkPage extends FormPage {
     Text membersText;
 
     NISLinkEditor editor;
-    NISDomain domain;
+    FederationRepositoryConfig domain;
     NISFederationClient nisFederation;
 
     Partition partition;

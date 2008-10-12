@@ -25,7 +25,7 @@ public class NISEditor extends FormEditor {
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         NISEditorInput ei = (NISEditorInput)input;
         project = ei.getProject();
-        nisFederation = ei.getNisTool();
+        nisFederation = ei.getNISFederation();
 
         setSite(site);
         setInput(input);
@@ -37,7 +37,7 @@ public class NISEditor extends FormEditor {
             addPage(new NISDomainsPage(this, nisFederation));
             addPage(new NISYPConfPage(this, nisFederation));
             //addPage(new NISDatabasesPage(this, nisFederation));
-            addPage(new NISPartitionsPage(this, nisFederation));
+            //addPage(new NISPartitionsPage(this, nisFederation));
             //addPage(new NISLDAPPage(this, nisFederation));
             addPage(new NISUserChangesPage(this, nisFederation));
             addPage(new NISGroupChangesPage(this, nisFederation));

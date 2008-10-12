@@ -21,10 +21,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.federation.NISFederationClient;
-import org.safehaus.penrose.federation.NISDomain;
-import org.safehaus.penrose.federation.Federation;
-import org.safehaus.penrose.federation.SynchronizationResult;
+import org.safehaus.penrose.federation.*;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.ldap.*;
@@ -53,7 +50,7 @@ public class NISSynchronizationPage extends FormPage {
     Project project;
     NISSynchronizationEditor editor;
     NISFederationClient nisFederation;
-    NISDomain domain;
+    FederationRepositoryConfig domain;
 
     Label statusText;
     Button baseButton;

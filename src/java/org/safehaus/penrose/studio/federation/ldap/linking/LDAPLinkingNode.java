@@ -5,15 +5,16 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.safehaus.penrose.federation.LDAPRepository;
 import org.safehaus.penrose.federation.LDAPFederationClient;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
+import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
 import org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryNode;
 import org.safehaus.penrose.studio.federation.linking.editor.LinkingEditor;
 import org.safehaus.penrose.studio.federation.linking.editor.LinkingEditorInput;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.tree.Node;
 
 /**
@@ -21,7 +22,7 @@ import org.safehaus.penrose.studio.tree.Node;
  */
 public class LDAPLinkingNode extends Node {
 
-    ProjectNode projectNode;
+    Project project;
     LDAPNode ldapNode;
     LDAPRepositoryNode repositoryNode;
 
@@ -37,7 +38,7 @@ public class LDAPLinkingNode extends Node {
 
         this.repositoryNode = repositoryNode;
         this.ldapNode = repositoryNode.getLdapNode();
-        this.projectNode = ldapNode.getProjectNode();
+        this.project = ldapNode.getProject();
 
         ldapFederation = ldapNode.getLdapFederation();
     }
@@ -57,12 +58,14 @@ public class LDAPLinkingNode extends Node {
 
     public void open() throws Exception {
 
-        LDAPRepository repository = repositoryNode.getRepository();
+        FederationRepositoryConfig repository = repositoryNode.getRepository();
+        FederationClient federationClient = ldapFederation.getFederationClient();
         
         LinkingEditorInput ei = new LinkingEditorInput();
-        ei.setProject(projectNode.getProject());
+        ei.setProject(project);
         ei.setRepository(repository);
-        ei.setPartitionName(repository.getName());
+        ei.setLocalPartition(repository.getName());
+        ei.setGlobalPartition(federationClient.getName());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();

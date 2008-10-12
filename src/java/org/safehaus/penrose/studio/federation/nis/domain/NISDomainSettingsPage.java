@@ -19,6 +19,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.federation.nis.wizard.EditNISDomainWizard;
 import org.safehaus.penrose.studio.project.Project;
@@ -37,7 +38,7 @@ public class NISDomainSettingsPage extends FormPage {
 
     NISDomainEditor editor;
     NISFederationClient nisFederation;
-    NISDomain domain;
+    FederationRepositoryConfig domain;
 
     Project project;
 
@@ -145,10 +146,10 @@ public class NISDomainSettingsPage extends FormPage {
 
     public void refresh() {
         try {
-            String server = domain.getParameter(NISDomain.NIS_SERVER);
+            String server = domain.getParameter(NISDomain.SERVER);
             serverText.setText(server == null ? "" : server);
 
-            String fullName = domain.getParameter(NISDomain.NIS_DOMAIN);
+            String fullName = domain.getParameter(NISDomain.DOMAIN);
             domainText.setText(fullName == null ? "" : fullName);
 
         } catch (Exception e) {

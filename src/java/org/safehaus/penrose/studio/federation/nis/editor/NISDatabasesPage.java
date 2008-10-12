@@ -18,8 +18,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.federation.NISFederationClient;
-import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.FederationClient;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.federation.nis.editor.NISEditor;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
@@ -136,7 +136,7 @@ public class NISDatabasesPage extends FormPage {
                     TableItem[] items = table.getSelection();
 
                     for (TableItem ti : items) {
-                        NISDomain domain = (NISDomain)ti.getData();
+                        FederationRepositoryConfig domain = (FederationRepositoryConfig)ti.getData();
                         String name = domain.getName();
                         //PartitionConfig nisPartitionConfig = project.getPartitionConfigManager().getPartitionConfig(name+"_"+NISFederation.YP);
                         //nisFederation.createDatabase(domain, nisPartitionConfig);
@@ -174,7 +174,7 @@ public class NISDatabasesPage extends FormPage {
                     TableItem[] items = table.getSelection();
 
                     for (TableItem ti : items) {
-                        NISDomain domain = (NISDomain)ti.getData();
+                        FederationRepositoryConfig domain = (FederationRepositoryConfig)ti.getData();
                         try {
                             //nisFederation.removeDatabase(domain);
                         } catch (Exception e) {
@@ -219,7 +219,7 @@ public class NISDatabasesPage extends FormPage {
             ConnectionManager connectionManager = nisPartition.getConnectionManager();
             JDBCConnection connection = (JDBCConnection)connectionManager.getConnection(FederationClient.JDBC);
 
-            for (NISDomain domain : nisFederation.getRepositories()) {
+            for (FederationRepositoryConfig domain : nisFederation.getRepositories()) {
                 boolean exists = connection.checkDatabase(domain.getName());
 
                 TableItem ti = new TableItem(table, SWT.NONE);

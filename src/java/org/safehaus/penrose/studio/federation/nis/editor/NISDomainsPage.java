@@ -21,6 +21,7 @@ import org.eclipse.jface.window.Window;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.federation.nis.wizard.AddNISDomainWizard;
 import org.safehaus.penrose.studio.federation.nis.wizard.EditNISDomainWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -132,7 +133,7 @@ public class NISDomainsPage extends FormPage {
 
                     if (dialog.open() == Window.CANCEL) return;
 
-                    NISDomain domain = wizard.getRepository();
+                    FederationRepositoryConfig domain = wizard.getRepository();
 
                     nisFederation.addRepository(domain);
                     nisFederation.createPartitions(domain.getName());
@@ -160,7 +161,7 @@ public class NISDomainsPage extends FormPage {
 
                     TableItem item = table.getSelection()[0];
 
-                    NISDomain domain = (NISDomain)item.getData();
+                    FederationRepositoryConfig domain = (FederationRepositoryConfig)item.getData();
 
                     EditNISDomainWizard wizard = new EditNISDomainWizard(domain);
                     WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
@@ -210,7 +211,7 @@ public class NISDomainsPage extends FormPage {
 
                     TableItem[] items = table.getSelection();
                     for (TableItem ti : items) {
-                        NISDomain repository = (NISDomain)ti.getData();
+                        FederationRepositoryConfig repository = (FederationRepositoryConfig)ti.getData();
 
                         try {
                             nisFederation.removePartitions(repository.getName());
@@ -256,15 +257,19 @@ public class NISDomainsPage extends FormPage {
 
             table.removeAll();
 
-            for (NISDomain domain : nisFederation.getRepositories()) {
+            for (FederationRepositoryConfig repositoryConfig : nisFederation.getRepositories()) {
 
                 TableItem ti = new TableItem(table, SWT.NONE);
 
-                ti.setText(0, domain.getName());
-                ti.setText(1, domain.getParameter(NISDomain.NIS_SERVER));
-                ti.setText(2, domain.getParameter(NISDomain.NIS_DOMAIN));
+                ti.setText(0, repositoryConfig.getName());
 
-                ti.setData(domain);
+                String server = repositoryConfig.getParameter(NISDomain.SERVER);
+                ti.setText(1, server == null ? "" : server);
+
+                String domain = repositoryConfig.getParameter(NISDomain.DOMAIN);
+                ti.setText(2, domain == null ? "" : domain);
+
+                ti.setData(repositoryConfig);
             }
 
             table.select(indices);

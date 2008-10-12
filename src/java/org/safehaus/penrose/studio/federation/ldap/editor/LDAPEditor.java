@@ -7,6 +7,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.safehaus.penrose.federation.LDAPFederationClient;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.federation.partition.FederationPartitionPartitionsPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,6 @@ public class LDAPEditor extends FormEditor {
     public void addPages() {
         try {
             addPage(new LDAPRepositoriesPage(this, ldapFederation));
-            addPage(new LDAPPartitionsPage(this, ldapFederation));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

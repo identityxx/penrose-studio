@@ -4,7 +4,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.federation.Repository;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 
 /**
  * @author Endi S. Dewata
@@ -12,8 +12,9 @@ import org.safehaus.penrose.federation.Repository;
 public class LinkingEditorInput implements IEditorInput {
 
     private Project project;
-    private Repository repository;
-    private String partitionName;
+    private FederationRepositoryConfig repository;
+    private String localPartition;
+    private String globalPartition;
 
     public LinkingEditorInput() {
     }
@@ -45,7 +46,8 @@ public class LinkingEditorInput implements IEditorInput {
     public int hashCode() {
         return (project == null ? 0 : project.hashCode()) +
                 (repository == null ? 0 : repository.hashCode()) +
-                (partitionName == null ? 0 : partitionName.hashCode());
+                (localPartition == null ? 0 : localPartition.hashCode()) +
+                (globalPartition == null ? 0 : globalPartition.hashCode());
     }
 
     boolean equals(Object o1, Object o2) {
@@ -62,7 +64,8 @@ public class LinkingEditorInput implements IEditorInput {
         LinkingEditorInput ei = (LinkingEditorInput)object;
         if (!equals(project, ei.project)) return false;
         if (!equals(repository, ei.repository)) return false;
-        if (!equals(partitionName, ei.partitionName)) return false;
+        if (!equals(localPartition, ei.localPartition)) return false;
+        if (!equals(globalPartition, ei.globalPartition)) return false;
 
         return true;
     }
@@ -75,19 +78,27 @@ public class LinkingEditorInput implements IEditorInput {
         this.project = project;
     }
 
-    public Repository getRepository() {
+    public FederationRepositoryConfig getRepository() {
         return repository;
     }
 
-    public void setRepository(Repository repository) {
+    public void setRepository(FederationRepositoryConfig repository) {
         this.repository = repository;
     }
 
-    public String getPartitionName() {
-        return partitionName;
+    public String getLocalPartition() {
+        return localPartition;
     }
 
-    public void setPartitionName(String partitionName) {
-        this.partitionName = partitionName;
+    public void setLocalPartition(String localPartition) {
+        this.localPartition = localPartition;
+    }
+
+    public String getGlobalPartition() {
+        return globalPartition;
+    }
+
+    public void setGlobalPartition(String globalPartition) {
+        this.globalPartition = globalPartition;
     }
 }

@@ -5,7 +5,7 @@ import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.federation.NISFederationClient;
-import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 
 /**
  * @author Endi S. Dewata
@@ -14,7 +14,7 @@ public class NISLinkEditorInput implements IEditorInput {
 
     private Project project;
     private NISFederationClient nisFederation;
-    private NISDomain domain;
+    private FederationRepositoryConfig domain;
 
     public NISLinkEditorInput() {
     }
@@ -66,11 +66,11 @@ public class NISLinkEditorInput implements IEditorInput {
         return true;
     }
 
-    public NISDomain getDomain() {
+    public FederationRepositoryConfig getDomain() {
         return domain;
     }
 
-    public void setDomain(NISDomain domain) {
+    public void setDomain(FederationRepositoryConfig domain) {
         this.domain = domain;
     }
 

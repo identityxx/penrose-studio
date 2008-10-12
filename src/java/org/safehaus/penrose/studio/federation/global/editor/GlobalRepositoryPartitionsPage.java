@@ -18,8 +18,10 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.federation.GlobalRepository;
 import org.safehaus.penrose.federation.FederationClient;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.federation.partition.FederationPartitionEditor;
 
 /**
  * @author Endi S. Dewata
@@ -30,7 +32,7 @@ public class GlobalRepositoryPartitionsPage extends FormPage {
 
     FormToolkit toolkit;
 
-    GlobalEditor editor;
+    FederationPartitionEditor editor;
 
     Label suffixText;
     Label templateText;
@@ -38,12 +40,12 @@ public class GlobalRepositoryPartitionsPage extends FormPage {
     FederationClient federation;
     Project project;
 
-    public GlobalRepositoryPartitionsPage(GlobalEditor editor) {
+    public GlobalRepositoryPartitionsPage(FederationPartitionEditor editor) {
         super(editor, "PARTITIONS", "  Partitions  ");
 
         this.editor = editor;
-        this.federation = editor.federation;
-        this.project = editor.project;
+        this.federation = editor.getFederationClient();
+        this.project = editor.getProject();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -127,8 +129,8 @@ public class GlobalRepositoryPartitionsPage extends FormPage {
 
                     if (!confirm) return;
 
-                    federation.createPartitions(FederationClient.GLOBAL);
-                    federation.startPartitions(FederationClient.GLOBAL);
+                    federation.createPartition(FederationClient.GLOBAL);
+                    federation.startPartition(FederationClient.GLOBAL);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -151,8 +153,8 @@ public class GlobalRepositoryPartitionsPage extends FormPage {
 
                     if (!confirm) return;
 
-                    federation.stopPartitions(FederationClient.GLOBAL);
-                    federation.removePartitions(FederationClient.GLOBAL);
+                    federation.stopPartition(FederationClient.GLOBAL);
+                    federation.removePartition(FederationClient.GLOBAL);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -166,7 +168,7 @@ public class GlobalRepositoryPartitionsPage extends FormPage {
 
     public void refresh() {
         try {
-            GlobalRepository globalRepository = federation.getGlobalRepository();
+            FederationRepositoryConfig globalRepository = federation.getGlobalRepository();
             if (globalRepository == null) return;
 
             String suffix = globalRepository.getParameter(GlobalRepository.SUFFIX);

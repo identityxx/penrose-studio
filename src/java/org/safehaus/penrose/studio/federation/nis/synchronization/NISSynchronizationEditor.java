@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.partition.PartitionClient;
@@ -22,7 +23,7 @@ public class NISSynchronizationEditor extends FormEditor {
 
     Project project;
     NISFederationClient nisFederationClient;
-    NISDomain domain;
+    FederationRepositoryConfig domain;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         NISSynchronizationEditorInput ei = (NISSynchronizationEditorInput)input;
@@ -68,11 +69,11 @@ public class NISSynchronizationEditor extends FormEditor {
         return false;
     }
 
-    public NISDomain getDomain() {
+    public FederationRepositoryConfig getDomain() {
         return domain;
     }
 
-    public void setDomain(NISDomain domain) {
+    public void setDomain(FederationRepositoryConfig domain) {
         this.domain = domain;
     }
 

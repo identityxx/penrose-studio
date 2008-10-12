@@ -2,7 +2,7 @@ package org.safehaus.penrose.studio.federation.linking;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.safehaus.penrose.federation.Repository;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.LinkingData;
 import org.safehaus.penrose.ldap.SearchResult;
 import org.safehaus.penrose.studio.federation.linking.editor.LinkingPage;
@@ -17,7 +17,7 @@ import java.util.Collection;
 public class DeleteTask implements IRunnableWithProgress {
 
     LinkingPage page;
-    Repository repository;
+    FederationRepositoryConfig repository;
 
     private LinkingData data;
 
@@ -27,7 +27,7 @@ public class DeleteTask implements IRunnableWithProgress {
 
     private Collection<SearchResult> globalEntries;
     
-    public DeleteTask(LinkingPage page, Repository repository) {
+    public DeleteTask(LinkingPage page, FederationRepositoryConfig repository) {
         this.page = page;
         this.repository = repository;
     }

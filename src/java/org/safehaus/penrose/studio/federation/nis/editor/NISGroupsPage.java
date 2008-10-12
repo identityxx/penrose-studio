@@ -15,9 +15,9 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.management.*;
 import org.safehaus.penrose.source.SourceClient;
@@ -47,7 +47,7 @@ public class NISGroupsPage extends FormPage {
 
     Project project;
     NISFederationClient nisFederation;
-    NISDomain domain;
+    FederationRepositoryConfig domain;
 
     public NISGroupsPage(NISGroupsEditor editor) {
         super(editor, "GROUPS", "  Groups  ");

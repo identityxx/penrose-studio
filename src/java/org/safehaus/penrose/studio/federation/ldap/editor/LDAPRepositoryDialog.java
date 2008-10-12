@@ -10,6 +10,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.graphics.Point;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.federation.LDAPRepository;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 
@@ -32,7 +33,7 @@ public class LDAPRepositoryDialog extends Dialog {
 
     int action;
 
-    private LDAPRepository repository;
+    private FederationRepositoryConfig repository;
 
     public LDAPRepositoryDialog(Shell parent, int style) {
 		super(parent, style);
@@ -69,16 +70,16 @@ public class LDAPRepositoryDialog extends Dialog {
     }
 
     public void reset() {
-        String url = repository.getParameter(LDAPRepository.LDAP_URL);
+        String url = repository.getParameter(LDAPRepository.URL);
         urlText.setText(url == null ? "" : url);
 
-        String suffix = repository.getParameter(LDAPRepository.LDAP_SUFFIX);
+        String suffix = repository.getParameter(LDAPRepository.SUFFIX);
         suffixText.setText(suffix == null ? "" : suffix);
 
-        String user = repository.getParameter(LDAPRepository.LDAP_USER);
+        String user = repository.getParameter(LDAPRepository.USER);
         userText.setText(user == null ? "" : user);
 
-        String password = repository.getParameter(LDAPRepository.LDAP_PASSWORD);
+        String password = repository.getParameter(LDAPRepository.PASSWORD);
         passwordText.setText(password == null ? "" : password);
     }
 
@@ -154,16 +155,16 @@ public class LDAPRepositoryDialog extends Dialog {
             public void widgetSelected(SelectionEvent e) {
 
                 String url = urlText.getText();
-                repository.setParameter(LDAPRepository.LDAP_URL, "".equals(url) ? null : url);
+                repository.setParameter(LDAPRepository.URL, "".equals(url) ? null : url);
 
                 String suffix = suffixText.getText();
-                repository.setParameter(LDAPRepository.LDAP_SUFFIX, "".equals(suffix) ? null : suffix);
+                repository.setParameter(LDAPRepository.SUFFIX, "".equals(suffix) ? null : suffix);
 
                 String user = userText.getText();
-                repository.setParameter(LDAPRepository.LDAP_USER, "".equals(user) ? null : user);
+                repository.setParameter(LDAPRepository.USER, "".equals(user) ? null : user);
 
                 String password = passwordText.getText();
-                repository.setParameter(LDAPRepository.LDAP_PASSWORD, "".equals(password) ? null : password);
+                repository.setParameter(LDAPRepository.PASSWORD, "".equals(password) ? null : password);
 
                 action = OK;
                 shell.close();
@@ -181,11 +182,11 @@ public class LDAPRepositoryDialog extends Dialog {
         this.action = action;
     }
 
-    public void setRepository(LDAPRepository repository) {
+    public void setRepository(FederationRepositoryConfig repository) {
         this.repository = repository;
     }
 
-    public LDAPRepository getRepository() {
+    public FederationRepositoryConfig getRepository() {
         return repository;
     }
 }

@@ -1,10 +1,8 @@
 package org.safehaus.penrose.studio.federation.nis.synchronization;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
-import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditor;
-import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditorInput;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
@@ -20,10 +18,10 @@ import org.eclipse.ui.IWorkbenchPage;
  */
 public class NISSynchronizationNode extends Node {
 
-    ProjectNode projectNode;
     NISNode nisNode;
     NISDomainNode domainNode;
 
+    private Project project;
     private NISFederationClient nisFederation;
 
     public NISSynchronizationNode(String name, NISDomainNode domainNode) {
@@ -37,8 +35,8 @@ public class NISSynchronizationNode extends Node {
         this.domainNode = domainNode;
 
         nisNode = domainNode.getNisNode();
-        projectNode = nisNode.getProjectNode();
 
+        project = nisNode.getProject();
         nisFederation = nisNode.getNisFederation();
     }
 
@@ -58,7 +56,7 @@ public class NISSynchronizationNode extends Node {
     public void open() throws Exception {
 
         NISSynchronizationEditorInput ei = new NISSynchronizationEditorInput();
-        ei.setProject(projectNode.getProject());
+        ei.setProject(project);
         ei.setNisTool(nisFederation);
         ei.setDomain(domainNode.getDomain());
 

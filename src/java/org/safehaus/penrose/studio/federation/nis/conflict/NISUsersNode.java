@@ -4,8 +4,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.tree.Node;
 
@@ -19,7 +19,7 @@ public class NISUsersNode extends Node {
 
     private Project project;
     private NISFederationClient nisFederation;
-    private NISDomain domain;
+    private FederationRepositoryConfig domain;
 
     public NISUsersNode(String name, Image image, Object object, Object parent) {
         super(name, image, object, parent);
@@ -53,11 +53,11 @@ public class NISUsersNode extends Node {
         this.nisFederation = nisFederation;
     }
 
-    public NISDomain getDomain() {
+    public FederationRepositoryConfig getDomain() {
         return domain;
     }
 
-    public void setDomain(NISDomain domain) {
+    public void setDomain(FederationRepositoryConfig domain) {
         this.domain = domain;
     }
 

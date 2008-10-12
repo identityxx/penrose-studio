@@ -5,7 +5,7 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.federation.NISDomain;
-import org.safehaus.penrose.federation.Repository;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.federation.linking.wizard.LinkingParametersWizardPage;
 
@@ -18,10 +18,10 @@ public class AddNISDomainWizard extends Wizard {
 
     NISRepositoryWizardPage     repositoryPage;
     NISDomainWizardPage         connectionPage;
-    NISPartitionsWizardPage     partitionsPage;
-    LinkingParametersWizardPage linkingPage;
+    //NISPartitionsWizardPage     partitionsPage;
+    //LinkingParametersWizardPage linkingPage;
 
-    NISDomain repository = new NISDomain();
+    FederationRepositoryConfig repository = new FederationRepositoryConfig();
 
     public AddNISDomainWizard() {
         setWindowTitle("Add NIS Domain");
@@ -33,19 +33,20 @@ public class AddNISDomainWizard extends Wizard {
 
         connectionPage = new NISDomainWizardPage();
         addPage(connectionPage);
-
+/*
         partitionsPage = new NISPartitionsWizardPage();
         addPage(partitionsPage);
 
         linkingPage = new LinkingParametersWizardPage();
         addPage(linkingPage);
+*/
     }
 
     public boolean canFinish() {
         if (!repositoryPage.isPageComplete()) return false;
         if (!connectionPage.isPageComplete()) return false;
-        if (!partitionsPage.isPageComplete()) return false;
-        if (!linkingPage.isPageComplete()) return false;
+        //if (!partitionsPage.isPageComplete()) return false;
+        //if (!linkingPage.isPageComplete()) return false;
         return true;
     }
 
@@ -53,7 +54,7 @@ public class AddNISDomainWizard extends Wizard {
         if (repositoryPage == page) {
             String name = repositoryPage.getRepositoryName();
             connectionPage.setDomain(name);
-            
+/*
         } else if (connectionPage == page) {
             String name = repositoryPage.getRepositoryName();
             String domainName = connectionPage.getDomain();
@@ -73,6 +74,7 @@ public class AddNISDomainWizard extends Wizard {
             partitionsPage.setNisSuffix(nisSuffix);
             partitionsPage.setYpSuffix(ypSuffix);
             partitionsPage.setNssSuffix(nssSuffix);
+*/
         }
 
         return super.getNextPage(page);
@@ -82,23 +84,20 @@ public class AddNISDomainWizard extends Wizard {
         try {
             repository.setName(repositoryPage.getRepositoryName());
 
-            repository.setParameter(NISDomain.NIS_SERVER, connectionPage.getServer());
-            repository.setParameter(NISDomain.NIS_DOMAIN, connectionPage.getDomain());
-
-            repository.setParameter(NISDomain.YP_ENABLED, partitionsPage.isYpEnabled());
+            repository.setParameter(NISDomain.SERVER, connectionPage.getServer());
+            repository.setParameter(NISDomain.DOMAIN, connectionPage.getDomain());
+/*
             repository.setParameter(NISDomain.YP_SUFFIX, partitionsPage.getYpSuffix());
 
-            repository.setParameter(NISDomain.NIS_ENABLED, partitionsPage.isNisEnabled());
             repository.setParameter(NISDomain.NIS_SUFFIX, partitionsPage.getNisSuffix());
 
-            repository.setParameter(NISDomain.NSS_ENABLED, partitionsPage.isNssEnabled());
             repository.setParameter(NISDomain.NSS_SUFFIX, partitionsPage.getNssSuffix());
 
-            repository.setParameter(Repository.LINKING_LOCAL_ATTRIBUTE, linkingPage.getLocalAttribute());
-            repository.setParameter(Repository.LINKING_GLOBAL_ATTRIBUTE, linkingPage.getGlobalAttribute());
-            repository.setParameter(Repository.IMPORT_MAPPING_NAME, linkingPage.getImportMappingName());
-            repository.setParameter(Repository.IMPORT_MAPPING_PREFIX, linkingPage.getImportMappingPrefix());
-
+            repository.setParameter(FederationRepositoryConfig.LINKING_LOCAL_ATTRIBUTE, linkingPage.getLocalAttribute());
+            repository.setParameter(FederationRepositoryConfig.LINKING_GLOBAL_ATTRIBUTE, linkingPage.getGlobalAttribute());
+            repository.setParameter(FederationRepositoryConfig.IMPORT_MAPPING_NAME, linkingPage.getImportMappingName());
+            repository.setParameter(FederationRepositoryConfig.IMPORT_MAPPING_PREFIX, linkingPage.getImportMappingPrefix());
+*/
             return true;
 
         } catch (Exception e) {
@@ -112,7 +111,7 @@ public class AddNISDomainWizard extends Wizard {
         return true;
     }
 
-    public NISDomain getRepository() {
+    public FederationRepositoryConfig getRepository() {
         return repository;
     }
 }

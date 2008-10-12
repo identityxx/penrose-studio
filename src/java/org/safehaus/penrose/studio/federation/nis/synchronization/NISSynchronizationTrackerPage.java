@@ -19,6 +19,7 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditor;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.federation.NISDomain;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.management.*;
 import org.safehaus.penrose.scheduler.JobClient;
 import org.safehaus.penrose.scheduler.SchedulerClient;
@@ -45,7 +46,7 @@ public class NISSynchronizationTrackerPage extends FormPage {
     Project project;
     NISSynchronizationEditor editor;
     NISFederationClient nisFederation;
-    NISDomain domain;
+    FederationRepositoryConfig domain;
 
     Table trackerTable;
 

@@ -22,6 +22,7 @@ import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.federation.LDAPFederationClient;
 import org.safehaus.penrose.federation.LDAPRepository;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.federation.ldap.wizard.EditLDAPRepositoryWizard;
 import org.safehaus.penrose.studio.project.Project;
 
@@ -40,7 +41,7 @@ public class LDAPRepositorySettingsPage extends FormPage {
     Label bindPasswordText;
 
     LDAPRepositoryEditor editor;
-    LDAPRepository repository;
+    FederationRepositoryConfig repository;
     LDAPFederationClient ldapFederation;
 
     Project project;
@@ -163,16 +164,16 @@ public class LDAPRepositorySettingsPage extends FormPage {
 
     public void refresh() {
         try {
-            String url = repository.getParameter(LDAPRepository.LDAP_URL);
+            String url = repository.getParameter(LDAPRepository.URL);
             urlText.setText(url == null ? "" : url);
 
-            String suffix = repository.getParameter(LDAPRepository.LDAP_SUFFIX);
+            String suffix = repository.getParameter(LDAPRepository.SUFFIX);
             suffixText.setText(suffix == null ? "" : suffix);
 
-            String bindDn = repository.getParameter(LDAPRepository.LDAP_USER);
+            String bindDn = repository.getParameter(LDAPRepository.USER);
             bindDnText.setText(bindDn == null ? "" : bindDn);
 
-            String bindPassword = repository.getParameter(LDAPRepository.LDAP_PASSWORD);
+            String bindPassword = repository.getParameter(LDAPRepository.PASSWORD);
             bindPasswordText.setText(bindPassword == null ? "" : "*****");
 
         } catch (Exception e) {
