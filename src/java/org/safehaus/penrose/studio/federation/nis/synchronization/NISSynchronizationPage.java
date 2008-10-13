@@ -871,6 +871,16 @@ public class NISSynchronizationPage extends FormPage {
     public String getSourceStatus(String mapName) {
         try {
             DN dn = getSourceDn(mapName);
+
+            Long result = (Long)moduleClient.invoke(
+                    "getSourceCount",
+                    new Object[] { dn },
+                    new String[] { DN.class.getName() }
+            );
+
+            String status = result == null ? "N/A" : ""+result;
+/*
+            DN dn = getSourceDn(mapName);
             log.debug("Searching "+dn+".");
 
             SearchRequest request = new SearchRequest();
@@ -890,7 +900,7 @@ public class NISSynchronizationPage extends FormPage {
             } else {
                 status = "N/A";
             }
-
+*/
             log.debug("Status: "+status);
 
             return status;
@@ -903,6 +913,16 @@ public class NISSynchronizationPage extends FormPage {
 
     public String getTargetStatus(String mapName) {
         try {
+            DN dn = getTargetDn(mapName);
+
+            Long result = (Long)moduleClient.invoke(
+                    "getTargetCount",
+                    new Object[] { dn },
+                    new String[] { DN.class.getName() }
+            );
+
+            String status = result == null ? "N/A" : ""+result;
+/*
             DN dn = getTargetDn(mapName);
             log.debug("Searching "+dn+".");
 
@@ -923,7 +943,7 @@ public class NISSynchronizationPage extends FormPage {
             } else {
                 status = "N/A";
             }
-
+*/
             log.debug("Status: "+status);
             
             return status;
