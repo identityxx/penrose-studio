@@ -656,12 +656,13 @@ public class NISSynchronizationPage extends FormPage {
                             );
 
                             log.warn("Synchronization Result:");
+                            log.warn(" - source    : "+result.getSourceEntries());
+                            log.warn(" - target    : "+result.getTargetEntries());
                             log.warn(" - added     : "+result.getAddedEntries());
                             log.warn(" - modified  : "+result.getModifiedEntries());
                             log.warn(" - deleted   : "+result.getDeletedEntries());
                             log.warn(" - unchanged : "+result.getUnchangedEntries());
                             log.warn(" - failed    : "+result.getFailedEntries());
-                            log.warn(" - total     : "+result.getTotalEntries());
                             log.warn(" - time      : "+result.getDuration()/1000.0+" s");
 
                             results.put(mapName, result);
@@ -682,13 +683,13 @@ public class NISSynchronizationPage extends FormPage {
                 }
             });
 
-            Map<String,String> statuses = refreshTarget(mapNames);
+            //Map<String,String> statuses = refreshTarget(mapNames);
 
             for (TableItem ti : items) {
                 String mapName = (String)ti.getData();
 
-                String status = statuses.get(mapName);
-                ti.setText(2, status);
+                //String status = statuses.get(mapName);
+                //ti.setText(2, status);
 
                 SynchronizationResult result = results.get(mapName);
 
@@ -696,6 +697,8 @@ public class NISSynchronizationPage extends FormPage {
                 long minutes = duration / 60;
                 long seconds = duration % 60;
 
+                ti.setText(1, ""+result.getSourceEntries());
+                ti.setText(2, ""+result.getTargetEntries());
                 ti.setText(3, minutes+":"+seconds);
                 ti.setText(4, ""+result.getAddedEntries());
                 ti.setText(5, ""+result.getModifiedEntries());
