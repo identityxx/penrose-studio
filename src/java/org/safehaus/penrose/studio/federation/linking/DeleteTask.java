@@ -5,6 +5,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.LinkingData;
 import org.safehaus.penrose.ldap.SearchResult;
+import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.studio.federation.linking.editor.LinkingPage;
 
 import javax.management.MBeanException;
@@ -41,11 +42,13 @@ public class DeleteTask implements IRunnableWithProgress {
 
                 monitor.subTask("Deleting "+globalEntry+"...");
 
-                page.linkingClient.deleteEntry(globalEntry.getDn());
+                DN localDn = data.getDn();
+                page.linkingClient.deleteEntry(localDn, globalEntry.getDn());
 
                 data.setSearched(false);
                 data.removeLinkedEntry(globalEntry.getDn());
                 data.removeMatchedEntry(globalEntry.getDn());
+                page.loadLocalEntry(data);
                 page.updateStatus(data);
 
                 monitor.worked(1);

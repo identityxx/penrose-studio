@@ -349,11 +349,13 @@ public class EntryDialog extends Dialog {
         this.attributes = attributes;
     }
 
-    public void addGUIDAttribute(String name) {
-        guidAttributes.add(name.toLowerCase());
+    public void setGUIDAttribute(Collection<String> guidAttributes) {
+        this.guidAttributes.clear();
+        this.guidAttributes.addAll(guidAttributes);
     }
 
-    public void addSIDAttribute(String name) {
-        sidAttributes.add(name.toLowerCase());
+    public void setSIDAttribute(Collection<String> guidAttributes) {
+        this.sidAttributes.clear();
+        this.sidAttributes.addAll(sidAttributes);
     }
 }

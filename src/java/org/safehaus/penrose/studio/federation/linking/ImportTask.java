@@ -43,7 +43,7 @@ public class ImportTask implements IRunnableWithProgress {
                 data.setSearched(false);
                 data.addLinkedEntry(importedEntry);
                 data.removeMatchedEntries();
-                page.updateLocal(data);
+                page.loadLocalEntry(data);
 
                 monitor.worked(1);
             }

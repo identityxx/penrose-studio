@@ -43,10 +43,7 @@ import org.safehaus.penrose.source.SourceClient;
 
 import javax.management.MBeanException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Endi S. Dewata
@@ -93,6 +90,9 @@ public class LinkingPage extends FormPage {
     public DNSorter dnSorter         = new DNSorter();
     public StatusSorter statusSorter = new StatusSorter();
 
+    public Collection<String> guidAttributes = new HashSet<String>();
+    public Collection<String> sidAttributes = new HashSet<String>();
+
     public LinkingPage(LinkingEditor editor) throws Exception {
         super(editor, "LINKING", "  Linking  ");
 
@@ -116,6 +116,22 @@ public class LinkingPage extends FormPage {
         globalBaseDn = new DN(globalSourceClient.getParameter("baseDn"));
 
         linkingClient = new LinkingClient(penroseClient, localPartition, Federation.LINKING_MODULE);
+
+        String s = linkingClient.getParameter("guidAttributes");
+        if (s != null) {
+            for (StringTokenizer st = new StringTokenizer(s, ", "); st.hasMoreTokens(); ) {
+                String token = st.nextToken();
+                guidAttributes.add(token.toLowerCase());
+            }
+        }
+
+        s = linkingClient.getParameter("sidAttributes");
+        if (s != null) {
+            for (StringTokenizer st = new StringTokenizer(s, ", "); st.hasMoreTokens(); ) {
+                String token = st.nextToken();
+                sidAttributes.add(token.toLowerCase());
+            }
+        }
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -733,9 +749,8 @@ public class LinkingPage extends FormPage {
         }
     }
 
-    public void updateLocal(LinkingData data) throws Exception {
+    public void loadLocalEntry(LinkingData data) throws Exception {
         try {
-            //SearchResult entry = localPartitionClient.find(data.getDn());
             SearchResult entry = localSourceClient.find(data.getDn());
             data.setEntry(entry);
             updateStatus(data);
@@ -754,20 +769,21 @@ public class LinkingPage extends FormPage {
     }
 
     public void showLocalAttributes(LinkingData data) throws Exception {
-        updateAttributes(localAttributeTable, data.getEntry());
+        showAttributes(localAttributeTable, data.getEntry());
     }
 
     public void showGlobalAttributes(SearchResult entry) throws Exception {
-        updateAttributes(globalAttributeTable, entry);
+        showAttributes(globalAttributeTable, entry);
     }
 
-    public void updateAttributes(Table table, SearchResult entry) throws Exception {
+    public void showAttributes(Table table, SearchResult entry) throws Exception {
 
         Attributes attributes = entry.getAttributes();
         log.debug("Attributes:");
 
         for (Attribute attribute : attributes.getAll()) {
             String attributeName = attribute.getName();
+            String normalizedAttributeName = attributeName.toLowerCase();
 
             if (log.isDebugEnabled()) attribute.print();
 
@@ -777,10 +793,8 @@ public class LinkingPage extends FormPage {
                 attrItem.setText(0, attributeName);
 
                 String s;
-                if ("objectGUID".equalsIgnoreCase(attributeName)) {
-                    s = ActiveDirectoryUtil.getGUID((byte[])value);
 
-                } else if ("adiSeeAlsoObjectGUID".equalsIgnoreCase(attributeName)) {
+                if (guidAttributes.contains(normalizedAttributeName)) {
                     if (value instanceof String) {
                         s = ActiveDirectoryUtil.getGUID(((String)value).getBytes());
 
@@ -788,7 +802,7 @@ public class LinkingPage extends FormPage {
                         s = ActiveDirectoryUtil.getGUID((byte[])value);
                     }
 
-                } else if ("objectSid".equalsIgnoreCase(attributeName)) {
+                } else if (sidAttributes.contains(normalizedAttributeName)) {
                     s = ActiveDirectoryUtil.getSID((byte[])value);
 
                 } else if (value instanceof byte[]) {
@@ -937,7 +951,7 @@ public class LinkingPage extends FormPage {
                 data.setSearched(false);
                 data.removeMatchedEntries();
                 data.removeLinkedEntries();
-                updateLocal(data);
+                loadLocalEntry(data);
             }
 
             localTableViewer.refresh();
@@ -1054,7 +1068,7 @@ public class LinkingPage extends FormPage {
                 updateStatus(data);
 
                 clearLocalAttributes();
-                updateLocal(data);
+                loadLocalEntry(data);
                 showLocalAttributes(data);
 
             } else {
@@ -1134,7 +1148,7 @@ public class LinkingPage extends FormPage {
 
             localTableViewer.refresh();
             clearLocalAttributes();
-            updateLocal(data);
+            loadLocalEntry(data);
             showLocalAttributes(data);
 
             globalTable.removeAll();
@@ -1193,7 +1207,7 @@ public class LinkingPage extends FormPage {
                 }
 
                 data.setSearched(false);
-                updateLocal(data);
+                loadLocalEntry(data);
             }
 
             if (count == 1) {
@@ -1202,7 +1216,6 @@ public class LinkingPage extends FormPage {
 
                 localTableViewer.refresh();
                 clearLocalAttributes();
-                //updateLocal(data);
                 showLocalAttributes(data);
 
                 globalTable.removeAll();
@@ -1310,9 +1323,8 @@ public class LinkingPage extends FormPage {
             dialog.setDn(targetDn);
             dialog.setAttributes(targetAttributes);
 
-            dialog.addGUIDAttribute("objectGUID");
-            dialog.addGUIDAttribute("adiSeeAlsoObjectGUID");
-            dialog.addSIDAttribute("objectSid");
+            dialog.setGUIDAttribute(guidAttributes);
+            dialog.setSIDAttribute(sidAttributes);
 
             int rc = dialog.open();
             if (rc == EntryDialog.SKIP || rc == EntryDialog.CANCEL) return rc;
@@ -1329,7 +1341,7 @@ public class LinkingPage extends FormPage {
                 data.removeMatchedEntries();
                 data.removeLinkedEntries();
                 data.addLinkedEntry(newEntry);
-                updateLocal(data);
+                loadLocalEntry(data);
 
                 break;
 
@@ -1388,14 +1400,11 @@ public class LinkingPage extends FormPage {
             progressService.busyCursorWhile(task);
 
             localTableViewer.refresh();
-
-            for (TableItem item : globalTable.getSelection()) {
-                item.dispose();
-            }
+            clearLocalAttributes();
+            showLocalAttributes(data);
 
             globalTable.removeAll();
             clearGlobalAttributes();
-
             showGlobalEntries(data);
 
         } catch (Exception e) {
