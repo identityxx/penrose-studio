@@ -19,12 +19,13 @@ import org.safehaus.penrose.federation.*;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.federation.partition.FederationPartitionEditorWizard;
-import org.safehaus.penrose.studio.federation.partition.FederationPartitionEditor;
-import org.safehaus.penrose.studio.federation.partition.FederationPartitionEditorInput;
+import org.safehaus.penrose.studio.federation.partition.FederationDomainEditorWizard;
+import org.safehaus.penrose.studio.federation.partition.FederationDomainEditor;
+import org.safehaus.penrose.studio.federation.partition.FederationDomainEditorInput;
 import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
+import org.safehaus.penrose.studio.federation.jdbc.JDBCNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.tree.Node;
 
@@ -36,28 +37,49 @@ import java.util.Collection;
 /**
  * @author Endi Sukma Dewata
  */
-public class FederationPartitionNode extends Node {
+public class FederationDomainNode extends Node {
 
     private Project project;
     private FederationClient federationClient;
 
     private Collection<Node> children = new ArrayList<Node>();
 
-    public FederationPartitionNode(String name, FederationNode federationNode) throws Exception {
+    public FederationDomainNode(String name, FederationNode federationNode) throws Exception {
         super(name, PenroseStudioPlugin.getImage(PenroseImage.MODULE), null, federationNode);
 
         project = federationNode.getProject();
         federationClient = new FederationClient(project.getClient(), name);
 
-        children.add(new LDAPNode(
-                "LDAP",
-                this
-        ));
+        refresh();
+    }
 
-        children.add(new NISNode(
-                "NIS",
-                this
-        ));
+    public void refresh() throws Exception {
+
+        log.debug("Refreshing repository types:");
+
+        children.clear();
+
+        for (String type : federationClient.getTypes()) {
+
+            log.debug(" - "+type);
+
+            Node node;
+
+            if ("JDBC".equals(type)) {
+                node = new JDBCNode(type, this);
+
+            } else if ("LDAP".equals(type)) {
+                node = new LDAPNode(type, this);
+
+            } else if ("NIS".equals(type)) {
+                node = new NISNode(type, this);
+
+            } else {
+                continue;
+            }
+
+            children.add(node);
+        }
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -120,17 +142,33 @@ public class FederationPartitionNode extends Node {
             }
         });
 */
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(new Action("Refresh") {
+            public void run() {
+                try {
+                    refresh();
+
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    penroseStudio.notifyChangeListeners();
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
     }
 
     public void open() throws Exception {
 
-        FederationPartitionEditorInput ei = new FederationPartitionEditorInput();
+        FederationDomainEditorInput ei = new FederationDomainEditorInput();
         ei.setProject(project);
         ei.setFederationClient(federationClient);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
-        page.openEditor(ei, FederationPartitionEditor.class.getName());
+        page.openEditor(ei, FederationDomainEditor.class.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
@@ -138,7 +176,7 @@ public class FederationPartitionNode extends Node {
 
     public void edit() throws Exception {
 
-        FederationPartitionEditorWizard wizard = new FederationPartitionEditorWizard(federationClient);
+        FederationDomainEditorWizard wizard = new FederationDomainEditorWizard(federationClient);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
@@ -188,7 +226,7 @@ public class FederationPartitionNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        return true;
+        return !children.isEmpty();
     }
 
     public Collection<Node> getChildren() throws Exception {
@@ -245,21 +283,12 @@ public class FederationPartitionNode extends Node {
 
                     monitor.worked(1);
 
-                    monitor.subTask("Creating global partition...");
+                    for (String partitionName : federationClient.getPartitionNames()) {
 
-                    federationClient.createPartition(FederationClient.GLOBAL);
-                    federationClient.startPartition(FederationClient.GLOBAL);
+                        monitor.subTask("Creating "+partitionName+" partition...");
 
-                    monitor.worked(1);
-
-                    for (FederationRepositoryConfig repository : federationClient.getRepositories()) {
-
-                        if (FederationClient.GLOBAL.equals(repository.getName())) continue;
-
-                        monitor.subTask("Creating "+repository.getName()+" partition...");
-
-                        federationClient.createPartition(repository.getName());
-                        federationClient.startPartition(repository.getName());
+                        federationClient.createPartition(partitionName);
+                        federationClient.startPartition(partitionName);
 
                         monitor.worked(1);
                     }

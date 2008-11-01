@@ -26,9 +26,10 @@ import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.directory.dialog.SourceDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.slf4j.Logger;
@@ -90,8 +91,9 @@ public class SelectSourcesWizardPage extends WizardPage implements SelectionList
                     PenroseClient client = project.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+                    SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
-                    Collection<String> sourceNames = partitionClient.getSourceNames();
+                    Collection<String> sourceNames = sourceManagerClient.getSourceNames();
                     if (sourceNames.isEmpty()) {
                         System.out.println("There is no sources defined.");
                         return;
@@ -99,7 +101,7 @@ public class SelectSourcesWizardPage extends WizardPage implements SelectionList
 
                     Collection<SourceConfig> sourceConfigs = new ArrayList<SourceConfig>();
                     for (String sourceName : sourceNames) {
-                        SourceClient sourceClient = partitionClient.getSourceClient(sourceName);
+                        SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceName);
                         SourceConfig sourceConfig = sourceClient.getSourceConfig();
                         sourceConfigs.add(sourceConfig);
                     }

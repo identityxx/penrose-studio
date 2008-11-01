@@ -23,11 +23,13 @@ import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.ProxyEntry;
 import org.safehaus.penrose.directory.EntrySourceConfig;
+import org.safehaus.penrose.directory.DirectoryClient;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDN;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.connection.ConnectionClient;
+import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.source.SourceConfig;
@@ -79,8 +81,10 @@ public class CreateLDAPProxyWizard extends Wizard {
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+            DirectoryClient directoryClient = partitionClient.getDirectoryClient();
 
-            ConnectionClient connectionClient = partitionClient.getConnectionClient(sourceConfig.getConnectionName());
+            ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(sourceConfig.getConnectionName());
             ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
             String url = connectionConfig.getParameter(Context.PROVIDER_URL);
@@ -125,7 +129,7 @@ public class CreateLDAPProxyWizard extends Wizard {
             directoryConfig.addEntryConfig(entryConfig);
             project.save(partitionConfig, directoryConfig);
 */
-            partitionClient.createEntry(entryConfig);
+            directoryClient.createEntry(entryConfig);
             partitionClient.store();
             
             return true;

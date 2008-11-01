@@ -29,9 +29,10 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.directory.EntryClient;
+import org.safehaus.penrose.directory.DirectoryClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.project.Project;
@@ -101,9 +102,10 @@ public class EntrySelectionDialog extends Dialog {
                     PenroseClient client = project.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+                    DirectoryClient directoryClient = partitionClient.getDirectoryClient();
 
                     for (String id : entryClient.getChildIds()) {
-                        EntryClient childClient = partitionClient.getEntryClient(id);
+                        EntryClient childClient = directoryClient.getEntryClient(id);
 
                         TreeItem it = new TreeItem(item, SWT.NONE);
                         it.setText(childClient.getDn().getRdn().toString());
@@ -178,9 +180,10 @@ public class EntrySelectionDialog extends Dialog {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        DirectoryClient directoryClient = partitionClient.getDirectoryClient();
 
-        for (String id : partitionClient.getRootEntryIds()) {
-            EntryClient entryClient = partitionClient.getEntryClient(id);
+        for (String id : directoryClient.getRootEntryIds()) {
+            EntryClient entryClient = directoryClient.getEntryClient(id);
             DN dn = entryClient.getDn();
 
             String label = dn.isEmpty() ? "Root DSE" : dn.toString();

@@ -25,11 +25,13 @@ import org.safehaus.penrose.federation.*;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.management.*;
 import org.safehaus.penrose.module.ModuleClient;
+import org.safehaus.penrose.module.ModuleManagerClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.source.SourceClient;
+import org.safehaus.penrose.source.SourceManagerClient;
+import org.safehaus.penrose.client.PenroseClient;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -79,15 +81,19 @@ public class NISSynchronizationPage extends FormPage {
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
 
         sourcePartitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.YP);
-        targetPartitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.NIS);
+        targetPartitionClient = partitionManagerClient.getPartitionClient(domain.getName());
 
-        sourceClient  = sourcePartitionClient.getSourceClient("LDAP");
-        targetClient  = targetPartitionClient.getSourceClient("LDAP");
+        SourceManagerClient sourceSourceManagerClient = sourcePartitionClient.getSourceManagerClient();
+        sourceClient  = sourceSourceManagerClient.getSourceClient("LDAP");
+
+        SourceManagerClient targetSourceManagerClient = targetPartitionClient.getSourceManagerClient();
+        targetClient  = targetSourceManagerClient.getSourceClient("LDAP");
 
         sourceSuffix = (DN)sourceClient.getAttribute("BaseDn");
         targetSuffix = (DN)targetClient.getAttribute("BaseDn");
 
-        moduleClient = targetPartitionClient.getModuleClient(Federation.SYNCHRONIZATION_MODULE);
+        ModuleManagerClient targetModuleManagerClient = targetPartitionClient.getModuleManagerClient();
+        moduleClient = targetModuleManagerClient.getModuleClient(Federation.SYNCHRONIZATION_MODULE);
     }
 
     public void createFormContent(IManagedForm managedForm) {

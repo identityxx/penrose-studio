@@ -34,7 +34,7 @@ import org.eclipse.ui.part.*;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.Penrose;
 import org.safehaus.penrose.PenroseFactory;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.config.PenroseConfig;
 import org.safehaus.penrose.session.Session;

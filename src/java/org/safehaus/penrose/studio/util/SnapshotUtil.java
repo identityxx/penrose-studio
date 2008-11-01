@@ -2,13 +2,14 @@ package org.safehaus.penrose.studio.util;
 
 import org.safehaus.penrose.directory.EntryAttributeConfig;
 import org.safehaus.penrose.directory.EntryConfig;
+import org.safehaus.penrose.directory.DirectoryClient;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.SchemaUtil;
 import org.safehaus.penrose.schema.attributeSyntax.AttributeSyntax;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.slf4j.Logger;
@@ -41,6 +42,8 @@ public class SnapshotUtil {
     
     public void createEntries(PartitionClient partitionClient, LDAPClient ldapClient, String baseDn) throws Exception {
 
+        DirectoryClient directoryClient = partitionClient.getDirectoryClient();
+
         if ("".equals(baseDn)) {
             SearchResult entry = ldapClient.find(baseDn);
             if (entry == null) return;
@@ -48,14 +51,14 @@ public class SnapshotUtil {
             EntryConfig entryConfig = createMapping(ldapClient, entry);
             //partitionConfig.getDirectoryConfig().addEntryConfig(entryConfig);
 
-            partitionClient.createEntry(entryConfig);
+            directoryClient.createEntry(entryConfig);
         }
 
         Collection<SearchResult> children = ldapClient.findChildren(baseDn);
         for (SearchResult entry : children) {
             EntryConfig entryConfig = createMapping(ldapClient, entry);
             //partitionConfig.getDirectoryConfig().addEntryConfig(entryConfig);
-            partitionClient.createEntry(entryConfig);
+            directoryClient.createEntry(entryConfig);
 
             createEntries(partitionClient, ldapClient, entry.getDn().toString());
         }

@@ -48,8 +48,6 @@ public class PenroseStudio implements IPlatformRunnable {
     public final static DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
     public final static String RELEASE_DATE    = "12/01/2007";
 
-    public final static String FEATURE_NOT_AVAILABLE = "This feature is only available in the commercial version.";
-
     public static PenroseStudio instance;
 
     File homeDir;
@@ -199,7 +197,7 @@ public class PenroseStudio implements IPlatformRunnable {
 
     public void loadLoggingConfig(File dir) throws Exception {
         try {
-            Log4jConfigReader reader = new Log4jConfigReader(new File(dir, "/conf/log4j.xml"));
+            Log4jConfigReader reader = new Log4jConfigReader(new File(dir, "conf/log4j.xml"));
             loggingConfig = reader.read();
         } catch (Exception e) {
             log.error("ERROR: "+e.getMessage());

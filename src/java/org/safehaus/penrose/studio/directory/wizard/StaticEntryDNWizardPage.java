@@ -26,8 +26,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Combo;
 import org.ietf.ldap.LDAPDN;
-import org.safehaus.penrose.directory.ProxyEntry;
 
 /**
  * @author Endi S. Dewata
@@ -37,7 +37,7 @@ public class StaticEntryDNWizardPage extends WizardPage implements ModifyListene
     public final static String NAME = "Entry DN";
 
     Text dnText;
-    Text classNameText;
+    Combo classNameCombo;
 
     public StaticEntryDNWizardPage() {
         super(NAME);
@@ -83,19 +83,15 @@ public class StaticEntryDNWizardPage extends WizardPage implements ModifyListene
         gd.widthHint = 50;
         classLabel.setLayoutData(gd);
 
-        classNameText = new Text(composite, SWT.BORDER);
+        classNameCombo = new Combo(composite, SWT.BORDER);
+        classNameCombo.add("");
+        classNameCombo.add("org.safehaus.penrose.directory.DynamicEntry");
+        classNameCombo.add("org.safehaus.penrose.directory.ProxyEntry");
+
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
-        classNameText.setLayoutData(gd);
-        classNameText.addModifyListener(this);
-
-        new Label(composite, SWT.NONE);
-
-        Label exampleClassLabel = new Label(composite, SWT.NONE);
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalSpan = 2;
-        exampleClassLabel.setLayoutData(gd);
-        exampleClassLabel.setText("Example: "+ ProxyEntry.class.getName());
+        classNameCombo.setLayoutData(gd);
+        classNameCombo.addModifyListener(this);
 
         setPageComplete(validatePage());
     }
@@ -105,7 +101,7 @@ public class StaticEntryDNWizardPage extends WizardPage implements ModifyListene
     }
 
     public String getClassName() {
-        return "".equals(classNameText.getText()) ? null : classNameText.getText();
+        return "".equals(classNameCombo.getText()) ? null : classNameCombo.getText();
     }
 
     public boolean validatePage() {

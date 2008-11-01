@@ -27,7 +27,8 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.source.SourceClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.source.SourceManagerClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 
 import java.text.DateFormat;
@@ -71,8 +72,10 @@ public class NISSynchronizationErrorsPage extends FormPage {
 
         PenroseClient penroseClient = project.getClient();
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-        partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.NIS);
-        errors = partitionClient.getSourceClient("errors");
+        partitionClient = partitionManagerClient.getPartitionClient(domain.getName());
+
+        SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+        errors = sourceManagerClient.getSourceClient("errors");
     }
 
     public void createFormContent(IManagedForm managedForm) {

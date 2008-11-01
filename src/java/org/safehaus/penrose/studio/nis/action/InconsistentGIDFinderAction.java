@@ -6,11 +6,8 @@ import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.federation.NISDomain;
-import org.safehaus.penrose.federation.FederationClient;
-import org.safehaus.penrose.federation.NISFederationClient;
-import org.safehaus.penrose.federation.FederationRepositoryConfig;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.federation.*;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.connection.ConnectionManager;
@@ -79,9 +76,9 @@ public class InconsistentGIDFinderAction extends NISAction {
 
         String sql = "select a.cn, a.gidNumber, b.gidNumber, c.cn, c.gidNumber, d.gidNumber" +
                 " from "+table1+" a"+
-                " left join "+ NISFederationClient.NIS_TOOL +".groups b on b.domain=? and a.cn=b.cn"+
+                " left join "+ Federation.FEDERATION +".groups b on b.domain=? and a.cn=b.cn"+
                 " join "+table2+" c on a.cn = c.cn "+
-                " left join "+ NISFederationClient.NIS_TOOL +".groups d on d.domain=? and c.cn=d.cn"+
+                " left join "+ Federation.FEDERATION +".groups d on d.domain=? and c.cn=d.cn"+
                 " where b.gidNumber is null and d.gidNumber is null and a.gidNumber <> c.gidNumber"+
                     " or b.gidNumber is null and a.gidNumber <> d.gidNumber"+
                     " or d.gidNumber is null and b.gidNumber <> c.gidNumber"+

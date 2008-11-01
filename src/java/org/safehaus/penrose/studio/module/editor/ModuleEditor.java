@@ -34,9 +34,10 @@ import org.eclipse.ui.part.EditorPart;
 import org.safehaus.penrose.module.ModuleClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
+import org.safehaus.penrose.module.ModuleManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
 import org.safehaus.penrose.studio.project.Project;
@@ -72,8 +73,9 @@ public class ModuleEditor extends EditorPart {
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            ModuleManagerClient moduleManagerClient = partitionClient.getModuleManagerClient();
 
-            ModuleClient moduleClient = partitionClient.getModuleClient(moduleName);
+            ModuleClient moduleClient = moduleManagerClient.getModuleClient(moduleName);
             origModuleConfig = moduleClient.getModuleConfig();
             moduleMappings = moduleClient.getModuleMappings();
 
@@ -483,8 +485,8 @@ public class ModuleEditor extends EditorPart {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-
-        partitionClient.updateModule(origModuleConfig.getName(), moduleConfig);
+        ModuleManagerClient moduleManagerClient = partitionClient.getModuleManagerClient();
+        moduleManagerClient.updateModule(origModuleConfig.getName(), moduleConfig);
 
         setPartName(partitionName+"/"+moduleConfig.getName());
 

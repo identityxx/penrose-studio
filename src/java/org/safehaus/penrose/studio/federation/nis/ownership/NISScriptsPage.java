@@ -25,11 +25,13 @@ import org.safehaus.penrose.ldap.Attributes;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
+import org.safehaus.penrose.federation.Federation;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.source.SourceClient;
+import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 
 import java.util.*;
@@ -118,8 +120,9 @@ public class NISScriptsPage extends FormPage {
 
            PenroseClient penroseClient = project.getClient();
            PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-           PartitionClient partitionClient = partitionManagerClient.getPartitionClient(FederationClient.FEDERATION);
-           SourceClient sourceClient = partitionClient.getSourceClient("penrose_hosts");
+           PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
+           SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+           SourceClient sourceClient = sourceManagerClient.getSourceClient("penrose_hosts");
 
            sourceClient.search(request, response);
            //nisFederation.getHosts().search(request, response);

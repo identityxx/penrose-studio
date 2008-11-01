@@ -27,11 +27,12 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.connection.ConnectionClient;
+import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.jdbc.source.JDBCSource;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
@@ -125,8 +126,9 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
     
-            for (String connectionName : partitionClient.getConnectionNames()) {
+            for (String connectionName : connectionManagerClient.getConnectionNames()) {
                 connectionNameCombo.add(connectionName);
             }
 
@@ -265,7 +267,8 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
                     PenroseClient client = project.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-                    ConnectionClient connectionClient = partitionClient.getConnectionClient(sourceConfig.getConnectionName());
+                    ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+                    ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(sourceConfig.getConnectionName());
                     ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
                     //PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
@@ -355,7 +358,8 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
                     PenroseClient client = project.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-                    ConnectionClient connectionClient = partitionClient.getConnectionClient(sourceConfig.getConnectionName());
+                    ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+                    ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(sourceConfig.getConnectionName());
                     ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
                     //PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
@@ -405,7 +409,8 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
                     PenroseClient client = project.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-                    ConnectionClient connectionClient = partitionClient.getConnectionClient(sourceConfig.getConnectionName());
+                    ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+                    ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(sourceConfig.getConnectionName());
                     ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
                     //PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();

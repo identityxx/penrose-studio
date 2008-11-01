@@ -66,7 +66,7 @@ public class NISLinkingNode extends Node {
         LinkingEditorInput ei = new LinkingEditorInput();
         ei.setProject(project);
         ei.setRepository(domain);
-        ei.setLocalPartition(domain.getName()+"_"+ NISDomain.NIS);
+        ei.setLocalPartition(domain.getName());
         ei.setGlobalPartition(federationClient.getName());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

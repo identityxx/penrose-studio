@@ -20,9 +20,10 @@ package org.safehaus.penrose.studio.module.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
+import org.safehaus.penrose.module.ModuleManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.apache.log4j.Logger;
@@ -81,13 +82,14 @@ public class ModuleWizard extends Wizard {
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            ModuleManagerClient moduleManagerCient = partitionClient.getModuleManagerClient();
 
             Collection<ModuleMapping> moduleMappings = mappingPage.getModuleMappings();
             for (ModuleMapping moduleMapping : moduleMappings) {
                 moduleMapping.setModuleName(propertyPage.getModuleName());
             }
 
-            partitionClient.createModule(moduleConfig, moduleMappings);
+            moduleManagerCient.createModule(moduleConfig, moduleMappings);
 
             partitionClient.store();
 

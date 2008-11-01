@@ -18,7 +18,7 @@
 package org.safehaus.penrose.studio.schema;
 
 import org.eclipse.swt.graphics.Image;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.schema.SchemaClient;
 import org.safehaus.penrose.schema.SchemaManagerClient;
 import org.safehaus.penrose.schema.ObjectClass;

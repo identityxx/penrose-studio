@@ -29,9 +29,10 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
@@ -149,6 +150,7 @@ public class SourceNode extends Node {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
         //SourceConfigManager sourceConfigManager = partitionConfig.getSourceConfigManager();
 
@@ -156,7 +158,7 @@ public class SourceNode extends Node {
             if (!(node instanceof SourceNode)) continue;
 
             SourceNode sourceNode = (SourceNode)node;
-            partitionClient.removeSource(sourceNode.getSourceName());
+            sourceManagerClient.removeSource(sourceNode.getSourceName());
         }
 
         partitionClient.store();
@@ -172,8 +174,9 @@ public class SourceNode extends Node {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
-        SourceClient sourceClient = partitionClient.getSourceClient(sourceName);
+        SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceName);
         view.setClipboard(sourceClient.getSourceConfig());
     }
 
@@ -203,8 +206,9 @@ public class SourceNode extends Node {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-
-        Collection<String> sourceNames = partitionClient.getSourceNames();
+        SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+        
+        Collection<String> sourceNames = sourceManagerClient.getSourceNames();
         int counter = 1;
         String name = newSourceConfig.getName();
         while (sourceNames.contains(name)) {
@@ -213,7 +217,7 @@ public class SourceNode extends Node {
         }
         newSourceConfig.setName(name);
 
-        partitionClient.createSource(newSourceConfig);
+        sourceManagerClient.createSource(newSourceConfig);
         partitionClient.store();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();

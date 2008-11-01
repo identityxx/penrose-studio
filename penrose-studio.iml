@@ -14,6 +14,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="penrose" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -176,7 +177,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="penrose" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>

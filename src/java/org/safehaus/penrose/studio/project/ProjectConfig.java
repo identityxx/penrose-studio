@@ -19,7 +19,7 @@ package org.safehaus.penrose.studio.project;
 
 import org.dom4j.Element;
 import org.dom4j.tree.DefaultElement;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 
 public class ProjectConfig {
 

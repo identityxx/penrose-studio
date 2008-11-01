@@ -1,7 +1,7 @@
 package org.safehaus.penrose.studio.project;
 
-import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.util.FileUtil;
+import org.safehaus.penrose.client.PenroseClient;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 

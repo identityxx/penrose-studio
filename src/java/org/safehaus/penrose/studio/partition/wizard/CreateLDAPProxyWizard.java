@@ -21,15 +21,18 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.directory.ProxyEntry;
+import org.safehaus.penrose.directory.DirectoryClient;
 import org.safehaus.penrose.ldap.LDAP;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionParametersWizardPage;
 import org.safehaus.penrose.studio.ldap.connection.LDAPConnectionWizardPage;
@@ -91,6 +94,8 @@ public class CreateLDAPProxyWizard extends Wizard {
             partitionManagerClient.createPartition(partitionConfig);
 
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+            DirectoryClient directoryClient = partitionClient.getDirectoryClient();
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
 
@@ -109,7 +114,7 @@ public class CreateLDAPProxyWizard extends Wizard {
             }
 
             //partitionConfig.getConnectionConfigManager().addConnectionConfig(connectionConfig);
-            partitionClient.createConnection(connectionConfig);
+            connectionManagerClient.createConnection(connectionConfig);
 
             //SourceConfigManager sourceConfigManager = partitionConfig.getSourceConfigManager();
 
@@ -121,7 +126,8 @@ public class CreateLDAPProxyWizard extends Wizard {
             sourceConfig.setParameter("filter", "(objectClass=*)");
 
             //sourceConfigManager.addSourceConfig(sourceConfig);
-            partitionClient.createSource(sourceConfig);
+            SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+            sourceManagerClient.createSource(sourceConfig);
 
             EntryConfig rootEntry = new EntryConfig(connectionInfoPage.getSuffix());
 
@@ -133,7 +139,7 @@ public class CreateLDAPProxyWizard extends Wizard {
             rootEntry.addACI(new ACI("rs"));
 
             //partitionConfig.getDirectoryConfig().addEntryConfig(rootEntry);
-            partitionClient.createEntry(rootEntry);
+            directoryClient.createEntry(rootEntry);
 
             if (infoPage.getMapRootDse()) {
                 SourceConfig rootDseSourceConfig = new SourceConfig();
@@ -144,7 +150,7 @@ public class CreateLDAPProxyWizard extends Wizard {
                 rootDseSourceConfig.setParameter("filter", "objectClass=*");
 
                 //sourceConfigManager.addSourceConfig(rootDseSourceConfig);
-                partitionClient.createSource(rootDseSourceConfig);
+                sourceManagerClient.createSource(rootDseSourceConfig);
 
                 EntryConfig rootDseEntryConfig = new EntryConfig();
                 rootDseEntryConfig.setDn("");
@@ -157,7 +163,7 @@ public class CreateLDAPProxyWizard extends Wizard {
                 rootDseEntryConfig.addACI(new ACI("rs"));
 
                 //partitionConfig.getDirectoryConfig().addEntryConfig(rootDseEntryConfig);
-                partitionClient.createEntry(rootDseEntryConfig);
+                directoryClient.createEntry(rootDseEntryConfig);
             }
 
             if (infoPage.getMapADSchema()) {

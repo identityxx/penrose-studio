@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
 
 import javax.naming.Context;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * @author Endi S. Dewata
@@ -76,8 +75,10 @@ public class CreateLDAPSnapshotWizard extends Wizard {
         LDAPClient client = null;
         try {
             String name = namePage.getPartitionName();
+            String className = namePage.getClassName();
 
             PartitionConfig partitionConfig = new PartitionConfig(name);
+            partitionConfig.setPartitionClass(className);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
 

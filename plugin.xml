@@ -144,10 +144,10 @@
             icon="images/object.gif"
             class="org.safehaus.penrose.studio.federation.editor.FederationEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.federation.partition.FederationPartitionEditor"
+            id="org.safehaus.penrose.studio.federation.partition.FederationDomainEditor"
             name="Global Repository"
             icon="images/object.gif"
-            class="org.safehaus.penrose.studio.federation.partition.FederationPartitionEditor"/>
+            class="org.safehaus.penrose.studio.federation.partition.FederationDomainEditor"/>
         <editor
             id="org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditor"
             name="LDAP"

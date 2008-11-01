@@ -20,22 +20,22 @@ package org.safehaus.penrose.studio.directory.action;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.directory.wizard.StaticEntryWizard;
+import org.safehaus.penrose.studio.directory.wizard.EntryWizard;
 import org.safehaus.penrose.studio.directory.EntryNode;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.apache.log4j.Logger;
 
-public class NewStaticEntryAction extends Action {
+public class NewEntryAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
     EntryNode node;
 
-	public NewStaticEntryAction(EntryNode node) {
+	public NewEntryAction(EntryNode node) {
         this.node = node;
 
-        setText("New Static Entry...");
+        setText("New Entry...");
         setId(getClass().getName());
 	}
 	
@@ -44,7 +44,7 @@ public class NewStaticEntryAction extends Action {
             ServersView serversView = ServersView.getInstance();
             ProjectNode projectNode = node.getProjectNode();
 
-            StaticEntryWizard wizard = new StaticEntryWizard(
+            EntryWizard wizard = new EntryWizard(
                     projectNode.getProject(),
                     node.getPartitionName(), 
                     node.getEntryConfig().getDn()

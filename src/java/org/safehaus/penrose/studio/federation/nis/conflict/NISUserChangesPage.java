@@ -15,12 +15,14 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
+import org.safehaus.penrose.federation.Federation;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.source.SourceClient;
+import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.federation.nis.editor.NISEditor;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISFilesPage;
@@ -134,8 +136,9 @@ public class NISUserChangesPage extends FormPage {
 
             PenroseClient penroseClient = project.getClient();
             PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(FederationClient.FEDERATION);
-            SourceClient sourceClient = partitionClient.getSourceClient("penrose_users");
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
+            SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+            SourceClient sourceClient = sourceManagerClient.getSourceClient("penrose_users");
 
             sourceClient.search(request, response);
             //nisFederation.getUsers().search(request, response);
@@ -266,8 +269,9 @@ public class NISUserChangesPage extends FormPage {
 
                         PenroseClient penroseClient = project.getClient();
                         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-                        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(FederationClient.FEDERATION);
-                        SourceClient sourceClient = partitionClient.getSourceClient("penrose_users");
+                        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
+                        SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+                        SourceClient sourceClient = sourceManagerClient.getSourceClient("penrose_users");
 
                         sourceClient.add(dn, attributes);
                         //nisFederation.getUsers().add(dn, attributes);
@@ -326,8 +330,9 @@ public class NISUserChangesPage extends FormPage {
 
                     PenroseClient penroseClient = project.getClient();
                     PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(FederationClient.FEDERATION);
-                    SourceClient sourceClient = partitionClient.getSourceClient("penrose_users");
+                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
+                    SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+                    SourceClient sourceClient = sourceManagerClient.getSourceClient("penrose_users");
 
                     sourceClient.modify(result.getDn(), modifications);
                     //nisFederation.getUsers().modify(result.getDn(), modifications);
@@ -354,8 +359,9 @@ public class NISUserChangesPage extends FormPage {
 
                     PenroseClient penroseClient = project.getClient();
                     PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(FederationClient.FEDERATION);
-                    SourceClient sourceClient = partitionClient.getSourceClient("penrose_users");
+                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
+                    SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+                    SourceClient sourceClient = sourceManagerClient.getSourceClient("penrose_users");
 
                     TableItem[] items = changesTable.getSelection();
                     for (TableItem ti : items) {
@@ -490,8 +496,9 @@ public class NISUserChangesPage extends FormPage {
 
                     PenroseClient penroseClient = project.getClient();
                     PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(FederationClient.FEDERATION);
-                    SourceClient sourceClient = partitionClient.getSourceClient("penrose_users");
+                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
+                    SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+                    SourceClient sourceClient = sourceManagerClient.getSourceClient("penrose_users");
 
                     sourceClient.modify(result.getDn(), modifications);
                     //nisFederation.getUsers().modify(result.getDn(), modifications);

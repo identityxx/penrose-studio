@@ -21,64 +21,82 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.directory.EntryConfig;
+import org.safehaus.penrose.directory.DirectoryClient;
+import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
-import org.safehaus.penrose.studio.directory.wizard.ObjectClassWizardPage;
-import org.safehaus.penrose.studio.directory.wizard.StaticEntryRDNWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
+import org.safehaus.penrose.studio.source.wizard.SelectSourcesWizardPage;
 
 import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
  */
-public class StaticEntryWizard extends Wizard {
+public class EntryWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
     private Project project;
     private String partitionName;
+    private DN parentDn;
+
     private EntryConfig entryConfig;
 
-    public StaticEntryRDNWizardPage rdnPage;
+    public EntryRDNWizardPage rdnPage;
     public ObjectClassWizardPage ocPage;
     public AttributeValueWizardPage attrPage;
+    public SelectSourcesWizardPage sourcesPage;
 
-    public StaticEntryWizard(Project project, String partitionName, DN parentDn) {
+    public EntryWizard(Project project, String partitionName, DN parentDn) {
         this.project = project;
         this.partitionName = partitionName;
-        setWindowTitle("Adding static entry");
+        this.parentDn = parentDn;
 
-        rdnPage = new StaticEntryRDNWizardPage();
+        setWindowTitle("Adding entry");
+    }
+
+    public void addPages() {
+
+        rdnPage = new EntryRDNWizardPage();
         rdnPage.setProject(project);
         rdnPage.setPartitionName(partitionName);
         rdnPage.setParentDn(parentDn);
 
+        addPage(rdnPage);
+
         ocPage = new ObjectClassWizardPage(project);
+
+        addPage(ocPage);
+
         attrPage = new AttributeValueWizardPage(project, partitionName);
+
+        addPage(attrPage);
+
+        sourcesPage = new SelectSourcesWizardPage();
+        sourcesPage.setDescription("Add data sources.");
+        sourcesPage.setProject(project);
+        sourcesPage.setPartitionName(partitionName);
+
+        addPage(sourcesPage);
     }
 
     public boolean canFinish() {
         if (!rdnPage.isPageComplete()) return false;
         if (!ocPage.isPageComplete()) return false;
         if (!attrPage.isPageComplete()) return false;
+        if (!sourcesPage.isPageComplete()) return false;
         return true;
     }
 
-    public void addPages() {
-        addPage(rdnPage);
-        addPage(ocPage);
-        addPage(attrPage);
-    }
-
     public IWizardPage getNextPage(IWizardPage page) {
-            try {
+        try {
             if (rdnPage == page) {
                 RDN rdn = new RDN(rdnPage.getRdn());
                 attrPage.setRdn(rdn);
@@ -108,15 +126,15 @@ public class StaticEntryWizard extends Wizard {
             entryConfig.setEntryClass(rdnPage.getClassName());
             entryConfig.addObjectClasses(ocPage.getSelectedObjectClasses());
             entryConfig.addAttributeConfigs(attrPage.getAttributeMappings());
-/*
-            DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
-            directoryConfig.addEntryConfig(entryConfig);
-            project.save(partitionConfig, directoryConfig);
-*/
+            entryConfig.addSourceConfigs(sourcesPage.getSourceMappings());
+
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-            partitionClient.createEntry(entryConfig);
+
+            DirectoryClient directoryClient = partitionClient.getDirectoryClient();
+            directoryClient.createEntry(entryConfig);
+
             partitionClient.store();
 
             return true;

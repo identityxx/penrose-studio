@@ -26,11 +26,12 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.mapping.MappingClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.mapping.MappingConfig;
+import org.safehaus.penrose.mapping.MappingManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 
@@ -105,7 +106,8 @@ public class MappingEditor extends FormEditor implements ModifyListener {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-        partitionClient.updateMapping(origMappingConfig.getName(), mappingConfig);
+        MappingManagerClient mappingManagerClient = partitionClient.getMappingManagerClient();
+        mappingManagerClient.updateMapping(origMappingConfig.getName(), mappingConfig);
         partitionClient.store();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();

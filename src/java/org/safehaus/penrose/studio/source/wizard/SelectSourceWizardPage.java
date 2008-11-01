@@ -30,13 +30,15 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.connection.ConnectionClient;
-import org.safehaus.penrose.management.*;
+import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.client.PenroseClient;
 
 import javax.naming.Context;
 
@@ -82,8 +84,9 @@ public class SelectSourceWizardPage extends WizardPage {
                     PenroseClient client = project.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+                    ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
 
-                    ConnectionClient connectionClient = partitionClient.getConnectionClient(sourceConfig.getConnectionName());
+                    ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(sourceConfig.getConnectionName());
                     ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
                     String baseDn = sourceConfig.getParameter("baseDn");
@@ -185,8 +188,9 @@ public class SelectSourceWizardPage extends WizardPage {
                     PenroseClient client = project.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+                    SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
-                    partitionClient.removeSource(sourceConfig.getName());
+                    sourceManagerClient.removeSource(sourceConfig.getName());
 
                     refresh();
 
@@ -210,12 +214,14 @@ public class SelectSourceWizardPage extends WizardPage {
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+            SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
-            for (String name : partitionClient.getSourceNames()) {
-                SourceClient sourceClient = partitionClient.getSourceClient(name);
+            for (String name : sourceManagerClient.getSourceNames()) {
+                SourceClient sourceClient = sourceManagerClient.getSourceClient(name);
                 SourceConfig sourceConfig = sourceClient.getSourceConfig();
 
-                ConnectionClient connectionClient = partitionClient.getConnectionClient(sourceConfig.getConnectionName());
+                ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(sourceConfig.getConnectionName());
                 ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
                 if (!"LDAP".equals(connectionConfig.getAdapterName())) continue;

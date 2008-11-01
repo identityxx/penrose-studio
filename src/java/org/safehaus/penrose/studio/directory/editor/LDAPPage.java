@@ -37,13 +37,14 @@ import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.ldap.RDNBuilder;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.schema.SchemaManagerClient;
 import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.mapping.Expression;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.directory.dialog.AttributeTypeSelectionDialog;
@@ -449,13 +450,14 @@ public class LDAPPage extends FormPage {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(editor.getPartitionName());
+        SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
         //PartitionConfig partitionConfig = editor.getPartitionConfig();
         Collection<EntrySourceConfig> sources = entryConfig.getSourceConfigs();
 
         for (EntrySourceConfig sourceMapping : sources) {
 
-            SourceClient sourceClient = partitionClient.getSourceClient(sourceMapping.getSourceName());
+            SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceMapping.getSourceName());
             SourceConfig sourceConfig = sourceClient.getSourceConfig();
 
             //SourceConfig sourceConfig = partitionConfig.getSourceConfigManager().getSourceConfig(sourceMapping.getSourceName());

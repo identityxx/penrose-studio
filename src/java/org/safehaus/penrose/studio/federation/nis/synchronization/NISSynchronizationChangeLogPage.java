@@ -22,7 +22,8 @@ import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchroniza
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.source.SourceClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.source.SourceManagerClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.ldap.SearchResult;
 import org.safehaus.penrose.ldap.SearchRequest;
@@ -67,8 +68,10 @@ public class NISSynchronizationChangeLogPage extends FormPage {
 
         PenroseClient penroseClient = project.getClient();
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-        partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.NIS);
-        changes = partitionClient.getSourceClient("changes");
+        partitionClient = partitionManagerClient.getPartitionClient(domain.getName());
+
+        SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+        changes = sourceManagerClient.getSourceClient("changes");
     }
 
     public void createFormContent(IManagedForm managedForm) {

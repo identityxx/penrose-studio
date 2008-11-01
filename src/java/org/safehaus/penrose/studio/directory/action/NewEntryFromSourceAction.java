@@ -20,10 +20,7 @@ package org.safehaus.penrose.studio.directory.action;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.SWT;
-import org.safehaus.penrose.directory.EntryAttributeConfig;
-import org.safehaus.penrose.directory.EntryConfig;
-import org.safehaus.penrose.directory.EntryFieldConfig;
-import org.safehaus.penrose.directory.EntrySourceConfig;
+import org.safehaus.penrose.directory.*;
 import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.filter.FilterParser;
 import org.safehaus.penrose.filter.FilterProcessor;
@@ -32,10 +29,11 @@ import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDNBuilder;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.directory.EntryNode;
 import org.safehaus.penrose.studio.directory.dialog.SourceDialog;
@@ -76,7 +74,10 @@ public class NewEntryFromSourceAction extends Action {
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(node.getPartitionName());
 
-            Collection<String> sourceNames = partitionClient.getSourceNames();
+            SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+            DirectoryClient directoryClient = partitionClient.getDirectoryClient();
+
+            Collection<String> sourceNames = sourceManagerClient.getSourceNames();
             if (sourceNames.isEmpty()) {
                 System.out.println("There is no sources defined.");
                 return;
@@ -84,7 +85,7 @@ public class NewEntryFromSourceAction extends Action {
 
             Map<String,SourceConfig> sourceConfigs = new HashMap<String,SourceConfig>();
             for (String sourceName : sourceNames) {
-                SourceClient sourceClient = partitionClient.getSourceClient(sourceName);
+                SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceName);
                 SourceConfig sourceConfig = sourceClient.getSourceConfig();
                 sourceConfigs.put(sourceConfig.getName(), sourceConfig);
             }
@@ -179,7 +180,7 @@ public class NewEntryFromSourceAction extends Action {
             DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
             directoryConfig.addEntryConfig(newEntryConfig);
 */
-            partitionClient.createEntry(newEntryConfig);
+            directoryClient.createEntry(newEntryConfig);
             partitionClient.store();
 
             penroseStudio.notifyChangeListeners();

@@ -22,10 +22,11 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.source.FieldConfig;
+import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.source.wizard.SourceWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.schema.AttributeType;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.apache.log4j.Logger;
@@ -117,7 +118,8 @@ public class JNDISourceWizard extends Wizard {
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-            partitionClient.createSource(sourceConfig);
+            SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+            sourceManagerClient.createSource(sourceConfig);
             partitionClient.store();
 
             return true;

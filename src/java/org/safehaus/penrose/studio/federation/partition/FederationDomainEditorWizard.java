@@ -10,16 +10,18 @@ import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.connection.ConnectionClient;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.source.SourceManagerClient;
+import org.safehaus.penrose.client.PenroseClient;
 
 import javax.naming.Context;
 
 /**
  * @author Endi S. Dewata
  */
-public class FederationPartitionEditorWizard extends Wizard {
+public class FederationDomainEditorWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -31,7 +33,7 @@ public class FederationPartitionEditorWizard extends Wizard {
     FederationClient federationClient;
     FederationRepositoryConfig repository;
 
-    public FederationPartitionEditorWizard(FederationClient federationClient) {
+    public FederationDomainEditorWizard(FederationClient federationClient) {
         this.federationClient = federationClient;
         this.client = federationClient.getClient();
         this.partitionClient = federationClient.getPartitionClient();
@@ -45,10 +47,13 @@ public class FederationPartitionEditorWizard extends Wizard {
         //partitionsPage = new LDAPPartitionsWizardPage();
 
         try {
-            ConnectionClient connectionClient = partitionClient.getConnectionClient("LDAP");
+            ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+            SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+
+            ConnectionClient connectionClient = connectionManagerClient.getConnectionClient("LDAP");
             ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
-            SourceClient sourceClient = partitionClient.getSourceClient("LDAP");
+            SourceClient sourceClient = sourceManagerClient.getSourceClient("LDAP");
             SourceConfig sourceConfig = sourceClient.getSourceConfig();
 
             String url = connectionConfig.getParameter(Context.PROVIDER_URL);
@@ -107,10 +112,13 @@ public class FederationPartitionEditorWizard extends Wizard {
 */
             log.debug("Getting existing configuration.");
 
-            ConnectionClient connectionClient = partitionClient.getConnectionClient("LDAP");
+            ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+            SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+
+            ConnectionClient connectionClient = connectionManagerClient.getConnectionClient("LDAP");
             ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
-            SourceClient sourceClient = partitionClient.getSourceClient("LDAP");
+            SourceClient sourceClient = sourceManagerClient.getSourceClient("LDAP");
             SourceConfig sourceConfig = sourceClient.getSourceConfig();
 
             String url = connectionPage.getProviderUrl();

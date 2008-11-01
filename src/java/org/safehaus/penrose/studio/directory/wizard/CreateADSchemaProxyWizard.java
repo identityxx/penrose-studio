@@ -27,7 +27,7 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.directory.EntryConfig;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.apache.log4j.Logger;

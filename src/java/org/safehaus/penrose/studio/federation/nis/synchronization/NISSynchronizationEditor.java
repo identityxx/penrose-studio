@@ -11,9 +11,10 @@ import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
+import org.safehaus.penrose.source.SourceManagerClient;
 
 import java.util.Collection;
 
@@ -41,8 +42,9 @@ public class NISSynchronizationEditor extends FormEditor {
 
             PenroseClient penroseClient = project.getClient();
             PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.NIS);
-            Collection<String> sourceNames = partitionClient.getSourceNames();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName());
+            SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+            Collection<String> sourceNames = sourceManagerClient.getSourceNames();
 
             addPage(new NISSynchronizationPage(this));
             if (sourceNames.contains("changes")) {

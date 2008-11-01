@@ -10,7 +10,7 @@ import org.safehaus.penrose.studio.project.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FederationPartitionEditor extends FormEditor {
+public class FederationDomainEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
@@ -18,7 +18,7 @@ public class FederationPartitionEditor extends FormEditor {
     FederationClient federationClient;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        FederationPartitionEditorInput ei = (FederationPartitionEditorInput)input;
+        FederationDomainEditorInput ei = (FederationDomainEditorInput)input;
         project = ei.getProject();
         federationClient = ei.getFederationClient();
 
@@ -29,8 +29,8 @@ public class FederationPartitionEditor extends FormEditor {
 
     public void addPages() {
         try {
-            addPage(new FederationPartitionSettingsPage(this));
-            addPage(new FederationPartitionPartitionsPage(this));
+            addPage(new FederationDomainSettingsPage(this));
+            addPage(new FederationDomainPartitionsPage(this));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

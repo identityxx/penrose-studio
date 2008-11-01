@@ -4,16 +4,17 @@ import org.apache.log4j.Logger;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.federation.FederationPartitionNode;
+import org.safehaus.penrose.studio.federation.FederationDomainNode;
 import org.safehaus.penrose.federation.LDAPFederationClient;
-import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.federation.*;
 import org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditor;
 import org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditorInput;
@@ -32,19 +33,38 @@ public class LDAPNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    private FederationPartitionNode federationPartitionNode;
+    private FederationDomainNode federationDomainNode;
 
     private Project project;
     private LDAPFederationClient ldapFederation;
 
-    //Map<String,Node> children = new TreeMap<String,Node>();
+    private Collection<Node> children = new ArrayList<Node>();
 
-    public LDAPNode(String name, FederationPartitionNode federationPartitionNode) throws Exception {
-        super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), null, federationPartitionNode);
+    public LDAPNode(String name, FederationDomainNode federationDomainNode) throws Exception {
+        super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), null, federationDomainNode);
 
-        this.federationPartitionNode = federationPartitionNode;
-        this.project = federationPartitionNode.getProject();
-        this.ldapFederation = new LDAPFederationClient(federationPartitionNode.getFederationClient());
+        this.federationDomainNode = federationDomainNode;
+
+        project = federationDomainNode.getProject();
+        ldapFederation = new LDAPFederationClient(federationDomainNode.getFederationClient());
+
+        refresh();
+    }
+
+    public void refresh() throws Exception {
+
+        log.debug("Refreshing repository types:");
+
+        children.clear();
+
+        for (FederationRepositoryConfig repository : ldapFederation.getRepositories()) {
+            LDAPRepositoryNode node = new LDAPRepositoryNode(
+                    repository.getName(),
+                    repository,
+                    this
+            );
+            children.add(node);
+        }
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -63,6 +83,22 @@ public class LDAPNode extends Node {
             public void run() {
                 try {
                     addLDAPRepository();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(new Action("Refresh") {
+            public void run() {
+                try {
+                    refresh();
+
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    penroseStudio.notifyChangeListeners();
+
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
@@ -104,25 +140,10 @@ public class LDAPNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        //FederationClient federation = federationPartitionNode.getFederationClient();
-        //Collection<FederationRepositoryConfig> children = federation.getRepositories("LDAP");
-        return true;
+        return !children.isEmpty();
     }
 
     public Collection<Node> getChildren() throws Exception {
-
-        Collection<Node> children = new ArrayList<Node>();
-
-        FederationClient federation = federationPartitionNode.getFederationClient();
-        for (FederationRepositoryConfig repository : federation.getRepositories("LDAP")) {
-            LDAPRepositoryNode node = new LDAPRepositoryNode(
-                    repository.getName(),
-                    repository,
-                    this
-            );
-            children.add(node);
-        }
-
         return children;
     }
 
@@ -134,12 +155,12 @@ public class LDAPNode extends Node {
         this.project = project;
     }
 
-    public FederationPartitionNode getFederationNode() {
-        return federationPartitionNode;
+    public FederationDomainNode getFederationNode() {
+        return federationDomainNode;
     }
 
-    public void setFederationNode(FederationPartitionNode federationPartitionNode) {
-        this.federationPartitionNode = federationPartitionNode;
+    public void setFederationNode(FederationDomainNode federationDomainNode) {
+        this.federationDomainNode = federationDomainNode;
     }
 
     public LDAPFederationClient getLdapFederation() {

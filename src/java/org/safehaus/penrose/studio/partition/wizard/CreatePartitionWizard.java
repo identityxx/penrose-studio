@@ -20,9 +20,10 @@ package org.safehaus.penrose.studio.partition.wizard;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.project.Project;
 
@@ -54,8 +55,10 @@ public class CreatePartitionWizard extends Wizard {
     public boolean performFinish() {
         try {
             String name = namePage.getPartitionName();
+            String className = namePage.getClassName();
 
             PartitionConfig partitionConfig = new PartitionConfig(name);
+            partitionConfig.setPartitionClass(className);
 
             //PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
             //partitionConfigManager.addPartitionConfig(partitionConfig);
@@ -75,6 +78,7 @@ public class CreatePartitionWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
             return false;
         }
     }

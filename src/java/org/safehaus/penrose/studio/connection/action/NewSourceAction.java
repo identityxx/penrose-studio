@@ -22,9 +22,10 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.connection.ConnectionClient;
+import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.connection.ConnectionNode;
 import org.safehaus.penrose.studio.jdbc.source.JDBCSourceWizard;
@@ -57,8 +58,9 @@ public class NewSourceAction extends Action {
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
 
-            ConnectionClient connectionClient = partitionClient.getConnectionClient(connectionName);
+            ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(connectionName);
             ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
             if ("JDBC".equals(adapterName)) {

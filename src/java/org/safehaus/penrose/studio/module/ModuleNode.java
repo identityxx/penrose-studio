@@ -31,7 +31,8 @@ import org.safehaus.penrose.studio.module.editor.ModuleEditor;
 import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
 import org.safehaus.penrose.module.ModuleClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.module.ModuleManagerClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.eclipse.jface.action.IMenuManager;
@@ -150,8 +151,10 @@ public class ModuleNode extends Node {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        ModuleManagerClient moduleManagerClient = partitionClient.getModuleManagerClient();
 
-        partitionClient.removeModule(moduleName);
+        moduleManagerClient.removeModule(moduleName);
+
         partitionClient.store();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -163,8 +166,9 @@ public class ModuleNode extends Node {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        ModuleManagerClient moduleManagerClient = partitionClient.getModuleManagerClient();
 
-        ModuleClient moduleClient = partitionClient.getModuleClient(moduleName);
+        ModuleClient moduleClient = moduleManagerClient.getModuleClient(moduleName);
         serversView.setClipboard(moduleClient.getModuleConfig());
     }
 
@@ -205,8 +209,9 @@ public class ModuleNode extends Node {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        ModuleManagerClient moduleManagerClient = partitionClient.getModuleManagerClient();
 
-        Collection<String> moduleNames = partitionClient.getModuleNames();
+        Collection<String> moduleNames = moduleManagerClient.getModuleNames();
 
         int counter = 1;
         String name = oldName;
@@ -216,7 +221,7 @@ public class ModuleNode extends Node {
         }
         newModuleConfig.setName(name);
 
-        ModuleClient moduleClient = partitionClient.getModuleClient(oldName);
+        ModuleClient moduleClient = moduleManagerClient.getModuleClient(oldName);
         Collection<ModuleMapping> moduleMappings = moduleClient.getModuleMappings();
 
         if (moduleMappings != null) {
@@ -225,7 +230,7 @@ public class ModuleNode extends Node {
             }
         }
 
-        partitionClient.createModule(newModuleConfig, moduleMappings);
+        moduleManagerClient.createModule(newModuleConfig, moduleMappings);
 
         partitionClient.store();
 

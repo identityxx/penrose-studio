@@ -21,7 +21,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.schema.SchemaConfig;
 import org.safehaus.penrose.schema.Schema;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.schema.SchemaManagerClient;
 import org.apache.log4j.Logger;
 

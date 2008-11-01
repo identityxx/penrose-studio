@@ -22,9 +22,10 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.directory.EntryConfig;
+import org.safehaus.penrose.directory.DirectoryClient;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.RDN;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
@@ -112,7 +113,10 @@ public class RootEntryWizard extends Wizard {
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-            partitionClient.createEntry(entryConfig);
+
+            DirectoryClient directoryClient = partitionClient.getDirectoryClient();
+            directoryClient.createEntry(entryConfig);
+
             partitionClient.store();
             
             return true;

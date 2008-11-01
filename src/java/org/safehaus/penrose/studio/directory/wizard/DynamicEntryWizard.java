@@ -20,20 +20,15 @@ package org.safehaus.penrose.studio.directory.wizard;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.directory.EntryAttributeConfig;
-import org.safehaus.penrose.directory.EntryConfig;
-import org.safehaus.penrose.directory.EntryFieldConfig;
-import org.safehaus.penrose.directory.EntrySourceConfig;
+import org.safehaus.penrose.directory.*;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDNBuilder;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.mapping.Relationship;
 import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
-import org.safehaus.penrose.studio.directory.wizard.ObjectClassWizardPage;
-import org.safehaus.penrose.studio.directory.wizard.RelationshipWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.source.wizard.SelectSourcesWizardPage;
 
@@ -106,10 +101,7 @@ public class DynamicEntryWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            Collection<EntrySourceConfig> sourceMappings = sourcesPage.getSourceMappings();
-            for (EntrySourceConfig sourceMapping : sourceMappings) {
-                entryConfig.addSourceConfig(sourceMapping);
-            }
+            entryConfig.addSourceConfigs(sourcesPage.getSourceMappings());
 
             Collection<Relationship> relationships = relationshipPage.getRelationships();
             for (Relationship relationship : relationships) {
@@ -133,10 +125,7 @@ public class DynamicEntryWizard extends Wizard {
 
             log.debug("Attribute mappings:");
             Collection<EntryAttributeConfig> attributeMappings = attrPage.getAttributeMappings();
-            for (EntryAttributeConfig attributeMapping : attributeMappings) {
-                log.debug(" - " + attributeMapping.getName() + " <= " + attributeMapping.getVariable());
-                entryConfig.addAttributeConfig(attributeMapping);
-            }
+            entryConfig.addAttributeConfigs(attributeMappings);
 
             RDNBuilder rb = new RDNBuilder();
             for (EntryAttributeConfig attributeMapping : attributeMappings) {
@@ -176,15 +165,14 @@ public class DynamicEntryWizard extends Wizard {
                 EntryFieldConfig fieldMapping = new EntryFieldConfig(fieldName, EntryFieldConfig.VARIABLE, attributeMapping.getName());
                 sourceMapping.addFieldConfig(fieldMapping);
             }
-/*
-            DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
-            directoryConfig.addEntryConfig(entryConfig);
-            project.save(partitionConfig, directoryConfig);
-*/
+
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-            partitionClient.createEntry(entryConfig);
+
+            DirectoryClient directoryClient = partitionClient.getDirectoryClient();
+            directoryClient.createEntry(entryConfig);
+
             partitionClient.store();
 
             return true;

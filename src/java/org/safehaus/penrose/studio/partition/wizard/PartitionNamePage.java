@@ -33,10 +33,11 @@ public class PartitionNamePage extends WizardPage implements ModifyListener {
     public final static String NAME = "Partition Name";
 
     Text nameText;
+    Combo classNameCombo;
 
     public PartitionNamePage() {
         super(NAME);
-        setDescription("Enter the name of the partition.");
+        setDescription("Enter the name and optionally the class name of the partition.");
     }
 
     public void createControl(Composite parent) {
@@ -57,11 +58,28 @@ public class PartitionNamePage extends WizardPage implements ModifyListener {
         nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         nameText.addModifyListener(this);
 
+        Label classLabel = new Label(composite, SWT.NONE);
+        classLabel.setText("Class:");
+        gd = new GridData();
+        gd.widthHint = 50;
+        classLabel.setLayoutData(gd);
+
+        classNameCombo = new Combo(composite, SWT.BORDER);
+        classNameCombo.add("");
+        classNameCombo.add("org.safehaus.penrose.federation.partition.FederationPartition");
+
+        classNameCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        classNameCombo.addModifyListener(this);
+
         setPageComplete(validatePage());
     }
 
     public String getPartitionName() {
         return nameText.getText().trim();
+    }
+
+    public String getClassName() {
+        return "".equals(classNameCombo.getText()) ? null : classNameCombo.getText();
     }
 
     public boolean validatePage() {

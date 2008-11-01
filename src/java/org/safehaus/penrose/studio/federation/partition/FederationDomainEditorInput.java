@@ -9,12 +9,12 @@ import org.safehaus.penrose.federation.FederationClient;
 /**
  * @author Endi S. Dewata
  */
-public class FederationPartitionEditorInput implements IEditorInput {
+public class FederationDomainEditorInput implements IEditorInput {
 
     private Project project;
     private FederationClient federationClient;
 
-    public FederationPartitionEditorInput() {
+    public FederationDomainEditorInput() {
     }
 
     public boolean exists() {
@@ -56,7 +56,7 @@ public class FederationPartitionEditorInput implements IEditorInput {
         if (object == null) return false;
         if (object.getClass() != this.getClass()) return false;
 
-        FederationPartitionEditorInput ei = (FederationPartitionEditorInput)object;
+        FederationDomainEditorInput ei = (FederationDomainEditorInput)object;
         if (!equals(project, ei.project)) return false;
 
         return true;

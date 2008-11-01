@@ -19,14 +19,16 @@ import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.jdbc.QueryResponse;
-import org.safehaus.penrose.management.*;
 import org.safehaus.penrose.source.SourceClient;
+import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.connection.ConnectionClient;
+import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.federation.nis.conflict.NISGroupsEditor;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.client.PenroseClient;
 
 import java.sql.ResultSet;
 
@@ -82,8 +84,12 @@ public class NISGroupsPage extends FormPage {
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName());
-            ConnectionClient connectionClient = partitionClient.getConnectionClient(FederationClient.JDBC);
-            SourceClient sourceClient = partitionClient.getSourceClient(NISFederationClient.CACHE_GROUPS);
+
+            ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+            ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(FederationClient.JDBC);
+
+            SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+            SourceClient sourceClient = sourceManagerClient.getSourceClient(NISFederationClient.CACHE_GROUPS);
 /*
             PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
 

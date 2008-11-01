@@ -29,11 +29,12 @@ import org.eclipse.swt.widgets.TableItem;
 import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.mapping.Relationship;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.directory.dialog.RelationshipDialog;
 import org.safehaus.penrose.studio.project.Project;
 import org.slf4j.Logger;
@@ -94,10 +95,11 @@ public class RelationshipWizardPage extends WizardPage implements SelectionListe
                     PenroseClient client = project.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+                    SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
                     for (EntrySourceConfig sourceMapping : sourceMappings) {
 
-                        SourceClient sourceClient = partitionClient.getSourceClient(sourceMapping.getSourceName());
+                        SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceMapping.getSourceName());
                         SourceConfig sourceConfig = sourceClient.getSourceConfig();
 
                         //SourceConfig sourceConfig = partitionConfig.getSourceConfigManager().getSourceConfig(sourceMapping.getSourceName());

@@ -273,11 +273,11 @@ public class LDAPConnectionWizardPage extends WizardPage implements ModifyListen
                 try {
                     String providerUrl = getProviderUrl();
                     String bindDn = getBindDn();
-                    byte[] bindPassword = getBindPassword().getBytes("UTF-8");
+                    String bindPassword = getBindPassword();
 
                     BindRequest request = new BindRequest();
                     request.setDn(bindDn);
-                    request.setPassword(bindPassword);
+                    request.setPassword(bindPassword == null ? null : bindPassword.getBytes("UTF-8"));
 
                     BindResponse response = new BindResponse();
 

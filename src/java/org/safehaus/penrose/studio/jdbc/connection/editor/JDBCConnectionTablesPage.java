@@ -33,7 +33,6 @@ import org.safehaus.penrose.jdbc.*;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.jdbc.connection.editor.JDBCConnectionEditor;
 import org.safehaus.penrose.studio.jdbc.connection.JDBCSourceWizard;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
@@ -208,6 +207,11 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
 
     public void refresh() {
         try {
+            log.debug("Connection parameters:");
+            for (String name : connectionConfig.getParameterNames()) {
+                log.debug(" - "+name+": "+connectionConfig.getParameter(name));
+            }
+
             String catalog = catalogCombo.getText();
             String schema = schemaCombo.getText();
 

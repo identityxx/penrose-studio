@@ -24,9 +24,10 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.EntryClient;
+import org.safehaus.penrose.directory.DirectoryClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.directory.action.*;
@@ -92,9 +93,10 @@ public class DirectoryNode extends Node {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        DirectoryClient directoryClient = partitionClient.getDirectoryClient();
 
-        for (String id : partitionClient.getRootEntryIds()) {
-            EntryClient entryClient = partitionClient.getEntryClient(id);
+        for (String id : directoryClient.getRootEntryIds()) {
+            EntryClient entryClient = directoryClient.getEntryClient(id);
             EntryConfig entryConfig = entryClient.getEntryConfig();
 
             String label;

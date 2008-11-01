@@ -41,11 +41,12 @@ import org.safehaus.penrose.directory.EntryFieldConfig;
 import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.mapping.Expression;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.directory.dialog.ExpressionDialog;
@@ -123,8 +124,9 @@ public class SourcesPage extends FormPage implements ModifyListener {
                     PenroseClient client = project.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(editor.getPartitionName());
+                    SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
-                    Collection<String> sourceNames = partitionClient.getSourceNames();
+                    Collection<String> sourceNames = sourceManagerClient.getSourceNames();
 
                     //PartitionConfig partitionConfig = editor.getPartitionConfig();
                     //Collection<SourceConfig> sourceConfigManager = partitionConfig.getSourceConfigManager().getSourceConfigManager();
@@ -136,7 +138,7 @@ public class SourcesPage extends FormPage implements ModifyListener {
 
                     Collection<SourceConfig> sourceConfigs = new ArrayList<SourceConfig>();
                     for (String sourceName : sourceNames) {
-                        SourceClient sourceClient = partitionClient.getSourceClient(sourceName);
+                        SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceName);
                         SourceConfig sourceConfig = sourceClient.getSourceConfig();
                         sourceConfigs.add(sourceConfig);
                     }
@@ -178,8 +180,9 @@ public class SourcesPage extends FormPage implements ModifyListener {
                     PenroseClient client = project.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(editor.getPartitionName());
+                    SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
-                    Collection<String> sourceNames = partitionClient.getSourceNames();
+                    Collection<String> sourceNames = sourceManagerClient.getSourceNames();
 
                     //PartitionConfig partitionConfig = editor.getPartitionConfig();
                     //Collection<SourceConfig> sourceConfigManager = partitionConfig.getSourceConfigManager().getSourceConfigManager();
@@ -191,7 +194,7 @@ public class SourcesPage extends FormPage implements ModifyListener {
 
                     Collection<SourceConfig> sourceConfigs = new ArrayList<SourceConfig>();
                     for (String sourceName : sourceNames) {
-                        SourceClient sourceClient = partitionClient.getSourceClient(sourceName);
+                        SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceName);
                         SourceConfig sourceConfig = sourceClient.getSourceConfig();
                         sourceConfigs.add(sourceConfig);
                     }
@@ -388,8 +391,9 @@ public class SourcesPage extends FormPage implements ModifyListener {
                     PenroseClient client = project.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(editor.getPartitionName());
+                    SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
-                    SourceClient sourceClient = partitionClient.getSourceClient(sourceMapping.getSourceName());
+                    SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceMapping.getSourceName());
                     SourceConfig sourceConfig = sourceClient.getSourceConfig();
 
                     //PartitionConfig partitionConfig = editor.getPartitionConfig();
@@ -452,8 +456,9 @@ public class SourcesPage extends FormPage implements ModifyListener {
             String partitionName = sourceMapping.getPartitionName();
             if (partitionName == null) partitionName = editor.getPartitionName();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
-            SourceClient sourceClient = partitionClient.getSourceClient(sourceMapping.getSourceName());
+            SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceMapping.getSourceName());
             SourceConfig sourceConfig = sourceClient.getSourceConfig();
 
             //PartitionConfig partitionConfig = editor.getPartitionConfig();

@@ -19,7 +19,7 @@ package org.safehaus.penrose.studio.schema;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IMenuManager;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.schema.SchemaManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;

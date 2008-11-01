@@ -25,6 +25,7 @@ import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.mapping.MappingConfig;
 import org.safehaus.penrose.mapping.MappingConfigManager;
 import org.safehaus.penrose.mapping.MappingReader;
+import org.safehaus.penrose.mapping.MappingManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.mapping.MappingsNode;
 import org.safehaus.penrose.studio.project.Project;
@@ -65,9 +66,10 @@ public class ImportMappingsAction extends Action {
             mappingReader.read(file, mappingConfigManager);
 
             PartitionClient partitionClient = project.getClient().getPartitionManagerClient().getPartitionClient(node.getPartitionName());
+            MappingManagerClient mappingManagerClient = partitionClient.getMappingManagerClient();
 
             for (MappingConfig mappingConfig : mappingConfigManager.getMappingConfigs()) {
-                partitionClient.createMapping(mappingConfig);
+                mappingManagerClient.createMapping(mappingConfig);
             }
 
             partitionClient.store();

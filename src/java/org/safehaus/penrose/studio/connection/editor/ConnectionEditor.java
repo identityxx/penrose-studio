@@ -8,9 +8,10 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.connection.ConnectionClient;
+import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 
@@ -41,8 +42,9 @@ public abstract class ConnectionEditor extends FormEditor {
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
 
-            ConnectionClient connectionClient = partitionClient.getConnectionClient(origConnectionName);
+            ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(origConnectionName);
             origConnectionConfig = connectionClient.getConnectionConfig();
 
             connectionConfig = (ConnectionConfig)origConnectionConfig.clone();
@@ -96,6 +98,7 @@ public abstract class ConnectionEditor extends FormEditor {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
 /*
         ConnectionConfigManager connectionConfigManager = partitionConfig.getConnectionConfigManager();
         if (!origConnectionConfig.getName().equals(connectionConfig.getName())) {
@@ -111,7 +114,7 @@ public abstract class ConnectionEditor extends FormEditor {
         connectionConfigManager.modifyConnectionConfig(connectionConfig.getName(), connectionConfig);
         project.save(partitionConfig, connectionConfigManager);
 */
-        partitionClient.updateConnection(origConnectionName, connectionConfig);
+        connectionManagerClient.updateConnection(origConnectionName, connectionConfig);
         partitionClient.store();
 
         setPartName(partitionName+"/"+connectionConfig.getName());

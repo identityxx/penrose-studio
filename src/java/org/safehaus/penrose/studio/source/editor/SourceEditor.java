@@ -8,9 +8,10 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 
@@ -44,8 +45,9 @@ public abstract class SourceEditor extends FormEditor {
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
-            SourceClient sourceClient = partitionClient.getSourceClient(origSourceName);
+            SourceClient sourceClient = sourceManagerClient.getSourceClient(origSourceName);
             origSourceConfig = sourceClient.getSourceConfig();
 
             sourceConfig = (SourceConfig)origSourceConfig.clone();
@@ -74,6 +76,7 @@ public abstract class SourceEditor extends FormEditor {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 /*
         SourceConfigManager sourceConfigManager = partitionConfig.getSourceConfigManager();
         if (!origSourceName.equals(sourceConfig.getName())) {
@@ -92,7 +95,7 @@ public abstract class SourceEditor extends FormEditor {
         sourceConfigManager.modifySourceConfig(sourceConfig.getName(), sourceConfig);
         project.save(partitionConfig, sourceConfigManager);
 */
-        partitionClient.updateSource(origSourceName, sourceConfig);
+        sourceManagerClient.updateSource(origSourceName, sourceConfig);
         partitionClient.store();
 
         setPartName(partitionName+"/"+sourceConfig.getName());

@@ -22,6 +22,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.mapping.MappingConfig;
+import org.safehaus.penrose.mapping.MappingManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.mapping.MappingsNode;
 import org.safehaus.penrose.studio.mapping.wizard.AddMappingWizard;
@@ -56,7 +57,10 @@ public class NewMappingAction extends Action {
 
             MappingConfig mappingConfig = wizard.getMappingConfig();
             PartitionClient partitionClient = project.getClient().getPartitionManagerClient().getPartitionClient(node.getPartitionName());
-            partitionClient.createMapping(mappingConfig);
+            MappingManagerClient mappingManagerClient = partitionClient.getMappingManagerClient();
+
+            mappingManagerClient.createMapping(mappingConfig);
+
             partitionClient.store();
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();

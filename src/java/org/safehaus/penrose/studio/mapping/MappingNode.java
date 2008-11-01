@@ -27,11 +27,12 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.mapping.MappingClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.mapping.MappingConfig;
+import org.safehaus.penrose.mapping.MappingManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
@@ -145,12 +146,13 @@ public class MappingNode extends Node {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        MappingManagerClient mappingManagerClient = partitionClient.getMappingManagerClient();
 
         for (Node node : view.getSelectedNodes()) {
             if (!(node instanceof MappingNode)) continue;
 
             MappingNode mappingNode = (MappingNode)node;
-            partitionClient.removeMapping(mappingNode.getMappingName());
+            mappingManagerClient.removeMapping(mappingNode.getMappingName());
         }
 
         partitionClient.store();
@@ -184,8 +186,9 @@ public class MappingNode extends Node {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        MappingManagerClient mappingManagerClient = partitionClient.getMappingManagerClient();
 
-        Collection<String> mappingNames = partitionClient.getMappingNames();
+        Collection<String> mappingNames = mappingManagerClient.getMappingNames();
         int counter = 1;
         String name = newMappingConfig.getName();
         while (mappingNames.contains(name)) {
@@ -194,7 +197,7 @@ public class MappingNode extends Node {
         }
         newMappingConfig.setName(name);
 
-        partitionClient.createMapping(newMappingConfig);
+        mappingManagerClient.createMapping(newMappingConfig);
         partitionClient.store();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();

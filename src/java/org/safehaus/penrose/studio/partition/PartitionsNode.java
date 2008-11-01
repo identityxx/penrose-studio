@@ -25,7 +25,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.*;
 import org.safehaus.penrose.studio.partition.action.ImportPartitionAction;

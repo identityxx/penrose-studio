@@ -406,7 +406,7 @@ public class ExpressionDialog extends Dialog {
         gd.widthHint = 80;
         label.setLayoutData(gd);
 
-        variableCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
+        variableCombo = new Combo(composite, SWT.BORDER);
         variableCombo.add("");
         for (Iterator i=variables.iterator(); i.hasNext(); ) {
             String variable = (String)i.next();

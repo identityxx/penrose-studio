@@ -25,7 +25,6 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.dom4j.tree.DefaultElement;
 import org.dom4j.tree.DefaultText;
-import org.safehaus.penrose.studio.driver.Parameter;
 
 /**
  * @author Endi S. Dewata

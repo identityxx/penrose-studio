@@ -25,9 +25,10 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.connection.ConnectionClient;
+import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
@@ -110,8 +111,9 @@ public class ConnectionsNode extends Node {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
 
-        Collection<String> connectionNames = partitionClient.getConnectionNames();
+        Collection<String> connectionNames = connectionManagerClient.getConnectionNames();
 
         int counter = 1;
         String name = newConnectionConfig.getName();
@@ -121,7 +123,7 @@ public class ConnectionsNode extends Node {
         }
         newConnectionConfig.setName(name);
 
-        partitionClient.createConnection(newConnectionConfig);
+        connectionManagerClient.createConnection(newConnectionConfig);
         partitionClient.store();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -140,13 +142,14 @@ public class ConnectionsNode extends Node {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
 
         //log.debug("Getting connections:");
 
-        for (String connectionName : partitionClient.getConnectionNames()) {
+        for (String connectionName : connectionManagerClient.getConnectionNames()) {
             //log.debug(" - "+connectionName);
 
-            ConnectionClient connectionClient = partitionClient.getConnectionClient(connectionName);
+            ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(connectionName);
             connectionClient.getAdapterName();
             ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 

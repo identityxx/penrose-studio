@@ -3,10 +3,12 @@ package org.safehaus.penrose.studio.util;
 import org.safehaus.penrose.directory.EntryAttributeConfig;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.EntrySourceConfig;
+import org.safehaus.penrose.directory.DirectoryClient;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.mapping.Expression;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 
 /**
@@ -44,8 +46,9 @@ public class ADUtil {
         sourceConfig.setParameter("scope", "ONELEVEL");
         sourceConfig.setParameter("filter", "(objectClass=*)");
 
+        SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
         //partitionConfig.getSourceConfigManager().addSourceConfig(sourceConfig);
-        partitionClient.createSource(sourceConfig);
+        sourceManagerClient.createSource(sourceConfig);
 
         DN dn = new DN(destSchemaDn);
 
@@ -128,8 +131,9 @@ public class ADUtil {
         EntrySourceConfig sourceMapping = new EntrySourceConfig("s", sourceConfig.getName());
         entryConfig.addSourceConfig(sourceMapping);
 
+        DirectoryClient directoryClient = partitionClient.getDirectoryClient();
         //partitionConfig.getDirectoryConfig().addEntryConfig(entryConfig);
-        partitionClient.createEntry(entryConfig);
+        directoryClient.createEntry(entryConfig);
 
         return entryConfig;
     }

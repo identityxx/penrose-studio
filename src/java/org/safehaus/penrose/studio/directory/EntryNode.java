@@ -29,16 +29,17 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.EntryClient;
+import org.safehaus.penrose.directory.DirectoryClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.directory.action.MapLDAPTreeAction;
 import org.safehaus.penrose.studio.directory.action.NewDynamicEntryAction;
 import org.safehaus.penrose.studio.directory.action.NewEntryFromSourceAction;
-import org.safehaus.penrose.studio.directory.action.NewStaticEntryAction;
+import org.safehaus.penrose.studio.directory.action.NewEntryAction;
 import org.safehaus.penrose.studio.directory.editor.EntryEditorInput;
 import org.safehaus.penrose.studio.directory.editor.EntryEditor;
 import org.safehaus.penrose.studio.partition.PartitionNode;
@@ -116,7 +117,7 @@ public class EntryNode extends Node {
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        manager.add(new NewStaticEntryAction(this));
+        manager.add(new NewEntryAction(this));
         manager.add(new NewDynamicEntryAction(this));
 
         showCommercialMenu(manager);
@@ -223,6 +224,7 @@ public class EntryNode extends Node {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        DirectoryClient directoryClient = partitionClient.getDirectoryClient();
 
         //DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
 
@@ -232,7 +234,7 @@ public class EntryNode extends Node {
             EntryNode entryNode = (EntryNode) node;
 
             String id = entryNode.getEntryConfig().getId();
-            partitionClient.removeEntry(id);
+            directoryClient.removeEntry(id);
         }
 
         //project.save(partitionConfig, directoryConfig);
@@ -254,15 +256,16 @@ public class EntryNode extends Node {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        DirectoryClient directoryClient = partitionClient.getDirectoryClient();
 
-        EntryClient entryClient = partitionClient.getEntryClient(entryConfig.getId());
+        EntryClient entryClient = directoryClient.getEntryClient(entryConfig.getId());
 
         log.debug("Getting children:");
 
         for (String id : entryClient.getChildIds()) {
             log.debug(" - "+id);
 
-            EntryClient childClient = partitionClient.getEntryClient(id);
+            EntryClient childClient = directoryClient.getEntryClient(id);
             EntryConfig childConfig = childClient.getEntryConfig();
 
             //log.debug(" - childConfig "+childConfig);

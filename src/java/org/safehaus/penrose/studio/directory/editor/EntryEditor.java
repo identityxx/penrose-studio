@@ -28,9 +28,10 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.EntryClient;
+import org.safehaus.penrose.directory.DirectoryClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 
@@ -60,8 +61,9 @@ public class EntryEditor extends FormEditor implements ModifyListener {
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            DirectoryClient directoryClient = partitionClient.getDirectoryClient();
 
-            EntryClient entryClient = partitionClient.getEntryClient(entryId);
+            EntryClient entryClient = directoryClient.getEntryClient(entryId);
             origEntryConfig = entryClient.getEntryConfig();
 
             entryConfig = (EntryConfig) origEntryConfig.clone();
@@ -131,7 +133,8 @@ public class EntryEditor extends FormEditor implements ModifyListener {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-        partitionClient.updateEntry(origEntryConfig.getId(), entryConfig);
+        DirectoryClient directoryClient = partitionClient.getDirectoryClient();
+        directoryClient.updateEntry(origEntryConfig.getId(), entryConfig);
         partitionClient.store();
 
         String dn;

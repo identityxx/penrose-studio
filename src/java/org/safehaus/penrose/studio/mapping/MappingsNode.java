@@ -24,11 +24,12 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.mapping.MappingClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.mapping.MappingConfig;
+import org.safehaus.penrose.mapping.MappingManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
@@ -110,10 +111,11 @@ public class MappingsNode extends Node {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        MappingManagerClient mappingManagerClient = partitionClient.getMappingManagerClient();
 
         newMappingConfig.setName(wizard.getMappingName());
 
-        partitionClient.createMapping(newMappingConfig);
+        mappingManagerClient.createMapping(newMappingConfig);
         partitionClient.store();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -132,10 +134,11 @@ public class MappingsNode extends Node {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        MappingManagerClient mappingManagerClient = partitionClient.getMappingManagerClient();
 
         //log.debug("Getting mappings:");
 
-        for (String mappingName : partitionClient.getMappingNames()) {
+        for (String mappingName : mappingManagerClient.getMappingNames()) {
             //log.debug(" - "+mappingName);
 
             MappingClient mappingClient = partitionClient.getMappingClient(mappingName);

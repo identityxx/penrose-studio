@@ -25,22 +25,18 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.*;
 import org.ietf.ldap.LDAPDN;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.studio.directory.dialog.EntrySelectionDialog;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.directory.ProxyEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Endi S. Dewata
  */
-public class StaticEntryRDNWizardPage extends WizardPage implements ModifyListener {
+public class EntryRDNWizardPage extends WizardPage implements ModifyListener {
 
     Logger log = LoggerFactory.getLogger(getClass());
     
@@ -49,13 +45,14 @@ public class StaticEntryRDNWizardPage extends WizardPage implements ModifyListen
     Text rdnText;
     Text parentDnText;
     Button browseButton;
-    Text classNameText;
+
+    Combo classNameCombo;
 
     private Project project;
     private String partitionName;
     private DN parentDn;
 
-    public StaticEntryRDNWizardPage() {
+    public EntryRDNWizardPage() {
         super(NAME);
         setDescription("Enter the RDN, parent DN, and optionally the class name of the entry.");
     }
@@ -89,9 +86,7 @@ public class StaticEntryRDNWizardPage extends WizardPage implements ModifyListen
         exampleRdnLabel.setText("Example: ou=Users");
 
         new Label(composite, SWT.NONE);
-
         new Label(composite, SWT.NONE);
-
         new Label(composite, SWT.NONE);
 
         Label parentDnLabel = new Label(composite, SWT.NONE);
@@ -140,19 +135,15 @@ public class StaticEntryRDNWizardPage extends WizardPage implements ModifyListen
         gd.widthHint = 50;
         classLabel.setLayoutData(gd);
 
-        classNameText = new Text(composite, SWT.BORDER);
+        classNameCombo = new Combo(composite, SWT.BORDER);
+        classNameCombo.add("");
+        classNameCombo.add("org.safehaus.penrose.directory.DynamicEntry");
+        classNameCombo.add("org.safehaus.penrose.directory.ProxyEntry");
+
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
-        classNameText.setLayoutData(gd);
-        classNameText.addModifyListener(this);
-
-        new Label(composite, SWT.NONE);
-
-        Label exampleClassLabel = new Label(composite, SWT.NONE);
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalSpan = 2;
-        exampleClassLabel.setLayoutData(gd);
-        exampleClassLabel.setText("Example: "+ ProxyEntry.class.getName());
+        classNameCombo.setLayoutData(gd);
+        classNameCombo.addModifyListener(this);
 
         setPageComplete(validatePage());
     }
@@ -166,7 +157,7 @@ public class StaticEntryRDNWizardPage extends WizardPage implements ModifyListen
     }
 
     public String getClassName() {
-        return "".equals(classNameText.getText()) ? null : classNameText.getText();
+        return "".equals(classNameCombo.getText()) ? null : classNameCombo.getText();
     }
 
     public boolean validatePage() {

@@ -25,9 +25,10 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
@@ -119,8 +120,9 @@ public class SourcesNode extends Node {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
-        Collection<String> sourceNames = partitionClient.getSourceNames();
+        Collection<String> sourceNames = sourceManagerClient.getSourceNames();
         int counter = 1;
         String name = newSourceConfig.getName();
         while (sourceNames.contains(name)) {
@@ -129,7 +131,7 @@ public class SourcesNode extends Node {
         }
         newSourceConfig.setName(name);
 
-        partitionClient.createSource(newSourceConfig);
+        sourceManagerClient.createSource(newSourceConfig);
         partitionClient.store();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -148,13 +150,14 @@ public class SourcesNode extends Node {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
         //log.debug("Getting sources:");
 
-        for (String sourceName : partitionClient.getSourceNames()) {
+        for (String sourceName : sourceManagerClient.getSourceNames()) {
             //log.debug(" - "+sourceName);
 
-            SourceClient sourceClient = partitionClient.getSourceClient(sourceName);
+            SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceName);
             String adapterName = sourceClient.getAdapterName();
 
             // log.debug("Checking "+ path +" with "+sourceName);

@@ -25,13 +25,15 @@ public class FederationNode extends Node {
     private Project project;
     private ProjectNode projectNode;
 
-    protected Collection<Node> children;
+    protected Collection<Node> children = new ArrayList<Node>();
 
     public FederationNode(String name, Object object, ProjectNode projectNode) throws Exception {
         super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), object, projectNode);
 
         this.projectNode = projectNode;
         project = projectNode.getProject();
+
+        refresh();
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -40,6 +42,10 @@ public class FederationNode extends Node {
             public void run() {
                 try {
                     refresh();
+
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    penroseStudio.notifyChangeListeners();
+
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
@@ -48,7 +54,7 @@ public class FederationNode extends Node {
     }
 
     public void refresh() throws Exception {
-        children = new ArrayList<Node>();
+        children.clear();
 
         PartitionManagerClient partitionManagerClient = project.getClient().getPartitionManagerClient();
 
@@ -59,20 +65,16 @@ public class FederationNode extends Node {
 
             if (!"org.safehaus.penrose.federation.partition.FederationPartition".equals(partitionClass)) continue;
 
-            FederationPartitionNode federationPartitionNode = new FederationPartitionNode(partitionName, this);
-            children.add(federationPartitionNode);
+            FederationDomainNode federationDomainNode = new FederationDomainNode(partitionName, this);
+            children.add(federationDomainNode);
         }
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public boolean hasChildren() throws Exception {
-        return true;
+        return !children.isEmpty();
     }
 
     public Collection<Node> getChildren() throws Exception {
-        if (children == null) refresh();
         return children;
     }
 

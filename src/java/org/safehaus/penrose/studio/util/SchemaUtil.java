@@ -3,7 +3,9 @@ package org.safehaus.penrose.studio.util;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.directory.ProxyEntry;
+import org.safehaus.penrose.directory.DirectoryClient;
 import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 
 /**
@@ -29,8 +31,9 @@ public class SchemaUtil {
         sourceConfig.setParameter("scope", "SUBTREE");
         sourceConfig.setParameter("filter", "(objectClass=*)");
 
+        SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
         //partitionConfig.getSourceConfigManager().addSourceConfig(sourceConfig);
-        partitionClient.createSource(sourceConfig);
+        sourceManagerClient.createSource(sourceConfig);
 
         EntryConfig entryConfig = new EntryConfig();
         entryConfig.setDn(destSchemaDn);
@@ -40,8 +43,9 @@ public class SchemaUtil {
 
         entryConfig.setEntryClass(ProxyEntry.class.getName());
 
+        DirectoryClient directoryClient = partitionClient.getDirectoryClient();
         //partitionConfig.getDirectoryConfig().addEntryConfig(entryConfig);
-        partitionClient.createEntry(entryConfig);
+        directoryClient.createEntry(entryConfig);
 
         return entryConfig;
     }

@@ -29,9 +29,10 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.connection.ConnectionClient;
+import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
@@ -159,14 +160,13 @@ public class ConnectionNode extends Node {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-
-        //ConnectionConfigManager connectionConfigManager = partitionConfig.getConnectionConfigManager();
+        ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
 
         for (Node node : view.getSelectedNodes()) {
             if (!(node instanceof ConnectionNode)) continue;
 
             ConnectionNode connectionNode = (ConnectionNode)node;
-            partitionClient.removeConnection(connectionNode.getConnectionName());
+            connectionManagerClient.removeConnection(connectionNode.getConnectionName());
         }
 
         partitionClient.store();
@@ -182,8 +182,9 @@ public class ConnectionNode extends Node {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
 
-        ConnectionClient connectionClient = partitionClient.getConnectionClient(connectionName);
+        ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(connectionName);
         view.setClipboard(connectionClient.getConnectionConfig());
     }
 
@@ -213,8 +214,9 @@ public class ConnectionNode extends Node {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
 
-        Collection<String> connectionNames = partitionClient.getConnectionNames();
+        Collection<String> connectionNames = connectionManagerClient.getConnectionNames();
         int counter = 1;
         String name = newConnectionConfig.getName();
         while (connectionNames.contains(name)) {
@@ -223,7 +225,7 @@ public class ConnectionNode extends Node {
         }
         newConnectionConfig.setName(name);
 
-        partitionClient.createConnection(newConnectionConfig);
+        connectionManagerClient.createConnection(newConnectionConfig);
         partitionClient.store();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();

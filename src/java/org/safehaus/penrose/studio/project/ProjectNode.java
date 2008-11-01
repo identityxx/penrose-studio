@@ -17,7 +17,7 @@ import org.safehaus.penrose.studio.service.ServicesNode;
 import org.safehaus.penrose.studio.schema.SchemasNode;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.safehaus.penrose.service.ServiceManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.user.UserConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.SWT;

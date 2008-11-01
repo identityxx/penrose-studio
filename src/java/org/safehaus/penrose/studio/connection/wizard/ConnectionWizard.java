@@ -20,6 +20,7 @@ package org.safehaus.penrose.studio.connection.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.studio.driver.Driver;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.jdbc.connection.JDBCConnectionWizardPage;
@@ -27,7 +28,7 @@ import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionParametersWizar
 import org.safehaus.penrose.studio.ldap.connection.LDAPConnectionWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.jdbc.JDBCClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.apache.log4j.Logger;
@@ -168,7 +169,8 @@ public class ConnectionWizard extends Wizard {
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-            partitionClient.createConnection(connectionConfig);
+            ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+            connectionManagerClient.createConnection(connectionConfig);
             partitionClient.store();
 
             return true;

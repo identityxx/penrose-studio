@@ -22,11 +22,13 @@ import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.source.SourceConfig;
+import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.directory.ProxyEntry;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.directory.DirectoryClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.apache.log4j.Logger;
@@ -92,8 +94,11 @@ public class CreateRootDSEProxyWizard extends Wizard {
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
-            partitionClient.createSource(sourceConfig);
-            partitionClient.createEntry(entryConfig);
+            SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+            sourceManagerClient.createSource(sourceConfig);
+
+            DirectoryClient directoryClient = partitionClient.getDirectoryClient();
+            directoryClient.createEntry(entryConfig);
 
             partitionClient.store();
 

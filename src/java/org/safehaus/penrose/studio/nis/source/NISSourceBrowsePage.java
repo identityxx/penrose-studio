@@ -12,9 +12,10 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceClient;
+import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 
@@ -156,8 +157,9 @@ public class NISSourceBrowsePage extends SourceEditorPage {
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
-            SourceClient sourceClient = partitionClient.getSourceClient(sourceConfig.getName());
+            SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceConfig.getName());
             sourceClient.search(sc, sr);
 
             while (sr.hasNext()) {

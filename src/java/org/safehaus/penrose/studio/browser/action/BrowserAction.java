@@ -22,7 +22,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.safehaus.penrose.management.PenroseClient;
 import org.safehaus.penrose.service.ServiceManagerClient;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -34,6 +33,7 @@ import org.safehaus.penrose.studio.project.ProjectConfig;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.user.UserConfig;
+import org.safehaus.penrose.client.PenroseClient;
 
 /**
  * @author Endi S. Dewata

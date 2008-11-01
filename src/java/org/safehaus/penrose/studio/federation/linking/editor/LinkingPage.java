@@ -29,7 +29,7 @@ import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.filter.FilterTool;
 import org.safehaus.penrose.filter.SubstringFilter;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
@@ -40,6 +40,7 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.util.ActiveDirectoryUtil;
 import org.safehaus.penrose.util.BinaryUtil;
 import org.safehaus.penrose.source.SourceClient;
+import org.safehaus.penrose.source.SourceManagerClient;
 
 import javax.management.MBeanException;
 import java.lang.reflect.InvocationTargetException;
@@ -109,8 +110,11 @@ public class LinkingPage extends FormPage {
         localPartitionClient = partitionManagerClient.getPartitionClient(localPartition);
         globalPartitionClient = partitionManagerClient.getPartitionClient(globalPartition);
 
-        localSourceClient = localPartitionClient.getSourceClient("LDAP");
-        globalSourceClient = globalPartitionClient.getSourceClient("LDAP");
+        SourceManagerClient localSourceManagerClient = localPartitionClient.getSourceManagerClient();
+        localSourceClient = localSourceManagerClient.getSourceClient("LDAP");
+
+        SourceManagerClient globalSourceManagerClient = globalPartitionClient.getSourceManagerClient();
+        globalSourceClient = globalSourceManagerClient.getSourceClient("LDAP");
 
         localBaseDn = new DN(localSourceClient.getParameter("baseDn"));
         globalBaseDn = new DN(globalSourceClient.getParameter("baseDn"));

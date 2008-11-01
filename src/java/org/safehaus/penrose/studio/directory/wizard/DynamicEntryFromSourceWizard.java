@@ -27,7 +27,7 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDNBuilder;
 import org.safehaus.penrose.directory.*;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.apache.log4j.Logger;
@@ -143,7 +143,10 @@ public class DynamicEntryFromSourceWizard extends Wizard {
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-            partitionClient.createEntry(entryConfig);
+
+            DirectoryClient directoryClient = partitionClient.getDirectoryClient();
+            directoryClient.createEntry(entryConfig);
+
             partitionClient.store();
 
             return true;

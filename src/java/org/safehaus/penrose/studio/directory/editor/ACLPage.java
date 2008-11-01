@@ -32,9 +32,10 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.EntryClient;
+import org.safehaus.penrose.directory.DirectoryClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.directory.dialog.ACIDialog;
 import org.safehaus.penrose.studio.project.Project;
 
@@ -386,14 +387,15 @@ public class ACLPage extends FormPage implements ModifyListener {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        DirectoryClient directoryClient = partitionClient.getDirectoryClient();
 
-        EntryClient entryClient = partitionClient.getEntryClient(entryConfig.getId());
+        EntryClient entryClient = directoryClient.getEntryClient(entryConfig.getId());
         String parentId = entryClient.getParentId();
         log.debug("Parent ID: "+parentId);
 
         if (parentId == null) return;
 
-        EntryClient parentClient = partitionClient.getEntryClient(parentId);
+        EntryClient parentClient = directoryClient.getEntryClient(parentId);
         EntryConfig parentConfig = parentClient.getEntryConfig();
 
         //PartitionConfig partitionConfig = editor.getPartitionConfig();
@@ -423,7 +425,7 @@ public class ACLPage extends FormPage implements ModifyListener {
             log.debug("Parent ID: "+parentId);
             if (parentId == null) break;
 
-            parentClient = partitionClient.getEntryClient(parentId);
+            parentClient = directoryClient.getEntryClient(parentId);
             parentConfig = parentClient.getEntryConfig();
 
             //parentConfig = partitionConfig.getDirectoryConfig().getParent(parentConfig);

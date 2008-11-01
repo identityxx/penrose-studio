@@ -4,11 +4,8 @@ import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.jdbc.QueryResponse;
 import org.safehaus.penrose.jdbc.connection.JDBCConnection;
 import org.safehaus.penrose.ldap.Attributes;
-import org.safehaus.penrose.federation.NISDomain;
-import org.safehaus.penrose.federation.FederationClient;
-import org.safehaus.penrose.federation.NISFederationClient;
-import org.safehaus.penrose.federation.FederationRepositoryConfig;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.federation.*;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.*;
@@ -78,9 +75,9 @@ public class InconsistentUIDFinderAction extends NISAction {
 
         String sql = "select a.uid, a.uidNumber, b.uidNumber, c.uid, c.uidNumber, d.uidNumber" +
                 " from "+table1+" a"+
-                " left join "+ NISFederationClient.NIS_TOOL +".users b on b.domain=? and a.uid=b.uid"+
+                " left join "+ Federation.FEDERATION +".users b on b.domain=? and a.uid=b.uid"+
                 " join "+table2+" c on a.uid = c.uid "+
-                " left join "+ NISFederationClient.NIS_TOOL +".users d on d.domain=? and c.uid=d.uid"+
+                " left join "+ Federation.FEDERATION +".users d on d.domain=? and c.uid=d.uid"+
                 " where b.uidNumber is null and d.uidNumber is null and a.uidNumber <> c.uidNumber"+
                     " or b.uidNumber is null and a.uidNumber <> d.uidNumber"+
                     " or d.uidNumber is null and b.uidNumber <> c.uidNumber"+

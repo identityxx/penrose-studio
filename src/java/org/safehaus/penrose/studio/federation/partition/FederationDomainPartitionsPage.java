@@ -19,7 +19,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.federation.FederationPartitionConfig;
-import org.safehaus.penrose.management.PenroseClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -29,19 +29,19 @@ import org.safehaus.penrose.studio.project.Project;
 /**
  * @author Endi S. Dewata
  */
-public class FederationPartitionPartitionsPage extends FormPage {
+public class FederationDomainPartitionsPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
     FormToolkit toolkit;
 
-    FederationPartitionEditor editor;
+    FederationDomainEditor editor;
     Project project;
     FederationClient federationClient;
 
     Table table;
 
-    public FederationPartitionPartitionsPage(FederationPartitionEditor editor) {
+    public FederationDomainPartitionsPage(FederationDomainEditor editor) {
         super(editor, "PARTITONS", "  Partitions  ");
 
         this.editor = editor;
