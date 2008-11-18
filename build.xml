@@ -12,7 +12,7 @@
     <property name="project.name" value="penrose-studio"/>
 
     <property name="prefix" value=""/>
-    <property name="penrose.studio.home" value="${prefix}/usr/local/${project.name}-${product.version}"/>
+    <property name="studio.home" value="${prefix}/opt/${project.name}-${product.version}"/>
     <property name="plugin.path" value="target/dist/plugins/org.safehaus.penrose.studio_${plugin.version}"/>
 
     <tstamp>
@@ -551,14 +551,14 @@
         <antcall target="install-dist">
             <param name="platform" value="linux-gtk"/>
         </antcall>
-        <chmod dir="${penrose.studio.home}" includes="penrose-studio" perm="a+rx" />
+        <chmod dir="${studio.home}" includes="penrose-studio" perm="a+rx" />
     </target>
 
     <target name="install-linux-gtk-x86_64">
         <antcall target="install-dist">
             <param name="platform" value="linux-gtk-x86_64"/>
         </antcall>
-        <chmod dir="${penrose.studio.home}" includes="penrose-studio" perm="a+rx" />
+        <chmod dir="${studio.home}" includes="penrose-studio" perm="a+rx" />
     </target>
 
     <target name="install-macosx" if="isMac">
@@ -574,16 +574,16 @@
     </target>
 
     <target name="pre-install" depends="init">
-        <mkdir dir="${penrose.studio.home}"/>
+        <mkdir dir="${studio.home}"/>
         <condition property="penrose.conf.missing">
           <not>
-            <available file="${penrose.studio.home}/conf/driver.xml"/>
+            <available file="${studio.home}/conf/driver.xml"/>
           </not>
         </condition>
     </target>
 
     <target name="copy-penrose-conf" depends="init" if="penrose.conf.missing">
-        <copy todir="${penrose.studio.home}">
+        <copy todir="${studio.home}">
             <fileset dir="target/dist">
                 <include name="conf/**/*"/>
             </fileset>
@@ -592,12 +592,12 @@
 
     <target name="install-dist" depends="pre-install,copy-penrose-conf">
         <delete failonerror="false" includeemptydirs="true">
-            <fileset dir="${penrose.studio.home}">
+            <fileset dir="${studio.home}">
                 <include name="configuration/**/*"/>
                 <include name="lib/*"/>
             </fileset>
         </delete>
-        <copy todir="${penrose.studio.home}">
+        <copy todir="${studio.home}">
             <fileset dir="target/dist">
                 <include name="**/*"/>
                 <exclude name="conf/**/*"/>
@@ -607,12 +607,12 @@
 
     <target name="uninstall" depends="init">
         <delete failonerror="false" includeemptydirs="true">
-            <fileset dir="${penrose.studio.home}/docs" includes="**/*"/>
-            <fileset dir="${penrose.studio.home}/features" includes="**/*"/>
-            <fileset dir="${penrose.studio.home}/plugins" includes="**/*"/>
-            <fileset dir="${penrose.studio.home}/readme" includes="**/*"/>
-            <fileset dir="${penrose.studio.home}/work" includes="**/*"/>
-            <fileset dir="${penrose.studio.home}" includes="*"/>
+            <fileset dir="${studio.home}/docs" includes="**/*"/>
+            <fileset dir="${studio.home}/features" includes="**/*"/>
+            <fileset dir="${studio.home}/plugins" includes="**/*"/>
+            <fileset dir="${studio.home}/readme" includes="**/*"/>
+            <fileset dir="${studio.home}/work" includes="**/*"/>
+            <fileset dir="${studio.home}" includes="*"/>
         </delete>
     </target>
 
