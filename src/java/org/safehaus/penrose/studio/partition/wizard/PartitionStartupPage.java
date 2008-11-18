@@ -20,23 +20,23 @@ package org.safehaus.penrose.studio.partition.wizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 
 /**
  * @author Endi S. Dewata
  */
-public class PartitionNamePage extends WizardPage implements ModifyListener {
+public class PartitionStartupPage extends WizardPage implements SelectionListener {
 
-    public final static String NAME = "Partition Name";
+    public final static String NAME = "Partition Startup";
 
-    Text nameText;
+    Button startPartitionCheckbox;
 
-    public PartitionNamePage() {
+    public PartitionStartupPage() {
         super(NAME);
-        setDescription("Enter the name of the partition.");
+        setDescription("Specify whether you want to start the partition immediately.");
     }
 
     public void createControl(Composite parent) {
@@ -48,28 +48,31 @@ public class PartitionNamePage extends WizardPage implements ModifyListener {
         composite.setLayout(sectionLayout);
 
         Label nameLabel = new Label(composite, SWT.NONE);
-        nameLabel.setText("Name:");
+        nameLabel.setText("Start partition:");
         GridData gd = new GridData(GridData.FILL);
-        gd.widthHint = 50;
+        gd.widthHint = 100;
         nameLabel.setLayoutData(gd);
 
-        nameText = new Text(composite, SWT.BORDER);
-        nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        nameText.addModifyListener(this);
+        startPartitionCheckbox = new Button(composite, SWT.CHECK);
+
+        startPartitionCheckbox.addSelectionListener(this);
 
         setPageComplete(validatePage());
     }
 
-    public String getPartitionName() {
-        return nameText.getText().trim();
+    public boolean getPartitionStartup() {
+        return startPartitionCheckbox.getSelection();
     }
 
     public boolean validatePage() {
-        if ("".equals(getPartitionName())) return false;
         return true;
     }
 
-    public void modifyText(ModifyEvent event) {
+    public void widgetSelected(SelectionEvent event) {
+        setPageComplete(validatePage());
+    }
+
+    public void widgetDefaultSelected(SelectionEvent event) {
         setPageComplete(validatePage());
     }
 }

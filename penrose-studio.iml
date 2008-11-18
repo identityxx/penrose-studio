@@ -14,7 +14,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="penrose" />
+    <orderEntry type="module" module-name="penrose-server" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>

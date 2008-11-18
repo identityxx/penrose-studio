@@ -91,7 +91,7 @@ public class CreateLDAPProxyWizard extends Wizard {
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 
             PartitionConfig partitionConfig = new PartitionConfig(partitionName);
-            partitionManagerClient.createPartition(partitionConfig);
+            partitionManagerClient.addPartition(partitionConfig);
 
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
             ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();

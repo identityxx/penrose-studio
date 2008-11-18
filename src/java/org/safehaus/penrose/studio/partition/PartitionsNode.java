@@ -156,7 +156,7 @@ public class PartitionsNode extends Node {
 
             //addPartitionConfig(newPartitionConfig);
 
-            partitionManagerClient.createPartition(newPartitionConfig);
+            partitionManagerClient.addPartition(newPartitionConfig);
         }
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();

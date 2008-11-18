@@ -38,6 +38,7 @@ public class CreatePartitionWizard extends Wizard {
     public PartitionsNode partitionsNode;
 
     public PartitionNamePage namePage = new PartitionNamePage();
+    public PartitionClassPage classPage = new PartitionClassPage();
 
     public CreatePartitionWizard(Project project, PartitionsNode partitionsNode) {
         this.project = project;
@@ -45,20 +46,30 @@ public class CreatePartitionWizard extends Wizard {
         setWindowTitle("New Partition");
     }
 
+    public void addPages() {
+        addPage(namePage);
+        addPage(classPage);
+    }
+
+    public boolean needsPreviousAndNextButtons() {
+        return true;
+    }
+
     public boolean canFinish() {
 
         if (!namePage.isPageComplete()) return false;
+        if (!classPage.isPageComplete()) return false;
 
         return true;
     }
 
     public boolean performFinish() {
         try {
-            String name = namePage.getPartitionName();
-            String className = namePage.getClassName();
+            String partitionName = namePage.getPartitionName();
+            String partitionClass = classPage.getPartitionClass();
 
-            PartitionConfig partitionConfig = new PartitionConfig(name);
-            partitionConfig.setPartitionClass(className);
+            PartitionConfig partitionConfig = new PartitionConfig(partitionName);
+            partitionConfig.setPartitionClass(partitionClass);
 
             //PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
             //partitionConfigManager.addPartitionConfig(partitionConfig);
@@ -69,7 +80,7 @@ public class CreatePartitionWizard extends Wizard {
 
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-            partitionManagerClient.createPartition(partitionConfig);
+            partitionManagerClient.addPartition(partitionConfig);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
@@ -81,13 +92,5 @@ public class CreatePartitionWizard extends Wizard {
             ErrorDialog.open(e);
             return false;
         }
-    }
-
-    public void addPages() {
-        addPage(namePage);
-    }
-
-    public boolean needsPreviousAndNextButtons() {
-        return true;
     }
 }

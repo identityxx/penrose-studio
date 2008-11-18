@@ -28,15 +28,15 @@ import org.eclipse.swt.layout.GridData;
 /**
  * @author Endi S. Dewata
  */
-public class PartitionNamePage extends WizardPage implements ModifyListener {
+public class PartitionClassPage extends WizardPage implements ModifyListener {
 
-    public final static String NAME = "Partition Name";
+    public final static String NAME = "Partition Class";
 
-    Text nameText;
+    Combo classNameCombo;
 
-    public PartitionNamePage() {
+    public PartitionClassPage() {
         super(NAME);
-        setDescription("Enter the name of the partition.");
+        setDescription("Enter the class name of the partition (optional).");
     }
 
     public void createControl(Composite parent) {
@@ -48,24 +48,26 @@ public class PartitionNamePage extends WizardPage implements ModifyListener {
         composite.setLayout(sectionLayout);
 
         Label nameLabel = new Label(composite, SWT.NONE);
-        nameLabel.setText("Name:");
+        nameLabel.setText("Class:");
         GridData gd = new GridData(GridData.FILL);
         gd.widthHint = 50;
         nameLabel.setLayoutData(gd);
 
-        nameText = new Text(composite, SWT.BORDER);
-        nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        nameText.addModifyListener(this);
+        classNameCombo = new Combo(composite, SWT.BORDER);
+        classNameCombo.add("");
+        classNameCombo.add("org.safehaus.penrose.federation.partition.FederationPartition");
+
+        classNameCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        classNameCombo.addModifyListener(this);
 
         setPageComplete(validatePage());
     }
 
-    public String getPartitionName() {
-        return nameText.getText().trim();
+    public String getPartitionClass() {
+        return "".equals(classNameCombo.getText()) ? null : classNameCombo.getText();
     }
 
     public boolean validatePage() {
-        if ("".equals(getPartitionName())) return false;
         return true;
     }
 

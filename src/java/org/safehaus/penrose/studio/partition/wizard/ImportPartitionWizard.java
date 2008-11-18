@@ -35,8 +35,10 @@ public class ImportPartitionWizard extends Wizard {
     Logger log = Logger.getLogger(getClass());
 
     Project project;
+
     public PartitionNamePage namePage = new PartitionNamePage();
     public PartitionLocationPage locationPage = new PartitionLocationPage();
+    public PartitionStartupPage startupPage = new PartitionStartupPage();
 
     public ImportPartitionWizard(Project project) {
         this.project = project;
@@ -44,10 +46,21 @@ public class ImportPartitionWizard extends Wizard {
         locationPage.setDescription("Enter the location from which the partition will be imported.");
     }
 
+    public void addPages() {
+        addPage(namePage);
+        addPage(locationPage);
+        addPage(startupPage);
+    }
+
+    public boolean needsPreviousAndNextButtons() {
+        return true;
+    }
+
     public boolean canFinish() {
 
         if (!namePage.isPageComplete()) return false;
         if (!locationPage.isPageComplete()) return false;
+        if (!startupPage.isPageComplete()) return false;
 
         return true;
     }
@@ -77,7 +90,11 @@ public class ImportPartitionWizard extends Wizard {
 
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-            partitionManagerClient.createPartition(partitionConfig);
+            partitionManagerClient.addPartition(partitionConfig);
+
+            if (startupPage.getPartitionStartup()) {
+                partitionManagerClient.startPartition(partitionName);
+            }
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
@@ -88,14 +105,5 @@ public class ImportPartitionWizard extends Wizard {
             log.error(e.getMessage(), e);
             return false;
         }
-    }
-
-    public void addPages() {
-        addPage(namePage);
-        addPage(locationPage);
-    }
-
-    public boolean needsPreviousAndNextButtons() {
-        return true;
     }
 }

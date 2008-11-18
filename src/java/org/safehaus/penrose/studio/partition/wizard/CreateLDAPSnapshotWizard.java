@@ -75,10 +75,8 @@ public class CreateLDAPSnapshotWizard extends Wizard {
         LDAPClient client = null;
         try {
             String name = namePage.getPartitionName();
-            String className = namePage.getClassName();
 
             PartitionConfig partitionConfig = new PartitionConfig(name);
-            partitionConfig.setPartitionClass(className);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
 

@@ -75,6 +75,11 @@ public class PartitionLocationPage extends WizardPage implements ModifyListener 
                 dialog.setText("Import");
                 dialog.setMessage("Select a directory from which you want to import Penrose configuration.");
 
+                String dir = locationText.getText();
+                if ("".equals(dir)) dir = System.getProperty("user.dir");
+                
+                dialog.setFilterPath(dir);
+                
                 String directory = dialog.open();
                 if (directory == null) return;
 

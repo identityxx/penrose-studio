@@ -78,15 +78,15 @@
     </target>
 
     <target name="import-common" depends="init">
-        <copy todir="lib" file="../penrose-${product.specification}/common/target/penrose-common-${penrose.version}.jar"/>
+        <copy todir="lib" file="../Server/common/target/penrose-common-${penrose.version}.jar"/>
     </target>
 
     <target name="import-core" depends="init">
-        <copy todir="lib" file="../penrose-${product.specification}/core/target/penrose-${penrose.version}.jar"/>
+        <copy todir="lib" file="../Server/core/target/penrose-${penrose.version}.jar"/>
     </target>
 
     <target name="import-client" depends="init">
-        <copy todir="lib" file="../penrose-${product.specification}/client/target/penrose-client-${penrose.version}.jar"/>
+        <copy todir="lib" file="../Server/client/target/penrose-client-${penrose.version}.jar"/>
     </target>
 
     <target name="clean" depends="init">
@@ -148,7 +148,7 @@
         </jar>
     </target>
 
-    <target name="build" depends="compile">
+    <target name="package" depends="compile">
 
         <copy todir="target" file="LICENSE.txt"/>
 
@@ -239,13 +239,13 @@
 
     </target>
 
-    <target name="dist" depends="init">
+    <target name="build" depends="init">
         <antcall target="build-linux"/>
         <antcall target="build-macosx"/>
         <antcall target="build-win32"/>
     </target>
 
-    <target name="build-linux">
+    <target name="build-linux" if="isLinux">
         <antcall target="build-linux-gtk"/>
         <antcall target="build-linux-gtk-x86_64"/>
     </target>
@@ -269,9 +269,7 @@
         </move>
         <move file="target/dist/eclipse" tofile="target/dist/${project.name}"/>
         <chmod file="target/dist/${project.name}" perm="a+rx"/>
-        <antcall target="build">
-            <param name="platform" value="${platform}"/>
-        </antcall>
+        <antcall target="package"/>
     </target>
 
     <target name="build-macosx" depends="init" if="isMac">
@@ -290,9 +288,7 @@
         />
     	-->
         <chmod file="target/dist/eclipse" perm="a+rx"/>
-        <antcall target="build">
-            <param name="platform" value="${platform}"/>
-        </antcall>
+        <antcall target="package"/>
     </target>
 
     <target name="build-win32" depends="init" if="isWindows">
@@ -304,9 +300,7 @@
         </move>
         <move file="target/dist/eclipse.exe" tofile="target/dist/penrose-studio.exe"/>
         <copy file="launcher/penrose-studio.exe" tofile="target/dist/penrose-studio.exe"/>
-        <antcall target="build">
-            <param name="platform" value="${platform}"/>
-        </antcall>
+        <antcall target="package"/>
     </target>
 
 <!--
@@ -335,7 +329,10 @@
         </tar>
     </target>
 
-    <target name="dist-all" depends="dist-linux,dist-macosx,dist-win32">
+    <target name="dist" depends="init">
+        <antcall target="dist-linux"/>
+        <antcall target="dist-macosx"/>
+        <antcall target="dist-win32"/>
         <copy
             todir="dist"
             file="target/${project.name}-${product.version}.jar">
@@ -495,7 +492,7 @@
         </condition>
     </target>
 
-    <target name="rpm-build" depends="dist" if="hasRpmBuilder">
+    <target name="rpm-build" depends="build" if="hasRpmBuilder">
         <copy todir="target" file="installer/${project.name}.spec">
             <filterchain>
                 <expandproperties/>
@@ -537,7 +534,7 @@
         <antcall target="install-win32"/>
     </target>
 
-    <target name="install-linux">
+    <target name="install-linux" if="isLinux">
         <antcall target="install-dist-linux-gtk"/>
         <antcall target="install-dist-linux-gtk-x86_64"/>
     </target>
