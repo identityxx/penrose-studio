@@ -91,38 +91,39 @@ public class ModuleEditor extends EditorPart {
     }
 
     public void createPartControl(Composite parent) {
-        try {
-            toolkit = new FormToolkit(parent.getDisplay());
+        toolkit = new FormToolkit(parent.getDisplay());
 
-            ScrolledForm form = toolkit.createScrolledForm(parent);
-            form.setText("Module Editor");
+        ScrolledForm form = toolkit.createScrolledForm(parent);
+        form.setText("Module Editor");
 
-            Composite body = form.getBody();
-            body.setLayout(new GridLayout());
+        Composite body = form.getBody();
+        body.setLayout(new GridLayout());
 
-            Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-            section.setText("Module Editor");
-            section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Section propertiesSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        propertiesSection.setText("Module Editor");
+        propertiesSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-            Composite propertiesSection = createPropertiesSection(section);
-            section.setClient(propertiesSection);
+        Composite propertiesComponent = createPropertiesComponent(propertiesSection);
+        propertiesSection.setClient(propertiesComponent);
 
-            section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-            section.setText("Parameters");
-            section.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Section parametersSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        parametersSection.setText("Parameters");
+        parametersSection.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-            Composite parametersSection = createParametersSection(section);
-            section.setClient(parametersSection);
+        Composite parametersComponent = createParametersComponent(parametersSection);
+        parametersSection.setClient(parametersComponent);
 
-            section = createMappingSection(body);
-            section.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Section mappingsSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        mappingsSection.setText("Mappings");
+        mappingsSection.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-	    } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
+        Composite mappingsComponent = createMappingsComponent(mappingsSection);
+        mappingsSection.setClient(mappingsComponent);
+
+        refresh();
 	}
 
-	public Composite createPropertiesSection(Composite parent) {
+	public Composite createPropertiesComponent(Composite parent) {
 
 		Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
@@ -188,7 +189,7 @@ public class ModuleEditor extends EditorPart {
         return composite;
     }
 
-    public Composite createParametersSection(final Composite parent) {
+    public Composite createParametersComponent(final Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
@@ -196,7 +197,6 @@ public class ModuleEditor extends EditorPart {
 		parametersTable = toolkit.createTable(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
         parametersTable.setHeaderVisible(true);
         parametersTable.setLinesVisible(true);
-
         parametersTable.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         parametersTable.addMouseListener(new MouseAdapter() {
@@ -243,7 +243,7 @@ public class ModuleEditor extends EditorPart {
 
         tc = new TableColumn(parametersTable, SWT.NONE);
         tc.setText("Value");
-        tc.setWidth(250);
+        tc.setWidth(300);
 
         Composite buttons = toolkit.createComposite(composite);
         buttons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
@@ -336,8 +336,6 @@ public class ModuleEditor extends EditorPart {
             }
         });
 
-        refresh();
-
 		return composite;
 	}
 
@@ -347,26 +345,31 @@ public class ModuleEditor extends EditorPart {
         for (String name : moduleConfig.getParameterNames()) {
             String value = moduleConfig.getParameter(name);
 
-            TableItem item = new TableItem(parametersTable, SWT.CHECK);
+            TableItem item = new TableItem(parametersTable, SWT.NONE);
             item.setText(0, name);
             item.setText(1, value);
         }
+
+        if (moduleMappings != null) {
+            for (ModuleMapping mapping : moduleMappings) {
+                TableItem tableItem = new TableItem(mappingsTable, SWT.NONE);
+                tableItem.setText(0, mapping.getBaseDn().toString());
+                tableItem.setText(1, mapping.getScope() == null ? "" : mapping.getScope());
+                tableItem.setText(2, mapping.getFilter() == null ? "" : mapping.getFilter());
+                tableItem.setData(mapping);
+            }
+        }
     }
 
-	public Section createMappingSection(final Composite parent) {
-        Section section = toolkit.createSection(parent, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Mappings");
+	public Composite createMappingsComponent(final Composite parent) {
 
-		Composite sectionClient = toolkit.createComposite(section);
-        section.setClient(sectionClient);
-		GridLayout layout = new GridLayout();
-        layout.numColumns = 2;
-		sectionClient.setLayout(layout);
+		Composite composite = toolkit.createComposite(parent);
+		composite.setLayout(new GridLayout(2, false));
 
-        mappingsTable = new Table(sectionClient, SWT.BORDER | SWT.FULL_SELECTION);
-        mappingsTable.setLayoutData(new GridData(GridData.FILL_BOTH));
+        mappingsTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
         mappingsTable.setHeaderVisible(true);
         mappingsTable.setLinesVisible(true);
+        mappingsTable.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         TableColumn tc = new TableColumn(mappingsTable, SWT.LEFT, 0);
         tc.setText("Base DN");
@@ -380,24 +383,11 @@ public class ModuleEditor extends EditorPart {
         tc.setText("Filter");
         tc.setWidth(200);
 
-        if (moduleMappings != null) {
-            for (ModuleMapping mapping : moduleMappings) {
-                TableItem tableItem = new TableItem(mappingsTable, SWT.NONE);
-                tableItem.setText(0, mapping.getBaseDn().toString());
-                tableItem.setText(1, mapping.getScope());
-                tableItem.setText(2, mapping.getFilter());
-                tableItem.setData(mapping);
-            }
-        }
-
-        mappingsTable.redraw();
-
-        Composite buttons = toolkit.createComposite(sectionClient);
+        Composite buttons = toolkit.createComposite(composite);
         buttons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
         buttons.setLayout(new GridLayout());
 
-        Button addButton = new Button(buttons, SWT.FLAT);
-        addButton.setText("Add");
+        Button addButton = toolkit.createButton(buttons, "Add", SWT.PUSH);
         addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         addButton.addSelectionListener(new SelectionAdapter() {
@@ -421,8 +411,7 @@ public class ModuleEditor extends EditorPart {
             }
         });
 
-        Button removeButton = new Button(buttons, SWT.FLAT);
-        removeButton.setText("Remove");
+        Button removeButton = toolkit.createButton(buttons, "Remove", SWT.PUSH);
         removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         removeButton.addSelectionListener(new SelectionAdapter() {
@@ -435,7 +424,7 @@ public class ModuleEditor extends EditorPart {
             }
         });
 
-		return section;
+		return composite;
 	}
 
     public void doSave(IProgressMonitor iProgressMonitor) {

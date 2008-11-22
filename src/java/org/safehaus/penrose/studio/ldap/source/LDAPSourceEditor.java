@@ -15,17 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.jndi.source;
+package org.safehaus.penrose.studio.ldap.source;
 
 import org.safehaus.penrose.studio.source.editor.SourceEditor;
 
-public class JNDISourceEditor extends SourceEditor {
+public class LDAPSourceEditor extends SourceEditor {
 
     public void addPages() {
         try {
-            addPage(new JNDISourcePropertyPage(this));
-            addPage(new JNDISourceBrowsePage(this));
-            //addPage(new JNDISourceCachePage(this));
+            addPage(new LDAPSourcePropertyPage(this));
+            addPage(new LDAPSourceBrowsePage(this));
+            //addPage(new LDAPSourceCachePage(this));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

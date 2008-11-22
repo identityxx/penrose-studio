@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.jndi.source;
+package org.safehaus.penrose.studio.ldap.source;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.*;
@@ -37,7 +37,7 @@ import java.util.*;
 /**
  * @author Endi S. Dewata
  */
-public class JNDIAttributeWizardPage extends WizardPage {
+public class LDAPAttributeWizardPage extends WizardPage {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -57,11 +57,11 @@ public class JNDIAttributeWizardPage extends WizardPage {
     Collection<String> attributeNames;
     Schema schema;
 
-    public JNDIAttributeWizardPage() {
+    public LDAPAttributeWizardPage() {
         this(new ArrayList<String>());
     }
 
-    public JNDIAttributeWizardPage(Collection<String> attributeNames) {
+    public LDAPAttributeWizardPage(Collection<String> attributeNames) {
         super(NAME);
 
         this.attributeNames = attributeNames;

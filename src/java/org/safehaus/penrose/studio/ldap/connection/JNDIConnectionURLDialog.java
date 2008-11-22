@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.jndi.connection;
+package org.safehaus.penrose.studio.ldap.connection;
 
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;

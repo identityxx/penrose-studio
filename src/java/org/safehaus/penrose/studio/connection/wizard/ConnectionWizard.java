@@ -24,7 +24,7 @@ import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.studio.driver.Driver;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.jdbc.connection.JDBCConnectionWizardPage;
-import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionParametersWizardPage;
+import org.safehaus.penrose.studio.ldap.connection.JNDIConnectionParametersWizardPage;
 import org.safehaus.penrose.studio.ldap.connection.LDAPConnectionWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.jdbc.JDBCClient;

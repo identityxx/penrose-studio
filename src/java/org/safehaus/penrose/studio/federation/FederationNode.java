@@ -59,9 +59,11 @@ public class FederationNode extends Node {
         PartitionManagerClient partitionManagerClient = project.getClient().getPartitionManagerClient();
 
         for (String partitionName : partitionManagerClient.getPartitionNames()) {
+            log.debug("Partition "+partitionName+":");
+
             PartitionConfig partitionConfig = partitionManagerClient.getPartitionConfig(partitionName);
             String partitionClass = partitionConfig.getPartitionClass();
-            log.debug("Partition "+partitionName+": "+partitionClass);
+            log.debug(" - Class: "+partitionClass);
 
             if (!"org.safehaus.penrose.federation.partition.FederationPartition".equals(partitionClass)) continue;
 

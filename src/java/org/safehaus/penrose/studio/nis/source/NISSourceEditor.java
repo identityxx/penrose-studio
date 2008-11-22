@@ -8,7 +8,7 @@ public class NISSourceEditor extends SourceEditor {
         try {
             addPage(new NISSourcePropertyPage(this));
             addPage(new NISSourceBrowsePage(this));
-            //addPage(new JNDISourceCachePage(this));
+            //addPage(new LDAPSourceCachePage(this));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

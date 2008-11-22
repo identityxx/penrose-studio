@@ -27,9 +27,9 @@ import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.ldap.source.LDAPSourceWizard;
 import org.safehaus.penrose.studio.connection.ConnectionNode;
 import org.safehaus.penrose.studio.jdbc.source.JDBCSourceWizard;
-import org.safehaus.penrose.studio.jndi.source.JNDISourceWizard;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.server.ServersView;
 
@@ -72,7 +72,7 @@ public class NewSourceAction extends Action {
                 dialog.open();
 
             } else if ("LDAP".equals(adapterName)) {
-                JNDISourceWizard wizard = new JNDISourceWizard(partitionName, connectionConfig);
+                LDAPSourceWizard wizard = new LDAPSourceWizard(partitionName, connectionConfig);
                 wizard.setProject(project);
 
                 WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);

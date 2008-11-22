@@ -46,7 +46,7 @@ public class JDBCNode extends Node {
     }
 
     public boolean hasChildren() throws Exception {
-        return true;
+        return false;
     }
 
     public Collection<Node> getChildren() throws Exception {

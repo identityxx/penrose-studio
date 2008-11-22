@@ -26,7 +26,7 @@ public class ConnectionEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return partitionName+"/"+connectionName;
+        return partitionName+"."+connectionName;
     }
 
     public IPersistableElement getPersistable() {

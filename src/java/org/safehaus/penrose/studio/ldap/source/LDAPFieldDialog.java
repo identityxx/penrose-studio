@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.jndi.source;
+package org.safehaus.penrose.studio.ldap.source;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
@@ -31,12 +31,12 @@ import java.util.*;
 /**
  * @author Endi S. Dewata
  */
-public class JNDIFieldDialog extends FieldDialog {
+public class LDAPFieldDialog extends FieldDialog {
 
     Table attributeTypeTable;
     Map items = new HashMap();
 
-	public JNDIFieldDialog(Shell parent, int style) {
+	public LDAPFieldDialog(Shell parent, int style) {
 		super(parent, style);
         setText("Field Editor");
 

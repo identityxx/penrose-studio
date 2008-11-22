@@ -1,7 +1,7 @@
 package org.safehaus.penrose.studio.plugin;
 
-import org.safehaus.penrose.studio.jndi.source.JNDISourceEditorInput;
-import org.safehaus.penrose.studio.jndi.source.JNDISourceEditor;
+import org.safehaus.penrose.studio.ldap.source.LDAPSourceEditorInput;
+import org.safehaus.penrose.studio.ldap.source.LDAPSourceEditor;
 import org.safehaus.penrose.studio.source.editor.SourceEditorInput;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorInput;
 import org.safehaus.penrose.studio.ldap.connection.editor.LDAPConnectionEditorInput;
@@ -21,10 +21,10 @@ public class LDAPPlugin extends Plugin {
     }
 
     public SourceEditorInput createSourceEditorInput() {
-        return new JNDISourceEditorInput();
+        return new LDAPSourceEditorInput();
     }
 
     public String getSourceEditorClass() {
-        return JNDISourceEditor.class.getName();
+        return LDAPSourceEditor.class.getName();
     }
 }

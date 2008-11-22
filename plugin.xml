@@ -71,10 +71,10 @@
             icon="images/source.gif"
             class="org.safehaus.penrose.studio.jdbc.source.JDBCSourceEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.jndi.source.JNDISourceEditor"
+            id="org.safehaus.penrose.studio.ldap.source.LDAPSourceEditor"
             name="JNDI Source"
             icon="images/source.gif"
-            class="org.safehaus.penrose.studio.jndi.source.JNDISourceEditor"/>
+            class="org.safehaus.penrose.studio.ldap.source.LDAPSourceEditor"/>
         <editor
             id="org.safehaus.penrose.studio.nis.source.NISSourceEditor"
             name="NIS Source"

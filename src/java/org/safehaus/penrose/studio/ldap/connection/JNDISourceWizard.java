@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.jndi.connection;
+package org.safehaus.penrose.studio.ldap.connection;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -23,8 +23,8 @@ import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
-import org.safehaus.penrose.studio.jndi.source.JNDIFieldWizardPage;
-import org.safehaus.penrose.studio.jndi.source.JNDIAttributeWizardPage;
+import org.safehaus.penrose.studio.ldap.source.LDAPFieldWizardPage;
+import org.safehaus.penrose.studio.ldap.source.LDAPAttributeWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.ldap.LDAPClient;
@@ -56,8 +56,8 @@ public class JNDISourceWizard extends Wizard {
     private SourceConfig sourceConfig;
 
     public JNDISourceWizardPage propertyPage;
-    public JNDIAttributeWizardPage attributesPage;
-    public JNDIFieldWizardPage fieldsPage = new JNDIFieldWizardPage();
+    public LDAPAttributeWizardPage attributesPage;
+    public LDAPFieldWizardPage fieldsPage = new LDAPFieldWizardPage();
 
     public JNDISourceWizard(LDAPClient client, String partitionName, ConnectionConfig connectionConfig, String baseDn) throws Exception {
         this(client, partitionName, connectionConfig, baseDn, "(objectClass=*)", "OBJECT", new ArrayList<String>());
@@ -87,7 +87,7 @@ public class JNDISourceWizard extends Wizard {
 
         propertyPage = new JNDISourceWizardPage(name, baseDn, filter, scope);
         
-        attributesPage = new JNDIAttributeWizardPage(attributeNames);
+        attributesPage = new LDAPAttributeWizardPage(attributeNames);
         attributesPage.setConnectionConfig(connectionConfig);
 
         setWindowTitle(connectionConfig.getName()+" - New Source");

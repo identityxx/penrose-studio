@@ -38,7 +38,7 @@ import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.SchemaUtil;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.jndi.connection.JNDISourceWizard;
+import org.safehaus.penrose.studio.ldap.connection.JNDISourceWizard;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
@@ -66,14 +66,6 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-/*
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        if (penroseStudio.isFreeware()) {
-            Label label = toolkit.createLabel(body, PenroseStudio.FEATURE_NOT_AVAILABLE);
-            label.setLayoutData(new GridData(GridData.FILL_BOTH));
-            return;
-        }
-*/
         Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Actions");
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -82,18 +74,18 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
         section.setClient(actionsSection);
 
         section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Directory Tree");
+        section.setText("Entries");
         section.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Control browserSection = createTreeSection(section);
-        section.setClient(browserSection);
+        Control entriesSection = createEntriesSection(section);
+        section.setClient(entriesSection);
 
         section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Entry");
+        section.setText("Attributes");
         section.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Control entrySection = createEntrySection(section);
-        section.setClient(entrySection);
+        Control attributesSection = createAttributesSection(section);
+        section.setClient(attributesSection);
 
         refresh();
     }
@@ -114,7 +106,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
         return composite;
     }
 
-    public Composite createTreeSection(final Composite parent) {
+    public Composite createEntriesSection(final Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout());
@@ -226,6 +218,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
 
                 } finally {
                     if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
@@ -334,7 +327,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
         return attributeNames;
     }
 
-    public Composite createEntrySection(final Composite parent) {
+    public Composite createAttributesSection(final Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout());
@@ -376,29 +369,30 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
     }
 
     public void refresh() {
-        LDAPClient client = null;
-        try {
-            tree.removeAll();
 
+        tree.removeAll();
+
+        LDAPClient client = null;
+
+        try {
             client = new LDAPClient(connectionConfig.getParameters());
 
-            DN emptyDn = new DN();
-            SearchResult root = client.find(emptyDn);
+            DN rootDn = new DN();
+            SearchResult root = client.find(rootDn);
             if (root == null) return;
 
             TreeItem item = new TreeItem(tree, SWT.NONE);
+            item.setText("Root");
+            item.setData(rootDn);
 
-            item.setText("Root DSE");
-            item.setData(emptyDn);
-
-            Collection<SearchResult> results = client.findChildren("");
+            Collection<SearchResult> results = client.findChildren(rootDn);
 
             for (SearchResult entry : results) {
-                DN dn = entry.getDn();
+                DN entryDn = entry.getDn();
 
                 TreeItem it = new TreeItem(item, SWT.NONE);
-                it.setText(dn.toString());
-                it.setData(dn);
+                it.setText(entryDn.toString());
+                it.setData(entryDn);
 
                 new TreeItem(it, SWT.NONE);
             }

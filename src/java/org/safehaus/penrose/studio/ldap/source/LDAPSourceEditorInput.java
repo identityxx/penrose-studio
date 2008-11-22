@@ -15,12 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.jndi.source;
+package org.safehaus.penrose.studio.ldap.source;
 
 import org.safehaus.penrose.studio.source.editor.SourceEditorInput;
 
 /**
  * @author Endi S. Dewata
  */
-public class JNDISourceEditorInput extends SourceEditorInput {
+public class LDAPSourceEditorInput extends SourceEditorInput {
 }

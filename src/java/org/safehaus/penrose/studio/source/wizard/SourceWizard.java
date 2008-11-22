@@ -23,9 +23,9 @@ import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
 import org.safehaus.penrose.studio.jdbc.source.JDBCPrimaryKeyWizardPage;
 import org.safehaus.penrose.studio.jdbc.source.JDBCTableWizardPage;
 import org.safehaus.penrose.studio.jdbc.source.JDBCFieldWizardPage;
-import org.safehaus.penrose.studio.jndi.source.JNDITreeWizardPage;
-import org.safehaus.penrose.studio.jndi.source.JNDIAttributeWizardPage;
-import org.safehaus.penrose.studio.jndi.source.JNDIFieldWizardPage;
+import org.safehaus.penrose.studio.ldap.source.LDAPTreeWizardPage;
+import org.safehaus.penrose.studio.ldap.source.LDAPAttributeWizardPage;
+import org.safehaus.penrose.studio.ldap.source.LDAPFieldWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.jdbc.Table;
 import org.safehaus.penrose.jdbc.source.JDBCSource;
@@ -59,9 +59,9 @@ public class SourceWizard extends Wizard {
     public JDBCFieldWizardPage jdbcFieldsPage;
     public JDBCPrimaryKeyWizardPage jdbcPrimaryKeyPage;
 
-    public JNDITreeWizardPage jndiTreePage;
-    public JNDIAttributeWizardPage jndiAttributesPage;
-    public JNDIFieldWizardPage jndiFieldsPage;
+    public LDAPTreeWizardPage jndiTreePage;
+    public LDAPAttributeWizardPage jndiAttributesPage;
+    public LDAPFieldWizardPage jndiFieldsPage;
 
     public SourceWizard(String partitionName) throws Exception {
         this.partitionName = partitionName;
@@ -80,9 +80,9 @@ public class SourceWizard extends Wizard {
         jdbcFieldsPage = new JDBCFieldWizardPage();
         jdbcPrimaryKeyPage = new JDBCPrimaryKeyWizardPage();
 
-        jndiTreePage = new JNDITreeWizardPage();
-        jndiAttributesPage = new JNDIAttributeWizardPage();
-        jndiFieldsPage = new JNDIFieldWizardPage();
+        jndiTreePage = new LDAPTreeWizardPage();
+        jndiAttributesPage = new LDAPAttributeWizardPage();
+        jndiFieldsPage = new LDAPFieldWizardPage();
 
         addPage(propertyPage);
         addPage(connectionPage);

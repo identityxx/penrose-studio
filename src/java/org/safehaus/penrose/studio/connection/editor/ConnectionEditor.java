@@ -117,7 +117,7 @@ public abstract class ConnectionEditor extends FormEditor {
         connectionManagerClient.updateConnection(origConnectionName, connectionConfig);
         partitionClient.store();
 
-        setPartName(partitionName+"/"+connectionConfig.getName());
+        setPartName(partitionName+"."+connectionConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();

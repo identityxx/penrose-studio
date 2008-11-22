@@ -34,7 +34,7 @@ import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionParametersWizardPage;
+import org.safehaus.penrose.studio.ldap.connection.JNDIConnectionParametersWizardPage;
 import org.safehaus.penrose.studio.ldap.connection.LDAPConnectionWizardPage;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.util.ADUtil;

@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.widgets.List;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionURLDialog;
+import org.safehaus.penrose.studio.ldap.connection.JNDIConnectionURLDialog;
 
 import javax.naming.Context;
 import java.util.*;

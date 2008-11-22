@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.jndi.source;
+package org.safehaus.penrose.studio.ldap.source;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.WizardPage;
@@ -37,7 +37,7 @@ import java.util.Collection;
 /**
  * @author Endi S. Dewata
  */
-public class JNDITreeWizardPage extends WizardPage implements SelectionListener, TreeListener {
+public class LDAPTreeWizardPage extends WizardPage implements SelectionListener, TreeListener {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -51,7 +51,7 @@ public class JNDITreeWizardPage extends WizardPage implements SelectionListener,
 
     ConnectionConfig connectionConfig;
 
-    public JNDITreeWizardPage() {
+    public LDAPTreeWizardPage() {
         super(NAME);
         setDescription("Select a subtree.");
     }

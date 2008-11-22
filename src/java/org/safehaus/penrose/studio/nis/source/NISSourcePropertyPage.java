@@ -25,7 +25,7 @@ import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.jndi.source.JNDIFieldDialog;
+import org.safehaus.penrose.studio.ldap.source.LDAPFieldDialog;
 import org.safehaus.penrose.studio.source.FieldDialog;
 import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
 import org.safehaus.penrose.client.PenroseClient;
@@ -240,7 +240,7 @@ public class NISSourcePropertyPage extends SourceEditorPage {
 
                     Collection<AttributeType> attributeTypes = new ArrayList<AttributeType>();
 
-                    JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
+                    LDAPFieldDialog dialog = new LDAPFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setAttributeTypes(attributeTypes);
                     dialog.setFieldConfig(fieldDefinition);
                     dialog.open();
@@ -315,7 +315,7 @@ public class NISSourcePropertyPage extends SourceEditorPage {
                     SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
                     Collection<AttributeType> attributeTypes = schemaManagerClient.getAttributeTypes();
 
-                    JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
+                    LDAPFieldDialog dialog = new LDAPFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setAttributeTypes(attributeTypes);
                     dialog.setFieldConfig(fieldDefinition);
                     dialog.open();
@@ -350,7 +350,7 @@ public class NISSourcePropertyPage extends SourceEditorPage {
                     SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
                     Collection<AttributeType> attributeTypes = schemaManagerClient.getAttributeTypes();
 
-                    JNDIFieldDialog dialog = new JNDIFieldDialog(parent.getShell(), SWT.NONE);
+                    LDAPFieldDialog dialog = new LDAPFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setAttributeTypes(attributeTypes);
                     dialog.setFieldConfig(fieldDefinition);
                     dialog.open();

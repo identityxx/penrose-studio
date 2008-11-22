@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.jndi.source;
+package org.safehaus.penrose.studio.ldap.source;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.*;
@@ -34,7 +34,7 @@ import java.util.*;
 /**
  * @author Endi S. Dewata
  */
-public class JNDIFieldWizardPage extends WizardPage implements SelectionListener, MouseListener {
+public class LDAPFieldWizardPage extends WizardPage implements SelectionListener, MouseListener {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -42,7 +42,7 @@ public class JNDIFieldWizardPage extends WizardPage implements SelectionListener
 
     Table fieldTable;
 
-    public JNDIFieldWizardPage() {
+    public LDAPFieldWizardPage() {
         super(NAME);
         setDescription("Select primary key fields.");
     }

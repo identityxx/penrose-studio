@@ -98,7 +98,7 @@ public abstract class SourceEditor extends FormEditor {
         sourceManagerClient.updateSource(origSourceName, sourceConfig);
         partitionClient.store();
 
-        setPartName(partitionName+"/"+sourceConfig.getName());
+        setPartName(partitionName+"."+sourceConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();

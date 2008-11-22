@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.jndi.source;
+package org.safehaus.penrose.studio.ldap.source;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
@@ -32,7 +32,7 @@ import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
 /**
  * @author Endi S. Dewata
  */
-public class JNDISourceCachePage extends SourceEditorPage {
+public class LDAPSourceCachePage extends SourceEditorPage {
 
     Text filterCacheSizeText;
     Text filterCacheExpirationText;
@@ -43,7 +43,7 @@ public class JNDISourceCachePage extends SourceEditorPage {
     Text sizeLimitText;
     Combo loadingMethodCombo;
 
-    public JNDISourceCachePage(JNDISourceEditor editor) {
+    public LDAPSourceCachePage(LDAPSourceEditor editor) {
         super(editor, "CACHE", "  Cache  ");
     }
 

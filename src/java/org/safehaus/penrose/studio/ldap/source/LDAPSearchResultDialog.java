@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.jndi.source;
+package org.safehaus.penrose.studio.ldap.source;
 
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;

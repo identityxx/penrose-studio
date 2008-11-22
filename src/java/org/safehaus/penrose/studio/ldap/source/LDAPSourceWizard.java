@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.jndi.source;
+package org.safehaus.penrose.studio.ldap.source;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -36,7 +36,7 @@ import java.util.Collection;
 /**
  * @author Endi S. Dewata
  */
-public class JNDISourceWizard extends Wizard {
+public class LDAPSourceWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -46,19 +46,19 @@ public class JNDISourceWizard extends Wizard {
     private SourceConfig sourceConfig;
 
     public SourceWizardPage propertyPage;
-    public JNDITreeWizardPage jndiTreePage;
-    public JNDIAttributeWizardPage jndiAttributesPage;
-    public JNDIFieldWizardPage jndiFieldsPage;
+    public LDAPTreeWizardPage jndiTreePage;
+    public LDAPAttributeWizardPage jndiAttributesPage;
+    public LDAPFieldWizardPage jndiFieldsPage;
 
-    public JNDISourceWizard(String partitionName, ConnectionConfig connectionConfig) throws Exception {
+    public LDAPSourceWizard(String partitionName, ConnectionConfig connectionConfig) throws Exception {
         this.partitionName = partitionName;
         this.connectionConfig = connectionConfig;
 
         propertyPage = new SourceWizardPage();
 
-        jndiTreePage = new JNDITreeWizardPage();
-        jndiAttributesPage = new JNDIAttributeWizardPage();
-        jndiFieldsPage = new JNDIFieldWizardPage();
+        jndiTreePage = new LDAPTreeWizardPage();
+        jndiAttributesPage = new LDAPAttributeWizardPage();
+        jndiFieldsPage = new LDAPFieldWizardPage();
 
         setWindowTitle(connectionConfig.getName()+" - New Source");
     }

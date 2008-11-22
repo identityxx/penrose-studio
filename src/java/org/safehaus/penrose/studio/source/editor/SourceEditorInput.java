@@ -26,7 +26,7 @@ public class SourceEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return partitionName+"/"+ sourceName;
+        return partitionName+"."+ sourceName;
     }
 
     public IPersistableElement getPersistable() {

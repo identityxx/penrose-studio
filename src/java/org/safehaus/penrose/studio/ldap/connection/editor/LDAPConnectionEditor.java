@@ -18,7 +18,7 @@
 package org.safehaus.penrose.studio.ldap.connection.editor;
 
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditor;
-import org.safehaus.penrose.studio.jndi.connection.JNDIConnectionPropertiesPage;
+import org.safehaus.penrose.studio.ldap.connection.JNDIConnectionPropertiesPage;
 import org.safehaus.penrose.studio.ldap.connection.editor.LDAPConnectionBrowserPage;
 import org.safehaus.penrose.studio.ldap.connection.editor.LDAPConnectionSchemaPage;
 

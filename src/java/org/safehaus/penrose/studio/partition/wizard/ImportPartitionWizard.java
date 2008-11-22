@@ -68,29 +68,20 @@ public class ImportPartitionWizard extends Wizard {
     public boolean performFinish() {
         try {
 
+            String newPartitionName = namePage.getPartitionName();
             String location = locationPage.getLocation();
 
             File source = new File(location);
             if (!source.isDirectory()) return false;
 
-/*
-            PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
-            PartitionConfig partitionConfig = partitionConfigManager.load(source);
-            partitionConfigManager.addPartitionConfig(partitionConfig);
-
-            File dest = new File(project.getWorkDir(), "partitions/"+partitionConfig.getName());
-            FileUtil.copy(source, dest);
-
-            project.save(partitionConfig);
-*/
             String partitionName = source.getName();
             
-            PartitionConfig partitionConfig = new PartitionConfig(partitionName);
-            partitionConfig.load(source);
-
             PenroseClient client = project.getClient();
+
+            client.uploadFolder(source, "partitions/"+newPartitionName);
+
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-            partitionManagerClient.addPartition(partitionConfig);
+            partitionManagerClient.loadPartition(newPartitionName);
 
             if (startupPage.getPartitionStartup()) {
                 partitionManagerClient.startPartition(partitionName);
