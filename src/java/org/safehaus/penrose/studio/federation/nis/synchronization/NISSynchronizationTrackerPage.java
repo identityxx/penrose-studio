@@ -45,7 +45,7 @@ public class NISSynchronizationTrackerPage extends FormPage {
 
     Project project;
     NISSynchronizationEditor editor;
-    NISFederationClient nisFederation;
+    NISFederationClient nisFederationClient;
     FederationRepositoryConfig domain;
 
     Table trackerTable;
@@ -55,7 +55,7 @@ public class NISSynchronizationTrackerPage extends FormPage {
 
         this.editor = editor;
         this.project = editor.getProject();
-        this.nisFederation = editor.getNISFederationClient();
+        this.nisFederationClient = editor.getNISFederationClient();
         this.domain = editor.getDomain();
     }
 
@@ -126,9 +126,11 @@ public class NISSynchronizationTrackerPage extends FormPage {
 
                     TableItem[] items = trackerTable.getSelection();
 
+                    String federationName = nisFederationClient.getFederationClient().getName();
                     PenroseClient penroseClient = project.getClient();
+
                     PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.YP);
+                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(federationName+"_"+domain.getName()+"_"+ NISDomain.YP);
                     SchedulerClient schedulerClient = partitionClient.getSchedulerClient();
 
                     JobClient jobClient = schedulerClient.getJobClient("LDAPSync");
@@ -174,9 +176,11 @@ public class NISSynchronizationTrackerPage extends FormPage {
 
             trackerTable.removeAll();
 
+            String federationName = nisFederationClient.getFederationClient().getName();
             PenroseClient penroseClient = project.getClient();
+
             PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.YP);
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(federationName+"_"+domain.getName()+"_"+ NISDomain.YP);
             SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
             SourceClient tracker = sourceManagerClient.getSourceClient("tracker");

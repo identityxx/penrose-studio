@@ -57,17 +57,19 @@ public class NISUserScriptsPage extends FormPage {
     NISUsersEditor editor;
 
     Project project;
-    NISFederationClient nisFederation;
+    NISFederationClient nisFederationClient;
     FederationRepositoryConfig domain;
 
+    Map<String,Collection<Conflict>> results = new TreeMap<String,Collection<Conflict>>();
     Map<String,Collection<Conflict>> conflicts = new TreeMap<String,Collection<Conflict>>();
+    Map<String,Collection<Conflict>> matches = new TreeMap<String,Collection<Conflict>>();
 
     public NISUserScriptsPage(NISUsersEditor editor) {
         super(editor, "SCRIPTS", "  Scripts  ");
 
         this.editor = editor;
         this.project = editor.project;
-        this.nisFederation = editor.getNisTool();
+        this.nisFederationClient = editor.getNisFederationClient();
         this.domain = editor.getDomain();
     }
 
@@ -299,7 +301,7 @@ public class NISUserScriptsPage extends FormPage {
                     Attributes attributes = (Attributes)item.getData();
                     String domain = (String)attributes.getValue("domain");
                     String uid = (String)attributes.getValue("uid");
-                    Integer origUidNumber = (Integer)attributes.getValue("origUidNumber");
+                    Object origUidNumber = attributes.getValue("origUidNumber");
 
                     edit(domain, uid, origUidNumber);
 
@@ -328,8 +330,8 @@ public class NISUserScriptsPage extends FormPage {
 
             String domain2 = (String) attributes2.getValue("domain");
             String uid2 = (String) attributes2.getValue("uid");
-            Integer uidNumber2 = (Integer) attributes2.getValue("uidNumber");
-            if (uidNumber2 == null) uidNumber2 = (Integer) attributes2.getValue("origUidNumber");
+            Object uidNumber2 = attributes2.getValue("uidNumber");
+            if (uidNumber2 == null) uidNumber2 = attributes2.getValue("origUidNumber");
 
             TableItem ti = new TableItem(conflictsTable, SWT.NONE);
             ti.setText(0, domain2);
@@ -344,9 +346,36 @@ public class NISUserScriptsPage extends FormPage {
 
         matchesTable.removeAll();
 
+        String uid1 = (String) attributes.getValue("uid");
+        Collection<Conflict> list = matches.get(uid1);
+
+        if (list == null) return;
+
+        for (Conflict conflict : list) {
+
+            Attributes attributes2 = conflict.getAttributes2();
+
+            String domain2 = (String) attributes2.getValue("domain");
+            String uid2 = (String) attributes2.getValue("uid");
+            Object uidNumber2 = attributes2.getValue("uidNumber");
+            if (uidNumber2 == null) uidNumber2 = attributes2.getValue("origUidNumber");
+
+            TableItem ti = new TableItem(matchesTable, SWT.NONE);
+            ti.setText(0, domain2);
+            ti.setText(1, "" + uid2);
+            ti.setText(2, "" + uidNumber2);
+
+            ti.setData(attributes2);
+        }
+    }
+/*
+    public void showMatches(Attributes attributes) throws Exception {
+
+        matchesTable.removeAll();
+
         String uid = (String) attributes.getValue("uid");
-        Integer uidNumber = (Integer) attributes.getValue("uidNumber");
-        if (uidNumber == null) uidNumber = (Integer) attributes.getValue("origUidNumber");
+        Object uidNumber = attributes.getValue("uidNumber");
+        if (uidNumber == null) uidNumber = attributes.getValue("origUidNumber");
 
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
@@ -355,22 +384,15 @@ public class NISUserScriptsPage extends FormPage {
         SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
         ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(FederationClient.JDBC);
-/*
-        PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
-        Partition partition = nisFederation.getPartition();
-        JDBCConnection connection = (JDBCConnection)partition.getConnection(Federation.JDBC);
-*/
-        for (FederationRepositoryConfig repository : nisFederation.getRepositories()) {
+
+        for (FederationRepositoryConfig repository : nisFederationClient.getRepositories()) {
             final String name = repository.getName();
             if (domain.getName().equals(name)) continue;
 
             SourceClient sourceClient = sourceManagerClient.getSourceClient(NISFederationClient.CACHE_USERS);
 
-            //PartitionConfig partitionConfig = partitionConfigManager.getPartitionConfig(name+"_"+NISFederation.YP);
-            //SourceConfig sourceConfig = partitionConfig.getSourceConfigManager().getSourceConfig(NISFederation.CACHE_USERS);
 
             String table = (String)sourceClient.getAttribute("TableName");
-            //String table = connection.getTableName(sourceConfig);
 
             String sql = "select a.uid, a.uidNumber, b.uidNumber" +
                     " from "+table+" a"+
@@ -383,8 +405,8 @@ public class NISUserScriptsPage extends FormPage {
                     ResultSet rs = (ResultSet)object;
 
                     String uid2 = rs.getString(1);
-                    Integer origUidNumber2 = (Integer)rs.getObject(2);
-                    Integer uidNumber2 = (Integer)rs.getObject(3);
+                    Object origUidNumber2 = rs.getObject(2);
+                    Object uidNumber2 = rs.getObject(3);
                     if (uidNumber2 == null) uidNumber2 = origUidNumber2;
 
                     Attributes attributes = new Attributes();
@@ -401,13 +423,7 @@ public class NISUserScriptsPage extends FormPage {
                     ti.setData(attributes);
                 }
             };
-/*
-            connection.executeQuery(
-                    sql,
-                    new Object[] { name, uid, uidNumber, uidNumber },
-                    queryResponse
-            );
-*/
+
             connectionClient.invoke(
                     "executeQuery",
                     new Object[] {
@@ -423,13 +439,16 @@ public class NISUserScriptsPage extends FormPage {
             );
         }
     }
-
+*/
     public void run() throws Exception {
 
         usersTable.removeAll();
         conflictsTable.removeAll();
         matchesTable.removeAll();
+
+        results.clear();
         conflicts.clear();
+        matches.clear();
 
         String actionName = actionCombo.getText();
         String className = (String) actionCombo.getData(actionName);
@@ -437,12 +456,12 @@ public class NISUserScriptsPage extends FormPage {
         Class clazz = Class.forName(className);
         NISAction action = (NISAction) clazz.newInstance();
         action.setProject(project);
-        action.setNisFederation(nisFederation);
+        action.setNisFederationClient(nisFederationClient);
 
         NISActionRequest request = new NISActionRequest();
         request.setDomain(domain.getName());
 
-        for (FederationRepositoryConfig repository : nisFederation.getRepositories()) {
+        for (FederationRepositoryConfig repository : nisFederationClient.getRepositories()) {
             String name = repository.getName();
             request.addDomain(name);
         }
@@ -452,28 +471,52 @@ public class NISUserScriptsPage extends FormPage {
                 Conflict conflict = (Conflict)object;
 
                 Attributes attributes1 = conflict.getAttributes1();
-                String uid = (String) attributes1.getValue("uid");
+                String uid1 = (String) attributes1.getValue("uid");
 
-                Collection<Conflict> list = conflicts.get(uid);
+                Attributes attributes2 = conflict.getAttributes2();
+                String uid2 = (String) attributes2.getValue("uid");
+
+                log.debug("Found "+uid1);
+                
+                Collection<Conflict> list = results.get(uid1);
                 if (list == null) {
                     list = new ArrayList<Conflict>();
-                    conflicts.put(uid, list);
+                    results.put(uid1, list);
                 }
 
                 list.add(conflict);
+
+                if (uid1.equals(uid2)) {
+                    list = matches.get(uid1);
+                    if (list == null) {
+                        list = new ArrayList<Conflict>();
+                        matches.put(uid1, list);
+                    }
+
+                    list.add(conflict);
+
+                } else {
+                    list = conflicts.get(uid1);
+                    if (list == null) {
+                        list = new ArrayList<Conflict>();
+                        conflicts.put(uid1, list);
+                    }
+
+                    list.add(conflict);
+                }
             }
         };
 
         action.execute(request, response);
 
-        for (Collection<Conflict> list : conflicts.values()) {
+        for (Collection<Conflict> list : results.values()) {
 
             Conflict conflict = list.iterator().next();
 
             Attributes attributes1 = conflict.getAttributes1();
             String uid = (String) attributes1.getValue("uid");
-            Integer uidNumber = (Integer)attributes1.getValue("uidNumber");
-            if (uidNumber == null) uidNumber = (Integer)attributes1.getValue("origUidNumber");
+            Object uidNumber = attributes1.getValue("uidNumber");
+            if (uidNumber == null) uidNumber = attributes1.getValue("origUidNumber");
 
             TableItem ti = new TableItem(usersTable, SWT.NONE);
             ti.setText(0, uid);
@@ -482,13 +525,13 @@ public class NISUserScriptsPage extends FormPage {
             ti.setData(attributes1);
         }
 
-        messageLabel.setText("Found " + conflicts.size() + " user(s).");
+        messageLabel.setText("Found " + results.size() + " user(s).");
     }
 
     public void edit(
             String domainName,
             String uid,
-            Integer origUidNumber
+            Object origUidNumber
     ) throws Exception {
 
         PenroseClient penroseClient = project.getClient();
@@ -524,7 +567,7 @@ public class NISUserScriptsPage extends FormPage {
         if (response.hasNext()) {
             SearchResult result = response.next();
             Attributes attributes = result.getAttributes();
-            dialog.setNewUidNumber((Integer)attributes.getValue("uidNumber"));
+            dialog.setNewUidNumber(attributes.getValue("uidNumber"));
         }
 
         dialog.open();
@@ -533,7 +576,7 @@ public class NISUserScriptsPage extends FormPage {
 
         if (action == NISUserDialog.CANCEL) return;
 
-        Integer uidNumber = dialog.getUidNumber();
+        Object uidNumber = dialog.getUidNumber();
         String message = dialog.getMessage();
 
         if (action == NISUserDialog.SET) {
@@ -565,7 +608,7 @@ public class NISUserScriptsPage extends FormPage {
         }
     }
 
-    public void checkUidNumber(String uid, Integer uidNumber) throws Exception {
+    public void checkUidNumber(String uid, Object uidNumber) throws Exception {
 
         PenroseClient penroseClient = project.getClient();
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
@@ -594,7 +637,7 @@ public class NISUserScriptsPage extends FormPage {
             throw new Exception("UID number "+uidNumber+" is already allocated for user "+uid2+" in domain "+domainName);
         }
 
-        for (FederationRepositoryConfig repository : nisFederation.getRepositories()) {
+        for (FederationRepositoryConfig repository : nisFederationClient.getRepositories()) {
             String name = repository.getName();
 
             PartitionClient partitionClient2 = partitionManagerClient.getPartitionClient(name+"_"+ NISDomain.YP);

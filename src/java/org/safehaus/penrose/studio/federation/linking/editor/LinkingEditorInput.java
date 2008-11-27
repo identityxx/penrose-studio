@@ -13,8 +13,8 @@ public class LinkingEditorInput implements IEditorInput {
 
     private Project project;
     private FederationRepositoryConfig repository;
-    private String localPartition;
-    private String globalPartition;
+    private String sourcePartition;
+    private String targetPartition;
 
     public LinkingEditorInput() {
     }
@@ -46,8 +46,8 @@ public class LinkingEditorInput implements IEditorInput {
     public int hashCode() {
         return (project == null ? 0 : project.hashCode()) +
                 (repository == null ? 0 : repository.hashCode()) +
-                (localPartition == null ? 0 : localPartition.hashCode()) +
-                (globalPartition == null ? 0 : globalPartition.hashCode());
+                (sourcePartition == null ? 0 : sourcePartition.hashCode()) +
+                (targetPartition == null ? 0 : targetPartition.hashCode());
     }
 
     boolean equals(Object o1, Object o2) {
@@ -64,8 +64,8 @@ public class LinkingEditorInput implements IEditorInput {
         LinkingEditorInput ei = (LinkingEditorInput)object;
         if (!equals(project, ei.project)) return false;
         if (!equals(repository, ei.repository)) return false;
-        if (!equals(localPartition, ei.localPartition)) return false;
-        if (!equals(globalPartition, ei.globalPartition)) return false;
+        if (!equals(sourcePartition, ei.sourcePartition)) return false;
+        if (!equals(targetPartition, ei.targetPartition)) return false;
 
         return true;
     }
@@ -86,19 +86,19 @@ public class LinkingEditorInput implements IEditorInput {
         this.repository = repository;
     }
 
-    public String getLocalPartition() {
-        return localPartition;
+    public String getSourcePartition() {
+        return sourcePartition;
     }
 
-    public void setLocalPartition(String localPartition) {
-        this.localPartition = localPartition;
+    public void setSourcePartition(String sourcePartition) {
+        this.sourcePartition = sourcePartition;
     }
 
-    public String getGlobalPartition() {
-        return globalPartition;
+    public String getTargetPartition() {
+        return targetPartition;
     }
 
-    public void setGlobalPartition(String globalPartition) {
-        this.globalPartition = globalPartition;
+    public void setTargetPartition(String targetPartition) {
+        this.targetPartition = targetPartition;
     }
 }

@@ -64,8 +64,8 @@ public class LDAPLinkingNode extends Node {
         LinkingEditorInput ei = new LinkingEditorInput();
         ei.setProject(project);
         ei.setRepository(repository);
-        ei.setLocalPartition(repository.getName());
-        ei.setGlobalPartition(federationClient.getName());
+        ei.setSourcePartition(federationClient.getName()+"_"+repository.getName());
+        ei.setTargetPartition(federationClient.getName());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();

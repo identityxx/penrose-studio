@@ -62,6 +62,8 @@ public class FederationNode extends Node {
             log.debug("Partition "+partitionName+":");
 
             PartitionConfig partitionConfig = partitionManagerClient.getPartitionConfig(partitionName);
+            if (partitionConfig == null) continue;
+            
             String partitionClass = partitionConfig.getPartitionClass();
             log.debug(" - Class: "+partitionClass);
 

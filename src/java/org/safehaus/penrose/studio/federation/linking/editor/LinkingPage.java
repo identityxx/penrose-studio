@@ -101,8 +101,8 @@ public class LinkingPage extends FormPage {
 
         this.project = ei.getProject();
         this.repository = ei.getRepository();
-        this.localPartition = ei.getLocalPartition();
-        this.globalPartition = ei.getGlobalPartition();
+        this.localPartition = ei.getSourcePartition();
+        this.globalPartition = ei.getTargetPartition();
 
         PenroseClient penroseClient = project.getClient();
 
@@ -114,7 +114,7 @@ public class LinkingPage extends FormPage {
         localSourceClient = localSourceManagerClient.getSourceClient("LDAP");
 
         SourceManagerClient globalSourceManagerClient = globalPartitionClient.getSourceManagerClient();
-        globalSourceClient = globalSourceManagerClient.getSourceClient("LDAP");
+        globalSourceClient = globalSourceManagerClient.getSourceClient("Global");
 
         localBaseDn = new DN(localSourceClient.getParameter("baseDn"));
         globalBaseDn = new DN(globalSourceClient.getParameter("baseDn"));

@@ -429,7 +429,7 @@ public class NISGroupScriptsPage extends FormPage {
         Class clazz = Class.forName(className);
         NISAction action = (NISAction) clazz.newInstance();
         action.setProject(project);
-        action.setNisFederation(nisFederation);
+        action.setNisFederationClient(nisFederation);
 
         NISActionRequest request = new NISActionRequest();
         request.setDomain(domain.getName());

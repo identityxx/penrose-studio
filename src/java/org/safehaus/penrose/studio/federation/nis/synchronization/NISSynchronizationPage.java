@@ -51,7 +51,7 @@ public class NISSynchronizationPage extends FormPage {
 
     Project project;
     NISSynchronizationEditor editor;
-    NISFederationClient nisFederation;
+    NISFederationClient nisFederationClient;
     FederationRepositoryConfig domain;
 
     Label statusText;
@@ -74,14 +74,16 @@ public class NISSynchronizationPage extends FormPage {
 
         this.editor = editor;
         this.project = editor.getProject();
-        this.nisFederation = editor.getNISFederationClient();
+        this.nisFederationClient = editor.getNISFederationClient();
         this.domain = editor.getDomain();
 
         PenroseClient penroseClient = project.getClient();
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
 
-        sourcePartitionClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.YP);
-        targetPartitionClient = partitionManagerClient.getPartitionClient(domain.getName());
+        String federationName = nisFederationClient.getFederationClient().getName();
+
+        sourcePartitionClient = partitionManagerClient.getPartitionClient(federationName+"_"+domain.getName()+"_"+ NISDomain.YP);
+        targetPartitionClient = partitionManagerClient.getPartitionClient(federationName+"_"+domain.getName());
 
         SourceManagerClient sourceSourceManagerClient = sourcePartitionClient.getSourceManagerClient();
         sourceClient  = sourceSourceManagerClient.getSourceClient("LDAP");

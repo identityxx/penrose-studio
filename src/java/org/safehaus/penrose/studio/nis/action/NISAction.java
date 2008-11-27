@@ -10,12 +10,13 @@ import org.safehaus.penrose.studio.project.Project;
 public class NISAction {
 
     public Logger log = Logger.getLogger(getClass());
+    public boolean debug = log.isDebugEnabled();
 
     protected String name;
     protected String description;
 
     protected Project project;
-    protected NISFederationClient nisFederation;
+    protected NISFederationClient nisFederationClient;
 
     public void execute(NISActionRequest request, NISActionResponse response) throws Exception {
     }
@@ -36,12 +37,12 @@ public class NISAction {
         this.description = description;
     }
 
-    public NISFederationClient getNisFederation() {
-        return nisFederation;
+    public NISFederationClient getNisFederationClient() {
+        return nisFederationClient;
     }
 
-    public void setNisFederation(NISFederationClient nisFederation) {
-        this.nisFederation = nisFederation;
+    public void setNisFederationClient(NISFederationClient nisFederationClient) {
+        this.nisFederationClient = nisFederationClient;
     }
 
     public Project getProject() {

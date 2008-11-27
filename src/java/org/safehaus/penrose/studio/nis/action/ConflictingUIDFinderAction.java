@@ -1,17 +1,12 @@
 package org.safehaus.penrose.studio.nis.action;
 
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.jdbc.QueryResponse;
-import org.safehaus.penrose.jdbc.connection.JDBCConnection;
-import org.safehaus.penrose.ldap.Attributes;
-import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.federation.*;
+import org.safehaus.penrose.source.SourceClient;
+import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
-import org.safehaus.penrose.connection.ConnectionManager;
-
-import java.sql.ResultSet;
+import org.safehaus.penrose.filter.SimpleFilter;
+import org.safehaus.penrose.filter.PresentFilter;
 
 /**
  * @author Endi S. Dewata
@@ -28,94 +23,83 @@ public class ConflictingUIDFinderAction extends NISAction {
             final NISActionResponse response
     ) throws Exception {
 
-        String domainName1 = request.getDomain();
-        FederationRepositoryConfig domain1 = nisFederation.getRepository(domainName1);
-
-        for (String domainName2 : nisFederation.getRepositoryNames()) {
-            if (domainName1.equals(domainName2)) continue;
-
-            FederationRepositoryConfig domain2 = nisFederation.getRepository(domainName2);
-            execute(domain1, domain2, response);
-        }
-
-        response.close();
-    }
-
-    public void execute(
-            final FederationRepositoryConfig domain1,
-            final FederationRepositoryConfig domain2,
-            final NISActionResponse response
-    ) throws Exception {
-
-        log.debug("Checking conflicts between "+domain1.getName()+" and "+domain2.getName()+".");
-
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 
-        PartitionClient partitionClient1 = partitionManagerClient.getPartitionClient(domain1.getName()+"_"+ NISDomain.YP);
-        PartitionConfig partitionConfig1 = partitionClient1.getPartitionConfig();
+        String federationName = nisFederationClient.getFederationClient().getName();
+        String localPartitionName = request.getDomain();
 
-        PartitionClient partitionClient2 = partitionManagerClient.getPartitionClient(domain2.getName()+"_"+ NISDomain.YP);
-        PartitionConfig partitionConfig2 = partitionClient2.getPartitionConfig();
+        PartitionClient localPartitionClient = partitionManagerClient.getPartitionClient(federationName+"_"+localPartitionName);
+        SourceClient localSourceClient = localPartitionClient.getSourceManagerClient().getSourceClient("LDAP");
 
-        //PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
+        PartitionClient federationPartitionClient = nisFederationClient.getFederationClient().getPartitionClient();
+        SourceClient nisSourceClient = federationPartitionClient.getSourceManagerClient().getSourceClient("NIS");
 
-        //PartitionConfig partitionConfig1 = partitionConfigManager.getPartitionConfig(domain1.getName()+"_"+NISFederation.YP);
-        SourceConfig sourceConfig1 = partitionConfig1.getSourceConfigManager().getSourceConfig(NISFederationClient.CACHE_USERS);
+        PresentFilter localFilter = new PresentFilter("uidNumber");
 
-        //PartitionConfig partitionConfig2 = partitionConfigManager.getPartitionConfig(domain2.getName()+"_"+NISFederation.YP);
-        SourceConfig sourceConfig2 = partitionConfig2.getSourceConfigManager().getSourceConfig(NISFederationClient.CACHE_USERS);
+        SearchRequest localRequest = new SearchRequest();
+        localRequest.setFilter(localFilter);
 
-        Partition partition = null; // nisFederation.getPartition();
-        ConnectionManager connectionManager = partition.getConnectionManager();
-        JDBCConnection connection = (JDBCConnection)connectionManager.getConnection(FederationClient.JDBC);
+        SearchResponse localResponse = new SearchResponse();
 
-        String table1 = connection.getTableName(sourceConfig1);
-        String table2 = connection.getTableName(sourceConfig2);
+        localSourceClient.search(localRequest, localResponse);
 
-        String sql = "select a.uid, a.uidNumber, b.uidNumber, c.uid, c.uidNumber, d.uidNumber" +
-                " from "+table1+" a"+
-                " left join "+ Federation.FEDERATION +".users b on b.domain=? and a.uid=b.uid"+
-                " join "+table2+" c on a.uid <> c.uid "+
-                " left join "+ Federation.FEDERATION +".users d on d.domain=? and c.uid=d.uid"+
-                " where b.uidNumber is null and d.uidNumber is null and a.uidNumber = c.uidNumber"+
-                    " or b.uidNumber is null and a.uidNumber = d.uidNumber"+
-                    " or d.uidNumber is null and b.uidNumber = c.uidNumber"+
-                    " or b.uidNumber = d.uidNumber" +
-                " order by a.uid";
+        while (localResponse.hasNext()) {
+            SearchResult localResult = localResponse.next();
 
-        QueryResponse queryResponse = new QueryResponse() {
-            public void add(Object object) throws Exception {
-                ResultSet rs = (ResultSet)object;
+            DN localDn = localResult.getDn();
+            Attributes localAttributes = localResult.getAttributes();
 
-                String uid1 = rs.getString(1);
-                Integer origUidNumber1 = (Integer)rs.getObject(2);
-                Integer uidNumber1 = (Integer)rs.getObject(3);
+            RDN localDomainRdn = localDn.get(2);
+            Object localDomain = localDomainRdn.get("ou");
 
-                String uid2 = rs.getString(4);
-                Integer origUidNumber2 = (Integer)rs.getObject(5);
-                Integer uidNumber2 = (Integer)rs.getObject(6);
+            Object localUid = localAttributes.getValue("uid");
+            Object localUidNumber = localAttributes.getValue("uidNumber");
+
+            if (debug) log.debug(localDn+": "+localUidNumber);
+
+            SimpleFilter remoteFilter = new SimpleFilter("uidNumber", "=", localUidNumber);
+
+            SearchRequest remoteRequest = new SearchRequest();
+            remoteRequest.setFilter(remoteFilter);
+
+            SearchResponse remoteResponse = new SearchResponse();
+
+            nisSourceClient.search(remoteRequest, remoteResponse);
+
+            while (remoteResponse.hasNext()) {
+                SearchResult remoteResult = remoteResponse.next();
+
+                DN remoteDn = remoteResult.getDn();
+
+                if (localDn.equals(remoteDn)) continue;
+
+                Attributes remoteAttributes = remoteResult.getAttributes();
+
+                RDN remoteDomainRdn = remoteDn.get(2);
+                Object remoteDomain = remoteDomainRdn.get("ou");
+
+                Object remoteUid = remoteAttributes.getValue("uid");
+                Object remoteUidNumber = remoteAttributes.getValue("uidNumber");
+
+                if (debug) log.debug(" - "+remoteDn);
 
                 Attributes attributes1 = new Attributes();
-                attributes1.setValue("domain", domain1.getName());
-                attributes1.setValue("uid", uid1);
-                attributes1.setValue("origUidNumber", origUidNumber1);
-                attributes1.setValue("uidNumber", uidNumber1);
+                attributes1.setValue("domain", localDomain);
+                attributes1.setValue("uid", localUid);
+                //attributes1.setValue("origUidNumber", origUidNumber1);
+                attributes1.setValue("uidNumber", localUidNumber);
 
                 Attributes attributes2 = new Attributes();
-                attributes2.setValue("domain", domain2.getName());
-                attributes2.setValue("uid", uid2);
-                attributes2.setValue("origUidNumber", origUidNumber2);
-                attributes2.setValue("uidNumber", uidNumber2);
+                attributes2.setValue("domain", remoteDomain);
+                attributes2.setValue("uid", remoteUid);
+                //attributes2.setValue("origUidNumber", origUidNumber2);
+                attributes2.setValue("uidNumber", remoteUidNumber);
 
                 response.add(new Conflict(attributes1, attributes2));
             }
-        };
+        }
 
-        connection.executeQuery(
-                sql,
-                new Object[] { domain1.getName(), domain2.getName() },
-                queryResponse
-        );
+        response.close();
     }
 }

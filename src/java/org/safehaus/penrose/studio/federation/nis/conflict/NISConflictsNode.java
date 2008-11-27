@@ -22,7 +22,7 @@ public class NISConflictsNode extends Node {
     NISDomainNode domainNode;
 
     private Project project;
-    private NISFederationClient nisFederation;
+    private NISFederationClient nisFederationClient;
 
     public NISConflictsNode(String name, NISDomainNode domainNode) {
         super(
@@ -37,7 +37,7 @@ public class NISConflictsNode extends Node {
         nisNode = domainNode.getNisNode();
 
         project = nisNode.getProject();
-        nisFederation = nisNode.getNisFederation();
+        nisFederationClient = nisNode.getNisFederation();
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -54,11 +54,11 @@ public class NISConflictsNode extends Node {
     }
 
     public NISFederationClient getNisTool() {
-        return nisFederation;
+        return nisFederationClient;
     }
 
     public void setNisTool(NISFederationClient nisFederation) {
-        this.nisFederation = nisFederation;
+        this.nisFederationClient = nisFederation;
     }
 
     public boolean hasChildren() throws Exception {
@@ -76,7 +76,7 @@ public class NISConflictsNode extends Node {
         );
 
         usersNode.setProject(project);
-        usersNode.setNisTool(nisFederation);
+        usersNode.setNisFederationClient(nisFederationClient);
         usersNode.setDomain(domainNode.getDomain());
 
         children.add(usersNode);
@@ -89,7 +89,7 @@ public class NISConflictsNode extends Node {
         );
 
         groupsNode.setProject(project);
-        groupsNode.setNisTool(nisFederation);
+        groupsNode.setNisTool(nisFederationClient);
         groupsNode.setDomain(domainNode.getDomain());
 
         children.add(groupsNode);

@@ -30,12 +30,12 @@ public class ConflictingGIDFinderAction extends NISAction {
     ) throws Exception {
 
         String domainName1 = request.getDomain();
-        FederationRepositoryConfig domain1 = nisFederation.getRepository(domainName1);
+        FederationRepositoryConfig domain1 = nisFederationClient.getRepository(domainName1);
 
-        for (String domainName2 : nisFederation.getRepositoryNames()) {
+        for (String domainName2 : nisFederationClient.getRepositoryNames()) {
             if (domainName1.equals(domainName2)) continue;
 
-            FederationRepositoryConfig domain2 = nisFederation.getRepository(domainName2);
+            FederationRepositoryConfig domain2 = nisFederationClient.getRepository(domainName2);
             execute(domain1, domain2, response);
         }
 

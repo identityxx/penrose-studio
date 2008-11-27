@@ -18,7 +18,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.federation.NISFederationClient;
-import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditor;
@@ -50,7 +49,7 @@ public class NISSynchronizationErrorsPage extends FormPage {
     FormToolkit toolkit;
 
     NISSynchronizationEditor editor;
-    NISFederationClient nisFederation;
+    NISFederationClient nisFederationClient;
     FederationRepositoryConfig domain;
 
     Table table;
@@ -67,12 +66,14 @@ public class NISSynchronizationErrorsPage extends FormPage {
 
         this.editor = editor;
         this.project = editor.getProject();
-        this.nisFederation = editor.getNISFederationClient();
+        this.nisFederationClient = editor.getNISFederationClient();
         this.domain = editor.getDomain();
 
+        String federationName = nisFederationClient.getFederationClient().getName();
         PenroseClient penroseClient = project.getClient();
+
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-        partitionClient = partitionManagerClient.getPartitionClient(domain.getName());
+        partitionClient = partitionManagerClient.getPartitionClient(federationName+"_"+domain.getName());
 
         SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
         errors = sourceManagerClient.getSourceClient("errors");

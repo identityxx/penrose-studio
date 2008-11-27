@@ -16,13 +16,13 @@ public class NISUsersEditor extends FormEditor {
     public Logger log = LoggerFactory.getLogger(getClass());
 
     public Project project;
-    public NISFederationClient nisFederation;
+    public NISFederationClient nisFederationClient;
     public FederationRepositoryConfig domain;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         NISUsersEditorInput ei = (NISUsersEditorInput)input;
         project = ei.getProject();
-        nisFederation = ei.getNisTool();
+        nisFederationClient = ei.getNisFederationClient();
         domain = ei.getDomain();
 
         setSite(site);
@@ -34,7 +34,7 @@ public class NISUsersEditor extends FormEditor {
         try {
             //addPage(new NISUsersPage(this));
             addPage(new NISUserScriptsPage(this));
-            addPage(new NISUserChangesPage(this, domain, nisFederation));
+            addPage(new NISUserChangesPage(this, domain, nisFederationClient));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -63,7 +63,7 @@ public class NISUsersEditor extends FormEditor {
         this.domain = domain;
     }
 
-    public NISFederationClient getNisTool() {
-        return nisFederation;
+    public NISFederationClient getNisFederationClient() {
+        return nisFederationClient;
     }
 }

@@ -5,7 +5,6 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.FederationClient;
@@ -27,7 +26,7 @@ public class NISLinkingNode extends Node {
     private NISDomainNode domainNode;
 
     private Project project;
-    private NISFederationClient nisFederation;
+    private NISFederationClient nisFederationClient;
 
     public NISLinkingNode(String name, NISDomainNode domainNode) {
         super(
@@ -42,7 +41,7 @@ public class NISLinkingNode extends Node {
         this.project = nisNode.getProject();
 
         NISNode nisNode = domainNode.getNisNode();
-        nisFederation = nisNode.getNisFederation();
+        nisFederationClient = nisNode.getNisFederation();
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -61,24 +60,24 @@ public class NISLinkingNode extends Node {
     public void open() throws Exception {
 
         FederationRepositoryConfig domain = domainNode.getDomain();
-        FederationClient federationClient = nisFederation.getFederationClient();
+        FederationClient federationClient = nisFederationClient.getFederationClient();
 
         LinkingEditorInput ei = new LinkingEditorInput();
         ei.setProject(project);
         ei.setRepository(domain);
-        ei.setLocalPartition(domain.getName());
-        ei.setGlobalPartition(federationClient.getName());
+        ei.setSourcePartition(federationClient.getName()+"_"+domain.getName());
+        ei.setTargetPartition(federationClient.getName());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
         page.openEditor(ei, LinkingEditor.class.getName());
     }
 
-    public NISFederationClient getNisFederation() {
-        return nisFederation;
+    public NISFederationClient getNisFederationClient() {
+        return nisFederationClient;
     }
 
-    public void setNisTool(NISFederationClient nisFederation) {
-        this.nisFederation = nisFederation;
+    public void setNisFederationClient(NISFederationClient nisFederation) {
+        this.nisFederationClient = nisFederation;
     }
 }

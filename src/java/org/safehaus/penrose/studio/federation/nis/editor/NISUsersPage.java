@@ -51,7 +51,7 @@ public class NISUsersPage extends FormPage {
 
         this.editor = editor;
         project = editor.project;
-        nisFederation = editor.getNisTool();
+        nisFederation = editor.getNisFederationClient();
         domain = editor.getDomain();
     }
 

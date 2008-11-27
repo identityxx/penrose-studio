@@ -23,8 +23,8 @@ public class LinkingEditor extends FormEditor {
         LinkingEditorInput ei = (LinkingEditorInput)input;
         project = ei.getProject();
         repository = ei.getRepository();
-        localPartition = ei.getLocalPartition();
-        globalPartition = ei.getGlobalPartition();
+        localPartition = ei.getSourcePartition();
+        globalPartition = ei.getTargetPartition();
 
         setSite(site);
         setInput(input);

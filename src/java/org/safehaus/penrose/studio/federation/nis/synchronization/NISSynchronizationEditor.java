@@ -40,9 +40,12 @@ public class NISSynchronizationEditor extends FormEditor {
     public void addPages() {
         try {
 
+            String federationName = nisFederationClient.getFederationClient().getName();
             PenroseClient penroseClient = project.getClient();
+
             PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(domain.getName());
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(federationName+"_"+domain.getName());
+
             SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
             Collection<String> sourceNames = sourceManagerClient.getSourceNames();
 

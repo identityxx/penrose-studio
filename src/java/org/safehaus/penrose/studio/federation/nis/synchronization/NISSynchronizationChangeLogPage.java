@@ -14,7 +14,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.federation.NISFederationClient;
-import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -46,7 +45,7 @@ public class NISSynchronizationChangeLogPage extends FormPage {
     FormToolkit toolkit;
 
     NISSynchronizationEditor editor;
-    NISFederationClient nisFederation;
+    NISFederationClient nisFederationClient;
     FederationRepositoryConfig domain;
 
     Table table;
@@ -63,12 +62,14 @@ public class NISSynchronizationChangeLogPage extends FormPage {
 
         this.editor = editor;
         this.project = editor.getProject();
-        this.nisFederation = editor.getNISFederationClient();
+        this.nisFederationClient = editor.getNISFederationClient();
         this.domain = editor.getDomain();
 
+        String federationName = nisFederationClient.getFederationClient().getName();
         PenroseClient penroseClient = project.getClient();
+
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
-        partitionClient = partitionManagerClient.getPartitionClient(domain.getName());
+        partitionClient = partitionManagerClient.getPartitionClient(federationName+"_"+domain.getName());
 
         SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
         changes = sourceManagerClient.getSourceClient("changes");

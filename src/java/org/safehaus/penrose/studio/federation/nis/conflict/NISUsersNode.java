@@ -18,7 +18,7 @@ import java.util.Collection;
 public class NISUsersNode extends Node {
 
     private Project project;
-    private NISFederationClient nisFederation;
+    private NISFederationClient nisFederationClient;
     private FederationRepositoryConfig domain;
 
     public NISUsersNode(String name, Image image, Object object, Object parent) {
@@ -29,7 +29,7 @@ public class NISUsersNode extends Node {
 
         NISUsersEditorInput ei = new NISUsersEditorInput();
         ei.setProject(project);
-        ei.setNisTool(nisFederation);
+        ei.setNisFederationClient(nisFederationClient);
         ei.setDomain(domain);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -45,12 +45,12 @@ public class NISUsersNode extends Node {
         return new ArrayList<Node>();
     }
 
-    public NISFederationClient getNisTool() {
-        return nisFederation;
+    public NISFederationClient getNisFederationClient() {
+        return nisFederationClient;
     }
 
-    public void setNisTool(NISFederationClient nisFederation) {
-        this.nisFederation = nisFederation;
+    public void setNisFederationClient(NISFederationClient nisFederation) {
+        this.nisFederationClient = nisFederation;
     }
 
     public FederationRepositoryConfig getDomain() {
