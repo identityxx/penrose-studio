@@ -23,7 +23,7 @@ Getting the Source Code
 
 Checkout the project from:
 
-   svn co https://svn.safehaus.org/repos/penrose-mt/trunk
+   svn co https://svn.safehaus.org/repos/penrose-studio/trunk
 
 Building
 --------

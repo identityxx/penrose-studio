@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Penrose Studio
+Bundle-Name: VD Studio
 Bundle-SymbolicName: org.safehaus.penrose.studio; singleton:=true
 Bundle-Version: 2.0.0
-Bundle-Vendor: Identyx Corporation
+Bundle-Vendor: Red Hat
 Bundle-Activator: org.safehaus.penrose.studio.PenroseStudioPlugin
 Bundle-Localization: plugin
 Eclipse-AutoStart: true
@@ -34,11 +34,11 @@ Bundle-ClassPath: lib/ant.jar,
  lib/log4j-1.2.13.jar,
  lib/nis-1.2.1.jar,
  lib/openldap-jldap.jar,
- lib/penrose-2.0.jar,
- lib/penrose-client-2.0.jar,
- lib/penrose-common-2.0.jar,
  lib/postgresql-8.1-405.jdbc3.jar,
  lib/quartz-1.6.0.jar,
  lib/slf4j-log4j12.jar,
+ lib/vd-2.0.jar,
+ lib/vd-client-2.0.jar,
+ lib/vd-common-2.0.jar,
  lib/xercesImpl-2.8.0.jar,
  lib/xml-apis-2.8.0.jar

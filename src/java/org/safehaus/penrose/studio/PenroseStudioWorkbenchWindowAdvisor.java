@@ -59,7 +59,7 @@ public class PenroseStudioWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor 
         try {
             IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
             configurer.setInitialSize(new Point(1024, 768));
-            configurer.setTitle("Penrose Studio");
+            configurer.setTitle(PenroseStudio.PRODUCT_NAME);
             //configurer.setShowCoolBar(true);
             configurer.setShowStatusLine(true);
             configurer.setShowProgressIndicator(true);
@@ -95,7 +95,7 @@ public class PenroseStudioWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor 
 
         try {
             IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
-            configurer.setTitle("Penrose Studio");
+            configurer.setTitle(PenroseStudio.PRODUCT_NAME);
 
             IWorkbenchWindow window = configurer.getWindow();
             IWorkbenchPage page = window.getActivePage();

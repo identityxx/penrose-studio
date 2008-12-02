@@ -29,6 +29,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.PenroseStudio;
 
 /**
  * @author Endi S. Dewata
@@ -48,7 +49,7 @@ public class WelcomeEditor extends EditorPart {
 		toolkit = new FormToolkit(parent.getDisplay());
 
         ScrolledForm form  = toolkit.createScrolledForm(parent);
-        //form.setText("Welcome to Penrose Studio");
+        //form.setText("Welcome to "+PenroseStudio.PRODUCT_NAME);
 
 		TableWrapLayout layout = new TableWrapLayout();
 		form.getBody().setLayout(layout);
@@ -78,7 +79,9 @@ public class WelcomeEditor extends EditorPart {
 
         StringBuilder sb = new StringBuilder();
         sb.append("<form>");
-        sb.append("<p><span font=\"font\">Welcome to Penrose Studio</span></p>");
+        sb.append("<p><span font=\"font\">Welcome to ");
+        sb.append(PenroseStudio.PRODUCT_NAME);
+        sb.append("</span></p>");
         sb.append("<p><img href=\"welcome\"/></p>");
         sb.append("</form>");
         ft.setText(sb.toString(), true, true);

@@ -3,16 +3,15 @@
  Copyright (c) 2000-2006, Identyx Corporation.
  All rights reserved.
 -->
-<project name="penrose-studio" default="compile">
+<project name="studio" default="compile">
 
-    <description>Penrose Studio</description>
+    <description>Studio</description>
 
     <property file="build.properties"/>
 
-    <property name="project.name" value="penrose-studio"/>
-
     <property name="prefix" value=""/>
-    <property name="studio.home" value="${prefix}/opt/${project.name}-${product.version}"/>
+  
+    <property name="studio.home" value="${prefix}/opt/${product.name}-${product.version}"/>
     <property name="plugin.path" value="target/dist/plugins/org.safehaus.penrose.studio_${plugin.version}"/>
 
     <tstamp>
@@ -78,15 +77,15 @@
     </target>
 
     <target name="import-common" depends="init">
-        <copy todir="lib" file="../Server/common/target/penrose-common-${penrose.version}.jar"/>
+        <copy todir="lib" file="../Server/common/target/${project.name}-common-${penrose.version}.jar"/>
     </target>
 
     <target name="import-core" depends="init">
-        <copy todir="lib" file="../Server/core/target/penrose-${penrose.version}.jar"/>
+        <copy todir="lib" file="../Server/core/target/${project.name}-${penrose.version}.jar"/>
     </target>
 
     <target name="import-client" depends="init">
-        <copy todir="lib" file="../Server/client/target/penrose-client-${penrose.version}.jar"/>
+        <copy todir="lib" file="../Server/client/target/${project.name}-client-${penrose.version}.jar"/>
     </target>
 
     <target name="clean" depends="init">
@@ -137,7 +136,7 @@
                 <include name="**/*.ico"/>
             </fileset>
         </copy>
-        <jar basedir="target/classes" destfile="target/${project.name}-${product.version}.jar">
+        <jar basedir="target/classes" destfile="target/${product.name}-${product.version}.jar">
             <manifest>
                 <attribute name="Specification-Version"  value="${product.specification}"/>
                 <attribute name="Implementation-Title"   value="${product.title}"/>
@@ -202,7 +201,7 @@
         </copy>
         <copy todir="${plugin.path}/lib">
             <fileset dir="target">
-                <include name="${project.name}-${product.version}.jar"/>
+                <include name="${product.name}-${product.version}.jar"/>
             </fileset>
         </copy>
 
@@ -225,15 +224,15 @@
         <fixcrlf srcdir="target/dist" includes="**/*.txt" eol="unix"/>
 
         <mkdir dir="dist"/>
-        <tar destfile="dist/${project.name}-${product.version}.tar.gz" compression="gzip">
-            <tarfileset dir="target/dist" prefix="${project.name}-${product.version}" mode="755">
-                <include name="penrose-studio"/>
-                <include name="penrose-studio.exe"/>
+        <tar destfile="dist/${product.name}-${product.version}.tar.gz" compression="gzip">
+            <tarfileset dir="target/dist" prefix="${product.name}-${product.version}" mode="755">
+                <include name="${product.name}"/>
+                <include name="${product.name}.exe"/>
             </tarfileset>
-            <tarfileset dir="target/dist" prefix="${project.name}-${product.version}">
+            <tarfileset dir="target/dist" prefix="${product.name}-${product.version}">
                 <include name="**/*"/>
-                <exclude name="penrose-studio"/>
-                <exclude name="penrose-studio.exe"/>
+                <exclude name="${product.name}"/>
+                <exclude name="${product.name}.exe"/>
             </tarfileset>
         </tar>
 
@@ -267,8 +266,8 @@
         <move todir="target/dist">
             <fileset dir="target/eclipse"/>
         </move>
-        <move file="target/dist/eclipse" tofile="target/dist/${project.name}"/>
-        <chmod file="target/dist/${project.name}" perm="a+rx"/>
+        <move file="target/dist/eclipse" tofile="target/dist/${product.name}"/>
+        <chmod file="target/dist/${product.name}" perm="a+rx"/>
         <antcall target="package"/>
     </target>
 
@@ -298,8 +297,8 @@
         <move todir="target/dist">
             <fileset dir="target/eclipse"/>
         </move>
-        <move file="target/dist/eclipse.exe" tofile="target/dist/penrose-studio.exe"/>
-        <copy file="launcher/penrose-studio.exe" tofile="target/dist/penrose-studio.exe"/>
+        <move file="target/dist/eclipse.exe" tofile="target/dist/${product.name}.exe"/>
+        <copy file="launcher/eclipse.exe" tofile="target/dist/${product.name}.exe"/>
         <antcall target="package"/>
     </target>
 
@@ -313,16 +312,16 @@
 
     <target name="dist-src" depends="init">
         <mkdir dir="dist"/>
-        <echo message="Creating ${project.name}-${product.version}-src.zip"/>
-        <zip destfile="dist/${project.name}-${product.version}-src.zip">
+        <echo message="Creating ${product.name}-${product.version}-src.zip"/>
+        <zip destfile="dist/${product.name}-${product.version}-src.zip">
             <zipfileset dir=".">
                 <exclude name="dist/**"/>
                 <exclude name="target/**"/>
             </zipfileset>
         </zip>
-        <echo message="Creating ${project.name}-${product.version}-src.tar.gz"/>
-        <tar destfile="dist/${project.name}-${product.version}-src.tar.gz" compression="gzip">
-            <tarfileset dir="." prefix="${project.name}-${product.version}">
+        <echo message="Creating ${product.name}-${product.version}-src.tar.gz"/>
+        <tar destfile="dist/${product.name}-${product.version}-src.tar.gz" compression="gzip">
+            <tarfileset dir="." prefix="${product.name}-${product.version}">
                 <exclude name="dist/**"/>
                 <exclude name="target/**"/>
             </tarfileset>
@@ -335,7 +334,7 @@
         <antcall target="dist-win32"/>
         <copy
             todir="dist"
-            file="target/${project.name}-${product.version}.jar">
+            file="target/${product.name}-${product.version}.jar">
         </copy>
     </target>
 
@@ -357,7 +356,7 @@
             </fileset>
         </move>
 <!--
-        <move tofile="target/dist/${app.name}/Contents/MacOS/penrose-studio"
+        <move tofile="target/dist/${app.name}/Contents/MacOS/${product.name}"
             file="target/dist/${app.name}/Contents/MacOS/eclipse"
         />
 -->
@@ -376,12 +375,12 @@
         <delete file="target/dist/${app.name}/Contents/Resources/Eclipse.icns"/>
         <mkdir dir="target/dist/.background"/>
 
-        <echo message="Creating ${project.name}-${product.version}.dmg"/>
+        <echo message="Creating ${product.name}-${product.version}.dmg"/>
         <mkdir dir="dist"/>
         <exec executable="bin/pkg-dmg">
             <arg line="--source target/dist"/>
-            <arg line="--target dist/${project.name}-${product.version}.dmg"/>
-            <!-- <arg line="- -volname &quot;Penrose Studio ${product.version}&quot;"/>  
+            <arg line="--target dist/${product.name}-${product.version}.dmg"/>
+            <!-- <arg line="- -volname &quot;${product.title} ${product.version}&quot;"/>
 			The image path is absolute, NOT relative. This means your temporary disk image and your pkg-dmg disk images must have the same name. -->
             <arg line="--volname &quot;${product.title}&quot;"/> 
             <arg line="--license target/LICENSE.txt"/>
@@ -398,7 +397,7 @@
     </target>
 
     <target name="dist-win32" depends="build-win32" if="isWindows">
-        <echo message="Creating dist/${project.name}-${product.version}.exe"/>
+        <echo message="Creating dist/${product.name}-${product.version}.exe"/>
         <copy todir="target" file="installer/penrose-studio.iss">
             <filterchain>
                 <expandproperties/>
@@ -407,13 +406,13 @@
         <exec executable="${iscc.path}">
             <arg line="/Q target/penrose-studio.iss"/>
         </exec>
-        <zip destfile="dist/${project.name}-${product.version}.zip">
-            <zipfileset dir="target/dist" prefix="${project.name}-${product.version}" filemode="755">
-                <include name="penrose-studio.exe"/>
+        <zip destfile="dist/${product.name}-${product.version}.zip">
+            <zipfileset dir="target/dist" prefix="${product.name}-${product.version}" filemode="755">
+                <include name="${product.name}.exe"/>
             </zipfileset>
-            <zipfileset dir="target/dist" prefix="${project.name}-${product.version}">
+            <zipfileset dir="target/dist" prefix="${product.name}-${product.version}">
                 <include name="**/*"/>
-                <exclude name="penrose-studio.exe"/>
+                <exclude name="${product.name}.exe"/>
             </zipfileset>
         </zip>
     </target>
@@ -441,11 +440,11 @@
             <param name="rpm.home" value="/usr/src/redhat"/>
             <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
             <param name="rpm.arch" value="${arch}"/>
-            <param name="rpm.name" value="${project.name}-${product.version}-1.${arch}.rpm"/>
+            <param name="rpm.name" value="${product.name}-${product.version}-1.${arch}.rpm"/>
         </antcall>
         <move
-            file="dist/${project.name}-${product.version}-1.${arch}.rpm"
-            tofile="dist/${project.name}-${product.version}-1.intel.rpm"
+            file="dist/${product.name}-${product.version}-1.${arch}.rpm"
+            tofile="dist/${product.name}-${product.version}-1.intel.rpm"
         />
     </target>
 
@@ -466,11 +465,11 @@
             <param name="rpm.home" value="/usr/src/redhat"/>
             <param name="rpm.builder" value="/usr/bin/rpmbuild"/>
             <param name="rpm.arch" value="${arch}"/>
-            <param name="rpm.name" value="${project.name}-${product.version}-1.${arch}.rpm"/>
+            <param name="rpm.name" value="${product.name}-${product.version}-1.${arch}.rpm"/>
         </antcall>
         <move
-            file="dist/${project.name}-${product.version}-1.${arch}.rpm"
-            tofile="dist/${project.name}-${product.version}-1.amd64.rpm"
+            file="dist/${product.name}-${product.version}-1.${arch}.rpm"
+            tofile="dist/${product.name}-${product.version}-1.amd64.rpm"
         />
     </target>
 
@@ -481,7 +480,7 @@
             <param name="rpm.home" value="${cygwin.home}/usr/src/rpm"/>
             <param name="rpm.builder" value="${cygwin.home}/lib/rpm/rpmb.exe"/>
             <param name="rpm.arch" value="i386"/>
-            <param name="rpm.name" value="${project.name}-${product.version}-1.cygwin.i386.rpm"/>
+            <param name="rpm.name" value="${product.name}-${product.version}-1.cygwin.i386.rpm"/>
         </antcall>
     </target>
 
@@ -493,13 +492,13 @@
     </target>
 
     <target name="rpm-build" depends="build" if="hasRpmBuilder">
-        <copy todir="target" file="installer/${project.name}.spec">
+        <copy todir="target" file="installer/${product.name}.spec">
             <filterchain>
                 <expandproperties/>
             </filterchain>
         </copy>
         <copy todir="${rpm.home}/SOURCES" overwrite="true"
-            file="dist/${project.name}-${product.version}.tar.gz">
+            file="dist/${product.name}-${product.version}.tar.gz">
         </copy>
         <exec executable="${rpm.builder}">
             <arg line="-bb target/penrose-studio.spec"/>
@@ -551,14 +550,14 @@
         <antcall target="install-dist">
             <param name="platform" value="linux-gtk"/>
         </antcall>
-        <chmod dir="${studio.home}" includes="penrose-studio" perm="a+rx" />
+        <chmod dir="${studio.home}" includes="${product.name}" perm="a+rx" />
     </target>
 
     <target name="install-linux-gtk-x86_64">
         <antcall target="install-dist">
             <param name="platform" value="linux-gtk-x86_64"/>
         </antcall>
-        <chmod dir="${studio.home}" includes="penrose-studio" perm="a+rx" />
+        <chmod dir="${studio.home}" includes="${product.name}" perm="a+rx" />
     </target>
 
     <target name="install-macosx" if="isMac">
@@ -582,7 +581,7 @@
         </condition>
     </target>
 
-    <target name="copy-penrose-conf" depends="init" if="penrose.conf.missing">
+    <target name="copy-conf" depends="init" if="penrose.conf.missing">
         <copy todir="${studio.home}">
             <fileset dir="target/dist">
                 <include name="conf/**/*"/>
@@ -590,7 +589,7 @@
         </copy>
     </target>
 
-    <target name="install-dist" depends="pre-install,copy-penrose-conf">
+    <target name="install-dist" depends="pre-install,copy-conf">
         <delete failonerror="false" includeemptydirs="true">
             <fileset dir="${studio.home}">
                 <include name="configuration/**/*"/>

@@ -5,13 +5,13 @@
 
 AppName=${product.title}
 AppVerName=${product.title} ${product.version}
-DefaultDirName={pf}\Identyx\${product.title} ${product.version}
-DefaultGroupName=Identyx\${product.title} ${product.version}
+DefaultDirName={pf}\${product.vendor}\${product.title} ${product.version}
+DefaultGroupName=${product.vendor}\${product.title} ${product.version}
 UninstallDisplayName=${product.title} ${product.version}
 UninstallDisplayIcon={app}\penrose.ico
 Compression=zip
 SolidCompression=yes
-OutputBaseFilename=${project.name}-${product.version}
+OutputBaseFilename=${product.name}-${product.version}
 OutputDir=..\dist
 LicenseFile=LICENSE.txt
 
@@ -28,6 +28,6 @@ Name: "{group}\Documentation\INSTALL-BINARY.txt"; Filename: "{app}\INSTALL-BINAR
 Name: "{group}\Documentation\Online Documentation"; Filename: "{app}\docs\Online Documentation.url";
 Name: "{group}\Documentation\Penrose Website"; Filename: "{app}\docs\Penrose Website.url";
 Name: "{group}\Documentation\Safehaus Website"; Filename: "{app}\docs\Safehaus Website.url";
-Name: "{group}\${product.title}"; Filename: "{app}\penrose-studio.exe"; IconFilename: "{app}\penrose.ico"; WorkingDir: "{app}"
+Name: "{group}\${product.title}"; Filename: "{app}\${product.name}.exe"; IconFilename: "{app}\penrose.ico"; WorkingDir: "{app}"
 Name: "{group}\Configuration Files"; Filename: "{app}\conf";
 Name: "{group}\Uninstall ${product.title}"; Filename: "{uninstallexe}"

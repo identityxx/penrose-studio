@@ -19,11 +19,12 @@ package org.safehaus.penrose.studio.welcome.action;
 
 import org.eclipse.jface.action.Action;
 import org.safehaus.penrose.studio.welcome.SplashShell;
+import org.safehaus.penrose.studio.PenroseStudio;
 
 public class AboutAction extends Action {
 
 	public AboutAction() {
-        setText("&About Penrose Studio");
+        setText("&About "+ PenroseStudio.PRODUCT_NAME);
         setId(getClass().getName());
 	}
 

@@ -44,6 +44,7 @@ public class PenroseStudio implements IPlatformRunnable {
     public static String PRODUCT_NAME;
     public static String PRODUCT_VERSION;
     public static String VENDOR_NAME;
+    public static String SPECIFICATION_VERSION;
 
     public final static DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
     public final static String RELEASE_DATE    = "12/01/2007";
@@ -66,9 +67,17 @@ public class PenroseStudio implements IPlatformRunnable {
         try {
             Package pkg = PenroseStudio.class.getPackage();
 
-            PRODUCT_NAME    = pkg.getImplementationTitle() == null ? PRODUCT_NAME : pkg.getImplementationTitle();
-            PRODUCT_VERSION = pkg.getImplementationVersion() == null ? PRODUCT_VERSION : pkg.getImplementationVersion();
-            VENDOR_NAME     = pkg.getImplementationVendor() == null ? VENDOR_NAME : pkg.getImplementationVendor();
+            String value = pkg.getImplementationTitle();
+            if (value != null) PRODUCT_NAME = value;
+
+            value = pkg.getImplementationVersion();
+            if (value != null) PRODUCT_VERSION = value;
+
+            value = pkg.getImplementationVendor();
+            if (value != null) VENDOR_NAME = value;
+
+            value = pkg.getSpecificationVersion();
+            if (value != null) SPECIFICATION_VERSION = value;
 
         } catch (Exception e) {
             e.printStackTrace();

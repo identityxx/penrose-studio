@@ -9,7 +9,7 @@
 
     <property file="../build.properties"/>
 
-    <property name="project.name" value="penrose-studio-federation"/>
+    <property name="product.name" value="penrose-studio-federation"/>
     <property name="project.dist" value="dist"/>
 
     <property name="rcp.prefix" value="eclipse-RCP-3.2.2"/>
@@ -102,7 +102,7 @@
                 <include name="**/*.ico"/>
             </fileset>
         </copy>
-        <jar basedir="target/classes" destfile="target/${project.name}-${product.version}.jar">
+        <jar basedir="target/classes" destfile="target/${product.name}-${product.version}.jar">
             <patternset>
                 <exclude name="**/.svn"/>
             </patternset>
@@ -126,7 +126,7 @@
         </copy>
         <copy todir="${plugin.path}/lib">
             <fileset dir="target">
-                <include name="${project.name}-${product.version}.jar"/>
+                <include name="${product.name}-${product.version}.jar"/>
             </fileset>
         </copy>
         <copy todir="${plugin.path}/META-INF" file="MANIFEST.MF" overwrite="true">

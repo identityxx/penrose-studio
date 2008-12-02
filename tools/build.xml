@@ -9,7 +9,7 @@
 
     <property file="../build.properties"/>
 
-    <property name="project.name" value="penrose-studio-tools"/>
+    <property name="product.name" value="penrose-studio-tools"/>
     <property name="project.dist" value="dist"/>
 
     <tstamp>
