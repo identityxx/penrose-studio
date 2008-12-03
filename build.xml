@@ -398,13 +398,13 @@
 
     <target name="dist-win32" depends="build-win32" if="isWindows">
         <echo message="Creating dist/${product.name}-${product.version}.exe"/>
-        <copy todir="target" file="installer/penrose-studio.iss">
+        <copy todir="target" file="installer/${product.name}.iss">
             <filterchain>
                 <expandproperties/>
             </filterchain>
         </copy>
         <exec executable="${iscc.path}">
-            <arg line="/Q target/penrose-studio.iss"/>
+            <arg line="/Q target/${product.name}.iss"/>
         </exec>
         <zip destfile="dist/${product.name}-${product.version}.zip">
             <zipfileset dir="target/dist" prefix="${product.name}-${product.version}" filemode="755">
@@ -501,7 +501,7 @@
             file="dist/${product.name}-${product.version}.tar.gz">
         </copy>
         <exec executable="${rpm.builder}">
-            <arg line="-bb target/penrose-studio.spec"/>
+            <arg line="-bb target/${product.name}.spec"/>
         </exec>
         <copy todir="dist" failonerror="false"
             file="${rpm.home}/RPMS/${rpm.arch}/${rpm.name}">
@@ -574,14 +574,14 @@
 
     <target name="pre-install" depends="init">
         <mkdir dir="${studio.home}"/>
-        <condition property="penrose.conf.missing">
+        <condition property="conf.missing">
           <not>
             <available file="${studio.home}/conf/driver.xml"/>
           </not>
         </condition>
     </target>
 
-    <target name="copy-conf" depends="init" if="penrose.conf.missing">
+    <target name="copy-conf" depends="init" if="conf.missing">
         <copy todir="${studio.home}">
             <fileset dir="target/dist">
                 <include name="conf/**/*"/>
