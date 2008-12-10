@@ -53,7 +53,7 @@ public class FederationDomainEditorWizard extends Wizard {
             ConnectionClient connectionClient = connectionManagerClient.getConnectionClient("LDAP");
             ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
-            SourceClient sourceClient = sourceManagerClient.getSourceClient("LDAP");
+            SourceClient sourceClient = sourceManagerClient.getSourceClient("Global");
             SourceConfig sourceConfig = sourceClient.getSourceConfig();
 
             String url = connectionConfig.getParameter(Context.PROVIDER_URL);
@@ -118,7 +118,7 @@ public class FederationDomainEditorWizard extends Wizard {
             ConnectionClient connectionClient = connectionManagerClient.getConnectionClient("LDAP");
             ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
-            SourceClient sourceClient = sourceManagerClient.getSourceClient("LDAP");
+            SourceClient sourceClient = sourceManagerClient.getSourceClient("Global");
             SourceConfig sourceConfig = sourceClient.getSourceConfig();
 
             String url = connectionPage.getProviderUrl();

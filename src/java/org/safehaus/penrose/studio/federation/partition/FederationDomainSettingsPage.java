@@ -52,12 +52,22 @@ public class FederationDomainSettingsPage extends FormPage {
     FederationClient federationClient;
     Project project;
 
-    public FederationDomainSettingsPage(FederationDomainEditor editor) {
+    ConnectionClient connectionClient;
+    SourceClient sourceClient;
+
+    public FederationDomainSettingsPage(FederationDomainEditor editor) throws Exception {
         super(editor, "SETTINGS", "  Settings  ");
 
         this.editor = editor;
         this.federationClient = editor.federationClient;
         this.project = editor.project;
+
+        PartitionClient partitionClient = federationClient.getPartitionClient();
+        ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+        SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+
+        connectionClient = connectionManagerClient.getConnectionClient("LDAP");
+        sourceClient = sourceManagerClient.getSourceClient("Global");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -136,7 +146,9 @@ public class FederationDomainSettingsPage extends FormPage {
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout());
 
-        Button editButton = toolkit.createButton(composite, "Edit", SWT.PUSH);
+        Button editButton = new Button(composite, SWT.PUSH);
+		editButton.setText("Edit");
+
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.widthHint = 100;
         editButton.setLayoutData(gd);
@@ -168,14 +180,7 @@ public class FederationDomainSettingsPage extends FormPage {
 
     public void refresh() {
         try {
-            PartitionClient partitionClient = federationClient.getPartitionClient();
-            ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
-            SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
-
-            ConnectionClient connectionClient = connectionManagerClient.getConnectionClient("LDAP");
             ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
-
-            SourceClient sourceClient = sourceManagerClient.getSourceClient("LDAP");
             SourceConfig sourceConfig = sourceClient.getSourceConfig();
 
             String url = connectionConfig.getParameter(Context.PROVIDER_URL);

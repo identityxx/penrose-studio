@@ -12,7 +12,7 @@ import org.safehaus.penrose.federation.NISFederationClient;
 public class NISEditorInput implements IEditorInput {
 
     private Project project;
-    private NISFederationClient nisFederation;
+    private NISFederationClient nisFederationClient;
 
     public NISEditorInput() {
     }
@@ -62,12 +62,12 @@ public class NISEditorInput implements IEditorInput {
         return true;
     }
 
-    public NISFederationClient getNISFederation() {
-        return nisFederation;
+    public NISFederationClient getNisFederationClient() {
+        return nisFederationClient;
     }
 
-    public void setNISFederation(NISFederationClient nisFederation) {
-        this.nisFederation = nisFederation;
+    public void setNisFederationClient(NISFederationClient nisFederation) {
+        this.nisFederationClient = nisFederation;
     }
 
     public Project getProject() {

@@ -35,8 +35,6 @@ public class LDAPRepositoryNode extends Node {
     private LDAPFederationClient ldapFederation;
     private FederationRepositoryConfig repository;
 
-    Collection<Node> children = new ArrayList<Node>();
-
     LDAPLinkingNode   linkingNode;
 
     public LDAPRepositoryNode(String name, FederationRepositoryConfig repository, LDAPNode ldapNode) {
@@ -131,13 +129,5 @@ public class LDAPRepositoryNode extends Node {
 
     public void setRepository(FederationRepositoryConfig repository) {
         this.repository = repository;
-    }
-
-    public boolean hasChildren() throws Exception {
-        return !children.isEmpty();
-    }
-
-    public Collection<Node> getChildren() throws Exception {
-        return children;
     }
 }

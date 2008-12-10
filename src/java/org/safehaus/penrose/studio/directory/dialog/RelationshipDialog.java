@@ -86,7 +86,9 @@ public class RelationshipDialog extends Dialog {
 
 /*
 		// (x) Expression
-		expressionButton = toolkit.createButton(sectionClient, "Expression", SWT.RADIO);
+		expressionButton = new Button(sectionClient, SWT.RADIO);
+		expressionButton.setText("Expression");
+
 		expressionButton.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.FILL_GRAB, 1, 3));
 		expressionButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -109,7 +111,9 @@ public class RelationshipDialog extends Dialog {
 		});
 
 		// (x) Simple Join
-		simpleJoinButton = toolkit.createButton(sectionClient, "Simple Join", SWT.RADIO);
+		simpleJoinButton = new Button(sectionClient, SWT.RADIO);
+		simpleJoinButton.setText("Simple Join");
+
 		simpleJoinButton.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.FILL_GRAB, 1, 3));
 		simpleJoinButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {

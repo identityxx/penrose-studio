@@ -22,6 +22,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
@@ -36,6 +37,8 @@ public class Node {
     protected Object object;
     protected Object parent;
 
+    protected Collection<Node> children = new ArrayList<Node>();
+
     public Node(String name, Image image, Object object, Object parent) {
         this.name = name;
         this.image = image;
@@ -43,6 +46,10 @@ public class Node {
         this.parent = parent;
     }
 
+    public void init() {
+
+    }
+    
     public String getName() {
         return name;
     }
@@ -115,10 +122,10 @@ public class Node {
     }
 
     public boolean hasChildren() throws Exception {
-        return false;
+        return !children.isEmpty();
     }
 
     public Collection<Node> getChildren() throws Exception {
-        return null;
+        return children;
     }
 }

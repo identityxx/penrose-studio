@@ -20,7 +20,7 @@ import org.safehaus.penrose.studio.project.Project;
 /**
  * @author Endi S. Dewata
  */
-public class LinkingSettingsPage extends FormPage {
+public class IdentityLinkingSettingsPage extends FormPage {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -37,7 +37,7 @@ public class LinkingSettingsPage extends FormPage {
 
     Project project;
 
-    public LinkingSettingsPage(FormEditor editor, FederationRepositoryConfig repository) {
+    public IdentityLinkingSettingsPage(FormEditor editor, FederationRepositoryConfig repository) {
         super(editor, "LINKING", "  Linking  ");
 
         this.repository = repository;

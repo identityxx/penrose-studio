@@ -172,7 +172,8 @@ public class ObjectClassEditor extends EditorPart implements ModifyListener, Sel
         gd.widthHint = 100;
         obsoleteLabel.setLayoutData(gd);
 
-        obsoleteCheckbox = toolkit.createButton(composite, "", SWT.CHECK);
+        obsoleteCheckbox = new Button(composite, SWT.CHECK);
+        obsoleteCheckbox.setText("");
         obsoleteCheckbox.setSelection(objectClass.isObsolete());
         obsoleteCheckbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         obsoleteCheckbox.setEnabled(false);

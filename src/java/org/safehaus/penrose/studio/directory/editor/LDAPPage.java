@@ -144,7 +144,9 @@ public class LDAPPage extends FormPage {
             }
         });
 
-        Button browseButton = toolkit.createButton(composite, "Browse...", SWT.PUSH);
+        Button browseButton = new Button(composite, SWT.PUSH);
+		browseButton.setText("Browse...");
+
         gd = new GridData();
         gd.widthHint = 100;
         browseButton.setLayoutData(gd);
@@ -216,7 +218,9 @@ public class LDAPPage extends FormPage {
         buttons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
         buttons.setLayout(new GridLayout());
 
-        Button addButton = toolkit.createButton(buttons, "Add", SWT.PUSH);
+        Button addButton = new Button(buttons, SWT.PUSH);
+		addButton.setText("Add");
+
         addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         addButton.addSelectionListener(new SelectionAdapter() {
@@ -248,7 +252,9 @@ public class LDAPPage extends FormPage {
             }
         });
 
-        Button removeButton = toolkit.createButton(buttons, "Remove", SWT.PUSH);
+        Button removeButton = new Button(buttons, SWT.PUSH);
+		removeButton.setText("Remove");
+
         removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         removeButton.addSelectionListener(new SelectionAdapter() {
@@ -365,7 +371,9 @@ public class LDAPPage extends FormPage {
         buttons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
         buttons.setLayout(new GridLayout());
 
-        Button addButton = toolkit.createButton(buttons, "Add", SWT.PUSH);
+        Button addButton = new Button(buttons, SWT.PUSH);
+		addButton.setText("Add");
+
         addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         addButton.addSelectionListener(new SelectionAdapter() {
@@ -396,7 +404,9 @@ public class LDAPPage extends FormPage {
             }
         });
 
-        Button editButton = toolkit.createButton(buttons, "Edit", SWT.PUSH);
+        Button editButton = new Button(buttons, SWT.PUSH);
+		editButton.setText("Edit");
+
         editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         editButton.addSelectionListener(new SelectionAdapter() {
@@ -410,7 +420,9 @@ public class LDAPPage extends FormPage {
             }
         });
 
-        Button removeButton = toolkit.createButton(buttons, "Remove", SWT.PUSH);
+        Button removeButton = new Button(buttons, SWT.PUSH);
+		removeButton.setText("Remove");
+
         removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         removeButton.addSelectionListener(new SelectionAdapter() {

@@ -10,8 +10,8 @@ import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
-import org.safehaus.penrose.studio.federation.linking.editor.LinkingEditor;
-import org.safehaus.penrose.studio.federation.linking.editor.LinkingEditorInput;
+import org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingEditor;
+import org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingEditorInput;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
 import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
 import org.safehaus.penrose.studio.project.Project;
@@ -22,11 +22,9 @@ import org.safehaus.penrose.studio.tree.Node;
  */
 public class NISLinkingNode extends Node {
 
-    private NISNode nisNode;
-    private NISDomainNode domainNode;
-
-    private Project project;
-    private NISFederationClient nisFederationClient;
+    Project project;
+    NISFederationClient nisFederationClient;
+    FederationRepositoryConfig repositoryConfig;
 
     public NISLinkingNode(String name, NISDomainNode domainNode) {
         super(
@@ -36,12 +34,9 @@ public class NISLinkingNode extends Node {
                 domainNode
         );
 
-        this.domainNode = domainNode;
-        this.nisNode = domainNode.getNisNode();
-        this.project = nisNode.getProject();
-
-        NISNode nisNode = domainNode.getNisNode();
-        nisFederationClient = nisNode.getNisFederation();
+        repositoryConfig = domainNode.getDomain();
+        project = domainNode.getProject();
+        nisFederationClient = domainNode.getNisFederationClient();
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -59,18 +54,17 @@ public class NISLinkingNode extends Node {
 
     public void open() throws Exception {
 
-        FederationRepositoryConfig domain = domainNode.getDomain();
         FederationClient federationClient = nisFederationClient.getFederationClient();
 
-        LinkingEditorInput ei = new LinkingEditorInput();
+        IdentityLinkingEditorInput ei = new IdentityLinkingEditorInput();
         ei.setProject(project);
-        ei.setRepository(domain);
-        ei.setSourcePartition(federationClient.getName()+"_"+domain.getName());
+        ei.setRepository(repositoryConfig);
+        ei.setSourcePartition(federationClient.getName()+"_"+ repositoryConfig.getName());
         ei.setTargetPartition(federationClient.getName());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
-        page.openEditor(ei, LinkingEditor.class.getName());
+        page.openEditor(ei, IdentityLinkingEditor.class.getName());
     }
 
     public NISFederationClient getNisFederationClient() {

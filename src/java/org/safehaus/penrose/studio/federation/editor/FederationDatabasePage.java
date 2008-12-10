@@ -100,7 +100,9 @@ public class FederationDatabasePage extends FormPage {
         suffixText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 */
 /*
-        Button importButton = toolkit.createButton(composite, "Import", SWT.PUSH);
+        Button importButton = new Button(composite, SWT.PUSH);
+		importButton.setText("Import");
+
         importButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
@@ -111,7 +113,9 @@ public class FederationDatabasePage extends FormPage {
             }
         });
 
-        Button exportButton = toolkit.createButton(composite, "Export", SWT.PUSH);
+        Button exportButton = new Button(composite, SWT.PUSH);
+		exportButton.setText("Export");
+
         exportButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {

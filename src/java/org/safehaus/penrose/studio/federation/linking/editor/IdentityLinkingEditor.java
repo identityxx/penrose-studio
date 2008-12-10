@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.project.Project;
 
-public class LinkingEditor extends FormEditor {
+public class IdentityLinkingEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
@@ -20,7 +20,7 @@ public class LinkingEditor extends FormEditor {
     private String globalPartition;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        LinkingEditorInput ei = (LinkingEditorInput)input;
+        IdentityLinkingEditorInput ei = (IdentityLinkingEditorInput)input;
         project = ei.getProject();
         repository = ei.getRepository();
         localPartition = ei.getSourcePartition();
@@ -33,7 +33,7 @@ public class LinkingEditor extends FormEditor {
 
     public void addPages() {
         try {
-            addPage(new LinkingPage(this));
+            addPage(new IdentityLinkingPage(this));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

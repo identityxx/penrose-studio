@@ -12,7 +12,6 @@ import org.safehaus.penrose.studio.federation.nis.editor.NISEditorInput;
 import org.safehaus.penrose.studio.federation.nis.editor.NISEditor;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISOwnershipNode;
 import org.safehaus.penrose.studio.federation.nis.linking.NISLinkingNode;
-import org.safehaus.penrose.studio.federation.nis.conflict.NISConflictsNode;
 import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
 import org.safehaus.penrose.studio.federation.nis.wizard.AddNISDomainWizard;
 import org.eclipse.jface.action.IMenuManager;
@@ -39,10 +38,7 @@ public class NISNode extends Node {
     NISFederationClient nisFederation;
 
     NISLinkingNode linkingNode;
-    NISConflictsNode conflictsNode;
     NISOwnershipNode ownershipNode;
-
-    private Collection<Node> children = new ArrayList<Node>();
 
     public NISNode(String name, FederationDomainNode federationDomainNode) throws Exception {
         super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), null, federationDomainNode);
@@ -114,7 +110,7 @@ public class NISNode extends Node {
 
         NISEditorInput ei = new NISEditorInput();
         ei.setProject(project);
-        ei.setNISFederation(nisFederation);
+        ei.setNisFederationClient(nisFederation);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -141,14 +137,6 @@ public class NISNode extends Node {
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
-    }
-
-    public boolean hasChildren() throws Exception {
-        return !children.isEmpty();
-    }
-
-    public Collection<Node> getChildren() throws Exception {
-        return children;
     }
 
     public NISFederationClient getNisFederation() {

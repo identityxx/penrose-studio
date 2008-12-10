@@ -26,7 +26,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
-import org.safehaus.penrose.federation.module.LinkingException;
+import org.safehaus.penrose.federation.module.IdentityLinkingException;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 
@@ -42,7 +42,7 @@ public class ImportErrorDialog extends Dialog {
 
 	Label messageText;
 
-    private LinkingException exception;
+    private IdentityLinkingException exception;
 
     int action;
 
@@ -138,11 +138,11 @@ public class ImportErrorDialog extends Dialog {
         this.action = action;
     }
 
-    public LinkingException getException() {
+    public IdentityLinkingException getException() {
         return exception;
     }
 
-    public void setException(LinkingException exception) {
+    public void setException(IdentityLinkingException exception) {
         this.exception = exception;
     }
 

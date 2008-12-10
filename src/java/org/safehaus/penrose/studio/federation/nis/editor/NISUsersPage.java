@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
-import org.safehaus.penrose.studio.federation.nis.conflict.NISUsersEditor;
+import org.safehaus.penrose.studio.federation.nis.ownership.OwnershipAlignmentEditor;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.jdbc.QueryResponse;
@@ -40,19 +40,19 @@ public class NISUsersPage extends FormPage {
 
     Label entriesText;
 
-    NISUsersEditor editor;
+    OwnershipAlignmentEditor editor;
 
     Project project;
     NISFederationClient nisFederation;
     FederationRepositoryConfig domain;
 
-    public NISUsersPage(NISUsersEditor editor) {
+    public NISUsersPage(OwnershipAlignmentEditor editor) {
         super(editor, "USERS", "  Users  ");
 
         this.editor = editor;
         project = editor.project;
         nisFederation = editor.getNisFederationClient();
-        domain = editor.getDomain();
+        domain = editor.getRepositoryConfig();
     }
 
     public void createFormContent(IManagedForm managedForm) {

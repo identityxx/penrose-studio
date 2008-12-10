@@ -116,7 +116,9 @@ public class NISDomainSettingsPage extends FormPage {
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout());
 
-        Button editButton = toolkit.createButton(composite, "Edit", SWT.PUSH);
+        Button editButton = new Button(composite, SWT.PUSH);
+		editButton.setText("Edit");
+
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.widthHint = 100;
         editButton.setLayoutData(gd);

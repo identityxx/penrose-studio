@@ -1,22 +1,20 @@
-package org.safehaus.penrose.studio.federation.nis.conflict;
+package org.safehaus.penrose.studio.federation.global;
 
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.federation.NISFederationClient;
-import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.federation.FederationClient;
 
 /**
  * @author Endi S. Dewata
  */
-public class NISGroupsEditorInput implements IEditorInput {
+public class ConflictDetectionInput implements IEditorInput {
 
     private Project project;
-    private NISFederationClient nisFederation;
-    private FederationRepositoryConfig domain;
+    private FederationClient federationClient;
 
-    public NISGroupsEditorInput() {
+    public ConflictDetectionInput() {
     }
 
     public boolean exists() {
@@ -28,7 +26,7 @@ public class NISGroupsEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "NIS Groups - "+domain.getName();
+        return "Conflict Detection";
     }
 
     public IPersistableElement getPersistable() {
@@ -44,8 +42,7 @@ public class NISGroupsEditorInput implements IEditorInput {
     }
 
     public int hashCode() {
-        return (project == null ? 0 : project.hashCode()) +
-                (domain == null ? 0 : domain.hashCode());
+        return (project == null ? 0 : project.hashCode());
     }
 
     boolean equals(Object o1, Object o2) {
@@ -59,27 +56,18 @@ public class NISGroupsEditorInput implements IEditorInput {
         if (object == null) return false;
         if (object.getClass() != this.getClass()) return false;
 
-        NISGroupsEditorInput ei = (NISGroupsEditorInput)object;
+        ConflictDetectionInput ei = (ConflictDetectionInput)object;
         if (!equals(project, ei.project)) return false;
-        if (!equals(domain, ei.domain)) return false;
 
         return true;
     }
 
-    public FederationRepositoryConfig getDomain() {
-        return domain;
+    public FederationClient getFederationClient() {
+        return federationClient;
     }
 
-    public void setDomain(FederationRepositoryConfig domain) {
-        this.domain = domain;
-    }
-
-    public NISFederationClient getNisTool() {
-        return nisFederation;
-    }
-
-    public void setNisTool(NISFederationClient nisFederation) {
-        this.nisFederation = nisFederation;
+    public void setFederationClient(FederationClient federationClient) {
+        this.federationClient = federationClient;
     }
 
     public Project getProject() {

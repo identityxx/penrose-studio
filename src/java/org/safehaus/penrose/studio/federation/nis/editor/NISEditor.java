@@ -7,10 +7,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.safehaus.penrose.studio.federation.nis.conflict.NISUserChangesPage;
-import org.safehaus.penrose.studio.federation.nis.conflict.NISGroupChangesPage;
 import org.safehaus.penrose.studio.federation.nis.editor.NISDomainsPage;
-import org.safehaus.penrose.studio.federation.nis.editor.NISPartitionsPage;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.studio.federation.nis.editor.NISEditorInput;
 import org.safehaus.penrose.studio.project.Project;
@@ -20,12 +17,12 @@ public class NISEditor extends FormEditor {
     public Logger log = LoggerFactory.getLogger(getClass());
 
     public Project project;
-    public NISFederationClient nisFederation;
+    public NISFederationClient nisFederationClient;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         NISEditorInput ei = (NISEditorInput)input;
         project = ei.getProject();
-        nisFederation = ei.getNISFederation();
+        nisFederationClient = ei.getNisFederationClient();
 
         setSite(site);
         setInput(input);
@@ -34,13 +31,13 @@ public class NISEditor extends FormEditor {
 
     public void addPages() {
         try {
-            addPage(new NISDomainsPage(this, nisFederation));
-            addPage(new NISYPConfPage(this, nisFederation));
+            addPage(new NISDomainsPage(this, nisFederationClient));
+            addPage(new NISYPConfPage(this, nisFederationClient));
             //addPage(new NISDatabasesPage(this, nisFederation));
             //addPage(new NISPartitionsPage(this, nisFederation));
             //addPage(new NISLDAPPage(this, nisFederation));
-            addPage(new NISUserChangesPage(this, nisFederation));
-            addPage(new NISGroupChangesPage(this, nisFederation));
+            //addPage(new NISUserChangesPage(this, nisFederationClient));
+            //addPage(new NISGroupChangesPage(this, nisFederationClient));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -62,7 +59,7 @@ public class NISEditor extends FormEditor {
     }
 
     public NISFederationClient getNisTool() {
-        return nisFederation;
+        return nisFederationClient;
     }
 
     public Project getProject() {

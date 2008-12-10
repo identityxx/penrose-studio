@@ -149,6 +149,11 @@
             icon="images/object.gif"
             class="org.safehaus.penrose.studio.federation.partition.FederationDomainEditor"/>
         <editor
+            id="org.safehaus.penrose.studio.federation.global.ConflictDetectionEditor"
+            name="Conflict Detection"
+            icon="images/object.gif"
+            class="org.safehaus.penrose.studio.federation.global.ConflictDetectionEditor"/>
+        <editor
             id="org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditor"
             name="LDAP"
             icon="images/object.gif"
@@ -159,10 +164,10 @@
             icon="images/object.gif"
             class="org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.federation.linking.editor.LinkingEditor"
+            id="org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingEditor"
             name="Identity Linking"
             icon="images/object.gif"
-            class="org.safehaus.penrose.studio.federation.linking.editor.LinkingEditor"/>
+            class="org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingEditor"/>
         <editor
             id="org.safehaus.penrose.studio.federation.nis.editor.NISEditor"
             name="NIS"
@@ -179,20 +184,10 @@
             icon="images/object.gif"
             class="org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.federation.nis.linking.NISLinkEditor"
-            name="NIS Users"
+            id="org.safehaus.penrose.studio.federation.nis.ownership.OwnershipAlignmentEditor"
+            name="Ownership Alignment"
             icon="images/object.gif"
-            class="org.safehaus.penrose.studio.federation.nis.linking.NISLinkEditor"/>
-        <editor
-            id="org.safehaus.penrose.studio.federation.nis.conflict.NISUsersEditor"
-            name="NIS Users"
-            icon="images/object.gif"
-            class="org.safehaus.penrose.studio.federation.nis.conflict.NISUsersEditor"/>
-        <editor
-            id="org.safehaus.penrose.studio.federation.nis.conflict.NISGroupsEditor"
-            name="NIS Users"
-            icon="images/object.gif"
-            class="org.safehaus.penrose.studio.federation.nis.conflict.NISGroupsEditor"/>
+            class="org.safehaus.penrose.studio.federation.nis.ownership.OwnershipAlignmentEditor"/>
         <editor
             id="org.safehaus.penrose.studio.federation.nis.ownership.NISFilesEditor"
             name="NIS Alignment Tool"

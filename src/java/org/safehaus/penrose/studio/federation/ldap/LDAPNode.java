@@ -38,8 +38,6 @@ public class LDAPNode extends Node {
     private Project project;
     private LDAPFederationClient ldapFederation;
 
-    private Collection<Node> children = new ArrayList<Node>();
-
     public LDAPNode(String name, FederationDomainNode federationDomainNode) throws Exception {
         super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), null, federationDomainNode);
 
@@ -137,14 +135,6 @@ public class LDAPNode extends Node {
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
-    }
-
-    public boolean hasChildren() throws Exception {
-        return !children.isEmpty();
-    }
-
-    public Collection<Node> getChildren() throws Exception {
-        return children;
     }
 
     public Project getProject() {

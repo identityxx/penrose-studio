@@ -26,13 +26,12 @@ import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
 import org.safehaus.penrose.studio.federation.jdbc.JDBCNode;
+import org.safehaus.penrose.studio.federation.global.GlobalNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.tree.Node;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * @author Endi Sukma Dewata
@@ -41,8 +40,6 @@ public class FederationDomainNode extends Node {
 
     private Project project;
     private FederationClient federationClient;
-
-    private Collection<Node> children = new ArrayList<Node>();
 
     public FederationDomainNode(String name, FederationNode federationNode) throws Exception {
         super(name, PenroseStudioPlugin.getImage(PenroseImage.MODULE), null, federationNode);
@@ -59,7 +56,9 @@ public class FederationDomainNode extends Node {
 
         children.clear();
 
-        for (String type : federationClient.getTypes()) {
+        children.add(new GlobalNode(this));
+
+        for (String type : federationClient.getRepositoryTypes()) {
 
             log.debug(" - "+type);
 
@@ -223,14 +222,6 @@ public class FederationDomainNode extends Node {
         IWorkbenchPage page = window.getActivePage();
         page.openEditor(ei, "org.safehaus.penrose.studio.federation.editor.TestEditor");
 
-    }
-
-    public boolean hasChildren() throws Exception {
-        return !children.isEmpty();
-    }
-
-    public Collection<Node> getChildren() throws Exception {
-        return children;
     }
 
     public FederationClient getFederationClient() {

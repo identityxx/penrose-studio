@@ -2,16 +2,13 @@ package org.safehaus.penrose.studio.federation.nis.domain;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.*;
-import org.safehaus.penrose.studio.federation.nis.conflict.NISConflictsNode;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISOwnershipNode;
 import org.safehaus.penrose.studio.federation.nis.linking.NISLinkingNode;
 import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationNode;
-import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.studio.federation.nis.wizard.EditNISDomainWizard;
-import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
@@ -33,14 +30,11 @@ public class NISDomainNode extends Node {
     private NISNode nisNode;
 
     Project project;
-    private NISFederationClient nisFederation;
-    private FederationRepositoryConfig domain;
-
-    Collection<Node> children = new ArrayList<Node>();
+    NISFederationClient nisFederationClient;
+    FederationRepositoryConfig domain;
 
     NISSynchronizationNode synchronizationNode;
     NISLinkingNode   linkingNode;
-    NISConflictsNode conflictsNode;
     NISOwnershipNode ownershipNode;
 
     public NISDomainNode(String name, FederationRepositoryConfig domain, NISNode nisNode) {
@@ -54,7 +48,7 @@ public class NISDomainNode extends Node {
         this.domain = domain;
         this.nisNode = nisNode;
 
-        nisFederation = nisNode.getNisFederation();
+        nisFederationClient = nisNode.getNisFederation();
         project = nisNode.getProject();
 
         synchronizationNode = new NISSynchronizationNode(
@@ -71,17 +65,15 @@ public class NISDomainNode extends Node {
 
         children.add(linkingNode);
 
-        conflictsNode = new NISConflictsNode(
-                "Conflict Resolution",
-                this
-        );
-
-        children.add(conflictsNode);
-
         ownershipNode = new NISOwnershipNode(
                 "Ownership Alignment",
                 this
         );
+
+        ownershipNode.setProject(project);
+        ownershipNode.setNisFederationClient(nisFederationClient);
+        ownershipNode.setRepositoryConfig(domain);
+        ownershipNode.init();
 
         children.add(ownershipNode);
 
@@ -126,7 +118,7 @@ public class NISDomainNode extends Node {
 
         NISDomainEditorInput ei = new NISDomainEditorInput();
         ei.setProject(project);
-        ei.setNisFederation(nisFederation);
+        ei.setNisFederation(nisFederationClient);
         ei.setDomain(domain);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -144,7 +136,7 @@ public class NISDomainNode extends Node {
 
         if (dialog.open() == Window.CANCEL) return;
 
-        nisFederation.updateRepository(domain);
+        nisFederationClient.updateRepository(domain);
     }
 
     public FederationRepositoryConfig getDomain() {
@@ -156,11 +148,11 @@ public class NISDomainNode extends Node {
     }
 
     public NISFederationClient getNisTool() {
-        return nisFederation;
+        return nisFederationClient;
     }
 
     public void setNisTool(NISFederationClient nisFederation) {
-        this.nisFederation = nisFederation;
+        this.nisFederationClient = nisFederation;
     }
 
     public NISNode getNisNode() {
@@ -171,19 +163,19 @@ public class NISDomainNode extends Node {
         this.nisNode = nisNode;
     }
 
-    public boolean hasChildren() throws Exception {
-        return !children.isEmpty();
-    }
-
-    public Collection<Node> getChildren() throws Exception {
-        return children;
-    }
-
     public Project getProject() {
         return project;
     }
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public NISFederationClient getNisFederationClient() {
+        return nisFederationClient;
+    }
+
+    public void setNisFederationClient(NISFederationClient nisFederationClient) {
+        this.nisFederationClient = nisFederationClient;
     }
 }

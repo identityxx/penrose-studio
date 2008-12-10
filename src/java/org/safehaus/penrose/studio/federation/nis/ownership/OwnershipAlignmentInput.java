@@ -1,22 +1,22 @@
-package org.safehaus.penrose.studio.federation.nis.linking;
+package org.safehaus.penrose.studio.federation.nis.ownership;
 
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 
 /**
  * @author Endi S. Dewata
  */
-public class NISLinkEditorInput implements IEditorInput {
+public class OwnershipAlignmentInput implements IEditorInput {
 
     private Project project;
-    private NISFederationClient nisFederation;
+    private NISFederationClient nisFederationClient;
     private FederationRepositoryConfig domain;
 
-    public NISLinkEditorInput() {
+    public OwnershipAlignmentInput() {
     }
 
     public boolean exists() {
@@ -28,7 +28,7 @@ public class NISLinkEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "NIS Link - "+domain.getName();
+        return "Ownership Alignment - "+domain.getName();
     }
 
     public IPersistableElement getPersistable() {
@@ -59,7 +59,7 @@ public class NISLinkEditorInput implements IEditorInput {
         if (object == null) return false;
         if (object.getClass() != this.getClass()) return false;
 
-        NISLinkEditorInput ei = (NISLinkEditorInput)object;
+        OwnershipAlignmentInput ei = (OwnershipAlignmentInput)object;
         if (!equals(project, ei.project)) return false;
         if (!equals(domain, ei.domain)) return false;
 
@@ -74,12 +74,12 @@ public class NISLinkEditorInput implements IEditorInput {
         this.domain = domain;
     }
 
-    public NISFederationClient getNisFederation() {
-        return nisFederation;
+    public NISFederationClient getNisFederationClient() {
+        return nisFederationClient;
     }
 
-    public void setNisFederation(NISFederationClient nisFederation) {
-        this.nisFederation = nisFederation;
+    public void setNisFederationClient(NISFederationClient nisFederation) {
+        this.nisFederationClient = nisFederation;
     }
 
     public Project getProject() {

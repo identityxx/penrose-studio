@@ -170,7 +170,7 @@ public class NISDomainsPage extends FormPage {
                     if (dialog.open() == Window.CANCEL) return;
 /*
                     NISDomainDialog dialog = new NISDomainDialog(editor.getSite().getShell(), SWT.NONE);
-                    dialog.setDomain(domain);
+                    dialog.setRepositoryConfig(domain);
                     dialog.open();
 
                     int action = dialog.getAction();

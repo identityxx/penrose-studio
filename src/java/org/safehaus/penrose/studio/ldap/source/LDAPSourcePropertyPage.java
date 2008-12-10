@@ -364,7 +364,8 @@ public class LDAPSourcePropertyPage extends SourceEditorPage {
         buttons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
         buttons.setLayout(new GridLayout());
 
-        addButton = toolkit.createButton(buttons, "Add", SWT.PUSH);
+        addButton = new Button(buttons, SWT.PUSH);
+        addButton.setText("Add");
         addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         addButton.addSelectionListener(new SelectionAdapter() {
@@ -395,7 +396,8 @@ public class LDAPSourcePropertyPage extends SourceEditorPage {
             }
         });
 
-        editButton = toolkit.createButton(buttons, "Edit", SWT.PUSH);
+        editButton = new Button(buttons, SWT.PUSH);
+        editButton.setText("Edit");
         editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         editButton.addSelectionListener(new SelectionAdapter() {
@@ -435,7 +437,8 @@ public class LDAPSourcePropertyPage extends SourceEditorPage {
             }
         });
 
-        removeButton = toolkit.createButton(buttons, "Remove", SWT.PUSH);
+        removeButton = new Button(buttons, SWT.PUSH);
+        removeButton.setText("Remove");
         removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         removeButton.addSelectionListener(new SelectionAdapter() {

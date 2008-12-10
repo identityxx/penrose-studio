@@ -12,8 +12,8 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
 import org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryNode;
-import org.safehaus.penrose.studio.federation.linking.editor.LinkingEditor;
-import org.safehaus.penrose.studio.federation.linking.editor.LinkingEditorInput;
+import org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingEditor;
+import org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingEditorInput;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.tree.Node;
 
@@ -61,7 +61,7 @@ public class LDAPLinkingNode extends Node {
         FederationRepositoryConfig repository = repositoryNode.getRepository();
         FederationClient federationClient = ldapFederation.getFederationClient();
         
-        LinkingEditorInput ei = new LinkingEditorInput();
+        IdentityLinkingEditorInput ei = new IdentityLinkingEditorInput();
         ei.setProject(project);
         ei.setRepository(repository);
         ei.setSourcePartition(federationClient.getName()+"_"+repository.getName());
@@ -69,7 +69,7 @@ public class LDAPLinkingNode extends Node {
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
-        page.openEditor(ei, LinkingEditor.class.getName());
+        page.openEditor(ei, IdentityLinkingEditor.class.getName());
     }
 
     public LDAPFederationClient getLdapFederation() {

@@ -37,14 +37,6 @@ public class NISFilesNode extends Node {
         page.openEditor(ei, NISFilesEditor.class.getName());
     }
 
-    public boolean hasChildren() throws Exception {
-        return false;
-    }
-
-    public Collection<Node> getChildren() throws Exception {
-        return new ArrayList<Node>();
-    }
-
     public NISFederationClient getNisTool() {
         return nisFederation;
     }

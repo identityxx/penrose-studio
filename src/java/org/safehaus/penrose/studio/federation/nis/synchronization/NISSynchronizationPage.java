@@ -95,7 +95,7 @@ public class NISSynchronizationPage extends FormPage {
         targetSuffix = (DN)targetClient.getAttribute("BaseDn");
 
         ModuleManagerClient targetModuleManagerClient = targetPartitionClient.getModuleManagerClient();
-        moduleClient = targetModuleManagerClient.getModuleClient(Federation.SYNCHRONIZATION_MODULE);
+        moduleClient = targetModuleManagerClient.getModuleClient(Federation.SYNCHRONIZATION);
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -663,15 +663,7 @@ public class NISSynchronizationPage extends FormPage {
                                     new String[] { DN.class.getName() }
                             );
 
-                            log.warn("Synchronization Result:");
-                            log.warn(" - source    : "+result.getSourceEntries());
-                            log.warn(" - target    : "+result.getTargetEntries());
-                            log.warn(" - added     : "+result.getAddedEntries());
-                            log.warn(" - modified  : "+result.getModifiedEntries());
-                            log.warn(" - deleted   : "+result.getDeletedEntries());
-                            log.warn(" - unchanged : "+result.getUnchangedEntries());
-                            log.warn(" - failed    : "+result.getFailedEntries());
-                            log.warn(" - time      : "+result.getDuration()/1000.0+" s");
+                            log.warn(result.toString());
 
                             results.put(mapName, result);
                             totalResult.add(result);

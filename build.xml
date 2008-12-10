@@ -11,6 +11,7 @@
 
     <property name="prefix" value=""/>
   
+    <property name="branding.path" value=""/>
     <property name="studio.home" value="${prefix}/opt/${product.name}-${product.version}"/>
     <property name="plugin.path" value="target/dist/plugins/org.safehaus.penrose.studio_${plugin.version}"/>
 
@@ -153,6 +154,7 @@
 
         <mkdir dir="target/dist"/>
 
+        <copy todir="target/dist" file="build.properties"/>
         <copy todir="target/dist" file="LICENSE.txt"/>
         <copy todir="target/dist" file="README.txt">
             <filterchain>
@@ -191,12 +193,14 @@
 
         <mkdir dir="${plugin.path}"/>
         <copy todir="${plugin.path}">
-            <fileset dir=".">
+            <fileset dir="${branding.path}">
                 <include name="images/**"/>
+                <include name="splash.bmp"/>
+            </fileset>
+            <fileset dir=".">
                 <include name="lib/*.jar"/>
                 <include name="plugin.xml"/>
                 <include name="plugin_customization.ini"/>
-                <include name="splash.bmp"/>
             </fileset>
         </copy>
         <copy todir="${plugin.path}/lib">

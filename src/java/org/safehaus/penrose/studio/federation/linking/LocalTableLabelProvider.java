@@ -7,9 +7,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.SWT;
-import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.SearchResult;
-import org.safehaus.penrose.federation.LinkingData;
+import org.safehaus.penrose.federation.IdentityLinkingResult;
 
 import java.util.Collection;
 
@@ -40,7 +39,7 @@ public class LocalTableLabelProvider implements ITableLabelProvider, ITableColor
 
     public String getColumnText(Object object, int index) {
 
-        LinkingData data = (LinkingData)object;
+        IdentityLinkingResult data = (IdentityLinkingResult)object;
 
         switch (index) {
             case 0:
@@ -64,7 +63,7 @@ public class LocalTableLabelProvider implements ITableLabelProvider, ITableColor
     }
 
     public Color getForeground(Object object, int index) {
-        LinkingData data = (LinkingData)object;
+        IdentityLinkingResult data = (IdentityLinkingResult)object;
 
         if (index == 0) return null;
 

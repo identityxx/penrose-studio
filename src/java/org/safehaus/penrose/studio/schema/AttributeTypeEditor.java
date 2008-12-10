@@ -209,7 +209,8 @@ public class AttributeTypeEditor extends EditorPart implements ModifyListener, S
         gd.widthHint = 100;
         singleValuedLabel.setLayoutData(gd);
 
-        singleValuedCheckbox = toolkit.createButton(composite, "", SWT.CHECK);
+        singleValuedCheckbox = new Button(composite, SWT.CHECK);
+        singleValuedCheckbox.setText("");
         singleValuedCheckbox.setSelection(attributeType.isSingleValued());
         singleValuedCheckbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         singleValuedCheckbox.setEnabled(false);
@@ -220,7 +221,8 @@ public class AttributeTypeEditor extends EditorPart implements ModifyListener, S
         gd.widthHint = 100;
         collectiveLabel.setLayoutData(gd);
 
-        collectiveCheckbox = toolkit.createButton(composite, "", SWT.CHECK);
+        collectiveCheckbox = new Button(composite, SWT.CHECK);
+        collectiveCheckbox.setText("");
         collectiveCheckbox.setSelection(attributeType.isCollective());
         collectiveCheckbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         collectiveCheckbox.setEnabled(false);
@@ -231,7 +233,8 @@ public class AttributeTypeEditor extends EditorPart implements ModifyListener, S
         gd.widthHint = 100;
         modifiableLabel.setLayoutData(gd);
 
-        modifiableCheckbox = toolkit.createButton(composite, "", SWT.CHECK);
+        modifiableCheckbox = new Button(composite, SWT.CHECK);
+        modifiableCheckbox.setText("");
         modifiableCheckbox.setSelection(attributeType.isModifiable());
         modifiableCheckbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         modifiableCheckbox.setEnabled(false);
@@ -242,7 +245,8 @@ public class AttributeTypeEditor extends EditorPart implements ModifyListener, S
         gd.widthHint = 100;
         obsoleteLabel.setLayoutData(gd);
 
-        obsoleteCheckbox = toolkit.createButton(composite, "", SWT.CHECK);
+        obsoleteCheckbox = new Button(composite, SWT.CHECK);
+        obsoleteCheckbox.setText("");
         obsoleteCheckbox.setSelection(attributeType.isObsolete());
         obsoleteCheckbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         obsoleteCheckbox.setEnabled(false);

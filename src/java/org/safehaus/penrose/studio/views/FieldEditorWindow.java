@@ -131,7 +131,8 @@ public class FieldEditorWindow {
 		description.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
 		// Source Type: [x] Database Source 
 		toolkit.createLabel(sectionClient, "Source Type:");
-		jdbcButton = toolkit.createButton(sectionClient, "Database Source (JDBC): SQL or databases", SWT.RADIO);
+		jdbcButton = new Button(sectionClient, SWT.RADIO);
+		jdbcButton.setText("Database Source (JDBC): SQL or databases");
 		jdbcButton.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -143,7 +144,8 @@ public class FieldEditorWindow {
 		});
 		// "" [x] Directory Source
 		toolkit.createLabel(sectionClient, "");
-		jndiButton = toolkit.createButton(sectionClient, "Directory Source (JNDI): LDAP or directories", SWT.RADIO);
+		jndiButton = new Button(sectionClient, SWT.RADIO);
+		jndiButton.setText("Directory Source (JNDI): LDAP or directories");
 		jndiButton.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -174,7 +176,9 @@ public class FieldEditorWindow {
 		sectionLayout.numColumns = 3;
 		sectionClient.setLayout(sectionLayout);
 		// [Test Source] 
-		Button testButton = toolkit.createButton(sectionClient, "Test Source", SWT.PUSH);
+		Button testButton = new Button(sectionClient, SWT.PUSH);
+		testButton.setText("Test Source");
+
 		testButton.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -183,7 +187,8 @@ public class FieldEditorWindow {
 			}
 		});
 		// [Save]
-		saveButton = toolkit.createButton(sectionClient, "Save", SWT.PUSH);
+		saveButton = new Button(sectionClient, SWT.PUSH);
+		saveButton.setText("Save");
 		saveButton.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -193,7 +198,9 @@ public class FieldEditorWindow {
 			}
 		});
 		// [Cancel]
-		Button cancelButton = toolkit.createButton(sectionClient, "Cancel", SWT.PUSH);
+		Button cancelButton = new Button(sectionClient, SWT.PUSH);
+		cancelButton.setText("Cancel");
+
 		cancelButton.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}

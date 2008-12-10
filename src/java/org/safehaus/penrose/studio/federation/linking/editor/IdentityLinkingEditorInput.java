@@ -9,14 +9,14 @@ import org.safehaus.penrose.federation.FederationRepositoryConfig;
 /**
  * @author Endi S. Dewata
  */
-public class LinkingEditorInput implements IEditorInput {
+public class IdentityLinkingEditorInput implements IEditorInput {
 
     private Project project;
     private FederationRepositoryConfig repository;
     private String sourcePartition;
     private String targetPartition;
 
-    public LinkingEditorInput() {
+    public IdentityLinkingEditorInput() {
     }
 
     public boolean exists() {
@@ -61,7 +61,7 @@ public class LinkingEditorInput implements IEditorInput {
         if (object == null) return false;
         if (object.getClass() != this.getClass()) return false;
 
-        LinkingEditorInput ei = (LinkingEditorInput)object;
+        IdentityLinkingEditorInput ei = (IdentityLinkingEditorInput)object;
         if (!equals(project, ei.project)) return false;
         if (!equals(repository, ei.repository)) return false;
         if (!equals(sourcePartition, ei.sourcePartition)) return false;

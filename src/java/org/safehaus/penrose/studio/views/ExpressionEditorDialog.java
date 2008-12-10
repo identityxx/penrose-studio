@@ -258,7 +258,8 @@ public class ExpressionEditorDialog extends BaseDialog {
 		sectionLayout.numColumns = 2;
 		sectionClient.setLayout(sectionLayout);
 		// [Save]
-		saveButton = toolkit.createButton(sectionClient, "Save", SWT.PUSH);
+		saveButton = new Button(sectionClient, SWT.PUSH);
+		saveButton.setText("Save");
 		saveButton.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -272,7 +273,9 @@ public class ExpressionEditorDialog extends BaseDialog {
 			}
 		});
 		// [Cancel]
-		Button cancelButton = toolkit.createButton(sectionClient, "Cancel", SWT.PUSH);
+		Button cancelButton = new Button(sectionClient, SWT.PUSH);
+		cancelButton.setText("Cancel");
+
 		cancelButton.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}

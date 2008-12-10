@@ -28,7 +28,8 @@ import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.studio.util.ApplicationConfig;
 import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.plugin.*;
-import org.safehaus.penrose.studio.federation.nis.NISPlugin;
+import org.safehaus.penrose.studio.nis.NISPlugin;
+import org.safehaus.penrose.studio.image.ImageManager;
 import org.safehaus.penrose.logger.log4j.Log4jConfigReader;
 import org.safehaus.penrose.logger.log4j.Log4jConfig;
 import org.safehaus.penrose.logger.log4j.Log4jConfigWriter;
@@ -52,9 +53,11 @@ public class PenroseStudio implements IPlatformRunnable {
     public static PenroseStudio instance;
 
     File homeDir;
+    Properties properties;
 
     ApplicationConfig applicationConfig = new ApplicationConfig();
     PluginManager pluginManager = new PluginManager();
+    ImageManager imageManager;
 
     PenroseStudioWorkbenchAdvisor workbenchAdvisor;
     ArrayList<ChangeListener> changeListeners = new ArrayList<ChangeListener>();
@@ -130,12 +133,27 @@ public class PenroseStudio implements IPlatformRunnable {
         pluginConfig.setName("NIS");
         pluginConfig.setClassName(NISPlugin.class.getName());
         pluginManager.init(pluginConfig);
+
+        properties = new Properties();
+
+        File buildProperties = new File(dir, "build.properties");
+        if (buildProperties.exists()) {
+            properties.load(new FileInputStream(buildProperties));
+        }
+
+        imageManager = new ImageManager();
+        imageManager.setProperties(properties);
+        imageManager.init();
     }
 
     public static PenroseStudio getInstance() {
         return instance;
     }
 
+    public ImageManager getImageManager() {
+        return imageManager;
+    }
+    
     public Object run(Object args) {
 
         Display display = PlatformUI.createDisplay();

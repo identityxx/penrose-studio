@@ -114,7 +114,9 @@ public class SourcesPage extends FormPage implements ModifyListener {
         buttons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
         buttons.setLayout(new GridLayout());
 
-        Button addButton = toolkit.createButton(buttons, "Add", SWT.PUSH);
+        Button addButton = new Button(buttons, SWT.PUSH);
+		addButton.setText("Add");
+
         addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         addButton.addSelectionListener(new SelectionAdapter() {
@@ -167,7 +169,9 @@ public class SourcesPage extends FormPage implements ModifyListener {
             }
         });
 
-        Button editButton = toolkit.createButton(buttons, "Edit", SWT.PUSH);
+        Button editButton = new Button(buttons, SWT.PUSH);
+		editButton.setText("Edit");
+
         editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         editButton.addSelectionListener(new SelectionAdapter() {
@@ -222,7 +226,9 @@ public class SourcesPage extends FormPage implements ModifyListener {
             }
         });
 
-        Button removeButton = toolkit.createButton(buttons, "Remove", SWT.PUSH);
+        Button removeButton = new Button(buttons, SWT.PUSH);
+		removeButton.setText("Remove");
+
         removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         removeButton.addSelectionListener(new SelectionAdapter() {
@@ -240,7 +246,9 @@ public class SourcesPage extends FormPage implements ModifyListener {
 
         new Label(buttons, SWT.NONE);
 
-        Button moveUpButton = toolkit.createButton(buttons, "Move Up", SWT.PUSH);
+        Button moveUpButton = new Button(buttons, SWT.PUSH);
+		moveUpButton.setText("Move Up");
+
         moveUpButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         moveUpButton.addSelectionListener(new SelectionAdapter() {
@@ -260,7 +268,9 @@ public class SourcesPage extends FormPage implements ModifyListener {
             }
         });
 
-        Button moveDownButton = toolkit.createButton(buttons, "Move Down", SWT.PUSH);
+        Button moveDownButton = new Button(buttons, SWT.PUSH);
+		moveDownButton.setText("Move Down");
+
         moveDownButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         moveDownButton.addSelectionListener(new SelectionAdapter() {

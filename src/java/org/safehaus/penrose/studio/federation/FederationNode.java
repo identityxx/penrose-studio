@@ -8,6 +8,10 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.module.ModuleManagerClient;
+import org.safehaus.penrose.module.ModuleClient;
+import org.safehaus.penrose.federation.Federation;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
@@ -24,8 +28,6 @@ public class FederationNode extends Node {
 
     private Project project;
     private ProjectNode projectNode;
-
-    protected Collection<Node> children = new ArrayList<Node>();
 
     public FederationNode(String name, Object object, ProjectNode projectNode) throws Exception {
         super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), object, projectNode);
@@ -58,28 +60,21 @@ public class FederationNode extends Node {
 
         PartitionManagerClient partitionManagerClient = project.getClient().getPartitionManagerClient();
 
+        log.debug("Partitions:");
         for (String partitionName : partitionManagerClient.getPartitionNames()) {
-            log.debug("Partition "+partitionName+":");
+            log.debug(" - "+partitionName);
 
-            PartitionConfig partitionConfig = partitionManagerClient.getPartitionConfig(partitionName);
-            if (partitionConfig == null) continue;
-            
-            String partitionClass = partitionConfig.getPartitionClass();
-            log.debug(" - Class: "+partitionClass);
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
-            if (!"org.safehaus.penrose.federation.partition.FederationPartition".equals(partitionClass)) continue;
+            ModuleManagerClient moduleManagerClient = partitionClient.getModuleManagerClient();
+            ModuleClient moduleClient = moduleManagerClient.getModuleClient(Federation.FEDERATION);
+            if (!moduleClient.exists()) continue;
+
+            log.debug("   - "+Federation.FEDERATION+" module: "+moduleClient.getModuleConfig().getModuleClass());
 
             FederationDomainNode federationDomainNode = new FederationDomainNode(partitionName, this);
             children.add(federationDomainNode);
         }
-    }
-
-    public boolean hasChildren() throws Exception {
-        return !children.isEmpty();
-    }
-
-    public Collection<Node> getChildren() throws Exception {
-        return children;
     }
 
     public Project getProject() {

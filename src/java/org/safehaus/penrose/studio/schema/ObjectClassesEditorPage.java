@@ -99,7 +99,9 @@ public class ObjectClassesEditorPage extends FormPage {
         buttons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
         buttons.setLayout(new GridLayout());
 
-        Button addButton = toolkit.createButton(buttons, "Add", SWT.PUSH);
+        Button addButton = new Button(buttons, SWT.PUSH);
+		addButton.setText("Add");
+
         addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         addButton.addSelectionListener(new SelectionAdapter() {
@@ -124,7 +126,9 @@ public class ObjectClassesEditorPage extends FormPage {
             }
         });
 
-        Button removeButton = toolkit.createButton(buttons, "Remove", SWT.PUSH);
+        Button removeButton = new Button(buttons, SWT.PUSH);
+		removeButton.setText("Remove");
+
         removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         removeButton.addSelectionListener(new SelectionAdapter() {

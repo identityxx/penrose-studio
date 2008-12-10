@@ -183,7 +183,9 @@ public class JDBCConnectionPropertiesPage extends ConnectionEditorPage {
 
         toolkit.createLabel(composite, "");
 
-        Button testButton = toolkit.createButton(composite, "Test Connection", SWT.PUSH);
+        Button testButton = new Button(composite, SWT.PUSH);
+		testButton.setText("Test Connection");
+
 
         testButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {

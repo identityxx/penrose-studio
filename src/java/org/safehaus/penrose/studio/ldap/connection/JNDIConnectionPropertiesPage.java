@@ -192,7 +192,9 @@ public class JNDIConnectionPropertiesPage extends ConnectionEditorPage {
             }
         });
 
-        Button fetchButton = toolkit.createButton(composite, "Fetch Base DNs", SWT.PUSH);
+        Button fetchButton = new Button(composite, SWT.PUSH);
+		fetchButton.setText("Fetch Base DNs");
+
         gd = new GridData();
         gd.horizontalSpan = 2;
         gd.widthHint = 120;
@@ -266,7 +268,9 @@ public class JNDIConnectionPropertiesPage extends ConnectionEditorPage {
 
         toolkit.createLabel(composite, "");
 
-        Button testButton = toolkit.createButton(composite, "Test Connection", SWT.PUSH);
+        Button testButton = new Button(composite, SWT.PUSH);
+		testButton.setText("Test Connection");
+
         gd = new GridData();
         gd.horizontalSpan = 5;
         testButton.setLayoutData(gd);
@@ -346,7 +350,9 @@ public class JNDIConnectionPropertiesPage extends ConnectionEditorPage {
         buttons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
         buttons.setLayout(new GridLayout());
 
-        Button addButton = toolkit.createButton(buttons, "Add", SWT.PUSH);
+        Button addButton = new Button(buttons, SWT.PUSH);
+		addButton.setText("Add");
+
         addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         addButton.addSelectionListener(new SelectionAdapter() {
@@ -364,7 +370,9 @@ public class JNDIConnectionPropertiesPage extends ConnectionEditorPage {
             }
         });
 
-        Button removeButton = toolkit.createButton(buttons, "Delete", SWT.PUSH);
+        Button removeButton = new Button(buttons, SWT.PUSH);
+		removeButton.setText("Delete");
+
         removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         removeButton.addSelectionListener(new SelectionAdapter() {

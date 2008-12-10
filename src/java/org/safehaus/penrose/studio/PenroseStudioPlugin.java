@@ -41,7 +41,7 @@ public class PenroseStudioPlugin extends AbstractUIPlugin {
 	public void start(BundleContext bundleContext) throws Exception {
         this.bundleContext = bundleContext;
 
-        log.debug("Starting "+PenroseStudio.PRODUCT_NAME+" Plugin");
+        log.debug("Starting "+PenroseStudio.PRODUCT_NAME+".");
         super.start(bundleContext);
 
         try {
@@ -58,7 +58,7 @@ public class PenroseStudioPlugin extends AbstractUIPlugin {
 	}
 
 	public void stop(BundleContext bundleContext) throws Exception {
-        log.debug("Stopping "+PenroseStudio.PRODUCT_NAME+" Plugin");
+        log.debug("Stopping "+PenroseStudio.PRODUCT_NAME+".");
 		super.stop(bundleContext);
 	}
 

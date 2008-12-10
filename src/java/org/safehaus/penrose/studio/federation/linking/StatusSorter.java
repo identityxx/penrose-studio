@@ -2,7 +2,7 @@ package org.safehaus.penrose.studio.federation.linking;
 
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.table.InvertibleSorter;
-import org.safehaus.penrose.federation.LinkingData;
+import org.safehaus.penrose.federation.IdentityLinkingResult;
 
 /**
  * @author Endi Sukma Dewata
@@ -13,8 +13,8 @@ public class StatusSorter extends InvertibleSorter {
 
     public int compare(Object object1, Object object2) {
 
-        LinkingData data1 = (LinkingData)object1;
-        LinkingData data2 = (LinkingData)object2;
+        IdentityLinkingResult data1 = (IdentityLinkingResult)object1;
+        IdentityLinkingResult data2 = (IdentityLinkingResult)object2;
 
         String status1 = data1.getStatus();
         String status2 = data2.getStatus();

@@ -3,10 +3,10 @@ package org.safehaus.penrose.studio.federation.linking;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
-import org.safehaus.penrose.federation.LinkingData;
+import org.safehaus.penrose.federation.IdentityLinkingResult;
 import org.safehaus.penrose.ldap.SearchResult;
 import org.safehaus.penrose.ldap.DN;
-import org.safehaus.penrose.studio.federation.linking.editor.LinkingPage;
+import org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingPage;
 
 import javax.management.MBeanException;
 import java.lang.reflect.InvocationTargetException;
@@ -17,10 +17,10 @@ import java.util.Collection;
  */
 public class DeleteTask implements IRunnableWithProgress {
 
-    LinkingPage page;
+    IdentityLinkingPage page;
     FederationRepositoryConfig repository;
 
-    private LinkingData data;
+    private IdentityLinkingResult data;
 
     private String baseDn;
     private String filter;
@@ -28,7 +28,7 @@ public class DeleteTask implements IRunnableWithProgress {
 
     private Collection<SearchResult> globalEntries;
     
-    public DeleteTask(LinkingPage page, FederationRepositoryConfig repository) {
+    public DeleteTask(IdentityLinkingPage page, FederationRepositoryConfig repository) {
         this.page = page;
         this.repository = repository;
     }
@@ -74,11 +74,11 @@ public class DeleteTask implements IRunnableWithProgress {
         }
     }
 
-    public LinkingData getData() {
+    public IdentityLinkingResult getData() {
         return data;
     }
 
-    public void setData(LinkingData data) {
+    public void setData(IdentityLinkingResult data) {
         this.data = data;
     }
 

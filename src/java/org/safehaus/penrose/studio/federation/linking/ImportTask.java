@@ -3,9 +3,9 @@ package org.safehaus.penrose.studio.federation.linking;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.safehaus.penrose.ldap.SearchResult;
-import org.safehaus.penrose.studio.federation.linking.editor.LinkingPage;
+import org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingPage;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
-import org.safehaus.penrose.federation.LinkingData;
+import org.safehaus.penrose.federation.IdentityLinkingResult;
 
 import javax.management.MBeanException;
 import java.lang.reflect.InvocationTargetException;
@@ -16,12 +16,12 @@ import java.util.List;
  */
 public class ImportTask implements IRunnableWithProgress {
 
-    LinkingPage page;
+    IdentityLinkingPage page;
     FederationRepositoryConfig repository;
 
-    private List<LinkingData> results;
+    private List<IdentityLinkingResult> results;
 
-    public ImportTask(LinkingPage page, FederationRepositoryConfig repository) {
+    public ImportTask(IdentityLinkingPage page, FederationRepositoryConfig repository) {
         this.page = page;
         this.repository = repository;
     }
@@ -33,7 +33,7 @@ public class ImportTask implements IRunnableWithProgress {
             while (!results.isEmpty()) {
                 if (monitor.isCanceled()) throw new InterruptedException();
 
-                LinkingData data = results.remove(0);
+                IdentityLinkingResult data = results.remove(0);
                 SearchResult entry = data.getEntry();
 
                 monitor.subTask("Processing "+entry.getDn()+"...");
@@ -62,11 +62,11 @@ public class ImportTask implements IRunnableWithProgress {
         }
     }
 
-    public List<LinkingData> getResults() {
+    public List<IdentityLinkingResult> getResults() {
         return results;
     }
 
-    public void setResults(List<LinkingData> results) {
+    public void setResults(List<IdentityLinkingResult> results) {
         this.results = results;
     }
 }

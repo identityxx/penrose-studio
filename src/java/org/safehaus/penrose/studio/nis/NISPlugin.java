@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.federation.nis;
+package org.safehaus.penrose.studio.nis;
 
 import org.safehaus.penrose.studio.nis.source.NISSourceEditor;
 import org.safehaus.penrose.studio.nis.connection.NISConnectionEditor;

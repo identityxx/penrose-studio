@@ -55,35 +55,30 @@ public class MappingEditorScriptsPage extends FormPage {
     }
 
     public void createFormContent(IManagedForm managedForm) {
-        try {
-            toolkit = managedForm.getToolkit();
 
-            ScrolledForm form = managedForm.getForm();
-            form.setText("Mapping Editor");
+        toolkit = managedForm.getToolkit();
 
-            Composite body = form.getBody();
-            body.setLayout(new GridLayout());
+        ScrolledForm form = managedForm.getForm();
+        form.setText("Mapping Editor");
 
-            Section preScriptSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-            preScriptSection.setText("Pre-Script");
-            preScriptSection.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Composite body = form.getBody();
+        body.setLayout(new GridLayout());
 
-            Control preScriptControl = createPreScriptSection(preScriptSection);
-            preScriptSection.setClient(preScriptControl);
+        Section preScriptSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        preScriptSection.setText("Pre-Script");
+        preScriptSection.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-            Section postScriptSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-            postScriptSection.setText("Post-Script");
-            postScriptSection.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Control preScriptControl = createPreScriptSection(preScriptSection);
+        preScriptSection.setClient(preScriptControl);
 
-            Control postScriptControl = createPostScriptSection(postScriptSection);
-            postScriptSection.setClient(postScriptControl);
+        Section postScriptSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        postScriptSection.setText("Post-Script");
+        postScriptSection.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-            refresh();
+        Control postScriptControl = createPostScriptSection(postScriptSection);
+        postScriptSection.setClient(postScriptControl);
 
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        refresh();
     }
 
     public Composite createPreScriptSection(final Composite parent) {
@@ -128,7 +123,7 @@ public class MappingEditorScriptsPage extends FormPage {
         return composite;
     }
 
-    public void refresh() throws Exception {
+    public void refresh() {
 
         String preScript = mappingConfig.getPreScript();
         preScriptText.setText(preScript == null ? "" : preScript);

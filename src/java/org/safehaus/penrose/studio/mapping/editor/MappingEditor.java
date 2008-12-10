@@ -71,7 +71,7 @@ public class MappingEditor extends FormEditor implements ModifyListener {
             throw new PartInitException(e.getMessage(), e);
         }
 
-        setPartName(mappingName);
+        setPartName(ei.getName());
     }
 
     protected void addPages() {
@@ -83,10 +83,6 @@ public class MappingEditor extends FormEditor implements ModifyListener {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         }
-    }
-
-    public Composite getParent() {
-        return getContainer();
     }
 
     public void doSave(IProgressMonitor iProgressMonitor) {
