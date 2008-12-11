@@ -25,7 +25,7 @@ import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.service.ServiceManagerClient;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.browser.BrowserEditor;
 import org.safehaus.penrose.studio.browser.BrowserEditorInput;
 import org.safehaus.penrose.studio.project.Project;
@@ -48,7 +48,7 @@ public class BrowserAction extends Action {
     public BrowserAction() {
 
         setText("&Browser");
-        setImageDescriptor(PenroseStudioPlugin.getImageDescriptor(PenroseImage.BROWSER));
+        setImageDescriptor(PenroseStudio.getImageDescriptor(PenroseImage.BROWSER));
         setToolTipText("Browser");
         setId(getClass().getName());
     }

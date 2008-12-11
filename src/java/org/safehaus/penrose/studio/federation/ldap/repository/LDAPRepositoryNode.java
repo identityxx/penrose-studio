@@ -1,10 +1,9 @@
 package org.safehaus.penrose.studio.federation.ldap.repository;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.federation.ldap.linking.LDAPLinkingNode;
 import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
 import org.safehaus.penrose.federation.LDAPFederationClient;
@@ -18,9 +17,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
-
-import java.util.Collection;
-import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
@@ -40,7 +36,7 @@ public class LDAPRepositoryNode extends Node {
     public LDAPRepositoryNode(String name, FederationRepositoryConfig repository, LDAPNode ldapNode) {
         super(
                 name,
-                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
+                PenroseStudio.getImage(PenroseImage.FOLDER),
                 repository,
                 ldapNode
         );

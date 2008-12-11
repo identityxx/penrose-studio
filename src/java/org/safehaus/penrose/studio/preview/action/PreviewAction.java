@@ -18,12 +18,11 @@
 package org.safehaus.penrose.studio.preview.action;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
@@ -41,7 +40,7 @@ public class PreviewAction extends Action {
     public PreviewAction() {
 
         setText("&Preview");
-        setImageDescriptor(PenroseStudioPlugin.getImageDescriptor(PenroseImage.PREVIEW));
+        setImageDescriptor(PenroseStudio.getImageDescriptor(PenroseImage.PREVIEW));
         setToolTipText("Directory Preview");
         setId(getClass().getName());
     }

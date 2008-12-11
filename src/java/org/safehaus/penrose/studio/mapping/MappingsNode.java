@@ -32,7 +32,6 @@ import org.safehaus.penrose.mapping.MappingConfig;
 import org.safehaus.penrose.mapping.MappingManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.mapping.action.ImportMappingsAction;
 import org.safehaus.penrose.studio.mapping.action.NewMappingAction;
 import org.safehaus.penrose.studio.mapping.wizard.PasteMappingWizard;
@@ -146,7 +145,7 @@ public class MappingsNode extends Node {
 
             MappingNode mappingNode = new MappingNode(
                     mappingName,
-                    PenroseStudioPlugin.getImage(PenroseImage.MAPPING),
+                    PenroseStudio.getImage(PenroseImage.MAPPING),
                     mappingName,
                     this
             );

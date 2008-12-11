@@ -24,7 +24,7 @@ import org.safehaus.penrose.schema.SchemaManagerClient;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.SchemaConfig;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.server.ServersView;
@@ -70,7 +70,7 @@ public class ObjectClassesNode extends Node {
             children.add(new ObjectClassNode(
                     view,
                     objectClass.getName(),
-                    PenroseStudioPlugin.getImage(PenroseImage.OBJECT_CLASS),
+                    PenroseStudio.getImage(PenroseImage.OBJECT_CLASS),
                     objectClass,
                     this
             ));

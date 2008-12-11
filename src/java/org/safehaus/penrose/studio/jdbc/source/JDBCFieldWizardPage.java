@@ -26,8 +26,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.FillLayout;
 import org.safehaus.penrose.jdbc.*;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
@@ -98,7 +98,7 @@ public class JDBCFieldWizardPage extends WizardPage {
                 for (Iterator i=map.values().iterator(); i.hasNext(); ) {
                     FieldConfig field = (FieldConfig)i.next();
                     TableItem item = new TableItem(selectedTable, SWT.NONE);
-                    item.setImage(PenroseStudioPlugin.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                    item.setImage(PenroseStudio.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
                     item.setText(field.getName());
                     item.setData(field);
                 }
@@ -131,7 +131,7 @@ public class JDBCFieldWizardPage extends WizardPage {
                 for (Iterator i=map.values().iterator(); i.hasNext(); ) {
                     FieldConfig field = (FieldConfig)i.next();
                     TableItem item = new TableItem(availableTable, SWT.NONE);
-                    item.setImage(PenroseStudioPlugin.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                    item.setImage(PenroseStudio.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
                     item.setText(field.getName());
                     item.setData(field);
                 }
@@ -162,7 +162,7 @@ public class JDBCFieldWizardPage extends WizardPage {
                 for (Iterator i=map.values().iterator(); i.hasNext(); ) {
                     FieldConfig field = (FieldConfig)i.next();
                     TableItem item = new TableItem(selectedTable, SWT.NONE);
-                    item.setImage(PenroseStudioPlugin.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                    item.setImage(PenroseStudio.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
                     item.setText(field.getName());
                     item.setData(field);
                 }
@@ -193,7 +193,7 @@ public class JDBCFieldWizardPage extends WizardPage {
                 for (Iterator i=map.values().iterator(); i.hasNext(); ) {
                     FieldConfig field = (FieldConfig)i.next();
                     TableItem item = new TableItem(availableTable, SWT.NONE);
-                    item.setImage(PenroseStudioPlugin.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                    item.setImage(PenroseStudio.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
                     item.setText(field.getName());
                     item.setData(field);
                 }
@@ -264,7 +264,7 @@ public class JDBCFieldWizardPage extends WizardPage {
                 if (set.contains(field.getName())) continue;
 
                 TableItem item = new TableItem(availableTable, SWT.NONE);
-                item.setImage(PenroseStudioPlugin.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                item.setImage(PenroseStudio.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
                 item.setText(field.getName());
                 item.setData(field);
             }

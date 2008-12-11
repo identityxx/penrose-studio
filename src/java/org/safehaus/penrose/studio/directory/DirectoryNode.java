@@ -29,7 +29,7 @@ import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.directory.action.*;
 import org.safehaus.penrose.studio.partition.PartitionNode;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
@@ -108,7 +108,7 @@ public class DirectoryNode extends Node {
 
             EntryNode entryNode = new EntryNode(
                     label,
-                    PenroseStudioPlugin.getImage(PenroseImage.HOME_NODE),
+                    PenroseStudio.getImage(PenroseImage.HOME_NODE),
                     entryConfig,
                     this
             );

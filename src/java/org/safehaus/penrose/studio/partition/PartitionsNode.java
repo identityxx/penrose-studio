@@ -51,7 +51,7 @@ public class PartitionsNode extends Node {
     protected ProjectNode projectNode;
 
     public PartitionsNode(ServersView view, String name, Object object, Object parent) {
-        super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), object, parent);
+        super(name, PenroseStudio.getImage(PenroseImage.FOLDER), object, parent);
         this.view = view;
         projectNode = (ProjectNode)parent;
 
@@ -173,7 +173,7 @@ public class PartitionsNode extends Node {
 
         PartitionNode defaultPartitionName = new PartitionNode(
                 "DEFAULT",
-                PenroseStudioPlugin.getImage(PenroseImage.PARTITION),
+                PenroseStudio.getImage(PenroseImage.PARTITION),
                 "DEFAULT",
                 this
         );
@@ -188,7 +188,7 @@ public class PartitionsNode extends Node {
 
             PartitionNode partitionNode = new PartitionNode(
                     partitionName,
-                    PenroseStudioPlugin.getImage(PenroseImage.PARTITION),
+                    PenroseStudio.getImage(PenroseImage.PARTITION),
                     partitionName,
                     this
             );

@@ -37,7 +37,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.part.*;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.directory.editor.EntryEditorInput;
 import org.safehaus.penrose.studio.directory.editor.EntryEditor;
 import org.safehaus.penrose.studio.connection.editor.*;
@@ -79,7 +78,7 @@ public class ValidationView extends ViewPart {
                         }
 					}
 				};
-				refreshAction.setImageDescriptor(PenroseStudioPlugin.getImageDescriptor(PenroseImage.REFRESH));
+				refreshAction.setImageDescriptor(PenroseStudio.getImageDescriptor(PenroseImage.REFRESH));
 				manager.add(refreshAction);
 				manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			}

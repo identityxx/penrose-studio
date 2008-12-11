@@ -9,28 +9,28 @@
             class="org.safehaus.penrose.studio.server.ServersView"
             category="penrose-studio"
             name="Servers"
-            icon="images/penrose16.ico"
+            icon="${images.logo}"
             id="org.safehaus.penrose.studio.server.ServersView"/>
         <view
             allowMultiple="false"
             class="org.safehaus.penrose.studio.validation.ValidationView"
             category="penrose-studio"
             name="Validation"
-            icon="images/validation.gif"
+            icon="${images.validation}"
             id="org.safehaus.penrose.studio.validation.ValidationView"/>
         <view
             allowMultiple="false"
             class="org.safehaus.penrose.studio.views.ProjectInfoView"
             category="penrose-studio"
             name="Project"
-            icon="images/penrose16.ico"
+            icon="${images.logo}"
             id="org.safehaus.penrose.studio.views.ProjectInfoView"/>
         <view
             allowMultiple="false"
             class="org.safehaus.penrose.studio.console.ConsoleView"
             category="penrose-studio"
             name="Console"
-            icon="images/console.gif"
+            icon="${images.console}"
             id="org.safehaus.penrose.studio.console.ConsoleView"/>
     </extension>
 
@@ -38,160 +38,153 @@
         <editor
             id="org.safehaus.penrose.studio.welcome.WelcomeEditor"
             name="Welcome"
-            icon="images/penrose16.ico"
+            icon="${images.logo}"
             class="org.safehaus.penrose.studio.welcome.WelcomeEditor"/>
         <editor
             id="org.safehaus.penrose.studio.connection.editor.ConnectionEditor"
             name="Connection"
-            icon="images/server.png"
+            icon="${images.connection}"
             class="org.safehaus.penrose.studio.connection.editor.ConnectionEditor"/>
         <editor
             id="org.safehaus.penrose.studio.jdbc.connection.editor.JDBCConnectionEditor"
             name="JDBC Connection"
-            icon="images/server.png"
+            icon="${images.connection}"
             class="org.safehaus.penrose.studio.jdbc.connection.editor.JDBCConnectionEditor"/>
         <editor
             id="org.safehaus.penrose.studio.ldap.connection.editor.LDAPConnectionEditor"
             name="LDAP Connection"
-            icon="images/server.png"
+            icon="${images.connection}"
             class="org.safehaus.penrose.studio.ldap.connection.editor.LDAPConnectionEditor"/>
         <editor
             id="org.safehaus.penrose.studio.nis.connection.NISConnectionEditor"
             name="NIS Connection"
-            icon="images/server.png"
+            icon="${images.connection}"
             class="org.safehaus.penrose.studio.nis.connection.NISConnectionEditor"/>
         <editor
             id="org.safehaus.penrose.studio.source.editor.SourceEditor"
             name="Source"
-            icon="images/source.gif"
+            icon="${images.source}"
             class="org.safehaus.penrose.studio.source.editor.SourceEditor"/>
         <editor
             id="org.safehaus.penrose.studio.jdbc.source.JDBCSourceEditor"
             name="JDBC Source"
-            icon="images/source.gif"
+            icon="${images.source}"
             class="org.safehaus.penrose.studio.jdbc.source.JDBCSourceEditor"/>
         <editor
             id="org.safehaus.penrose.studio.ldap.source.LDAPSourceEditor"
             name="JNDI Source"
-            icon="images/source.gif"
+            icon="${images.source}"
             class="org.safehaus.penrose.studio.ldap.source.LDAPSourceEditor"/>
         <editor
             id="org.safehaus.penrose.studio.nis.source.NISSourceEditor"
             name="NIS Source"
-            icon="images/source.gif"
+            icon="${images.source}"
             class="org.safehaus.penrose.studio.nis.source.NISSourceEditor"/>
         <editor
             id="org.safehaus.penrose.studio.mapping.editor.MappingEditor"
             name="Mapping"
-            icon="images/mapping.png"
+            icon="${images.mapping}"
             class="org.safehaus.penrose.studio.mapping.editor.MappingEditor"/>
         <editor
             id="org.safehaus.penrose.studio.directory.editor.EntryEditor"
             name="Entry"
-            icon="images/penrose16.ico"
+            icon="${images.logo}"
             class="org.safehaus.penrose.studio.directory.editor.EntryEditor"/>
         <editor
             id="org.safehaus.penrose.studio.browser.BrowserEditor"
             name="Browser"
-            icon="images/browser_22x22.png"
+            icon="${images.browser}"
             class="org.safehaus.penrose.studio.browser.BrowserEditor"/>
-<!--
-        <editor
-            id="org.safehaus.penrose.studio.preview.PreviewEditor"
-            name="Preview"
-            icon="images/dirpreview_22x22.png"
-            class="org.safehaus.penrose.studio.preview.PreviewEditor"/>
--->
         <editor
             id="org.safehaus.penrose.studio.properties.SystemPropertiesEditor"
             name="System Properties"
-            icon="images/properties.png"
+            icon="${images.system_properties}"
             class="org.safehaus.penrose.studio.properties.SystemPropertiesEditor"/>
         <editor
             id="org.safehaus.penrose.studio.module.editor.ModuleEditor"
             name="Module"
-            icon="images/object.gif"
+            icon="${images.module}"
             class="org.safehaus.penrose.studio.module.editor.ModuleEditor"/>
         <editor
             id="org.safehaus.penrose.studio.schema.SchemaEditor"
             name="Schema"
-            icon="images/schema.png"
+            icon="${images.schema}"
             class="org.safehaus.penrose.studio.schema.SchemaEditor"/>
         <editor
             id="org.safehaus.penrose.studio.schema.ObjectClassEditor"
             name="Object Class"
-            icon="images/schema.png"
+            icon="${images.object_class}"
             class="org.safehaus.penrose.studio.schema.ObjectClassEditor"/>
         <editor
             id="org.safehaus.penrose.studio.schema.AttributeTypeEditor"
             name="Attribute Type"
-            icon="images/schema.png"
+            icon="${images.attribute_type}"
             class="org.safehaus.penrose.studio.schema.AttributeTypeEditor"/>
         <editor
             id="org.safehaus.penrose.studio.user.UserEditor"
             name="User"
-            icon="images/root.png"
+            icon="${images.administrator}"
             class="org.safehaus.penrose.studio.user.UserEditor"/>
         <editor
             id="org.safehaus.penrose.studio.service.editor.ServiceEditor"
             name="Service"
-            icon="images/service.png"
+            icon="${images.service}"
             class="org.safehaus.penrose.studio.service.editor.ServiceEditor"/>
 
         <editor
             id="org.safehaus.penrose.studio.federation.editor.FederationEditor"
             name="Federation"
-            icon="images/object.gif"
+            icon="${images.object}"
             class="org.safehaus.penrose.studio.federation.editor.FederationEditor"/>
         <editor
             id="org.safehaus.penrose.studio.federation.partition.FederationDomainEditor"
             name="Global Repository"
-            icon="images/object.gif"
+            icon="${images.object}"
             class="org.safehaus.penrose.studio.federation.partition.FederationDomainEditor"/>
         <editor
             id="org.safehaus.penrose.studio.federation.global.ConflictDetectionEditor"
             name="Conflict Detection"
-            icon="images/object.gif"
+            icon="${images.object}"
             class="org.safehaus.penrose.studio.federation.global.ConflictDetectionEditor"/>
         <editor
             id="org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditor"
             name="LDAP"
-            icon="images/object.gif"
+            icon="${images.object}"
             class="org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditor"/>
         <editor
             id="org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryEditor"
             name="LDAP Repository"
-            icon="images/object.gif"
+            icon="${images.object}"
             class="org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryEditor"/>
         <editor
             id="org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingEditor"
             name="Identity Linking"
-            icon="images/object.gif"
+            icon="${images.object}"
             class="org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingEditor"/>
         <editor
             id="org.safehaus.penrose.studio.federation.nis.editor.NISEditor"
             name="NIS"
-            icon="images/object.gif"
+            icon="${images.object}"
             class="org.safehaus.penrose.studio.federation.nis.editor.NISEditor"/>
         <editor
             id="org.safehaus.penrose.studio.federation.nis.domain.NISDomainEditor"
             name="NIS Domain"
-            icon="images/object.gif"
+            icon="${images.object}"
             class="org.safehaus.penrose.studio.federation.nis.domain.NISDomainEditor"/>
         <editor
             id="org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditor"
             name="Synchronization"
-            icon="images/object.gif"
+            icon="${images.object}"
             class="org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditor"/>
         <editor
             id="org.safehaus.penrose.studio.federation.nis.ownership.OwnershipAlignmentEditor"
             name="Ownership Alignment"
-            icon="images/object.gif"
+            icon="${images.object}"
             class="org.safehaus.penrose.studio.federation.nis.ownership.OwnershipAlignmentEditor"/>
         <editor
             id="org.safehaus.penrose.studio.federation.nis.ownership.NISFilesEditor"
             name="NIS Alignment Tool"
-            icon="images/object.gif"
+            icon="${images.object}"
             class="org.safehaus.penrose.studio.federation.nis.ownership.NISFilesEditor"/>
     </extension>
 
@@ -215,7 +208,7 @@
             application="org.safehaus.penrose.studio.application">
             <property
                 name="windowImages"
-                value="images/penrose16.gif,images/penrose32.gif"/>
+                value="${images.logo16},${images.logo32}"/>
             <property
                 name="preferenceCustomization"
                 value="plugin_customization.ini"/>

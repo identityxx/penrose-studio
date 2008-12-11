@@ -32,7 +32,6 @@ import org.safehaus.penrose.module.ModuleMapping;
 import org.safehaus.penrose.module.ModuleManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.module.action.NewModuleAction;
 import org.safehaus.penrose.studio.partition.PartitionNode;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
@@ -170,7 +169,7 @@ public class ModulesNode extends Node {
 
             ModuleNode moduleNode = new ModuleNode(
                     moduleName,
-                    PenroseStudioPlugin.getImage(PenroseImage.MODULE),
+                    PenroseStudio.getImage(PenroseImage.MODULE),
                     moduleName,
                     this
             );

@@ -22,10 +22,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.safehaus.penrose.studio.project.ProjectConfig;
 import org.safehaus.penrose.studio.project.ProjectDialog;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
@@ -38,7 +36,7 @@ public class NewProjectAction extends Action {
 
 	public NewProjectAction() {
         setText("&New Server...");
-        setImageDescriptor(PenroseStudioPlugin.getImageDescriptor(PenroseImage.NEW));
+        setImageDescriptor(PenroseStudio.getImageDescriptor(PenroseImage.NEW));
         setAccelerator(SWT.CTRL | 'N');
         setToolTipText("New Server");
         setId(getClass().getName());

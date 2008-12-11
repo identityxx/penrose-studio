@@ -7,11 +7,13 @@
 
     <description>Studio</description>
 
-    <property file="build.properties"/>
+    <property name="branding.path" value="."/>
+    <property name="cygwin.home" value="c:/cygwin"/>
+
+    <property file="${branding.path}/build.properties"/>
 
     <property name="prefix" value=""/>
   
-    <property name="branding.path" value=""/>
     <property name="studio.home" value="${prefix}/opt/${product.name}-${product.version}"/>
     <property name="plugin.path" value="target/dist/plugins/org.safehaus.penrose.studio_${plugin.version}"/>
 
@@ -154,7 +156,7 @@
 
         <mkdir dir="target/dist"/>
 
-        <copy todir="target/dist" file="build.properties"/>
+        <copy todir="target/dist" file="${branding.path}/build.properties"/>
         <copy todir="target/dist" file="LICENSE.txt"/>
         <copy todir="target/dist" file="README.txt">
             <filterchain>
@@ -165,7 +167,7 @@
         <copy todir="target/dist" file="INSTALL-BINARY.txt"/>
         <copy todir="target/dist" file="THIRDPARTY.txt"/>
 
-        <copy todir="target/dist" file="images/penrose.ico"/>
+        <copy todir="target/dist" file="${branding.path}/${images.icon}"/>
 
         <copy todir="target/dist/conf">
             <fileset dir="conf">
@@ -192,17 +194,31 @@
         </copy>
 
         <mkdir dir="${plugin.path}"/>
+
         <copy todir="${plugin.path}">
+            <fileset dir=".">
+                <include name="plugin.xml"/>
+                <include name="plugin_customization.ini"/>
+            </fileset>
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+
+        <copy todir="${plugin.path}" overwrite="true">
+            <fileset dir=".">
+                <include name="lib/*.jar"/>
+            </fileset>
+            <fileset dir=".">
+                <include name="images/**"/>
+                <include name="splash.bmp"/>
+            </fileset>
             <fileset dir="${branding.path}">
                 <include name="images/**"/>
                 <include name="splash.bmp"/>
             </fileset>
-            <fileset dir=".">
-                <include name="lib/*.jar"/>
-                <include name="plugin.xml"/>
-                <include name="plugin_customization.ini"/>
-            </fileset>
         </copy>
+
         <copy todir="${plugin.path}/lib">
             <fileset dir="target">
                 <include name="${product.name}-${product.version}.jar"/>
@@ -302,7 +318,7 @@
             <fileset dir="target/eclipse"/>
         </move>
         <move file="target/dist/eclipse.exe" tofile="target/dist/${product.name}.exe"/>
-        <copy file="launcher/eclipse.exe" tofile="target/dist/${product.name}.exe"/>
+        <copy file="${branding.path}/launcher/eclipse.exe" tofile="target/dist/${product.name}.exe" overwrite="true"/>
         <antcall target="package"/>
     </target>
 

@@ -31,7 +31,6 @@ import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.partition.PartitionNode;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.project.Project;
@@ -172,7 +171,7 @@ public class SourcesNode extends Node {
                     // log.debug("Creating sources node "+label);
                     SourcesNode sourcesNode = new SourcesNode(
                             label,
-                            PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
+                            PenroseStudio.getImage(PenroseImage.FOLDER),
                             ServersView.SOURCES,
                             this
                     );
@@ -189,7 +188,7 @@ public class SourcesNode extends Node {
                 // log.debug("Creating source node "+label);
                 SourceNode sourceNode = new SourceNode(
                         label,
-                        PenroseStudioPlugin.getImage(PenroseImage.SOURCE),
+                        PenroseStudio.getImage(PenroseImage.SOURCE),
                         sourceName,
                         this
                 );

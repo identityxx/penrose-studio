@@ -46,7 +46,7 @@ import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.directory.dialog.AttributeTypeSelectionDialog;
 import org.safehaus.penrose.studio.directory.dialog.ExpressionDialog;
 import org.safehaus.penrose.studio.directory.dialog.*;
@@ -311,7 +311,7 @@ public class LDAPPage extends FormPage {
                         TableItem item = attributeTable.getItem(i);
                         EntryAttributeConfig ad = (EntryAttributeConfig)item.getData();
 
-                        item.setImage(PenroseStudioPlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                        item.setImage(PenroseStudio.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
                         ad.setRdn(item.getChecked());
                     }
                     refreshRdn();
@@ -331,7 +331,7 @@ public class LDAPPage extends FormPage {
                         TableItem item = attributeTable.getItem(i);
                         EntryAttributeConfig ad = (EntryAttributeConfig)item.getData();
 
-                        item.setImage(PenroseStudioPlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                        item.setImage(PenroseStudio.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
                         ad.setRdn(item.getChecked());
                     }
                     refreshRdn();
@@ -542,7 +542,7 @@ public class LDAPPage extends FormPage {
 
             TableItem item = new TableItem(attributeTable, SWT.CHECK);
             item.setChecked(attributeConfig.isRdn());
-            item.setImage(PenroseStudioPlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
+            item.setImage(PenroseStudio.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
             item.setText(0, attributeConfig.getName());
             item.setText(1, value == null ? "" : value);
             item.setData(attributeConfig);

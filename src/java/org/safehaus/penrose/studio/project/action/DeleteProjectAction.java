@@ -6,7 +6,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
@@ -20,7 +19,7 @@ public class DeleteProjectAction extends Action {
 
     public DeleteProjectAction() {
         setText("&Delete Server");
-        setImageDescriptor(PenroseStudioPlugin.getImageDescriptor(PenroseImage.SIZE_22x22, PenroseImage.DELETE));
+        setImageDescriptor(PenroseStudio.getImageDescriptor(PenroseImage.DELETE_LARGE));
         setAccelerator(SWT.CTRL | 'D');
         setToolTipText("Delete Server");
         setId(getClass().getName());

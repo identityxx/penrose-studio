@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.federation.FederationDomainNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.tree.Node;
@@ -23,7 +23,7 @@ public class GlobalNode extends Node {
     FederationClient federationClient;
 
     public GlobalNode(FederationDomainNode federationDomainNode) throws Exception {
-        super("Global", PenroseStudioPlugin.getImage(PenroseImage.FOLDER), null, federationDomainNode);
+        super("Global", PenroseStudio.getImage(PenroseImage.FOLDER), null, federationDomainNode);
 
         this.federationDomainNode = federationDomainNode;
 

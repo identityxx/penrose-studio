@@ -22,7 +22,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.schema.SchemaManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.schema.action.ImportSchemaAction;
@@ -69,7 +69,7 @@ public class CustomSchemasNode extends SchemasNode {
 
             SchemaNode schemaNode = new SchemaNode(
                     schemaName,
-                    PenroseStudioPlugin.getImage(PenroseImage.SCHEMA),
+                    PenroseStudio.getImage(PenroseImage.SCHEMA),
                     schemaName,
                     this
             );

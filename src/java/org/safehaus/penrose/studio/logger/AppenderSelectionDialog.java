@@ -8,8 +8,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.graphics.Point;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.logger.log4j.AppenderConfig;
 
 import java.util.Collection;
@@ -50,7 +50,7 @@ public class AppenderSelectionDialog extends Dialog {
         shell.setLocation(l.x + (s.x - size.x)/2, l.y + (s.y - size.y)/2);
 
         shell.setText(getText());
-        shell.setImage(PenroseStudioPlugin.getImage(PenroseImage.LOGGER));
+        shell.setImage(PenroseStudio.getImage(PenroseImage.LOGGER));
         shell.open();
 
         Display display = getParent().getDisplay();

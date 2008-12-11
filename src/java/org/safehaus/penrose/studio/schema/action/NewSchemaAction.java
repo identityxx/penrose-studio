@@ -22,7 +22,6 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.schema.wizard.NewSchemaWizard;
 import org.apache.log4j.Logger;
@@ -34,7 +33,7 @@ public class NewSchemaAction extends Action {
 
 	public NewSchemaAction() {
         setText("New Schema...");        
-        setImageDescriptor(PenroseStudioPlugin.getImageDescriptor(PenroseImage.SCHEMA));
+        setImageDescriptor(PenroseStudio.getImageDescriptor(PenroseImage.SCHEMA));
         setId(getClass().getName());
 	}
 	

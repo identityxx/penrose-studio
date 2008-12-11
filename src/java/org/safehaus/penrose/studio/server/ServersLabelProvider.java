@@ -21,8 +21,8 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.apache.log4j.Logger;
 
 public class ServersLabelProvider extends LabelProvider implements ITableLabelProvider {
@@ -51,7 +51,7 @@ public class ServersLabelProvider extends LabelProvider implements ITableLabelPr
         Image image = node.getImage();
 
         if (image == null) {
-            image = PenroseStudioPlugin.getImage(PenroseImage.FOLDER);
+            image = PenroseStudio.getImage(PenroseImage.FOLDER);
         }
 
         return image;

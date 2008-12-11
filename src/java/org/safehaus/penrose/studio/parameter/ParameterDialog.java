@@ -24,8 +24,8 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.apache.log4j.Logger;
 
 public class ParameterDialog extends Dialog {
@@ -64,7 +64,7 @@ public class ParameterDialog extends Dialog {
         shell.setLocation(l.x + (s.x - size.x)/2, l.y + (s.y - size.y)/2);
 
         shell.setText(getText());
-        shell.setImage(PenroseStudioPlugin.getImage(PenroseImage.LOGO16));
+        shell.setImage(PenroseStudio.getImage(PenroseImage.LOGO));
         shell.open();
 
         Display display = getParent().getDisplay();

@@ -26,7 +26,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.PenroseStudio;
 
 public class SplashShell {
 	
@@ -37,9 +37,9 @@ public class SplashShell {
 
 	public SplashShell() {
 
-        image = PenroseStudioPlugin.getImage(PenroseImage.SPLASH);
+        image = PenroseStudio.getImage(PenroseImage.SPLASH);
 
-		shell = new Shell(SWT.NONE | SWT.APPLICATION_MODAL);
+		shell = new Shell(SWT.APPLICATION_MODAL);
 		shell.setLayout(new FillLayout());
 
         final Canvas canvas = new Canvas(shell, SWT.NONE);

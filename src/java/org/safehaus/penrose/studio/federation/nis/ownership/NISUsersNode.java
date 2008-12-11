@@ -11,11 +11,8 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.federation.nis.ownership.OwnershipAlignmentEditor;
 import org.safehaus.penrose.studio.federation.nis.ownership.OwnershipAlignmentInput;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
-
-import java.util.ArrayList;
-import java.util.Collection;
+import org.safehaus.penrose.studio.PenroseStudio;
 
 /**
  * @author Endi S. Dewata
@@ -27,7 +24,7 @@ public class NISUsersNode extends Node {
     private FederationRepositoryConfig repositoryConfig;
 
     public NISUsersNode(String name, Object parent) {
-        super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), null, parent);
+        super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, parent);
     }
 
     public void showMenu(IMenuManager manager) throws Exception {

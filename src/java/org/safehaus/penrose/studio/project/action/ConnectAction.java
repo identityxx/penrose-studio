@@ -3,7 +3,6 @@ package org.safehaus.penrose.studio.project.action;
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.SWT;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
@@ -17,7 +16,7 @@ public class ConnectAction extends Action {
 
     public ConnectAction() {
         setText("&Connect");
-        setImageDescriptor(PenroseStudioPlugin.getImageDescriptor(PenroseImage.SIZE_22x22, PenroseImage.CONNECT));
+        setImageDescriptor(PenroseStudio.getImageDescriptor(PenroseImage.CONNECT));
         setAccelerator(SWT.CTRL | 'C');
         setToolTipText("Connect");
         setId(getClass().getName());

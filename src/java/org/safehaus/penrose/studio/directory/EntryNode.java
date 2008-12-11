@@ -35,7 +35,6 @@ import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.directory.action.MapLDAPTreeAction;
 import org.safehaus.penrose.studio.directory.action.NewDynamicEntryAction;
 import org.safehaus.penrose.studio.directory.action.NewEntryFromSourceAction;
@@ -144,7 +143,7 @@ public class EntryNode extends Node {
             }
         });
 
-        manager.add(new Action("Delete", PenroseStudioPlugin.getImageDescriptor(PenroseImage.SIZE_16x16, PenroseImage.DELETE)) {
+        manager.add(new Action("Delete", PenroseStudio.getImageDescriptor(PenroseImage.DELETE_SMALL)) {
             public void run() {
                 try {
                     remove();
@@ -275,7 +274,7 @@ public class EntryNode extends Node {
 
             EntryNode entryNode = new EntryNode(
                     rdn,
-                    PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
+                    PenroseStudio.getImage(PenroseImage.FOLDER),
                     childConfig,
                     this
             );

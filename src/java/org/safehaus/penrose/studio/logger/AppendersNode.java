@@ -3,7 +3,6 @@ package org.safehaus.penrose.studio.logger;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.logger.log4j.Log4jConfig;
 import org.safehaus.penrose.logger.log4j.AppenderConfig;
@@ -83,7 +82,7 @@ public class AppendersNode extends Node {
             AppenderNode appenderNode = new AppenderNode(
                     view,
                     appenderConfig.getName(),
-                    PenroseStudioPlugin.getImage(PenroseImage.APPENDER),
+                    PenroseStudio.getImage(PenroseImage.APPENDER),
                     appenderConfig,
                     this
             );

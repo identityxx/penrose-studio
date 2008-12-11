@@ -25,8 +25,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -96,7 +96,7 @@ public class LDAPFieldWizardPage extends WizardPage implements SelectionListener
             field.setPrimaryKey(pk);
 
             TableItem it = new TableItem(fieldTable, SWT.CHECK);
-            it.setImage(PenroseStudioPlugin.getImage(pk ? PenroseImage.KEY : PenroseImage.NOKEY));
+            it.setImage(PenroseStudio.getImage(pk ? PenroseImage.KEY : PenroseImage.NOKEY));
             it.setText(0, name);
             it.setText(1, field.getType());
             it.setChecked(field.isPrimaryKey());
@@ -132,7 +132,7 @@ public class LDAPFieldWizardPage extends WizardPage implements SelectionListener
         for (TableItem item : items) {
             FieldConfig field = (FieldConfig) item.getData();
             field.setPrimaryKey(item.getChecked());
-            item.setImage(PenroseStudioPlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
+            item.setImage(PenroseStudio.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
         }
     }
 

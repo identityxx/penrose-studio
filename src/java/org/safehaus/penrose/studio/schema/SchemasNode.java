@@ -19,7 +19,7 @@ package org.safehaus.penrose.studio.schema;
 
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
@@ -38,7 +38,7 @@ public class SchemasNode extends Node {
     protected ProjectNode projectNode;
 
     public SchemasNode(String name, Object object, ProjectNode projectNode) {
-        super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), object, projectNode);
+        super(name, PenroseStudio.getImage(PenroseImage.FOLDER), object, projectNode);
 
         this.projectNode = projectNode;
         this.view = this.projectNode.getServersView();
@@ -55,7 +55,7 @@ public class SchemasNode extends Node {
         BuiltinSchemasNode builtinSchemas = new BuiltinSchemasNode(
                 "Built-in Schemas",
                 ServersView.BUILTIN_SCHEMA,
-                PenroseStudioPlugin.getImage(PenroseImage.SCHEMA),
+                PenroseStudio.getImage(PenroseImage.SCHEMA),
                 this
         );
 
@@ -64,7 +64,7 @@ public class SchemasNode extends Node {
         CustomSchemasNode customSchemasNode = new CustomSchemasNode(
                 "Custom Schemas",
                 ServersView.CUSTOM_SCHEMA,
-                PenroseStudioPlugin.getImage(PenroseImage.SCHEMA),
+                PenroseStudio.getImage(PenroseImage.SCHEMA),
                 this
         );
 

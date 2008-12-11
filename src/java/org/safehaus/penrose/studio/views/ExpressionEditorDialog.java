@@ -48,7 +48,6 @@ import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.views.BaseDialog;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.util.Pair;
@@ -379,7 +378,7 @@ public class ExpressionEditorDialog extends BaseDialog {
 				SourceConfig sourceConfig = partitionConfig.getSourceConfigManager().getSourceConfig(source.getSourceName());
 
 				Object[] fields = sourceConfig.getFieldConfigs().toArray();
-				Image icon = PenroseStudioPlugin.getImage(PenroseImage.SOURCE);
+				Image icon = PenroseStudio.getImage(PenroseImage.SOURCE);
 
 				for (int j=0; j<fields.length; j++) {
 					FieldConfig field = (FieldConfig) fields[j];
@@ -390,7 +389,7 @@ public class ExpressionEditorDialog extends BaseDialog {
 			Object[] attributes = entry.getAttributeConfigs().toArray();
 			for (int i=0; i<attributes.length; i++) {
 				EntryAttributeConfig attribute = (EntryAttributeConfig) attributes[i];
-				addHint(PenroseStudioPlugin.getImage(PenroseImage.NOKEY), attribute.getName());
+				addHint(PenroseStudio.getImage(PenroseImage.NOKEY), attribute.getName());
 			}
 		}
 		

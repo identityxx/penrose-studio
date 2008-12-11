@@ -50,7 +50,7 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
     ConnectAction connectAction;
     DisconnectAction disconnectAction;
 
-    UploadAction uploadAction;
+    //UploadAction uploadAction;
     IAction quitAction;
 
     NewPartitionAction newPartitionAction;
@@ -100,8 +100,8 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
             disconnectAction = new DisconnectAction();
             register(disconnectAction);
 
-            uploadAction = new UploadAction();
-            register(uploadAction);
+            //uploadAction = new UploadAction();
+            //register(uploadAction);
 
             quitAction = ActionFactory.QUIT.create(window);
             quitAction.setAccelerator(SWT.ALT | SWT.F4);
@@ -171,10 +171,10 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
             fileMenu.add(connectAction);
             fileMenu.add(disconnectAction);
 
-            fileMenu.add(new Separator());
+            //fileMenu.add(new Separator());
 
-            fileMenu.add(uploadAction);
-            fileMenu.add(restartAction);
+            //fileMenu.add(uploadAction);
+            //fileMenu.add(restartAction);
 
             fileMenu.add(new Separator());
             fileMenu.add(quitAction);
@@ -233,10 +233,10 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
             standardToolBar.add(new ActionContributionItem(connectAction));
             standardToolBar.add(new ActionContributionItem(disconnectAction));
 
-            standardToolBar.add(new Separator());
+            //standardToolBar.add(new Separator());
 
-            standardToolBar.add(new ActionContributionItem(uploadAction));
-            standardToolBar.add(new ActionContributionItem(restartAction));
+            //standardToolBar.add(new ActionContributionItem(uploadAction));
+            //standardToolBar.add(new ActionContributionItem(restartAction));
 
             IToolBarManager previewToolBar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
             coolBar.add(new ToolBarContributionItem(previewToolBar, "preview"));

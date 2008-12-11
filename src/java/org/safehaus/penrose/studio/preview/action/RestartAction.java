@@ -18,11 +18,10 @@
 package org.safehaus.penrose.studio.preview.action;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
@@ -39,7 +38,7 @@ public class RestartAction extends Action {
 
     public RestartAction() {
         setText("&Restart");
-        setImageDescriptor(PenroseStudioPlugin.getImageDescriptor(PenroseImage.REFRESH));
+        setImageDescriptor(PenroseStudio.getImageDescriptor(PenroseImage.REFRESH));
         setToolTipText("Restart Penrose Server");
         setId(getClass().getName());
     }

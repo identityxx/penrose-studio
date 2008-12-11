@@ -12,7 +12,6 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.federation.FederationDomainNode;
 import org.safehaus.penrose.federation.LDAPFederationClient;
 import org.safehaus.penrose.federation.*;
@@ -22,9 +21,6 @@ import org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryNode
 import org.safehaus.penrose.studio.federation.ldap.wizard.AddLDAPRepositoryWizard;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.tree.Node;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
@@ -39,7 +35,7 @@ public class LDAPNode extends Node {
     private LDAPFederationClient ldapFederation;
 
     public LDAPNode(String name, FederationDomainNode federationDomainNode) throws Exception {
-        super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), null, federationDomainNode);
+        super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, federationDomainNode);
 
         this.federationDomainNode = federationDomainNode;
 

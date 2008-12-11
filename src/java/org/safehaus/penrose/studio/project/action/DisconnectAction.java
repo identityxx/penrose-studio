@@ -1,12 +1,8 @@
 package org.safehaus.penrose.studio.project.action;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
@@ -20,7 +16,7 @@ public class DisconnectAction extends Action {
 
     public DisconnectAction() {
         setText("&Disconnect");
-        setImageDescriptor(PenroseStudioPlugin.getImageDescriptor(PenroseImage.SIZE_22x22, PenroseImage.DISCONNECT));
+        setImageDescriptor(PenroseStudio.getImageDescriptor(PenroseImage.DISCONNECT));
         setAccelerator(SWT.CTRL | 'D');
         setToolTipText("Disconnect");
         setId(getClass().getName());

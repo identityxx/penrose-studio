@@ -22,7 +22,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.service.ServiceManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.server.ServersView;
@@ -43,7 +43,7 @@ public class ServicesNode extends Node {
     private ProjectNode projectNode;
 
     public ServicesNode(String name, Object object, Object parent) {
-        super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), object, parent);
+        super(name, PenroseStudio.getImage(PenroseImage.FOLDER), object, parent);
         
         projectNode = (ProjectNode)parent;
         view = projectNode.getServersView();
@@ -70,7 +70,7 @@ public class ServicesNode extends Node {
 
             ServiceNode serviceNode = new ServiceNode(
                     name,
-                    PenroseStudioPlugin.getImage(PenroseImage.SERVICE),
+                    PenroseStudio.getImage(PenroseImage.SERVICE),
                     null,
                     this
             );

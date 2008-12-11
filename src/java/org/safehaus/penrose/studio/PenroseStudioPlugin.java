@@ -18,21 +18,17 @@
 package org.safehaus.penrose.studio;
 
 import org.eclipse.ui.plugin.*;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.BundleContext;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
+import org.slf4j.Logger;
 
 public class PenroseStudioPlugin extends AbstractUIPlugin {
 
-    public org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
+    public Logger log = LoggerFactory.getLogger(getClass());
 
 	public static PenroseStudioPlugin instance;
-    public static HashMap<String,Image> images = new HashMap<String,Image>();
 
-	private BundleContext bundleContext;
+    private BundleContext bundleContext;
 	
 	public PenroseStudioPlugin() {
 		instance = this;
@@ -43,18 +39,6 @@ public class PenroseStudioPlugin extends AbstractUIPlugin {
 
         log.debug("Starting "+PenroseStudio.PRODUCT_NAME+".");
         super.start(bundleContext);
-
-        try {
-            //IWorkbench workbench = PlatformUI.getWorkbench();
-            //IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-            //workbench.showPerspective(PenroseStudioPerspective.class.getName(), window);
-
-            //IWorkbenchPage page = window.getActivePage();
-            //page.openEditor(new WelcomeEditorInput(), WelcomeEditor.class.getName());
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
 	}
 
 	public void stop(BundleContext bundleContext) throws Exception {
@@ -65,36 +49,6 @@ public class PenroseStudioPlugin extends AbstractUIPlugin {
 	public static PenroseStudioPlugin getInstance() {
 		return instance;
 	}
-
-    public static ImageDescriptor getImageDescriptor(String size, String name) {
-        String path = "images/"+size+"/"+name;
-        return getImageDescriptor(path);
-    }
-
-    public static ImageDescriptor getImageDescriptor(String path) {
-        return AbstractUIPlugin.imageDescriptorFromPlugin("org.safehaus.penrose.studio", path);
-    }
-
-	public static Image getImage(String path) {
-		Image image = images.get(path);
-        if (image == null) {
-            ImageDescriptor descriptor = getImageDescriptor(path);
-            image = descriptor.createImage();
-            images.put(path, image);
-        }
-        return image;
-	}
-
-    public static Image getImage(String size, String name) {
-        String path = "images/"+size+"/"+name;
-        Image image = images.get(path);
-        if (image == null) {
-            ImageDescriptor descriptor = getImageDescriptor(path);
-            image = descriptor.createImage();
-            images.put(path, image);
-        }
-        return image;
-    }
 
     public BundleContext getBundleContext(){
         return bundleContext;

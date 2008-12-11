@@ -18,8 +18,8 @@ public class ImageManager {
 
     public Map<String,Image> images = new HashMap<String,Image>();
 
-    public ImageManager() {
-        pluginName = "org.safehaus.penrose.studio";
+    public ImageManager(String pluginName) {
+        this.pluginName = pluginName;
     }
 
     public void init() throws Exception {
@@ -46,17 +46,17 @@ public class ImageManager {
         return AbstractUIPlugin.imageDescriptorFromPlugin(pluginName, path);
     }
 
-    public Image createImage(String path) {
-        ImageDescriptor descriptor = getImageDescriptor(path);
+    public Image createImage(String name) {
+        ImageDescriptor descriptor = getImageDescriptor(name);
         return descriptor.createImage();
     }
 
-    public Image getImage(String path) {
-        Image image = images.get(path);
+    public Image getImage(String name) {
+        Image image = images.get(name);
 
         if (image == null) {
-            image = createImage(path);
-            images.put(path, image);
+            image = createImage(name);
+            images.put(name, image);
         }
 
         return image;

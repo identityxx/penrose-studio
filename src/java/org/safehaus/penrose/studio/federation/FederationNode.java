@@ -3,11 +3,9 @@ package org.safehaus.penrose.studio.federation;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.module.ModuleManagerClient;
 import org.safehaus.penrose.module.ModuleClient;
@@ -15,9 +13,6 @@ import org.safehaus.penrose.federation.Federation;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
-
-import java.util.Collection;
-import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
@@ -30,7 +25,7 @@ public class FederationNode extends Node {
     private ProjectNode projectNode;
 
     public FederationNode(String name, Object object, ProjectNode projectNode) throws Exception {
-        super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), object, projectNode);
+        super(name, PenroseStudio.getImage(PenroseImage.FOLDER), object, projectNode);
 
         this.projectNode = projectNode;
         project = projectNode.getProject();

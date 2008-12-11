@@ -24,8 +24,8 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -86,7 +86,7 @@ public class JDBCPrimaryKeyWizardPage extends WizardPage implements SelectionLis
             for (FieldConfig fieldConfig : fieldConfigs) {
 
                 TableItem it = new TableItem(fieldsTable, SWT.CHECK);
-                it.setImage(PenroseStudioPlugin.getImage(fieldConfig.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                it.setImage(PenroseStudio.getImage(fieldConfig.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
                 it.setText(0, fieldConfig.getName());
                 it.setText(1, fieldConfig.getType());
                 it.setChecked(fieldConfig.isPrimaryKey());
@@ -117,7 +117,7 @@ public class JDBCPrimaryKeyWizardPage extends WizardPage implements SelectionLis
         for (TableItem item : items) {
             FieldConfig field = (FieldConfig) item.getData();
             field.setPrimaryKey(item.getChecked());
-            item.setImage(PenroseStudioPlugin.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
+            item.setImage(PenroseStudio.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
 
         }
 

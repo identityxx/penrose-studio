@@ -5,8 +5,8 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
@@ -25,12 +25,7 @@ public class NISSynchronizationNode extends Node {
     private NISFederationClient nisFederation;
 
     public NISSynchronizationNode(String name, NISDomainNode domainNode) {
-        super(
-                name,
-                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
-                null,
-                domainNode
-        );
+        super(name, PenroseStudio.getImage(PenroseImage.OBJECT), null, domainNode);
 
         this.domainNode = domainNode;
 

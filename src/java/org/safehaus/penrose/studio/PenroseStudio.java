@@ -19,12 +19,12 @@ package org.safehaus.penrose.studio;
 
 import java.io.*;
 import java.util.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 import org.eclipse.core.runtime.IPlatformRunnable;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.studio.util.ApplicationConfig;
 import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.plugin.*;
@@ -47,22 +47,19 @@ public class PenroseStudio implements IPlatformRunnable {
     public static String VENDOR_NAME;
     public static String SPECIFICATION_VERSION;
 
-    public final static DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
-    public final static String RELEASE_DATE    = "12/01/2007";
-
     public static PenroseStudio instance;
 
-    File homeDir;
-    Properties properties;
+    public File homeDir;
+    public Properties properties;
 
-    ApplicationConfig applicationConfig = new ApplicationConfig();
-    PluginManager pluginManager = new PluginManager();
-    ImageManager imageManager;
+    public ApplicationConfig applicationConfig = new ApplicationConfig();
+    public PluginManager pluginManager = new PluginManager();
+    public ImageManager imageManager;
 
-    PenroseStudioWorkbenchAdvisor workbenchAdvisor;
-    ArrayList<ChangeListener> changeListeners = new ArrayList<ChangeListener>();
+    public PenroseStudioWorkbenchAdvisor workbenchAdvisor;
+    public ArrayList<ChangeListener> changeListeners = new ArrayList<ChangeListener>();
 
-    Log4jConfig loggingConfig;
+    public Log4jConfig loggingConfig;
 
     boolean dirty = false;
 
@@ -141,7 +138,7 @@ public class PenroseStudio implements IPlatformRunnable {
             properties.load(new FileInputStream(buildProperties));
         }
 
-        imageManager = new ImageManager();
+        imageManager = new ImageManager("org.safehaus.penrose.studio");
         imageManager.setProperties(properties);
         imageManager.init();
     }
@@ -318,4 +315,14 @@ public class PenroseStudio implements IPlatformRunnable {
     public void setPluginManager(PluginManager pluginManager) {
         this.pluginManager = pluginManager;
     }
+
+    public static ImageDescriptor getImageDescriptor(String name) {
+        ImageManager imageManager = instance.getImageManager();
+        return imageManager.getImageDescriptor(name);
+    }
+
+    public static Image getImage(String name) {
+        ImageManager imageManager = instance.getImageManager();
+        return imageManager.getImage(name);
+	}
 }

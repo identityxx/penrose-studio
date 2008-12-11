@@ -42,7 +42,7 @@ public class FederationDomainNode extends Node {
     private FederationClient federationClient;
 
     public FederationDomainNode(String name, FederationNode federationNode) throws Exception {
-        super(name, PenroseStudioPlugin.getImage(PenroseImage.MODULE), null, federationNode);
+        super(name, PenroseStudio.getImage(PenroseImage.MODULE), null, federationNode);
 
         project = federationNode.getProject();
         federationClient = new FederationClient(project.getClient(), name);

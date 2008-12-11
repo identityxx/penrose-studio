@@ -4,13 +4,10 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.federation.FederationDomainNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.tree.Node;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
@@ -23,7 +20,7 @@ public class JDBCNode extends Node {
     private Project project;
 
     public JDBCNode(String name, FederationDomainNode federationDomainNode) throws Exception {
-        super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), null, federationDomainNode);
+        super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, federationDomainNode);
 
         this.federationDomainNode = federationDomainNode;
         this.project = federationDomainNode.getProject();

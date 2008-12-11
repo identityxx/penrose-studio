@@ -24,7 +24,7 @@ import org.safehaus.penrose.schema.SchemaManagerClient;
 import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.schema.SchemaConfig;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.server.ServersView;
@@ -69,7 +69,7 @@ public class AttributeTypesNode extends Node {
             children.add(new AttributeTypeNode(
                     view,
                     attributeType.getName(),
-                    PenroseStudioPlugin.getImage(PenroseImage.ATTRIBUTE_TYPE),
+                    PenroseStudio.getImage(PenroseImage.ATTRIBUTE_TYPE),
                     attributeType,
                     this
             ));

@@ -9,7 +9,7 @@ import org.safehaus.penrose.federation.LDAPFederationClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
 import org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryNode;
 import org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingEditor;
@@ -29,12 +29,7 @@ public class LDAPLinkingNode extends Node {
     private LDAPFederationClient ldapFederation;
 
     public LDAPLinkingNode(String name, LDAPRepositoryNode repositoryNode) {
-        super(
-                name,
-                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
-                null, 
-                repositoryNode
-        );
+        super(name, PenroseStudio.getImage(PenroseImage.OBJECT), null, repositoryNode);
 
         this.repositoryNode = repositoryNode;
         this.ldapNode = repositoryNode.getLdapNode();

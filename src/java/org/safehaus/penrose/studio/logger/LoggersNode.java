@@ -18,7 +18,6 @@
 package org.safehaus.penrose.studio.logger;
 
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
@@ -133,7 +132,7 @@ public class LoggersNode extends Node {
             LoggerNode loggerNode = new LoggerNode(
                     view,
                     loggerConfig.getName(),
-                    PenroseStudioPlugin.getImage(PenroseImage.LOGGER),
+                    PenroseStudio.getImage(PenroseImage.LOGGER),
                     loggerConfig,
                     this
             );

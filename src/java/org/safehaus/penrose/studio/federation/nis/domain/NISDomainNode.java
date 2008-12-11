@@ -19,9 +19,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
 
-import java.util.Collection;
-import java.util.ArrayList;
-
 /**
  * @author Endi S. Dewata
  */
@@ -40,7 +37,7 @@ public class NISDomainNode extends Node {
     public NISDomainNode(String name, FederationRepositoryConfig domain, NISNode nisNode) {
         super(
                 name,
-                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
+                PenroseStudio.getImage(PenroseImage.FOLDER),
                 domain,
                 nisNode
         );
@@ -88,7 +85,7 @@ public class NISDomainNode extends Node {
     }
 
     public Image getImage() {
-        return PenroseStudioPlugin.getImage(PenroseImage.FOLDER);
+        return PenroseStudio.getImage(PenroseImage.FOLDER);
     }
 
     public void showMenu(IMenuManager manager) throws Exception {

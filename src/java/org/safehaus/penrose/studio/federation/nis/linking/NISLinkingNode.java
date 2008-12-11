@@ -9,10 +9,9 @@ import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingEditor;
 import org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingEditorInput;
-import org.safehaus.penrose.studio.federation.nis.NISNode;
 import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.tree.Node;
@@ -27,12 +26,7 @@ public class NISLinkingNode extends Node {
     FederationRepositoryConfig repositoryConfig;
 
     public NISLinkingNode(String name, NISDomainNode domainNode) {
-        super(
-                name,
-                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
-                null,
-                domainNode
-        );
+        super(name, PenroseStudio.getImage(PenroseImage.OBJECT), null, domainNode);
 
         repositoryConfig = domainNode.getDomain();
         project = domainNode.getProject();

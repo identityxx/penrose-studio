@@ -6,8 +6,8 @@ import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.PenroseStudio;
 
 /**
  * @author Endi S. Dewata
@@ -18,7 +18,7 @@ public class ConflictDetectionNode extends Node {
     private FederationClient federationClient;
 
     public ConflictDetectionNode(String name, Object parent) {
-        super(name, PenroseStudioPlugin.getImage(PenroseImage.FOLDER), null, parent);
+        super(name, PenroseStudio.getImage(PenroseImage.OBJECT), null, parent);
     }
 
     public void open() throws Exception {

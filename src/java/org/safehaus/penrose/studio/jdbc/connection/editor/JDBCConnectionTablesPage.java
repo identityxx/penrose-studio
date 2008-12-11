@@ -30,7 +30,6 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.jdbc.*;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.jdbc.connection.JDBCSourceWizard;
@@ -324,7 +323,7 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
 
             for (FieldConfig field : fields) {
                 TableItem it = new TableItem(fieldsTable, SWT.NONE);
-                it.setImage(PenroseStudioPlugin.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
+                it.setImage(PenroseStudio.getImage(field.isPrimaryKey() ? PenroseImage.KEY : PenroseImage.NOKEY));
                 it.setText(0, field.getName());
                 it.setText(1, field.getType());
             }

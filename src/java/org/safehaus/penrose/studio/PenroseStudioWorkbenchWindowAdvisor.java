@@ -82,7 +82,7 @@ public class PenroseStudioWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor 
         //System.out.println("bounds: "+bounds);
 
         shell.setLocation(bounds.x + (bounds.width - size.x)/2, bounds.y + (bounds.height - size.y)/2);
-        shell.setImage(PenroseStudioPlugin.getImage(PenroseImage.LOGO16));
+        shell.setImage(PenroseStudio.getImage(PenroseImage.LOGO));
     }
 
     public Control createEmptyWindowContents(Composite composite) {

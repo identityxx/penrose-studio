@@ -25,7 +25,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.tree.Node;
@@ -41,7 +41,7 @@ public class AdministratorNode extends Node {
     ProjectNode projectNode;
 
     public AdministratorNode(String name, Object object, Object parent) {
-        super(name, PenroseStudioPlugin.getImage(PenroseImage.ADMINISTRATOR), object, parent);
+        super(name, PenroseStudio.getImage(PenroseImage.ADMINISTRATOR), object, parent);
         
         projectNode = (ProjectNode)parent;
     }
