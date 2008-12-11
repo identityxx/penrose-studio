@@ -8,12 +8,12 @@
     <description>Studio</description>
 
     <property name="branding.path" value="."/>
-    <property name="cygwin.home" value="c:/cygwin"/>
-
     <property file="${branding.path}/build.properties"/>
 
     <property name="prefix" value=""/>
-  
+    <property name="iscc.path" value="ISCC.exe"/>
+    <property name="cygwin.home" value="c:/cygwin"/>
+
     <property name="studio.home" value="${prefix}/opt/${product.name}-${product.version}"/>
     <property name="plugin.path" value="target/dist/plugins/org.safehaus.penrose.studio_${plugin.version}"/>
 
@@ -80,15 +80,15 @@
     </target>
 
     <target name="import-common" depends="init">
-        <copy todir="lib" file="../Server/common/target/${project.name}-common-${penrose.version}.jar"/>
+        <copy todir="lib" file="../penrose-server/common/target/${project.name}-common-${penrose.version}.jar"/>
     </target>
 
     <target name="import-core" depends="init">
-        <copy todir="lib" file="../Server/core/target/${project.name}-${penrose.version}.jar"/>
+        <copy todir="lib" file="../penrose-server/core/target/${project.name}-${penrose.version}.jar"/>
     </target>
 
     <target name="import-client" depends="init">
-        <copy todir="lib" file="../Server/client/target/${project.name}-client-${penrose.version}.jar"/>
+        <copy todir="lib" file="../penrose-server/client/target/${project.name}-client-${penrose.version}.jar"/>
     </target>
 
     <target name="clean" depends="init">
