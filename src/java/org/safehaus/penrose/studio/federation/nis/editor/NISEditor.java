@@ -7,9 +7,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.safehaus.penrose.studio.federation.nis.editor.NISDomainsPage;
-import org.safehaus.penrose.federation.NISFederationClient;
-import org.safehaus.penrose.studio.federation.nis.editor.NISEditorInput;
+import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.project.Project;
 
 public class NISEditor extends FormEditor {
@@ -17,12 +15,12 @@ public class NISEditor extends FormEditor {
     public Logger log = LoggerFactory.getLogger(getClass());
 
     public Project project;
-    public NISFederationClient nisFederationClient;
+    public FederationClient federationClient;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         NISEditorInput ei = (NISEditorInput)input;
         project = ei.getProject();
-        nisFederationClient = ei.getNisFederationClient();
+        federationClient = ei.getFederationClient();
 
         setSite(site);
         setInput(input);
@@ -31,13 +29,8 @@ public class NISEditor extends FormEditor {
 
     public void addPages() {
         try {
-            addPage(new NISDomainsPage(this, nisFederationClient));
-            addPage(new NISYPConfPage(this, nisFederationClient));
-            //addPage(new NISDatabasesPage(this, nisFederation));
-            //addPage(new NISPartitionsPage(this, nisFederation));
-            //addPage(new NISLDAPPage(this, nisFederation));
-            //addPage(new NISUserChangesPage(this, nisFederationClient));
-            //addPage(new NISGroupChangesPage(this, nisFederationClient));
+            addPage(new NISDomainsPage(this, federationClient));
+            addPage(new NISYPConfPage(this, federationClient));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -56,10 +49,6 @@ public class NISEditor extends FormEditor {
 
     public boolean isSaveAsAllowed() {
         return false;
-    }
-
-    public NISFederationClient getNisTool() {
-        return nisFederationClient;
     }
 
     public Project getProject() {

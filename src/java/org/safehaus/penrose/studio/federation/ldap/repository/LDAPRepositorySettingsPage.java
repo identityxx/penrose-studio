@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
+import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
@@ -23,6 +24,7 @@ import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.federation.LDAPFederationClient;
 import org.safehaus.penrose.federation.LDAPRepository;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
+import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.federation.ldap.wizard.EditLDAPRepositoryWizard;
 import org.safehaus.penrose.studio.project.Project;
 
@@ -40,19 +42,13 @@ public class LDAPRepositorySettingsPage extends FormPage {
     Label bindDnText;
     Label bindPasswordText;
 
-    LDAPRepositoryEditor editor;
-    FederationRepositoryConfig repository;
-    LDAPFederationClient ldapFederation;
-
     Project project;
+    FederationClient federationClient;
+    LDAPFederationClient ldapFederationClient;
+    FederationRepositoryConfig repositoryConfig;
 
-    public LDAPRepositorySettingsPage(LDAPRepositoryEditor editor) {
+    public LDAPRepositorySettingsPage(FormEditor editor) {
         super(editor, "SETTINGS", "  Settings  ");
-
-        this.editor = editor;
-        this.project = editor.project;
-        this.ldapFederation = editor.ldapFederation;
-        this.repository = editor.getRepository();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -142,7 +138,7 @@ public class LDAPRepositorySettingsPage extends FormPage {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    EditLDAPRepositoryWizard wizard = new EditLDAPRepositoryWizard(repository);
+                    EditLDAPRepositoryWizard wizard = new EditLDAPRepositoryWizard(repositoryConfig);
 
                     IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
                     WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
@@ -150,7 +146,7 @@ public class LDAPRepositorySettingsPage extends FormPage {
 
                     if (dialog.open() == Window.CANCEL) return;
 
-                    ldapFederation.updateRepository(repository);
+                    federationClient.updateRepository(repositoryConfig);
 
                     refresh();
 
@@ -166,21 +162,53 @@ public class LDAPRepositorySettingsPage extends FormPage {
 
     public void refresh() {
         try {
-            String url = repository.getParameter(LDAPRepository.URL);
+            String url = repositoryConfig.getParameter(LDAPRepository.URL);
             urlText.setText(url == null ? "" : url);
 
-            String suffix = repository.getParameter(LDAPRepository.SUFFIX);
+            String suffix = repositoryConfig.getParameter(LDAPRepository.SUFFIX);
             suffixText.setText(suffix == null ? "" : suffix);
 
-            String bindDn = repository.getParameter(LDAPRepository.USER);
+            String bindDn = repositoryConfig.getParameter(LDAPRepository.USER);
             bindDnText.setText(bindDn == null ? "" : bindDn);
 
-            String bindPassword = repository.getParameter(LDAPRepository.PASSWORD);
+            String bindPassword = repositoryConfig.getParameter(LDAPRepository.PASSWORD);
             bindPasswordText.setText(bindPassword == null ? "" : "*****");
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);
         }
+    }
+
+    public FederationClient getFederationClient() {
+        return federationClient;
+    }
+
+    public void setFederationClient(FederationClient federationClient) {
+        this.federationClient = federationClient;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public LDAPFederationClient getLdapFederationClient() {
+        return ldapFederationClient;
+    }
+
+    public void setLdapFederationClient(LDAPFederationClient ldapFederationClient) {
+        this.ldapFederationClient = ldapFederationClient;
+    }
+
+    public FederationRepositoryConfig getRepositoryConfig() {
+        return repositoryConfig;
+    }
+
+    public void setRepositoryConfig(FederationRepositoryConfig repositoryConfig) {
+        this.repositoryConfig = repositoryConfig;
     }
 }

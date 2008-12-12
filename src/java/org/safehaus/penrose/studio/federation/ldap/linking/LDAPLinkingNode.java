@@ -10,8 +10,6 @@ import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
-import org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryNode;
 import org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingEditor;
 import org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingEditorInput;
 import org.safehaus.penrose.studio.project.Project;
@@ -23,19 +21,11 @@ import org.safehaus.penrose.studio.tree.Node;
 public class LDAPLinkingNode extends Node {
 
     Project project;
-    LDAPNode ldapNode;
-    LDAPRepositoryNode repositoryNode;
+    LDAPFederationClient ldapFederationClient;
+    FederationRepositoryConfig repositoryConfig;
 
-    private LDAPFederationClient ldapFederation;
-
-    public LDAPLinkingNode(String name, LDAPRepositoryNode repositoryNode) {
-        super(name, PenroseStudio.getImage(PenroseImage.OBJECT), null, repositoryNode);
-
-        this.repositoryNode = repositoryNode;
-        this.ldapNode = repositoryNode.getLdapNode();
-        this.project = ldapNode.getProject();
-
-        ldapFederation = ldapNode.getLdapFederation();
+    public LDAPLinkingNode(String name, Object parent) {
+        super(name, PenroseStudio.getImage(PenroseImage.OBJECT), null, parent);
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -53,13 +43,12 @@ public class LDAPLinkingNode extends Node {
 
     public void open() throws Exception {
 
-        FederationRepositoryConfig repository = repositoryNode.getRepository();
-        FederationClient federationClient = ldapFederation.getFederationClient();
+        FederationClient federationClient = ldapFederationClient.getFederationClient();
         
         IdentityLinkingEditorInput ei = new IdentityLinkingEditorInput();
         ei.setProject(project);
-        ei.setRepository(repository);
-        ei.setSourcePartition(federationClient.getName()+"_"+repository.getName());
+        ei.setRepository(repositoryConfig);
+        ei.setSourcePartition(federationClient.getName()+"_"+ repositoryConfig.getName());
         ei.setTargetPartition(federationClient.getName());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -67,11 +56,27 @@ public class LDAPLinkingNode extends Node {
         page.openEditor(ei, IdentityLinkingEditor.class.getName());
     }
 
-    public LDAPFederationClient getLdapFederation() {
-        return ldapFederation;
+    public LDAPFederationClient getLdapFederationClient() {
+        return ldapFederationClient;
     }
 
-    public void setLdapFederation(LDAPFederationClient ldapFederation) {
-        this.ldapFederation = ldapFederation;
+    public void setLdapFederationClient(LDAPFederationClient ldapFederationClient) {
+        this.ldapFederationClient = ldapFederationClient;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public FederationRepositoryConfig getRepositoryConfig() {
+        return repositoryConfig;
+    }
+
+    public void setRepositoryConfig(FederationRepositoryConfig repositoryConfig) {
+        this.repositoryConfig = repositoryConfig;
     }
 }

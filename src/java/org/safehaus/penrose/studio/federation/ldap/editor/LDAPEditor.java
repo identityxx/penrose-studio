@@ -5,7 +5,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
-import org.safehaus.penrose.federation.LDAPFederationClient;
+import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.project.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,13 +14,13 @@ public class LDAPEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    Project project;
-    LDAPFederationClient ldapFederation;
+    private Project project;
+    private FederationClient federationClient;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         LDAPEditorInput ei = (LDAPEditorInput)input;
         project = ei.getProject();
-        ldapFederation = ei.getLdapFederation();
+        federationClient = ei.getFederationClient();
 
         setSite(site);
         setInput(input);
@@ -29,7 +29,7 @@ public class LDAPEditor extends FormEditor {
 
     public void addPages() {
         try {
-            addPage(new LDAPRepositoriesPage(this, ldapFederation));
+            addPage(new LDAPRepositoriesPage(this, federationClient));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -50,7 +50,19 @@ public class LDAPEditor extends FormEditor {
         return false;
     }
 
-    public LDAPFederationClient getLdapFederation() {
-        return ldapFederation;
+    public FederationClient getFederationClient() {
+        return federationClient;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public void setFederationClient(FederationClient federationClient) {
+        this.federationClient = federationClient;
     }
 }

@@ -33,8 +33,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.progress.IProgressService;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import java.util.Collection;
-import java.util.ArrayList;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -46,8 +44,6 @@ public class ProjectNode extends Node {
 
     protected ProjectConfig projectConfig;
     protected Project project;
-
-    Collection<Node> children = new ArrayList<Node>();
 
     protected PartitionsNode partitionsNode;
     protected SchemasNode schemasNode;
@@ -248,8 +244,11 @@ public class ProjectNode extends Node {
 
                     federationNode = new FederationNode(
                             "Federation",
-                            "Federation",
                             ProjectNode.this);
+
+                    federationNode.setProject(project);
+                    federationNode.init();
+
                     children.add(federationNode);
 
                     children.add(new AdministratorNode(
@@ -369,10 +368,6 @@ public class ProjectNode extends Node {
 
     public boolean hasChildren() throws Exception {
         return true;
-    }
-
-    public Collection<Node> getChildren() throws Exception {
-        return children;
     }
 
     public PartitionsNode getPartitionsNode() {

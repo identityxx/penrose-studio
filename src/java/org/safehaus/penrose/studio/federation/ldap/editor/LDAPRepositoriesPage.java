@@ -21,9 +21,9 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.federation.LDAPFederationClient;
 import org.safehaus.penrose.federation.LDAPRepository;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
+import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.federation.ldap.wizard.AddLDAPRepositoryWizard;
 import org.safehaus.penrose.studio.federation.ldap.wizard.EditLDAPRepositoryWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -40,17 +40,17 @@ public class LDAPRepositoriesPage extends FormPage {
     FormToolkit toolkit;
 
     LDAPEditor editor;
-    LDAPFederationClient ldapFederation;
+    FederationClient federationClient;
     Project project;
 
     Table table;
 
-    public LDAPRepositoriesPage(LDAPEditor editor, LDAPFederationClient ldapFederation) {
+    public LDAPRepositoriesPage(LDAPEditor editor, FederationClient federationClient) {
         super(editor, "REPOSITORIES", "  Repositories  ");
 
         this.editor = editor;
-        this.project = editor.project;
-        this.ldapFederation = ldapFederation;
+        this.project = editor.getProject();
+        this.federationClient = federationClient;
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -140,8 +140,11 @@ public class LDAPRepositoriesPage extends FormPage {
 
                     FederationRepositoryConfig repository = wizard.getRepository();
 
-                    ldapFederation.addRepository(repository);
-                    ldapFederation.createPartitions(repository.getName());
+                    federationClient.addRepository(repository);
+                    federationClient.store();
+
+                    federationClient.createPartition(repository.getName());
+                    federationClient.startPartition(repository.getName());
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
@@ -176,7 +179,7 @@ public class LDAPRepositoriesPage extends FormPage {
 
                     if (dialog.open() == Window.CANCEL) return;
 
-                    ldapFederation.updateRepository(repository);
+                    federationClient.updateRepository(repository);
 
                     refresh();
 
@@ -210,8 +213,10 @@ public class LDAPRepositoriesPage extends FormPage {
                     for (TableItem ti : items) {
                         FederationRepositoryConfig repository = (FederationRepositoryConfig)ti.getData();
 
-                        ldapFederation.removePartitions(repository.getName());
-                        ldapFederation.removeRepository(repository.getName());
+                        federationClient.stopPartition(repository.getName());
+                        federationClient.removePartition(repository.getName());
+                        federationClient.removeRepository(repository.getName());
+                        federationClient.store();
                     }
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
@@ -249,7 +254,7 @@ public class LDAPRepositoriesPage extends FormPage {
 
             table.removeAll();
 
-            for (FederationRepositoryConfig repositoryConfig : ldapFederation.getRepositories()) {
+            for (FederationRepositoryConfig repositoryConfig : federationClient.getRepositories("LDAP")) {
 
                 TableItem ti = new TableItem(table, SWT.NONE);
 

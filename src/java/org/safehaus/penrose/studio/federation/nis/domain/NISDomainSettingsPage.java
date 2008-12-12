@@ -14,12 +14,14 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
+import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
+import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.federation.nis.wizard.EditNISDomainWizard;
 import org.safehaus.penrose.studio.project.Project;
@@ -36,19 +38,13 @@ public class NISDomainSettingsPage extends FormPage {
     Label serverText;
     Label domainText;
 
-    NISDomainEditor editor;
-    NISFederationClient nisFederation;
-    FederationRepositoryConfig domain;
-
     Project project;
+    FederationClient federationClient;
+    NISFederationClient nisFederationClient;
+    FederationRepositoryConfig repositoryConfig;
 
-    public NISDomainSettingsPage(NISDomainEditor editor) {
+    public NISDomainSettingsPage(FormEditor editor) {
         super(editor, "SETTINGS", "  Settings  ");
-
-        this.editor = editor;
-        this.project = editor.project;
-        this.nisFederation = editor.getNisFederation();
-        this.domain = editor.getDomain();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -126,13 +122,13 @@ public class NISDomainSettingsPage extends FormPage {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    EditNISDomainWizard wizard = new EditNISDomainWizard(domain);
-                    WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
+                    EditNISDomainWizard wizard = new EditNISDomainWizard(repositoryConfig);
+                    WizardDialog dialog = new WizardDialog(getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
 
                     if (dialog.open() == Window.CANCEL) return;
 
-                    nisFederation.updateRepository(domain);
+                    federationClient.updateRepository(repositoryConfig);
 
                     refresh();
                     
@@ -148,15 +144,47 @@ public class NISDomainSettingsPage extends FormPage {
 
     public void refresh() {
         try {
-            String server = domain.getParameter(NISDomain.SERVER);
+            String server = repositoryConfig.getParameter(NISDomain.SERVER);
             serverText.setText(server == null ? "" : server);
 
-            String fullName = domain.getParameter(NISDomain.DOMAIN);
+            String fullName = repositoryConfig.getParameter(NISDomain.DOMAIN);
             domainText.setText(fullName == null ? "" : fullName);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);
         }
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public NISFederationClient getNisFederationClient() {
+        return nisFederationClient;
+    }
+
+    public void setNisFederationClient(NISFederationClient nisFederationClient) {
+        this.nisFederationClient = nisFederationClient;
+    }
+
+    public FederationRepositoryConfig getRepositoryConfig() {
+        return repositoryConfig;
+    }
+
+    public void setRepositoryConfig(FederationRepositoryConfig repositoryConfig) {
+        this.repositoryConfig = repositoryConfig;
+    }
+
+    public FederationClient getFederationClient() {
+        return federationClient;
+    }
+
+    public void setFederationClient(FederationClient federationClient) {
+        this.federationClient = federationClient;
     }
 }

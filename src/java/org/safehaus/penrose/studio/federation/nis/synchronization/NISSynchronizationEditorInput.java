@@ -13,7 +13,7 @@ import org.safehaus.penrose.federation.FederationRepositoryConfig;
 public class NISSynchronizationEditorInput implements IEditorInput {
 
     private Project project;
-    private NISFederationClient nisFederation;
+    private NISFederationClient nisFederationClient;
     private FederationRepositoryConfig domain;
 
     public NISSynchronizationEditorInput() {
@@ -74,12 +74,12 @@ public class NISSynchronizationEditorInput implements IEditorInput {
         this.domain = domain;
     }
 
-    public NISFederationClient getNisTool() {
-        return nisFederation;
+    public NISFederationClient getNisFederationClient() {
+        return nisFederationClient;
     }
 
-    public void setNisTool(NISFederationClient nisFederation) {
-        this.nisFederation = nisFederation;
+    public void setNisFederationClient(NISFederationClient nisFederationClient) {
+        this.nisFederationClient = nisFederationClient;
     }
 
     public Project getProject() {

@@ -12,7 +12,6 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.federation.FederationDomainNode;
 import org.safehaus.penrose.federation.LDAPFederationClient;
 import org.safehaus.penrose.federation.*;
 import org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditor;
@@ -29,34 +28,39 @@ public class LDAPNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    private FederationDomainNode federationDomainNode;
+    Project project;
+    FederationClient federationClient;
 
-    private Project project;
-    private LDAPFederationClient ldapFederation;
+    public LDAPNode(String name, Object parent) throws Exception {
+        super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, parent);
+    }
 
-    public LDAPNode(String name, FederationDomainNode federationDomainNode) throws Exception {
-        super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, federationDomainNode);
-
-        this.federationDomainNode = federationDomainNode;
-
-        project = federationDomainNode.getProject();
-        ldapFederation = new LDAPFederationClient(federationDomainNode.getFederationClient());
-
+    public void init() throws Exception {
         refresh();
     }
 
     public void refresh() throws Exception {
 
-        log.debug("Refreshing repository types:");
+        log.debug("LDAP repositories:");
 
         children.clear();
 
-        for (FederationRepositoryConfig repository : ldapFederation.getRepositories()) {
-            LDAPRepositoryNode node = new LDAPRepositoryNode(
-                    repository.getName(),
-                    repository,
-                    this
-            );
+        for (FederationRepositoryConfig repositoryConfig : federationClient.getRepositories("LDAP")) {
+
+            String repositoryName = repositoryConfig.getName();
+            log.debug(" - "+repositoryName);
+            
+            LDAPFederationClient ldapFederationClient = new LDAPFederationClient(federationClient, repositoryName);
+
+            LDAPRepositoryNode node = new LDAPRepositoryNode(repositoryConfig.getName(), this);
+
+            node.setProject(project);
+            node.setFederationClient(federationClient);
+            node.setLdapFederationClient(ldapFederationClient);
+            node.setRepositoryConfig(repositoryConfig);
+
+            node.init();
+
             children.add(node);
         }
     }
@@ -104,7 +108,7 @@ public class LDAPNode extends Node {
 
         LDAPEditorInput ei = new LDAPEditorInput();
         ei.setProject(project);
-        ei.setLdapFederation(ldapFederation);
+        ei.setFederationClient(federationClient);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -126,8 +130,11 @@ public class LDAPNode extends Node {
 
         FederationRepositoryConfig repository = wizard.getRepository();
 
-        ldapFederation.addRepository(repository);
-        ldapFederation.createPartitions(repository.getName());
+        federationClient.addRepository(repository);
+        federationClient.store();
+
+        federationClient.createPartition(repository.getName());
+        federationClient.startPartition(repository.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
@@ -141,19 +148,11 @@ public class LDAPNode extends Node {
         this.project = project;
     }
 
-    public FederationDomainNode getFederationNode() {
-        return federationDomainNode;
+    public FederationClient getFederationClient() {
+        return federationClient;
     }
 
-    public void setFederationNode(FederationDomainNode federationDomainNode) {
-        this.federationDomainNode = federationDomainNode;
-    }
-
-    public LDAPFederationClient getLdapFederation() {
-        return ldapFederation;
-    }
-
-    public void setLdapFederation(LDAPFederationClient ldapFederation) {
-        this.ldapFederation = ldapFederation;
+    public void setFederationClient(FederationClient federationClient) {
+        this.federationClient = federationClient;
     }
 }

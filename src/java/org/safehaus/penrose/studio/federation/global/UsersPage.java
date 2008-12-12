@@ -49,8 +49,8 @@ public class UsersPage extends FormPage {
 
     SourceClient globalSourceClient;
 
-    String objectClass; // = "posixAccount";
-    String attributeName; // = "uidNumber";
+    String objectClass = "posixAccount";
+    String uidNumber = "uidNumber";
 
     public UsersPage(ConflictDetectionEditor editor) throws Exception {
         super(editor, "USERS", "  Users  ");
@@ -388,10 +388,10 @@ public class UsersPage extends FormPage {
         DN localDn = localEntry.getDn();
         Attributes localAttributes = localEntry.getAttributes();
 
-        Object value = localAttributes.getValue(attributeName);
+        Object value = localAttributes.getValue(uidNumber);
 
         Filter objectClassFilter = new SimpleFilter("objectClass", "=", objectClass);
-        Filter attributeFilter = new SimpleFilter(attributeName, "=", value);
+        Filter attributeFilter = new SimpleFilter(uidNumber, "=", value);
         Filter remoteFilter = FilterTool.appendAndFilter(objectClassFilter, attributeFilter);
 
         SearchRequest remoteRequest = new SearchRequest();
@@ -468,11 +468,11 @@ public class UsersPage extends FormPage {
         this.objectClass = objectClass;
     }
 
-    public String getAttributeName() {
-        return attributeName;
+    public String getUidNumber() {
+        return uidNumber;
     }
 
-    public void setAttributeName(String attributeName) {
-        this.attributeName = attributeName;
+    public void setUidNumber(String uidNumber) {
+        this.uidNumber = uidNumber;
     }
 }

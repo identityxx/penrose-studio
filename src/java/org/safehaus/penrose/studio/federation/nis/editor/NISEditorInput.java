@@ -5,6 +5,7 @@ import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.FederationClient;
 
 /**
  * @author Endi S. Dewata
@@ -12,7 +13,7 @@ import org.safehaus.penrose.federation.NISFederationClient;
 public class NISEditorInput implements IEditorInput {
 
     private Project project;
-    private NISFederationClient nisFederationClient;
+    private FederationClient federationClient;
 
     public NISEditorInput() {
     }
@@ -62,12 +63,12 @@ public class NISEditorInput implements IEditorInput {
         return true;
     }
 
-    public NISFederationClient getNisFederationClient() {
-        return nisFederationClient;
+    public FederationClient getFederationClient() {
+        return federationClient;
     }
 
-    public void setNisFederationClient(NISFederationClient nisFederation) {
-        this.nisFederationClient = nisFederation;
+    public void setFederationClient(FederationClient federationClient) {
+        this.federationClient = federationClient;
     }
 
     public Project getProject() {

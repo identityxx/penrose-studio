@@ -5,6 +5,7 @@ import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
+import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.project.Project;
 
 /**
@@ -13,8 +14,9 @@ import org.safehaus.penrose.studio.project.Project;
 public class NISDomainEditorInput implements IEditorInput {
 
     private Project project;
-    private NISFederationClient nisFederation;
-    private FederationRepositoryConfig domain;
+    private FederationClient federationClient;
+    private NISFederationClient nisFederationClient;
+    private FederationRepositoryConfig repositoryConfig;
 
     public NISDomainEditorInput() {
     }
@@ -28,7 +30,7 @@ public class NISDomainEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "NIS - "+domain.getName();
+        return "NIS - "+ repositoryConfig.getName();
     }
 
     public IPersistableElement getPersistable() {
@@ -45,7 +47,7 @@ public class NISDomainEditorInput implements IEditorInput {
 
     public int hashCode() {
         return (project == null ? 0 : project.hashCode()) +
-                (domain == null ? 0 : domain.hashCode());
+                (repositoryConfig == null ? 0 : repositoryConfig.hashCode());
     }
 
     boolean equals(Object o1, Object o2) {
@@ -61,25 +63,25 @@ public class NISDomainEditorInput implements IEditorInput {
 
         NISDomainEditorInput cei = (NISDomainEditorInput)object;
         if (!equals(project, cei.project)) return false;
-        if (!equals(domain, cei.domain)) return false;
+        if (!equals(repositoryConfig, cei.repositoryConfig)) return false;
 
         return true;
     }
 
-    public FederationRepositoryConfig getDomain() {
-        return domain;
+    public FederationRepositoryConfig getRepositoryConfig() {
+        return repositoryConfig;
     }
 
-    public void setDomain(FederationRepositoryConfig domain) {
-        this.domain = domain;
+    public void setRepositoryConfig(FederationRepositoryConfig repositoryConfig) {
+        this.repositoryConfig = repositoryConfig;
     }
 
-    public NISFederationClient getNisFederation() {
-        return nisFederation;
+    public NISFederationClient getNisFederationClient() {
+        return nisFederationClient;
     }
 
-    public void setNisFederation(NISFederationClient nisFederation) {
-        this.nisFederation = nisFederation;
+    public void setNisFederationClient(NISFederationClient nisFederationClient) {
+        this.nisFederationClient = nisFederationClient;
     }
 
     public Project getProject() {
@@ -88,5 +90,13 @@ public class NISDomainEditorInput implements IEditorInput {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public FederationClient getFederationClient() {
+        return federationClient;
+    }
+
+    public void setFederationClient(FederationClient federationClient) {
+        this.federationClient = federationClient;
     }
 }

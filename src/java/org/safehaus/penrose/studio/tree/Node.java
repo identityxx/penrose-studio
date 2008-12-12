@@ -46,8 +46,7 @@ public class Node {
         this.parent = parent;
     }
 
-    public void init() {
-
+    public void init() throws Exception {
     }
     
     public String getName() {

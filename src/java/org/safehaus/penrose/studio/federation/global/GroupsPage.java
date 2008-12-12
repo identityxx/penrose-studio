@@ -49,8 +49,8 @@ public class GroupsPage extends FormPage {
 
     SourceClient globalSourceClient;
 
-    String objectClass; // = "posixGroup";
-    String attributeName; // = "gidNumber";
+    String objectClass = "posixGroup";
+    String gidNumber = "gidNumber";
 
     public GroupsPage(ConflictDetectionEditor editor) throws Exception {
         super(editor, "GROUPS", "  Groups  ");
@@ -388,10 +388,10 @@ public class GroupsPage extends FormPage {
         DN localDn = localEntry.getDn();
         Attributes localAttributes = localEntry.getAttributes();
 
-        Object value = localAttributes.getValue(attributeName);
+        Object value = localAttributes.getValue(gidNumber);
 
         Filter objectClassFilter = new SimpleFilter("objectClass", "=", objectClass);
-        Filter attributeFilter = new SimpleFilter(attributeName, "=", value);
+        Filter attributeFilter = new SimpleFilter(gidNumber, "=", value);
         Filter remoteFilter = FilterTool.appendAndFilter(objectClassFilter, attributeFilter);
 
         SearchRequest remoteRequest = new SearchRequest();
@@ -468,11 +468,11 @@ public class GroupsPage extends FormPage {
         this.objectClass = objectClass;
     }
 
-    public String getAttributeName() {
-        return attributeName;
+    public String getGidNumber() {
+        return gidNumber;
     }
 
-    public void setAttributeName(String attributeName) {
-        this.attributeName = attributeName;
+    public void setGidNumber(String gidNumber) {
+        this.gidNumber = gidNumber;
     }
 }

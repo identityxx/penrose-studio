@@ -1,6 +1,7 @@
 package org.safehaus.penrose.studio.federation.wizard;
 
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TreeAdapter;
@@ -9,10 +10,16 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.ui.progress.IProgressService;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.source.SourceClient;
+
+import javax.management.MBeanException;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Endi Sukma Dewata
@@ -94,17 +101,34 @@ public class BrowserPage extends WizardPage {
     public void expand(TreeItem parent) throws Exception {
         parent.removeAll();
 
-        DN parentDn = (DN)parent.getData();
+        final DN parentDn = (DN)parent.getData();
 
-        SearchRequest request = new SearchRequest();
+        final SearchRequest request = new SearchRequest();
         request.setDn(parentDn);
         request.setScope(SearchRequest.SCOPE_ONE);
         request.setAttributes(new String[] { "dn" });
 
-        SearchResponse response = new SearchResponse();
+        final SearchResponse response = new SearchResponse();
 
-        //response = partitionClient.search(request, response);
-        response = sourceClient.search(request, response);
+        IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+        progressService.busyCursorWhile(new IRunnableWithProgress() {
+            public void run(final IProgressMonitor monitor) throws InvocationTargetException {
+                try {
+                    monitor.beginTask("Searching "+parentDn, IProgressMonitor.UNKNOWN);
+
+                    sourceClient.search(request, response);
+
+                    monitor.worked(1);
+
+                } catch (Exception e) {
+                    throw new InvocationTargetException(e);
+
+                } finally {
+                    monitor.done();
+                }
+            }
+        });
 
         while (response.hasNext()) {
             SearchResult result = response.next();

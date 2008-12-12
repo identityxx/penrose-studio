@@ -38,13 +38,17 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class FederationDomainNode extends Node {
 
-    private Project project;
-    private FederationClient federationClient;
+    Project project;
+    FederationClient federationClient;
 
     public FederationDomainNode(String name, FederationNode federationNode) throws Exception {
         super(name, PenroseStudio.getImage(PenroseImage.MODULE), null, federationNode);
 
         project = federationNode.getProject();
+    }
+
+    public void init() throws Exception {
+
         federationClient = new FederationClient(project.getClient(), name);
 
         refresh();
@@ -52,32 +56,43 @@ public class FederationDomainNode extends Node {
 
     public void refresh() throws Exception {
 
-        log.debug("Refreshing repository types:");
-
         children.clear();
 
         children.add(new GlobalNode(this));
+
+        log.debug("Refreshing repository types:");
 
         for (String type : federationClient.getRepositoryTypes()) {
 
             log.debug(" - "+type);
 
-            Node node;
-
             if ("JDBC".equals(type)) {
-                node = new JDBCNode(type, this);
+
+                JDBCNode node = new JDBCNode(type, this);
+                node.setProject(project);
+                node.setFederationClient(federationClient);
+                node.init();
+
+                children.add(node);
 
             } else if ("LDAP".equals(type)) {
-                node = new LDAPNode(type, this);
+
+                LDAPNode node = new LDAPNode(type, this);
+                node.setProject(project);
+                node.setFederationClient(federationClient);
+                node.init();
+
+                children.add(node);
 
             } else if ("NIS".equals(type)) {
-                node = new NISNode(type, this);
 
-            } else {
-                continue;
+                NISNode node = new NISNode(type, this);
+                node.setProject(project);
+                node.setFederationClient(federationClient);
+                node.init();
+
+                children.add(node);
             }
-
-            children.add(node);
         }
     }
 
@@ -270,7 +285,7 @@ public class FederationDomainNode extends Node {
                     monitor.subTask("Uploading Federation configuration...");
 
                     federationClient.setFederationConfig(federationConfig);
-                    federationClient.storeFederationConfig();
+                    federationClient.store();
 
                     monitor.worked(1);
 

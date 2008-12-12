@@ -19,9 +19,9 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
+import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.federation.nis.wizard.AddNISDomainWizard;
 import org.safehaus.penrose.studio.federation.nis.wizard.EditNISDomainWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -37,15 +37,15 @@ public class NISDomainsPage extends FormPage {
     FormToolkit toolkit;
 
     NISEditor editor;
-    NISFederationClient nisFederation;
+    FederationClient federationClient;
 
     Table table;
 
-    public NISDomainsPage(NISEditor editor, NISFederationClient nisFederation) {
+    public NISDomainsPage(NISEditor editor, FederationClient federationClient) {
         super(editor, "DOMAINS", "  Domains  ");
 
         this.editor = editor;
-        this.nisFederation = nisFederation;
+        this.federationClient = federationClient;
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -135,8 +135,11 @@ public class NISDomainsPage extends FormPage {
 
                     FederationRepositoryConfig domain = wizard.getRepository();
 
-                    nisFederation.addRepository(domain);
-                    nisFederation.createPartitions(domain.getName());
+                    federationClient.addRepository(domain);
+                    federationClient.store();
+
+                    federationClient.createPartition(domain.getName());
+                    federationClient.startPartition(domain.getName());
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
@@ -176,7 +179,7 @@ public class NISDomainsPage extends FormPage {
                     int action = dialog.getAction();
                     if (action == NISUserDialog.CANCEL) return;
 */
-                    nisFederation.updateRepository(domain);
+                    federationClient.updateRepository(domain);
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
@@ -214,8 +217,10 @@ public class NISDomainsPage extends FormPage {
                         FederationRepositoryConfig repository = (FederationRepositoryConfig)ti.getData();
 
                         try {
-                            nisFederation.removePartitions(repository.getName());
-                            nisFederation.removeRepository(repository.getName());
+                            federationClient.stopPartition(repository.getName());
+                            federationClient.removePartition(repository.getName());
+                            federationClient.removeRepository(repository.getName());
+                            federationClient.store();
 
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
@@ -257,7 +262,7 @@ public class NISDomainsPage extends FormPage {
 
             table.removeAll();
 
-            for (FederationRepositoryConfig repositoryConfig : nisFederation.getRepositories()) {
+            for (FederationRepositoryConfig repositoryConfig : federationClient.getRepositories("NIS")) {
 
                 TableItem ti = new TableItem(table, SWT.NONE);
 

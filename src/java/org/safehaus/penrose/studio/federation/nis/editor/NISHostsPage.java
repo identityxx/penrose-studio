@@ -398,7 +398,7 @@ public class NISHostsPage extends FormPage {
                     new String[] { String.class.getName(), String[].class.getName() }
             );
 
-            //Runnable runnable = new UpdateFilesRunnable(result, nisFederation.getHosts(), nisFederation.getFiles());
+            //Runnable runnable = new UpdateFilesRunnable(result, nisFederation.getHosts(), nisFederationClient.getFiles());
             //runnable.run();
 
             //new Thread(runnable).start();

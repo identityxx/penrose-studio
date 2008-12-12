@@ -7,6 +7,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.safehaus.penrose.federation.LDAPFederationClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
+import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.project.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,14 +17,16 @@ public class LDAPRepositoryEditor extends FormEditor {
     public Logger log = LoggerFactory.getLogger(getClass());
 
     Project project;
-    LDAPFederationClient ldapFederation;
-    FederationRepositoryConfig repository;
+    FederationClient federationClient;
+    LDAPFederationClient ldapFederationClient;
+    FederationRepositoryConfig repositoryConfig;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         LDAPRepositoryEditorInput ei = (LDAPRepositoryEditorInput)input;
         project = ei.getProject();
-        ldapFederation = ei.getLdapFederation();
-        repository = ei.getRepository();
+        federationClient = ei.getFederationClient();
+        ldapFederationClient = ei.getLdapFederationClient();
+        repositoryConfig = ei.getRepositoryConfig();
 
         setSite(site);
         setInput(input);
@@ -32,7 +35,12 @@ public class LDAPRepositoryEditor extends FormEditor {
 
     public void addPages() {
         try {
-            addPage(new LDAPRepositorySettingsPage(this));
+            LDAPRepositorySettingsPage page = new LDAPRepositorySettingsPage(this);
+            page.setProject(project);
+            page.setFederationClient(federationClient);
+            page.setLdapFederationClient(ldapFederationClient);
+            page.setRepositoryConfig(repositoryConfig);
+            addPage(page);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -53,15 +61,15 @@ public class LDAPRepositoryEditor extends FormEditor {
         return false;
     }
 
-    public FederationRepositoryConfig getRepository() {
-        return repository;
+    public FederationRepositoryConfig getRepositoryConfig() {
+        return repositoryConfig;
     }
 
-    public void setRepository(FederationRepositoryConfig repository) {
-        this.repository = repository;
+    public void setRepositoryConfig(FederationRepositoryConfig repositoryConfig) {
+        this.repositoryConfig = repositoryConfig;
     }
 
-    public LDAPFederationClient getLdapFederation() {
-        return ldapFederation;
+    public LDAPFederationClient getLdapFederationClient() {
+        return ldapFederationClient;
     }
 }

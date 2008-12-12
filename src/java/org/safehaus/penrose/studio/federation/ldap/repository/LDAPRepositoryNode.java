@@ -5,9 +5,9 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.federation.ldap.linking.LDAPLinkingNode;
-import org.safehaus.penrose.studio.federation.ldap.LDAPNode;
 import org.safehaus.penrose.federation.LDAPFederationClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
+import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.federation.ldap.wizard.EditLDAPRepositoryWizard;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IMenuManager;
@@ -25,32 +25,25 @@ public class LDAPRepositoryNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    private LDAPNode ldapNode;
-
     private Project project;
-    private LDAPFederationClient ldapFederation;
-    private FederationRepositoryConfig repository;
+    private FederationClient federationClient;
+    private LDAPFederationClient ldapFederationClient;
+    private FederationRepositoryConfig repositoryConfig;
 
-    LDAPLinkingNode   linkingNode;
+    public LDAPRepositoryNode(String name, Object parent) {
+        super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, parent );
+    }
 
-    public LDAPRepositoryNode(String name, FederationRepositoryConfig repository, LDAPNode ldapNode) {
-        super(
-                name,
-                PenroseStudio.getImage(PenroseImage.FOLDER),
-                repository,
-                ldapNode
-        );
+    public void init() throws Exception {
 
-        this.repository = repository;
-        this.ldapNode = ldapNode;
-        this.ldapFederation = ldapNode.getLdapFederation();
-
-        project = ldapNode.getProject();
-
-        linkingNode = new LDAPLinkingNode(
+        LDAPLinkingNode linkingNode = new LDAPLinkingNode(
                 "Identity Linking",
                 this
         );
+
+        linkingNode.setProject(project);
+        linkingNode.setLdapFederationClient(ldapFederationClient);
+        linkingNode.setRepositoryConfig(repositoryConfig);
 
         children.add(linkingNode);
     }
@@ -82,8 +75,9 @@ public class LDAPRepositoryNode extends Node {
 
         LDAPRepositoryEditorInput ei = new LDAPRepositoryEditorInput();
         ei.setProject(project);
-        ei.setLdapFederation(ldapFederation);
-        ei.setRepository(repository);
+        ei.setFederationClient(federationClient);
+        ei.setLdapFederationClient(ldapFederationClient);
+        ei.setRepositoryConfig(repositoryConfig);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -92,7 +86,7 @@ public class LDAPRepositoryNode extends Node {
 
     public void edit() throws Exception {
 
-        EditLDAPRepositoryWizard wizard = new EditLDAPRepositoryWizard(repository);
+        EditLDAPRepositoryWizard wizard = new EditLDAPRepositoryWizard(repositoryConfig);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
@@ -100,7 +94,7 @@ public class LDAPRepositoryNode extends Node {
 
         if (dialog.open() == Window.CANCEL) return;
 
-        ldapFederation.updateRepository(repository);
+        federationClient.updateRepository(repositoryConfig);
     }
 
     public Project getProject() {
@@ -111,19 +105,27 @@ public class LDAPRepositoryNode extends Node {
         this.project = project;
     }
 
-    public LDAPNode getLdapNode() {
-        return ldapNode;
+    public FederationRepositoryConfig getRepositoryConfig() {
+        return repositoryConfig;
     }
 
-    public void setLdapNode(LDAPNode ldapNode) {
-        this.ldapNode = ldapNode;
+    public void setRepositoryConfig(FederationRepositoryConfig repositoryConfig) {
+        this.repositoryConfig = repositoryConfig;
     }
 
-    public FederationRepositoryConfig getRepository() {
-        return repository;
+    public LDAPFederationClient getLdapFederationClient() {
+        return ldapFederationClient;
     }
 
-    public void setRepository(FederationRepositoryConfig repository) {
-        this.repository = repository;
+    public void setLdapFederationClient(LDAPFederationClient ldapFederationClient) {
+        this.ldapFederationClient = ldapFederationClient;
+    }
+
+    public FederationClient getFederationClient() {
+        return federationClient;
+    }
+
+    public void setFederationClient(FederationClient federationClient) {
+        this.federationClient = federationClient;
     }
 }

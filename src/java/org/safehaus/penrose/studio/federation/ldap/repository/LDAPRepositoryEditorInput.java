@@ -6,6 +6,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.federation.LDAPFederationClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
+import org.safehaus.penrose.federation.FederationClient;
 
 /**
  * @author Endi S. Dewata
@@ -13,8 +14,9 @@ import org.safehaus.penrose.federation.FederationRepositoryConfig;
 public class LDAPRepositoryEditorInput implements IEditorInput {
 
     private Project project;
-    private LDAPFederationClient ldapFederation;
-    private FederationRepositoryConfig repository;
+    private FederationClient federationClient;
+    private LDAPFederationClient ldapFederationClient;
+    private FederationRepositoryConfig repositoryConfig;
 
     public LDAPRepositoryEditorInput() {
     }
@@ -28,7 +30,7 @@ public class LDAPRepositoryEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "LDAP - "+repository.getName();
+        return "LDAP - "+ repositoryConfig.getName();
     }
 
     public IPersistableElement getPersistable() {
@@ -45,7 +47,7 @@ public class LDAPRepositoryEditorInput implements IEditorInput {
 
     public int hashCode() {
         return (project == null ? 0 : project.hashCode()) +
-                (repository == null ? 0 : repository.hashCode());
+                (repositoryConfig == null ? 0 : repositoryConfig.hashCode());
     }
 
     boolean equals(Object o1, Object o2) {
@@ -61,25 +63,25 @@ public class LDAPRepositoryEditorInput implements IEditorInput {
 
         LDAPRepositoryEditorInput cei = (LDAPRepositoryEditorInput)object;
         if (!equals(project, cei.project)) return false;
-        if (!equals(repository, cei.repository)) return false;
+        if (!equals(repositoryConfig, cei.repositoryConfig)) return false;
 
         return true;
     }
 
-    public FederationRepositoryConfig getRepository() {
-        return repository;
+    public FederationRepositoryConfig getRepositoryConfig() {
+        return repositoryConfig;
     }
 
-    public void setRepository(FederationRepositoryConfig repository) {
-        this.repository = repository;
+    public void setRepositoryConfig(FederationRepositoryConfig repositoryConfig) {
+        this.repositoryConfig = repositoryConfig;
     }
 
-    public LDAPFederationClient getLdapFederation() {
-        return ldapFederation;
+    public LDAPFederationClient getLdapFederationClient() {
+        return ldapFederationClient;
     }
 
-    public void setLdapFederation(LDAPFederationClient nisFederation) {
-        this.ldapFederation = nisFederation;
+    public void setLdapFederationClient(LDAPFederationClient nisFederation) {
+        this.ldapFederationClient = nisFederation;
     }
 
     public Project getProject() {
@@ -88,5 +90,13 @@ public class LDAPRepositoryEditorInput implements IEditorInput {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public FederationClient getFederationClient() {
+        return federationClient;
+    }
+
+    public void setFederationClient(FederationClient federationClient) {
+        this.federationClient = federationClient;
     }
 }

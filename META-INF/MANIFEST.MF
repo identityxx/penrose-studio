@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: VD Studio
 Bundle-SymbolicName: org.safehaus.penrose.studio; singleton:=true
 Bundle-Version: 2.0.0
-Bundle-Vendor: Red Hat
+Bundle-Vendor: Identyx
 Bundle-Activator: org.safehaus.penrose.studio.PenroseStudioPlugin
 Bundle-Localization: plugin
 Eclipse-AutoStart: true

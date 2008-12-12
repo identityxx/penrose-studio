@@ -12,7 +12,6 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingEditor;
 import org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingEditorInput;
-import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.tree.Node;
 
@@ -25,12 +24,8 @@ public class NISLinkingNode extends Node {
     NISFederationClient nisFederationClient;
     FederationRepositoryConfig repositoryConfig;
 
-    public NISLinkingNode(String name, NISDomainNode domainNode) {
-        super(name, PenroseStudio.getImage(PenroseImage.OBJECT), null, domainNode);
-
-        repositoryConfig = domainNode.getDomain();
-        project = domainNode.getProject();
-        nisFederationClient = domainNode.getNisFederationClient();
+    public NISLinkingNode(String name, Object parent) {
+        super(name, PenroseStudio.getImage(PenroseImage.OBJECT), null, parent);
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -67,5 +62,21 @@ public class NISLinkingNode extends Node {
 
     public void setNisFederationClient(NISFederationClient nisFederation) {
         this.nisFederationClient = nisFederation;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public FederationRepositoryConfig getRepositoryConfig() {
+        return repositoryConfig;
+    }
+
+    public void setRepositoryConfig(FederationRepositoryConfig repositoryConfig) {
+        this.repositoryConfig = repositoryConfig;
     }
 }

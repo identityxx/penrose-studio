@@ -12,9 +12,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
+import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 /**
@@ -27,15 +27,15 @@ public class NISYPConfPage extends FormPage {
     FormToolkit toolkit;
 
     NISEditor editor;
-    NISFederationClient nisFederation;
+    FederationClient federationClient;
 
     Text text;
 
-    public NISYPConfPage(NISEditor editor, NISFederationClient nisFederation) {
+    public NISYPConfPage(NISEditor editor, FederationClient federationClient) {
         super(editor, "YP_CONF", "  yp.conf  ");
 
         this.editor = editor;
-        this.nisFederation = nisFederation;
+        this.federationClient = federationClient;
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -112,7 +112,7 @@ public class NISYPConfPage extends FormPage {
             sb.append("#\n");
             sb.append("\n");
             
-            for (FederationRepositoryConfig domain : nisFederation.getRepositories()) {
+            for (FederationRepositoryConfig domain : federationClient.getRepositories("NIS")) {
                 sb.append("domain ");
                 sb.append(domain.getParameter(NISDomain.DOMAIN));
                 sb.append(" server ");

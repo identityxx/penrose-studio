@@ -8,6 +8,11 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.module.ModuleManagerClient;
+import org.safehaus.penrose.module.ModuleClient;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +37,39 @@ public class OwnershipAlignmentEditor extends FormEditor {
 
     public void addPages() {
         try {
-            addPage(new UsersPage(this));
-            addPage(new GroupsPage(this));
+            String federationName = nisFederationClient.getFederationClient().getName();
+            String localPartitionName = repositoryConfig.getName();
+
+            PenroseClient client = project.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient localPartitionClient = partitionManagerClient.getPartitionClient(federationName+"_"+localPartitionName);
+            ModuleManagerClient moduleManagerClient = localPartitionClient.getModuleManagerClient();
+
+            ModuleClient usersModuleClient = moduleManagerClient.getModuleClient("Users");
+
+            UsersPage usersPage = new UsersPage(this);
+
+            usersPage.setObjectClass(usersModuleClient.getParameter("objectClass"));
+            usersPage.setRdnAttribute(usersModuleClient.getParameter("rdnAttribute"));
+            usersPage.setSourceAttribute(usersModuleClient.getParameter("sourceAttribute"));
+            usersPage.setTargetAttribute(usersModuleClient.getParameter("targetAttribute"));
+            usersPage.setLinkingAttribute(usersModuleClient.getParameter("linkingAttribute"));
+            usersPage.setLinkingKey(usersModuleClient.getParameter("linkingKey"));
+
+            addPage(usersPage);
+
+            ModuleClient groupsModuleClient = moduleManagerClient.getModuleClient("Groups");
+
+            GroupsPage groupsPage = new GroupsPage(this);
+
+            groupsPage.setObjectClass(groupsModuleClient.getParameter("objectClass"));
+            groupsPage.setRdnAttribute(groupsModuleClient.getParameter("rdnAttribute"));
+            groupsPage.setSourceAttribute(groupsModuleClient.getParameter("sourceAttribute"));
+            groupsPage.setTargetAttribute(usersModuleClient.getParameter("targetAttribute"));
+            groupsPage.setLinkingAttribute(groupsModuleClient.getParameter("linkingAttribute"));
+            groupsPage.setLinkingKey(usersModuleClient.getParameter("linkingKey"));
+
+            addPage(groupsPage);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

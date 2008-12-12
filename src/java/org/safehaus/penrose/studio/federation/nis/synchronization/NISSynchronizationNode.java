@@ -2,9 +2,8 @@ package org.safehaus.penrose.studio.federation.nis.synchronization;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.federation.nis.NISNode;
 import org.safehaus.penrose.federation.NISFederationClient;
-import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.eclipse.jface.action.IMenuManager;
@@ -18,21 +17,12 @@ import org.eclipse.ui.IWorkbenchPage;
  */
 public class NISSynchronizationNode extends Node {
 
-    NISNode nisNode;
-    NISDomainNode domainNode;
+    Project project;
+    NISFederationClient nisFederationClient;
+    FederationRepositoryConfig repositoryConfig;
 
-    private Project project;
-    private NISFederationClient nisFederation;
-
-    public NISSynchronizationNode(String name, NISDomainNode domainNode) {
-        super(name, PenroseStudio.getImage(PenroseImage.OBJECT), null, domainNode);
-
-        this.domainNode = domainNode;
-
-        nisNode = domainNode.getNisNode();
-
-        project = nisNode.getProject();
-        nisFederation = nisNode.getNisFederation();
+    public NISSynchronizationNode(String name, Object parent) {
+        super(name, PenroseStudio.getImage(PenroseImage.OBJECT), null, parent);
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -52,20 +42,35 @@ public class NISSynchronizationNode extends Node {
 
         NISSynchronizationEditorInput ei = new NISSynchronizationEditorInput();
         ei.setProject(project);
-        ei.setNisTool(nisFederation);
-        ei.setDomain(domainNode.getDomain());
+        ei.setNisFederationClient(nisFederationClient);
+        ei.setDomain(repositoryConfig);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
         page.openEditor(ei, NISSynchronizationEditor.class.getName());
     }
 
-
-    public NISFederationClient getNisTool() {
-        return nisFederation;
+    public Project getProject() {
+        return project;
     }
 
-    public void setNisTool(NISFederationClient nisFederation) {
-        this.nisFederation = nisFederation;
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public NISFederationClient getNisFederationClient() {
+        return nisFederationClient;
+    }
+
+    public void setNisFederationClient(NISFederationClient nisFederationClient) {
+        this.nisFederationClient = nisFederationClient;
+    }
+
+    public FederationRepositoryConfig getRepositoryConfig() {
+        return repositoryConfig;
+    }
+
+    public void setRepositoryConfig(FederationRepositoryConfig repositoryConfig) {
+        this.repositoryConfig = repositoryConfig;
     }
 }

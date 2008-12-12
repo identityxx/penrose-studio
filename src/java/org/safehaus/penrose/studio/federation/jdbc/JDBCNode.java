@@ -5,9 +5,10 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.federation.FederationDomainNode;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.tree.Node;
+import org.safehaus.penrose.federation.FederationClient;
+import org.safehaus.penrose.federation.FederationRepositoryConfig;
 
 /**
  * @author Endi S. Dewata
@@ -16,14 +17,23 @@ public class JDBCNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    private FederationDomainNode federationDomainNode;
-    private Project project;
+    Project project;
+    FederationClient federationClient;
 
-    public JDBCNode(String name, FederationDomainNode federationDomainNode) throws Exception {
-        super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, federationDomainNode);
+    public JDBCNode(String name, Object parent) throws Exception {
+        super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, parent);
+    }
 
-        this.federationDomainNode = federationDomainNode;
-        this.project = federationDomainNode.getProject();
+    public void init() throws Exception {
+
+        log.debug("JDBC repositories:");
+
+        children.clear();
+
+        for (FederationRepositoryConfig repositoryConfig : federationClient.getRepositories("JDBC")) {
+
+            log.debug(" - "+repositoryConfig.getName());
+        }
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -50,11 +60,11 @@ public class JDBCNode extends Node {
         this.project = project;
     }
 
-    public FederationDomainNode getFederationNode() {
-        return federationDomainNode;
+    public FederationClient getFederationClient() {
+        return federationClient;
     }
 
-    public void setFederationNode(FederationDomainNode federationDomainNode) {
-        this.federationDomainNode = federationDomainNode;
+    public void setFederationClient(FederationClient federationClient) {
+        this.federationClient = federationClient;
     }
 }

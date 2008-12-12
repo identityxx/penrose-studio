@@ -8,7 +8,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.federation.NISFederationClient;
-import org.safehaus.penrose.federation.NISDomain;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.client.PenroseClient;
@@ -29,7 +28,7 @@ public class NISSynchronizationEditor extends FormEditor {
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         NISSynchronizationEditorInput ei = (NISSynchronizationEditorInput)input;
         project = ei.getProject();
-        nisFederationClient = ei.getNisTool();
+        nisFederationClient = ei.getNisFederationClient();
         domain = ei.getDomain();
 
         setSite(site);

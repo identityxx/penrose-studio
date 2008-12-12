@@ -48,6 +48,19 @@ public class GroupsPage extends FormPage {
     NISFederationClient nisFederationClient;
     FederationRepositoryConfig repositoryConfig;
 
+    SourceClient localSourceClient;
+    SourceClient globalSourceClient;
+
+    String objectClass = "posixGroup";
+
+    String rdnAttribute = "cn";
+
+    String sourceAttribute = "gidNumber";
+    String targetAttribute = "gidNumber";
+
+    String linkingAttribute = "seeAlso";
+    String linkingKey = "dn";
+
     public GroupsPage(OwnershipAlignmentEditor editor) throws Exception {
         super(editor, "GROUPS", "  Groups  ");
 
@@ -55,6 +68,21 @@ public class GroupsPage extends FormPage {
         this.project = editor.project;
         this.nisFederationClient = editor.nisFederationClient;
         this.repositoryConfig = editor.repositoryConfig;
+
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+
+        String federationName = nisFederationClient.getFederationClient().getName();
+        String localPartitionName = repositoryConfig.getName();
+
+        PartitionClient localPartitionClient = partitionManagerClient.getPartitionClient(federationName+"_"+localPartitionName);
+        localSourceClient = localPartitionClient.getSourceManagerClient().getSourceClient("LDAP");
+
+        PartitionClient federationPartitionClient = nisFederationClient.getFederationClient().getPartitionClient();
+        SourceManagerClient sourceManagerClient = federationPartitionClient.getSourceManagerClient();
+
+        globalSourceClient = sourceManagerClient.getSourceClient("Global");
+
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -78,21 +106,7 @@ public class GroupsPage extends FormPage {
 
         Collection<String[]> results = new ArrayList<String[]>();
 
-        PenroseClient client = project.getClient();
-        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-
-        String federationName = nisFederationClient.getFederationClient().getName();
-        String localPartitionName = repositoryConfig.getName();
-
-        PartitionClient localPartitionClient = partitionManagerClient.getPartitionClient(federationName+"_"+localPartitionName);
-        SourceClient localSourceClient = localPartitionClient.getSourceManagerClient().getSourceClient("LDAP");
-
-        PartitionClient federationPartitionClient = nisFederationClient.getFederationClient().getPartitionClient();
-        SourceManagerClient sourceManagerClient = federationPartitionClient.getSourceManagerClient();
-
-        SourceClient globalSourceClient = sourceManagerClient.getSourceClient("Global");
-
-        Filter localFilter = new SimpleFilter("objectClass", "=", "posixGroup");
+        Filter localFilter = new SimpleFilter("objectClass", "=", objectClass);
 
         SearchRequest localRequest = new SearchRequest();
         localRequest.setFilter(localFilter);
@@ -108,30 +122,50 @@ public class GroupsPage extends FormPage {
             DN localDn = localEntry.getDn();
             Attributes localAttributes = localEntry.getAttributes();
 
-            Object localCn = localAttributes.getValue("cn");
-            Object localGidNumber = localAttributes.getValue("gidNumber");
+            Object localRdn = localAttributes.getValue(rdnAttribute);
+            Object localAttribute = localAttributes.getValue(sourceAttribute);
 
-            log.debug(" - "+localDn+": "+localGidNumber);
+            log.debug(" - "+localDn+": "+localAttribute);
 
-            Object localSeeAlso = localAttributes.getValue("seeAlso");
-            Object globalGidNumber = null;
+            Object linkingValue = localAttributes.getValue(linkingAttribute);
+            Object globalAttribute = null;
 
-            if (localSeeAlso != null) {
+            if (linkingValue != null) {
+                SearchResult globalEntry = null;
+
                 try {
-                    SearchResult globalEntry = globalSourceClient.find(localSeeAlso.toString());
-                    Attributes globalAttributes = globalEntry.getAttributes();
-                    globalGidNumber = globalAttributes.getValue("gidNumber");
+                    if ("dn".equals(linkingKey)) {
+                        globalEntry = globalSourceClient.find(linkingValue.toString());
+
+                    } else {
+                        SearchRequest request = new SearchRequest();
+                        request.setFilter(new SimpleFilter(linkingKey, "=", linkingValue));
+
+                        SearchResponse response = new SearchResponse();
+
+                        globalSourceClient.search(request, response);
+
+                        if (response.hasNext()) {
+                            globalEntry = response.next();
+                        }
+                    }
+
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
+
+                if (globalEntry == null) continue;
+
+                Attributes globalAttributes = globalEntry.getAttributes();
+                globalAttribute = globalAttributes.getValue(targetAttribute);
             }
 
-            if (globalGidNumber == null || localGidNumber.equals(globalGidNumber)) continue;
+            if (globalAttribute == null || localAttribute.equals(globalAttribute)) continue;
 
             String result[] = new String[3];
-            result[0] = localCn.toString();
-            result[1] = localGidNumber.toString();
-            result[2] = globalGidNumber.toString();
+            result[0] = localRdn.toString();
+            result[1] = localAttribute.toString();
+            result[2] = globalAttribute.toString();
 
             results.add(result);
         }
@@ -244,5 +278,53 @@ public class GroupsPage extends FormPage {
         }
 
         out.close();
+    }
+
+    public String getObjectClass() {
+        return objectClass;
+    }
+
+    public void setObjectClass(String objectClass) {
+        this.objectClass = objectClass;
+    }
+
+    public String getRdnAttribute() {
+        return rdnAttribute;
+    }
+
+    public void setRdnAttribute(String rdnAttribute) {
+        this.rdnAttribute = rdnAttribute;
+    }
+
+    public String getSourceAttribute() {
+        return sourceAttribute;
+    }
+
+    public void setSourceAttribute(String sourceAttribute) {
+        this.sourceAttribute = sourceAttribute;
+    }
+
+    public String getLinkingAttribute() {
+        return linkingAttribute;
+    }
+
+    public void setLinkingAttribute(String linkingAttribute) {
+        this.linkingAttribute = linkingAttribute;
+    }
+
+    public String getTargetAttribute() {
+        return targetAttribute;
+    }
+
+    public void setTargetAttribute(String targetAttribute) {
+        this.targetAttribute = targetAttribute;
+    }
+
+    public String getLinkingKey() {
+        return linkingKey;
+    }
+
+    public void setLinkingKey(String linkingKey) {
+        this.linkingKey = linkingKey;
     }
 }

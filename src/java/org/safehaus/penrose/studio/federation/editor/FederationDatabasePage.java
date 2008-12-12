@@ -170,7 +170,7 @@ public class FederationDatabasePage extends FormPage {
             federationConfig.addRepository(repository);
         }
 
-        NISFederation nisFederation = federation.getNisFederation();
+        NISFederation nisFederation = federation.getNisFederationClient();
         for (NISDomain repository : nisFederation.getRepositories()) {
             federationConfig.addRepository(repository);
         }

@@ -7,6 +7,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
+import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.project.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,14 +17,15 @@ public class NISDomainEditor extends FormEditor {
     public Logger log = LoggerFactory.getLogger(getClass());
 
     public Project project;
-    public NISFederationClient nisFederation;
-    public FederationRepositoryConfig domain;
+    public FederationClient federationClient;
+    public NISFederationClient nisFederationClient;
+    public FederationRepositoryConfig repositoryConfig;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         NISDomainEditorInput ei = (NISDomainEditorInput)input;
         project = ei.getProject();
-        nisFederation = ei.getNisFederation();
-        domain = ei.getDomain();
+        nisFederationClient = ei.getNisFederationClient();
+        repositoryConfig = ei.getRepositoryConfig();
 
         setSite(site);
         setInput(input);
@@ -32,7 +34,13 @@ public class NISDomainEditor extends FormEditor {
 
     public void addPages() {
         try {
-            addPage(new NISDomainSettingsPage(this));
+            NISDomainSettingsPage page = new NISDomainSettingsPage(this);
+            page.setProject(project);
+            page.setFederationClient(federationClient);
+            page.setNisFederationClient(nisFederationClient);
+            page.setRepositoryConfig(repositoryConfig);
+
+            addPage(page);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -53,15 +61,15 @@ public class NISDomainEditor extends FormEditor {
         return false;
     }
 
-    public FederationRepositoryConfig getDomain() {
-        return domain;
+    public FederationRepositoryConfig getRepositoryConfig() {
+        return repositoryConfig;
     }
 
-    public void setDomain(FederationRepositoryConfig domain) {
-        this.domain = domain;
+    public void setRepositoryConfig(FederationRepositoryConfig repositoryConfig) {
+        this.repositoryConfig = repositoryConfig;
     }
 
-    public NISFederationClient getNisFederation() {
-        return nisFederation;
+    public NISFederationClient getNisFederationClient() {
+        return nisFederationClient;
     }
 }
