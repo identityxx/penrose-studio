@@ -5,12 +5,16 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.progress.IProgressService;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.federation.*;
 import org.safehaus.penrose.studio.project.Project;
@@ -26,6 +30,7 @@ import org.safehaus.penrose.filter.SimpleFilter;
 import org.safehaus.penrose.filter.FilterTool;
 
 import java.util.*;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Endi S. Dewata
@@ -354,29 +359,54 @@ public class UsersPage extends FormPage {
         remoteTable.removeAll();
         remoteAttributeTable.removeAll();
 
-        Filter localFilter = new SimpleFilter("objectClass", "=", objectClass);
+        final Collection<ConflictDetectionResult> results = new LinkedList<ConflictDetectionResult>();
 
-        SearchRequest localRequest = new SearchRequest();
-        localRequest.setFilter(localFilter);
+        IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
-        SearchResponse localResponse = new SearchResponse();
+        progressService.busyCursorWhile(new IRunnableWithProgress() {
+            public void run(final IProgressMonitor monitor) throws InvocationTargetException {
+                try {
+                    Filter localFilter = new SimpleFilter("objectClass", "=", objectClass);
 
-        globalSourceClient.search(localRequest, localResponse);
+                    SearchRequest localRequest = new SearchRequest();
+                    localRequest.setFilter(localFilter);
 
-        log.debug("Results:");
+                    SearchResponse localResponse = new SearchResponse();
 
-        while (localResponse.hasNext()) {
+                    globalSourceClient.search(localRequest, localResponse);
 
-            SearchResult localEntry = localResponse.next();
-            DN localDn = localEntry.getDn();
+                    monitor.beginTask("Searching conflicts...", (int)localResponse.getTotalCount());
 
-            log.debug(" - "+localDn+":");
+                    log.debug("Results:");
 
-            ConflictDetectionResult result = searchConflicts(localEntry);
-            if (result.getConflicts().isEmpty()) continue;
+                    while (localResponse.hasNext()) {
+
+                        monitor.worked(1);
+
+                        SearchResult localEntry = localResponse.next();
+                        DN localDn = localEntry.getDn();
+
+                        log.debug(" - "+localDn+":");
+
+                        ConflictDetectionResult result = searchConflicts(localEntry);
+                        if (result.getConflicts().isEmpty()) continue;
+
+                        results.add(result);
+                    }
+
+                } catch (Exception e) {
+                    throw new InvocationTargetException(e);
+
+                } finally {
+                    monitor.done();
+                }
+            }
+        });
+
+        for (ConflictDetectionResult result : results) {
 
             TableItem ti = new TableItem(localTable, SWT.NONE);
-            ti.setText(0, localDn.toString());
+            ti.setText(0, result.getEntry().getDn().toString());
             ti.setData(result);
         }
     }
