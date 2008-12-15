@@ -40,14 +40,14 @@ public class ConflictDetectionEditor extends FormEditor {
 
             UsersPage usersPage = new UsersPage(this);
             usersPage.setObjectClass(usersModuleClient.getParameter("objectClass"));
-            usersPage.setUidNumber(usersModuleClient.getParameter("uidNumber"));
+            usersPage.setAttributeName(usersModuleClient.getParameter("attribute"));
             addPage(usersPage);
 
             ModuleClient groupsModuleClient = moduleManagerClient.getModuleClient("Groups");
 
             GroupsPage groupsPage = new GroupsPage(this);
             groupsPage.setObjectClass(groupsModuleClient.getParameter("objectClass"));
-            groupsPage.setGidNumber(groupsModuleClient.getParameter("gidNumber"));
+            groupsPage.setAttributeName(groupsModuleClient.getParameter("attribute"));
             addPage(groupsPage);
 
         } catch (Exception e) {

@@ -235,6 +235,67 @@ public class NISSynchronizationPage extends FormPage {
         tc.setWidth(50);
         tc.setText("Failed");
 
+        Menu menu = new Menu(table);
+        table.setMenu(menu);
+
+        MenuItem mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Refresh Source");
+
+        mi.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                refreshSource();
+            }
+        });
+
+        mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Refresh Target");
+
+        mi.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                refreshTarget();
+            }
+        });
+
+        new MenuItem(menu, SWT.SEPARATOR);
+
+        mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Create");
+
+        mi.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                create();
+            }
+        });
+
+        mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Clear");
+
+        mi.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                clear();
+            }
+        });
+
+        mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Remove");
+
+        mi.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                remove();
+            }
+        });
+
+        new MenuItem(menu, SWT.SEPARATOR);
+
+        mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Synchronize");
+
+        mi.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                synchronize();
+            }
+        });
+
         try {
             Map<String,String> nisMapRDNs = (Map<String,String>)moduleClient.getAttribute("NisMapRDNs");
 
