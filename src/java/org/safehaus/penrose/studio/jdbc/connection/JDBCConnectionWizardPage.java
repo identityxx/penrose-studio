@@ -31,7 +31,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.safehaus.penrose.studio.util.Helper;
-import org.safehaus.penrose.studio.driver.Parameter;
+import org.safehaus.penrose.config.Parameter;
 import org.safehaus.penrose.studio.driver.Driver;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.connection.ConnectionConfig;
@@ -155,7 +155,7 @@ public class JDBCConnectionWizardPage extends WizardPage implements ModifyListen
 
                 if (type == Parameter.TYPE_REQUIRED) {
                     Label label = new Label(fieldComposite, SWT.NONE);
-                    label.setText(parameter.getDisplayName() + "*:");
+                    label.setText(parameter.getDescription() + "*:");
 
                     GridData gd = new GridData(GridData.FILL);
                     gd.widthHint = 100;
@@ -165,7 +165,7 @@ public class JDBCConnectionWizardPage extends WizardPage implements ModifyListen
 
                 } else {
                     Label label = new Label(fieldComposite, SWT.NONE);
-                    label.setText(parameter.getDisplayName() + ":");
+                    label.setText(parameter.getDescription() + ":");
 
                     GridData gd = new GridData(GridData.FILL);
                     gd.widthHint = 100;

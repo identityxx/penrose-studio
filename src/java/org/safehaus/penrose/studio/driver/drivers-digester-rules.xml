@@ -23,7 +23,7 @@
 
 			<pattern value="parameter">
 
-                <object-create-rule classname="org.safehaus.penrose.studio.driver.Parameter" />
+                <object-create-rule classname="org.safehaus.penrose.config.Parameter" />
                 <set-properties-rule>
                     <alias attr-name="type" prop-name="typeAsString" />
                 </set-properties-rule>

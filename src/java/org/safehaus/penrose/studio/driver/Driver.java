@@ -17,6 +17,8 @@
  */
 package org.safehaus.penrose.studio.driver;
 
+import org.safehaus.penrose.config.Parameter;
+
 import java.util.Map;
 import java.util.Collection;
 import java.util.LinkedHashMap;

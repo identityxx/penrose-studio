@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.driver;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.apache.log4j.Logger;
+import org.safehaus.penrose.config.Parameter;
 
 import java.util.Collection;
 import java.util.Iterator;

@@ -25,6 +25,7 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.dom4j.tree.DefaultElement;
 import org.dom4j.tree.DefaultText;
+import org.safehaus.penrose.config.Parameter;
 
 /**
  * @author Endi S. Dewata
@@ -67,7 +68,7 @@ public class DriverWriter {
             parameterElement.addAttribute("type", parameter.getTypeAsString());
 
             Element paramName = new DefaultElement("display-name");
-            paramName.add(new DefaultText(parameter.getDisplayName()));
+            paramName.add(new DefaultText(parameter.getDescription()));
             parameterElement.add(paramName);
 
             Element paramValue = new DefaultElement("default-value");

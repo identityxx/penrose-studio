@@ -27,6 +27,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.studio.driver.ParameterDialog;
 import org.safehaus.penrose.studio.driver.DriverWizard;
+import org.safehaus.penrose.config.Parameter;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -239,7 +240,7 @@ public class DriverParameterPage extends WizardPage implements SelectionListener
 
             TableItem item = new TableItem(parameterTable, SWT.NONE);
             item.setText(0, parameter.getName());
-            item.setText(1, parameter.getDisplayName());
+            item.setText(1, parameter.getDescription());
             item.setText(2, parameter.getDefaultValue() == null ? "" : parameter.getDefaultValue());
             item.setData(parameter);
         }
