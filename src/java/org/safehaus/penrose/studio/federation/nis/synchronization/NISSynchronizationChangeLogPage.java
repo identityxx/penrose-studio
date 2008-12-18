@@ -13,7 +13,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -45,7 +45,7 @@ public class NISSynchronizationChangeLogPage extends FormPage {
     FormToolkit toolkit;
 
     NISSynchronizationEditor editor;
-    NISFederationClient nisFederationClient;
+    NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig domain;
 
     Table table;
@@ -65,7 +65,7 @@ public class NISSynchronizationChangeLogPage extends FormPage {
         this.nisFederationClient = editor.getNISFederationClient();
         this.domain = editor.getDomain();
 
-        String federationName = nisFederationClient.getFederationClient().getName();
+        String federationName = nisFederationClient.getFederationClient().getFederationDomain();
         PenroseClient penroseClient = project.getClient();
 
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();

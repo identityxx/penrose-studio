@@ -6,7 +6,7 @@ import org.safehaus.penrose.studio.federation.nis.ownership.NISOwnershipNode;
 import org.safehaus.penrose.studio.federation.nis.linking.NISLinkingNode;
 import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationNode;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.studio.federation.nis.wizard.EditNISDomainWizard;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.FederationClient;
@@ -26,7 +26,7 @@ public class NISDomainNode extends Node {
 
     Project project;
     FederationClient federationClient;
-    NISFederationClient nisFederationClient;
+    NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig repositoryConfig;
 
     public NISDomainNode(String name, Object parent) {
@@ -139,11 +139,11 @@ public class NISDomainNode extends Node {
         this.project = project;
     }
 
-    public NISFederationClient getNisFederationClient() {
+    public NISRepositoryClient getNisFederationClient() {
         return nisFederationClient;
     }
 
-    public void setNisFederationClient(NISFederationClient nisFederationClient) {
+    public void setNisFederationClient(NISRepositoryClient nisFederationClient) {
         this.nisFederationClient = nisFederationClient;
     }
 

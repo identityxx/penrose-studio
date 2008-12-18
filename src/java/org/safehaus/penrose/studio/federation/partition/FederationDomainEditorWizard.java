@@ -38,7 +38,7 @@ public class FederationDomainEditorWizard extends Wizard {
         this.client = federationClient.getClient();
         this.partitionClient = federationClient.getPartitionClient();
 
-        setWindowTitle(federationClient.getName());
+        setWindowTitle(federationClient.getFederationDomain());
     }
 
     public void addPages() {
@@ -96,7 +96,7 @@ public class FederationDomainEditorWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            String name = federationClient.getName();
+            String name = federationClient.getFederationDomain();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 /*
             if (repository == null) {

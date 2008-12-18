@@ -44,7 +44,7 @@ public class NISHostsPage extends FormPage {
     NISFilesEditor editor;
 
     Project project;
-    NISFederationClient nisFederation;
+    NISRepositoryClient nisFederation;
     FederationRepositoryConfig domain;
 
     Table hostsTable;

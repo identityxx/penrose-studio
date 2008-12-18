@@ -4,13 +4,10 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.tree.Node;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
@@ -18,7 +15,7 @@ import java.util.Collection;
 public class NISFilesNode extends Node {
 
     private Project project;
-    private NISFederationClient nisFederation;
+    private NISRepositoryClient nisFederation;
     private FederationRepositoryConfig domain;
 
     public NISFilesNode(String name, Image image, Object object, Object parent) {
@@ -37,11 +34,11 @@ public class NISFilesNode extends Node {
         page.openEditor(ei, NISFilesEditor.class.getName());
     }
 
-    public NISFederationClient getNisTool() {
+    public NISRepositoryClient getNisTool() {
         return nisFederation;
     }
 
-    public void setNisTool(NISFederationClient nisFederation) {
+    public void setNisTool(NISRepositoryClient nisFederation) {
         this.nisFederation = nisFederation;
     }
 

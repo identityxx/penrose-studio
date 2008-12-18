@@ -12,7 +12,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.federation.LDAPFederationClient;
+import org.safehaus.penrose.federation.LDAPRepositoryClient;
 import org.safehaus.penrose.federation.*;
 import org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditor;
 import org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditorInput;
@@ -50,7 +50,7 @@ public class LDAPNode extends Node {
             String repositoryName = repositoryConfig.getName();
             log.debug(" - "+repositoryName);
             
-            LDAPFederationClient ldapFederationClient = new LDAPFederationClient(federationClient, repositoryName);
+            LDAPRepositoryClient ldapFederationClient = new LDAPRepositoryClient(federationClient, repositoryName);
 
             LDAPRepositoryNode node = new LDAPRepositoryNode(repositoryConfig.getName(), this);
 

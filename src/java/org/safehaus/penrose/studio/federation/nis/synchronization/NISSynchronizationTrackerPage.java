@@ -13,7 +13,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
@@ -45,7 +45,7 @@ public class NISSynchronizationTrackerPage extends FormPage {
 
     Project project;
     NISSynchronizationEditor editor;
-    NISFederationClient nisFederationClient;
+    NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig domain;
 
     Table trackerTable;
@@ -126,7 +126,7 @@ public class NISSynchronizationTrackerPage extends FormPage {
 
                     TableItem[] items = trackerTable.getSelection();
 
-                    String federationName = nisFederationClient.getFederationClient().getName();
+                    String federationName = nisFederationClient.getFederationClient().getFederationDomain();
                     PenroseClient penroseClient = project.getClient();
 
                     PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
@@ -176,7 +176,7 @@ public class NISSynchronizationTrackerPage extends FormPage {
 
             trackerTable.removeAll();
 
-            String federationName = nisFederationClient.getFederationClient().getName();
+            String federationName = nisFederationClient.getFederationClient().getFederationDomain();
             PenroseClient penroseClient = project.getClient();
 
             PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();

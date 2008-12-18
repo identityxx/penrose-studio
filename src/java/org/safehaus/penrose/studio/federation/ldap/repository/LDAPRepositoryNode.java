@@ -5,7 +5,7 @@ import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.federation.ldap.linking.LDAPLinkingNode;
-import org.safehaus.penrose.federation.LDAPFederationClient;
+import org.safehaus.penrose.federation.LDAPRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.federation.ldap.wizard.EditLDAPRepositoryWizard;
@@ -27,7 +27,7 @@ public class LDAPRepositoryNode extends Node {
 
     private Project project;
     private FederationClient federationClient;
-    private LDAPFederationClient ldapFederationClient;
+    private LDAPRepositoryClient ldapFederationClient;
     private FederationRepositoryConfig repositoryConfig;
 
     public LDAPRepositoryNode(String name, Object parent) {
@@ -113,11 +113,11 @@ public class LDAPRepositoryNode extends Node {
         this.repositoryConfig = repositoryConfig;
     }
 
-    public LDAPFederationClient getLdapFederationClient() {
+    public LDAPRepositoryClient getLdapFederationClient() {
         return ldapFederationClient;
     }
 
-    public void setLdapFederationClient(LDAPFederationClient ldapFederationClient) {
+    public void setLdapFederationClient(LDAPRepositoryClient ldapFederationClient) {
         this.ldapFederationClient = ldapFederationClient;
     }
 

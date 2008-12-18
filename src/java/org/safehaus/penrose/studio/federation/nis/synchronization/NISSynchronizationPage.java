@@ -51,7 +51,7 @@ public class NISSynchronizationPage extends FormPage {
 
     Project project;
     NISSynchronizationEditor editor;
-    NISFederationClient nisFederationClient;
+    NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig domain;
 
     Label statusText;
@@ -80,7 +80,7 @@ public class NISSynchronizationPage extends FormPage {
         PenroseClient penroseClient = project.getClient();
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
 
-        String federationName = nisFederationClient.getFederationClient().getName();
+        String federationName = nisFederationClient.getFederationClient().getFederationDomain();
 
         sourcePartitionClient = partitionManagerClient.getPartitionClient(federationName+"_"+domain.getName()+"_"+ NISDomain.YP);
         targetPartitionClient = partitionManagerClient.getPartitionClient(federationName+"_"+domain.getName());

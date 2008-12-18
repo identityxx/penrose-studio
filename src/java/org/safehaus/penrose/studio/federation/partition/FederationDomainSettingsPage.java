@@ -74,7 +74,7 @@ public class FederationDomainSettingsPage extends FormPage {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText(federationClient.getName());
+        form.setText(federationClient.getFederationDomain());
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());

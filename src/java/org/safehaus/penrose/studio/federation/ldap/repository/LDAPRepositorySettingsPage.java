@@ -21,7 +21,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.federation.LDAPFederationClient;
+import org.safehaus.penrose.federation.LDAPRepositoryClient;
 import org.safehaus.penrose.federation.LDAPRepository;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.FederationClient;
@@ -44,7 +44,7 @@ public class LDAPRepositorySettingsPage extends FormPage {
 
     Project project;
     FederationClient federationClient;
-    LDAPFederationClient ldapFederationClient;
+    LDAPRepositoryClient ldapFederationClient;
     FederationRepositoryConfig repositoryConfig;
 
     public LDAPRepositorySettingsPage(FormEditor editor) {
@@ -196,11 +196,11 @@ public class LDAPRepositorySettingsPage extends FormPage {
         this.project = project;
     }
 
-    public LDAPFederationClient getLdapFederationClient() {
+    public LDAPRepositoryClient getLdapFederationClient() {
         return ldapFederationClient;
     }
 
-    public void setLdapFederationClient(LDAPFederationClient ldapFederationClient) {
+    public void setLdapFederationClient(LDAPRepositoryClient ldapFederationClient) {
         this.ldapFederationClient = ldapFederationClient;
     }
 

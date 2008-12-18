@@ -2,7 +2,7 @@ package org.safehaus.penrose.studio.federation.nis.ownership;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -18,7 +18,7 @@ import org.eclipse.ui.IWorkbenchPage;
 public class NISOwnershipNode extends Node {
 
     Project project;
-    NISFederationClient nisFederationClient;
+    NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig repositoryConfig;
 
     public NISOwnershipNode(String name, Object parent) {
@@ -58,11 +58,11 @@ public class NISOwnershipNode extends Node {
         this.project = project;
     }
 
-    public NISFederationClient getNisFederationClient() {
+    public NISRepositoryClient getNisFederationClient() {
         return nisFederationClient;
     }
 
-    public void setNisFederationClient(NISFederationClient nisFederationClient) {
+    public void setNisFederationClient(NISRepositoryClient nisFederationClient) {
         this.nisFederationClient = nisFederationClient;
     }
 

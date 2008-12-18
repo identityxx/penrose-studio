@@ -5,7 +5,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
-import org.safehaus.penrose.federation.LDAPFederationClient;
+import org.safehaus.penrose.federation.LDAPRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.project.Project;
@@ -18,7 +18,7 @@ public class LDAPRepositoryEditor extends FormEditor {
 
     Project project;
     FederationClient federationClient;
-    LDAPFederationClient ldapFederationClient;
+    LDAPRepositoryClient ldapFederationClient;
     FederationRepositoryConfig repositoryConfig;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -69,7 +69,7 @@ public class LDAPRepositoryEditor extends FormEditor {
         this.repositoryConfig = repositoryConfig;
     }
 
-    public LDAPFederationClient getLdapFederationClient() {
+    public LDAPRepositoryClient getLdapFederationClient() {
         return ldapFederationClient;
     }
 }

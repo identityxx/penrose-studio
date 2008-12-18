@@ -4,7 +4,7 @@ import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.*;
 import org.safehaus.penrose.studio.federation.nis.editor.NISEditorInput;
 import org.safehaus.penrose.studio.federation.nis.editor.NISEditor;
@@ -47,7 +47,7 @@ public class NISNode extends Node {
             String repositoryName = repositoryConfig.getName();
             log.debug(" - "+repositoryName);
 
-            NISFederationClient nisFederationClient = new NISFederationClient(federationClient, repositoryName);
+            NISRepositoryClient nisFederationClient = new NISRepositoryClient(federationClient, repositoryName);
 
             NISDomainNode domainNode = new NISDomainNode(repositoryConfig.getName(), this);
 

@@ -5,7 +5,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
-import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.module.ModuleManagerClient;
@@ -21,7 +21,7 @@ public class OwnershipAlignmentEditor extends FormEditor {
     public Logger log = LoggerFactory.getLogger(getClass());
 
     public Project project;
-    public NISFederationClient nisFederationClient;
+    public NISRepositoryClient nisFederationClient;
     public FederationRepositoryConfig repositoryConfig;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -37,7 +37,7 @@ public class OwnershipAlignmentEditor extends FormEditor {
 
     public void addPages() {
         try {
-            String federationName = nisFederationClient.getFederationClient().getName();
+            String federationName = nisFederationClient.getFederationClient().getFederationDomain();
             String localPartitionName = repositoryConfig.getName();
 
             PenroseClient client = project.getClient();
@@ -98,7 +98,7 @@ public class OwnershipAlignmentEditor extends FormEditor {
         this.repositoryConfig = repositoryConfig;
     }
 
-    public NISFederationClient getNisFederationClient() {
+    public NISRepositoryClient getNisFederationClient() {
         return nisFederationClient;
     }
 }

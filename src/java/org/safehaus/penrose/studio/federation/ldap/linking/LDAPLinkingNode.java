@@ -5,7 +5,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.safehaus.penrose.federation.LDAPFederationClient;
+import org.safehaus.penrose.federation.LDAPRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -21,7 +21,7 @@ import org.safehaus.penrose.studio.tree.Node;
 public class LDAPLinkingNode extends Node {
 
     Project project;
-    LDAPFederationClient ldapFederationClient;
+    LDAPRepositoryClient ldapFederationClient;
     FederationRepositoryConfig repositoryConfig;
 
     public LDAPLinkingNode(String name, Object parent) {
@@ -48,19 +48,19 @@ public class LDAPLinkingNode extends Node {
         IdentityLinkingEditorInput ei = new IdentityLinkingEditorInput();
         ei.setProject(project);
         ei.setRepository(repositoryConfig);
-        ei.setSourcePartition(federationClient.getName()+"_"+ repositoryConfig.getName());
-        ei.setTargetPartition(federationClient.getName());
+        ei.setSourcePartition(federationClient.getFederationDomain()+"_"+ repositoryConfig.getName());
+        ei.setTargetPartition(federationClient.getFederationDomain());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
         page.openEditor(ei, IdentityLinkingEditor.class.getName());
     }
 
-    public LDAPFederationClient getLdapFederationClient() {
+    public LDAPRepositoryClient getLdapFederationClient() {
         return ldapFederationClient;
     }
 
-    public void setLdapFederationClient(LDAPFederationClient ldapFederationClient) {
+    public void setLdapFederationClient(LDAPRepositoryClient ldapFederationClient) {
         this.ldapFederationClient = ldapFederationClient;
     }
 

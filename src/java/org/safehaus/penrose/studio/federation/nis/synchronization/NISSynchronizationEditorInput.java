@@ -4,7 +4,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 
 /**
@@ -13,7 +13,7 @@ import org.safehaus.penrose.federation.FederationRepositoryConfig;
 public class NISSynchronizationEditorInput implements IEditorInput {
 
     private Project project;
-    private NISFederationClient nisFederationClient;
+    private NISRepositoryClient nisFederationClient;
     private FederationRepositoryConfig domain;
 
     public NISSynchronizationEditorInput() {
@@ -74,11 +74,11 @@ public class NISSynchronizationEditorInput implements IEditorInput {
         this.domain = domain;
     }
 
-    public NISFederationClient getNisFederationClient() {
+    public NISRepositoryClient getNisFederationClient() {
         return nisFederationClient;
     }
 
-    public void setNisFederationClient(NISFederationClient nisFederationClient) {
+    public void setNisFederationClient(NISRepositoryClient nisFederationClient) {
         this.nisFederationClient = nisFederationClient;
     }
 

@@ -15,7 +15,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.client.PenroseClient;
-import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
@@ -45,7 +45,7 @@ public class GroupsPage extends FormPage {
     FormEditor editor;
 
     Project project;
-    NISFederationClient nisFederationClient;
+    NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig repositoryConfig;
 
     SourceClient localSourceClient;
@@ -72,7 +72,7 @@ public class GroupsPage extends FormPage {
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 
-        String federationName = nisFederationClient.getFederationClient().getName();
+        String federationName = nisFederationClient.getFederationClient().getFederationDomain();
         String localPartitionName = repositoryConfig.getName();
 
         PartitionClient localPartitionClient = partitionManagerClient.getPartitionClient(federationName+"_"+localPartitionName);

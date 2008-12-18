@@ -21,8 +21,7 @@ import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.filter.OrFilter;
 import org.safehaus.penrose.filter.SimpleFilter;
 import org.safehaus.penrose.filter.AndFilter;
-import org.safehaus.penrose.federation.NISFederationClient;
-import org.safehaus.penrose.federation.FederationClient;
+import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.Federation;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
@@ -52,7 +51,7 @@ public class NISFilesPage extends FormPage implements Runnable {
     NISFilesEditor editor;
 
     Project project;
-    NISFederationClient nisFederation;
+    NISRepositoryClient nisFederation;
     FederationRepositoryConfig domain;
 
     public NISFilesPage(NISFilesEditor editor) {

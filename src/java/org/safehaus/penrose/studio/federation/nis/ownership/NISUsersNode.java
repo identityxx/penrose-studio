@@ -5,7 +5,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
-import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.tree.Node;
@@ -20,7 +20,7 @@ import org.safehaus.penrose.studio.PenroseStudio;
 public class NISUsersNode extends Node {
 
     private Project project;
-    private NISFederationClient nisFederationClient;
+    private NISRepositoryClient nisFederationClient;
     private FederationRepositoryConfig repositoryConfig;
 
     public NISUsersNode(String name, Object parent) {
@@ -52,11 +52,11 @@ public class NISUsersNode extends Node {
         page.openEditor(ei, OwnershipAlignmentEditor.class.getName());
     }
 
-    public NISFederationClient getNisFederationClient() {
+    public NISRepositoryClient getNisFederationClient() {
         return nisFederationClient;
     }
 
-    public void setNisFederationClient(NISFederationClient nisFederation) {
+    public void setNisFederationClient(NISRepositoryClient nisFederation) {
         this.nisFederationClient = nisFederation;
     }
 

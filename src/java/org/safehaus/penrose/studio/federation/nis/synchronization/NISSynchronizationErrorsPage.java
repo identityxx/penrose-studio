@@ -17,7 +17,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditor;
@@ -49,7 +49,7 @@ public class NISSynchronizationErrorsPage extends FormPage {
     FormToolkit toolkit;
 
     NISSynchronizationEditor editor;
-    NISFederationClient nisFederationClient;
+    NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig domain;
 
     Table table;
@@ -69,7 +69,7 @@ public class NISSynchronizationErrorsPage extends FormPage {
         this.nisFederationClient = editor.getNISFederationClient();
         this.domain = editor.getDomain();
 
-        String federationName = nisFederationClient.getFederationClient().getName();
+        String federationName = nisFederationClient.getFederationClient().getFederationDomain();
         PenroseClient penroseClient = project.getClient();
 
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();

@@ -169,9 +169,9 @@ public class LDAPRepositoriesPage extends FormPage {
 
                     TableItem ti = table.getSelection()[0];
 
-                    FederationRepositoryConfig repository = (FederationRepositoryConfig)ti.getData();
+                    FederationRepositoryConfig repositoryConfig = (FederationRepositoryConfig)ti.getData();
 
-                    EditLDAPRepositoryWizard wizard = new EditLDAPRepositoryWizard(repository);
+                    EditLDAPRepositoryWizard wizard = new EditLDAPRepositoryWizard(repositoryConfig);
 
                     IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
                     WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
@@ -179,7 +179,7 @@ public class LDAPRepositoriesPage extends FormPage {
 
                     if (dialog.open() == Window.CANCEL) return;
 
-                    federationClient.updateRepository(repository);
+                    federationClient.updateRepository(repositoryConfig);
 
                     refresh();
 

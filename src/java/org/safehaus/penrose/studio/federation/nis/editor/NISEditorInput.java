@@ -4,7 +4,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.federation.NISFederationClient;
 import org.safehaus.penrose.federation.FederationClient;
 
 /**

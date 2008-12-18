@@ -7,7 +7,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.client.PenroseClient;
@@ -22,7 +22,7 @@ public class NISSynchronizationEditor extends FormEditor {
     public Logger log = LoggerFactory.getLogger(getClass());
 
     Project project;
-    NISFederationClient nisFederationClient;
+    NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig domain;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -39,7 +39,7 @@ public class NISSynchronizationEditor extends FormEditor {
     public void addPages() {
         try {
 
-            String federationName = nisFederationClient.getFederationClient().getName();
+            String federationName = nisFederationClient.getFederationClient().getFederationDomain();
             PenroseClient penroseClient = project.getClient();
 
             PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
@@ -81,7 +81,7 @@ public class NISSynchronizationEditor extends FormEditor {
         this.domain = domain;
     }
 
-    public NISFederationClient getNISFederationClient() {
+    public NISRepositoryClient getNISFederationClient() {
         return nisFederationClient;
     }
 

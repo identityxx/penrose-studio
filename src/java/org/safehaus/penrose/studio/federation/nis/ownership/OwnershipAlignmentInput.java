@@ -3,7 +3,7 @@ package org.safehaus.penrose.studio.federation.nis.ownership;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 
@@ -13,7 +13,7 @@ import org.safehaus.penrose.federation.FederationRepositoryConfig;
 public class OwnershipAlignmentInput implements IEditorInput {
 
     private Project project;
-    private NISFederationClient nisFederationClient;
+    private NISRepositoryClient nisFederationClient;
     private FederationRepositoryConfig domain;
 
     public OwnershipAlignmentInput() {
@@ -74,11 +74,11 @@ public class OwnershipAlignmentInput implements IEditorInput {
         this.domain = domain;
     }
 
-    public NISFederationClient getNisFederationClient() {
+    public NISRepositoryClient getNisFederationClient() {
         return nisFederationClient;
     }
 
-    public void setNisFederationClient(NISFederationClient nisFederation) {
+    public void setNisFederationClient(NISRepositoryClient nisFederation) {
         this.nisFederationClient = nisFederation;
     }
 

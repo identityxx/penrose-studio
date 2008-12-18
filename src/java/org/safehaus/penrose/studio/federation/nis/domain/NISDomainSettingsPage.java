@@ -19,7 +19,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.federation.NISDomain;
-import org.safehaus.penrose.federation.NISFederationClient;
+import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
@@ -40,7 +40,7 @@ public class NISDomainSettingsPage extends FormPage {
 
     Project project;
     FederationClient federationClient;
-    NISFederationClient nisFederationClient;
+    NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig repositoryConfig;
 
     public NISDomainSettingsPage(FormEditor editor) {
@@ -164,11 +164,11 @@ public class NISDomainSettingsPage extends FormPage {
         this.project = project;
     }
 
-    public NISFederationClient getNisFederationClient() {
+    public NISRepositoryClient getNisFederationClient() {
         return nisFederationClient;
     }
 
-    public void setNisFederationClient(NISFederationClient nisFederationClient) {
+    public void setNisFederationClient(NISRepositoryClient nisFederationClient) {
         this.nisFederationClient = nisFederationClient;
     }
 

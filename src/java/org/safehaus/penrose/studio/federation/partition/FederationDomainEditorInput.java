@@ -26,7 +26,7 @@ public class FederationDomainEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return federationClient.getName();
+        return federationClient.getFederationDomain();
     }
 
     public IPersistableElement getPersistable() {
