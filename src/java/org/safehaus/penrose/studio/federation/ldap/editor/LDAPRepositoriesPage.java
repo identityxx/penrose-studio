@@ -144,7 +144,6 @@ public class LDAPRepositoriesPage extends FormPage {
                     federationClient.store();
 
                     federationClient.createPartition(repository.getName());
-                    federationClient.startPartition(repository.getName());
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
@@ -213,7 +212,6 @@ public class LDAPRepositoriesPage extends FormPage {
                     for (TableItem ti : items) {
                         FederationRepositoryConfig repository = (FederationRepositoryConfig)ti.getData();
 
-                        federationClient.stopPartition(repository.getName());
                         federationClient.removePartition(repository.getName());
                         federationClient.removeRepository(repository.getName());
                         federationClient.store();

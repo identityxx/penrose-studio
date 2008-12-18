@@ -294,7 +294,6 @@ public class FederationDomainNode extends Node {
                         monitor.subTask("Creating "+partitionName+" partition...");
 
                         federationClient.createPartition(partitionName);
-                        federationClient.startPartition(partitionName);
 
                         monitor.worked(1);
                     }

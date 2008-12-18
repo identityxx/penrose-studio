@@ -134,7 +134,6 @@ public class LDAPNode extends Node {
         federationClient.store();
 
         federationClient.createPartition(repository.getName());
-        federationClient.startPartition(repository.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();

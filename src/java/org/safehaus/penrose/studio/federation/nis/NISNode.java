@@ -130,7 +130,6 @@ public class NISNode extends Node {
         federationClient.store();
 
         federationClient.createPartition(domain.getName());
-        federationClient.startPartition(domain.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();

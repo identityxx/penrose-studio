@@ -139,7 +139,6 @@ public class NISDomainsPage extends FormPage {
                     federationClient.store();
 
                     federationClient.createPartition(domain.getName());
-                    federationClient.startPartition(domain.getName());
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
@@ -217,7 +216,6 @@ public class NISDomainsPage extends FormPage {
                         FederationRepositoryConfig repository = (FederationRepositoryConfig)ti.getData();
 
                         try {
-                            federationClient.stopPartition(repository.getName());
                             federationClient.removePartition(repository.getName());
                             federationClient.removeRepository(repository.getName());
                             federationClient.store();
