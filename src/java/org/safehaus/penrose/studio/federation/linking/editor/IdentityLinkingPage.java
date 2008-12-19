@@ -38,7 +38,7 @@ import org.safehaus.penrose.studio.ldap.dialog.AttributeDialog;
 import org.safehaus.penrose.studio.federation.linking.*;
 import org.safehaus.penrose.studio.federation.wizard.BrowserWizard;
 import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.util.ActiveDirectoryUtil;
+import org.safehaus.penrose.ad.ActiveDirectory;
 import org.safehaus.penrose.util.BinaryUtil;
 import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.source.SourceManagerClient;
@@ -912,14 +912,14 @@ public class IdentityLinkingPage extends FormPage {
 
                 if (guidAttributes.contains(normalizedAttributeName)) {
                     if (value instanceof String) {
-                        s = ActiveDirectoryUtil.getGUID(((String)value).getBytes());
+                        s = ActiveDirectory.getGUID(((String)value).getBytes());
 
                     } else {
-                        s = ActiveDirectoryUtil.getGUID((byte[])value);
+                        s = ActiveDirectory.getGUID((byte[])value);
                     }
 
                 } else if (sidAttributes.contains(normalizedAttributeName)) {
-                    s = ActiveDirectoryUtil.getSID((byte[])value);
+                    s = ActiveDirectory.getSID((byte[])value);
 
                 } else if (value instanceof byte[]) {
                     s = BinaryUtil.encode(BinaryUtil.BIG_INTEGER, (byte[])value);

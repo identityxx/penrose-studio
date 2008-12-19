@@ -32,7 +32,7 @@ import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.util.ActiveDirectoryUtil;
+import org.safehaus.penrose.ad.ActiveDirectory;
 import org.safehaus.penrose.util.BinaryUtil;
 
 import java.util.Collection;
@@ -293,10 +293,10 @@ public class EntryDialog extends Dialog {
 
         if (guidAttributes.contains(normalizedName)) {
             if (value instanceof String) {
-                s = ActiveDirectoryUtil.getGUID(((String)value).getBytes());
+                s = ActiveDirectory.getGUID(((String)value).getBytes());
 
             } else if (value instanceof byte[]) {
-                s = ActiveDirectoryUtil.getGUID((byte[])value);
+                s = ActiveDirectory.getGUID((byte[])value);
 
             } else {
                 s = value.toString();
@@ -304,10 +304,10 @@ public class EntryDialog extends Dialog {
 
         } else if (sidAttributes.contains(normalizedName)) {
             if (value instanceof String) {
-                s = ActiveDirectoryUtil.getSID(((String)value).getBytes());
+                s = ActiveDirectory.getSID(((String)value).getBytes());
 
             } else if (value instanceof byte[]) {
-                s = ActiveDirectoryUtil.getSID((byte[])value);
+                s = ActiveDirectory.getSID((byte[])value);
 
             } else {
                 s = value.toString();

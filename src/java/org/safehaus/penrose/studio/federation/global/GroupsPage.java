@@ -467,14 +467,14 @@ public class GroupsPage extends FormPage {
 /*
                 if (guidAttributes.contains(normalizedAttributeName)) {
                     if (value instanceof String) {
-                        s = ActiveDirectoryUtil.getGUID(((String)value).getBytes());
+                        s = ActiveDirectory.getGUID(((String)value).getBytes());
 
                     } else {
-                        s = ActiveDirectoryUtil.getGUID((byte[])value);
+                        s = ActiveDirectory.getGUID((byte[])value);
                     }
 
                 } else if (sidAttributes.contains(normalizedAttributeName)) {
-                    s = ActiveDirectoryUtil.getSID((byte[])value);
+                    s = ActiveDirectory.getSID((byte[])value);
 
                 } else
 */
