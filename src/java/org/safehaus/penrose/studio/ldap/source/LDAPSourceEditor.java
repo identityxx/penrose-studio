@@ -18,13 +18,14 @@
 package org.safehaus.penrose.studio.ldap.source;
 
 import org.safehaus.penrose.studio.source.editor.SourceEditor;
+import org.safehaus.penrose.studio.source.editor.SourceBrowsePage;
 
 public class LDAPSourceEditor extends SourceEditor {
 
     public void addPages() {
         try {
             addPage(new LDAPSourcePropertyPage(this));
-            addPage(new LDAPSourceBrowsePage(this));
+            addPage(new SourceBrowsePage(this));
             //addPage(new LDAPSourceCachePage(this));
 
         } catch (Exception e) {

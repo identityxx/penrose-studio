@@ -465,10 +465,6 @@
             <param name="rpm.arch" value="${arch}"/>
             <param name="rpm.name" value="${product.name}-${product.version}-1.${arch}.rpm"/>
         </antcall>
-        <move
-            file="dist/${product.name}-${product.version}-1.${arch}.rpm"
-            tofile="dist/${product.name}-${product.version}-1.i386.rpm"
-        />
     </target>
 
     <target name="dist-rpm-linux-gtk-x86_64" depends="init" if="linux_x86_64">
@@ -490,10 +486,6 @@
             <param name="rpm.arch" value="${arch}"/>
             <param name="rpm.name" value="${product.name}-${product.version}-1.${arch}.rpm"/>
         </antcall>
-        <move
-            file="dist/${product.name}-${product.version}-1.${arch}.rpm"
-            tofile="dist/${product.name}-${product.version}-1.amd64.rpm"
-        />
     </target>
 
     <target name="dist-rpm-win32" depends="init" if="windows">

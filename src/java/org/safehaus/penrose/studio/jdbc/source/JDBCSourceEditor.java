@@ -18,6 +18,7 @@
 package org.safehaus.penrose.studio.jdbc.source;
 
 import org.safehaus.penrose.studio.source.editor.SourceEditor;
+import org.safehaus.penrose.studio.source.editor.SourceBrowsePage;
 
 public class JDBCSourceEditor extends SourceEditor {
 
@@ -26,7 +27,8 @@ public class JDBCSourceEditor extends SourceEditor {
     public void addPages() {
         try {
             addPage(new JDBCSourcePropertyPage(this));
-            addPage(new JDBCSourceBrowsePage(this));
+            //addPage(new JDBCSourceBrowsePage(this));
+            addPage(new SourceBrowsePage(this));
             //addPage(new JDBCSourceCachePage(this));
 
         } catch (Exception e) {

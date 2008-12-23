@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.ldap.source;
+package org.safehaus.penrose.studio.source.editor;
 
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
@@ -18,13 +18,12 @@ import org.eclipse.swt.events.TreeListener;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.source.SourceManagerClient;
-import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 
-public class LDAPSourceBrowsePage extends SourceEditorPage implements TreeListener {
+public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
 
     Button refreshButton;
     Text maxSizeText;
@@ -32,7 +31,7 @@ public class LDAPSourceBrowsePage extends SourceEditorPage implements TreeListen
     Tree tree;
     Table table;
 
-    public LDAPSourceBrowsePage(LDAPSourceEditor editor) throws Exception {
+    public SourceBrowsePage(SourceEditor editor) throws Exception {
         super(editor, "BROWSE", "  Browse  ");
     }
 
@@ -67,54 +66,7 @@ public class LDAPSourceBrowsePage extends SourceEditorPage implements TreeListen
 
         refresh();
     }
-/*
-    public Composite createFieldsSection(Composite parent) {
 
-        Composite composite = toolkit.createComposite(parent);
-        composite.setLayout(new GridLayout());
-
-        Composite buttons = toolkit.createComposite(composite);
-        buttons.setLayout(new GridLayout(3, false));
-        buttons.setLayoutData(new GridData());
-
-        Label label = toolkit.createLabel(buttons, "Max:");
-        label.setLayoutData(new GridData());
-
-        maxSizeText = toolkit.createText(buttons, "100", SWT.BORDER);
-        GridData gd = new GridData();
-        gd.widthHint = 50;
-        maxSizeText.setLayoutData(gd);
-
-        refreshButton = new Button(buttons, SWT.PUSH);
-        refreshButton.setText("Refresh");
-        gd = new GridData();
-        gd.horizontalIndent = 5;
-        gd.widthHint = 80;
-        refreshButton.setLayoutData(gd);
-
-        refreshButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                refresh();
-            }
-        });
-
-        table = toolkit.createTable(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
-        table.setHeaderVisible(true);
-        table.setLinesVisible(true);
-
-        table.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-        Collection<FieldConfig> fields = sourceConfig.getFieldConfigs();
-        for (FieldConfig fieldConfig : fields) {
-
-            TableColumn tc = new TableColumn(table, SWT.NONE);
-            tc.setText(fieldConfig.getName());
-            tc.setWidth(100);
-        }
-
-        return composite;
-    }
-*/
     public Composite createActionsSection(final Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
