@@ -21,7 +21,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.service.wizard.ServiceWizard;
 import org.apache.log4j.Logger;
 
@@ -46,7 +46,7 @@ public class NewServiceAction extends Action {
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 
-            ProjectNode projectNode = serversView.getSelectedProjectNode();
+            ServerNode projectNode = serversView.getSelectedProjectNode();
             serversView.open(projectNode.getServicesNode());
 
         } catch (Exception e) {

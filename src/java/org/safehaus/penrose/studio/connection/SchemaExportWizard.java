@@ -25,7 +25,7 @@ import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.SchemaWriter;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 import java.io.File;
 import java.util.Collection;
@@ -38,13 +38,13 @@ public class SchemaExportWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Project project;
+    private Server project;
     private Schema schema;
 
     public SchemaExportPage page = new SchemaExportPage();
     public SchemaSyntaxMappingPage syntaxMappingPage;
 
-    public SchemaExportWizard(Project project, Schema schema) {
+    public SchemaExportWizard(Server project, Schema schema) {
         this.project = project;
         this.schema = schema;
 

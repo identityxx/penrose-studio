@@ -26,7 +26,7 @@ import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.Federation;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.source.SourceClient;
@@ -54,7 +54,7 @@ public class NISScriptsPage extends FormPage {
 
     NISFilesEditor editor;
 
-    Project project;
+    Server project;
     NISRepositoryClient nisFederation;
     FederationRepositoryConfig domain;
 

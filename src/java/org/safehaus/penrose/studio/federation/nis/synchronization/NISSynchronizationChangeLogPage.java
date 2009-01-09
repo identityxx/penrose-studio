@@ -15,7 +15,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationEditor;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
@@ -53,7 +53,7 @@ public class NISSynchronizationChangeLogPage extends FormPage {
     Text descriptionText;
     //Text noteText;
 
-    Project project;
+    Server project;
     PartitionClient partitionClient;
     SourceClient changes;
 

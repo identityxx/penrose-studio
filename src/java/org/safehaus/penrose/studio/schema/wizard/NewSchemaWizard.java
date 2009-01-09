@@ -18,7 +18,7 @@
 package org.safehaus.penrose.studio.schema.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.schema.SchemaConfig;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.client.PenroseClient;
@@ -34,11 +34,11 @@ public class NewSchemaWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Project project;
+    private Server project;
 
     public SchemaNameWizardPage namePage = new SchemaNameWizardPage();
 
-    public NewSchemaWizard(Project project) {
+    public NewSchemaWizard(Server project) {
         setWindowTitle("New Schema");
 
         this.project = project;
@@ -101,11 +101,11 @@ public class NewSchemaWizard extends Wizard {
         return true;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 }

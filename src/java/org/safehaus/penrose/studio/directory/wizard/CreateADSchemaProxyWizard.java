@@ -23,7 +23,7 @@ import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
 import org.safehaus.penrose.studio.schema.wizard.SelectSchemaWizardPage;
 import org.safehaus.penrose.studio.util.ADUtil;
 import org.safehaus.penrose.studio.util.SchemaUtil;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.directory.EntryConfig;
@@ -42,7 +42,7 @@ public class CreateADSchemaProxyWizard extends Wizard {
     SelectConnectionWizardPage connectionPage;
     SelectSchemaWizardPage schemaPage;
 
-    private Project project;
+    private Server project;
     private String partitionName;
 
     public CreateADSchemaProxyWizard() {
@@ -117,11 +117,11 @@ public class CreateADSchemaProxyWizard extends Wizard {
         return true;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

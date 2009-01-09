@@ -24,7 +24,7 @@ import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.federation.nis.wizard.EditNISDomainWizard;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
@@ -38,7 +38,7 @@ public class NISDomainSettingsPage extends FormPage {
     Label serverText;
     Label domainText;
 
-    Project project;
+    Server project;
     FederationClient federationClient;
     NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig repositoryConfig;
@@ -129,6 +129,7 @@ public class NISDomainSettingsPage extends FormPage {
                     if (dialog.open() == Window.CANCEL) return;
 
                     federationClient.updateRepository(repositoryConfig);
+                    federationClient.store();
 
                     refresh();
                     
@@ -156,11 +157,11 @@ public class NISDomainSettingsPage extends FormPage {
         }
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

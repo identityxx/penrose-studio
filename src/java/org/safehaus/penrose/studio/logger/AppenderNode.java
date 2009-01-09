@@ -22,7 +22,7 @@ public class AppenderNode extends Node {
     ServersView view;
     AppenderConfig appenderConfig;
 
-    public AppenderNode(ServersView view, String name, Image image, Object object, Object parent) {
+    public AppenderNode(ServersView view, String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
         this.view = view;
         this.appenderConfig = (AppenderConfig)object;

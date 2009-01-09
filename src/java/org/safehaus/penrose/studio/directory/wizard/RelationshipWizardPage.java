@@ -36,7 +36,7 @@ import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.directory.dialog.RelationshipDialog;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,13 +52,13 @@ public class RelationshipWizardPage extends WizardPage implements SelectionListe
     
     public final static String NAME = "Data source relationships";
 
-    Project project;
+    Server project;
     String partitionName;
     Table relationshipTable;
 
     private Collection<EntrySourceConfig> sourceMappings;
 
-    public RelationshipWizardPage(Project project, String partitionName) {
+    public RelationshipWizardPage(Server project, String partitionName) {
         super(NAME);
         this.project = project;
         this.partitionName = partitionName;

@@ -20,10 +20,10 @@ package org.safehaus.penrose.studio.directory.action;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.directory.wizard.RootEntryWizard;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.ProjectNode;
 import org.apache.log4j.Logger;
 
 public class NewRootEntryAction extends Action {
@@ -42,15 +42,17 @@ public class NewRootEntryAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            ProjectNode projectNode = node.getProjectNode();
+            ServerNode projectNode = node.getProjectNode();
 
-            RootEntryWizard wizard = new RootEntryWizard(projectNode.getProject(), node.getPartitionName());
+            RootEntryWizard wizard = new RootEntryWizard(projectNode.getServer(), node.getPartitionName());
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
             dialog.open();
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
+            node.refresh();
+
+            //PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            //penroseStudio.notifyChangeListeners();
 
             serversView.open(node);
 

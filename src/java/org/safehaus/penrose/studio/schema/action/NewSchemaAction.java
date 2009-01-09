@@ -20,9 +20,9 @@ package org.safehaus.penrose.studio.schema.action;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.schema.wizard.NewSchemaWizard;
 import org.apache.log4j.Logger;
 
@@ -40,9 +40,9 @@ public class NewSchemaAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            ProjectNode projectNode = serversView.getSelectedProjectNode();
+            ServerNode projectNode = serversView.getSelectedProjectNode();
 
-            NewSchemaWizard wizard = new NewSchemaWizard(projectNode.getProject());
+            NewSchemaWizard wizard = new NewSchemaWizard(projectNode.getServer());
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);

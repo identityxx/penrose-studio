@@ -33,7 +33,7 @@ import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.source.wizard.SelectSourceWizardPage;
 
 import javax.naming.Context;
@@ -47,7 +47,7 @@ public class CreateLDAPProxyWizard extends Wizard {
 
     public SelectSourceWizardPage sourcePage;
 
-    private Project project;
+    private Server project;
     private String partitionName;
 
     private DN parentDn;
@@ -144,11 +144,11 @@ public class CreateLDAPProxyWizard extends Wizard {
         return true;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

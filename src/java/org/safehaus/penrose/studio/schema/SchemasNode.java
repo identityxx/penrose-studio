@@ -20,7 +20,7 @@ package org.safehaus.penrose.studio.schema;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 
@@ -35,9 +35,9 @@ public class SchemasNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     protected ServersView view;
-    protected ProjectNode projectNode;
+    protected ServerNode projectNode;
 
-    public SchemasNode(String name, Object object, ProjectNode projectNode) {
+    public SchemasNode(String name, Object object, ServerNode projectNode) {
         super(name, PenroseStudio.getImage(PenroseImage.FOLDER), object, projectNode);
 
         this.projectNode = projectNode;
@@ -81,11 +81,11 @@ public class SchemasNode extends Node {
         this.view = view;
     }
 
-    public ProjectNode getProjectNode() {
+    public ServerNode getProjectNode() {
         return projectNode;
     }
 
-    public void setProjectNode(ProjectNode projectNode) {
+    public void setProjectNode(ServerNode projectNode) {
         this.projectNode = projectNode;
     }
 }

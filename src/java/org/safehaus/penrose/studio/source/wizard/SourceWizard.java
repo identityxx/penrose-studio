@@ -26,7 +26,7 @@ import org.safehaus.penrose.studio.jdbc.source.JDBCFieldWizardPage;
 import org.safehaus.penrose.studio.ldap.source.LDAPTreeWizardPage;
 import org.safehaus.penrose.studio.ldap.source.LDAPAttributeWizardPage;
 import org.safehaus.penrose.studio.ldap.source.LDAPFieldWizardPage;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.jdbc.Table;
 import org.safehaus.penrose.jdbc.source.JDBCSource;
 import org.safehaus.penrose.source.SourceConfig;
@@ -48,7 +48,7 @@ public class SourceWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Project project;
+    private Server server;
     private String partitionName;
     private SourceConfig sourceConfig;
 
@@ -73,26 +73,39 @@ public class SourceWizard extends Wizard {
 
         propertyPage = new SourceWizardPage();
 
-        connectionPage = new SelectConnectionWizardPage(partitionName);
-        connectionPage.setProject(project);
-
-        jdbcTablePage = new JDBCTableWizardPage();
-        jdbcFieldsPage = new JDBCFieldWizardPage();
-        jdbcPrimaryKeyPage = new JDBCPrimaryKeyWizardPage();
-
-        jndiTreePage = new LDAPTreeWizardPage();
-        jndiAttributesPage = new LDAPAttributeWizardPage();
-        jndiFieldsPage = new LDAPFieldWizardPage();
-
         addPage(propertyPage);
+
+        connectionPage = new SelectConnectionWizardPage(partitionName);
+        connectionPage.setProject(server);
+
         addPage(connectionPage);
 
+        jdbcTablePage = new JDBCTableWizardPage();
+        jdbcTablePage.setServer(server);
+        jdbcTablePage.setPartitionName(partitionName);
+
         addPage(jdbcTablePage);
+
+        jdbcFieldsPage = new JDBCFieldWizardPage();
+        jdbcFieldsPage.setServer(server);
+        jdbcFieldsPage.setPartitionName(partitionName);
+
         addPage(jdbcFieldsPage);
+
+        jdbcPrimaryKeyPage = new JDBCPrimaryKeyWizardPage();
+
         addPage(jdbcPrimaryKeyPage);
 
+        jndiTreePage = new LDAPTreeWizardPage();
+
         addPage(jndiTreePage);
+
+        jndiAttributesPage = new LDAPAttributeWizardPage();
+
         addPage(jndiAttributesPage);
+
+        jndiFieldsPage = new LDAPFieldWizardPage();
+
         addPage(jndiFieldsPage);
     }
 
@@ -223,7 +236,7 @@ public class SourceWizard extends Wizard {
             sourceConfigManager.addSourceConfig(sourceConfig);
             project.save(partitionConfig, sourceConfigManager);
 */
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
             SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
@@ -258,11 +271,11 @@ public class SourceWizard extends Wizard {
         this.partitionName = partitionName;
     }
 
-    public Project getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

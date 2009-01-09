@@ -59,7 +59,7 @@ public class FederationDatabasePage extends FormPage {
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
 /*
-        Project project = federation.getProject();
+        Project project = federation.getServer();
         PenroseClient client = project.getClient();
 
         PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);

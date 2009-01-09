@@ -27,9 +27,15 @@ import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.jdbc.*;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionManagerClient;
+import org.safehaus.penrose.connection.ConnectionClient;
 import org.safehaus.penrose.source.FieldConfig;
+import org.safehaus.penrose.client.PenroseClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -52,6 +58,8 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
     Table tableTable;
     Table fieldTable;
 
+    private Server server;
+    private String partitionName;
     Collection<FieldConfig> fields;
     ConnectionConfig connectionConfig;
 
@@ -196,30 +204,49 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
         catalogCombo.removeAll();
         schemaCombo.removeAll();
 
-        JDBCClient client = new JDBCClient(connectionConfig.getParameters());
+        PenroseClient client = server.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+        ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(connectionConfig.getName());
 
-        Collection<String> catalogs = client.getCatalogs();
+        Collection<String> catalogs = (Collection<String>)connectionClient.getAttribute("Catalogs");
+
+        //JDBCClient client = new JDBCClient(connectionConfig.getParameters());
+        //Collection<String> catalogs = client.getCatalogs();
 
         for (String catalog : catalogs) {
             catalogCombo.add(catalog);
         }
 
-        Collection<String> schemas = client.getSchemas();
+        Collection<String> schemas = (Collection<String>)connectionClient.getAttribute("Schemas");
+        //Collection<String> schemas = client.getSchemas();
 
         for (String schema : schemas) {
             schemaCombo.add(schema);
         }
 
-        client.close();
+        //client.close();
     }
 
     public void showTableNames() throws Exception {
         tableTable.removeAll();
 
-        JDBCClient client = new JDBCClient(connectionConfig.getParameters());
+        PenroseClient client = server.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+        ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(connectionConfig.getName());
+
+        //JDBCClient client = new JDBCClient(connectionConfig.getParameters());
 
         try {
-            Collection<org.safehaus.penrose.jdbc.Table> tables = client.getTables(getCatalog(), getSchema());
+            Collection<org.safehaus.penrose.jdbc.Table> tables = (Collection<org.safehaus.penrose.jdbc.Table>)connectionClient.invoke(
+                    "getTables",
+                    new Object[] { getCatalog(), getSchema() },
+                    new String[] { String.class.getName(), String.class.getName() }
+            );
+            //Collection<org.safehaus.penrose.jdbc.Table> tables = client.getTables(getCatalog(), getSchema());
 
             for (org.safehaus.penrose.jdbc.Table tableConfig : tables) {
                 String tableName = tableConfig.getName();
@@ -233,7 +260,7 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
             log.error(e.getMessage(), e);
         }
 
-        client.close();
+        //client.close();
     }
 
     public void showFieldNames() throws Exception {
@@ -241,9 +268,20 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
 
         if (getTableName() == null) return;
 
-        JDBCClient client = new JDBCClient(connectionConfig.getParameters());
+        PenroseClient client = server.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+        ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(connectionConfig.getName());
 
-        fields = client.getColumns(getCatalog(), getSchema(), getTableName());
+        //JDBCClient client = new JDBCClient(connectionConfig.getParameters());
+
+        fields = (Collection<FieldConfig>)connectionClient.invoke(
+                "getColumns",
+                new Object[] { getCatalog(), getSchema(), getTableName() },
+                new String[] { String.class.getName(), String.class.getName(), String.class.getName() }
+        );
+        //fields = client.getColumns(getCatalog(), getSchema(), getTableName());
 
         for (FieldConfig field : fields) {
             TableItem it = new TableItem(fieldTable, SWT.NONE);
@@ -252,7 +290,7 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
             it.setText(1, field.getType());
         }
 
-        client.close();
+        //client.close();
     }
 
     public String getCatalog() {
@@ -313,5 +351,21 @@ public class JDBCTableWizardPage extends WizardPage implements SelectionListener
 
     public void modifyText(ModifyEvent event) {
         setPageComplete(validatePage());
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
+    }
+
+    public String getPartitionName() {
+        return partitionName;
+    }
+
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 }

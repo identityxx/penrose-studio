@@ -19,7 +19,7 @@ package org.safehaus.penrose.studio.directory.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
@@ -42,7 +42,7 @@ public class CreateRootDSEProxyWizard extends Wizard {
 
     public SelectConnectionWizardPage connectionPage;
 
-    private Project project;
+    private Server project;
     private String partitionName;
 
     public CreateRootDSEProxyWizard() {
@@ -114,11 +114,11 @@ public class CreateRootDSEProxyWizard extends Wizard {
         return true;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

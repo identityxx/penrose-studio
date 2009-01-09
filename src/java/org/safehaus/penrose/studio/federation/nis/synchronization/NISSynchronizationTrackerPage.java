@@ -14,7 +14,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.federation.NISRepositoryClient;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.federation.NISDomain;
@@ -43,7 +43,7 @@ public class NISSynchronizationTrackerPage extends FormPage {
 
     FormToolkit toolkit;
 
-    Project project;
+    Server project;
     NISSynchronizationEditor editor;
     NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig domain;

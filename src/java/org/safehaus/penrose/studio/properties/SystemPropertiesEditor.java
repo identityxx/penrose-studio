@@ -27,7 +27,7 @@ import org.eclipse.ui.part.MultiPageEditorPart;
 import org.safehaus.penrose.PenroseConfig;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -41,7 +41,7 @@ public class SystemPropertiesEditor extends MultiPageEditorPart {
 
     boolean dirty;
 
-    Project project;
+    Server project;
 
     Map<String,String> origProperties;
     Map<String,String> properties = new TreeMap<String,String>();

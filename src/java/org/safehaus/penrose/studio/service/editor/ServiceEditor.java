@@ -28,7 +28,7 @@ import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.service.ServiceManagerClient;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
@@ -37,7 +37,7 @@ public class ServiceEditor extends MultiPageEditorPart {
 
     Logger log = Logger.getLogger(getClass());
 
-    Project project;
+    Server project;
     ServiceConfig origServiceConfig;
     ServiceConfig serviceConfig;
 

@@ -20,6 +20,7 @@ package org.safehaus.penrose.studio.directory;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.action.Action;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.safehaus.penrose.directory.EntryConfig;
@@ -33,13 +34,10 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.directory.action.*;
 import org.safehaus.penrose.studio.partition.PartitionNode;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
@@ -49,13 +47,13 @@ public class DirectoryNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     protected ServersView view;
-    protected ProjectNode projectNode;
+    protected ServerNode projectNode;
     protected PartitionsNode partitionsNode;
     protected PartitionNode partitionNode;
 
     private String partitionName;
 
-    public DirectoryNode(String name, Image image, Object object, Object parent) {
+    public DirectoryNode(String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
         partitionNode = (PartitionNode)parent;
         partitionsNode = partitionNode.getPartitionsNode();
@@ -63,33 +61,12 @@ public class DirectoryNode extends Node {
         view = projectNode.getServersView();
     }
 
-    public void showMenu(IMenuManager manager) throws Exception {
-
-        manager.add(new NewRootEntryAction(this));
-
-        //PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        //PenroseStudioWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
-        //PenroseStudioWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
-        //PenroseStudioActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
-
-        //if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
-            manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-            manager.add(new MapLDAPTreeFromTopAction(this));
-            manager.add(new MapRootDSEAction(this));
-            manager.add(new MapADSchemaAction(this));
-            manager.add(new CreateLDAPSnapshotEntryAction(this));
-        //}
+    public void init() throws Exception {
+        updateChildren();
     }
 
-    public boolean hasChildren() throws Exception {
-        return !getChildren().isEmpty();
-    }
-
-    public Collection<Node> getChildren() throws Exception {
-
-        Collection<Node> children = new ArrayList<Node>();
-
-        Project project = projectNode.getProject();
+    public void updateChildren() throws Exception {
+        Server project = projectNode.getServer();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
@@ -115,11 +92,43 @@ public class DirectoryNode extends Node {
 
             entryNode.setPartitionName(partitionName);
             entryNode.setEntryConfig(entryConfig);
-
+            entryNode.init();
+            
             children.add(entryNode);
         }
+    }
 
-        return children;
+    public void refresh() throws Exception {
+
+        children.clear();
+        updateChildren();
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
+    }
+
+    public void showMenu(IMenuManager manager) throws Exception {
+
+        manager.add(new NewRootEntryAction(this));
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+        
+        manager.add(new MapLDAPTreeFromTopAction(this));
+        manager.add(new MapRootDSEAction(this));
+        manager.add(new MapADSchemaAction(this));
+        manager.add(new CreateLDAPSnapshotEntryAction(this));
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(new Action("Refresh") {
+            public void run() {
+                try {
+                    refresh();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
     }
 
     public String getPartitionName() {
@@ -138,11 +147,11 @@ public class DirectoryNode extends Node {
         this.view = view;
     }
 
-    public ProjectNode getProjectNode() {
+    public ServerNode getProjectNode() {
         return projectNode;
     }
 
-    public void setProjectNode(ProjectNode projectNode) {
+    public void setProjectNode(ServerNode projectNode) {
         this.projectNode = projectNode;
     }
 

@@ -28,6 +28,8 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.directory.EntryAttributeConfig;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.EntrySourceConfig;
@@ -45,13 +47,11 @@ import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
-import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.directory.dialog.AttributeTypeSelectionDialog;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.directory.dialog.ExpressionDialog;
-import org.safehaus.penrose.studio.directory.dialog.*;
-import org.safehaus.penrose.studio.directory.dialog.ObjectClassSelectionDialog;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.directory.wizard.EntryDNWizard;
+import org.safehaus.penrose.studio.directory.wizard.ObjectClassWizard;
+import org.safehaus.penrose.studio.directory.wizard.AttributeWizard;
 
 import java.util.Collection;
 import java.util.Map;
@@ -67,9 +67,8 @@ public class LDAPPage extends FormPage {
 
     FormToolkit toolkit;
 
-    Text parentDnText;
-    Text rdnText;
-    Text classNameText;
+    Label rdnText;
+    Label parentDnText;
 
     Table objectClassTable;
     Table attributeTable;
@@ -98,7 +97,7 @@ public class LDAPPage extends FormPage {
             section.setText("Distinguished Name");
             section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-            Control entrySection = createMainSection(section);
+            Control entrySection = createDNSection(section);
             section.setClient(entrySection);
 
             section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
@@ -116,85 +115,99 @@ public class LDAPPage extends FormPage {
             section.setClient(atSection);
 
             refresh();
+
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
-    public Composite createMainSection(final Composite parent) {
+    public Composite createDNSection(final Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
-        composite.setLayout(new GridLayout(3, false));
+        composite.setLayout(new GridLayout(2, false));
 
-        Label parentDnLabel = toolkit.createLabel(composite, "Parent DN:");
+        Composite leftControl = createDNLeftControl(composite);
+        leftControl.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        Composite rightControl = createDNRightControl(composite);
+        GridData gd = new GridData(GridData.FILL_VERTICAL);
+        gd.widthHint = 100;
+        rightControl.setLayoutData(gd);
+
+        return composite;
+    }
+
+    public Composite createDNLeftControl(final Composite parent) {
+
+        Composite composite = toolkit.createComposite(parent);
+        composite.setLayout(new GridLayout(2, false));
+
+        Label rdnLabel = toolkit.createLabel(composite, "RDN:");
         GridData gd = new GridData();
         gd.widthHint = 100;
-        parentDnLabel.setLayoutData(gd);
+        rdnLabel.setLayoutData(gd);
 
-        parentDnText = toolkit.createText(composite, "", SWT.BORDER);
-        parentDnText.setText(entryConfig.getParentDn() == null ? "" : entryConfig.getParentDn().toString());
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        parentDnText.setLayoutData(gd);
+        rdnText = toolkit.createLabel(composite, "", SWT.NONE);
+        //rdnText.setText(entryConfig.getRdn() == null ? "" : entryConfig.getRdn().toString());
+        rdnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+        //rdnText.setEditable(false);
+        //rdnText.setEnabled(false);
+
+        Label parentDnLabel = toolkit.createLabel(composite, "Parent DN:");
+        parentDnLabel.setLayoutData(new GridData());
+
+        parentDnText = toolkit.createLabel(composite, "", SWT.NONE);
+        //parentDnText.setText(entryConfig.getParentDn() == null ? "" : entryConfig.getParentDn().toString());
+        parentDnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+/*
         parentDnText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent event) {
                 entryConfig.setDn(getDn());
                 checkDirty();
             }
         });
+*/
+        return composite;
+    }
 
-        Button browseButton = new Button(composite, SWT.PUSH);
-		browseButton.setText("Browse...");
+    public Composite createDNRightControl(final Composite parent) {
 
-        gd = new GridData();
-        gd.widthHint = 100;
-        browseButton.setLayoutData(gd);
+        Composite composite = toolkit.createComposite(parent);
 
-        browseButton.addSelectionListener(new SelectionAdapter() {
+        GridLayout layout = new GridLayout();
+        layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        composite.setLayout(layout);
+
+        Button editButton = new Button(composite, SWT.PUSH);
+		editButton.setText("Edit");
+        editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    EntrySelectionDialog dialog = new EntrySelectionDialog(parent.getShell(), SWT.NONE);
-                    dialog.setText("Select parent entry...");
-                    dialog.setPartitionName(editor.getPartitionName());
-                    dialog.setProject(editor.project);
-                    dialog.open();
+                    EntryDNWizard wizard = new EntryDNWizard();
+                    wizard.setEntryConfig(entryConfig);
+                    wizard.setServer(editor.server);
+                    wizard.setPartitionName(editor.getPartitionName());
+                    wizard.setRdn(entryConfig.getRdn());
+                    wizard.setParentDn(entryConfig.getParentDn());
 
-                    DN dn = dialog.getDn();
-                    if (dn == null) return;
+                    WizardDialog dialog = new WizardDialog(getSite().getShell(), wizard);
+                    dialog.setPageSize(600, 300);
 
-                    parentDnText.setText(dn.toString());
+                    int rc = dialog.open();
+                    if (rc == Window.CANCEL) return;
+
+                    editor.store();
+                    refresh();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     throw new RuntimeException(e.getMessage(), e);
                 }
-            }
-        });
-
-        toolkit.createLabel(composite, "RDN:");
-
-        rdnText = toolkit.createText(composite, "", SWT.BORDER);
-        rdnText.setText(entryConfig.getRdn() == null ? "" : entryConfig.getRdn().toString());
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalSpan = 2;
-        rdnText.setLayoutData(gd);
-
-        rdnText.setEditable(false);
-        rdnText.setEnabled(false);
-
-        toolkit.createLabel(composite, "Class:");
-
-        classNameText = toolkit.createText(composite, "", SWT.BORDER);
-        classNameText .setText(entryConfig.getEntryClass() == null ? "" : entryConfig.getEntryClass());
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalSpan = 2;
-        classNameText .setLayoutData(gd);
-
-        classNameText.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent event) {
-                entryConfig.setEntryClass("".equals(classNameText.getText()) ? null : classNameText.getText());
-                checkDirty();
             }
         });
 
@@ -204,21 +217,67 @@ public class LDAPPage extends FormPage {
     public Composite createObjectClassesSection(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
-        GridLayout layout = new GridLayout();
-        layout.numColumns = 2;
-        composite.setLayout(layout);
+        composite.setLayout(new GridLayout(2, false));
 
-        objectClassTable = toolkit.createTable(composite, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
+        Composite leftControl = createObjectClassesLeftControl(composite);
+        leftControl.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        Composite rightControl = createObjectClassesRightControl(composite);
+        GridData gd = new GridData(GridData.FILL_VERTICAL);
+        gd.widthHint = 100;
+        rightControl.setLayoutData(gd);
+
+        return composite;
+    }
+
+    public Composite createObjectClassesLeftControl(final Composite parent) {
+
+        objectClassTable = toolkit.createTable(parent, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
         GridData gd = new GridData(GridData.FILL_BOTH);
         gd.heightHint = 100;
         objectClassTable.setLayoutData(gd);
         objectClassTable.setLayout(new FillLayout());
 
-        Composite buttons = toolkit.createComposite(composite);
-        buttons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
-        buttons.setLayout(new GridLayout());
+        return objectClassTable;
+    }
 
-        Button addButton = new Button(buttons, SWT.PUSH);
+    public Composite createObjectClassesRightControl(final Composite parent) {
+
+        Composite composite = toolkit.createComposite(parent);
+
+        GridLayout layout = new GridLayout();
+        layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        composite.setLayout(layout);
+
+        Button editButton = new Button(composite, SWT.PUSH);
+		editButton.setText("Edit");
+        editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        editButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                try {
+                    ObjectClassWizard wizard = new ObjectClassWizard();
+                    wizard.setServer(editor.getServer());
+                    wizard.setEntryConfig(entryConfig);
+
+                    WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
+                    dialog.setPageSize(600, 300);
+
+                    int rc = dialog.open();
+                    if (rc == Window.CANCEL) return;
+
+                    editor.store();
+                    refresh();
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+        });
+/*
+        Button addButton = new Button(composite, SWT.PUSH);
 		addButton.setText("Add");
 
         addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -229,7 +288,7 @@ public class LDAPPage extends FormPage {
                     ObjectClassSelectionDialog dialog = new ObjectClassSelectionDialog(editor.getParent().getShell(), SWT.NONE);
                     dialog.setText("Add object classes...");
 
-                    Project project = editor.getProject();
+                    Server project = editor.getServer();
                     PenroseClient client = project.getClient();
                     SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
 
@@ -252,7 +311,7 @@ public class LDAPPage extends FormPage {
             }
         });
 
-        Button removeButton = new Button(buttons, SWT.PUSH);
+        Button removeButton = new Button(composite, SWT.PUSH);
 		removeButton.setText("Remove");
 
         removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -277,23 +336,34 @@ public class LDAPPage extends FormPage {
                 }
             }
         });
-
+*/
         return composite;
     }
 
     public Composite createAttributesSection(final Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
-        GridLayout layout = new GridLayout();
-        layout.numColumns = 2;
-        composite.setLayout(layout);
+        composite.setLayout(new GridLayout(2, false));
 
-        attributeTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.CHECK);
+        Composite leftControl = createAttributesLeftControl(composite);
+        leftControl.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        Composite rightControl = createAttributesRightControl(composite);
+        GridData gd = new GridData(GridData.FILL_VERTICAL);
+        gd.widthHint = 100;
+        rightControl.setLayoutData(gd);
+
+        return composite;
+    }
+
+    public Composite createAttributesLeftControl(final Composite parent) {
+
+        attributeTable = new Table(parent, SWT.BORDER | SWT.FULL_SELECTION);
         attributeTable.setHeaderVisible(true);
         attributeTable.setLinesVisible(true);
 
         attributeTable.setLayoutData(new GridData(GridData.FILL_BOTH));
-
+/*
         attributeTable.addMouseListener(new MouseAdapter() {
             public void mouseDoubleClick(MouseEvent event) {
                 try {
@@ -314,7 +384,8 @@ public class LDAPPage extends FormPage {
                         item.setImage(PenroseStudio.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
                         ad.setRdn(item.getChecked());
                     }
-                    refreshRdn();
+                    updateRdn();
+                    refresh();
                     checkDirty();
 
                 } catch (Exception e) {
@@ -334,22 +405,27 @@ public class LDAPPage extends FormPage {
                         item.setImage(PenroseStudio.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
                         ad.setRdn(item.getChecked());
                     }
-                    refreshRdn();
+                    updateRdn();
+                    refresh();
                     checkDirty();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
             }
         });
-
-        TableColumn tc = new TableColumn(this.attributeTable, SWT.LEFT);
+*/
+        TableColumn tc = new TableColumn(attributeTable, SWT.LEFT);
         tc.setText("Attribute");
-        tc.setWidth(200);
+        tc.setWidth(150);
 
         tc = new TableColumn(attributeTable, SWT.LEFT);
         tc.setText("Value/Expression");
         tc.setWidth(350);
 
+        tc = new TableColumn(attributeTable, SWT.LEFT);
+        tc.setText("RDN");
+        tc.setWidth(50);
+/*
         Menu menu = new Menu(attributeTable);
         attributeTable.setMenu(menu);
 
@@ -366,12 +442,48 @@ public class LDAPPage extends FormPage {
                 }
             }
         });
+*/
+        return attributeTable;
+    }
 
-        Composite buttons = toolkit.createComposite(composite);
-        buttons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
-        buttons.setLayout(new GridLayout());
+    public Composite createAttributesRightControl(final Composite parent) {
 
-        Button addButton = new Button(buttons, SWT.PUSH);
+        Composite composite = toolkit.createComposite(parent);
+
+        GridLayout layout = new GridLayout();
+        layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        composite.setLayout(layout);
+
+        Button editButton = new Button(composite, SWT.PUSH);
+		editButton.setText("Edit");
+        editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        editButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                try {
+                    AttributeWizard wizard = new AttributeWizard();
+                    wizard.setServer(editor.getServer());
+                    wizard.setPartitionName(editor.getPartitionName());
+                    wizard.setEntryConfig(entryConfig);
+
+                    WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
+                    dialog.setPageSize(600, 300);
+
+                    int rc = dialog.open();
+                    if (rc == Window.CANCEL) return;
+
+                    editor.store();
+                    refresh();
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+        });
+/*
+        Button addButton = new Button(composite, SWT.PUSH);
 		addButton.setText("Add");
 
         addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -382,7 +494,7 @@ public class LDAPPage extends FormPage {
                     AttributeTypeSelectionDialog dialog = new AttributeTypeSelectionDialog(editor.getParent().getShell(), SWT.NONE);
                     dialog.setText("Add attributes...");
 
-                    Project project = editor.getProject();
+                    Server project = editor.getServer();
                     PenroseClient client = project.getClient();
                     dialog.setSchemaManagerClient(client.getSchemaManagerClient());
 
@@ -404,7 +516,7 @@ public class LDAPPage extends FormPage {
             }
         });
 
-        Button editButton = new Button(buttons, SWT.PUSH);
+        Button editButton = new Button(composite, SWT.PUSH);
 		editButton.setText("Edit");
 
         editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -420,7 +532,7 @@ public class LDAPPage extends FormPage {
             }
         });
 
-        Button removeButton = new Button(buttons, SWT.PUSH);
+        Button removeButton = new Button(composite, SWT.PUSH);
 		removeButton.setText("Remove");
 
         removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -445,7 +557,7 @@ public class LDAPPage extends FormPage {
                 }
             }
         });
-
+*/
         return composite;
     }
 
@@ -458,7 +570,7 @@ public class LDAPPage extends FormPage {
         ExpressionDialog dialog = new ExpressionDialog(editor.getParent().getShell(), SWT.NONE);
         dialog.setText("Edit attribute value/expression...");
 
-        Project project = editor.getProject();
+        Server project = editor.getServer();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(editor.getPartitionName());
@@ -488,12 +600,17 @@ public class LDAPPage extends FormPage {
 
         //entry.addEntryAttributeConfig(ad);
 
+        updateRdn();
         refresh();
-        refreshRdn();
         checkDirty();
     }
 
     public void refresh() throws Exception {
+
+        DN dn = entryConfig.getDn();
+        rdnText.setText(dn.isEmpty() ? "" : dn.getRdn().toString());
+        parentDnText.setText(dn.isEmpty() ? "" : dn.getParentDn().toString());
+
         objectClassTable.removeAll();
         attributeTable.removeAll();
 /*
@@ -542,9 +659,10 @@ public class LDAPPage extends FormPage {
 
             TableItem item = new TableItem(attributeTable, SWT.CHECK);
             item.setChecked(attributeConfig.isRdn());
-            item.setImage(PenroseStudio.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
+            //item.setImage(PenroseStudio.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
             item.setText(0, attributeConfig.getName());
             item.setText(1, value == null ? "" : value);
+            item.setText(2, attributeConfig.isRdn() ? "Yes" : "");
             item.setData(attributeConfig);
         }
     }
@@ -555,7 +673,7 @@ public class LDAPPage extends FormPage {
 
     public Map<String,ObjectClass> getObjectClasses(Collection<String> ocNames) throws Exception {
 
-        Project project = editor.getProject();
+        Server project = editor.getServer();
         PenroseClient client = project.getClient();
         SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
 
@@ -592,7 +710,7 @@ public class LDAPPage extends FormPage {
         }
     }
 
-    public void refreshRdn() {
+    public void updateRdn() {
 
         //log.debug("Rdn:");
 
@@ -619,8 +737,10 @@ public class LDAPPage extends FormPage {
         }
 
         RDN rdn = rb.toRdn();
-        rdnText.setText(rdn.toString());
-        entryConfig.setDn(getDn());
+        DN parentDn = entryConfig.getParentDn();
+
+        DN dn = rdn.append(parentDn);
+        entryConfig.setDn(dn);
     }
 
     public DN getDn() {

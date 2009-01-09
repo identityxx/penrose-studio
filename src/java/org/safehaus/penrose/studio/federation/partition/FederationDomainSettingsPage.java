@@ -22,7 +22,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.federation.partition.FederationDomainEditorWizard;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.connection.ConnectionClient;
 import org.safehaus.penrose.connection.ConnectionConfig;
@@ -50,7 +50,7 @@ public class FederationDomainSettingsPage extends FormPage {
     Label bindPasswordText;
 
     FederationClient federationClient;
-    Project project;
+    Server project;
 
     ConnectionClient connectionClient;
     SourceClient sourceClient;

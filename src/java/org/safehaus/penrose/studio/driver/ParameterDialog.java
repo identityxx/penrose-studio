@@ -124,7 +124,7 @@ public class ParameterDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
                 parameter.setName(nameText.getText());
                 parameter.setTypeAsString(typeCombo.getText());
-                parameter.setDescription(displayNameText.getText());
+                parameter.setDisplayName(displayNameText.getText());
                 parameter.setDefaultValue(defaultValue.getText().equals("") ? null : defaultValue.getText());
                 action = OK;
                 shell.close();
@@ -148,7 +148,7 @@ public class ParameterDialog extends Dialog {
         this.parameter = parameter;
         nameText.setText(parameter.getName() == null ? "" : parameter.getName());
         typeCombo.setText(parameter.getTypeAsString() == null ? "" : parameter.getTypeAsString());
-        displayNameText.setText(parameter.getDescription() == null ? "" : parameter.getDescription());
+        displayNameText.setText(parameter.getDisplayName() == null ? "" : parameter.getDisplayName());
         defaultValue.setText(parameter.getDefaultValue() == null ? "" : parameter.getDefaultValue());
     }
 

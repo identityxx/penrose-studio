@@ -8,7 +8,7 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.FederationClient;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +16,7 @@ public class NISDomainEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    public Project project;
+    public Server project;
     public FederationClient federationClient;
     public NISRepositoryClient nisFederationClient;
     public FederationRepositoryConfig repositoryConfig;

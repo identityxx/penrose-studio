@@ -34,9 +34,9 @@ import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.ldap.connection.JNDIConnectionParametersWizardPage;
-import org.safehaus.penrose.studio.ldap.connection.LDAPConnectionWizardPage;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.config.wizard.ParametersWizardPage;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.ldap.connection.wizard.LDAPConnectionSettingsWizardPage;
 import org.safehaus.penrose.studio.util.ADUtil;
 import org.safehaus.penrose.studio.util.SchemaUtil;
 
@@ -50,11 +50,11 @@ public class CreateLDAPProxyWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Project project;
+    private Server project;
 
     public PartitionProxyPage infoPage;
-    public LDAPConnectionWizardPage connectionInfoPage;
-    public JNDIConnectionParametersWizardPage connectionParametersPage;
+    public LDAPConnectionSettingsWizardPage connectionInfoPage;
+    public ParametersWizardPage connectionParametersPage;
 
     public CreateLDAPProxyWizard() {
         setWindowTitle("New LDAP Proxy");
@@ -65,10 +65,10 @@ public class CreateLDAPProxyWizard extends Wizard {
         infoPage = new PartitionProxyPage();
         addPage(infoPage);
 
-        connectionInfoPage = new LDAPConnectionWizardPage();
+        connectionInfoPage = new LDAPConnectionSettingsWizardPage();
         addPage(connectionInfoPage);
 
-        connectionParametersPage = new JNDIConnectionParametersWizardPage();
+        connectionParametersPage = new ParametersWizardPage();
         addPage(connectionParametersPage);
     }
 
@@ -199,11 +199,11 @@ public class CreateLDAPProxyWizard extends Wizard {
         }
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 }

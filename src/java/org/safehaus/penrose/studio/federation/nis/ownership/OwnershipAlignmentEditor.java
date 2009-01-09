@@ -7,7 +7,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.module.ModuleManagerClient;
 import org.safehaus.penrose.module.ModuleClient;
 import org.safehaus.penrose.partition.PartitionClient;
@@ -20,7 +20,7 @@ public class OwnershipAlignmentEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    public Project project;
+    public Server project;
     public NISRepositoryClient nisFederationClient;
     public FederationRepositoryConfig repositoryConfig;
 

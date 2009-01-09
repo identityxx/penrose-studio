@@ -21,7 +21,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.schema.wizard.ImportSchemaWizard;
 import org.apache.log4j.Logger;
 
@@ -37,9 +37,9 @@ public class ImportSchemaAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            ProjectNode projectNode = serversView.getSelectedProjectNode();
+            ServerNode projectNode = serversView.getSelectedProjectNode();
 
-            ImportSchemaWizard wizard = new ImportSchemaWizard(projectNode.getProject());
+            ImportSchemaWizard wizard = new ImportSchemaWizard(projectNode.getServer());
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);

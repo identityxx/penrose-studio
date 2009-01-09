@@ -37,7 +37,7 @@ import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.directory.dialog.ACIDialog;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 import java.util.Collection;
 
@@ -55,11 +55,11 @@ public class ACLPage extends FormPage implements ModifyListener {
 
     EntryEditor editor;
 
-    Project project;
+    Server project;
     String partitionName;
     EntryConfig entryConfig;
 
-    public ACLPage(EntryEditor editor, Project project, String partitionName, EntryConfig entryConfig) {
+    public ACLPage(EntryEditor editor, Server project, String partitionName, EntryConfig entryConfig) {
         super(editor, "ACL", "  ACL  ");
 
         this.editor = editor;

@@ -8,7 +8,7 @@ import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.SchemaUtil;
 import org.safehaus.penrose.schema.attributeSyntax.AttributeSyntax;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
@@ -24,9 +24,9 @@ public class SnapshotUtil {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    Project project;
+    Server project;
 
-    public SnapshotUtil(Project project) throws Exception {
+    public SnapshotUtil(Server project) throws Exception {
         this.project = project;
     }
 

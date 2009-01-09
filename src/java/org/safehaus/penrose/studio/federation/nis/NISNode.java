@@ -3,13 +3,15 @@ package org.safehaus.penrose.studio.federation.nis;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.*;
 import org.safehaus.penrose.studio.federation.nis.editor.NISEditorInput;
 import org.safehaus.penrose.studio.federation.nis.editor.NISEditor;
 import org.safehaus.penrose.studio.federation.nis.domain.NISDomainNode;
 import org.safehaus.penrose.studio.federation.nis.wizard.AddNISDomainWizard;
+import org.safehaus.penrose.studio.federation.FederationDomainNode;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
@@ -23,41 +25,49 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 /**
  * @author Endi S. Dewata
  */
-public class NISNode extends Node {
+public class NISNode extends Node implements ChangeListener {
 
-    Project project;
+    Server server;
     FederationClient federationClient;
 
-    public NISNode(String name, Object parent) throws Exception {
+    public NISNode(String name, Node parent) throws Exception {
         super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, parent);
     }
 
     public void init() throws Exception {
+
+        //PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        //penroseStudio.addChangeListener(this);
+
         refresh();
     }
 
-    public void refresh() throws Exception {
+    public void refresh() {
+        try {
+            log.debug("NIS repositories:");
 
-        log.debug("NIS repositories:");
+            children.clear();
 
-        children.clear();
+            for (FederationRepositoryConfig repositoryConfig : getFederationClient().getRepositories("NIS")) {
 
-        for (FederationRepositoryConfig repositoryConfig : federationClient.getRepositories("NIS")) {
+                String repositoryName = repositoryConfig.getName();
+                log.debug(" - "+repositoryName);
 
-            String repositoryName = repositoryConfig.getName();
-            log.debug(" - "+repositoryName);
+                NISRepositoryClient nisFederationClient = new NISRepositoryClient(getFederationClient(), repositoryName);
 
-            NISRepositoryClient nisFederationClient = new NISRepositoryClient(federationClient, repositoryName);
+                NISDomainNode domainNode = new NISDomainNode(repositoryConfig.getName(), this);
 
-            NISDomainNode domainNode = new NISDomainNode(repositoryConfig.getName(), this);
+                domainNode.setProject(server);
+                domainNode.setFederationClient(getFederationClient());
+                domainNode.setNisFederationClient(nisFederationClient);
+                domainNode.setRepositoryConfig(repositoryConfig);
+                domainNode.init();
 
-            domainNode.setProject(project);
-            domainNode.setFederationClient(federationClient);
-            domainNode.setNisFederationClient(nisFederationClient);
-            domainNode.setRepositoryConfig(repositoryConfig);
-            domainNode.init();
-
-            children.add(domainNode);
+                children.add(domainNode);
+            }
+            
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -103,8 +113,8 @@ public class NISNode extends Node {
     public void open() throws Exception {
 
         NISEditorInput ei = new NISEditorInput();
-        ei.setProject(project);
-        ei.setFederationClient(federationClient);
+        ei.setProject(server);
+        ei.setFederationClient(getFederationClient());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -126,28 +136,27 @@ public class NISNode extends Node {
 
         FederationRepositoryConfig domain = wizard.getRepository();
 
+        FederationClient federationClient = getFederationClient();
         federationClient.addRepository(domain);
         federationClient.store();
-
-        federationClient.createPartition(domain.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
 
-    public Project getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
-    public FederationClient getFederationClient() {
-        return federationClient;
+    public FederationClient getFederationClient() throws Exception {
+        return ((FederationDomainNode)parent).getFederationClient();
     }
 
-    public void setFederationClient(FederationClient federationClient) {
-        this.federationClient = federationClient;
+    public void handleChange(Object object) {
+        refresh();
     }
 }

@@ -13,7 +13,7 @@ import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi Sukma Dewata
@@ -24,7 +24,7 @@ public abstract class SourceEditor extends FormEditor {
 
     protected boolean dirty;
 
-    protected Project project;
+    protected Server project;
     protected String partitionName;
     protected String origSourceName;
 
@@ -135,11 +135,11 @@ public abstract class SourceEditor extends FormEditor {
         }
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

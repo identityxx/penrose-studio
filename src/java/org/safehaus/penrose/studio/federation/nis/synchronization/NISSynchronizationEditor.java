@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
@@ -21,7 +21,7 @@ public class NISSynchronizationEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    Project project;
+    Server project;
     NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig domain;
 
@@ -85,11 +85,11 @@ public class NISSynchronizationEditor extends FormEditor {
         return nisFederationClient;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 }

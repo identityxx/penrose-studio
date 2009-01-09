@@ -10,7 +10,7 @@ import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.schema.SchemaManagerClient;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
@@ -19,7 +19,7 @@ public class SchemaEditor extends FormEditor {
 
     Logger log = Logger.getLogger(getClass());
 
-    Project project;
+    Server project;
 
     public Schema origSchema;
     public Schema schema;

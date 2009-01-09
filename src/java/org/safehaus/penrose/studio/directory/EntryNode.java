@@ -35,21 +35,15 @@ import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.directory.action.MapLDAPTreeAction;
-import org.safehaus.penrose.studio.directory.action.NewDynamicEntryAction;
-import org.safehaus.penrose.studio.directory.action.NewEntryFromSourceAction;
-import org.safehaus.penrose.studio.directory.action.NewEntryAction;
+import org.safehaus.penrose.studio.directory.action.*;
 import org.safehaus.penrose.studio.directory.editor.EntryEditorInput;
 import org.safehaus.penrose.studio.directory.editor.EntryEditor;
 import org.safehaus.penrose.studio.partition.PartitionNode;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
@@ -59,7 +53,7 @@ public class EntryNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     protected ServersView view;
-    protected ProjectNode projectNode;
+    protected ServerNode serverNode;
     protected PartitionsNode partitionsNode;
     protected PartitionNode partitionNode;
     protected DirectoryNode directoryNode;
@@ -67,7 +61,7 @@ public class EntryNode extends Node {
     private String partitionName;
     private EntryConfig entryConfig;
 
-    public EntryNode(String name, Image image, Object object, Object parent) {
+    public EntryNode(String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
 
         if (parent instanceof DirectoryNode) {
@@ -78,8 +72,59 @@ public class EntryNode extends Node {
 
         partitionNode = directoryNode.getPartitionNode();
         partitionsNode = partitionNode.getPartitionsNode();
-        projectNode = partitionsNode.getProjectNode();
-        view = projectNode.getServersView();
+        serverNode = partitionsNode.getProjectNode();
+        view = serverNode.getServersView();
+    }
+
+    public void init() throws Exception {
+        updateChildren();
+    }
+
+    public void updateChildren() throws Exception {
+
+        Server project = serverNode.getServer();
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        DirectoryClient directoryClient = partitionClient.getDirectoryClient();
+
+        EntryClient entryClient = directoryClient.getEntryClient(entryConfig.getId());
+
+        log.debug("Getting children:");
+
+        for (String id : entryClient.getChildIds()) {
+            log.debug(" - "+id);
+
+            EntryClient childClient = directoryClient.getEntryClient(id);
+            EntryConfig childConfig = childClient.getEntryConfig();
+
+            //log.debug(" - childConfig "+childConfig);
+            //log.debug(" - childConfig.rdn "+childConfig.getRdn());
+
+            String rdn = childConfig.getRdn() == null ? "Root DSE" : childConfig.getRdn().toString();
+
+            EntryNode entryNode = new EntryNode(
+                    rdn,
+                    PenroseStudio.getImage(PenroseImage.FOLDER),
+                    childConfig,
+                    this
+            );
+
+            entryNode.setPartitionName(partitionName);
+            entryNode.setEntryConfig(childConfig);
+            entryNode.init();
+
+            children.add(entryNode);
+        }
+    }
+
+    public void refresh() throws Exception {
+
+        children.clear();
+        updateChildren();
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -118,6 +163,7 @@ public class EntryNode extends Node {
 
         manager.add(new NewEntryAction(this));
         manager.add(new NewDynamicEntryAction(this));
+        manager.add(new NewProxyEntryAction(this));
 
         showCommercialMenu(manager);
 
@@ -126,7 +172,7 @@ public class EntryNode extends Node {
         manager.add(new Action("Copy") {
             public void run() {
                 try {
-                    //copy(connection);
+                    //copy();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
@@ -136,7 +182,7 @@ public class EntryNode extends Node {
         manager.add(new Action("Paste") {
             public void run() {
                 try {
-                    //paste(connection);
+                    //paste();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
@@ -147,6 +193,18 @@ public class EntryNode extends Node {
             public void run() {
                 try {
                     remove();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(new Action("Refresh") {
+            public void run() {
+                try {
+                    refresh();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
@@ -174,7 +232,7 @@ public class EntryNode extends Node {
         EntryEditorInput ei = new EntryEditorInput();
         ei.setPartitionName(partitionName);
         ei.setEntryId(entryConfig.getId());
-        ei.setProject(projectNode.getProject());
+        ei.setProject(serverNode.getServer());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -187,7 +245,7 @@ public class EntryNode extends Node {
         EntryEditorInput ei = new EntryEditorInput();
         ei.setPartitionName(partitionName);
         ei.setEntryId(entryConfig.getId());
-        ei.setProject(projectNode.getProject());
+        ei.setProject(serverNode.getServer());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -201,7 +259,7 @@ public class EntryNode extends Node {
         EntryEditorInput ei = new EntryEditorInput();
         ei.setPartitionName(partitionName);
         ei.setEntryId(entryConfig.getId());
-        ei.setProject(projectNode.getProject());
+        ei.setProject(serverNode.getServer());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -219,7 +277,7 @@ public class EntryNode extends Node {
 
         if (!confirm) return;
 
-        Project project = projectNode.getProject();
+        Server project = serverNode.getServer();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
@@ -239,53 +297,9 @@ public class EntryNode extends Node {
         //project.save(partitionConfig, directoryConfig);
         partitionClient.store();
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
-    }
-
-    public boolean hasChildren() throws Exception {
-        return !getChildren().isEmpty();
-    }
-
-    public Collection<Node> getChildren() throws Exception {
-
-        Collection<Node> children = new ArrayList<Node>();
-
-        Project project = projectNode.getProject();
-        PenroseClient client = project.getClient();
-        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-        DirectoryClient directoryClient = partitionClient.getDirectoryClient();
-
-        EntryClient entryClient = directoryClient.getEntryClient(entryConfig.getId());
-
-        log.debug("Getting children:");
-
-        for (String id : entryClient.getChildIds()) {
-            log.debug(" - "+id);
-
-            EntryClient childClient = directoryClient.getEntryClient(id);
-            EntryConfig childConfig = childClient.getEntryConfig();
-
-            //log.debug(" - childConfig "+childConfig);
-            //log.debug(" - childConfig.rdn "+childConfig.getRdn());
-
-            String rdn = childConfig.getRdn() == null ? "Root DSE" : childConfig.getRdn().toString();
-
-            EntryNode entryNode = new EntryNode(
-                    rdn,
-                    PenroseStudio.getImage(PenroseImage.FOLDER),
-                    childConfig,
-                    this
-            );
-
-            entryNode.setPartitionName(partitionName);
-            entryNode.setEntryConfig(childConfig);
-
-            children.add(entryNode);
-        }
-
-        return children;
+        parent.refresh();
+        //PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        //penroseStudio.notifyChangeListeners();
     }
 
     public String getPartitionName() {
@@ -312,12 +326,12 @@ public class EntryNode extends Node {
         this.view = view;
     }
 
-    public ProjectNode getProjectNode() {
-        return projectNode;
+    public ServerNode getServerNode() {
+        return serverNode;
     }
 
-    public void setProjectNode(ProjectNode projectNode) {
-        this.projectNode = projectNode;
+    public void setServerNode(ServerNode serverNode) {
+        this.serverNode = serverNode;
     }
 
     public PartitionsNode getPartitionsNode() {

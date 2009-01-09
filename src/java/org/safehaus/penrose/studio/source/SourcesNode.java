@@ -31,12 +31,13 @@ import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.ldap.source.action.NewLDAPSourceAction;
+import org.safehaus.penrose.studio.jdbc.source.action.NewJDBCSourceAction;
 import org.safehaus.penrose.studio.partition.PartitionNode;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.source.action.NewSourceAction;
 import org.safehaus.penrose.studio.tree.Node;
 
 import java.util.Collection;
@@ -53,14 +54,14 @@ public class SourcesNode extends Node {
     public final static char SEPARATOR = '_';
 
     protected ServersView view;
-    protected ProjectNode projectNode;
+    protected ServerNode projectNode;
     protected PartitionsNode partitionsNode;
     protected PartitionNode partitionNode;
 
     private String partitionName;
     private String path;
 
-    public SourcesNode(String name, Image image, Object object, Object parent) {
+    public SourcesNode(String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
 
         if (parent instanceof PartitionNode) {
@@ -77,7 +78,8 @@ public class SourcesNode extends Node {
 
     public void showMenu(IMenuManager manager) {
 
-        manager.add(new NewSourceAction(this));
+        manager.add(new NewJDBCSourceAction(this));
+        manager.add(new NewLDAPSourceAction(this));
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
@@ -98,7 +100,7 @@ public class SourcesNode extends Node {
 
         if (!(newObject instanceof SourceConfig)) return;
 
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
 
         SourceConfig newSourceConfig = (SourceConfig)((SourceConfig)newObject).clone();
         view.setClipboard(null);
@@ -145,7 +147,7 @@ public class SourcesNode extends Node {
 
         Map<String,Node> children = new TreeMap<String,Node>();
 
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
@@ -228,11 +230,11 @@ public class SourcesNode extends Node {
         this.view = view;
     }
 
-    public ProjectNode getProjectNode() {
+    public ServerNode getProjectNode() {
         return projectNode;
     }
 
-    public void setProjectNode(ProjectNode projectNode) {
+    public void setProjectNode(ServerNode projectNode) {
         this.projectNode = projectNode;
     }
 

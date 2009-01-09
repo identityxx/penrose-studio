@@ -18,7 +18,7 @@ public class LoggingNode extends Node {
 
     ServersView view;
 
-    public LoggingNode(ServersView view, String name, Object object, Object parent) {
+    public LoggingNode(ServersView view, String name, Object object, Node parent) {
         super(name, PenroseStudio.getImage(PenroseImage.FOLDER), object, parent);
         this.view = view;
     }

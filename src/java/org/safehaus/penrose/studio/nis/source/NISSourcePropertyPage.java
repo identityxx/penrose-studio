@@ -53,7 +53,7 @@ public class NISSourcePropertyPage extends SourceEditorPage {
     public NISSourcePropertyPage(NISSourceEditor editor) throws Exception {
         super(editor, "PROPERTIES", "  Properties  ");
 
-        PenroseClient client = project.getClient();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
@@ -141,7 +141,7 @@ public class NISSourcePropertyPage extends SourceEditorPage {
 		connectionNameCombo.setLayoutData(gd);
 
         try {
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
             ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
@@ -311,7 +311,7 @@ public class NISSourcePropertyPage extends SourceEditorPage {
                 try {
                     FieldConfig fieldDefinition = new FieldConfig();
 
-                    PenroseClient client = project.getClient();
+                    PenroseClient client = server.getClient();
                     SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
                     Collection<AttributeType> attributeTypes = schemaManagerClient.getAttributeTypes();
 
@@ -347,7 +347,7 @@ public class NISSourcePropertyPage extends SourceEditorPage {
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     String oldName = fieldDefinition.getName();
 
-                    PenroseClient client = project.getClient();
+                    PenroseClient client = server.getClient();
                     SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
                     Collection<AttributeType> attributeTypes = schemaManagerClient.getAttributeTypes();
 
@@ -405,7 +405,7 @@ public class NISSourcePropertyPage extends SourceEditorPage {
 
     public void store() throws Exception {
 
-        PenroseClient client = project.getClient();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
@@ -428,7 +428,7 @@ public class NISSourcePropertyPage extends SourceEditorPage {
                 s.setAlias(newName);
                 entryConfig.addSourceConfig(s);
 
-                directoryClient.updateEntry(id, entryConfig);
+                directoryClient.updateEntry(entryConfig);
             }
 
             //sources.removeSourceConfig(oldName);

@@ -23,8 +23,8 @@ import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.client.PenroseClient;
 import org.apache.log4j.Logger;
@@ -47,8 +47,8 @@ public class RestartAction extends Action {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         try {
             ServersView serversView = ServersView.getInstance();
-            ProjectNode projectNode = serversView.getSelectedProjectNode();
-            Project project = projectNode.getProject();
+            ServerNode projectNode = serversView.getSelectedProjectNode();
+            Server project = projectNode.getServer();
             PenroseClient client = project.getClient();
             client.restart();
 

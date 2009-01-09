@@ -25,8 +25,8 @@ import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.SchemaConfig;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 
@@ -39,12 +39,12 @@ import java.util.Collection;
 public class ObjectClassesNode extends Node {
 
     ServersView view;
-    ProjectNode projectNode;
+    ServerNode projectNode;
     SchemaNode schemaNode;
 
     private SchemaConfig schemaConfig;
 
-    public ObjectClassesNode(ServersView view, String name, Image image, Object object, Object parent) {
+    public ObjectClassesNode(ServersView view, String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
         schemaNode = (SchemaNode)parent;
         projectNode = schemaNode.getProjectNode();
@@ -59,7 +59,7 @@ public class ObjectClassesNode extends Node {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
         PenroseClient client = project.getClient();
         SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
         SchemaClient schemaClient = schemaManagerClient.getSchemaClient(schemaConfig.getName());

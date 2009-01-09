@@ -3,7 +3,7 @@ package org.safehaus.penrose.studio.federation.linking.editor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 
 /**
@@ -11,7 +11,7 @@ import org.safehaus.penrose.federation.FederationRepositoryConfig;
  */
 public class IdentityLinkingEditorInput implements IEditorInput {
 
-    private Project project;
+    private Server project;
     private FederationRepositoryConfig repository;
     private String sourcePartition;
     private String targetPartition;
@@ -70,11 +70,11 @@ public class IdentityLinkingEditorInput implements IEditorInput {
         return true;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

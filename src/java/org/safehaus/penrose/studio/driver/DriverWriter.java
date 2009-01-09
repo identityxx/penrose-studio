@@ -68,7 +68,7 @@ public class DriverWriter {
             parameterElement.addAttribute("type", parameter.getTypeAsString());
 
             Element paramName = new DefaultElement("display-name");
-            paramName.add(new DefaultText(parameter.getDescription()));
+            paramName.add(new DefaultText(parameter.getDisplayName()));
             parameterElement.add(paramName);
 
             Element paramValue = new DefaultElement("default-value");

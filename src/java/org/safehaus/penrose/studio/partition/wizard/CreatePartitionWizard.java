@@ -23,9 +23,9 @@ import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
-import org.safehaus.penrose.studio.project.Project;
 
 /**
  * @author Endi S. Dewata
@@ -34,13 +34,13 @@ public class CreatePartitionWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    public Project project;
+    public Server project;
     public PartitionsNode partitionsNode;
 
     public PartitionNamePage namePage = new PartitionNamePage();
     public PartitionClassPage classPage = new PartitionClassPage();
 
-    public CreatePartitionWizard(Project project, PartitionsNode partitionsNode) {
+    public CreatePartitionWizard(Server project, PartitionsNode partitionsNode) {
         this.project = project;
         this.partitionsNode = partitionsNode;
         setWindowTitle("New Partition");

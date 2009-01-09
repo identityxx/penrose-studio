@@ -20,14 +20,14 @@ package org.safehaus.penrose.studio.module.editor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
  */
 public class ModuleEditorInput implements IEditorInput {
 
-    private Project project;
+    private Server project;
     private String partitionName;
     private String moduleName;
 
@@ -67,11 +67,11 @@ public class ModuleEditorInput implements IEditorInput {
         return moduleName.equals(ei.moduleName);
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

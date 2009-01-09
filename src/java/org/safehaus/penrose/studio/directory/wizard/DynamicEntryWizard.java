@@ -28,9 +28,7 @@ import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.mapping.Relationship;
-import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.source.wizard.SelectSourcesWizardPage;
+import org.safehaus.penrose.studio.server.Server;
 
 import java.util.Collection;
 
@@ -41,15 +39,15 @@ public class DynamicEntryWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Project project;
+    private Server server;
     private String partitionName;
     private DN parentDn;
-    private EntryConfig entryConfig = new EntryConfig();
+    private EntryConfig entryConfig;
 
-    public SelectSourcesWizardPage sourcesPage;
+    public EntrySourceWizardPage sourcesPage;
     public RelationshipWizardPage relationshipPage;
     public ObjectClassWizardPage ocPage;
-    public AttributeValueWizardPage attrPage;
+    public AttributeWizardPage attributePage;
 
     public DynamicEntryWizard() {
         setWindowTitle("Adding dynamic entry");
@@ -57,43 +55,47 @@ public class DynamicEntryWizard extends Wizard {
 
     public void addPages() {
 
-        sourcesPage = new SelectSourcesWizardPage();
+        sourcesPage = new EntrySourceWizardPage();
         sourcesPage.setDescription("Add data sources. This step is optional.");
-        sourcesPage.setProject(project);
+        sourcesPage.setServer(server);
         sourcesPage.setPartitionName(partitionName);
 
-        relationshipPage = new RelationshipWizardPage(project, partitionName);
-
-        ocPage = new ObjectClassWizardPage(project);
-        //ocPage.setSelecteObjectClasses(entryConfig.getObjectClasses());
-
-        attrPage = new AttributeValueWizardPage(project, partitionName);
-        attrPage.setDefaultType(AttributeValueWizardPage.VARIABLE);
-
         addPage(sourcesPage);
+
+        relationshipPage = new RelationshipWizardPage(server, partitionName);
+
         addPage(relationshipPage);
+
+        ocPage = new ObjectClassWizardPage(server);
+
         addPage(ocPage);
-        addPage(attrPage);
+
+        attributePage = new AttributeWizardPage();
+        attributePage.setServer(server);
+        attributePage.setPartitionName(partitionName);
+        attributePage.setDefaultType(AttributeWizardPage.VARIABLE);
+
+        addPage(attributePage);
     }
 
     public boolean canFinish() {
         if (!sourcesPage.isPageComplete()) return false;
         if (!relationshipPage.isPageComplete()) return false;
         if (!ocPage.isPageComplete()) return false;
-        if (!attrPage.isPageComplete()) return false;
+        if (!attributePage.isPageComplete()) return false;
 
         return true;
     }
 
     public IWizardPage getNextPage(IWizardPage page) {
         if (sourcesPage == page) {
-            Collection<EntrySourceConfig> sourceMappings = sourcesPage.getSourceMappings();
+            Collection<EntrySourceConfig> sourceMappings = sourcesPage.getEntrySourceConfigs();
             relationshipPage.setSourceMappings(sourceMappings);
-            attrPage.setSourceMappings(sourceMappings);
+            attributePage.setSourceConfigs(sourceMappings);
 
         } else if (ocPage == page) {
             Collection<String> objectClasses = ocPage.getSelectedObjectClasses();
-            attrPage.setObjectClasses(objectClasses);
+            attributePage.setObjectClasses(objectClasses);
         }
 
         return super.getNextPage(page);
@@ -101,7 +103,9 @@ public class DynamicEntryWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            entryConfig.addSourceConfigs(sourcesPage.getSourceMappings());
+            entryConfig.setEntryClass("org.safehaus.penrose.directory.DynamicEntry");
+
+            entryConfig.addSourceConfigs(sourcesPage.getEntrySourceConfigs());
 
             Collection<Relationship> relationships = relationshipPage.getRelationships();
             for (Relationship relationship : relationships) {
@@ -124,7 +128,7 @@ public class DynamicEntryWizard extends Wizard {
             entryConfig.addObjectClasses(ocPage.getSelectedObjectClasses());
 
             log.debug("Attribute mappings:");
-            Collection<EntryAttributeConfig> attributeMappings = attrPage.getAttributeMappings();
+            Collection<EntryAttributeConfig> attributeMappings = attributePage.getAttributeConfigs();
             entryConfig.addAttributeConfigs(attributeMappings);
 
             RDNBuilder rb = new RDNBuilder();
@@ -166,7 +170,7 @@ public class DynamicEntryWizard extends Wizard {
                 sourceMapping.addFieldConfig(fieldMapping);
             }
 
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
@@ -211,11 +215,11 @@ public class DynamicEntryWizard extends Wizard {
         this.partitionName = partitionName;
     }
 
-    public Project getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

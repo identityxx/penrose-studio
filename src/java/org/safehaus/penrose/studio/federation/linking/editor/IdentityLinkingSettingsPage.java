@@ -15,7 +15,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
@@ -35,7 +35,7 @@ public class IdentityLinkingSettingsPage extends FormPage {
 
     FederationRepositoryConfig repository;
 
-    Project project;
+    Server project;
 
     public IdentityLinkingSettingsPage(FormEditor editor, FederationRepositoryConfig repository) {
         super(editor, "LINKING", "  Linking  ");

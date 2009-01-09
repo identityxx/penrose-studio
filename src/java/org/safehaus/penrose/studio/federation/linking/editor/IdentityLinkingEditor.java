@@ -8,13 +8,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 public class IdentityLinkingEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    private Project project;
+    private Server project;
     private FederationRepositoryConfig repository;
     private String localPartition;
     private String globalPartition;
@@ -62,11 +62,11 @@ public class IdentityLinkingEditor extends FormEditor {
         this.repository = repository;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

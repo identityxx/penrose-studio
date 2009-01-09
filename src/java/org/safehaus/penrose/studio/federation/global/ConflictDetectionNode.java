@@ -4,7 +4,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.federation.FederationClient;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -14,10 +14,10 @@ import org.safehaus.penrose.studio.PenroseStudio;
  */
 public class ConflictDetectionNode extends Node {
 
-    private Project project;
+    private Server project;
     private FederationClient federationClient;
 
-    public ConflictDetectionNode(String name, Object parent) {
+    public ConflictDetectionNode(String name, Node parent) {
         super(name, PenroseStudio.getImage(PenroseImage.OBJECT), null, parent);
     }
 
@@ -40,11 +40,11 @@ public class ConflictDetectionNode extends Node {
         this.federationClient = federationClient;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 }

@@ -6,7 +6,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.safehaus.penrose.federation.FederationClient;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +14,7 @@ public class FederationDomainEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    Project project;
+    Server project;
     FederationClient federationClient;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -55,7 +55,7 @@ public class FederationDomainEditor extends FormEditor {
         return federationClient;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 }

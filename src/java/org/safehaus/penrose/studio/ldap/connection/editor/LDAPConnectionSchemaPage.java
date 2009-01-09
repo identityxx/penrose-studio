@@ -49,7 +49,7 @@ public class LDAPConnectionSchemaPage extends ConnectionEditorPage {
     Schema schema;
 
     public LDAPConnectionSchemaPage(LDAPConnectionEditor editor) {
-        super(editor, "SCHEMA", "  Schema  ");
+        super(editor, "SCHEMA", "Schema");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -114,7 +114,7 @@ public class LDAPConnectionSchemaPage extends ConnectionEditorPage {
 
                     Schema newSchema = (Schema)schema.clone();
 
-                    SchemaExportWizard wizard = new SchemaExportWizard(project, newSchema);
+                    SchemaExportWizard wizard = new SchemaExportWizard(server, newSchema);
                     WizardDialog dialog = new WizardDialog(shell, wizard);
                     dialog.setPageSize(600, 300);
                     dialog.open();

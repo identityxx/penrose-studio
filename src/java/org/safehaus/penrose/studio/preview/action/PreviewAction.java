@@ -24,8 +24,8 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.preview.PreviewEditorInput;
 import org.apache.log4j.Logger;
@@ -50,8 +50,8 @@ public class PreviewAction extends Action {
         try {
             IWorkbenchPage page = window.getActivePage();
             ServersView serversView = ServersView.getInstance();
-            ProjectNode projectNode = serversView.getSelectedProjectNode();
-            Project project = projectNode.getProject();
+            ServerNode projectNode = serversView.getSelectedProjectNode();
+            Server project = projectNode.getServer();
 
             //page.showView(ConsoleView.class.getName());
 

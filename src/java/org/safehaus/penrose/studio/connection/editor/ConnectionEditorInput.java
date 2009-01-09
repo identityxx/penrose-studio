@@ -3,14 +3,14 @@ package org.safehaus.penrose.studio.connection.editor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
  */
 public class ConnectionEditorInput implements IEditorInput {
 
-    private Project project;
+    private Server project;
     private String partitionName;
     private String connectionName;
 
@@ -74,11 +74,11 @@ public class ConnectionEditorInput implements IEditorInput {
         this.partitionName = partitionName;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

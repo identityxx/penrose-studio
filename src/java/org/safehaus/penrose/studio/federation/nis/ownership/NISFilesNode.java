@@ -6,7 +6,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.tree.Node;
 
 /**
@@ -14,11 +14,11 @@ import org.safehaus.penrose.studio.tree.Node;
  */
 public class NISFilesNode extends Node {
 
-    private Project project;
+    private Server project;
     private NISRepositoryClient nisFederation;
     private FederationRepositoryConfig domain;
 
-    public NISFilesNode(String name, Image image, Object object, Object parent) {
+    public NISFilesNode(String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
     }
 
@@ -50,11 +50,11 @@ public class NISFilesNode extends Node {
         this.domain = domain;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 }

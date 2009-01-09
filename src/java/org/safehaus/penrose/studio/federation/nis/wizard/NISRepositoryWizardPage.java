@@ -28,7 +28,7 @@ public class NISRepositoryWizardPage extends WizardPage implements ModifyListene
     public NISRepositoryWizardPage() {
         super(NAME);
 
-        setDescription("Enter a short name of the NIS domain (not the full NIS repositoryConfig name).");
+        setDescription("Enter a short name of the NIS domain (not the full NIS domain name).");
     }
 
     public void createControl(final Composite parent) {

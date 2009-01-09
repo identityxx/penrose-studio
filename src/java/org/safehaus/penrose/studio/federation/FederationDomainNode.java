@@ -19,6 +19,7 @@ import org.safehaus.penrose.federation.*;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.federation.partition.FederationDomainEditorWizard;
 import org.safehaus.penrose.studio.federation.partition.FederationDomainEditor;
 import org.safehaus.penrose.studio.federation.partition.FederationDomainEditorInput;
@@ -27,7 +28,6 @@ import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.federation.nis.NISNode;
 import org.safehaus.penrose.studio.federation.jdbc.JDBCNode;
 import org.safehaus.penrose.studio.federation.global.GlobalNode;
-import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.tree.Node;
 
 import java.io.File;
@@ -38,18 +38,15 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class FederationDomainNode extends Node {
 
-    Project project;
-    FederationClient federationClient;
+    Server server;
 
     public FederationDomainNode(String name, FederationNode federationNode) throws Exception {
         super(name, PenroseStudio.getImage(PenroseImage.MODULE), null, federationNode);
 
-        project = federationNode.getProject();
+        server = federationNode.getServer();
     }
 
     public void init() throws Exception {
-
-        federationClient = new FederationClient(project.getClient(), name);
 
         refresh();
     }
@@ -62,15 +59,15 @@ public class FederationDomainNode extends Node {
 
         log.debug("Refreshing repository types:");
 
-        for (String type : federationClient.getRepositoryTypes()) {
+        for (String type : getFederationClient().getRepositoryTypes()) {
 
             log.debug(" - "+type);
 
             if ("JDBC".equals(type)) {
 
                 JDBCNode node = new JDBCNode(type, this);
-                node.setProject(project);
-                node.setFederationClient(federationClient);
+                node.setProject(server);
+                node.setFederationClient(getFederationClient());
                 node.init();
 
                 children.add(node);
@@ -78,8 +75,8 @@ public class FederationDomainNode extends Node {
             } else if ("LDAP".equals(type)) {
 
                 LDAPNode node = new LDAPNode(type, this);
-                node.setProject(project);
-                node.setFederationClient(federationClient);
+                node.setProject(server);
+                node.setFederationClient(getFederationClient());
                 node.init();
 
                 children.add(node);
@@ -87,8 +84,7 @@ public class FederationDomainNode extends Node {
             } else if ("NIS".equals(type)) {
 
                 NISNode node = new NISNode(type, this);
-                node.setProject(project);
-                node.setFederationClient(federationClient);
+                node.setServer(server);
                 node.init();
 
                 children.add(node);
@@ -177,8 +173,8 @@ public class FederationDomainNode extends Node {
     public void open() throws Exception {
 
         FederationDomainEditorInput ei = new FederationDomainEditorInput();
-        ei.setProject(project);
-        ei.setFederationClient(federationClient);
+        ei.setProject(server);
+        ei.setFederationClient(getFederationClient());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -190,7 +186,7 @@ public class FederationDomainNode extends Node {
 
     public void edit() throws Exception {
 
-        FederationDomainEditorWizard wizard = new FederationDomainEditorWizard(federationClient);
+        FederationDomainEditorWizard wizard = new FederationDomainEditorWizard(getFederationClient());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
@@ -198,7 +194,7 @@ public class FederationDomainNode extends Node {
 
         if (dialog.open() == Window.CANCEL) return;
 
-        //federationClient.updateGlobalRepository(wizard.getRepository());
+        //getFederationClient().updateGlobalRepository(wizard.getRepository());
     }
 
     public void test() throws Exception {
@@ -239,20 +235,16 @@ public class FederationDomainNode extends Node {
 
     }
 
-    public FederationClient getFederationClient() {
-        return federationClient;
+    public FederationClient getFederationClient() throws Exception {
+        return new FederationClient(server.getClient(), name);
     }
 
-    public void setFederationClient(FederationClient federationClient) {
-        this.federationClient = federationClient;
+    public Server getServer() {
+        return server;
     }
 
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public void importFederationConfig() throws Exception {
@@ -284,6 +276,7 @@ public class FederationDomainNode extends Node {
 
                     monitor.subTask("Uploading Federation configuration...");
 
+                    FederationClient federationClient = getFederationClient();
                     federationClient.setFederationConfig(federationConfig);
                     federationClient.store();
 
@@ -293,7 +286,7 @@ public class FederationDomainNode extends Node {
 
                         monitor.subTask("Creating "+partitionName+" partition...");
 
-                        federationClient.createPartition(partitionName);
+                        getFederationClient().createPartition(partitionName);
 
                         monitor.worked(1);
                     }
@@ -322,7 +315,7 @@ public class FederationDomainNode extends Node {
         String filename = dialog.open();
         if (filename == null) return;
 
-        FederationConfig federationConfig = federationClient.getFederationConfig();
+        FederationConfig federationConfig = getFederationClient().getFederationConfig();
 
         File file = new File(filename);
 

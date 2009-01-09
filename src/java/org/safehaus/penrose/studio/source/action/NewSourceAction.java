@@ -20,8 +20,8 @@ package org.safehaus.penrose.studio.source.action;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.source.wizard.SourceWizard;
 import org.safehaus.penrose.studio.source.SourcesNode;
 import org.apache.log4j.Logger;
@@ -42,10 +42,10 @@ public class NewSourceAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Project project = sourcesNode.getProjectNode().getProject();
+            Server project = sourcesNode.getProjectNode().getServer();
 
             SourceWizard wizard = new SourceWizard(sourcesNode.getPartitionName());
-            wizard.setProject(project);
+            wizard.setServer(project);
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);

@@ -35,8 +35,8 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.module.action.NewModuleAction;
 import org.safehaus.penrose.studio.partition.PartitionNode;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 
@@ -51,13 +51,13 @@ public class ModulesNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     private ServersView serversView;
-    private ProjectNode projectNode;
+    private ServerNode projectNode;
     private PartitionsNode partitionsNode;
     private PartitionNode partitionNode;
 
     private String partitionName;
 
-    public ModulesNode(String name, Image image, Object object, Object parent) {
+    public ModulesNode(String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
 
         partitionNode = (PartitionNode)parent;
@@ -89,7 +89,7 @@ public class ModulesNode extends Node {
 
         if (!(newObject instanceof ModuleConfig)) return;
 
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
 
         ModuleConfig newModuleConfig = (ModuleConfig)((ModuleConfig)newObject).clone();
         String oldName = newModuleConfig.getName();
@@ -158,7 +158,7 @@ public class ModulesNode extends Node {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
@@ -199,11 +199,11 @@ public class ModulesNode extends Node {
         this.serversView = serversView;
     }
 
-    public ProjectNode getProjectNode() {
+    public ServerNode getProjectNode() {
         return projectNode;
     }
 
-    public void setProjectNode(ProjectNode projectNode) {
+    public void setProjectNode(ServerNode projectNode) {
         this.projectNode = projectNode;
     }
 

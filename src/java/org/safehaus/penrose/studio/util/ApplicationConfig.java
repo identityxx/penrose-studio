@@ -27,16 +27,16 @@ import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.dom4j.tree.DefaultElement;
-import org.safehaus.penrose.studio.project.ProjectConfig;
+import org.safehaus.penrose.studio.server.ServerConfig;
 import org.safehaus.penrose.util.FileUtil;
 
 public class ApplicationConfig {
 	
 	private Logger log = Logger.getLogger(getClass().getName());
 
-	Map<String, ProjectConfig> projects = new TreeMap<String, ProjectConfig>();
+	Map<String, ServerConfig> projects = new TreeMap<String, ServerConfig>();
 	
-    ProjectConfig currentProjectConfig;
+    ServerConfig currentProjectConfig;
 
 	public ApplicationConfig() {
 		super();
@@ -46,7 +46,7 @@ public class ApplicationConfig {
 		log.debug("Loading configuration from "+file+".");
 		try {
 			Digester digester = new Digester();
-			digester.addObjectCreate("config/project", ProjectConfig.class);
+			digester.addObjectCreate("config/project", ServerConfig.class);
 			digester.addSetProperties("config/project");
 			digester.addSetNext("config/project", "addProject");
 			digester.setValidating(false);
@@ -73,11 +73,11 @@ public class ApplicationConfig {
 		writer.close();
 	}
 	
-	public void addProject(ProjectConfig projectConfig) {
+	public void addProject(ServerConfig projectConfig) {
 		projects.put(projectConfig.getName(), projectConfig);
 	}
 
-    public ProjectConfig getProject(String name) {
+    public ServerConfig getProject(String name) {
         return projects.get(name);
     }
     
@@ -88,22 +88,22 @@ public class ApplicationConfig {
 	public Element toElement() {
 		Element element = new DefaultElement("config");
 
-        for (ProjectConfig projectConfig : projects.values()) {
+        for (ServerConfig projectConfig : projects.values()) {
             element.add(projectConfig.toElement());
         }
 
         return element;
 	}
 	
-	public Collection<ProjectConfig> getProjects() {
+	public Collection<ServerConfig> getProjects() {
 		return projects.values();
 	}
 	
-    public void setCurrentProject(ProjectConfig projectConfig) {
+    public void setCurrentProject(ServerConfig projectConfig) {
         this.currentProjectConfig = projectConfig;
     }
 
-	public ProjectConfig getCurrentProject() {
+	public ServerConfig getCurrentProject() {
 		return currentProjectConfig;
 	}
 }

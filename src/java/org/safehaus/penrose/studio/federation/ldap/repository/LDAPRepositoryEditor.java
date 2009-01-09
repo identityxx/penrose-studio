@@ -8,7 +8,7 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.safehaus.penrose.federation.LDAPRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.FederationClient;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +16,7 @@ public class LDAPRepositoryEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    Project project;
+    Server project;
     FederationClient federationClient;
     LDAPRepositoryClient ldapFederationClient;
     FederationRepositoryConfig repositoryConfig;

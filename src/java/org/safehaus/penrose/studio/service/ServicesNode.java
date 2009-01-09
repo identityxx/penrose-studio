@@ -23,8 +23,8 @@ import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.service.ServiceManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.service.action.NewServiceAction;
 import org.safehaus.penrose.studio.tree.Node;
@@ -40,12 +40,12 @@ public class ServicesNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     private ServersView view;
-    private ProjectNode projectNode;
+    private ServerNode projectNode;
 
-    public ServicesNode(String name, Object object, Object parent) {
+    public ServicesNode(String name, Object object, Node parent) {
         super(name, PenroseStudio.getImage(PenroseImage.FOLDER), object, parent);
         
-        projectNode = (ProjectNode)parent;
+        projectNode = (ServerNode)parent;
         view = projectNode.getServersView();
     }
 
@@ -61,7 +61,7 @@ public class ServicesNode extends Node {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
         PenroseClient client = project.getClient();
 
         ServiceManagerClient serviceManagerClient = client.getServiceManagerClient();
@@ -89,11 +89,11 @@ public class ServicesNode extends Node {
         this.view = view;
     }
 
-    public ProjectNode getProjectNode() {
+    public ServerNode getProjectNode() {
         return projectNode;
     }
 
-    public void setProjectNode(ProjectNode projectNode) {
+    public void setProjectNode(ServerNode projectNode) {
         this.projectNode = projectNode;
     }
 }

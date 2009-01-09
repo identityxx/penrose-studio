@@ -18,9 +18,9 @@
 package org.safehaus.penrose.studio.jdbc.connection.editor;
 
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditor;
+import org.safehaus.penrose.studio.connection.editor.ConnectionParametersPage;
 import org.safehaus.penrose.studio.jdbc.connection.editor.JDBCConnectionPropertiesPage;
 import org.safehaus.penrose.studio.jdbc.connection.editor.JDBCConnectionTablesPage;
-import org.safehaus.penrose.studio.jdbc.connection.editor.JDBCConnectionAdvancedPage;
 
 /**
  * @author Endi S. Dewata
@@ -30,8 +30,8 @@ public class JDBCConnectionEditor extends ConnectionEditor {
     public void addPages() {
         try {
             addPage(new JDBCConnectionPropertiesPage(this));
+            addPage(new ConnectionParametersPage(this));
             addPage(new JDBCConnectionTablesPage(this));
-            addPage(new JDBCConnectionAdvancedPage(this));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

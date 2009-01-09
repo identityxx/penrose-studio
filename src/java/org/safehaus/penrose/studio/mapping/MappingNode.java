@@ -39,8 +39,8 @@ import org.safehaus.penrose.studio.mapping.editor.MappingEditor;
 import org.safehaus.penrose.studio.mapping.editor.MappingEditorInput;
 import org.safehaus.penrose.studio.partition.PartitionNode;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 
@@ -54,7 +54,7 @@ public class MappingNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     private ServersView view;
-    private ProjectNode projectNode;
+    private ServerNode projectNode;
     private PartitionsNode partitionsNode;
     private PartitionNode partitionNode;
     private MappingsNode mappingsNode;
@@ -62,7 +62,7 @@ public class MappingNode extends Node {
     private String partitionName;
     private String mappingName;
 
-    public MappingNode(String name, Image image, Object object, Object parent) {
+    public MappingNode(String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
         mappingsNode = (MappingsNode)parent;
         partitionNode = mappingsNode.getPartitionNode();
@@ -123,7 +123,7 @@ public class MappingNode extends Node {
     public void open() throws Exception {
 
         MappingEditorInput ei = new MappingEditorInput();
-        ei.setProject(projectNode.getProject());
+        ei.setProject(projectNode.getServer());
         ei.setPartitionName(partitionName);
         ei.setMappingName(mappingName);
 
@@ -141,7 +141,7 @@ public class MappingNode extends Node {
 
         if (!confirm) return;
 
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
@@ -162,7 +162,7 @@ public class MappingNode extends Node {
 
     public void copy() throws Exception {
 
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
@@ -177,7 +177,7 @@ public class MappingNode extends Node {
 
         if (!(newObject instanceof MappingConfig)) return;
 
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
 
         MappingConfig newMappingConfig = (MappingConfig)((MappingConfig)newObject).clone();
         view.setClipboard(null);
@@ -227,11 +227,11 @@ public class MappingNode extends Node {
         this.view = view;
     }
 
-    public ProjectNode getProjectNode() {
+    public ServerNode getProjectNode() {
         return projectNode;
     }
 
-    public void setProjectNode(ProjectNode projectNode) {
+    public void setProjectNode(ServerNode projectNode) {
         this.projectNode = projectNode;
     }
 

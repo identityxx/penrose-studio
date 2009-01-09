@@ -240,7 +240,7 @@ public class DriverParameterPage extends WizardPage implements SelectionListener
 
             TableItem item = new TableItem(parameterTable, SWT.NONE);
             item.setText(0, parameter.getName());
-            item.setText(1, parameter.getDescription());
+            item.setText(1, parameter.getDisplayName());
             item.setText(2, parameter.getDefaultValue() == null ? "" : parameter.getDefaultValue());
             item.setData(parameter);
         }

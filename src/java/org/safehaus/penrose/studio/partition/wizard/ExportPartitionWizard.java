@@ -23,7 +23,7 @@ import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionConfig;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 import java.io.File;
 
@@ -34,12 +34,12 @@ public class ExportPartitionWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Project project;
+    private Server project;
     private String partitionName;
 
     public PartitionLocationPage locationPage = new PartitionLocationPage();
 
-    public ExportPartitionWizard(Project project, String partitionName) {
+    public ExportPartitionWizard(Server project, String partitionName) {
         this.project = project;
         this.partitionName = partitionName;
 

@@ -12,13 +12,13 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.federation.LDAPRepositoryClient;
 import org.safehaus.penrose.federation.*;
 import org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditor;
 import org.safehaus.penrose.studio.federation.ldap.editor.LDAPEditorInput;
 import org.safehaus.penrose.studio.federation.ldap.repository.LDAPRepositoryNode;
 import org.safehaus.penrose.studio.federation.ldap.wizard.AddLDAPRepositoryWizard;
-import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.tree.Node;
 
 /**
@@ -28,10 +28,10 @@ public class LDAPNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    Project project;
+    Server project;
     FederationClient federationClient;
 
-    public LDAPNode(String name, Object parent) throws Exception {
+    public LDAPNode(String name, Node parent) throws Exception {
         super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, parent);
     }
 
@@ -133,17 +133,15 @@ public class LDAPNode extends Node {
         federationClient.addRepository(repository);
         federationClient.store();
 
-        federationClient.createPartition(repository.getName());
-
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

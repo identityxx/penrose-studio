@@ -18,8 +18,8 @@
 package org.safehaus.penrose.studio.properties;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.eclipse.jface.action.IMenuManager;
@@ -36,12 +36,12 @@ public class SystemPropertiesNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ProjectNode projectNode;
+    ServerNode projectNode;
 
-    public SystemPropertiesNode(String name, Object object, Object parent) {
+    public SystemPropertiesNode(String name, Object object, Node parent) {
         super(name, PenroseStudio.getImage(PenroseImage.SYSTEM_PROPERTIES), object, parent);
 
-        projectNode = (ProjectNode)parent;
+        projectNode = (ServerNode)parent;
     }
 
     public void showMenu(IMenuManager manager) {
@@ -58,7 +58,7 @@ public class SystemPropertiesNode extends Node {
     }
 
     public void open() throws Exception {
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
 
         SystemPropertiesEditorInput ei = new SystemPropertiesEditorInput();
         ei.setProject(project);

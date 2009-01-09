@@ -49,11 +49,11 @@ public class ServersLabelProvider extends LabelProvider implements ITableLabelPr
     public Image getImage(Object object) {
         Node node = (Node)object;
         Image image = node.getImage();
-
+/*
         if (image == null) {
             image = PenroseStudio.getImage(PenroseImage.FOLDER);
         }
-
+*/
         return image;
     }
 

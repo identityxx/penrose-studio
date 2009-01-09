@@ -19,11 +19,13 @@ package org.safehaus.penrose.studio.directory.action;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.directory.wizard.DynamicEntryWizard;
 import org.safehaus.penrose.studio.directory.EntryNode;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.directory.EntryConfig;
 import org.apache.log4j.Logger;
 
 public class NewDynamicEntryAction extends Action {
@@ -41,20 +43,27 @@ public class NewDynamicEntryAction extends Action {
 	
 	public void run() {
         try {
+            EntryConfig entryConfig = new EntryConfig();
+
             ServersView serversView = ServersView.getInstance();
-            ProjectNode projectNode = node.getProjectNode();
+            ServerNode projectNode = node.getServerNode();
 
             DynamicEntryWizard wizard = new DynamicEntryWizard();
-            wizard.setProject(projectNode.getProject());
+            wizard.setEntryConfig(entryConfig);
+            wizard.setServer(projectNode.getServer());
             wizard.setPartitionName(node.getPartitionName());
             wizard.setParentDn(node.getEntryConfig().getDn());
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
-            dialog.open();
+            int rc = dialog.open();
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
+            if (rc == Window.CANCEL) return;
+
+            node.refresh();
+
+            //PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            //penroseStudio.notifyChangeListeners();
 
             serversView.open(node);
 

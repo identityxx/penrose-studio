@@ -27,10 +27,10 @@ import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.ldap.source.LDAPSourceWizard;
+import org.safehaus.penrose.studio.ldap.source.wizard.LDAPSourceWizard;
 import org.safehaus.penrose.studio.connection.ConnectionNode;
-import org.safehaus.penrose.studio.jdbc.source.JDBCSourceWizard;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.jdbc.source.wizard.JDBCSourceWizard;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.ServersView;
 
 public class NewSourceAction extends Action {
@@ -49,7 +49,7 @@ public class NewSourceAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Project project = node.getProjectNode().getProject();
+            Server project = node.getProjectNode().getServer();
 
             String partitionName  = node.getPartitionName();
             String adapterName    = node.getAdapterName();
@@ -64,16 +64,20 @@ public class NewSourceAction extends Action {
             ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
             if ("JDBC".equals(adapterName)) {
-                JDBCSourceWizard wizard = new JDBCSourceWizard(partitionName, connectionConfig);
-                wizard.setProject(project);
-                
+                JDBCSourceWizard wizard = new JDBCSourceWizard();
+                wizard.setServer(project);
+                wizard.setPartitionName(partitionName);
+                wizard.setConnectionConfig(connectionConfig);
+
                 WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
                 dialog.setPageSize(600, 300);
                 dialog.open();
 
             } else if ("LDAP".equals(adapterName)) {
-                LDAPSourceWizard wizard = new LDAPSourceWizard(partitionName, connectionConfig);
-                wizard.setProject(project);
+                LDAPSourceWizard wizard = new LDAPSourceWizard();
+                wizard.setServer(project);
+                wizard.setPartitionName(partitionName);
+                wizard.setConnectionConfig(connectionConfig);
 
                 WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
                 dialog.setPageSize(600, 300);

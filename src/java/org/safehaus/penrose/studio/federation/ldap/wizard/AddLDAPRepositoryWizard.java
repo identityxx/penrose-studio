@@ -5,8 +5,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.federation.LDAPRepository;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.federation.linking.wizard.LinkingParametersWizardPage;
-import org.safehaus.penrose.studio.ldap.connection.LDAPConnectionWizardPage;
+import org.safehaus.penrose.studio.ldap.connection.wizard.LDAPConnectionSettingsWizardPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +19,7 @@ public class AddLDAPRepositoryWizard extends Wizard {
     public Logger log = LoggerFactory.getLogger(getClass());
 
     LDAPRepositoryWizardPage    repositoryPage;
-    LDAPConnectionWizardPage    connectionPage;
+    LDAPConnectionSettingsWizardPage connectionPage;
 
     //LDAPPartitionsWizardPage    partitionsPage;
     //LinkingParametersWizardPage linkingPage;
@@ -36,7 +35,7 @@ public class AddLDAPRepositoryWizard extends Wizard {
         repositoryPage = new LDAPRepositoryWizardPage();
         addPage(repositoryPage);
 
-        connectionPage = new LDAPConnectionWizardPage();
+        connectionPage = new LDAPConnectionSettingsWizardPage();
         addPage(connectionPage);
 /*
         partitionsPage = new LDAPPartitionsWizardPage();
@@ -70,6 +69,7 @@ public class AddLDAPRepositoryWizard extends Wizard {
         try {
             Map<String,String> parameters = connectionPage.getParameters();
 
+            repository.setType("LDAP");
             repository.setName(repositoryPage.getRepository());
             repository.setParameter(LDAPRepository.URL, connectionPage.getProviderUrl());
             repository.setParameter(LDAPRepository.SUFFIX, connectionPage.getSuffix());

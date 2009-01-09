@@ -20,10 +20,10 @@ package org.safehaus.penrose.studio.directory.action;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.studio.directory.wizard.CreateADSchemaProxyWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
 import org.apache.log4j.Logger;
 
 public class MapADSchemaAction extends Action {
@@ -42,7 +42,7 @@ public class MapADSchemaAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Project project = node.getProjectNode().getProject();
+            Server project = node.getProjectNode().getServer();
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             //if (!penroseStudio.isCommercial()) return;

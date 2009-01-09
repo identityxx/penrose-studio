@@ -22,8 +22,8 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.partition.PartitionNode;
 import org.safehaus.penrose.studio.partition.wizard.ExportPartitionWizard;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 
 public class ExportPartitionAction extends Action {
@@ -42,8 +42,8 @@ public class ExportPartitionAction extends Action {
         try {
             ServersView serversView = ServersView.getInstance();
 
-            ProjectNode projectNode = serversView.getSelectedProjectNode();
-            Project project = projectNode.getProject();
+            ServerNode projectNode = serversView.getSelectedProjectNode();
+            Server project = projectNode.getServer();
 
             ExportPartitionWizard wizard = new ExportPartitionWizard(project, partitionNode.getPartitionName());
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);

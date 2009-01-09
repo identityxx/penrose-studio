@@ -31,7 +31,7 @@ import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
 import org.safehaus.penrose.module.ModuleManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 import java.util.Collection;
 
@@ -39,7 +39,7 @@ public class ModuleEditor extends FormEditor {
 
     Logger log = Logger.getLogger(getClass());
 
-    Project project;
+    Server project;
     String partitionName;
     String moduleName;
 

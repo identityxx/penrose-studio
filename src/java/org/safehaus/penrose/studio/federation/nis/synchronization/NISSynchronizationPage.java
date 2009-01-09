@@ -22,7 +22,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.federation.*;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.module.ModuleClient;
@@ -49,7 +49,7 @@ public class NISSynchronizationPage extends FormPage {
 
     FormToolkit toolkit;
 
-    Project project;
+    Server project;
     NISSynchronizationEditor editor;
     NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig domain;

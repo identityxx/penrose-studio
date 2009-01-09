@@ -28,9 +28,15 @@ import org.eclipse.swt.layout.FillLayout;
 import org.safehaus.penrose.jdbc.*;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.connection.ConnectionManagerClient;
+import org.safehaus.penrose.connection.ConnectionClient;
+import org.safehaus.penrose.client.PenroseClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -49,8 +55,10 @@ public class JDBCFieldWizardPage extends WizardPage {
 
     Text filterText;
 
-    ConnectionConfig connectionConfig;
-    org.safehaus.penrose.jdbc.Table table;
+    private Server server;
+    private String partitionName;
+    private ConnectionConfig connectionConfig;
+    private org.safehaus.penrose.jdbc.Table table;
 
     public JDBCFieldWizardPage() {
         super(NAME);
@@ -244,10 +252,21 @@ public class JDBCFieldWizardPage extends WizardPage {
             String schema = table.getSchema();
             String tableName = table.getName();
 
-            JDBCClient client = new JDBCClient(connectionConfig.getParameters());
+            PenroseClient client = server.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+            ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(connectionConfig.getName());
 
-            Collection<FieldConfig> fields = client.getColumns(catalog, schema, tableName);
-            client.close();
+            //JDBCClient client = new JDBCClient(connectionConfig.getParameters());
+
+            Collection<FieldConfig> fields = (Collection<FieldConfig>)connectionClient.invoke(
+                    "getColumns",
+                    new Object[] { catalog, schema, tableName },
+                    new String[] { String.class.getName(), String.class.getName(), String.class.getName() }
+            );
+            //Collection<FieldConfig> fields = client.getColumns(catalog, schema, tableName);
+            //client.close();
 
             if (fields == null) return;
 
@@ -291,5 +310,37 @@ public class JDBCFieldWizardPage extends WizardPage {
 
     public boolean validatePage() {
         return getSelectedFieldConfigs().size() > 0;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
+    }
+
+    public String getPartitionName() {
+        return partitionName;
+    }
+
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
+    }
+
+    public ConnectionConfig getConnectionConfig() {
+        return connectionConfig;
+    }
+
+    public void setConnectionConfig(ConnectionConfig connectionConfig) {
+        this.connectionConfig = connectionConfig;
+    }
+
+    public org.safehaus.penrose.jdbc.Table getTable() {
+        return table;
+    }
+
+    public void setTable(org.safehaus.penrose.jdbc.Table table) {
+        this.table = table;
     }
 }

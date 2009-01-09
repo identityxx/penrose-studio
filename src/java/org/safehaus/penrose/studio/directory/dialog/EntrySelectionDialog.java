@@ -35,7 +35,7 @@ import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,9 +50,9 @@ public class EntrySelectionDialog extends Dialog {
     Tree tree;
     Button saveButton;
 
-    private Project project;
-    private String partitionName;
-    private DN dn;
+    Server server;
+    String partitionName;
+    DN dn;
 
 	public EntrySelectionDialog(Shell parent, int style) {
 		super(parent, style);
@@ -62,7 +62,25 @@ public class EntrySelectionDialog extends Dialog {
         createControl(shell);
     }
 
-    public void open () {
+    public void open () throws Exception {
+
+        PenroseClient client = server.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        DirectoryClient directoryClient = partitionClient.getDirectoryClient();
+
+        for (String id : directoryClient.getRootEntryIds()) {
+            EntryClient entryClient = directoryClient.getEntryClient(id);
+            DN dn = entryClient.getDn();
+
+            String label = dn.isEmpty() ? "Root DSE" : dn.toString();
+
+            TreeItem item = new TreeItem(tree, SWT.NONE);
+            item.setText(label);
+            item.setData(entryClient);
+
+            new TreeItem(item, SWT.NONE);
+        }
 
         Point size = new Point(400, 300);
         shell.setSize(size);
@@ -99,7 +117,7 @@ public class EntrySelectionDialog extends Dialog {
                     TreeItem items[] = item.getItems();
                     for (TreeItem ti : items) ti.dispose();
 
-                    PenroseClient client = project.getClient();
+                    PenroseClient client = server.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
                     DirectoryClient directoryClient = partitionClient.getDirectoryClient();
@@ -176,31 +194,13 @@ public class EntrySelectionDialog extends Dialog {
 
     public void setPartitionName(String partitionName) throws Exception {
         this.partitionName = partitionName;
-
-        PenroseClient client = project.getClient();
-        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-        DirectoryClient directoryClient = partitionClient.getDirectoryClient();
-
-        for (String id : directoryClient.getRootEntryIds()) {
-            EntryClient entryClient = directoryClient.getEntryClient(id);
-            DN dn = entryClient.getDn();
-
-            String label = dn.isEmpty() ? "Root DSE" : dn.toString();
-
-            TreeItem item = new TreeItem(tree, SWT.NONE);
-            item.setText(label);
-            item.setData(entryClient);
-
-            new TreeItem(item, SWT.NONE);
-        }
     }
 
-    public Project getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

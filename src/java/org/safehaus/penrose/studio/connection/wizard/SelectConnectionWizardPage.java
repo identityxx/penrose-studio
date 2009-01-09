@@ -18,8 +18,6 @@
 package org.safehaus.penrose.studio.connection.wizard;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -34,8 +32,7 @@ import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 import javax.naming.Context;
 
@@ -51,7 +48,7 @@ public class SelectConnectionWizardPage extends WizardPage {
     Table connectionTable;
     Table infoTable;
 
-    private Project project;
+    private Server project;
     String partitionName;
     String adapterType;
 
@@ -143,7 +140,7 @@ public class SelectConnectionWizardPage extends WizardPage {
         gd.horizontalSpan = 2;
         buttons.setLayoutData(gd);
         buttons.setLayout(new RowLayout());
-
+/*
         Button addButton = new Button(buttons, SWT.PUSH);
         addButton.setText("Add Connection");
 
@@ -151,7 +148,7 @@ public class SelectConnectionWizardPage extends WizardPage {
             public void widgetSelected(SelectionEvent event) {
 
                 ConnectionWizard wizard = new ConnectionWizard(partitionName);
-                wizard.setProject(project);
+                wizard.setServer(project);
 
                 WizardDialog dialog = new WizardDialog(parent.getShell(), wizard);
                 dialog.setPageSize(600, 300);
@@ -199,7 +196,7 @@ public class SelectConnectionWizardPage extends WizardPage {
                 }
             }
         });
-
+*/
         refresh();
     }
 
@@ -241,11 +238,11 @@ public class SelectConnectionWizardPage extends WizardPage {
         return getConnectionConfig() != null;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

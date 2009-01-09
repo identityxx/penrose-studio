@@ -3,7 +3,7 @@ package org.safehaus.penrose.studio.federation.nis.synchronization;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 
@@ -12,7 +12,7 @@ import org.safehaus.penrose.federation.FederationRepositoryConfig;
  */
 public class NISSynchronizationEditorInput implements IEditorInput {
 
-    private Project project;
+    private Server project;
     private NISRepositoryClient nisFederationClient;
     private FederationRepositoryConfig domain;
 
@@ -82,11 +82,11 @@ public class NISSynchronizationEditorInput implements IEditorInput {
         this.nisFederationClient = nisFederationClient;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 }

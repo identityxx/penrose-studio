@@ -26,8 +26,8 @@ import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.user.UserConfig;
 
@@ -38,12 +38,12 @@ public class AdministratorNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ProjectNode projectNode;
+    ServerNode projectNode;
 
-    public AdministratorNode(String name, Object object, Object parent) {
+    public AdministratorNode(String name, Object object, Node parent) {
         super(name, PenroseStudio.getImage(PenroseImage.ADMINISTRATOR), object, parent);
         
-        projectNode = (ProjectNode)parent;
+        projectNode = (ServerNode)parent;
     }
 
     public void showMenu(IMenuManager manager) {
@@ -61,7 +61,7 @@ public class AdministratorNode extends Node {
     }
 
     public void open() throws Exception {
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
         PenroseClient penroseClient = project.getClient();
         UserConfig rootUserConfig = penroseClient.getRootUserConfig();
                 

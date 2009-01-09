@@ -20,8 +20,8 @@ package org.safehaus.penrose.studio.partition.action;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.partition.wizard.ImportPartitionWizard;
-import org.safehaus.penrose.studio.project.ProjectNode;
 import org.apache.log4j.Logger;
 
 public class ImportPartitionAction extends Action {
@@ -36,9 +36,9 @@ public class ImportPartitionAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            ProjectNode projectNode = serversView.getSelectedProjectNode();
+            ServerNode projectNode = serversView.getSelectedProjectNode();
 
-            ImportPartitionWizard wizard = new ImportPartitionWizard(projectNode.getProject());
+            ImportPartitionWizard wizard = new ImportPartitionWizard(projectNode.getServer());
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
             dialog.open();

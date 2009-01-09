@@ -41,8 +41,8 @@ import org.safehaus.penrose.studio.partition.PartitionNode;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.plugin.Plugin;
 import org.safehaus.penrose.studio.plugin.PluginManager;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 
@@ -56,7 +56,7 @@ public class ConnectionNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     private ServersView view;
-    private ProjectNode projectNode;
+    private ServerNode projectNode;
     private PartitionsNode partitionsNode;
     private PartitionNode partitionNode;
     private ConnectionsNode connectionsNode;
@@ -65,7 +65,7 @@ public class ConnectionNode extends Node {
     private String adapterName;
     private String connectionName;
 
-    public ConnectionNode(String name, Image image, Object object, Object parent) {
+    public ConnectionNode(String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
         connectionsNode = (ConnectionsNode)parent;
         partitionNode = connectionsNode.getPartitionNode();
@@ -134,7 +134,7 @@ public class ConnectionNode extends Node {
         Plugin plugin = pluginManager.getPlugin(adapterName);
 
         ConnectionEditorInput ei = plugin.createConnectionEditorInput();
-        ei.setProject(projectNode.getProject());
+        ei.setProject(projectNode.getServer());
         ei.setPartitionName(partitionName);
         ei.setConnectionName(connectionName);
 
@@ -155,7 +155,7 @@ public class ConnectionNode extends Node {
 
         if (!confirm) return;
 
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
@@ -170,6 +170,8 @@ public class ConnectionNode extends Node {
 
         partitionClient.store();
         //project.save(partitionConfig, connectionConfigManager);
+
+        parent.refresh();
         
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
@@ -177,7 +179,7 @@ public class ConnectionNode extends Node {
 
     public void copy() throws Exception {
 
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
@@ -193,7 +195,7 @@ public class ConnectionNode extends Node {
 
         if (!(newObject instanceof ConnectionConfig)) return;
 
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
 
         ConnectionConfig newConnectionConfig = (ConnectionConfig)((ConnectionConfig)newObject).clone();
         view.setClipboard(null);
@@ -255,11 +257,11 @@ public class ConnectionNode extends Node {
         this.view = view;
     }
 
-    public ProjectNode getProjectNode() {
+    public ServerNode getProjectNode() {
         return projectNode;
     }
 
-    public void setProjectNode(ProjectNode projectNode) {
+    public void setProjectNode(ServerNode projectNode) {
         this.projectNode = projectNode;
     }
 

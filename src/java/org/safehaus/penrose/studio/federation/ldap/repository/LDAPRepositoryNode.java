@@ -1,7 +1,7 @@
 package org.safehaus.penrose.studio.federation.ldap.repository;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.federation.ldap.linking.LDAPLinkingNode;
@@ -25,12 +25,12 @@ public class LDAPRepositoryNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Project project;
+    private Server project;
     private FederationClient federationClient;
     private LDAPRepositoryClient ldapFederationClient;
     private FederationRepositoryConfig repositoryConfig;
 
-    public LDAPRepositoryNode(String name, Object parent) {
+    public LDAPRepositoryNode(String name, Node parent) {
         super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, parent );
     }
 
@@ -95,13 +95,14 @@ public class LDAPRepositoryNode extends Node {
         if (dialog.open() == Window.CANCEL) return;
 
         federationClient.updateRepository(repositoryConfig);
+        federationClient.store();
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

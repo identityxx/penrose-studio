@@ -1,6 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <drivers>
+  <driver name="HSQLDB">
+    <adapter-name>JDBC</adapter-name>
+    <parameter name="driver" type="READ_ONLY">
+      <display-name>Driver</display-name>
+      <default-value>org.hsqldb.jdbcDriver</default-value>
+    </parameter>
+    <parameter name="url" type="READ_ONLY">
+      <display-name>URL</display-name>
+      <default-value>jdbc:hsqldb:file:${path}</default-value>
+    </parameter>
+    <parameter name="path" type="TEMP">
+      <display-name>Path</display-name>
+      <default-value></default-value>
+    </parameter>
+    <parameter name="user" type="NORMAL">
+      <display-name>User</display-name>
+      <default-value>sa</default-value>
+    </parameter>
+    <parameter name="password" type="PASSWORD">
+      <display-name>Password</display-name>
+      <default-value></default-value>
+    </parameter>
+    <parameter name="shutdown" type="HIDDEN">
+      <display-name>Shutdown</display-name>
+      <default-value>true</default-value>
+    </parameter>
+  </driver>
   <driver name="JDBC">
     <adapter-name>JDBC</adapter-name>
     <parameter name="driver" type="REQUIRED">

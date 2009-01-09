@@ -23,7 +23,7 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.studio.directory.wizard.CreateLDAPSnapshotWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.apache.log4j.Logger;
 
 public class CreateLDAPSnapshotEntryAction extends Action {
@@ -42,7 +42,7 @@ public class CreateLDAPSnapshotEntryAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Project project = node.getProjectNode().getProject();
+            Server project = node.getProjectNode().getServer();
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             //if (!penroseStudio.isCommercial()) return;

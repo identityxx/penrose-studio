@@ -5,7 +5,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
@@ -17,10 +17,10 @@ public class JDBCNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    Project project;
+    Server project;
     FederationClient federationClient;
 
-    public JDBCNode(String name, Object parent) throws Exception {
+    public JDBCNode(String name, Node parent) throws Exception {
         super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, parent);
     }
 
@@ -52,11 +52,11 @@ public class JDBCNode extends Node {
     public void open() throws Exception {
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

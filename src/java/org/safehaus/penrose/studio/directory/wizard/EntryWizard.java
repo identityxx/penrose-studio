@@ -22,17 +22,16 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.DirectoryClient;
-import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
-import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.directory.wizard.AttributeWizardPage;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.source.wizard.SelectSourcesWizardPage;
+import org.safehaus.penrose.studio.directory.wizard.EntrySourceWizardPage;
 
 import java.util.Collection;
 
@@ -43,45 +42,51 @@ public class EntryWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Project project;
+    private Server server;
     private String partitionName;
     private DN parentDn;
 
     private EntryConfig entryConfig;
 
-    public EntryRDNWizardPage rdnPage;
+    public EntryDNWizardPage rdnPage;
+    public EntryClassWizardPage classPage;
     public ObjectClassWizardPage ocPage;
-    public AttributeValueWizardPage attrPage;
-    public SelectSourcesWizardPage sourcesPage;
+    public AttributeWizardPage attributePage;
+    public EntrySourceWizardPage sourcesPage;
 
-    public EntryWizard(Project project, String partitionName, DN parentDn) {
-        this.project = project;
-        this.partitionName = partitionName;
-        this.parentDn = parentDn;
-
+    public EntryWizard() {
         setWindowTitle("Adding entry");
     }
 
     public void addPages() {
 
-        rdnPage = new EntryRDNWizardPage();
-        rdnPage.setProject(project);
+        rdnPage = new EntryDNWizardPage();
+        rdnPage.setDescription("Enter the RDN, parent DN, and optionally the class name of the entry.");
+        rdnPage.setServer(server);
         rdnPage.setPartitionName(partitionName);
         rdnPage.setParentDn(parentDn);
 
         addPage(rdnPage);
 
-        ocPage = new ObjectClassWizardPage(project);
+        classPage = new EntryClassWizardPage();
+        classPage.setDescription("Enter the class name of the entry.");
+        classPage.setClassName(entryConfig.getEntryClass());
+
+        addPage(classPage);
+
+        ocPage = new ObjectClassWizardPage(server);
 
         addPage(ocPage);
 
-        attrPage = new AttributeValueWizardPage(project, partitionName);
+        attributePage = new AttributeWizardPage();
+        attributePage.setServer(server);
+        attributePage.setPartitionName(partitionName);
 
-        addPage(attrPage);
+        addPage(attributePage);
 
-        sourcesPage = new SelectSourcesWizardPage();
+        sourcesPage = new EntrySourceWizardPage();
         sourcesPage.setDescription("Add data sources.");
-        sourcesPage.setProject(project);
+        sourcesPage.setServer(server);
         sourcesPage.setPartitionName(partitionName);
 
         addPage(sourcesPage);
@@ -90,7 +95,7 @@ public class EntryWizard extends Wizard {
     public boolean canFinish() {
         if (!rdnPage.isPageComplete()) return false;
         if (!ocPage.isPageComplete()) return false;
-        if (!attrPage.isPageComplete()) return false;
+        if (!attributePage.isPageComplete()) return false;
         if (!sourcesPage.isPageComplete()) return false;
         return true;
     }
@@ -98,12 +103,12 @@ public class EntryWizard extends Wizard {
     public IWizardPage getNextPage(IWizardPage page) {
         try {
             if (rdnPage == page) {
-                RDN rdn = new RDN(rdnPage.getRdn());
-                attrPage.setRdn(rdn);
+                RDN rdn = rdnPage.getRdn();
+                attributePage.setRdn(rdn);
 
             } else if (ocPage == page) {
-                Collection objectClasses = ocPage.getSelectedObjectClasses();
-                attrPage.setObjectClasses(objectClasses);
+                Collection<String> objectClasses = ocPage.getSelectedObjectClasses();
+                attributePage.setObjectClasses(objectClasses);
             }
 
             return super.getNextPage(page);
@@ -123,12 +128,13 @@ public class EntryWizard extends Wizard {
             db.append(rdnPage.getParentDn());
             entryConfig.setDn(db.toDn());
 
-            entryConfig.setEntryClass(rdnPage.getClassName());
-            entryConfig.addObjectClasses(ocPage.getSelectedObjectClasses());
-            entryConfig.addAttributeConfigs(attrPage.getAttributeMappings());
-            entryConfig.addSourceConfigs(sourcesPage.getSourceMappings());
+            entryConfig.setEntryClass(classPage.getClassName());
 
-            PenroseClient client = project.getClient();
+            entryConfig.addObjectClasses(ocPage.getSelectedObjectClasses());
+            entryConfig.addAttributeConfigs(attributePage.getAttributeConfigs());
+            entryConfig.addSourceConfigs(sourcesPage.getEntrySourceConfigs());
+
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
@@ -166,11 +172,19 @@ public class EntryWizard extends Wizard {
         this.partitionName = partitionName;
     }
 
-    public Project getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
+    }
+
+    public DN getParentDn() {
+        return parentDn;
+    }
+
+    public void setParentDn(DN parentDn) {
+        this.parentDn = parentDn;
     }
 }

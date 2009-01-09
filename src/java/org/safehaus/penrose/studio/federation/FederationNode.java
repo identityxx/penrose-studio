@@ -1,8 +1,7 @@
 package org.safehaus.penrose.studio.federation;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.project.ProjectNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.partition.PartitionManagerClient;
@@ -22,9 +21,9 @@ public class FederationNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Project project;
+    private Server server;
 
-    public FederationNode(String name, Object parent) throws Exception {
+    public FederationNode(String name, Node parent) throws Exception {
         super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, parent);
     }
 
@@ -36,7 +35,7 @@ public class FederationNode extends Node {
 
         children.clear();
 
-        PartitionManagerClient partitionManagerClient = project.getClient().getPartitionManagerClient();
+        PartitionManagerClient partitionManagerClient = server.getClient().getPartitionManagerClient();
 
         log.debug("Partitions:");
 
@@ -55,7 +54,7 @@ public class FederationNode extends Node {
             if (!moduleClass.equals("org.safehaus.penrose.federation.module.FederationModule")) continue;
 
             FederationDomainNode node = new FederationDomainNode(partitionName, this);
-            node.setProject(project);
+            node.setServer(server);
             node.init();
 
             children.add(node);
@@ -79,12 +78,12 @@ public class FederationNode extends Node {
         });
     }
 
-    public Project getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public boolean hasChildren() {

@@ -37,7 +37,7 @@ public class ObjectClassNode extends Node {
 
     ServersView view;
     
-    public ObjectClassNode(ServersView view, String name, Image image, Object object, Object parent) {
+    public ObjectClassNode(ServersView view, String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
         this.view = view;
     }

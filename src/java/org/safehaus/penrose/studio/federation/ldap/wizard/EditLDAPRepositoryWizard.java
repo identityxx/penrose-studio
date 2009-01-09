@@ -2,8 +2,7 @@ package org.safehaus.penrose.studio.federation.ldap.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.apache.log4j.Logger;
-import org.safehaus.penrose.studio.ldap.connection.LDAPConnectionWizardPage;
-import org.safehaus.penrose.studio.federation.linking.wizard.LinkingParametersWizardPage;
+import org.safehaus.penrose.studio.ldap.connection.wizard.LDAPConnectionSettingsWizardPage;
 import org.safehaus.penrose.federation.LDAPRepository;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 
@@ -14,7 +13,7 @@ public class EditLDAPRepositoryWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    LDAPConnectionWizardPage    connectionPage;
+    LDAPConnectionSettingsWizardPage connectionPage;
     //LDAPPartitionsWizardPage    partitionsPage;
     //LinkingParametersWizardPage linkingPage;
 
@@ -28,7 +27,7 @@ public class EditLDAPRepositoryWizard extends Wizard {
 
     public void addPages() {
 
-        connectionPage = new LDAPConnectionWizardPage();
+        connectionPage = new LDAPConnectionSettingsWizardPage();
 
         connectionPage.setProviderUrl(repository.getParameter(LDAPRepository.URL));
         connectionPage.setSuffix(repository.getParameter(LDAPRepository.SUFFIX));

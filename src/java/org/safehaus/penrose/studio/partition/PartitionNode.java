@@ -35,8 +35,8 @@ import org.safehaus.penrose.studio.directory.DirectoryNode;
 import org.safehaus.penrose.studio.mapping.MappingsNode;
 import org.safehaus.penrose.studio.module.ModulesNode;
 import org.safehaus.penrose.studio.partition.action.ExportPartitionAction;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.source.SourcesNode;
 import org.safehaus.penrose.studio.tree.Node;
@@ -52,7 +52,7 @@ public class PartitionNode extends Node {
     public Logger log = Logger.getLogger(getClass());
 
     private ServersView view;
-    private ProjectNode projectNode;
+    private ServerNode projectNode;
     private PartitionsNode partitionsNode;
 
     private String partitionName;
@@ -61,7 +61,7 @@ public class PartitionNode extends Node {
 
     Collection<Node> children = new ArrayList<Node>();
 
-    public PartitionNode(String name, Image image, String partitionName, Object parent) {
+    public PartitionNode(String name, Image image, String partitionName, Node parent) throws Exception {
         super(name, image, partitionName, parent);
 
         this.partitionName = partitionName;
@@ -69,7 +69,10 @@ public class PartitionNode extends Node {
         partitionsNode = (PartitionsNode)parent;
         projectNode = partitionsNode.getProjectNode();
         view = projectNode.getServersView();
+    }
 
+    public void init() throws Exception {
+        
         DirectoryNode directoryNode = new DirectoryNode(
                 ServersView.DIRECTORY,
                 PenroseStudio.getImage(PenroseImage.FOLDER),
@@ -78,6 +81,7 @@ public class PartitionNode extends Node {
         );
 
         directoryNode.setPartitionName(partitionName);
+        directoryNode.init();
 
         children.add(directoryNode);
 
@@ -100,6 +104,7 @@ public class PartitionNode extends Node {
         );
 
         connectionsNode.setPartitionName(partitionName);
+        connectionsNode.init();
 
         children.add(connectionsNode);
 
@@ -219,7 +224,7 @@ public class PartitionNode extends Node {
     public void start() throws Exception {
         log.debug("Starting "+name+" partition.");
 
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(name);
@@ -229,7 +234,7 @@ public class PartitionNode extends Node {
     public void stop() throws Exception {
         log.debug("Stopping "+name+" partition.");
 
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(name);
@@ -239,7 +244,7 @@ public class PartitionNode extends Node {
     public void upload() throws Exception {
         log.debug("Uploading "+name+" partition.");
 
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
         project.upload("partitions/"+name);
     }
 
@@ -254,7 +259,7 @@ public class PartitionNode extends Node {
 
         if (!confirm) return;
 
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 
@@ -310,11 +315,11 @@ public class PartitionNode extends Node {
         this.view = view;
     }
 
-    public ProjectNode getProjectNode() {
+    public ServerNode getProjectNode() {
         return projectNode;
     }
 
-    public void setProjectNode(ProjectNode projectNode) {
+    public void setProjectNode(ServerNode projectNode) {
         this.projectNode = projectNode;
     }
 

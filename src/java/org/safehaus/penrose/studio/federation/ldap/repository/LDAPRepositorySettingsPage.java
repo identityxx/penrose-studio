@@ -26,7 +26,7 @@ import org.safehaus.penrose.federation.LDAPRepository;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.federation.ldap.wizard.EditLDAPRepositoryWizard;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
@@ -42,7 +42,7 @@ public class LDAPRepositorySettingsPage extends FormPage {
     Label bindDnText;
     Label bindPasswordText;
 
-    Project project;
+    Server project;
     FederationClient federationClient;
     LDAPRepositoryClient ldapFederationClient;
     FederationRepositoryConfig repositoryConfig;
@@ -147,6 +147,7 @@ public class LDAPRepositorySettingsPage extends FormPage {
                     if (dialog.open() == Window.CANCEL) return;
 
                     federationClient.updateRepository(repositoryConfig);
+                    federationClient.store();
 
                     refresh();
 
@@ -188,11 +189,11 @@ public class LDAPRepositorySettingsPage extends FormPage {
         this.federationClient = federationClient;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

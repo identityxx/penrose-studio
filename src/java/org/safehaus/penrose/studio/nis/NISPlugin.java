@@ -1,7 +1,7 @@
 package org.safehaus.penrose.studio.nis;
 
 import org.safehaus.penrose.studio.nis.source.NISSourceEditor;
-import org.safehaus.penrose.studio.nis.connection.NISConnectionEditor;
+import org.safehaus.penrose.studio.nis.connection.editor.NISConnectionEditor;
 import org.safehaus.penrose.studio.plugin.Plugin;
 
 /**

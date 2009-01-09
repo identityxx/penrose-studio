@@ -22,7 +22,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -35,6 +34,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.directory.EntryAttributeConfig;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.EntryFieldConfig;
@@ -49,10 +50,11 @@ import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.directory.dialog.ExpressionDialog;
 import org.safehaus.penrose.studio.directory.dialog.FieldSelectionDialog;
-import org.safehaus.penrose.studio.directory.dialog.SourceDialog;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.directory.wizard.AttributeWizard;
+import org.safehaus.penrose.studio.directory.wizard.EntrySourceWizard;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,11 +62,14 @@ import java.util.Collection;
 /**
  * @author Endi S. Dewata
  */
-public class SourcesPage extends FormPage implements ModifyListener {
+public class SourcesPage extends FormPage { //implements ModifyListener {
 
     Logger log = Logger.getLogger(getClass());
 
     FormToolkit toolkit;
+
+    Table sourcesTable;
+    Table fieldsTable;
 
     CTabFolder tabFolder;
 
@@ -87,16 +92,212 @@ public class SourcesPage extends FormPage implements ModifyListener {
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-        Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Sources");
-        section.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Section sourceSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        sourceSection.setText("Sources");
+        sourceSection.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Composite sourceSection = createSourcesSection(section);
-        section.setClient(sourceSection);
+        Composite sourceComponent = createSourcesSection(sourceSection);
+        sourceSection.setClient(sourceComponent);
 
-        load();
+        Section fieldsSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        fieldsSection.setText("Fields");
+        fieldsSection.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        Composite fieldsComponent = createFieldsSection(fieldsSection);
+        fieldsSection.setClient(fieldsComponent);
+
+        refresh();
+        //load();
 	}
 
+    public Composite createSourcesSection(final Composite parent) {
+
+        Composite composite = toolkit.createComposite(parent);
+        composite.setLayout(new GridLayout(2, false));
+
+        Composite leftControl = createSourcesLeftControl(composite);
+        leftControl.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        Composite rightControl = createSourcesRightControl(composite);
+        GridData gd = new GridData(GridData.FILL_VERTICAL);
+        gd.widthHint = 100;
+        rightControl.setLayoutData(gd);
+
+        return composite;
+    }
+
+    public Composite createSourcesLeftControl(final Composite parent) {
+
+        sourcesTable = new Table(parent, SWT.BORDER | SWT.FULL_SELECTION);
+        sourcesTable.setHeaderVisible(true);
+        sourcesTable.setLinesVisible(true);
+
+        sourcesTable.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        TableColumn tc = new TableColumn(sourcesTable, SWT.LEFT);
+        tc.setText("Source");
+        tc.setWidth(350);
+
+        tc = new TableColumn(sourcesTable, SWT.LEFT);
+        tc.setText("Alias");
+        tc.setWidth(150);
+
+        sourcesTable.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                if (sourcesTable.getSelectionCount() != 1) return;
+
+                fieldsTable.removeAll();
+
+                TableItem item = sourcesTable.getSelection()[0];
+                EntrySourceConfig source = (EntrySourceConfig)item.getData();
+
+                for (EntryFieldConfig field : source.getFieldConfigs()) {
+
+                    String value;
+
+                    Object constant = field.getConstant();
+                    if (constant != null) {
+                        if (constant instanceof byte[]) {
+                            value = "(binary)";
+                        } else {
+                            value = "\"" + constant + "\"";
+                        }
+
+                    } else {
+                        value = field.getVariable();
+                    }
+
+                    if (value == null) {
+                        Expression expression = field.getExpression();
+                        value = expression == null ? null : expression.getScript();
+                    }
+
+                    TableItem ti = new TableItem(fieldsTable, SWT.CHECK);
+                    ti.setText(0, field.getName());
+                    ti.setText(1, value == null ? "" : value);
+                    ti.setData(field);
+                }
+            }
+        });
+
+        return sourcesTable;
+    }
+
+    public Composite createSourcesRightControl(final Composite parent) {
+
+        Composite composite = toolkit.createComposite(parent);
+
+        GridLayout layout = new GridLayout();
+        layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        composite.setLayout(layout);
+
+        Button editButton = new Button(composite, SWT.PUSH);
+		editButton.setText("Edit");
+        editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        editButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                try {
+                    EntrySourceWizard wizard = new EntrySourceWizard();
+                    wizard.setServer(editor.getServer());
+                    wizard.setPartitionName(editor.getPartitionName());
+                    wizard.setEntryConfig(entryConfig);
+
+                    WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
+                    dialog.setPageSize(600, 300);
+
+                    int rc = dialog.open();
+                    if (rc == Window.CANCEL) return;
+
+                    editor.store();
+                    refresh();
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+        });
+
+        return composite;
+    }
+
+    public Composite createFieldsSection(final Composite parent) {
+
+        Composite composite = toolkit.createComposite(parent);
+        composite.setLayout(new GridLayout(2, false));
+
+        Composite leftControl = createFieldsLeftControl(composite);
+        leftControl.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        Composite rightControl = createFieldsRightControl(composite);
+        GridData gd = new GridData(GridData.FILL_VERTICAL);
+        gd.widthHint = 100;
+        rightControl.setLayoutData(gd);
+
+        return composite;
+    }
+
+    public Composite createFieldsLeftControl(final Composite parent) {
+
+        fieldsTable = new Table(parent, SWT.BORDER | SWT.FULL_SELECTION);
+        fieldsTable.setHeaderVisible(true);
+        fieldsTable.setLinesVisible(true);
+
+        fieldsTable.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        TableColumn tc = new TableColumn(fieldsTable, SWT.LEFT);
+        tc.setText("Field");
+        tc.setWidth(150);
+
+        tc = new TableColumn(fieldsTable, SWT.LEFT);
+        tc.setText("Value/Expression");
+        tc.setWidth(350);
+
+        return fieldsTable;
+    }
+
+    public Composite createFieldsRightControl(final Composite parent) {
+
+        Composite composite = toolkit.createComposite(parent);
+
+        GridLayout layout = new GridLayout();
+        layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        composite.setLayout(layout);
+
+        Button editButton = new Button(composite, SWT.PUSH);
+		editButton.setText("Edit");
+        editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        editButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                try {
+                    AttributeWizard wizard = new AttributeWizard();
+                    wizard.setServer(editor.getServer());
+                    wizard.setPartitionName(editor.getPartitionName());
+                    wizard.setEntryConfig(entryConfig);
+
+                    WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
+                    dialog.setPageSize(600, 300);
+
+                    int rc = dialog.open();
+                    if (rc == Window.CANCEL) return;
+
+                    editor.store();
+                    refresh();
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+        });
+
+        return composite;
+    }
+/*
     public Composite createSourcesSection(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
@@ -122,7 +323,7 @@ public class SourcesPage extends FormPage implements ModifyListener {
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    Project project = editor.getProject();
+                    Server project = editor.getServer();
                     PenroseClient client = project.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(editor.getPartitionName());
@@ -180,7 +381,7 @@ public class SourcesPage extends FormPage implements ModifyListener {
                     CTabItem item = tabFolder.getSelection();
                     if (item == null) return;
 
-                    Project project = editor.getProject();
+                    Server project = editor.getServer();
                     PenroseClient client = project.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(editor.getPartitionName());
@@ -397,7 +598,7 @@ public class SourcesPage extends FormPage implements ModifyListener {
                     FieldSelectionDialog dialog = new FieldSelectionDialog(editor.getParent().getShell(), SWT.NONE);
                     dialog.setText("Add field...");
 
-                    Project project = editor.getProject();
+                    Server project = editor.getServer();
                     PenroseClient client = project.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(editor.getPartitionName());
@@ -459,7 +660,7 @@ public class SourcesPage extends FormPage implements ModifyListener {
         try {
             table.removeAll();
 
-            Project project = editor.getProject();
+            Server project = editor.getServer();
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 
@@ -551,6 +752,20 @@ public class SourcesPage extends FormPage implements ModifyListener {
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+        }
+    }
+*/
+
+    public void refresh() {
+        sourcesTable.removeAll();
+
+        Collection<EntrySourceConfig> sources = entryConfig.getSourceConfigs();
+        for (EntrySourceConfig source : sources) {
+
+            TableItem item = new TableItem(sourcesTable, SWT.CHECK);
+            item.setText(0, source.getSourceName());
+            item.setText(1, source.getAlias());
+            item.setData(source);
         }
     }
 }

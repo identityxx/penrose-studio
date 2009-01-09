@@ -56,10 +56,10 @@
             icon="${images.connection}"
             class="org.safehaus.penrose.studio.ldap.connection.editor.LDAPConnectionEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.nis.connection.NISConnectionEditor"
+            id="org.safehaus.penrose.studio.nis.connection.editor.NISConnectionEditor"
             name="NIS Connection"
             icon="${images.connection}"
-            class="org.safehaus.penrose.studio.nis.connection.NISConnectionEditor"/>
+            class="org.safehaus.penrose.studio.nis.connection.editor.NISConnectionEditor"/>
         <editor
             id="org.safehaus.penrose.studio.source.editor.SourceEditor"
             name="Source"

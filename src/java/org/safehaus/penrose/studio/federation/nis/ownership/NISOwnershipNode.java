@@ -1,7 +1,7 @@
 package org.safehaus.penrose.studio.federation.nis.ownership;
 
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -17,11 +17,11 @@ import org.eclipse.ui.IWorkbenchPage;
  */
 public class NISOwnershipNode extends Node {
 
-    Project project;
+    Server project;
     NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig repositoryConfig;
 
-    public NISOwnershipNode(String name, Object parent) {
+    public NISOwnershipNode(String name, Node parent) {
         super(name, PenroseStudio.getImage(PenroseImage.OBJECT), null, parent);
     }
 
@@ -50,11 +50,11 @@ public class NISOwnershipNode extends Node {
         page.openEditor(ei, OwnershipAlignmentEditor.class.getName());
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

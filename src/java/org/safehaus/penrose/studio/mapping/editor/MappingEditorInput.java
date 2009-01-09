@@ -20,15 +20,14 @@ package org.safehaus.penrose.studio.mapping.editor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.directory.editor.EntryEditorInput;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
  */
 public class MappingEditorInput implements IEditorInput {
 
-    private Project project;
+    private Server project;
     private String partitionName;
     private String mappingName;
 
@@ -92,11 +91,11 @@ public class MappingEditorInput implements IEditorInput {
         this.partitionName = partitionName;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

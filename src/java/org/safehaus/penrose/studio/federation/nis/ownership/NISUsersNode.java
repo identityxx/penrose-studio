@@ -7,7 +7,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.federation.nis.ownership.OwnershipAlignmentEditor;
 import org.safehaus.penrose.studio.federation.nis.ownership.OwnershipAlignmentInput;
@@ -19,11 +19,11 @@ import org.safehaus.penrose.studio.PenroseStudio;
  */
 public class NISUsersNode extends Node {
 
-    private Project project;
+    private Server project;
     private NISRepositoryClient nisFederationClient;
     private FederationRepositoryConfig repositoryConfig;
 
-    public NISUsersNode(String name, Object parent) {
+    public NISUsersNode(String name, Node parent) {
         super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, parent);
     }
 
@@ -68,11 +68,11 @@ public class NISUsersNode extends Node {
         this.repositoryConfig = repositoryConfig;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 }

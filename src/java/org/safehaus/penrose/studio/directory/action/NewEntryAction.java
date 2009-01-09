@@ -19,11 +19,13 @@ package org.safehaus.penrose.studio.directory.action;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.directory.wizard.EntryWizard;
 import org.safehaus.penrose.studio.directory.EntryNode;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.directory.EntryConfig;
 import org.apache.log4j.Logger;
 
 public class NewEntryAction extends Action {
@@ -41,21 +43,27 @@ public class NewEntryAction extends Action {
 	
 	public void run() {
         try {
-            ServersView serversView = ServersView.getInstance();
-            ProjectNode projectNode = node.getProjectNode();
+            EntryConfig entryConfig = new EntryConfig();
 
-            EntryWizard wizard = new EntryWizard(
-                    projectNode.getProject(),
-                    node.getPartitionName(), 
-                    node.getEntryConfig().getDn()
-            );
+            ServersView serversView = ServersView.getInstance();
+            ServerNode projectNode = node.getServerNode();
+
+            EntryWizard wizard = new EntryWizard();
+            wizard.setServer(projectNode.getServer());
+            wizard.setPartitionName(node.getPartitionName());
+            wizard.setParentDn(node.getEntryConfig().getDn());
+            wizard.setEntryConfig(entryConfig);
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
-            dialog.open();
+            int rc = dialog.open();
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
+            if (rc == Window.CANCEL) return;
+
+            node.refresh();
+
+            //PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            //penroseStudio.notifyChangeListeners();
 
             serversView.open(node);
 

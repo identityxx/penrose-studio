@@ -5,7 +5,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
-import org.safehaus.penrose.studio.ldap.connection.LDAPConnectionWizardPage;
+import org.safehaus.penrose.studio.ldap.connection.wizard.LDAPConnectionSettingsWizardPage;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.connection.ConnectionClient;
@@ -25,7 +25,7 @@ public class FederationDomainEditorWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    LDAPConnectionWizardPage connectionPage;
+    LDAPConnectionSettingsWizardPage connectionPage;
     //LDAPPartitionsWizardPage partitionsPage;
 
     PenroseClient client;
@@ -33,7 +33,7 @@ public class FederationDomainEditorWizard extends Wizard {
     FederationClient federationClient;
     FederationRepositoryConfig repository;
 
-    public FederationDomainEditorWizard(FederationClient federationClient) {
+    public FederationDomainEditorWizard(FederationClient federationClient) throws Exception {
         this.federationClient = federationClient;
         this.client = federationClient.getClient();
         this.partitionClient = federationClient.getPartitionClient();
@@ -43,7 +43,7 @@ public class FederationDomainEditorWizard extends Wizard {
 
     public void addPages() {
 
-        connectionPage = new LDAPConnectionWizardPage();
+        connectionPage = new LDAPConnectionSettingsWizardPage();
         //partitionsPage = new LDAPPartitionsWizardPage();
 
         try {

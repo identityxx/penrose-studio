@@ -17,7 +17,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.federation.*;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.ldap.dialog.AttributeDialog;
 import org.safehaus.penrose.ldap.*;
@@ -49,7 +49,7 @@ public class GroupsPage extends FormPage {
 
     ConflictDetectionEditor editor;
 
-    Project project;
+    Server project;
     FederationClient federationClient;
 
     SourceClient globalSourceClient;

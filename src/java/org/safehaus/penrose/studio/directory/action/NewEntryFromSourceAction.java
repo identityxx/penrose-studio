@@ -37,8 +37,8 @@ import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.directory.EntryNode;
 import org.safehaus.penrose.studio.directory.dialog.SourceDialog;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 
 import java.io.StringReader;
@@ -67,8 +67,8 @@ public class NewEntryFromSourceAction extends Action {
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             //if (!penroseStudio.isCommercial()) return;
 
-            ProjectNode projectNode = node.getProjectNode();
-            Project project = projectNode.getProject();
+            ServerNode projectNode = node.getServerNode();
+            Server project = projectNode.getServer();
 
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
@@ -99,7 +99,7 @@ public class NewEntryFromSourceAction extends Action {
             EntrySourceConfig sourceMapping = new EntrySourceConfig();
             SourceDialog dialog = new SourceDialog(serversView.getSite().getShell(), SWT.NONE);
             dialog.setSourceConfigs(sourceConfigs.values());
-            dialog.setSourceMapping(sourceMapping);
+            dialog.setSourceConfig(sourceMapping);
             dialog.setText("Select source...");
 
             dialog.open();

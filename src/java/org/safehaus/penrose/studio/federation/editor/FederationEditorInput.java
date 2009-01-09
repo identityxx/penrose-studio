@@ -3,7 +3,7 @@ package org.safehaus.penrose.studio.federation.editor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.federation.FederationClient;
 
 /**
@@ -11,7 +11,7 @@ import org.safehaus.penrose.federation.FederationClient;
  */
 public class FederationEditorInput implements IEditorInput {
 
-    private Project project;
+    private Server project;
     private FederationClient federation;
 
     public FederationEditorInput() {
@@ -70,11 +70,11 @@ public class FederationEditorInput implements IEditorInput {
         this.federation = federation;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 }

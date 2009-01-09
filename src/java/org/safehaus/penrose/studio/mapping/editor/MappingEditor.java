@@ -21,7 +21,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -33,13 +32,13 @@ import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.mapping.MappingConfig;
 import org.safehaus.penrose.mapping.MappingManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 public class MappingEditor extends FormEditor implements ModifyListener {
 
     Logger log = Logger.getLogger(getClass());
 
-    Project project;
+    Server project;
     String partitionName;
     String mappingName;
 
@@ -150,11 +149,11 @@ public class MappingEditor extends FormEditor implements ModifyListener {
         this.partitionName = partitionName;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

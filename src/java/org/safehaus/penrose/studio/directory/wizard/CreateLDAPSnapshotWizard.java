@@ -20,8 +20,7 @@ package org.safehaus.penrose.studio.directory.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
 import org.safehaus.penrose.studio.util.SnapshotUtil;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.partition.*;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
@@ -33,7 +32,7 @@ public class CreateLDAPSnapshotWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Project project;
+    private Server project;
     private String partitionName;
     SelectConnectionWizardPage connectionPage;
 
@@ -79,11 +78,11 @@ public class CreateLDAPSnapshotWizard extends Wizard {
         return true;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

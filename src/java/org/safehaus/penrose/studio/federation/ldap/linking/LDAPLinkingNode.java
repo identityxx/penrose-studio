@@ -10,9 +10,9 @@ import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingEditor;
 import org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingEditorInput;
-import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.tree.Node;
 
 /**
@@ -20,11 +20,11 @@ import org.safehaus.penrose.studio.tree.Node;
  */
 public class LDAPLinkingNode extends Node {
 
-    Project project;
+    Server project;
     LDAPRepositoryClient ldapFederationClient;
     FederationRepositoryConfig repositoryConfig;
 
-    public LDAPLinkingNode(String name, Object parent) {
+    public LDAPLinkingNode(String name, Node parent) {
         super(name, PenroseStudio.getImage(PenroseImage.OBJECT), null, parent);
     }
 
@@ -64,11 +64,11 @@ public class LDAPLinkingNode extends Node {
         this.ldapFederationClient = ldapFederationClient;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

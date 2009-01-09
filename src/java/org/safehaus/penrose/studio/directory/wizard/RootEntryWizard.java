@@ -29,10 +29,7 @@ import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.mapping.wizard.AttributeValueWizardPage;
-import org.safehaus.penrose.studio.directory.wizard.ObjectClassWizardPage;
-import org.safehaus.penrose.studio.directory.wizard.StaticEntryDNWizardPage;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 import java.util.Collection;
 
@@ -43,48 +40,55 @@ public class RootEntryWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Project project;
+    private Server server;
     private String partitionName;
     private EntryConfig entryConfig;
 
     public StaticEntryDNWizardPage dnPage;
     public ObjectClassWizardPage ocPage;
-    public AttributeValueWizardPage attrPage;
+    public AttributeWizardPage attributePage;
 
-    public RootEntryWizard(Project project, String partitionName) {
-        this.project = project;
+    public RootEntryWizard(Server server, String partitionName) {
+        this.server = server;
         this.partitionName = partitionName;
 
-        dnPage = new StaticEntryDNWizardPage();
-        ocPage = new ObjectClassWizardPage(project);
-        attrPage = new AttributeValueWizardPage(project, partitionName);
-        
         setWindowTitle("Adding root entry");
     }
 
     public boolean canFinish() {
         if (!dnPage.isPageComplete()) return false;
         if (!ocPage.isPageComplete()) return false;
-        if (!attrPage.isPageComplete()) return false;
+        if (!attributePage.isPageComplete()) return false;
         return true;
     }
 
     public void addPages() {
+
+        dnPage = new StaticEntryDNWizardPage();
+
         addPage(dnPage);
+
+        ocPage = new ObjectClassWizardPage(server);
+
         addPage(ocPage);
-        addPage(attrPage);
+
+        attributePage = new AttributeWizardPage();
+        attributePage.setServer(server);
+        attributePage.setPartitionName(partitionName);
+
+        addPage(attributePage);
     }
 
     public IWizardPage getNextPage(IWizardPage page) {
         try {
             if (ocPage == page) {
-                Collection objectClasses = ocPage.getSelectedObjectClasses();
-                attrPage.setObjectClasses(objectClasses);
+                Collection<String> objectClasses = ocPage.getSelectedObjectClasses();
+                attributePage.setObjectClasses(objectClasses);
 
                 if (!objectClasses.isEmpty()) {
                     DN dn = new DN(dnPage.getDn());
                     RDN rdn = dn.getRdn();
-                    attrPage.setRdn(rdn);
+                    attributePage.setRdn(rdn);
                 }
             }
 
@@ -102,7 +106,7 @@ public class RootEntryWizard extends Wizard {
             entryConfig.setDn(dnPage.getDn());
             entryConfig.setEntryClass(dnPage.getClassName());
             entryConfig.addObjectClasses(ocPage.getSelectedObjectClasses());
-            entryConfig.addAttributeConfigs(attrPage.getAttributeMappings());
+            entryConfig.addAttributeConfigs(attributePage.getAttributeConfigs());
 
             entryConfig.addACI(new ACI("rs"));
 /*
@@ -110,7 +114,7 @@ public class RootEntryWizard extends Wizard {
             directoryConfig.addEntryConfig(entryConfig);
             project.save(partitionConfig, directoryConfig);
 */
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
@@ -148,11 +152,11 @@ public class RootEntryWizard extends Wizard {
         this.partitionName = partitionName;
     }
 
-    public Project getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

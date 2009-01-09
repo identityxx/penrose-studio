@@ -33,13 +33,13 @@ import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 public class EntryEditor extends FormEditor implements ModifyListener {
 
     Logger log = Logger.getLogger(getClass());
 
-    protected Project project;
+    protected Server server;
     protected String partitionName;
     protected String entryId;
 
@@ -53,12 +53,12 @@ public class EntryEditor extends FormEditor implements ModifyListener {
 
         EntryEditorInput ei = (EntryEditorInput)input;
 
-        project = ei.getProject();
+        server = ei.getProject();
         partitionName = ei.getPartitionName();
         entryId = ei.getEntryId();
 
         try {
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
             DirectoryClient directoryClient = partitionClient.getDirectoryClient();
@@ -85,8 +85,8 @@ public class EntryEditor extends FormEditor implements ModifyListener {
         try {
             addPage(new LDAPPage(this));
             addPage(new SourcesPage(this));
-            addPage(new ACLPage(this, project, partitionName, entryConfig));
-            addPage(new MiscPage(this));
+            addPage(new ACLPage(this, server, partitionName, entryConfig));
+            addPage(new EntryClassPage(this));
             //addPage(new EntryCachePage(this));
 
         } catch (Exception e) {
@@ -130,11 +130,12 @@ public class EntryEditor extends FormEditor implements ModifyListener {
 */
         //project.save(partitionConfig, directoryConfig);
 
-        PenroseClient client = project.getClient();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
         DirectoryClient directoryClient = partitionClient.getDirectoryClient();
-        directoryClient.updateEntry(origEntryConfig.getId(), entryConfig);
+        directoryClient.updateEntry(entryConfig);
         partitionClient.store();
 
         String dn;
@@ -163,12 +164,12 @@ public class EntryEditor extends FormEditor implements ModifyListener {
     public void checkDirty() {
         try {
             dirty = false;
-
+/*
             if (!origEntryConfig.equals(entryConfig)) {
                 dirty = true;
                 return;
             }
-
+*/
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
@@ -190,12 +191,12 @@ public class EntryEditor extends FormEditor implements ModifyListener {
         this.partitionName = partitionName;
     }
 
-    public Project getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public EntryConfig getEntryConfig() {

@@ -37,8 +37,8 @@ import org.safehaus.penrose.studio.mapping.action.NewMappingAction;
 import org.safehaus.penrose.studio.mapping.wizard.PasteMappingWizard;
 import org.safehaus.penrose.studio.partition.PartitionNode;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 
@@ -53,13 +53,13 @@ public class MappingsNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     private ServersView view;
-    private ProjectNode projectNode;
+    private ServerNode projectNode;
     private PartitionsNode partitionsNode;
     private PartitionNode partitionNode;
 
     private String partitionName;
 
-    public MappingsNode(String name, Image image, Object object, Object parent) {
+    public MappingsNode(String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
         partitionNode = (PartitionNode)parent;
         partitionsNode = partitionNode.getPartitionsNode();
@@ -93,7 +93,7 @@ public class MappingsNode extends Node {
 
         if (!(newObject instanceof MappingConfig)) return;
 
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
 
         MappingConfig newMappingConfig = (MappingConfig)((MappingConfig)newObject).clone();
         view.setClipboard(null);
@@ -129,7 +129,7 @@ public class MappingsNode extends Node {
 
         Collection<Node> children = new ArrayList<Node>();
 
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
@@ -175,11 +175,11 @@ public class MappingsNode extends Node {
         this.view = view;
     }
 
-    public ProjectNode getProjectNode() {
+    public ServerNode getProjectNode() {
         return projectNode;
     }
 
-    public void setProjectNode(ProjectNode projectNode) {
+    public void setProjectNode(ServerNode projectNode) {
         this.projectNode = projectNode;
     }
 

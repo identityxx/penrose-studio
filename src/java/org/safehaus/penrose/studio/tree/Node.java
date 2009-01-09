@@ -35,11 +35,11 @@ public class Node {
     protected String name;
     protected Image image;
     protected Object object;
-    protected Object parent;
+    protected Node parent;
 
     protected Collection<Node> children = new ArrayList<Node>();
 
-    public Node(String name, Image image, Object object, Object parent) {
+    public Node(String name, Image image, Object object, Node parent) {
         this.name = name;
         this.image = image;
         this.object = object;
@@ -48,7 +48,10 @@ public class Node {
 
     public void init() throws Exception {
     }
-    
+
+    public void refresh() throws Exception {
+    }
+
     public String getName() {
         return name;
     }
@@ -73,11 +76,11 @@ public class Node {
         this.object = object;
     }
 
-    public Object getParent() {
+    public Node getParent() {
         return parent;
     }
 
-    public void setParent(Object parent) {
+    public void setParent(Node parent) {
         this.parent = parent;
     }
 

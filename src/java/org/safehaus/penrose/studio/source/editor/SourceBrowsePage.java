@@ -99,7 +99,7 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
                     TreeItem item = tree.getSelection()[0];
                     DN entryDn = (DN)item.getData();
 
-                    PenroseClient client = project.getClient();
+                    PenroseClient client = server.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
                     SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
@@ -167,7 +167,7 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
         tree.removeAll();
 
         try {
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
             SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
@@ -231,7 +231,7 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
                 item1.dispose();
             }
 
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
             SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();

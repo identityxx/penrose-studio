@@ -32,9 +32,14 @@ import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.jdbc.*;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.jdbc.connection.JDBCSourceWizard;
+import org.safehaus.penrose.studio.jdbc.connection.wizard.JDBCSourceWizard;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
+import org.safehaus.penrose.client.PenroseClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.connection.ConnectionManagerClient;
+import org.safehaus.penrose.connection.ConnectionClient;
 
 import java.util.Collection;
 
@@ -49,7 +54,7 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
     Table fieldsTable;
 
     public JDBCConnectionTablesPage(JDBCConnectionEditor editor) {
-        super(editor, "TABLES", "  Tables  ");
+        super(editor, "TABLES", "Tables");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -173,7 +178,7 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
                     org.safehaus.penrose.jdbc.Table table = (org.safehaus.penrose.jdbc.Table)ti.getData();
 
                     JDBCSourceWizard wizard = new JDBCSourceWizard(partitionName, connectionConfig, table);
-                    wizard.setProject(editor.getProject());
+                    wizard.setServer(editor.getServer());
 
                     WizardDialog dialog = new WizardDialog(getEditor().getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
@@ -218,9 +223,16 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
             schemaCombo.removeAll();
             tablesTable.removeAll();
 
-            JDBCClient client = new JDBCClient(connectionConfig.getParameters());
+            PenroseClient client = server.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+            ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(connectionConfig.getName());
 
-            Collection<String> catalogs = client.getCatalogs();
+            Collection<String> catalogs = (Collection<String>)connectionClient.getAttribute("Catalogs");
+
+            //JDBCClient client = new JDBCClient(connectionConfig.getParameters());
+            //Collection<String> catalogs = client.getCatalogs();
 
             catalogCombo.add("");
             for (String catalogName : catalogs) {
@@ -233,7 +245,8 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
                 catalogCombo.select(0);
             }
 
-            Collection<String> schemas = client.getSchemas();
+            Collection<String> schemas = (Collection<String>)connectionClient.getAttribute("Schemas");
+            //Collection<String> schemas = client.getSchemas();
 
             schemaCombo.add("");
             for (String schemaName : schemas) {
@@ -247,7 +260,12 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
             }
 
             try {
-                Collection<org.safehaus.penrose.jdbc.Table> tables = client.getTables(getCatalog(), getSchema());
+                Collection<org.safehaus.penrose.jdbc.Table> tables = (Collection<org.safehaus.penrose.jdbc.Table>)connectionClient.invoke(
+                        "getTables",
+                        new Object[] { getCatalog(), getSchema() },
+                        new String[] { String.class.getName(), String.class.getName() }
+                );
+                //Collection<org.safehaus.penrose.jdbc.Table> tables = client.getTables(getCatalog(), getSchema());
 
                 for (org.safehaus.penrose.jdbc.Table table : tables) {
                     TableItem item = new TableItem(tablesTable, SWT.NONE);
@@ -259,7 +277,7 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
                 log.error(e.getMessage(), e);
             }
 
-            client.close();
+            //client.close();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -281,10 +299,20 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
 
             tablesTable.removeAll();
 
-            JDBCClient client = new JDBCClient(connectionConfig.getParameters());
+            PenroseClient client = server.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+            ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(connectionConfig.getName());
+            //JDBCClient client = new JDBCClient(connectionConfig.getParameters());
 
             try {
-                Collection<org.safehaus.penrose.jdbc.Table> tables = client.getTables(getCatalog(), getSchema());
+                Collection<org.safehaus.penrose.jdbc.Table> tables = (Collection<org.safehaus.penrose.jdbc.Table>)connectionClient.invoke(
+                        "getTables",
+                        new Object[] { getCatalog(), getSchema() },
+                        new String[] { String.class.getName(), String.class.getName() }
+                );
+                //Collection<org.safehaus.penrose.jdbc.Table> tables = client.getTables(getCatalog(), getSchema());
 
                 for (org.safehaus.penrose.jdbc.Table tableConfig : tables) {
                     TableItem item = new TableItem(tablesTable, SWT.NONE);
@@ -296,7 +324,7 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
                 log.error(e.getMessage(), e);
             }
 
-            client.close();
+            //client.close();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -315,11 +343,22 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
             TableItem ti = tablesTable.getSelection()[0];
             org.safehaus.penrose.jdbc.Table table = (org.safehaus.penrose.jdbc.Table)ti.getData();
 
-            JDBCClient client = new JDBCClient(connectionConfig.getParameters());
+            PenroseClient client = server.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+            ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(connectionConfig.getName());
 
-            Collection<FieldConfig> fields = client.getColumns(getCatalog(), getSchema(), table.getName());
+            //JDBCClient client = new JDBCClient(connectionConfig.getParameters());
 
-            client.close();
+            Collection<FieldConfig> fields = (Collection<FieldConfig>)connectionClient.invoke(
+                    "getColumns",
+                    new Object[] { getCatalog(), getSchema(), table.getName() },
+                    new String[] { String.class.getName(), String.class.getName(), String.class.getName() }
+            );
+            //Collection<FieldConfig> fields = client.getColumns(getCatalog(), getSchema(), table.getName());
+
+            //client.close();
 
             for (FieldConfig field : fields) {
                 TableItem it = new TableItem(fieldsTable, SWT.NONE);

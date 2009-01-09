@@ -13,7 +13,7 @@ import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi Sukma Dewata
@@ -23,7 +23,7 @@ public abstract class ConnectionEditor extends FormEditor {
     public Logger log = Logger.getLogger(getClass());
 
     protected boolean dirty;
-    protected Project project;
+    protected Server server;
     protected String partitionName;
     protected String origConnectionName;
 
@@ -34,12 +34,12 @@ public abstract class ConnectionEditor extends FormEditor {
         super.init(site, input);
 
         ConnectionEditorInput ei = (ConnectionEditorInput)input;
-        project = ei.getProject();
+        server = ei.getProject();
         partitionName = ei.getPartitionName();
         origConnectionName = ei.getConnectionName();
 
         try {
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
             ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
@@ -73,12 +73,12 @@ public abstract class ConnectionEditor extends FormEditor {
         this.connectionConfig = connectionConfig;
     }
 
-    public Project getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public void doSave(IProgressMonitor iProgressMonitor) {
@@ -93,28 +93,32 @@ public abstract class ConnectionEditor extends FormEditor {
     public void doSaveAs() {
     }
 
-    public void store() throws Exception {
+    public void rename(String name, String newName) throws Exception {
 
-        PenroseClient client = project.getClient();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
-/*
-        ConnectionConfigManager connectionConfigManager = partitionConfig.getConnectionConfigManager();
-        if (!origConnectionConfig.getName().equals(connectionConfig.getName())) {
 
-            connectionConfigManager.renameConnectionConfig(origConnectionConfig, connectionConfig.getName());
+        connectionManagerClient.renameConnection(name, newName);
+        partitionClient.store();
 
-            for (SourceConfig sourceConfig : partitionConfig.getSourceConfigManager().getSourceConfigManager()) {
-                if (!sourceConfig.getConnectionName().equals(origConnectionConfig.getName())) continue;
-                sourceConfig.setConnectionName(connectionConfig.getName());
-            }
-        }
+        connectionConfig.setName(newName);
 
-        connectionConfigManager.modifyConnectionConfig(connectionConfig.getName(), connectionConfig);
-        project.save(partitionConfig, connectionConfigManager);
-*/
-        connectionManagerClient.updateConnection(origConnectionName, connectionConfig);
+        setPartName(partitionName+"."+newName);
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
+    }
+
+    public void store() throws Exception {
+
+        PenroseClient client = server.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+
+        connectionManagerClient.updateConnection(connectionConfig);
         partitionClient.store();
 
         setPartName(partitionName+"."+connectionConfig.getName());
@@ -136,12 +140,12 @@ public abstract class ConnectionEditor extends FormEditor {
     public void checkDirty() {
         try {
             dirty = false;
-
+/*
             if (!origConnectionConfig.equals(connectionConfig)) {
                 dirty = true;
                 return;
             }
-
+*/
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);

@@ -18,9 +18,7 @@
 package org.safehaus.penrose.studio.ldap.connection.editor;
 
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditor;
-import org.safehaus.penrose.studio.ldap.connection.JNDIConnectionPropertiesPage;
-import org.safehaus.penrose.studio.ldap.connection.editor.LDAPConnectionBrowserPage;
-import org.safehaus.penrose.studio.ldap.connection.editor.LDAPConnectionSchemaPage;
+import org.safehaus.penrose.studio.connection.editor.ConnectionParametersPage;
 
 /**
  * @author Endi S. Dewata
@@ -29,18 +27,10 @@ public class LDAPConnectionEditor extends ConnectionEditor {
 
     public void addPages() {
         try {
-            addPage(new JNDIConnectionPropertiesPage(this));
-
-            //PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            //PenroseStudioWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
-            //PenroseStudioWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
-            //PenroseStudioActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
-
-            //if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
-
-                addPage(new LDAPConnectionBrowserPage(this));
-                addPage(new LDAPConnectionSchemaPage(this));
-            //}
+            addPage(new LDAPConnectionPropertiesPage(this));
+            addPage(new ConnectionParametersPage(this));
+            addPage(new LDAPConnectionBrowserPage(this));
+            addPage(new LDAPConnectionSchemaPage(this));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

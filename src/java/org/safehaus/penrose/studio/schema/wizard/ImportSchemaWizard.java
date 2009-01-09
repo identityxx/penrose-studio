@@ -23,7 +23,7 @@ import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.schema.SchemaManagerClient;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.SchemaReader;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 import java.io.File;
 
@@ -34,12 +34,12 @@ public class ImportSchemaWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Project project;
+    private Server project;
 
     public SchemaNameWizardPage namePage = new SchemaNameWizardPage();
     public SchemaFileWizardPage filePage = new SchemaFileWizardPage();
 
-    public ImportSchemaWizard(Project project) {
+    public ImportSchemaWizard(Server project) {
         setWindowTitle("Import Schema");
 
         this.project = project;
@@ -81,11 +81,11 @@ public class ImportSchemaWizard extends Wizard {
         return true;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 }

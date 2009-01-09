@@ -133,12 +133,10 @@ public class NISDomainsPage extends FormPage {
 
                     if (dialog.open() == Window.CANCEL) return;
 
-                    FederationRepositoryConfig domain = wizard.getRepository();
+                    FederationRepositoryConfig repositoryConfig = wizard.getRepository();
 
-                    federationClient.addRepository(domain);
+                    federationClient.addRepository(repositoryConfig);
                     federationClient.store();
-
-                    federationClient.createPartition(domain.getName());
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
@@ -179,6 +177,7 @@ public class NISDomainsPage extends FormPage {
                     if (action == NISUserDialog.CANCEL) return;
 */
                     federationClient.updateRepository(domain);
+                    federationClient.store();
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
@@ -216,7 +215,6 @@ public class NISDomainsPage extends FormPage {
                         FederationRepositoryConfig repository = (FederationRepositoryConfig)ti.getData();
 
                         try {
-                            federationClient.removePartition(repository.getName());
                             federationClient.removeRepository(repository.getName());
                             federationClient.store();
 

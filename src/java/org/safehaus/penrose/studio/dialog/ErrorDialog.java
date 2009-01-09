@@ -12,20 +12,20 @@ import java.io.PrintWriter;
  */
 public class ErrorDialog {
 
-    public static void open(Exception e) {
-        open("ERROR", e);
+    public static void open(Throwable t) {
+        open("ERROR", t);
     }
     
     public static void open(String message) {
         open("ERROR", message);
     }
 
-    public static void open(String title, Exception e) {
+    public static void open(String title, Throwable t) {
 
         StringWriter sw = new StringWriter();
 
         PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
+        t.printStackTrace(pw);
 
         String message = sw.toString();
         if (message.length() > 500) {

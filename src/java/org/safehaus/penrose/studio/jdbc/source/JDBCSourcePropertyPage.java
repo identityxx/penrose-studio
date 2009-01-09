@@ -123,7 +123,7 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
 		connectionNameCombo.setLayoutData(gd);
 
         try {
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
             ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
@@ -264,7 +264,7 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
                     FieldConfig fieldConfig = (FieldConfig)item.getData();
                     String oldName = fieldConfig.getName();
 
-                    PenroseClient client = project.getClient();
+                    PenroseClient client = server.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
                     ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
@@ -357,7 +357,7 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
                 try {
                     FieldConfig fieldDefinition = new FieldConfig();
 
-                    PenroseClient client = project.getClient();
+                    PenroseClient client = server.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
                     ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
@@ -410,7 +410,7 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
                     FieldConfig fieldDefinition = (FieldConfig)item.getData();
                     String oldName = fieldDefinition.getName();
 
-                    PenroseClient client = project.getClient();
+                    PenroseClient client = server.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
                     ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();

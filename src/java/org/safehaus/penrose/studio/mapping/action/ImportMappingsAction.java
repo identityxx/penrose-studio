@@ -28,7 +28,7 @@ import org.safehaus.penrose.mapping.MappingReader;
 import org.safehaus.penrose.mapping.MappingManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.mapping.MappingsNode;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.ServersView;
 
 import java.io.File;
@@ -49,7 +49,7 @@ public class ImportMappingsAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Project project = node.getProjectNode().getProject();
+            Server project = node.getProjectNode().getServer();
 
             FileDialog dialog = new FileDialog(serversView.getSite().getShell(), SWT.OPEN);
             dialog.setText("Import Mappings");

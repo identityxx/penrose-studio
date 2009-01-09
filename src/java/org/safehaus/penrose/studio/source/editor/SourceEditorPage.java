@@ -6,7 +6,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.IManagedForm;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi Sukma Dewata
@@ -19,7 +19,7 @@ public class SourceEditorPage extends FormPage {
 
     protected SourceEditor editor;
 
-    protected Project project;
+    protected Server server;
     protected String partitionName;
     protected SourceConfig sourceConfig;
 
@@ -28,7 +28,7 @@ public class SourceEditorPage extends FormPage {
 
         this.editor = editor;
 
-        project = editor.getProject();
+        server = editor.getProject();
         partitionName = editor.getPartitionName();
         sourceConfig = editor.getSourceConfig();
     }
@@ -65,12 +65,12 @@ public class SourceEditorPage extends FormPage {
         this.partitionName = partitionName;
     }
 
-    public Project getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public SourceConfig getSourceConfig() {

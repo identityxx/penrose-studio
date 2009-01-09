@@ -5,14 +5,14 @@ import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
  */
 public class NISFilesEditorInput implements IEditorInput {
 
-    private Project project;
+    private Server project;
     private NISRepositoryClient nisFederation;
     private FederationRepositoryConfig domain;
 
@@ -82,11 +82,11 @@ public class NISFilesEditorInput implements IEditorInput {
         this.nisFederation = nisFederation;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 }

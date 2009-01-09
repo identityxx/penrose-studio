@@ -17,7 +17,7 @@ import org.safehaus.penrose.federation.*;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISHostDialog;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISFilesEditor;
 import org.safehaus.penrose.studio.nis.dialog.NISUserDialog;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.module.ModuleClient;
 import org.safehaus.penrose.module.ModuleManagerClient;
@@ -43,7 +43,7 @@ public class NISHostsPage extends FormPage {
 
     NISFilesEditor editor;
 
-    Project project;
+    Server project;
     NISRepositoryClient nisFederation;
     FederationRepositoryConfig domain;
 

@@ -39,7 +39,7 @@ public class LoggerNode extends Node {
     ServersView view;
     LoggerConfig loggerConfig;
 
-    public LoggerNode(ServersView view, String name, Image image, Object object, Object parent) {
+    public LoggerNode(ServersView view, String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
         this.view = view;
         this.loggerConfig = (LoggerConfig)object;

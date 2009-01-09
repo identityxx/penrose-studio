@@ -22,7 +22,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.partition.wizard.CreatePartitionWizard;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 
 public class NewPartitionAction extends Action {
@@ -37,10 +37,10 @@ public class NewPartitionAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            ProjectNode projectNode = serversView.getSelectedProjectNode();
+            ServerNode projectNode = serversView.getSelectedProjectNode();
             PartitionsNode partitionsNode = projectNode.getPartitionsNode();
 
-            CreatePartitionWizard wizard = new CreatePartitionWizard(projectNode.getProject(), partitionsNode);
+            CreatePartitionWizard wizard = new CreatePartitionWizard(projectNode.getServer(), partitionsNode);
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
             dialog.open();

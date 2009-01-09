@@ -31,8 +31,6 @@ import org.eclipse.swt.SWT;
 import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.project.ProjectConfig;
-import org.safehaus.penrose.studio.project.ProjectNode;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.tree.Node;
 
@@ -81,7 +79,7 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
     public final static String LOGGER            = "Logger";
 
     ServersContentProvider contentProvider;
-    private TreeViewer treeViewer;
+    TreeViewer treeViewer;
 
     Object clipboard;
 
@@ -232,7 +230,7 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
         this.treeViewer = treeViewer;
     }
 
-    public void addProjectConfig(ProjectConfig projectConfig) {
+    public void addProjectConfig(ServerConfig projectConfig) {
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.getApplicationConfig().addProject(projectConfig);
         penroseStudio.saveApplicationConfig();
@@ -248,15 +246,15 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
         contentProvider.removeProjectConfig(name);
     }
 
-    public ProjectNode getSelectedProjectNode() {
+    public ServerNode getSelectedProjectNode() {
         IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
         if (selection == null) return null;
 
         Node node = (Node)selection.getFirstElement();
 
         while (node != null) {
-            if (node instanceof ProjectNode) return (ProjectNode)node;
-            node = (Node)node.getParent();
+            if (node instanceof ServerNode) return (ServerNode)node;
+            node = node.getParent();
         }
 
         return null;

@@ -21,14 +21,14 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.service.ServiceConfig;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
  */
 public class ServiceEditorInput implements IEditorInput {
 
-    private Project project;
+    private Server project;
     private ServiceConfig serviceConfig;
 
     public ServiceEditorInput() {
@@ -89,11 +89,11 @@ public class ServiceEditorInput implements IEditorInput {
         this.serviceConfig = serviceConfig;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 }

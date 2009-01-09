@@ -34,6 +34,9 @@ public class ConnectionNamePage extends WizardPage implements ModifyListener {
 
     Text nameText;
 
+    private String connectionName;
+    private String description;
+
     public ConnectionNamePage() {
         super(NAME);
         setDescription("Enter the name of the connection.");
@@ -55,6 +58,9 @@ public class ConnectionNamePage extends WizardPage implements ModifyListener {
 
         nameText = new Text(composite, SWT.BORDER);
         nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        if (connectionName != null) nameText.setText(connectionName);
+
         nameText.addModifyListener(this);
 
         setPageComplete(validatePage());
@@ -71,5 +77,17 @@ public class ConnectionNamePage extends WizardPage implements ModifyListener {
 
     public void modifyText(ModifyEvent event) {
         setPageComplete(validatePage());
+    }
+
+    public void setConnectionName(String connectionName) {
+        this.connectionName = connectionName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

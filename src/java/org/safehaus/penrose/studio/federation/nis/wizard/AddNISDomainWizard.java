@@ -84,6 +84,7 @@ public class AddNISDomainWizard extends Wizard {
         try {
             repository.setName(repositoryPage.getRepositoryName());
 
+            repository.setType("NIS");
             repository.setParameter(NISDomain.SERVER, connectionPage.getServer());
             repository.setParameter(NISDomain.DOMAIN, connectionPage.getDomain());
 /*

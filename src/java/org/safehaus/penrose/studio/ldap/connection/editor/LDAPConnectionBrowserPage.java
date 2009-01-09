@@ -38,7 +38,7 @@ import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.SchemaUtil;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.ldap.connection.JNDISourceWizard;
+import org.safehaus.penrose.studio.ldap.connection.wizard.LDAPSourceWizard;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
@@ -55,7 +55,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
     Schema schema;
 
     public LDAPConnectionBrowserPage(LDAPConnectionEditor editor) {
-        super(editor, "BROWSER", "  Browser  ");
+        super(editor, "BROWSER", "Browser");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -159,7 +159,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
 
                     Collection<String> attributeNames = getAttributeNames(schema, entry);
 
-                    JNDISourceWizard wizard = new JNDISourceWizard(
+                    LDAPSourceWizard wizard = new LDAPSourceWizard(
                             client,
                             partitionName,
                             connectionConfig,
@@ -168,7 +168,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
                             "OBJECT",
                             attributeNames
                     );
-                    wizard.setProject(editor.getProject());
+                    wizard.setProject(editor.getServer());
 
                     WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
@@ -198,7 +198,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
                     TreeItem treeItem = tree.getSelection()[0];
                     DN baseDn = (DN)treeItem.getData();
 
-                    JNDISourceWizard wizard = new JNDISourceWizard(
+                    LDAPSourceWizard wizard = new LDAPSourceWizard(
                             client,
                             partitionName,
                             connectionConfig,
@@ -207,7 +207,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
                             "ONELEVEL",
                             new ArrayList<String>()
                     );
-                    wizard.setProject(editor.getProject());
+                    wizard.setProject(editor.getServer());
 
                     WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
@@ -264,7 +264,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
 
                     Collection<String> attributeNames = getAttributeNames(schema, entry);
 
-                    JNDISourceWizard wizard = new JNDISourceWizard(
+                    LDAPSourceWizard wizard = new LDAPSourceWizard(
                             client,
                             partitionName,
                             connectionConfig,
@@ -273,7 +273,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
                             "ONELEVEL",
                             attributeNames
                     );
-                    wizard.setProject(editor.getProject());
+                    wizard.setProject(editor.getServer());
 
                     WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);

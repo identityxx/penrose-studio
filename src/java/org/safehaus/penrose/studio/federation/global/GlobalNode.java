@@ -5,8 +5,8 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.federation.FederationDomainNode;
-import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.federation.FederationClient;
 
@@ -19,7 +19,7 @@ public class GlobalNode extends Node {
 
     FederationDomainNode federationDomainNode;
 
-    Project project;
+    Server project;
     FederationClient federationClient;
 
     public GlobalNode(FederationDomainNode federationDomainNode) throws Exception {
@@ -27,8 +27,8 @@ public class GlobalNode extends Node {
 
         this.federationDomainNode = federationDomainNode;
 
-        project = federationDomainNode.getProject();
-        setFederationClient(federationDomainNode.getFederationClient());
+        project = federationDomainNode.getServer();
+        federationClient = federationDomainNode.getFederationClient();
 
         ConflictDetectionNode conflictDetectionNode = new ConflictDetectionNode(
                 "Conflict Detection",
@@ -57,11 +57,11 @@ public class GlobalNode extends Node {
     public void open() throws Exception {
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

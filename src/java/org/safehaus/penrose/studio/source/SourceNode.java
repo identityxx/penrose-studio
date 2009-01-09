@@ -39,8 +39,8 @@ import org.safehaus.penrose.studio.partition.PartitionNode;
 import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.plugin.Plugin;
 import org.safehaus.penrose.studio.plugin.PluginManager;
-import org.safehaus.penrose.studio.project.Project;
-import org.safehaus.penrose.studio.project.ProjectNode;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.source.editor.SourceEditorInput;
 import org.safehaus.penrose.studio.tree.Node;
@@ -55,7 +55,7 @@ public class SourceNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     protected ServersView view;
-    protected ProjectNode projectNode;
+    protected ServerNode projectNode;
     protected PartitionsNode partitionsNode;
     protected PartitionNode partitionNode;
     protected SourcesNode sourcesNode;
@@ -64,7 +64,7 @@ public class SourceNode extends Node {
     private String adapterName;
     private String sourceName;
 
-    public SourceNode(String name, Image image, Object object, Object parent) {
+    public SourceNode(String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
         sourcesNode = (SourcesNode)parent;
         partitionNode = sourcesNode.getPartitionNode();
@@ -125,7 +125,7 @@ public class SourceNode extends Node {
         Plugin plugin = pluginManager.getPlugin(adapterName);
 
         SourceEditorInput ei = plugin.createSourceEditorInput();
-        ei.setProject(projectNode.getProject());
+        ei.setProject(projectNode.getServer());
         ei.setPartitionName(partitionName);
         ei.setSourceName(sourceName);
 
@@ -145,7 +145,7 @@ public class SourceNode extends Node {
 
         if (!confirm) return;
 
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
@@ -169,7 +169,7 @@ public class SourceNode extends Node {
 
     public void copy() throws Exception {
 
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
@@ -185,7 +185,7 @@ public class SourceNode extends Node {
 
         if (!(newObject instanceof SourceConfig)) return;
 
-        Project project = projectNode.getProject();
+        Server project = projectNode.getServer();
 
         SourceConfig newSourceConfig = (SourceConfig)((SourceConfig)newObject).clone();
         view.setClipboard(null);

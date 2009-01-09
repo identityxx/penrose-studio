@@ -26,7 +26,7 @@ import org.eclipse.swt.SWT;
 import org.safehaus.penrose.studio.preview.action.RestartAction;
 import org.safehaus.penrose.studio.welcome.action.WelcomeAction;
 import org.safehaus.penrose.studio.welcome.action.AboutAction;
-import org.safehaus.penrose.studio.server.action.ServersAction;
+import org.safehaus.penrose.studio.server.action.*;
 import org.safehaus.penrose.studio.validation.ValidationAction;
 import org.safehaus.penrose.studio.console.ConsoleAction;
 import org.safehaus.penrose.studio.partition.action.NewPartitionAction;
@@ -34,7 +34,6 @@ import org.safehaus.penrose.studio.partition.action.ImportPartitionAction;
 import org.safehaus.penrose.studio.partition.action.NewLDAPSnapshotPartitionAction;
 import org.safehaus.penrose.studio.partition.action.NewLDAPProxyPartitionAction;
 import org.safehaus.penrose.studio.service.action.NewServiceAction;
-import org.safehaus.penrose.studio.project.action.*;
 import org.safehaus.penrose.studio.schema.action.ImportSchemaAction;
 import org.safehaus.penrose.studio.schema.action.NewSchemaAction;
 import org.safehaus.penrose.studio.browser.action.BrowserAction;
@@ -44,8 +43,8 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
 
     Logger log = Logger.getLogger(getClass());
 
-    NewProjectAction newProjectAction;
-    DeleteProjectAction deleteProjectAction;
+    CreateServerAction newProjectAction;
+    DeleteServerAction deleteProjectAction;
 
     ConnectAction connectAction;
     DisconnectAction disconnectAction;
@@ -88,10 +87,10 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
         super.makeActions(window);
 
         try {
-            newProjectAction = new NewProjectAction();
+            newProjectAction = new CreateServerAction();
             register(newProjectAction);
 
-            deleteProjectAction = new DeleteProjectAction();
+            deleteProjectAction = new DeleteServerAction();
             register(deleteProjectAction);
 
             connectAction = new ConnectAction();

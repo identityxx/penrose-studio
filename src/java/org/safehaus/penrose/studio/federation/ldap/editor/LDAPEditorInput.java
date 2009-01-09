@@ -3,7 +3,7 @@ package org.safehaus.penrose.studio.federation.ldap.editor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.federation.FederationClient;
 
 /**
@@ -11,7 +11,7 @@ import org.safehaus.penrose.federation.FederationClient;
  */
 public class LDAPEditorInput implements IEditorInput {
 
-    Project project;
+    Server project;
     FederationClient federationClient;
 
     public LDAPEditorInput() {
@@ -70,11 +70,11 @@ public class LDAPEditorInput implements IEditorInput {
         this.federationClient = federationClient;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 }

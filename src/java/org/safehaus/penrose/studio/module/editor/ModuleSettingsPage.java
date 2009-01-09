@@ -39,8 +39,8 @@ public class ModuleSettingsPage extends FormPage {
     Logger log = Logger.getLogger(getClass());
 
     FormToolkit toolkit;
-    Table parametersTable;
 
+    Table parametersTable;
     Table mappingsTable;
 
     boolean dirty;

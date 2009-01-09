@@ -2,10 +2,10 @@ package org.safehaus.penrose.studio.federation.nis.domain;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.*;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISOwnershipNode;
 import org.safehaus.penrose.studio.federation.nis.linking.NISLinkingNode;
 import org.safehaus.penrose.studio.federation.nis.synchronization.NISSynchronizationNode;
-import org.safehaus.penrose.studio.project.Project;
 import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.studio.federation.nis.wizard.EditNISDomainWizard;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
@@ -24,12 +24,12 @@ import org.eclipse.ui.IWorkbenchPage;
  */
 public class NISDomainNode extends Node {
 
-    Project project;
+    Server project;
     FederationClient federationClient;
     NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig repositoryConfig;
 
-    public NISDomainNode(String name, Object parent) {
+    public NISDomainNode(String name, Node parent) {
         super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, parent);
     }
 
@@ -121,6 +121,7 @@ public class NISDomainNode extends Node {
         if (dialog.open() == Window.CANCEL) return;
 
         federationClient.updateRepository(repositoryConfig);
+        federationClient.store();
     }
 
     public FederationRepositoryConfig getRepositoryConfig() {
@@ -131,11 +132,11 @@ public class NISDomainNode extends Node {
         this.repositoryConfig = repositoryConfig;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

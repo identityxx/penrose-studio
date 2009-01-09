@@ -27,8 +27,8 @@ import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.federation.ldap.wizard.AddLDAPRepositoryWizard;
 import org.safehaus.penrose.studio.federation.ldap.wizard.EditLDAPRepositoryWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.project.Project;
 
 /**
  * @author Endi S. Dewata
@@ -41,7 +41,7 @@ public class LDAPRepositoriesPage extends FormPage {
 
     LDAPEditor editor;
     FederationClient federationClient;
-    Project project;
+    Server project;
 
     Table table;
 
@@ -143,8 +143,6 @@ public class LDAPRepositoriesPage extends FormPage {
                     federationClient.addRepository(repository);
                     federationClient.store();
 
-                    federationClient.createPartition(repository.getName());
-
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
 
@@ -179,6 +177,7 @@ public class LDAPRepositoriesPage extends FormPage {
                     if (dialog.open() == Window.CANCEL) return;
 
                     federationClient.updateRepository(repositoryConfig);
+                    federationClient.store();
 
                     refresh();
 
@@ -212,9 +211,13 @@ public class LDAPRepositoriesPage extends FormPage {
                     for (TableItem ti : items) {
                         FederationRepositoryConfig repository = (FederationRepositoryConfig)ti.getData();
 
-                        federationClient.removePartition(repository.getName());
-                        federationClient.removeRepository(repository.getName());
-                        federationClient.store();
+                        try {
+                            federationClient.removeRepository(repository.getName());
+                            federationClient.store();
+
+                        } catch (Exception e) {
+                            log.error(e.getMessage(), e);
+                        }
                     }
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();

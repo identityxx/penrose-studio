@@ -40,8 +40,8 @@ import org.safehaus.penrose.PenroseConfig;
 import org.safehaus.penrose.session.Session;
 import org.safehaus.penrose.session.SessionManager;
 import org.safehaus.penrose.session.SessionContext;
-import org.safehaus.penrose.studio.project.ProjectConfig;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.ServerConfig;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.io.File;
@@ -50,8 +50,8 @@ public class PreviewEditor extends EditorPart {
 
     private Logger log = Logger.getLogger(getClass());
 
-    Project project;
-    ProjectConfig projectConfig;
+    Server project;
+    ServerConfig projectConfig;
     PenroseConfig penroseConfig;
     File workDir;
 

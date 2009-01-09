@@ -7,7 +7,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
@@ -19,17 +19,19 @@ public class ConnectionEditorPage extends FormPage {
     protected FormToolkit toolkit;
 
     protected ConnectionEditor editor;
+    String title;
 
-    protected Project project;
+    protected Server server;
     protected String partitionName;
     protected ConnectionConfig connectionConfig;
 
-    public ConnectionEditorPage(ConnectionEditor editor, String name, String label) {
-        super(editor, name, label);
+    public ConnectionEditorPage(ConnectionEditor editor, String name, String title) {
+        super(editor, name, "  "+title+"  ");
 
         this.editor = editor;
+        this.title = title;
 
-        project = editor.getProject();
+        server = editor.getServer();
         partitionName = editor.getPartitionName();
         connectionConfig = editor.getConnectionConfig();
     }
@@ -39,7 +41,7 @@ public class ConnectionEditorPage extends FormPage {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText(getTitle());
+        form.setText(title);
     }
 
     public void setActive(boolean b) {
@@ -74,12 +76,12 @@ public class ConnectionEditorPage extends FormPage {
         this.connectionConfig = connectionConfig;
     }
 
-    public Project getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public void checkDirty() {

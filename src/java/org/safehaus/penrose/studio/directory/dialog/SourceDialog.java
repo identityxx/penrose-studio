@@ -45,7 +45,7 @@ public class SourceDialog extends Dialog {
 
     Map<String,TreeItem> items = new HashMap<String,TreeItem>();
 
-    EntrySourceConfig sourceMapping;
+    EntrySourceConfig entrySourceConfig;
 
     Combo searchCombo;
     Combo bindCombo;
@@ -241,16 +241,16 @@ public class SourceDialog extends Dialog {
 
                 SourceConfig sourceConfig = (SourceConfig)item.getData();
 
-                sourceMapping.setAlias(aliasText.getText());
-                sourceMapping.setSourceName(sourceConfig.getName());
+                entrySourceConfig.setAlias(aliasText.getText());
+                entrySourceConfig.setSourceName(sourceConfig.getName());
 
-                sourceMapping.setSearch("".equals(searchCombo.getText()) ? null : searchCombo.getText());
-                sourceMapping.setBind("".equals(bindCombo.getText()) ? null : bindCombo.getText());
+                entrySourceConfig.setSearch("".equals(searchCombo.getText()) ? null : searchCombo.getText());
+                entrySourceConfig.setBind("".equals(bindCombo.getText()) ? null : bindCombo.getText());
 
-                sourceMapping.setAdd("".equals(addCombo.getText()) ? null : addCombo.getText());
-                sourceMapping.setDelete("".equals(deleteCombo.getText()) ? null : deleteCombo.getText());
-                sourceMapping.setModify("".equals(modifyCombo.getText()) ? null : modifyCombo.getText());
-                sourceMapping.setModrdn("".equals(modrdnCombo.getText()) ? null : modrdnCombo.getText());
+                entrySourceConfig.setAdd("".equals(addCombo.getText()) ? null : addCombo.getText());
+                entrySourceConfig.setDelete("".equals(deleteCombo.getText()) ? null : deleteCombo.getText());
+                entrySourceConfig.setModify("".equals(modifyCombo.getText()) ? null : modifyCombo.getText());
+                entrySourceConfig.setModrdn("".equals(modrdnCombo.getText()) ? null : modrdnCombo.getText());
 
                 saved = true;
                 shell.close();
@@ -313,14 +313,14 @@ public class SourceDialog extends Dialog {
         this.saved = saved;
     }
 
-    public EntrySourceConfig getSourceMapping() {
-        return sourceMapping;
+    public EntrySourceConfig getSourceConfig() {
+        return entrySourceConfig;
     }
 
-    public void setSourceMapping(EntrySourceConfig source) {
-        this.sourceMapping = source;
+    public void setSourceConfig(EntrySourceConfig source) {
+        this.entrySourceConfig = source;
 
-        TreeItem item = (TreeItem)items.get(source.getSourceName());
+        TreeItem item = items.get(source.getSourceName());
         if (item != null) {
             sourceTree.setSelection(new TreeItem[] { item });
         }

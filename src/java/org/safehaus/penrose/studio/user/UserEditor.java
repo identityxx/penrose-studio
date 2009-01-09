@@ -26,7 +26,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.MultiPageEditorPart;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.user.UserConfig;
 
 /**
@@ -36,7 +36,7 @@ public class UserEditor extends MultiPageEditorPart {
 
     Logger log = Logger.getLogger(getClass());
 
-    Project project;
+    Server project;
     UserConfig origUserConfig;
     UserConfig userConfig;
 

@@ -21,14 +21,14 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.user.UserConfig;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
  */
 public class UserEditorInput implements IEditorInput {
 
-    private Project project;
+    private Server project;
     private UserConfig userConfig;
 
     public UserEditorInput() {
@@ -80,11 +80,11 @@ public class UserEditorInput implements IEditorInput {
         return true;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

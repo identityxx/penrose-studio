@@ -22,7 +22,7 @@ import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
 import org.safehaus.penrose.module.ModuleManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
@@ -38,7 +38,7 @@ public class ModuleWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    Project project;
+    Server project;
     String partitionName;
 
     public ModulePropertyWizardPage propertyPage = new ModulePropertyWizardPage();
@@ -114,11 +114,11 @@ public class ModuleWizard extends Wizard {
         return true;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

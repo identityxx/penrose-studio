@@ -6,14 +6,14 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.FederationClient;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
  */
 public class NISDomainEditorInput implements IEditorInput {
 
-    private Project project;
+    private Server project;
     private FederationClient federationClient;
     private NISRepositoryClient nisFederationClient;
     private FederationRepositoryConfig repositoryConfig;
@@ -84,11 +84,11 @@ public class NISDomainEditorInput implements IEditorInput {
         this.nisFederationClient = nisFederationClient;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 

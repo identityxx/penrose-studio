@@ -8,13 +8,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.federation.FederationClient;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 public class NISEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    public Project project;
+    public Server project;
     public FederationClient federationClient;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -51,11 +51,11 @@ public class NISEditor extends FormEditor {
         return false;
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 }

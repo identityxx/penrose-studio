@@ -37,7 +37,7 @@ public class AttributeTypeNode extends Node {
 
     ServersView view;
     
-    public AttributeTypeNode(ServersView view, String name, Image image, Object object, Object parent) {
+    public AttributeTypeNode(ServersView view, String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
         this.view = view;
     }

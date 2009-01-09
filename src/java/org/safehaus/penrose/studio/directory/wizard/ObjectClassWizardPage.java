@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.schema.SchemaManagerClient;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,14 +54,14 @@ public class ObjectClassWizardPage extends WizardPage {
     Button addAllButton;
     Button removeAllButton;
 
-    Project project;
+    Server server;
     Collection<String> availableOCs = new TreeSet<String>();
     Collection<String> selectedOCs = new TreeSet<String>();
 
-    public ObjectClassWizardPage(Project project) {
+    public ObjectClassWizardPage(Server server) {
         super(NAME);
 
-        this.project = project;
+        this.server = server;
         setDescription("Select object classes.");
     }
 
@@ -87,7 +87,7 @@ public class ObjectClassWizardPage extends WizardPage {
                 try {
                     if (availableTable.getSelectionCount() == 0) return;
 
-                    PenroseClient client = project.getClient();
+                    PenroseClient client = server.getClient();
                     SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
 
                     TableItem items[] = availableTable.getSelection();
@@ -116,7 +116,7 @@ public class ObjectClassWizardPage extends WizardPage {
                 try {
                     if (selectedTable.getSelectionCount() == 0) return;
 
-                    PenroseClient client = project.getClient();
+                    PenroseClient client = server.getClient();
                     SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
 
                     TableItem items[] = selectedTable.getSelection();
@@ -196,7 +196,7 @@ public class ObjectClassWizardPage extends WizardPage {
 
     public void init() {
         try {
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
             Collection<String> ocNames = schemaManagerClient.getObjectClassNames();
 

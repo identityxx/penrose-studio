@@ -24,7 +24,7 @@ public class AppendersNode extends Node {
 
     ServersView view;
 
-    public AppendersNode(ServersView view, String name, Image image, Object object, Object parent) {
+    public AppendersNode(ServersView view, String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
         this.view = view;
     }

@@ -19,9 +19,9 @@ package org.safehaus.penrose.studio.partition.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.ldap.connection.LDAPConnectionWizardPage;
-import org.safehaus.penrose.studio.ldap.connection.JNDIConnectionParametersWizardPage;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.config.wizard.ParametersWizardPage;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.ldap.connection.wizard.LDAPConnectionSettingsWizardPage;
 import org.safehaus.penrose.studio.util.SnapshotUtil;
 import org.safehaus.penrose.partition.*;
 import org.safehaus.penrose.ldap.LDAPClient;
@@ -38,11 +38,11 @@ public class CreateLDAPSnapshotWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Project project;
+    private Server project;
 
     public PartitionNamePage namePage;
-    public LDAPConnectionWizardPage connectionInfoPage;
-    public JNDIConnectionParametersWizardPage connectionParametersPage;
+    public LDAPConnectionSettingsWizardPage connectionInfoPage;
+    public ParametersWizardPage connectionParametersPage;
 
     public CreateLDAPSnapshotWizard() {
         setWindowTitle("Create LDAP Snapshot");
@@ -53,10 +53,10 @@ public class CreateLDAPSnapshotWizard extends Wizard {
         namePage = new PartitionNamePage();
         addPage(namePage);
 
-        connectionInfoPage = new LDAPConnectionWizardPage();
+        connectionInfoPage = new LDAPConnectionSettingsWizardPage();
         addPage(connectionInfoPage);
 
-        connectionParametersPage = new JNDIConnectionParametersWizardPage();
+        connectionParametersPage = new ParametersWizardPage();
         addPage(connectionParametersPage);
     }
 
@@ -116,11 +116,11 @@ public class CreateLDAPSnapshotWizard extends Wizard {
         }
     }
 
-    public Project getProject() {
+    public Server getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Server project) {
         this.project = project;
     }
 }

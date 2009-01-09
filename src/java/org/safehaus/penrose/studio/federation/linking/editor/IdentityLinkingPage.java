@@ -37,7 +37,7 @@ import org.safehaus.penrose.studio.ldap.dialog.EntryDialog;
 import org.safehaus.penrose.studio.ldap.dialog.AttributeDialog;
 import org.safehaus.penrose.studio.federation.linking.*;
 import org.safehaus.penrose.studio.federation.wizard.BrowserWizard;
-import org.safehaus.penrose.studio.project.Project;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.ad.ActiveDirectory;
 import org.safehaus.penrose.util.BinaryUtil;
 import org.safehaus.penrose.source.SourceClient;
@@ -73,7 +73,7 @@ public class IdentityLinkingPage extends FormPage {
     public Table globalTable;
     public Table globalAttributeTable;
 
-    public Project project;
+    public Server project;
     public FederationRepositoryConfig repository;
     public String localPartition;
     public String globalPartition;
