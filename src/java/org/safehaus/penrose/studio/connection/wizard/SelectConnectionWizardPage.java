@@ -24,7 +24,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.connection.ConnectionClient;
@@ -35,6 +34,8 @@ import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.server.Server;
 
 import javax.naming.Context;
+import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
@@ -48,20 +49,13 @@ public class SelectConnectionWizardPage extends WizardPage {
     Table connectionTable;
     Table infoTable;
 
-    private Server project;
+    Server server;
     String partitionName;
     String adapterType;
+    String connectionName;
 
-    public SelectConnectionWizardPage(String partitionName) {
-        this(partitionName, null);
-    }
-
-    public SelectConnectionWizardPage(String partitionName, String adapterType) {
+    public SelectConnectionWizardPage() {
         super(NAME);
-
-        this.partitionName = partitionName;
-        this.adapterType = adapterType;
-
         setDescription("Select connection.");
     }
 
@@ -79,48 +73,9 @@ public class SelectConnectionWizardPage extends WizardPage {
 
         connectionTable.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                TableItem ti = connectionTable.getSelection()[0];
-                ConnectionConfig connectionConfig = (ConnectionConfig)ti.getData();
-                String adapterName = connectionConfig.getAdapterName();
-                infoTable.removeAll();
-
-                ti = new TableItem(infoTable, SWT.NONE);
-                ti.setText(0, "Adapter:");
-                ti.setText(1, adapterName);
-
-                if ("JDBC".equals(adapterName)) {
-                    ti = new TableItem(infoTable, SWT.NONE);
-                    ti.setText(0, "Driver:");
-                    ti.setText(1, connectionConfig.getParameter("driver"));
-
-                    ti = new TableItem(infoTable, SWT.NONE);
-                    ti.setText(0, "URL:");
-                    ti.setText(1, connectionConfig.getParameter("url"));
-
-                    String username = connectionConfig.getParameter("user");
-                    ti = new TableItem(infoTable, SWT.NONE);
-                    ti.setText(0, "Username:");
-                    ti.setText(1, username == null ? "" : username);
-
-                    ti = new TableItem(infoTable, SWT.NONE);
-                    ti.setText(0, "Password:");
-                    ti.setText(1, "********");
-
-                } else if ("LDAP".equals(adapterName)) {
-                    ti = new TableItem(infoTable, SWT.NONE);
-                    ti.setText(0, "URL:");
-                    ti.setText(1, connectionConfig.getParameter(Context.PROVIDER_URL));
-
-                    String bindDn = connectionConfig.getParameter(Context.SECURITY_PRINCIPAL);
-                    ti = new TableItem(infoTable, SWT.NONE);
-                    ti.setText(0, "Bind DN:");
-                    ti.setText(1, bindDn == null ? "" : bindDn);
-
-                    ti = new TableItem(infoTable, SWT.NONE);
-                    ti.setText(0, "Password:");
-                    ti.setText(1, "********");
-                }
-
+                TableItem item = connectionTable.getSelection()[0];
+                ConnectionConfig connectionConfig = (ConnectionConfig)item.getData();
+                showConnectionInfo(connectionConfig);
                 setPageComplete(validatePage());
             }
         });
@@ -135,81 +90,87 @@ public class SelectConnectionWizardPage extends WizardPage {
         tc = new TableColumn(infoTable, SWT.NONE);
         tc.setWidth(300);
 
-        Composite buttons = new Composite(composite, SWT.NONE);
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalSpan = 2;
-        buttons.setLayoutData(gd);
-        buttons.setLayout(new RowLayout());
-/*
-        Button addButton = new Button(buttons, SWT.PUSH);
-        addButton.setText("Add Connection");
+        for (ConnectionConfig connectionConfig : getConnections()) {
+            TableItem item = new TableItem(connectionTable, SWT.NONE);
+            item.setText(connectionConfig.getName());
+            item.setData(connectionConfig);
 
-        addButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-
-                ConnectionWizard wizard = new ConnectionWizard(partitionName);
-                wizard.setServer(project);
-
-                WizardDialog dialog = new WizardDialog(parent.getShell(), wizard);
-                dialog.setPageSize(600, 300);
-                dialog.open();
-
-                refresh();
-
-                PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                penroseStudio.notifyChangeListeners();
+            if (connectionName != null && connectionName.equals(connectionConfig.getName())) {
+                connectionTable.setSelection(item);
+                showConnectionInfo(connectionConfig);
             }
-        });
+        }
 
-        Button removeButton = new Button(buttons, SWT.PUSH);
-        removeButton.setText("Delete Connection");
+        setPageComplete(validatePage());
+    }
 
-        removeButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                try {
-                    if (connectionTable.getSelectionCount() == 0) return;
+    public void showConnectionInfo(ConnectionConfig connectionConfig) {
 
-                    TableItem ti = connectionTable.getSelection()[0];
-                    ConnectionConfig connectionConfig = (ConnectionConfig)ti.getData();
+        infoTable.removeAll();
 
-                    boolean confirm = MessageDialog.openQuestion(
-                            parent.getShell(),
-                            "Confirmation",
-                            "Remove Connection \""+connectionConfig.getName()+"\"?");
+        String adapterName = connectionConfig.getAdapterName();
 
-                    if (!confirm) return;
+        TableItem item = new TableItem(infoTable, SWT.NONE);
+        item.setText(0, "Adapter:");
+        item.setText(1, adapterName);
 
-                    PenroseClient client = project.getClient();
-                    PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-                    ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+        if ("JDBC".equals(adapterName)) {
+            item = new TableItem(infoTable, SWT.NONE);
+            item.setText(0, "Driver:");
+            item.setText(1, connectionConfig.getParameter("driver"));
 
-                    connectionManagerClient.removeConnection(connectionConfig.getName());
+            item = new TableItem(infoTable, SWT.NONE);
+            item.setText(0, "URL:");
+            item.setText(1, connectionConfig.getParameter("url"));
 
-                    refresh();
+            String username = connectionConfig.getParameter("user");
+            item = new TableItem(infoTable, SWT.NONE);
+            item.setText(0, "Username:");
+            item.setText(1, username == null ? "" : username);
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
-                    
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        });
-*/
-        refresh();
+            item = new TableItem(infoTable, SWT.NONE);
+            item.setText(0, "Password:");
+            item.setText(1, "********");
+
+        } else if ("LDAP".equals(adapterName)) {
+            item = new TableItem(infoTable, SWT.NONE);
+            item.setText(0, "URL:");
+            item.setText(1, connectionConfig.getParameter(Context.PROVIDER_URL));
+
+            String bindDn = connectionConfig.getParameter(Context.SECURITY_PRINCIPAL);
+            item = new TableItem(infoTable, SWT.NONE);
+            item.setText(0, "Bind DN:");
+            item.setText(1, bindDn == null ? "" : bindDn);
+
+            item = new TableItem(infoTable, SWT.NONE);
+            item.setText(0, "Password:");
+            item.setText(1, "********");
+
+        } else if ("NIS".equals(adapterName)) {
+            item = new TableItem(infoTable, SWT.NONE);
+            item.setText(0, "URL:");
+            item.setText(1, connectionConfig.getParameter(Context.PROVIDER_URL));
+        }
+    }
+
+    public void setVisible(boolean b) {
+        super.setVisible(b);
+        if (b) refresh();
     }
 
     public void refresh() {
-        try {
-            connectionTable.removeAll();
-            infoTable.removeAll();
+    }
 
-            PenroseClient client = project.getClient();
+    public Collection<ConnectionConfig> getConnections() {
+
+        Collection<ConnectionConfig> list = new ArrayList<ConnectionConfig>();
+
+        try {
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
             ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
-            
+
             for (String connectionName : connectionManagerClient.getConnectionNames()) {
                 ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(connectionName);
                 ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
@@ -217,14 +178,21 @@ public class SelectConnectionWizardPage extends WizardPage {
                 String adapterName = connectionConfig.getAdapterName();
                 if (adapterType != null && !adapterType.equals(adapterName)) continue;
 
-                TableItem item = new TableItem(connectionTable, SWT.NONE);
-                item.setText(connectionConfig.getName());
-                item.setData(connectionConfig);
+                list.add(connectionConfig);
             }
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+
+        return list;
+    }
+
+    public String getConnectionName() {
+        if (connectionTable.getSelectionCount() == 0) return null;
+
+        TableItem item = connectionTable.getSelection()[0];
+        return item.getText();
     }
 
     public ConnectionConfig getConnectionConfig() {
@@ -238,12 +206,12 @@ public class SelectConnectionWizardPage extends WizardPage {
         return getConnectionConfig() != null;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public String getPartitionName() {
@@ -252,5 +220,17 @@ public class SelectConnectionWizardPage extends WizardPage {
 
     public void setPartitionName(String partitionName) {
         this.partitionName = partitionName;
+    }
+
+    public void setConnectionName(String connectionName) {
+        this.connectionName = connectionName;
+    }
+
+    public String getAdapterType() {
+        return adapterType;
+    }
+
+    public void setAdapterType(String adapterType) {
+        this.adapterType = adapterType;
     }
 }

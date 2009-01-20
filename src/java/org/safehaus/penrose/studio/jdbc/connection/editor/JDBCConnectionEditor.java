@@ -18,19 +18,25 @@
 package org.safehaus.penrose.studio.jdbc.connection.editor;
 
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditor;
-import org.safehaus.penrose.studio.connection.editor.ConnectionParametersPage;
-import org.safehaus.penrose.studio.jdbc.connection.editor.JDBCConnectionPropertiesPage;
-import org.safehaus.penrose.studio.jdbc.connection.editor.JDBCConnectionTablesPage;
+import org.safehaus.penrose.studio.connection.editor.ConnectionPropertiesPage;
+import org.safehaus.penrose.studio.config.editor.ParametersPage;
 
 /**
  * @author Endi S. Dewata
  */
 public class JDBCConnectionEditor extends ConnectionEditor {
 
+    ParametersPage parametersPage;
+
     public void addPages() {
         try {
+            addPage(new ConnectionPropertiesPage(this));
             addPage(new JDBCConnectionPropertiesPage(this));
-            addPage(new ConnectionParametersPage(this));
+
+            parametersPage = new ParametersPage(this, "Connection Editor");
+            parametersPage.setParameters(connectionConfig.getParameters());
+            addPage(parametersPage);
+
             addPage(new JDBCConnectionTablesPage(this));
 
         } catch (Exception e) {

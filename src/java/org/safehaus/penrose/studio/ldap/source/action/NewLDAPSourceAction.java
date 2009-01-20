@@ -23,7 +23,6 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.ldap.source.wizard.LDAPSourceWizard;
-import org.safehaus.penrose.studio.source.wizard.SourceWizard;
 import org.safehaus.penrose.studio.source.SourcesNode;
 import org.apache.log4j.Logger;
 

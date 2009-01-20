@@ -41,7 +41,7 @@ public class ConnectionEditorPage extends FormPage {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText(title);
+        form.setText("Connection Editor");
     }
 
     public void setActive(boolean b) {

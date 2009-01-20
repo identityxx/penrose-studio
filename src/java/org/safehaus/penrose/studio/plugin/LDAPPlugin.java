@@ -1,7 +1,7 @@
 package org.safehaus.penrose.studio.plugin;
 
-import org.safehaus.penrose.studio.ldap.source.LDAPSourceEditorInput;
-import org.safehaus.penrose.studio.ldap.source.LDAPSourceEditor;
+import org.safehaus.penrose.studio.ldap.source.editor.LDAPSourceEditorInput;
+import org.safehaus.penrose.studio.ldap.source.editor.LDAPSourceEditor;
 import org.safehaus.penrose.studio.source.editor.SourceEditorInput;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorInput;
 import org.safehaus.penrose.studio.ldap.connection.editor.LDAPConnectionEditorInput;

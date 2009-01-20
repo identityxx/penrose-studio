@@ -51,8 +51,10 @@ public class CreateRootDSEProxyWizard extends Wizard {
 
     public void addPages() {
 
-        connectionPage = new SelectConnectionWizardPage(partitionName);
-        connectionPage.setProject(project);
+        connectionPage = new SelectConnectionWizardPage();
+        connectionPage.setServer(project);
+        connectionPage.setPartitionName(partitionName);
+        connectionPage.setAdapterType("LDAP");
 
         addPage(connectionPage);
     }

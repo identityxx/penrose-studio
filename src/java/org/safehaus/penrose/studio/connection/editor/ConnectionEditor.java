@@ -116,8 +116,8 @@ public abstract class ConnectionEditor extends FormEditor {
         PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-        ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
 
+        ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
         connectionManagerClient.updateConnection(connectionConfig);
         partitionClient.store();
 

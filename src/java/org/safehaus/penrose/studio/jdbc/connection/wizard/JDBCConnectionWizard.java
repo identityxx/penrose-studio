@@ -23,7 +23,7 @@ import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.connection.wizard.ConnectionNamePage;
+import org.safehaus.penrose.studio.connection.wizard.ConnectionPropertiesWizardPage;
 import org.safehaus.penrose.studio.driver.Driver;
 import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.client.PenroseClient;
@@ -44,7 +44,7 @@ public class JDBCConnectionWizard extends Wizard {
     private String partitionName;
     private ConnectionConfig connectionConfig;
 
-    public ConnectionNamePage namePage;
+    public ConnectionPropertiesWizardPage namePage;
     public JDBCDriverWizardPage driverPage;
     public JDBCConnectionSettingsWizardPage settingsPage;
 
@@ -54,7 +54,7 @@ public class JDBCConnectionWizard extends Wizard {
 
     public void addPages() {
 
-        namePage = new ConnectionNamePage();
+        namePage = new ConnectionPropertiesWizardPage();
 
         addPage(namePage);
 
@@ -89,7 +89,7 @@ public class JDBCConnectionWizard extends Wizard {
     public boolean performFinish() {
         try {
             connectionConfig = new ConnectionConfig();
-            connectionConfig.setName(namePage.getConnectionName());
+            connectionConfig.setName(namePage.getName());
 
             connectionConfig.setAdapterName("JDBC");
 

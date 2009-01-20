@@ -183,7 +183,7 @@ public class ValidationView extends ViewPart {
 
             EntryEditorInput ei = new EntryEditorInput();
             ei.setPartitionName(partitionConfig.getName());
-            ei.setEntryId(entryConfig.getId());
+            ei.setEntryId(entryConfig.getName());
 
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();

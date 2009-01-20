@@ -49,7 +49,7 @@ public class EntryWizard extends Wizard {
     private EntryConfig entryConfig;
 
     public EntryDNWizardPage rdnPage;
-    public EntryClassWizardPage classPage;
+    public EntryPropertiesWizardPage classPage;
     public ObjectClassWizardPage ocPage;
     public AttributeWizardPage attributePage;
     public EntrySourceWizardPage sourcesPage;
@@ -68,7 +68,7 @@ public class EntryWizard extends Wizard {
 
         addPage(rdnPage);
 
-        classPage = new EntryClassWizardPage();
+        classPage = new EntryPropertiesWizardPage();
         classPage.setDescription("Enter the class name of the entry.");
         classPage.setClassName(entryConfig.getEntryClass());
 

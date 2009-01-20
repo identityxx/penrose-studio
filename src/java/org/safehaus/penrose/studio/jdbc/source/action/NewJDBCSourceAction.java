@@ -23,7 +23,6 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.jdbc.source.wizard.JDBCSourceWizard;
-import org.safehaus.penrose.studio.source.wizard.SourceWizard;
 import org.safehaus.penrose.studio.source.SourcesNode;
 import org.apache.log4j.Logger;
 
@@ -43,10 +42,10 @@ public class NewJDBCSourceAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Server project = sourcesNode.getProjectNode().getServer();
+            Server server = sourcesNode.getProjectNode().getServer();
 
             JDBCSourceWizard wizard = new JDBCSourceWizard();
-            wizard.setServer(project);
+            wizard.setServer(server);
             wizard.setPartitionName(sourcesNode.getPartitionName());
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);

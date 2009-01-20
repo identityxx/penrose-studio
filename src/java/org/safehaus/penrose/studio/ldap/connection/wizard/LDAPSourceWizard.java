@@ -23,13 +23,13 @@ import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
-import org.safehaus.penrose.studio.ldap.source.LDAPFieldWizardPage;
-import org.safehaus.penrose.studio.ldap.source.LDAPAttributeWizardPage;
+import org.safehaus.penrose.studio.ldap.source.wizard.LDAPSourcePrimaryKeysWizardPage;
+import org.safehaus.penrose.studio.ldap.source.wizard.LDAPSourceFieldsWizardPage;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.ldap.DN;
-import org.safehaus.penrose.schema.AttributeType;
+import org.safehaus.penrose.ldap.source.LDAPSource;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
@@ -37,6 +37,8 @@ import org.apache.log4j.Logger;
 
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author Endi S. Dewata
@@ -55,9 +57,12 @@ public class LDAPSourceWizard extends Wizard {
     private Collection attributeNames;
     private SourceConfig sourceConfig;
 
-    public LDAPSourceWizardPage propertyPage;
-    public LDAPAttributeWizardPage attributesPage;
-    public LDAPFieldWizardPage fieldsPage = new LDAPFieldWizardPage();
+    public LDAPSourceWizardPage propertiesPage;
+    public LDAPSourceFieldsWizardPage fieldsPage;
+    public LDAPSourcePrimaryKeysWizardPage primarykeysPage = new LDAPSourcePrimaryKeysWizardPage();
+
+    Map<String,FieldConfig> availableFieldConfigs = new TreeMap<String,FieldConfig>();
+    Map<String,FieldConfig> selectedFieldConfigs = new TreeMap<String,FieldConfig>();
 
     public LDAPSourceWizard(LDAPClient client, String partitionName, ConnectionConfig connectionConfig, String baseDn) throws Exception {
         this(client, partitionName, connectionConfig, baseDn, "(objectClass=*)", "OBJECT", new ArrayList<String>());
@@ -85,18 +90,18 @@ public class LDAPSourceWizard extends Wizard {
         String rdnValue = (String)rdn.get(rdnAttr);
         String name = rdnValue.replaceAll("\\s", "").toLowerCase();
 
-        propertyPage = new LDAPSourceWizardPage(name, baseDn, filter, scope);
+        propertiesPage = new LDAPSourceWizardPage(name, baseDn, filter, scope);
         
-        attributesPage = new LDAPAttributeWizardPage(attributeNames);
-        attributesPage.setConnectionConfig(connectionConfig);
+        fieldsPage = new LDAPSourceFieldsWizardPage(attributeNames);
+        //fieldsPage.setConnectionConfig(connectionConfig);
 
         setWindowTitle(connectionConfig.getName()+" - New Source");
     }
 
     public boolean canFinish() {
-        if (!propertyPage.isPageComplete()) return false;
-        if (!attributesPage.isPageComplete()) return false;
+        if (!propertiesPage.isPageComplete()) return false;
         if (!fieldsPage.isPageComplete()) return false;
+        if (!primarykeysPage.isPageComplete()) return false;
 
         return true;
     }
@@ -104,21 +109,14 @@ public class LDAPSourceWizard extends Wizard {
     public boolean performFinish() {
         try {
             sourceConfig = new SourceConfig();
-            sourceConfig.setName(propertyPage.getSourceName());
+            sourceConfig.setName(propertiesPage.getSourceName());
             sourceConfig.setConnectionName(connectionConfig.getName());
 
-            sourceConfig.setParameter("baseDn", baseDn);
-            sourceConfig.setParameter("filter", propertyPage.getFilter());
-            sourceConfig.setParameter("scope", propertyPage.getScope());
+            sourceConfig.setParameter(LDAPSource.BASE_DN, baseDn);
+            sourceConfig.setParameter(LDAPSource.FILTER, propertiesPage.getFilter());
+            sourceConfig.setParameter(LDAPSource.SCOPE, propertiesPage.getScope());
 
-            Collection<FieldConfig> fields = fieldsPage.getFields();
-            for (FieldConfig field : fields) {
-                sourceConfig.addFieldConfig(field);
-            }
-
-            //SourceConfigManager sourceConfigManager = partitionConfig.getSourceConfigManager();
-            //sourceConfigManager.addSourceConfig(sourceConfig);
-            //project.save(partitionConfig, sourceConfigManager);
+            sourceConfig.setFieldConfigs(selectedFieldConfigs.values());
 
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
@@ -144,20 +142,20 @@ public class LDAPSourceWizard extends Wizard {
     }
 
     public void addPages() {
-        addPage(propertyPage);
-        addPage(attributesPage);
+        addPage(propertiesPage);
         addPage(fieldsPage);
+        addPage(primarykeysPage);
     }
 
     public IWizardPage getNextPage(IWizardPage page) {
-        if (attributesPage == page) {
+        if (fieldsPage == page) {
             RDN rdn = new DN(baseDn).getRdn();
             Collection<String> names = new ArrayList<String>();
             for (String name : rdn.getNames()) {
                 names.add(name.toLowerCase());
             }
-            Collection<AttributeType> attributeTypes = attributesPage.getAttributeTypes();
-            fieldsPage.setAttributeTypes(attributeTypes, names);
+            //Collection<AttributeType> attributeTypes = fieldsPage.getAttributeTypes();
+            //primarykeysPage.setAttributeTypes(attributeTypes, names);
         }
 
         return super.getNextPage(page);

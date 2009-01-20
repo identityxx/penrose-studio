@@ -88,7 +88,7 @@ public class EntryNode extends Node {
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         DirectoryClient directoryClient = partitionClient.getDirectoryClient();
 
-        EntryClient entryClient = directoryClient.getEntryClient(entryConfig.getId());
+        EntryClient entryClient = directoryClient.getEntryClient(entryConfig.getName());
 
         log.debug("Getting children:");
 
@@ -139,7 +139,17 @@ public class EntryNode extends Node {
             }
         });
 
-        manager.add(new Action("Edit sources") {
+        manager.add(new Action("Edit LDAP") {
+            public void run() {
+                try {
+                    editLDAP();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Action("Edit Sources") {
             public void run() {
                 try {
                     editSources();
@@ -231,7 +241,7 @@ public class EntryNode extends Node {
 
         EntryEditorInput ei = new EntryEditorInput();
         ei.setPartitionName(partitionName);
-        ei.setEntryId(entryConfig.getId());
+        ei.setEntryId(entryConfig.getName());
         ei.setProject(serverNode.getServer());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -240,11 +250,25 @@ public class EntryNode extends Node {
         page.openEditor(ei, EntryEditor.class.getName());
     }
 
+    public void editLDAP() throws Exception {
+
+        EntryEditorInput ei = new EntryEditorInput();
+        ei.setPartitionName(partitionName);
+        ei.setEntryId(entryConfig.getName());
+        ei.setProject(serverNode.getServer());
+
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        IWorkbenchPage page = window.getActivePage();
+
+        EntryEditor editor = (EntryEditor)page.openEditor(ei, EntryEditor.class.getName());
+        editor.showLDAPPage();
+    }
+
     public void editSources() throws Exception {
 
         EntryEditorInput ei = new EntryEditorInput();
         ei.setPartitionName(partitionName);
-        ei.setEntryId(entryConfig.getId());
+        ei.setEntryId(entryConfig.getName());
         ei.setProject(serverNode.getServer());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -258,7 +282,7 @@ public class EntryNode extends Node {
 
         EntryEditorInput ei = new EntryEditorInput();
         ei.setPartitionName(partitionName);
-        ei.setEntryId(entryConfig.getId());
+        ei.setEntryId(entryConfig.getName());
         ei.setProject(serverNode.getServer());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -290,7 +314,7 @@ public class EntryNode extends Node {
 
             EntryNode entryNode = (EntryNode) node;
 
-            String id = entryNode.getEntryConfig().getId();
+            String id = entryNode.getEntryConfig().getName();
             directoryClient.removeEntry(id);
         }
 

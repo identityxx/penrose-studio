@@ -88,8 +88,6 @@ public class LDAPConnectionSchemaPage extends ConnectionEditorPage {
 
         Control attributeTypesSection = createAttributeTypesSection(section);
         section.setClient(attributeTypesSection);
-
-        refresh();
     }
 
     public Composite createActionsSection(final Composite parent) {

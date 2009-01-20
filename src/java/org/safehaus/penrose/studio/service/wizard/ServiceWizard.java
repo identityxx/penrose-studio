@@ -32,16 +32,16 @@ public class ServiceWizard extends Wizard {
 
     private ServiceConfig serviceConfig;
 
-    public ServiceWizardPage propertyPage = new ServiceWizardPage();
-    public ServiceParameterPage parameterPage = new ServiceParameterPage();
+    public ServicePropertiesWizardPage propertiesPage = new ServicePropertiesWizardPage();
+    public ServiceParametersWizardPage parametersPage = new ServiceParametersWizardPage();
 
     public ServiceWizard() {
         setWindowTitle("New Service");
     }
 
     public boolean canFinish() {
-        if (!propertyPage.isPageComplete()) return false;
-        if (!parameterPage.isPageComplete()) return false;
+        if (!propertiesPage.isPageComplete()) return false;
+        if (!parametersPage.isPageComplete()) return false;
 
         return true;
     }
@@ -49,12 +49,12 @@ public class ServiceWizard extends Wizard {
     public boolean performFinish() {
         try {
             serviceConfig = new ServiceConfig();
-            serviceConfig.setName(propertyPage.getServiceName());
-            serviceConfig.setServiceClass(propertyPage.getServiceClass());
-            serviceConfig.setDescription(propertyPage.getDescription());
-            serviceConfig.setEnabled(propertyPage.isEnabled());
+            serviceConfig.setName(propertiesPage.getServiceName());
+            serviceConfig.setServiceClass(propertiesPage.getClassName());
+            serviceConfig.setEnabled(propertiesPage.isEnabled());
+            serviceConfig.setDescription(propertiesPage.getServiceDescription());
 
-            Map<String,String> parameters = parameterPage.getParameters();
+            Map<String,String> parameters = parametersPage.getParameters();
             for (String name : parameters.keySet()) {
                 String value = parameters.get(name);
 
@@ -70,8 +70,8 @@ public class ServiceWizard extends Wizard {
     }
 
     public void addPages() {
-        addPage(propertyPage);
-        addPage(parameterPage);
+        addPage(propertiesPage);
+        addPage(parametersPage);
     }
 
     public boolean needsPreviousAndNextButtons() {

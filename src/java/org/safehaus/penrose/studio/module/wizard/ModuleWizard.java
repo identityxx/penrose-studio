@@ -41,7 +41,7 @@ public class ModuleWizard extends Wizard {
     Server project;
     String partitionName;
 
-    public ModulePropertyWizardPage propertyPage = new ModulePropertyWizardPage();
+    public ModulePropertiesWizardPage propertyPage = new ModulePropertiesWizardPage();
     public ModuleParameterWizardPage parameterPage = new ModuleParameterWizardPage();
     public ModuleMappingWizardPage mappingPage = new ModuleMappingWizardPage();
 

@@ -31,6 +31,7 @@ import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
 import org.safehaus.penrose.module.ModuleManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.config.editor.ParametersPage;
 import org.safehaus.penrose.studio.server.Server;
 
 import java.util.Collection;
@@ -39,7 +40,7 @@ public class ModuleEditor extends FormEditor {
 
     Logger log = Logger.getLogger(getClass());
 
-    Server project;
+    Server server;
     String partitionName;
     String moduleName;
 
@@ -50,17 +51,19 @@ public class ModuleEditor extends FormEditor {
 
     boolean dirty;
 
+    ParametersPage parametersPage;
+
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         super.init(site, input);
 
         ModuleEditorInput ei = (ModuleEditorInput)input;
 
-        project = ei.getProject();
+        server = ei.getProject();
         partitionName = ei.getPartitionName();
         moduleName = ei.getModuleName();
 
         try {
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
             ModuleManagerClient moduleManagerClient = partitionClient.getModuleManagerClient();
@@ -80,7 +83,13 @@ public class ModuleEditor extends FormEditor {
 
     protected void addPages() {
         try {
-            addPage(new ModuleSettingsPage(this));
+            addPage(new ModulePropertiesPage(this));
+            addPage(new ModuleMappingsPage(this));
+
+            parametersPage = new ParametersPage(this, "Module Editor");
+            parametersPage.setParameters(moduleConfig.getParameters());
+            addPage(parametersPage);
+
             addPage(new ModuleMethodsPage(this, moduleClient));
 
         } catch (Exception e) {
@@ -108,38 +117,14 @@ public class ModuleEditor extends FormEditor {
     }
 
     public void store() throws Exception {
-/*
-        ModuleConfigManager moduleConfigManager = partitionConfig.getModuleConfigManager();
 
-        boolean rename = !origModuleConfig.getName().equals(moduleConfig.getName());
-        if (rename) {
-            moduleConfigManager.removeModuleConfig(origModuleConfig.getName());
-        }
-
-        origModuleConfig.copy(moduleConfig);
-
-        if (rename) {
-            moduleConfigManager.addModuleConfig(origModuleConfig);
-        }
-
-        moduleConfigManager.removeModuleMapping(moduleConfig.getName());
-
-        Item items[] = mappingsTable.getItems();
-        for (Item item : items) {
-            ModuleMapping mapping = (ModuleMapping) item.getData();
-            mapping.setModuleName(moduleConfig.getName());
-            moduleConfigManager.addModuleMapping(mapping);
-        }
-
-        project.save(partitionConfig, moduleConfigManager);
-*/
-        PenroseClient client = project.getClient();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         ModuleManagerClient moduleManagerClient = partitionClient.getModuleManagerClient();
         moduleManagerClient.updateModule(origModuleConfig.getName(), moduleConfig);
 
-        setPartName(partitionName+"/"+moduleConfig.getName());
+        setPartName(partitionName+"."+moduleConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
@@ -154,12 +139,12 @@ public class ModuleEditor extends FormEditor {
     public void checkDirty() {
         try {
             dirty = false;
-
+/*
             if (!origModuleConfig.equals(moduleConfig)) {
                 dirty = true;
                 return;
             }
-
+*/
         } catch (Exception e) {
             log.error(e.getMessage(), e);
 

@@ -33,8 +33,6 @@ public abstract class SourceEditor extends FormEditor {
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         super.init(site, input);
-        //setSite(site);
-        //setInput(input);
 
         SourceEditorInput ei = (SourceEditorInput)input;
         project = ei.getProject();
@@ -71,30 +69,33 @@ public abstract class SourceEditor extends FormEditor {
     public void doSaveAs() {
     }
 
+    public void rename(String name, String newName) throws Exception {
+
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+
+        sourceManagerClient.renameSource(name, newName);
+        partitionClient.store();
+
+        sourceConfig.setName(newName);
+
+        setPartName(partitionName+"."+newName);
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
+
+        checkDirty();
+    }
+
     public void store() throws Exception {
 
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
-/*
-        SourceConfigManager sourceConfigManager = partitionConfig.getSourceConfigManager();
-        if (!origSourceName.equals(sourceConfig.getName())) {
 
-            sourceConfigManager.renameSourceConfig(origSourceConfig, sourceConfig.getName());
-
-            for (EntryConfig entryConfig : partitionConfig.getDirectoryConfig().getEntryConfigs()) {
-
-                for (SourceMapping sourceMapping : entryConfig.getSourceConfigs()) {
-                    if (!sourceMapping.getSourceName().equals(origSourceConfig.getName())) continue;
-                    sourceMapping.setSourceName(sourceConfig.getName());
-                }
-            }
-        }
-
-        sourceConfigManager.modifySourceConfig(sourceConfig.getName(), sourceConfig);
-        project.save(partitionConfig, sourceConfigManager);
-*/
         sourceManagerClient.updateSource(origSourceName, sourceConfig);
         partitionClient.store();
 
@@ -121,12 +122,12 @@ public abstract class SourceEditor extends FormEditor {
     public void checkDirty() {
         try {
             dirty = false;
-
+/*
             if (!origSourceConfig.equals(sourceConfig)) {
                 dirty = true;
                 return;
             }
-
+*/
         } catch (Exception e) {
             log.error(e.getMessage(), e);
 

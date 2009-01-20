@@ -31,6 +31,7 @@ import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.nis.source.action.NewNISSourceAction;
 import org.safehaus.penrose.studio.ldap.source.action.NewLDAPSourceAction;
 import org.safehaus.penrose.studio.jdbc.source.action.NewJDBCSourceAction;
 import org.safehaus.penrose.studio.partition.PartitionNode;
@@ -80,6 +81,7 @@ public class SourcesNode extends Node {
 
         manager.add(new NewJDBCSourceAction(this));
         manager.add(new NewLDAPSourceAction(this));
+        manager.add(new NewNISSourceAction(this));
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 

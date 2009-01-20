@@ -32,6 +32,7 @@ import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
+import org.safehaus.penrose.synchronization.SynchronizationResult;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

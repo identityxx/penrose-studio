@@ -43,7 +43,7 @@ public class ModuleEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return partitionName+"/"+moduleName;
+        return partitionName+"."+moduleName;
     }
 
     public IPersistableElement getPersistable() {

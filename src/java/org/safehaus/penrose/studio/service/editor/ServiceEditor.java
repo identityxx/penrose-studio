@@ -19,36 +19,37 @@ package org.safehaus.penrose.studio.service.editor;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.part.MultiPageEditorPart;
+import org.eclipse.ui.forms.editor.FormEditor;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.service.ServiceManagerClient;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.config.editor.ParametersPage;
 import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
  */
-public class ServiceEditor extends MultiPageEditorPart {
+public class ServiceEditor extends FormEditor {
 
     Logger log = Logger.getLogger(getClass());
 
-    Server project;
+    Server server;
     ServiceConfig origServiceConfig;
     ServiceConfig serviceConfig;
 
     boolean dirty;
 
-    ServicePropertyPage propertyPage;
+    ServicePropertiesPage propertiesPage;
+    ParametersPage parametersPage;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         ServiceEditorInput ei = (ServiceEditorInput)input;
 
-        project = ei.getProject();
+        server = ei.getProject();
         origServiceConfig = ei.getServiceConfig();
 
         try {
@@ -62,30 +63,18 @@ public class ServiceEditor extends MultiPageEditorPart {
         setPartName(ei.getName());
     }
 
-    protected void createPages() {
+    protected void addPages() {
         try {
-            propertyPage = new ServicePropertyPage(this);
-            addPage(propertyPage.createControl());
-            setPageText(0, "  Properties  ");
+            propertiesPage = new ServicePropertiesPage(this);
+            addPage(propertiesPage);
 
-            load();
+            parametersPage = new ParametersPage(this, "Service Editor");
+            parametersPage.setParameters(serviceConfig.getParameters());
+            addPage(parametersPage);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-    }
-
-    public Composite getParent() {
-        return getContainer();
-    }
-
-    public void dispose() {
-        propertyPage.dispose();
-        super.dispose();
-    }
-
-    public void load() throws Exception {
-        propertyPage.load();
     }
 
     public void doSave(IProgressMonitor iProgressMonitor) {
@@ -102,7 +91,7 @@ public class ServiceEditor extends MultiPageEditorPart {
 
     public void store() throws Exception {
 
-        PenroseClient client = project.getClient();
+        PenroseClient client = server.getClient();
         ServiceManagerClient serviceManagerClient = client.getServiceManagerClient();
         serviceManagerClient.updateService(origServiceConfig.getName(), serviceConfig);
 
@@ -127,12 +116,12 @@ public class ServiceEditor extends MultiPageEditorPart {
     public void checkDirty() {
         try {
             dirty = false;
-
+/*
             if (!origServiceConfig.equals(serviceConfig)) {
                 dirty = true;
                 return;
             }
-
+*/
         } catch (Exception e) {
             log.error(e.getMessage(), e);
 

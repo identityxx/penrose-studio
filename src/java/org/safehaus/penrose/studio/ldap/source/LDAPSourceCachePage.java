@@ -28,6 +28,7 @@ import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
+import org.safehaus.penrose.studio.ldap.source.editor.LDAPSourceEditor;
 
 /**
  * @author Endi S. Dewata
@@ -44,7 +45,7 @@ public class LDAPSourceCachePage extends SourceEditorPage {
     Combo loadingMethodCombo;
 
     public LDAPSourceCachePage(LDAPSourceEditor editor) {
-        super(editor, "CACHE", "  Cache  ");
+        super(editor, "CACHE", "Cache");
     }
 
     public void createFormContent(IManagedForm managedForm) {

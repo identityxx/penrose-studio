@@ -17,10 +17,7 @@
  */
 package org.safehaus.penrose.studio.jdbc.source.wizard;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.jdbc.Table;
 import org.safehaus.penrose.jdbc.source.JDBCSource;
 import org.safehaus.penrose.client.PenroseClient;
@@ -29,75 +26,112 @@ import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
-import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.source.wizard.SourceWizardPage;
-import org.safehaus.penrose.studio.jdbc.source.JDBCTableWizardPage;
-import org.safehaus.penrose.studio.jdbc.source.JDBCFieldWizardPage;
-import org.safehaus.penrose.studio.jdbc.source.JDBCPrimaryKeyWizardPage;
+import org.safehaus.penrose.studio.source.wizard.SourceWizard;
+import org.safehaus.penrose.studio.source.wizard.SourcePropertiesWizardPage;
+import org.safehaus.penrose.studio.source.wizard.SourcePrimaryKeysWizardPage;
 import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
+import org.safehaus.penrose.connection.ConnectionManagerClient;
+import org.safehaus.penrose.connection.ConnectionClient;
 
 import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author Endi S. Dewata
  */
-public class JDBCSourceWizard extends Wizard {
+public class JDBCSourceWizard extends SourceWizard {
 
-    Logger log = Logger.getLogger(getClass());
+    public SourcePropertiesWizardPage propertiesPage;
 
-    private Server server;
-    private String partitionName;
-    private ConnectionConfig connectionConfig;
-    private SourceConfig sourceConfig;
-
-    public SourceWizardPage propertyPage;
     public SelectConnectionWizardPage connectionPage;
+    public JDBCSourceTableWizardPage tablePage;
+    public JDBCSourceFilterWizardPage filterPage;
 
-    public JDBCTableWizardPage tablePage;
-    public JDBCFieldWizardPage fieldsPage;
-    public JDBCPrimaryKeyWizardPage primaryKeyPage;
+    public JDBCSourceFieldsWizardPage fieldsPage;
+    public SourcePrimaryKeysWizardPage primaryKeysPage;
+
+    Map<String,FieldConfig> availableFieldConfigs = new TreeMap<String,FieldConfig>();
+    Map<String,FieldConfig> selectedFieldConfigs = new TreeMap<String,FieldConfig>();
 
     public JDBCSourceWizard() {
         setWindowTitle("New JDBC Source");
     }
 
     public void addPages() {
-        propertyPage = new SourceWizardPage();
+        propertiesPage = new SourcePropertiesWizardPage();
 
-        addPage(propertyPage);
+        addPage(propertiesPage);
 
         if (connectionConfig == null) {
-            connectionPage = new SelectConnectionWizardPage(partitionName);
-            connectionPage.setProject(server);
+            connectionPage = new SelectConnectionWizardPage();
+            connectionPage.setServer(server);
+            connectionPage.setPartitionName(partitionName);
+            connectionPage.setAdapterType("JDBC");
 
             addPage(connectionPage);
         }
 
-        tablePage = new JDBCTableWizardPage();
+        tablePage = new JDBCSourceTableWizardPage();
         tablePage.setServer(server);
         tablePage.setPartitionName(partitionName);
-        tablePage.setConnectionConfig(connectionConfig);
 
         addPage(tablePage);
 
-        fieldsPage = new JDBCFieldWizardPage();
-        fieldsPage.setServer(server);
-        fieldsPage.setPartitionName(partitionName);
-        fieldsPage.setConnectionConfig(connectionConfig);
+        filterPage = new JDBCSourceFilterWizardPage();
+
+        addPage(filterPage);
+
+        fieldsPage = new JDBCSourceFieldsWizardPage();
+        fieldsPage.setAvailableFieldConfigs(availableFieldConfigs);
+        fieldsPage.setSelectedFieldConfigs(selectedFieldConfigs);
 
         addPage(fieldsPage);
 
-        primaryKeyPage = new JDBCPrimaryKeyWizardPage();
+        primaryKeysPage = new SourcePrimaryKeysWizardPage();
+        primaryKeysPage.setFieldConfigs(selectedFieldConfigs);
 
-        addPage(primaryKeyPage);
+        addPage(primaryKeysPage);
+    }
+
+    public Collection<FieldConfig> getAvailableFieldConfigs(Table table) {
+
+        Collection<FieldConfig> results = new ArrayList<FieldConfig>();
+
+        try {
+            String catalog = table.getCatalog();
+            String schema = table.getSchema();
+            String tableName = table.getName();
+
+            PenroseClient client = server.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+            ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+            ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(connectionConfig.getName());
+
+            Collection<FieldConfig> list = (Collection<FieldConfig>)connectionClient.invoke(
+                    "getColumns",
+                    new Object[] { catalog, schema, tableName },
+                    new String[] { String.class.getName(), String.class.getName(), String.class.getName() }
+            );
+
+            if (list != null) results.addAll(list);
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+
+        return results;
     }
 
     public boolean canFinish() {
-        if (!propertyPage.isPageComplete()) return false;
+        if (!propertiesPage.isPageComplete()) return false;
         if (connectionPage != null && !connectionPage.isPageComplete()) return false;
         if (!tablePage.isPageComplete()) return false;
+        if (!filterPage.isPageComplete()) return false;
         if (!fieldsPage.isPageComplete()) return false;
-        if (!primaryKeyPage.isPageComplete()) return false;
+        if (!primaryKeysPage.isPageComplete()) return false;
 
         return true;
     }
@@ -106,15 +140,15 @@ public class JDBCSourceWizard extends Wizard {
         if (connectionPage == page) {
             connectionConfig = connectionPage.getConnectionConfig();
             if (connectionConfig == null) return null;
-            tablePage.setConnectionConfig(connectionConfig);
+            tablePage.setConnectionName(connectionConfig.getName());
 
         } else if (tablePage == page) {
-            fieldsPage.setConnectionConfig(connectionConfig);
-            fieldsPage.setTable(tablePage.getTable());
+            Table table = tablePage.getTable();
 
-        } else if (fieldsPage == page) {
-            Collection<FieldConfig> selectedFields = fieldsPage.getSelectedFieldConfigs();
-            primaryKeyPage.setFieldConfigs(selectedFields);
+            availableFieldConfigs.clear();
+            for (FieldConfig fieldConfig : getAvailableFieldConfigs(table)) {
+                availableFieldConfigs.put(fieldConfig.getName(), fieldConfig);
+            }
         }
 
         return super.getNextPage(page);
@@ -123,38 +157,22 @@ public class JDBCSourceWizard extends Wizard {
     public boolean performFinish() {
         try {
             sourceConfig = new SourceConfig();
-            sourceConfig.setName(propertyPage.getSourceName());
+            sourceConfig.setName(propertiesPage.getSourceName());
+            sourceConfig.setSourceClass(propertiesPage.getClassName());
+            sourceConfig.setEnabled(propertiesPage.isEnabled());
+            sourceConfig.setDescription(propertiesPage.getSourceDescription());
+
             sourceConfig.setConnectionName(connectionConfig.getName());
 
             Table table = tablePage.getTable();
 
-            String catalog   = table.getCatalog();
-            String schema    = table.getSchema();
-            String tableName = table.getName();
+            sourceConfig.setParameter(JDBCSource.CATALOG, table.getCatalog());
+            sourceConfig.setParameter(JDBCSource.SCHEMA, table.getSchema());
+            sourceConfig.setParameter(JDBCSource.TABLE, table.getName());
 
-            sourceConfig.setParameter(JDBCSource.CATALOG, catalog);
-            sourceConfig.setParameter(JDBCSource.SCHEMA, schema);
-            sourceConfig.setParameter(JDBCSource.TABLE, tableName);
+            sourceConfig.setParameter(JDBCSource.FILTER, filterPage.getFilter());
 
-            String filter = fieldsPage.getFilter();
-            if (filter != null) {
-                sourceConfig.setParameter(JDBCSource.FILTER, filter);
-            }
-
-            System.out.println("Saving fields :");
-            Collection<FieldConfig> fields = primaryKeyPage.getFields();
-            if (fields.isEmpty()) {
-                fields = fieldsPage.getSelectedFieldConfigs();
-            }
-
-            for (FieldConfig field : fields) {
-                System.out.println(" - " + field.getName() + " " + field.isPrimaryKey());
-                sourceConfig.addFieldConfig(field);
-            }
-
-            //SourceConfigManager sourceConfigManager = partitionConfig.getSourceConfigManager();
-            //sourceConfigManager.addSourceConfig(sourceConfig);
-            //project.save(partitionConfig, sourceConfigManager);
+            sourceConfig.setFieldConfigs(selectedFieldConfigs.values());
 
             PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
@@ -169,41 +187,5 @@ public class JDBCSourceWizard extends Wizard {
             log.error(e.getMessage(), e);
             return false;
         }
-    }
-
-    public SourceConfig getSourceConfig() {
-        return sourceConfig;
-    }
-
-    public void setSourceConfig(SourceConfig connection) {
-        this.sourceConfig = connection;
-    }
-
-    public boolean needsPreviousAndNextButtons() {
-        return true;
-    }
-
-    public ConnectionConfig getConnectionConfig() {
-        return connectionConfig;
-    }
-
-    public void setConnectionConfig(ConnectionConfig connectionConfig) {
-        this.connectionConfig = connectionConfig;
-    }
-
-    public String getPartitionName() {
-        return partitionName;
-    }
-
-    public void setPartitionName(String partitionName) {
-        this.partitionName = partitionName;
-    }
-
-    public Server getServer() {
-        return server;
-    }
-
-    public void setServer(Server server) {
-        this.server = server;
     }
 }

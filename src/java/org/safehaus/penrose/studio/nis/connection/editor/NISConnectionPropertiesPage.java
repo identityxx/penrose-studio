@@ -12,7 +12,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
-import org.safehaus.penrose.studio.connection.wizard.ConnectionNameWizard;
 import org.safehaus.penrose.studio.nis.connection.wizard.NISConnectionSettingsWizard;
 
 import javax.naming.InitialContext;
@@ -22,7 +21,6 @@ import javax.naming.InitialContext;
  */
 public class NISConnectionPropertiesPage extends ConnectionEditorPage {
 
-    Label nameText;
     Label hostnameText;
     Label domainText;
 
@@ -31,7 +29,7 @@ public class NISConnectionPropertiesPage extends ConnectionEditorPage {
     String url;
 
     public NISConnectionPropertiesPage(NISConnectionEditor editor) {
-        super(editor, "PROPERTIES", "Properties");
+        super(editor, "NIS", "NIS");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -42,32 +40,23 @@ public class NISConnectionPropertiesPage extends ConnectionEditorPage {
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-        Section propertiesSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        propertiesSection.setText("Properties");
-        propertiesSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Section nisSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        nisSection.setText("NIS");
+        nisSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Control propertiesControl = createPropertiesControl(propertiesSection);
-        propertiesSection.setClient(propertiesControl);
-
-        Section settingsSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        settingsSection.setText("Settings");
-        settingsSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        Control settingsControl = createSettingsControl(settingsSection);
-        settingsSection.setClient(settingsControl);
-
-        refresh();
+        Control nisControl = createNISControl(nisSection);
+        nisSection.setClient(nisControl);
     }
 
-    public Composite createPropertiesControl(final Composite parent) {
+    public Composite createNISControl(final Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
 
-        Composite leftControl = createPropertiesLeftControl(composite);
+        Composite leftControl = createNISLeftControl(composite);
         leftControl.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Composite rightControl = createPropertiesRightControl(composite);
+        Composite rightControl = createNISRightControl(composite);
         GridData gd = new GridData(GridData.FILL_VERTICAL);
         gd.widthHint = 100;
         rightControl.setLayoutData(gd);
@@ -75,95 +64,7 @@ public class NISConnectionPropertiesPage extends ConnectionEditorPage {
         return composite;
     }
 
-    public Composite createPropertiesLeftControl(final Composite parent) {
-
-        Composite composite = toolkit.createComposite(parent);
-
-        GridLayout layout = new GridLayout(2, false);
-        layout.marginWidth = 0;
-        layout.marginHeight = 0;
-        composite.setLayout(layout);
-
-        Label connectionNameLabel = toolkit.createLabel(composite, "Name:");
-        GridData gd = new GridData();
-        gd.widthHint = 100;
-        connectionNameLabel.setLayoutData(gd);
-
-        nameText = toolkit.createLabel(composite, "", SWT.NONE);
-        nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-/*
-        nameText.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent event) {
-                connectionConfig.setName(nameText.getText());
-                checkDirty();
-            }
-        });
-*/
-        return composite;
-    }
-
-    public Composite createPropertiesRightControl(final Composite parent) {
-
-        Composite composite = toolkit.createComposite(parent);
-
-        GridLayout layout = new GridLayout();
-        layout.marginWidth = 0;
-        layout.marginHeight = 0;
-        composite.setLayout(layout);
-
-        Button editButton = new Button(composite, SWT.PUSH);
-		editButton.setText("Edit");
-        editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        editButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                try {
-                    String name = connectionConfig.getName();
-
-                    ConnectionNameWizard wizard = new ConnectionNameWizard();
-                    wizard.setServer(server);
-                    wizard.setPartitionName(partitionName);
-                    wizard.setConnectionName(name);
-
-                    WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
-                    dialog.setPageSize(600, 300);
-
-                    int rc = dialog.open();
-                    if (rc == Window.CANCEL) return;
-
-                    String newName = wizard.getConnectionName();
-
-                    editor.rename(name, newName);
-
-                    refresh();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
-                }
-            }
-        });
-
-        return composite;
-    }
-
-    public Composite createSettingsControl(final Composite parent) {
-
-        Composite composite = toolkit.createComposite(parent);
-        composite.setLayout(new GridLayout(2, false));
-
-        Composite leftControl = createSettingsLeftControl(composite);
-        leftControl.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-        Composite rightControl = createSettingsRightControl(composite);
-        GridData gd = new GridData(GridData.FILL_VERTICAL);
-        gd.widthHint = 100;
-        rightControl.setLayoutData(gd);
-
-        return composite;
-    }
-
-    public Composite createSettingsLeftControl(final Composite parent) {
+    public Composite createNISLeftControl(final Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
 
@@ -204,7 +105,7 @@ public class NISConnectionPropertiesPage extends ConnectionEditorPage {
         return composite;
     }
 
-    public Composite createSettingsRightControl(final Composite parent) {
+    public Composite createNISRightControl(final Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
 
@@ -245,7 +146,6 @@ public class NISConnectionPropertiesPage extends ConnectionEditorPage {
     }
 
     public void refresh() {
-        nameText.setText(connectionConfig.getName());
 
         String url = connectionConfig.getParameter(InitialContext.PROVIDER_URL);
         String hostname = null;

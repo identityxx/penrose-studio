@@ -39,7 +39,9 @@ public class CreateLDAPSnapshotWizard extends Wizard {
     public CreateLDAPSnapshotWizard() {
         setWindowTitle("Create LDAP Snapshot");
 
-        connectionPage = new SelectConnectionWizardPage(partitionName, "LDAP");
+        connectionPage = new SelectConnectionWizardPage();
+        connectionPage.setPartitionName(partitionName);
+        connectionPage.setAdapterType("LDAP");
     }
 
     public boolean canFinish() {

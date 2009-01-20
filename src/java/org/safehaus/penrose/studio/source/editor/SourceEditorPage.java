@@ -18,15 +18,17 @@ public class SourceEditorPage extends FormPage {
     protected FormToolkit toolkit;
 
     protected SourceEditor editor;
+    String title;
 
     protected Server server;
     protected String partitionName;
     protected SourceConfig sourceConfig;
 
-    public SourceEditorPage(SourceEditor editor, String name, String label) {
-        super(editor, name, label);
+    public SourceEditorPage(SourceEditor editor, String name, String title) {
+        super(editor, name, "  "+title+"  ");
 
         this.editor = editor;
+        this.title = title;
 
         server = editor.getProject();
         partitionName = editor.getPartitionName();
@@ -38,7 +40,7 @@ public class SourceEditorPage extends FormPage {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText(getTitle());
+        form.setText("Source Editor");
     }
 
     public void setActive(boolean b) {

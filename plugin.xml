@@ -66,20 +66,20 @@
             icon="${images.source}"
             class="org.safehaus.penrose.studio.source.editor.SourceEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.jdbc.source.JDBCSourceEditor"
+            id="org.safehaus.penrose.studio.jdbc.source.editor.JDBCSourceEditor"
             name="JDBC Source"
             icon="${images.source}"
-            class="org.safehaus.penrose.studio.jdbc.source.JDBCSourceEditor"/>
+            class="org.safehaus.penrose.studio.jdbc.source.editor.JDBCSourceEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.ldap.source.LDAPSourceEditor"
+            id="org.safehaus.penrose.studio.ldap.source.editor.LDAPSourceEditor"
             name="JNDI Source"
             icon="${images.source}"
-            class="org.safehaus.penrose.studio.ldap.source.LDAPSourceEditor"/>
+            class="org.safehaus.penrose.studio.ldap.source.editor.LDAPSourceEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.nis.source.NISSourceEditor"
+            id="org.safehaus.penrose.studio.nis.source.editor.NISSourceEditor"
             name="NIS Source"
             icon="${images.source}"
-            class="org.safehaus.penrose.studio.nis.source.NISSourceEditor"/>
+            class="org.safehaus.penrose.studio.nis.source.editor.NISSourceEditor"/>
         <editor
             id="org.safehaus.penrose.studio.mapping.editor.MappingEditor"
             name="Mapping"

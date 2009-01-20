@@ -48,7 +48,10 @@ public class CreateADSchemaProxyWizard extends Wizard {
     public CreateADSchemaProxyWizard() {
         setWindowTitle("New Active Directory Schema Proxy");
 
-        connectionPage = new SelectConnectionWizardPage(partitionName, "LDAP");
+        connectionPage = new SelectConnectionWizardPage();
+        connectionPage.setPartitionName(partitionName);
+        connectionPage.setAdapterType("LDAP");
+
         connectionPage.setDescription(
                 "Select Active Directory connection. "+
                 "The connection URL should point to the Root DSE (empty base DN)."

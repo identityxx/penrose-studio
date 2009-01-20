@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.ldap.DN;
 
 /**
  * @author Endi S. Dewata
@@ -52,7 +53,7 @@ public class ACIDialog extends Dialog {
     Button deleteCheckbox;
 
     private String subject;
-    private String dn;
+    private DN dn;
     private String target;
     private String attributes;
     private String scope;
@@ -251,7 +252,7 @@ public class ACIDialog extends Dialog {
 		saveButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
                 subject = subjectCombo.getText();
-                dn = "".equals(dnText.getText()) ? null : dnText.getText();
+                dn = "".equals(dnText.getText()) ? null : new DN(dnText.getText());
                 target = targetCombo.getText();
                 attributes = "".equals(attributesText.getText()) ? null : attributesText.getText();
 
@@ -346,13 +347,13 @@ public class ACIDialog extends Dialog {
         attributesText.setText(attributes == null ? "" : attributes);
     }
 
-    public String getDn() {
+    public DN getDn() {
         return dn;
     }
 
-    public void setDn(String dn) {
+    public void setDn(DN dn) {
         this.dn = dn;
-        dnText.setText(dn == null ? "" : dn);
+        dnText.setText(dn == null ? "" : dn.toString());
     }
 
     public boolean isSaved() {

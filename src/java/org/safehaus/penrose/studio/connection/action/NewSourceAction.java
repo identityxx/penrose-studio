@@ -27,6 +27,8 @@ import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.source.wizard.SourceWizard;
+import org.safehaus.penrose.studio.nis.source.wizard.NISSourceWizard;
 import org.safehaus.penrose.studio.ldap.source.wizard.LDAPSourceWizard;
 import org.safehaus.penrose.studio.connection.ConnectionNode;
 import org.safehaus.penrose.studio.jdbc.source.wizard.JDBCSourceWizard;
@@ -63,8 +65,9 @@ public class NewSourceAction extends Action {
             ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(connectionName);
             ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
+            SourceWizard wizard;
             if ("JDBC".equals(adapterName)) {
-                JDBCSourceWizard wizard = new JDBCSourceWizard();
+                wizard = new JDBCSourceWizard();
                 wizard.setServer(project);
                 wizard.setPartitionName(partitionName);
                 wizard.setConnectionConfig(connectionConfig);
@@ -74,7 +77,17 @@ public class NewSourceAction extends Action {
                 dialog.open();
 
             } else if ("LDAP".equals(adapterName)) {
-                LDAPSourceWizard wizard = new LDAPSourceWizard();
+                wizard = new LDAPSourceWizard();
+                wizard.setServer(project);
+                wizard.setPartitionName(partitionName);
+                wizard.setConnectionConfig(connectionConfig);
+
+                WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
+                dialog.setPageSize(600, 300);
+                dialog.open();
+
+            } else if ("NIS".equals(adapterName)) {
+                wizard = new NISSourceWizard();
                 wizard.setServer(project);
                 wizard.setPartitionName(partitionName);
                 wizard.setConnectionConfig(connectionConfig);

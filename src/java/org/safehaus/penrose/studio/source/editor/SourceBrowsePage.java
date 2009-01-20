@@ -32,7 +32,7 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
     Table table;
 
     public SourceBrowsePage(SourceEditor editor) throws Exception {
-        super(editor, "BROWSE", "  Browse  ");
+        super(editor, "BROWSE", "Browse");
     }
 
     public void createFormContent(IManagedForm managedForm) {

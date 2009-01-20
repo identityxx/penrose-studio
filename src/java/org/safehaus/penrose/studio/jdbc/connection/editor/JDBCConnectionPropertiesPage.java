@@ -27,7 +27,6 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
-import org.safehaus.penrose.studio.connection.wizard.ConnectionNameWizard;
 import org.safehaus.penrose.studio.jdbc.connection.wizard.JDBCConnectionSettingsWizard;
 import org.safehaus.penrose.jdbc.JDBCClient;
 
@@ -36,17 +35,13 @@ import org.safehaus.penrose.jdbc.JDBCClient;
  */
 public class JDBCConnectionPropertiesPage extends ConnectionEditorPage {
 
-    Label nameText;
-    //Label descriptionText;
-
-    Label adapterText;
     Label driverText;
     Label urlText;
     Label usernameText;
     Label passwordText;
 
     public JDBCConnectionPropertiesPage(JDBCConnectionEditor editor) {
-        super(editor, "PROPERTIES", "Properties");
+        super(editor, "JDBC", "JDBC");
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -57,30 +52,23 @@ public class JDBCConnectionPropertiesPage extends ConnectionEditorPage {
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-        Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Properties");
-        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Section jdbcSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        jdbcSection.setText("JDBC");
+        jdbcSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        Control propertiesControl = createPropertiesControl(section);
-        section.setClient(propertiesControl);
-
-        Section settingsSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        settingsSection.setText("Settings");
-        settingsSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        Control settingsControl = createSettingsControl(settingsSection);
-        settingsSection.setClient(settingsControl);
+        Control jdbcControl = createJDBCControl(jdbcSection);
+        jdbcSection.setClient(jdbcControl);
     }
 
-    public Composite createPropertiesControl(final Composite parent) {
+    public Composite createJDBCControl(final Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
 
-        Composite leftControl = createPropertiesLeftControl(composite);
+        Composite leftControl = createJDBCLeftControl(composite);
         leftControl.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Composite rightControl = createPropertiesRightControl(composite);
+        Composite rightControl = createJDBCRightControl(composite);
         GridData gd = new GridData(GridData.FILL_VERTICAL);
         gd.widthHint = 100;
         rightControl.setLayoutData(gd);
@@ -88,7 +76,7 @@ public class JDBCConnectionPropertiesPage extends ConnectionEditorPage {
         return composite;
     }
 
-    public Composite createPropertiesLeftControl(final Composite parent) {
+    public Composite createJDBCLeftControl(Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
 
@@ -96,118 +84,6 @@ public class JDBCConnectionPropertiesPage extends ConnectionEditorPage {
         layout.marginWidth = 0;
         layout.marginHeight = 0;
         composite.setLayout(layout);
-
-        Label connectionNameLabel = toolkit.createLabel(composite, "Name:");
-        GridData gd = new GridData();
-        gd.widthHint = 100;
-        connectionNameLabel.setLayoutData(gd);
-
-        nameText = toolkit.createLabel(composite, "", SWT.NONE);
-        nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-/*
-        nameText.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent event) {
-                connectionConfig.setName("".equals(nameText.getText()) ? null : nameText.getText());
-                checkDirty();
-            }
-        });
-
-        Label descriptionLabel = toolkit.createLabel(composite, "Description:");
-        gd = new GridData();
-        gd.widthHint = 100;
-        descriptionLabel.setLayoutData(gd);
-
-        descriptionText = toolkit.createLabel(composite, "", SWT.NONE);
-        descriptionText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        descriptionText.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent event) {
-                connectionConfig.setDescription("".equals(descriptionText.getText()) ? null : descriptionText.getText());
-                checkDirty();
-            }
-        });
-*/
-
-        return composite;
-    }
-
-    public Composite createPropertiesRightControl(final Composite parent) {
-
-        Composite composite = toolkit.createComposite(parent);
-
-        GridLayout layout = new GridLayout();
-        layout.marginWidth = 0;
-        layout.marginHeight = 0;
-        composite.setLayout(layout);
-
-        Button editButton = new Button(composite, SWT.PUSH);
-		editButton.setText("Edit");
-        editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        editButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                try {
-                    String name = connectionConfig.getName();
-
-                    ConnectionNameWizard wizard = new ConnectionNameWizard();
-                    wizard.setServer(server);
-                    wizard.setPartitionName(partitionName);
-                    wizard.setConnectionName(name);
-
-                    WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
-                    dialog.setPageSize(600, 300);
-
-                    int rc = dialog.open();
-                    if (rc == Window.CANCEL) return;
-
-                    String newName = wizard.getConnectionName();
-
-                    editor.rename(name, newName);
-
-                    refresh();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
-                }
-            }
-        });
-
-        return composite;
-    }
-
-    public Composite createSettingsControl(final Composite parent) {
-
-        Composite composite = toolkit.createComposite(parent);
-        composite.setLayout(new GridLayout(2, false));
-
-        Composite leftControl = createSettingsLeftControl(composite);
-        leftControl.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-        Composite rightControl = createSettingsRightControl(composite);
-        GridData gd = new GridData(GridData.FILL_VERTICAL);
-        gd.widthHint = 100;
-        rightControl.setLayoutData(gd);
-
-        return composite;
-    }
-
-    public Composite createSettingsLeftControl(Composite parent) {
-
-        Composite composite = toolkit.createComposite(parent);
-
-        GridLayout layout = new GridLayout(2, false);
-        layout.marginWidth = 0;
-        layout.marginHeight = 0;
-        composite.setLayout(layout);
-
-        Label adapterLabel = toolkit.createLabel(composite, "Adapter:");
-        GridData gd = new GridData();
-        gd.widthHint = 100;
-        adapterLabel.setLayoutData(gd);
-
-        adapterText = toolkit.createLabel(composite, "", SWT.NONE);
-        adapterText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         toolkit.createLabel(composite, "Driver:");
 
@@ -274,7 +150,7 @@ public class JDBCConnectionPropertiesPage extends ConnectionEditorPage {
         return composite;
     }
 
-    public Composite createSettingsRightControl(final Composite parent) {
+    public Composite createJDBCRightControl(final Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
 
@@ -315,11 +191,6 @@ public class JDBCConnectionPropertiesPage extends ConnectionEditorPage {
     }
 
     public void refresh() {
-        nameText.setText(connectionConfig.getName() == null ? "" : connectionConfig.getName());
-        //descriptionText.setText(connectionConfig.getDescription() == null ? "" : connectionConfig.getDescription());
-
-        adapterText.setText(connectionConfig.getAdapterName() == null ? "" : connectionConfig.getAdapterName());
-
         String s = connectionConfig.getParameter(JDBCClient.DRIVER);
         driverText.setText(s == null ? "" : s);
 

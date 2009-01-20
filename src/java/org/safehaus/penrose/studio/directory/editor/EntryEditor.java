@@ -33,6 +33,8 @@ import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.config.editor.ParametersPage;
+import org.safehaus.penrose.studio.acl.editor.ACLPage;
 import org.safehaus.penrose.studio.server.Server;
 
 public class EntryEditor extends FormEditor implements ModifyListener {
@@ -47,6 +49,8 @@ public class EntryEditor extends FormEditor implements ModifyListener {
     protected EntryConfig entryConfig;
 
     boolean dirty;
+
+    ParametersPage parametersPage;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         super.init(site, input);
@@ -83,11 +87,14 @@ public class EntryEditor extends FormEditor implements ModifyListener {
 
     protected void addPages() {
         try {
-            addPage(new LDAPPage(this));
-            addPage(new SourcesPage(this));
+            addPage(new EntryPropertiesPage(this));
+            addPage(new EntryLDAPPage(this));
+            addPage(new EntrySourcesPage(this));
             addPage(new ACLPage(this, server, partitionName, entryConfig));
-            addPage(new EntryClassPage(this));
-            //addPage(new EntryCachePage(this));
+
+            parametersPage = new ParametersPage(this, "Entry Editor");
+            parametersPage.setParameters(entryConfig.getParameters());
+            addPage(parametersPage);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -99,12 +106,16 @@ public class EntryEditor extends FormEditor implements ModifyListener {
         return getContainer();
     }
 
-    public void showSourcesPage() {
+    public void showLDAPPage() {
         setActivePage(1);
     }
 
-    public void showACLPage() {
+    public void showSourcesPage() {
         setActivePage(2);
+    }
+
+    public void showACLPage() {
+        setActivePage(3);
     }
 
     public void doSave(IProgressMonitor iProgressMonitor) {
@@ -120,15 +131,6 @@ public class EntryEditor extends FormEditor implements ModifyListener {
     }
 
 	public void store() throws Exception {
-/*
-        DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
-        if (!origEntryConfig.getDn().matches(entryConfig.getDn())) {
-            directoryConfig.renameEntryConfig(origEntryConfig, entryConfig.getDn());
-        }
-
-        origEntryConfig.copy(entryConfig);
-*/
-        //project.save(partitionConfig, directoryConfig);
 
         PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();

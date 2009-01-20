@@ -140,7 +140,7 @@ public class SelectSourceWizardPage extends WizardPage {
 
         tc = new TableColumn(infoTable, SWT.NONE);
         tc.setWidth(300);
-
+/*
         Composite buttons = new Composite(composite, SWT.NONE);
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
@@ -202,7 +202,7 @@ public class SelectSourceWizardPage extends WizardPage {
                 }
             }
         });
-
+*/
         refresh();
     }
 

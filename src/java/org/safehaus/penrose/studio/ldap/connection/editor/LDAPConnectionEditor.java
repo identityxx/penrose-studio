@@ -18,17 +18,25 @@
 package org.safehaus.penrose.studio.ldap.connection.editor;
 
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditor;
-import org.safehaus.penrose.studio.connection.editor.ConnectionParametersPage;
+import org.safehaus.penrose.studio.connection.editor.ConnectionPropertiesPage;
+import org.safehaus.penrose.studio.config.editor.ParametersPage;
 
 /**
  * @author Endi S. Dewata
  */
 public class LDAPConnectionEditor extends ConnectionEditor {
 
+    ParametersPage parametersPage;
+
     public void addPages() {
         try {
+            addPage(new ConnectionPropertiesPage(this));
             addPage(new LDAPConnectionPropertiesPage(this));
-            addPage(new ConnectionParametersPage(this));
+
+            parametersPage = new ParametersPage(this, "Connection Editor");
+            parametersPage.setParameters(connectionConfig.getParameters());
+            addPage(parametersPage);
+
             addPage(new LDAPConnectionBrowserPage(this));
             addPage(new LDAPConnectionSchemaPage(this));
 

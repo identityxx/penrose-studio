@@ -21,7 +21,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.connection.wizard.ConnectionNamePage;
+import org.safehaus.penrose.studio.connection.wizard.ConnectionPropertiesWizardPage;
 import org.safehaus.penrose.studio.config.wizard.ParametersWizardPage;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
@@ -41,7 +41,7 @@ public class LDAPConnectionWizard extends Wizard {
     private String partitionName;
     private ConnectionConfig connectionConfig;
 
-    public ConnectionNamePage namePage;
+    public ConnectionPropertiesWizardPage namePage;
 
     public LDAPConnectionSettingsWizardPage settingsPage;
     public ParametersWizardPage parametersPage;
@@ -53,7 +53,7 @@ public class LDAPConnectionWizard extends Wizard {
 
     public void addPages() {
 
-        namePage = new ConnectionNamePage();
+        namePage = new ConnectionPropertiesWizardPage();
         addPage(namePage);
 
         settingsPage = new LDAPConnectionSettingsWizardPage();
@@ -74,7 +74,7 @@ public class LDAPConnectionWizard extends Wizard {
     public boolean performFinish() {
         try {
             connectionConfig = new ConnectionConfig();
-            connectionConfig.setName(namePage.getConnectionName());
+            connectionConfig.setName(namePage.getName());
             connectionConfig.setAdapterName("LDAP");
 
             Map<String,String> parameters = settingsPage.getParameters();
