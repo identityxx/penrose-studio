@@ -20,7 +20,7 @@ package org.safehaus.penrose.studio.directory.action;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.directory.DirectoryNode;
-import org.safehaus.penrose.studio.directory.wizard.CreateRootDSEProxyWizard;
+import org.safehaus.penrose.studio.directory.wizard.RootDSEProxyWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.ServersView;
@@ -45,8 +45,8 @@ public class MapRootDSEAction extends Action {
             Server project = directoryNode.getProjectNode().getServer();
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
 
-            CreateRootDSEProxyWizard wizard = new CreateRootDSEProxyWizard();
-            wizard.setProject(project);
+            RootDSEProxyWizard wizard = new RootDSEProxyWizard();
+            wizard.setServer(project);
             wizard.setPartitionName(directoryNode.getPartitionName());
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);

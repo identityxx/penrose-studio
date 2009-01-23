@@ -27,7 +27,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
-import org.safehaus.penrose.studio.jdbc.connection.wizard.JDBCConnectionSettingsWizard;
+import org.safehaus.penrose.studio.jdbc.connection.wizard.JDBCConnectionPropertiesWizard;
 import org.safehaus.penrose.jdbc.JDBCClient;
 
 /**
@@ -35,6 +35,7 @@ import org.safehaus.penrose.jdbc.JDBCClient;
  */
 public class JDBCConnectionPropertiesPage extends ConnectionEditorPage {
 
+    Label adapterText;
     Label driverText;
     Label urlText;
     Label usernameText;
@@ -85,68 +86,31 @@ public class JDBCConnectionPropertiesPage extends ConnectionEditorPage {
         layout.marginHeight = 0;
         composite.setLayout(layout);
 
+        toolkit.createLabel(composite, "Adapter:");
+
+        adapterText = toolkit.createLabel(composite, "", SWT.READ_ONLY);
+        adapterText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
         toolkit.createLabel(composite, "Driver:");
 
         driverText = toolkit.createLabel(composite, "", SWT.NONE);
         driverText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-/*
-        driverText.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent event) {
-                connectionConfig.setParameter(JDBCClient.DRIVER, driverText.getText());
-                checkDirty();
-            }
-        });
-*/
+
         toolkit.createLabel(composite, "URL:");
 
         urlText = toolkit.createLabel(composite, "", SWT.NONE);
         urlText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-/*
-        urlText.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent event) {
-                connectionConfig.setParameter(JDBCClient.URL, urlText.getText());
-                checkDirty();
-            }
-        });
-*/
+
         toolkit.createLabel(composite, "Username:");
 
         usernameText = toolkit.createLabel(composite, "", SWT.NONE);
         usernameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-/*
-        usernameText.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent event) {
-                connectionConfig.setParameter(JDBCClient.USER, usernameText.getText());
-                checkDirty();
-            }
-        });
-*/
+
         toolkit.createLabel(composite, "Password:");
 
         passwordText = toolkit.createLabel(composite, "", SWT.PASSWORD );
-		
         passwordText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-/*
-        passwordText.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent event) {
-                connectionConfig.setParameter(JDBCClient.PASSWORD, passwordText.getText());
-                checkDirty();
-            }
-        });
 
-        toolkit.createLabel(composite, "");
-
-        Button testButton = new Button(composite, SWT.PUSH);
-		testButton.setText("Test Connection");
-
-
-        testButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
-
-                Helper.testJdbcConnection(getEditor().getSite().getShell(), driverText.getText(), urlText.getText(), usernameText.getText(), passwordText.getText());
-            }
-        });
-*/
         return composite;
     }
 
@@ -166,7 +130,7 @@ public class JDBCConnectionPropertiesPage extends ConnectionEditorPage {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    JDBCConnectionSettingsWizard wizard = new JDBCConnectionSettingsWizard();
+                    JDBCConnectionPropertiesWizard wizard = new JDBCConnectionPropertiesWizard();
                     wizard.setServer(server);
                     wizard.setPartitionName(partitionName);
                     wizard.setConnectionConfig(connectionConfig);
@@ -191,6 +155,10 @@ public class JDBCConnectionPropertiesPage extends ConnectionEditorPage {
     }
 
     public void refresh() {
+
+        String adapter = connectionConfig.getAdapterName();
+        adapterText.setText(adapter == null ? "" : adapter);
+
         String s = connectionConfig.getParameter(JDBCClient.DRIVER);
         driverText.setText(s == null ? "" : s);
 

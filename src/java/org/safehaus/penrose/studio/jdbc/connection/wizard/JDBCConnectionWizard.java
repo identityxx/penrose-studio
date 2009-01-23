@@ -44,9 +44,9 @@ public class JDBCConnectionWizard extends Wizard {
     private String partitionName;
     private ConnectionConfig connectionConfig;
 
-    public ConnectionPropertiesWizardPage namePage;
+    public ConnectionPropertiesWizardPage propertiesPage;
     public JDBCDriverWizardPage driverPage;
-    public JDBCConnectionSettingsWizardPage settingsPage;
+    public JDBCConnectionPropertiesWizardPage settingsPage;
 
     public JDBCConnectionWizard() {
         setWindowTitle("New JDBC Connection");
@@ -54,15 +54,20 @@ public class JDBCConnectionWizard extends Wizard {
 
     public void addPages() {
 
-        namePage = new ConnectionPropertiesWizardPage();
+        propertiesPage = new ConnectionPropertiesWizardPage();
 
-        addPage(namePage);
+        propertiesPage.setConnectionName(connectionConfig.getName());
+        propertiesPage.setClassName(connectionConfig.getConnectionClass());
+        propertiesPage.setEnabled(connectionConfig.isEnabled());
+        propertiesPage.setConnectionDescription(connectionConfig.getDescription());
+
+        addPage(propertiesPage);
 
         driverPage = new JDBCDriverWizardPage();
 
         addPage(driverPage);
 
-        settingsPage = new JDBCConnectionSettingsWizardPage();
+        settingsPage = new JDBCConnectionPropertiesWizardPage();
         settingsPage.setServer(server);
         settingsPage.setPartitionName(partitionName);
 
@@ -79,7 +84,7 @@ public class JDBCConnectionWizard extends Wizard {
     }
 
     public boolean canFinish() {
-        if (!namePage.isPageComplete()) return false;
+        if (!propertiesPage.isPageComplete()) return false;
         if (!driverPage.isPageComplete()) return false;
         if (!settingsPage.isPageComplete()) return false;
 
@@ -88,8 +93,10 @@ public class JDBCConnectionWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            connectionConfig = new ConnectionConfig();
-            connectionConfig.setName(namePage.getName());
+            connectionConfig.setName(propertiesPage.getConnectionName());
+            connectionConfig.setConnectionClass(propertiesPage.getClassName());
+            connectionConfig.setEnabled(propertiesPage.isEnabled());
+            connectionConfig.setDescription(propertiesPage.getConnectionDescription());
 
             connectionConfig.setAdapterName("JDBC");
 

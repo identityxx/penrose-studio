@@ -34,6 +34,7 @@ import org.safehaus.penrose.studio.connection.ConnectionNode;
 import org.safehaus.penrose.studio.jdbc.source.wizard.JDBCSourceWizard;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.source.SourceConfig;
 
 public class NewSourceAction extends Action {
 
@@ -65,12 +66,15 @@ public class NewSourceAction extends Action {
             ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(connectionName);
             ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
+            SourceConfig sourceConfig = new SourceConfig();
+
             SourceWizard wizard;
             if ("JDBC".equals(adapterName)) {
                 wizard = new JDBCSourceWizard();
                 wizard.setServer(project);
                 wizard.setPartitionName(partitionName);
                 wizard.setConnectionConfig(connectionConfig);
+                wizard.setSourceConfig(sourceConfig);
 
                 WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
                 dialog.setPageSize(600, 300);
@@ -81,6 +85,7 @@ public class NewSourceAction extends Action {
                 wizard.setServer(project);
                 wizard.setPartitionName(partitionName);
                 wizard.setConnectionConfig(connectionConfig);
+                wizard.setSourceConfig(sourceConfig);
 
                 WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
                 dialog.setPageSize(600, 300);
@@ -91,6 +96,7 @@ public class NewSourceAction extends Action {
                 wizard.setServer(project);
                 wizard.setPartitionName(partitionName);
                 wizard.setConnectionConfig(connectionConfig);
+                wizard.setSourceConfig(sourceConfig);
 
                 WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
                 dialog.setPageSize(600, 300);

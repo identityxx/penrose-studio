@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.service.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.service.ServiceConfig;
+import org.safehaus.penrose.studio.config.wizard.ParametersWizardPage;
 import org.apache.log4j.Logger;
 
 import java.util.Map;
@@ -32,11 +33,29 @@ public class ServiceWizard extends Wizard {
 
     private ServiceConfig serviceConfig;
 
-    public ServicePropertiesWizardPage propertiesPage = new ServicePropertiesWizardPage();
-    public ServiceParametersWizardPage parametersPage = new ServiceParametersWizardPage();
+    public ServicePropertiesWizardPage propertiesPage;
+    public ParametersWizardPage parametersPage;
 
     public ServiceWizard() {
         setWindowTitle("New Service");
+    }
+
+    public void addPages() {
+
+        propertiesPage = new ServicePropertiesWizardPage();
+
+        propertiesPage.setServiceName(serviceConfig.getName());
+        propertiesPage.setClassName(serviceConfig.getServiceClass());
+        propertiesPage.setEnabled(serviceConfig.isEnabled());
+        propertiesPage.setServiceDescription(serviceConfig.getDescription());
+
+        addPage(propertiesPage);
+
+        parametersPage = new ParametersWizardPage();
+
+        parametersPage.setParameters(serviceConfig.getParameters());
+
+        addPage(parametersPage);
     }
 
     public boolean canFinish() {
@@ -48,18 +67,12 @@ public class ServiceWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            serviceConfig = new ServiceConfig();
             serviceConfig.setName(propertiesPage.getServiceName());
             serviceConfig.setServiceClass(propertiesPage.getClassName());
             serviceConfig.setEnabled(propertiesPage.isEnabled());
             serviceConfig.setDescription(propertiesPage.getServiceDescription());
 
-            Map<String,String> parameters = parametersPage.getParameters();
-            for (String name : parameters.keySet()) {
-                String value = parameters.get(name);
-
-                serviceConfig.setParameter(name, value);
-            }
+            serviceConfig.setParameters(parametersPage.getParameters());
 
             return true;
 
@@ -67,11 +80,6 @@ public class ServiceWizard extends Wizard {
             log.error(e.getMessage(), e);
             return false;
         }
-    }
-
-    public void addPages() {
-        addPage(propertiesPage);
-        addPage(parametersPage);
     }
 
     public boolean needsPreviousAndNextButtons() {

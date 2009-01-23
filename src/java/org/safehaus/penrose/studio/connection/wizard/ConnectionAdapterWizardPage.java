@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.partition.wizard;
+package org.safehaus.penrose.studio.connection.wizard;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.*;
@@ -28,17 +28,17 @@ import org.eclipse.swt.layout.GridData;
 /**
  * @author Endi S. Dewata
  */
-public class PartitionNamePage extends WizardPage implements ModifyListener {
+public class ConnectionAdapterWizardPage extends WizardPage implements ModifyListener {
 
-    public final static String NAME = "Partition Name";
+    public final static String NAME = "Connection Properties";
 
-    Text partitionNameText;
+    Combo adapterCombo;
 
-    private String partitionName;
+    private String adapter;
 
-    public PartitionNamePage() {
+    public ConnectionAdapterWizardPage() {
         super(NAME);
-        setDescription("Enter the name of the partition.");
+        setDescription("Enter the adapter of the connection.");
     }
 
     public void createControl(Composite parent) {
@@ -47,27 +47,19 @@ public class PartitionNamePage extends WizardPage implements ModifyListener {
 
         composite.setLayout(new GridLayout(2, false));
 
-        Label nameLabel = new Label(composite, SWT.NONE);
-        nameLabel.setText("Name:");
-        GridData gd = new GridData(GridData.FILL);
-        gd.widthHint = 50;
-        nameLabel.setLayoutData(gd);
+        Label adapterLabel = new Label(composite, SWT.NONE);
+        adapterLabel.setText("Adater:");
+        adapterLabel.setLayoutData(new GridData());
 
-        partitionNameText = new Text(composite, SWT.BORDER);
-        partitionNameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        partitionNameText.addModifyListener(this);
-
-        partitionNameText.setText(partitionName == null ? "" : partitionName);
+        adapterCombo = new Combo(composite, SWT.BORDER);
+        adapterCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        adapterCombo.addModifyListener(this);
 
         setPageComplete(validatePage());
     }
 
-    public String getPartitionName() {
-        return partitionNameText.getText().trim();
-    }
-
     public boolean validatePage() {
-        if ("".equals(getPartitionName())) return false;
+        if (adapterCombo.getText().equals("")) return false;
         return true;
     }
 
@@ -75,7 +67,21 @@ public class PartitionNamePage extends WizardPage implements ModifyListener {
         setPageComplete(validatePage());
     }
 
-    public void setPartitionName(String partitionName) {
-        this.partitionName = partitionName;
+    public void setVisible(boolean b) {
+        super.setVisible(b);
+        if (b) refresh();
+    }
+
+    public void refresh() {
+        adapterCombo.setText(adapter == null ? "" : adapter);
+    }
+
+    public String getAdapter() {
+        String adapter = adapterCombo.getText();
+        return "".equals(adapter) ? null : adapter;
+    }
+
+    public void setAdapter(String adapter) {
+        this.adapter = adapter;
     }
 }

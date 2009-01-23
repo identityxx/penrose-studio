@@ -23,7 +23,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -138,40 +137,11 @@ public class LDAPSourcePrimaryKeysWizardPage extends WizardPage implements Selec
         }
     }
 
-    public void setAttributeTypes(Collection<AttributeType> attributeTypes) {
-        setAttributeTypes(attributeTypes, new ArrayList<String>());
+    public Map<String,FieldConfig> getFieldConfigs() {
+        return fieldConfigs;
     }
 
-    public void setAttributeTypes(Collection<AttributeType> attributeTypes, Collection<String> primaryKeyNames) {
-        fieldsTable.removeAll();
-
-        for (AttributeType attributeType : attributeTypes) {
-            String name = attributeType.getName();
-            boolean pk = primaryKeyNames.contains(name.toLowerCase());
-
-            FieldConfig field = new FieldConfig();
-            field.setName(name);
-            field.setPrimaryKey(pk);
-
-            TableItem it = new TableItem(fieldsTable, SWT.CHECK);
-            it.setImage(PenroseStudio.getImage(pk ? PenroseImage.KEY : PenroseImage.NOKEY));
-            it.setText(0, name);
-            it.setText(1, field.getType());
-            it.setChecked(field.isPrimaryKey());
-            it.setData(field);
-        }
-
-        setPageComplete(validatePage());
+    public void setFieldConfigs(Map<String,FieldConfig> fieldConfigs) {
+        this.fieldConfigs = fieldConfigs;
     }
-
-    public Collection<FieldConfig> getFields() {
-        Collection<FieldConfig> fields = new ArrayList<FieldConfig>();
-        TableItem items[] = fieldsTable.getItems();
-        for (TableItem item : items) {
-            FieldConfig field = (FieldConfig) item.getData();
-            fields.add(field);
-        }
-        return fields;
-    }
-
 }

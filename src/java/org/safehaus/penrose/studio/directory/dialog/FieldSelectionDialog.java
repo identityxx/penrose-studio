@@ -24,6 +24,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
+import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 
@@ -39,6 +40,8 @@ public class FieldSelectionDialog extends Dialog {
 
     Table table;
 
+    int action = Window.CANCEL;
+
     private Collection<String> selections = new ArrayList<String>();
 
 	public FieldSelectionDialog(Shell parent, int style) {
@@ -49,7 +52,7 @@ public class FieldSelectionDialog extends Dialog {
         createControl(shell);
     }
 
-    public void open () {
+    public int open () {
 
         Point size = new Point(400, 300);
         shell.setSize(size);
@@ -67,6 +70,8 @@ public class FieldSelectionDialog extends Dialog {
         while (!shell.isDisposed()) {
             if (!display.readAndDispatch()) display.sleep();
         }
+
+        return action;
     }
 
     public void setFieldNames(Collection<String> list) {
@@ -100,6 +105,7 @@ public class FieldSelectionDialog extends Dialog {
                 for (TableItem item : items) {
                     selections.add(item.getText());
                 }
+                action = Window.OK;
                 shell.close();
 			}
 		});

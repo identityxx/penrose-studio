@@ -41,6 +41,7 @@ public class LDAPSourcePropertiesWizard extends SourceWizard {
     public void addPages() {
 
         connectionPage = new SelectConnectionWizardPage();
+        
         connectionPage.setServer(server);
         connectionPage.setPartitionName(partitionName);
         connectionPage.setAdapterType("LDAP");

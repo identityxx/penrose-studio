@@ -24,6 +24,7 @@ import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.ldap.source.wizard.LDAPSourceWizard;
 import org.safehaus.penrose.studio.source.SourcesNode;
+import org.safehaus.penrose.source.SourceConfig;
 import org.apache.log4j.Logger;
 
 public class NewLDAPSourceAction extends Action {
@@ -44,9 +45,12 @@ public class NewLDAPSourceAction extends Action {
             ServersView serversView = ServersView.getInstance();
             Server server = sourcesNode.getProjectNode().getServer();
 
+            SourceConfig sourceConfig = new SourceConfig();
+
             LDAPSourceWizard wizard = new LDAPSourceWizard();
             wizard.setServer(server);
             wizard.setPartitionName(sourcesNode.getPartitionName());
+            wizard.setSourceConfig(sourceConfig);
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);

@@ -43,12 +43,16 @@ public class LDAPSourceFieldsWizard extends SourceWizard {
     Map<String,FieldConfig> selectedFieldConfigs = new TreeMap<String,FieldConfig>();
 
     public LDAPSourceFieldsWizard() throws Exception {
-        setWindowTitle("New LDAP Source");
+        setWindowTitle("Edit LDAP Source Fields");
     }
 
     public void addPages() {
 
         Schema schema = getSchema();
+
+        for (FieldConfig fieldConfig : sourceConfig.getFieldConfigs()) {
+            selectedFieldConfigs.put(fieldConfig.getName(), fieldConfig);
+        }
 
         fieldsPage = new LDAPSourceFieldsWizardPage();
         fieldsPage.setSchema(schema);

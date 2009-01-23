@@ -21,6 +21,7 @@ import javax.naming.InitialContext;
  */
 public class NISConnectionPropertiesPage extends ConnectionEditorPage {
 
+    Label adapterText;
     Label hostnameText;
     Label domainText;
 
@@ -73,6 +74,11 @@ public class NISConnectionPropertiesPage extends ConnectionEditorPage {
         layout.marginHeight = 0;
         composite.setLayout(layout);
 
+        toolkit.createLabel(composite, "Adapter:");
+
+        adapterText = toolkit.createLabel(composite, "", SWT.READ_ONLY);
+        adapterText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
         Label hostLabel = toolkit.createLabel(composite, "Server:");
         GridData gd = new GridData();
         gd.widthHint = 100;
@@ -80,28 +86,12 @@ public class NISConnectionPropertiesPage extends ConnectionEditorPage {
 
         hostnameText = toolkit.createLabel(composite, "", SWT.NONE);
         hostnameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-/*
-        hostnameText.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent event) {
-                String url = getURL();
-                connectionConfig.setParameter(Context.PROVIDER_URL, url);
-                checkDirty();
-            }
-        });
-*/
+
         toolkit.createLabel(composite, "Domain:");
 
         domainText = toolkit.createLabel(composite, "", SWT.NONE);
         domainText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-/*
-        domainText.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent event) {
-                String url = getURL();
-                connectionConfig.setParameter(Context.PROVIDER_URL, url);
-                checkDirty();
-            }
-        });
-*/
+
         return composite;
     }
 
@@ -146,6 +136,9 @@ public class NISConnectionPropertiesPage extends ConnectionEditorPage {
     }
 
     public void refresh() {
+
+        String adapter = connectionConfig.getAdapterName();
+        adapterText.setText(adapter == null ? "" : adapter);
 
         String url = connectionConfig.getParameter(InitialContext.PROVIDER_URL);
         String hostname = null;

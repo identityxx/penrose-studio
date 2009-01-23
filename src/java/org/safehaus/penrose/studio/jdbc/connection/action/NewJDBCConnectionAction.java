@@ -25,6 +25,7 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.jdbc.connection.wizard.JDBCConnectionWizard;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.connection.ConnectionsNode;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
 public class NewJDBCConnectionAction extends Action {
@@ -45,9 +46,12 @@ public class NewJDBCConnectionAction extends Action {
             ServersView serversView = ServersView.getInstance();
             Server project = connectionsNode.getProjectNode().getServer();
 
+            ConnectionConfig connectionConfig = new ConnectionConfig();
+
             JDBCConnectionWizard wizard = new JDBCConnectionWizard();
             wizard.setServer(project);
             wizard.setPartitionName(connectionsNode.getPartitionName());
+            wizard.setConnectionConfig(connectionConfig);
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);

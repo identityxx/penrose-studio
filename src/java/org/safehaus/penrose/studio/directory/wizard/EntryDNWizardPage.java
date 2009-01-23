@@ -21,170 +21,85 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.*;
-import org.safehaus.penrose.ldap.DN;
-import org.safehaus.penrose.ldap.RDN;
-import org.safehaus.penrose.studio.directory.dialog.EntrySelectionDialog;
-import org.safehaus.penrose.studio.server.Server;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
+import org.ietf.ldap.LDAPDN;
 
 /**
  * @author Endi S. Dewata
  */
 public class EntryDNWizardPage extends WizardPage implements ModifyListener {
 
-    Logger log = LoggerFactory.getLogger(getClass());
-    
-    public final static String NAME = "Entry RDN";
+    public final static String NAME = "Entry DN";
 
-    Text rdnText;
-    Text parentDnText;
-    Button browseButton;
-
-    private Server server;
-    private String partitionName;
-    private RDN rdn;
-    private DN parentDn;
+    Text dnText;
+    //Combo classNameCombo;
 
     public EntryDNWizardPage() {
         super(NAME);
+
+        setDescription("Enter the DN and optionally the class name of the entry.");
     }
 
     public void createControl(final Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
         setControl(composite);
 
-        GridLayout sectionLayout = new GridLayout();
-        sectionLayout.numColumns = 3;
-        composite.setLayout(sectionLayout);
+        composite.setLayout(new GridLayout(2, false));
 
-        Label nameLabel = new Label(composite, SWT.NONE);
-        nameLabel.setText("RDN:");
-        GridData gd = new GridData(GridData.FILL);
+        Label dnLabel = new Label(composite, SWT.NONE);
+        dnLabel.setText("DN:");
+        GridData gd = new GridData();
         gd.widthHint = 50;
-        nameLabel.setLayoutData(gd);
+        dnLabel.setLayoutData(gd);
 
-        rdnText = new Text(composite, SWT.BORDER);
-        if (rdn != null) {
-            rdnText.setText(rdn.toString());
-        }
-
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalSpan = 2;
-        rdnText.setLayoutData(gd);
-        rdnText.addModifyListener(this);
+        dnText = new Text(composite, SWT.BORDER);
+        dnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        dnText.addModifyListener(this);
 
         new Label(composite, SWT.NONE);
 
-        Label exampleRdnLabel = new Label(composite, SWT.NONE);
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalSpan = 2;
-        exampleRdnLabel.setLayoutData(gd);
-        exampleRdnLabel.setText("Example: ou=Users");
-
+        Label exampleDnLabel = new Label(composite, SWT.NONE);
+        exampleDnLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        exampleDnLabel.setText("Example: dc=Example,dc=com");
+/*
         new Label(composite, SWT.NONE);
         new Label(composite, SWT.NONE);
         new Label(composite, SWT.NONE);
 
-        Label parentDnLabel = new Label(composite, SWT.NONE);
-        parentDnLabel.setText("Parent DN:");
-        parentDnLabel.setLayoutData(new GridData());
+        Label classLabel = new Label(composite, SWT.NONE);
+        classLabel.setText("Class:");
+        gd = new GridData();
+        gd.widthHint = 50;
+        classLabel.setLayoutData(gd);
 
-        parentDnText = new Text(composite, SWT.BORDER);
-        if (parentDn != null) {
-            parentDnText.setText(parentDn.toString());
-        }
+        classNameCombo = new Combo(composite, SWT.BORDER);
+        classNameCombo.add("");
+        classNameCombo.add("org.safehaus.penrose.directory.DynamicEntry");
+        classNameCombo.add("org.safehaus.penrose.directory.ProxyEntry");
 
-        parentDnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        parentDnText.addModifyListener(this);
-
-        browseButton = new Button(composite, SWT.PUSH);
-        browseButton.setText("Browse...");
-
-        browseButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                try {
-                    EntrySelectionDialog dialog = new EntrySelectionDialog(parent.getShell(), SWT.NONE);
-                    dialog.setText("Select parent entry...");
-                    dialog.setServer(server);
-                    dialog.setPartitionName(partitionName);
-                    dialog.open();
-
-                    DN dn = dialog.getDn();
-                    if (dn == null) return;
-
-                    parentDnText.setText(dn.toString());
-                    
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
-                }
-            }
-        });
-
+        classNameCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        classNameCombo.addModifyListener(this);
+*/
         setPageComplete(validatePage());
     }
 
-    public RDN getRdn() {
-        if ("".equals(rdnText.getText())) return null;
-
-        try {
-            return new RDN(rdnText.getText());
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return null;
-        }
+    public String getDn() {
+        return dnText.getText();
     }
-
-    public String getParentDn() {
-        if ("".equals(parentDnText.getText())) return null;
-
-        try {
-            return parentDnText.getText();
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return null;
-        }
+/*
+    public String getClassName() {
+        return "".equals(classNameCombo.getText()) ? null : classNameCombo.getText();
     }
-
+*/
     public boolean validatePage() {
-        RDN rdn = getRdn();
-        if (rdn == null) return false;
-        return true;
+        return LDAPDN.isValid(getDn());
     }
 
     public void modifyText(ModifyEvent event) {
         setPageComplete(validatePage());
-    }
-
-    public String getPartitionName() {
-        return partitionName;
-    }
-
-    public void setPartitionName(String partitionName) {
-        this.partitionName = partitionName;
-    }
-
-    public Server getServer() {
-        return server;
-    }
-
-    public void setServer(Server server) {
-        this.server = server;
-    }
-
-    public void setRdn(RDN rdn) {
-        this.rdn = rdn;
-    }
-
-    public void setParentDn(DN parentDn) {
-        this.parentDn = parentDn;
     }
 }

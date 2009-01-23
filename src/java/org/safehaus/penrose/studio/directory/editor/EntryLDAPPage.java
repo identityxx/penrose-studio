@@ -49,9 +49,9 @@ import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.directory.dialog.ExpressionDialog;
-import org.safehaus.penrose.studio.directory.wizard.EntryDNWizard;
+import org.safehaus.penrose.studio.directory.wizard.EntryRDNWizard;
 import org.safehaus.penrose.studio.directory.wizard.ObjectClassWizard;
-import org.safehaus.penrose.studio.directory.wizard.AttributeWizard;
+import org.safehaus.penrose.studio.directory.wizard.AttributesWizard;
 
 import java.util.Collection;
 import java.util.Map;
@@ -188,7 +188,7 @@ public class EntryLDAPPage extends FormPage {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    EntryDNWizard wizard = new EntryDNWizard();
+                    EntryRDNWizard wizard = new EntryRDNWizard();
                     wizard.setEntryConfig(entryConfig);
                     wizard.setServer(editor.server);
                     wizard.setPartitionName(editor.getPartitionName());
@@ -460,7 +460,7 @@ public class EntryLDAPPage extends FormPage {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    AttributeWizard wizard = new AttributeWizard();
+                    AttributesWizard wizard = new AttributesWizard();
                     wizard.setServer(editor.getServer());
                     wizard.setPartitionName(editor.getPartitionName());
                     wizard.setEntryConfig(entryConfig);

@@ -36,13 +36,11 @@ public class ConnectionPropertiesWizardPage extends WizardPage implements Modify
 
     Text nameText;
     Combo classCombo;
-    Combo adapterCombo;
     Button enabledCheckbox;
     Text descriptionText;
 
     private String name;
     private String className;
-    private String adapter;
     private boolean enabled;
     private String description;
 
@@ -72,14 +70,6 @@ public class ConnectionPropertiesWizardPage extends WizardPage implements Modify
         classCombo = new Combo(composite, SWT.BORDER);
         classCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         classCombo.addModifyListener(this);
-
-        Label adapterLabel = new Label(composite, SWT.NONE);
-        adapterLabel.setText("Adater:");
-        adapterLabel.setLayoutData(new GridData());
-
-        adapterCombo = new Combo(composite, SWT.BORDER);
-        adapterCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        adapterCombo.addModifyListener(this);
 
         Label enabledLabel = new Label(composite, SWT.NONE);
         enabledLabel.setText("Enabled:");
@@ -123,7 +113,6 @@ public class ConnectionPropertiesWizardPage extends WizardPage implements Modify
     public void refresh() {
         nameText.setText(name == null ? "" : name);
         classCombo.setText(className == null ? "" : className);
-        adapterCombo.setText(adapter == null ? "" : adapter);
         enabledCheckbox.setSelection(enabled);
         descriptionText.setText(description == null ? "" : description);
     }
@@ -144,15 +133,6 @@ public class ConnectionPropertiesWizardPage extends WizardPage implements Modify
 
     public void setClassName(String className) {
         this.className = className;
-    }
-
-    public String getAdapter() {
-        String adapter = adapterCombo.getText();
-        return "".equals(adapter) ? null : adapter;
-    }
-
-    public void setAdapter(String adapter) {
-        this.adapter = adapter;
     }
 
     public boolean isEnabled() {

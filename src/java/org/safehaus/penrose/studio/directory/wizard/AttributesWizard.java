@@ -21,51 +21,42 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.directory.*;
-import org.safehaus.penrose.ldap.DN;
-import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.directory.wizard.EntrySourceWizardPage;
 
 /**
  * @author Endi S. Dewata
  */
-public class ProxyEntryWizard extends Wizard {
+public class AttributesWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
     private Server server;
     private String partitionName;
-    private DN parentDn;
     private EntryConfig entryConfig;
 
-    public EntryRDNWizardPage rdnPage;
-    public EntrySourceWizardPage sourcesPage;
+    public AttributesWizardPage attributePage;
 
-    public ProxyEntryWizard() {
-        setWindowTitle("Adding proxy entry");
+    public AttributesWizard() {
+        setWindowTitle("Edit Attributes");
     }
 
     public void addPages() {
 
-        rdnPage = new EntryRDNWizardPage();
-        rdnPage.setDescription("Enter the RDN of the entry.");
-        rdnPage.setServer(server);
-        rdnPage.setPartitionName(partitionName);
-        rdnPage.setParentDn(parentDn);
+        attributePage = new AttributesWizardPage();
+        attributePage.setDescription("Enter the attributes of the entry.");
+        
+        attributePage.setServer(server);
+        attributePage.setPartitionName(partitionName);
+        attributePage.setSourceConfigs(entryConfig.getSourceConfigs());
+        attributePage.setObjectClasses(entryConfig.getObjectClasses());
+        attributePage.setAttributeConfigs(entryConfig.getAttributeConfigs());
+        attributePage.setDefaultType(AttributesWizardPage.VARIABLE);
 
-        addPage(rdnPage);
-
-        sourcesPage = new EntrySourceWizardPage();
-        sourcesPage.setDescription("Select proxy source.");
-        sourcesPage.setServer(server);
-        sourcesPage.setPartitionName(partitionName);
-
-        addPage(sourcesPage);
+        addPage(attributePage);
     }
 
     public boolean canFinish() {
-        if (!rdnPage.isPageComplete()) return false;
-        if (!sourcesPage.isPageComplete()) return false;
+        if (!attributePage.isPageComplete()) return false;
 
         return true;
     }
@@ -76,15 +67,7 @@ public class ProxyEntryWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            entryConfig.setEntryClass("org.safehaus.penrose.directory.ProxyEntry");
-
-            DNBuilder db = new DNBuilder();
-            db.append(rdnPage.getRdn());
-            db.append(parentDn);
-            //db.append(rdnPage.getParentDn());
-            entryConfig.setDn(db.toDn());
-
-            entryConfig.addSourceConfigs(sourcesPage.getEntrySourceConfigs());
+            entryConfig.setAttributeConfigs(attributePage.getAttributeConfigs());
 
             return true;
 
@@ -98,14 +81,6 @@ public class ProxyEntryWizard extends Wizard {
         return true;
     }
 
-    public DN getParentDn() {
-        return parentDn;
-    }
-
-    public void setParentDn(DN parentDn) {
-        this.parentDn = parentDn;
-    }
-
     public EntryConfig getEntryConfig() {
         return entryConfig;
     }
@@ -114,19 +89,19 @@ public class ProxyEntryWizard extends Wizard {
         this.entryConfig = entryConfig;
     }
 
-    public String getPartitionName() {
-        return partitionName;
-    }
-
-    public void setPartitionName(String partitionName) {
-        this.partitionName = partitionName;
-    }
-
     public Server getServer() {
         return server;
     }
 
     public void setServer(Server server) {
         this.server = server;
+    }
+
+    public String getPartitionName() {
+        return partitionName;
+    }
+
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 }

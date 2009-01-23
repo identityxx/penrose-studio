@@ -25,7 +25,6 @@ import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.partition.PartitionsNode;
 
 /**
  * @author Endi S. Dewata
@@ -34,21 +33,28 @@ public class CreatePartitionWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    public Server project;
-    public PartitionsNode partitionsNode;
+    private Server server;
 
-    public PartitionNamePage namePage = new PartitionNamePage();
-    public PartitionClassPage classPage = new PartitionClassPage();
+    public PartitionNamePage propertiesPage;
+    public PartitionStartupPage startupPage;
 
-    public CreatePartitionWizard(Server project, PartitionsNode partitionsNode) {
-        this.project = project;
-        this.partitionsNode = partitionsNode;
+    protected PartitionConfig partitionConfig;
+
+    public CreatePartitionWizard() {
         setWindowTitle("New Partition");
     }
 
     public void addPages() {
-        addPage(namePage);
-        addPage(classPage);
+
+        propertiesPage = new PartitionNamePage();
+        propertiesPage.setPartitionName(partitionConfig.getName());
+
+        addPage(propertiesPage);
+
+        startupPage = new PartitionStartupPage();
+        startupPage.setEnabled(partitionConfig.isEnabled());
+
+        addPage(startupPage);
     }
 
     public boolean needsPreviousAndNextButtons() {
@@ -57,30 +63,25 @@ public class CreatePartitionWizard extends Wizard {
 
     public boolean canFinish() {
 
-        if (!namePage.isPageComplete()) return false;
-        if (!classPage.isPageComplete()) return false;
+        if (!propertiesPage.isPageComplete()) return false;
+        if (!startupPage.isPageComplete()) return false;
 
         return true;
     }
 
     public boolean performFinish() {
         try {
-            String partitionName = namePage.getPartitionName();
-            String partitionClass = classPage.getPartitionClass();
+            String partitionName = propertiesPage.getPartitionName();
 
-            PartitionConfig partitionConfig = new PartitionConfig(partitionName);
-            partitionConfig.setPartitionClass(partitionClass);
+            partitionConfig.setName(partitionName);
 
-            //PartitionConfigManager partitionConfigManager = project.getPartitionConfigManager();
-            //partitionConfigManager.addPartitionConfig(partitionConfig);
-
-            //project.save(partitionConfig);
-            
-            //partitionsNode.addPartitionConfig(partitionConfig);
-
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             partitionManagerClient.addPartition(partitionConfig);
+
+            if (startupPage.isEnabled()) {
+                partitionManagerClient.startPartition(partitionName);
+            }
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
@@ -92,5 +93,21 @@ public class CreatePartitionWizard extends Wizard {
             ErrorDialog.open(e);
             return false;
         }
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
+    }
+
+    public PartitionConfig getPartitionConfig() {
+        return partitionConfig;
+    }
+
+    public void setPartitionConfig(PartitionConfig partitionConfig) {
+        this.partitionConfig = partitionConfig;
     }
 }

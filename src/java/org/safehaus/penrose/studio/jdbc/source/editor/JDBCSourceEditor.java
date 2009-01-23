@@ -17,10 +17,7 @@
  */
 package org.safehaus.penrose.studio.jdbc.source.editor;
 
-import org.safehaus.penrose.studio.source.editor.SourceEditor;
-import org.safehaus.penrose.studio.source.editor.SourceBrowsePage;
-import org.safehaus.penrose.studio.source.editor.SourcePropertiesPage;
-import org.safehaus.penrose.studio.source.editor.SourceFieldsPage;
+import org.safehaus.penrose.studio.source.editor.*;
 import org.safehaus.penrose.studio.config.editor.ParametersPage;
 
 public class JDBCSourceEditor extends SourceEditor {
@@ -33,7 +30,7 @@ public class JDBCSourceEditor extends SourceEditor {
             addPage(new JDBCSourcePropertyPage(this));
             addPage(new JDBCSourceFieldsPage(this));
 
-            parametersPage = new ParametersPage(this, "Source Editor");
+            parametersPage = new SourceParametersPage(this);
             parametersPage.setParameters(sourceConfig.getParameters());
             addPage(parametersPage);
 

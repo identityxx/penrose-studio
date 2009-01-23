@@ -20,16 +20,11 @@ package org.safehaus.penrose.studio.ldap.connection.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.connection.ConnectionManagerClient;
-import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.jdbc.connection.wizard.JDBCConnectionSettingsWizardPage;
-import org.safehaus.penrose.jdbc.JDBCClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.apache.log4j.Logger;
-
-import java.util.Map;
 
 /**
  * @author Endi S. Dewata

@@ -30,7 +30,7 @@ import org.eclipse.swt.layout.GridData;
 /**
  * @author Endi S. Dewata
  */
-public class NISSourceSettingsWizardPage extends WizardPage implements SelectionListener, ModifyListener {
+public class NISSourcePropertiesWizardPage extends WizardPage implements SelectionListener, ModifyListener {
 
     public final static String NAME = "NIS Source Settings";
 
@@ -40,9 +40,9 @@ public class NISSourceSettingsWizardPage extends WizardPage implements Selection
     private String base;
     private String objectClasses;
 
-    public NISSourceSettingsWizardPage() {
+    public NISSourcePropertiesWizardPage() {
         super(NAME);
-        setDescription("Enter the base and object classes of the NIS source.");
+        setDescription("Enter the properties of the NIS source.");
     }
 
     public void createControl(Composite parent) {

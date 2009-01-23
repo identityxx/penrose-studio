@@ -33,7 +33,7 @@ import java.util.Map;
 /**
  * @author Endi S. Dewata
  */
-public class JDBCConnectionSettingsWizard extends Wizard {
+public class JDBCConnectionPropertiesWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -41,35 +41,35 @@ public class JDBCConnectionSettingsWizard extends Wizard {
     private String partitionName;
     private ConnectionConfig connectionConfig;
 
-    public JDBCConnectionSettingsWizardPage settingsPage;
+    public JDBCConnectionPropertiesWizardPage propertiesPage;
 
-    public JDBCConnectionSettingsWizard() {
-        setWindowTitle("Edit JDBC Connection Settings");
+    public JDBCConnectionPropertiesWizard() {
+        setWindowTitle("Edit JDBC Connection Properties");
     }
 
     public void addPages() {
 
-        settingsPage = new JDBCConnectionSettingsWizardPage();
-        settingsPage.setServer(server);
-        settingsPage.setPartitionName(partitionName);
-        settingsPage.setParameterValues(connectionConfig.getParameters());
+        propertiesPage = new JDBCConnectionPropertiesWizardPage();
+        propertiesPage.setServer(server);
+        propertiesPage.setPartitionName(partitionName);
+        propertiesPage.setParameterValues(connectionConfig.getParameters());
 
-        addPage(settingsPage);
+        addPage(propertiesPage);
     }
 
     public boolean canFinish() {
-        if (!settingsPage.isPageComplete()) return false;
+        if (!propertiesPage.isPageComplete()) return false;
 
         return true;
     }
 
     public boolean performFinish() {
         try {
-            Map<String,String> fieldValues = settingsPage.getFieldValues();
+            Map<String,String> fieldValues = propertiesPage.getFieldValues();
             String url = fieldValues.get(JDBCClient.URL);
             url = Helper.replace(url, fieldValues);
 
-            Map<String,String> parameters = settingsPage.getParameterValues();
+            Map<String,String> parameters = propertiesPage.getParameterValues();
             parameters.put(JDBCClient.URL, url);
             connectionConfig.setParameters(parameters);
 

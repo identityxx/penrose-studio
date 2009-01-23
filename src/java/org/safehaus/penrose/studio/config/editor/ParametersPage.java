@@ -117,6 +117,8 @@ public class ParametersPage extends FormPage {
                     parameters.clear();
                     parameters.putAll(wizard.getParameters());
 
+                    store();
+
                     refresh();
 
                 } catch (Exception e) {
@@ -153,5 +155,8 @@ public class ParametersPage extends FormPage {
             ti.setText(0, name);
             ti.setText(1, value);
         }
+    }
+
+    public void store() throws Exception {
     }
 }

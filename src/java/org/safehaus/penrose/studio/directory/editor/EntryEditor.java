@@ -92,7 +92,7 @@ public class EntryEditor extends FormEditor implements ModifyListener {
             addPage(new EntrySourcesPage(this));
             addPage(new ACLPage(this, server, partitionName, entryConfig));
 
-            parametersPage = new ParametersPage(this, "Entry Editor");
+            parametersPage = new EntryParametersPage(this);
             parametersPage.setParameters(entryConfig.getParameters());
             addPage(parametersPage);
 

@@ -52,7 +52,7 @@ import java.util.TreeMap;
 /**
  * @author Endi S. Dewata
  */
-public class AttributeWizardPage extends WizardPage implements SelectionListener {
+public class AttributesWizardPage extends WizardPage implements SelectionListener {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -76,7 +76,7 @@ public class AttributeWizardPage extends WizardPage implements SelectionListener
 
     private boolean needRdn = false;
 
-    public AttributeWizardPage() {
+    public AttributesWizardPage() {
         super(NAME);
         setDescription("Double-click the attribute to enter the values. Check attributes that will be used as RDN.");
     }

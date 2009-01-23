@@ -20,10 +20,7 @@ package org.safehaus.penrose.studio.ldap.source.wizard;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.events.TreeEvent;
-import org.eclipse.swt.events.TreeListener;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
@@ -38,7 +35,7 @@ import java.util.Collection;
 /**
  * @author Endi S. Dewata
  */
-public class LDAPSourceTreeWizardPage extends WizardPage implements SelectionListener, TreeListener {
+public class LDAPSourceTreeWizardPage extends WizardPage implements ModifyListener, SelectionListener, TreeListener {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -81,6 +78,8 @@ public class LDAPSourceTreeWizardPage extends WizardPage implements SelectionLis
         baseDnText = new Text(composite, SWT.BORDER);
         baseDnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+        baseDnText.addModifyListener(this);
+
         baseDnTree = new Tree(composite, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         GridData gd = new GridData(GridData.FILL_BOTH);
         gd.heightHint = 100;
@@ -110,16 +109,20 @@ public class LDAPSourceTreeWizardPage extends WizardPage implements SelectionLis
         filterText.setText("(objectClass=*)");
         filterText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+        filterText.addModifyListener(this);
+
         Label scopeLabel = new Label(composite, SWT.NONE);
         scopeLabel.setText("Scope:");
         scopeLabel.setLayoutData(new GridData(GridData.FILL));
 
         scopeCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
+        scopeCombo.add("");
         scopeCombo.add("OBJECT");
         scopeCombo.add("ONELEVEL");
         scopeCombo.add("SUBTREE");
-        scopeCombo.select(1);
         scopeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        scopeCombo.addModifyListener(this);
 
         Label objectClassesLabel = new Label(composite, SWT.NONE);
         objectClassesLabel.setText("Object classes:");
@@ -127,6 +130,8 @@ public class LDAPSourceTreeWizardPage extends WizardPage implements SelectionLis
 
         objectClassesText = new Text(composite, SWT.BORDER);
         objectClassesText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        objectClassesText.addModifyListener(this);
 
         baseDnText.setText(baseDn == null ? "" : baseDn);
         filterText.setText(filter == null ? "" : filter);
@@ -234,8 +239,6 @@ public class LDAPSourceTreeWizardPage extends WizardPage implements SelectionLis
 
     public boolean validatePage() {
         if (getBaseDn() == null) return false;
-        if ("".equals(getFilter())) return false;
-        if ("".equals(getScope())) return false;
         return true;
     }
 
@@ -277,5 +280,9 @@ public class LDAPSourceTreeWizardPage extends WizardPage implements SelectionLis
 
     public void setPartitionName(String partitionName) {
         this.partitionName = partitionName;
+    }
+
+    public void modifyText(ModifyEvent event) {
+        setPageComplete(validatePage());
     }
 }

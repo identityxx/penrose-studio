@@ -1,9 +1,6 @@
 package org.safehaus.penrose.studio.nis.source.editor;
 
-import org.safehaus.penrose.studio.source.editor.SourceEditor;
-import org.safehaus.penrose.studio.source.editor.SourceBrowsePage;
-import org.safehaus.penrose.studio.source.editor.SourcePropertiesPage;
-import org.safehaus.penrose.studio.source.editor.SourceFieldsPage;
+import org.safehaus.penrose.studio.source.editor.*;
 import org.safehaus.penrose.studio.config.editor.ParametersPage;
 
 public class NISSourceEditor extends SourceEditor {
@@ -14,9 +11,9 @@ public class NISSourceEditor extends SourceEditor {
         try {
             addPage(new SourcePropertiesPage(this));
             addPage(new NISSourcePropertyPage(this));
-            addPage(new SourceFieldsPage(this));
+            addPage(new NISSourceFieldsPage(this));
 
-            parametersPage = new ParametersPage(this, "Source Editor");
+            parametersPage = new SourceParametersPage(this);
             parametersPage.setParameters(sourceConfig.getParameters());
             addPage(parametersPage);
 

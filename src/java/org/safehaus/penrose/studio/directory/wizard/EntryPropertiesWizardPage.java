@@ -102,7 +102,6 @@ public class EntryPropertiesWizardPage extends WizardPage implements ModifyListe
     }
 
     public boolean validatePage() {
-        if (nameText.getText().equals("")) return false;
         return true;
     }
 

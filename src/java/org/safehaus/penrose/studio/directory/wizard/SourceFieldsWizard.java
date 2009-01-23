@@ -26,36 +26,37 @@ import org.safehaus.penrose.studio.server.Server;
 /**
  * @author Endi S. Dewata
  */
-public class AttributeWizard extends Wizard {
+public class SourceFieldsWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
     private Server server;
     private String partitionName;
     private EntryConfig entryConfig;
+    private EntrySourceConfig sourceConfig;
 
-    public AttributeWizardPage attributePage;
+    public SourceFieldsWizardPage fieldsPage;
 
-    public AttributeWizard() {
-        setWindowTitle("Edit Attributes");
+    public SourceFieldsWizard() {
+        setWindowTitle("Edit Source Fields");
     }
 
     public void addPages() {
 
-        attributePage = new AttributeWizardPage();
-        attributePage.setDescription("Enter the attributes of the entry.");
-        attributePage.setServer(server);
-        attributePage.setPartitionName(partitionName);
-        attributePage.setSourceConfigs(entryConfig.getSourceConfigs());
-        attributePage.setObjectClasses(entryConfig.getObjectClasses());
-        attributePage.setAttributeConfigs(entryConfig.getAttributeConfigs());
-        attributePage.setDefaultType(AttributeWizardPage.VARIABLE);
+        fieldsPage = new SourceFieldsWizardPage();
+        fieldsPage.setDescription("Enter the fields of the source.");
+        fieldsPage.setServer(server);
+        fieldsPage.setPartitionName(partitionName);
 
-        addPage(attributePage);
+        fieldsPage.setAttributeConfigs(entryConfig.getAttributeConfigs());
+        fieldsPage.setSourceConfig(sourceConfig);
+        fieldsPage.setDefaultType(AttributesWizardPage.VARIABLE);
+
+        addPage(fieldsPage);
     }
 
     public boolean canFinish() {
-        if (!attributePage.isPageComplete()) return false;
+        if (!fieldsPage.isPageComplete()) return false;
 
         return true;
     }
@@ -66,7 +67,7 @@ public class AttributeWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            entryConfig.setAttributeConfigs(attributePage.getAttributeConfigs());
+            sourceConfig.setFieldConfigs(fieldsPage.getFieldConfigs());
 
             return true;
 
@@ -102,5 +103,13 @@ public class AttributeWizard extends Wizard {
 
     public void setPartitionName(String partitionName) {
         this.partitionName = partitionName;
+    }
+
+    public EntrySourceConfig getSourceConfig() {
+        return sourceConfig;
+    }
+
+    public void setSourceConfig(EntrySourceConfig sourceConfig) {
+        this.sourceConfig = sourceConfig;
     }
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.ldap.source.wizard;
+package org.safehaus.penrose.studio.nis.source.wizard;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.*;
@@ -39,7 +39,7 @@ import java.util.*;
 /**
  * @author Endi S. Dewata
  */
-public class LDAPSourceFieldsWizardPage extends WizardPage {
+public class NISSourceFieldsWizardPage extends WizardPage {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -57,11 +57,11 @@ public class LDAPSourceFieldsWizardPage extends WizardPage {
     private Map<String,FieldConfig> availableFieldConfigs;
     private Map<String,FieldConfig> selectedFieldConfigs;
 
-    public LDAPSourceFieldsWizardPage() {
+    public NISSourceFieldsWizardPage() {
         this(new ArrayList<String>());
     }
 
-    public LDAPSourceFieldsWizardPage(Collection<String> attributeNames) {
+    public NISSourceFieldsWizardPage(Collection<String> attributeNames) {
         super(NAME);
 
         this.attributeNames = attributeNames;
@@ -80,7 +80,7 @@ public class LDAPSourceFieldsWizardPage extends WizardPage {
         objectClassLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         new Label(composite, SWT.NONE);
-        
+
         Label label2 = new Label(composite, SWT.NONE);
         label2.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 

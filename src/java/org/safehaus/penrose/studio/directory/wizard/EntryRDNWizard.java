@@ -29,7 +29,7 @@ import org.safehaus.penrose.studio.server.Server;
 /**
  * @author Endi S. Dewata
  */
-public class EntryDNWizard extends Wizard {
+public class EntryRDNWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -39,16 +39,16 @@ public class EntryDNWizard extends Wizard {
     private DN parentDn;
     private EntryConfig entryConfig;
 
-    public EntryDNWizardPage dnPage;
+    public EntryRDNWizardPage dnPage;
 
-    public EntryDNWizard() {
+    public EntryRDNWizard() {
         setWindowTitle("Edit Entry DN");
     }
 
     public void addPages() {
 
-        dnPage = new EntryDNWizardPage();
-        dnPage.setDescription("Enter the DN of the entry.");
+        dnPage = new EntryRDNWizardPage();
+        dnPage.setDescription("Enter the RDN of the entry.");
         dnPage.setServer(server);
         dnPage.setPartitionName(partitionName);
         dnPage.setRdn(rdn);
@@ -71,7 +71,8 @@ public class EntryDNWizard extends Wizard {
         try {
             DNBuilder db = new DNBuilder();
             db.append(dnPage.getRdn());
-            db.append(dnPage.getParentDn());
+            db.append(parentDn);
+            //db.append(dnPage.getParentDn());
             entryConfig.setDn(db.toDn());
 
             return true;

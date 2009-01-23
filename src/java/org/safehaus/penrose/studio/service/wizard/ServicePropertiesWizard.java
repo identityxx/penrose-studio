@@ -37,6 +37,7 @@ public class ServicePropertiesWizard extends Wizard {
     }
 
     public void addPages() {
+
         propertiesPage = new ServicePropertiesWizardPage();
 
         propertiesPage.setServiceName(serviceConfig.getName());

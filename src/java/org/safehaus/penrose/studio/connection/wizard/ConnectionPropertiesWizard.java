@@ -42,7 +42,6 @@ public class ConnectionPropertiesWizard extends Wizard {
 
         propertiesPage.setConnectionName(connectionConfig.getName());
         propertiesPage.setClassName(connectionConfig.getConnectionClass());
-        propertiesPage.setAdapter(connectionConfig.getAdapterName());
         propertiesPage.setEnabled(connectionConfig.isEnabled());
         propertiesPage.setConnectionDescription(connectionConfig.getDescription());
 
@@ -59,7 +58,6 @@ public class ConnectionPropertiesWizard extends Wizard {
         try {
             connectionConfig.setName(propertiesPage.getConnectionName());
             connectionConfig.setConnectionClass(propertiesPage.getClassName());
-            connectionConfig.setAdapterName(propertiesPage.getAdapter());
             connectionConfig.setEnabled(propertiesPage.isEnabled());
             connectionConfig.setDescription(propertiesPage.getConnectionDescription());
 

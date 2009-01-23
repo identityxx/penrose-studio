@@ -33,21 +33,29 @@ public class ImportPartitionWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    Server project;
+    private Server server;
 
-    public PartitionNamePage namePage = new PartitionNamePage();
-    public PartitionLocationPage locationPage = new PartitionLocationPage();
-    public PartitionStartupPage startupPage = new PartitionStartupPage();
+    public PartitionNamePage namePage;
+    public PartitionLocationPage locationPage;
+    public PartitionStartupPage startupPage;
 
-    public ImportPartitionWizard(Server project) {
-        this.project = project;
+    public ImportPartitionWizard() {
         setWindowTitle("Import Partition");
-        locationPage.setDescription("Enter the location from which the partition will be imported.");
     }
 
     public void addPages() {
+
+        namePage = new PartitionNamePage();
+
         addPage(namePage);
+
+        locationPage = new PartitionLocationPage();
+        locationPage.setDescription("Enter the location from which the partition will be imported.");
+
         addPage(locationPage);
+
+        startupPage = new PartitionStartupPage();
+
         addPage(startupPage);
     }
 
@@ -75,14 +83,14 @@ public class ImportPartitionWizard extends Wizard {
 
             String partitionName = source.getName();
             
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
 
             client.uploadFolder(source, "partitions/"+newPartitionName);
 
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             partitionManagerClient.loadPartition(newPartitionName);
 
-            if (startupPage.getPartitionStartup()) {
+            if (startupPage.isEnabled()) {
                 partitionManagerClient.startPartition(partitionName);
             }
 
@@ -95,5 +103,13 @@ public class ImportPartitionWizard extends Wizard {
             log.error(e.getMessage(), e);
             return false;
         }
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

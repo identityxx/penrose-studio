@@ -28,7 +28,7 @@ import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
-import org.safehaus.penrose.studio.directory.wizard.AttributeWizardPage;
+import org.safehaus.penrose.studio.directory.wizard.AttributesWizardPage;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.directory.wizard.EntrySourceWizardPage;
@@ -48,10 +48,10 @@ public class EntryWizard extends Wizard {
 
     private EntryConfig entryConfig;
 
-    public EntryDNWizardPage rdnPage;
-    public EntryPropertiesWizardPage classPage;
+    public EntryRDNWizardPage rdnPage;
+    public EntryPropertiesWizardPage propertiesPage;
     public ObjectClassWizardPage ocPage;
-    public AttributeWizardPage attributePage;
+    public AttributesWizardPage attributePage;
     public EntrySourceWizardPage sourcesPage;
 
     public EntryWizard() {
@@ -60,25 +60,28 @@ public class EntryWizard extends Wizard {
 
     public void addPages() {
 
-        rdnPage = new EntryDNWizardPage();
-        rdnPage.setDescription("Enter the RDN, parent DN, and optionally the class name of the entry.");
+        rdnPage = new EntryRDNWizardPage();
+        rdnPage.setDescription("Enter the RDN of the entry.");
         rdnPage.setServer(server);
         rdnPage.setPartitionName(partitionName);
         rdnPage.setParentDn(parentDn);
 
         addPage(rdnPage);
 
-        classPage = new EntryPropertiesWizardPage();
-        classPage.setDescription("Enter the class name of the entry.");
-        classPage.setClassName(entryConfig.getEntryClass());
+        propertiesPage = new EntryPropertiesWizardPage();
 
-        addPage(classPage);
+        propertiesPage.setEntryName(entryConfig.getName());
+        propertiesPage.setClassName(entryConfig.getEntryClass());
+        propertiesPage.setEnabled(entryConfig.isEnabled());
+        propertiesPage.setEntryDescription(entryConfig.getDescription());
+
+        addPage(propertiesPage);
 
         ocPage = new ObjectClassWizardPage(server);
 
         addPage(ocPage);
 
-        attributePage = new AttributeWizardPage();
+        attributePage = new AttributesWizardPage();
         attributePage.setServer(server);
         attributePage.setPartitionName(partitionName);
 
@@ -125,10 +128,11 @@ public class EntryWizard extends Wizard {
 
             DNBuilder db = new DNBuilder();
             db.append(rdnPage.getRdn());
-            db.append(rdnPage.getParentDn());
+            db.append(parentDn);
+            //db.append(rdnPage.getParentDn());
             entryConfig.setDn(db.toDn());
 
-            entryConfig.setEntryClass(classPage.getClassName());
+            entryConfig.setEntryClass(propertiesPage.getClassName());
 
             entryConfig.addObjectClasses(ocPage.getSelectedObjectClasses());
             entryConfig.addAttributeConfigs(attributePage.getAttributeConfigs());

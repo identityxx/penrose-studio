@@ -60,15 +60,23 @@ public class JDBCSourceWizard extends SourceWizard {
     }
 
     public void addPages() {
+
         propertiesPage = new SourcePropertiesWizardPage();
+
+        propertiesPage.setSourceName(sourceConfig.getName());
+        propertiesPage.setClassName(sourceConfig.getSourceClass());
+        propertiesPage.setEnabled(sourceConfig.isEnabled());
+        propertiesPage.setSourceDescription(sourceConfig.getDescription());
 
         addPage(propertiesPage);
 
         if (connectionConfig == null) {
+            
             connectionPage = new SelectConnectionWizardPage();
             connectionPage.setServer(server);
             connectionPage.setPartitionName(partitionName);
             connectionPage.setAdapterType("JDBC");
+            connectionPage.setConnectionName(sourceConfig.getConnectionName());
 
             addPage(connectionPage);
         }
@@ -156,7 +164,6 @@ public class JDBCSourceWizard extends SourceWizard {
 
     public boolean performFinish() {
         try {
-            sourceConfig = new SourceConfig();
             sourceConfig.setName(propertiesPage.getSourceName());
             sourceConfig.setSourceClass(propertiesPage.getClassName());
             sourceConfig.setEnabled(propertiesPage.isEnabled());

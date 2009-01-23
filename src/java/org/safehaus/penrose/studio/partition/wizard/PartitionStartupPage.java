@@ -32,7 +32,9 @@ public class PartitionStartupPage extends WizardPage implements SelectionListene
 
     public final static String NAME = "Partition Startup";
 
-    Button startPartitionCheckbox;
+    Button enabledCheckbox;
+
+    boolean enabled;
 
     public PartitionStartupPage() {
         super(NAME);
@@ -53,15 +55,12 @@ public class PartitionStartupPage extends WizardPage implements SelectionListene
         gd.widthHint = 100;
         nameLabel.setLayoutData(gd);
 
-        startPartitionCheckbox = new Button(composite, SWT.CHECK);
+        enabledCheckbox = new Button(composite, SWT.CHECK);
+        enabledCheckbox.addSelectionListener(this);
 
-        startPartitionCheckbox.addSelectionListener(this);
-
+        enabledCheckbox.setSelection(enabled);
+        
         setPageComplete(validatePage());
-    }
-
-    public boolean getPartitionStartup() {
-        return startPartitionCheckbox.getSelection();
     }
 
     public boolean validatePage() {
@@ -74,5 +73,13 @@ public class PartitionStartupPage extends WizardPage implements SelectionListene
 
     public void widgetDefaultSelected(SelectionEvent event) {
         setPageComplete(validatePage());
+    }
+
+    public boolean isEnabled() {
+        return enabledCheckbox.getSelection();
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

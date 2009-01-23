@@ -15,54 +15,47 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.jdbc.source.wizard;
+package org.safehaus.penrose.studio.nis.source.wizard;
 
-import org.safehaus.penrose.client.PenroseClient;
-import org.safehaus.penrose.partition.PartitionClient;
-import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.source.wizard.SourceWizard;
 import org.safehaus.penrose.studio.source.wizard.SourcePrimaryKeysWizardPage;
+import org.safehaus.penrose.client.PenroseClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.connection.ConnectionClient;
-import org.safehaus.penrose.jdbc.Table;
-import org.safehaus.penrose.jdbc.source.JDBCSource;
+import org.safehaus.penrose.schema.Schema;
 
-import java.util.*;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author Endi S. Dewata
  */
-public class JDBCSourceFieldsWizard extends SourceWizard {
+public class NISSourceFieldsWizard extends SourceWizard {
 
-    public JDBCSourceFieldsWizardPage fieldsPage;
+    public NISSourceFieldsWizardPage fieldsPage;
     public SourcePrimaryKeysWizardPage primaryKeysPage;
 
     Map<String,FieldConfig> availableFieldConfigs = new TreeMap<String,FieldConfig>();
     Map<String,FieldConfig> selectedFieldConfigs = new TreeMap<String,FieldConfig>();
 
-    public JDBCSourceFieldsWizard() {
-        setWindowTitle("Edit JDBC Source Fields");
+    public NISSourceFieldsWizard() throws Exception {
+        setWindowTitle("Edit NIS Source Fields");
     }
 
     public void addPages() {
 
-        String catalog = sourceConfig.getParameter(JDBCSource.CATALOG);
-        String schema = sourceConfig.getParameter(JDBCSource.SCHEMA);
-        String tableName = sourceConfig.getParameter(JDBCSource.TABLE);
-
-        Table table = new Table(tableName, catalog, schema);
-
-        for (FieldConfig fieldConfig : getAvailableFieldConfigs(table)) {
-            availableFieldConfigs.put(fieldConfig.getName(), fieldConfig);
-        }
+        Schema schema = getSchema();
 
         for (FieldConfig fieldConfig : sourceConfig.getFieldConfigs()) {
             selectedFieldConfigs.put(fieldConfig.getName(), fieldConfig);
         }
 
-        fieldsPage = new JDBCSourceFieldsWizardPage();
+        fieldsPage = new NISSourceFieldsWizardPage();
+        fieldsPage.setSchema(schema);
         fieldsPage.setAvailableFieldConfigs(availableFieldConfigs);
         fieldsPage.setSelectedFieldConfigs(selectedFieldConfigs);
 
@@ -74,41 +67,32 @@ public class JDBCSourceFieldsWizard extends SourceWizard {
         addPage(primaryKeysPage);
     }
 
-    public Collection<FieldConfig> getAvailableFieldConfigs(Table table) {
+    public boolean canFinish() {
+        if (!fieldsPage.isPageComplete()) return false;
+        if (!primaryKeysPage.isPageComplete()) return false;
 
-        Collection<FieldConfig> results = new ArrayList<FieldConfig>();
+        return true;
+    }
+
+    public Schema getSchema() {
+
+        Schema schema = new Schema(sourceConfig.getConnectionName());
 
         try {
-            String catalog = table.getCatalog();
-            String schema = table.getSchema();
-            String tableName = table.getName();
-
             PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
             ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
             ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(sourceConfig.getConnectionName());
 
-            Collection<FieldConfig> list = (Collection<FieldConfig>)connectionClient.invoke(
-                    "getColumns",
-                    new Object[] { catalog, schema, tableName },
-                    new String[] { String.class.getName(), String.class.getName(), String.class.getName() }
-            );
-
-            if (list != null) results.addAll(list);
+            Schema s = (Schema)connectionClient.getAttribute("Schema");
+            schema.add(s);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
 
-        return results;
-    }
-
-    public boolean canFinish() {
-        if (!fieldsPage.isPageComplete()) return false;
-        if (!primaryKeysPage.isPageComplete()) return false;
-
-        return true;
+        return schema;
     }
 
     public boolean performFinish() {

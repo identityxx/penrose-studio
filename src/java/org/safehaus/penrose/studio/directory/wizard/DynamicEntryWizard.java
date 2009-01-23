@@ -45,9 +45,9 @@ public class DynamicEntryWizard extends Wizard {
     private EntryConfig entryConfig;
 
     public EntrySourceWizardPage sourcesPage;
-    public RelationshipWizardPage relationshipPage;
-    public ObjectClassWizardPage ocPage;
-    public AttributeWizardPage attributePage;
+    public RelationshipWizardPage relationsPage;
+    public ObjectClassWizardPage objectClassesPage;
+    public AttributesWizardPage attributesPage;
 
     public DynamicEntryWizard() {
         setWindowTitle("Adding dynamic entry");
@@ -56,46 +56,48 @@ public class DynamicEntryWizard extends Wizard {
     public void addPages() {
 
         sourcesPage = new EntrySourceWizardPage();
-        sourcesPage.setDescription("Add data sources. This step is optional.");
+        sourcesPage.setDescription("Add data sources to be mapped into this entry.");
         sourcesPage.setServer(server);
         sourcesPage.setPartitionName(partitionName);
 
         addPage(sourcesPage);
 
-        relationshipPage = new RelationshipWizardPage(server, partitionName);
+        relationsPage = new RelationshipWizardPage(server, partitionName);
 
-        addPage(relationshipPage);
+        addPage(relationsPage);
 
-        ocPage = new ObjectClassWizardPage(server);
+        objectClassesPage = new ObjectClassWizardPage(server);
 
-        addPage(ocPage);
+        addPage(objectClassesPage);
 
-        attributePage = new AttributeWizardPage();
-        attributePage.setServer(server);
-        attributePage.setPartitionName(partitionName);
-        attributePage.setDefaultType(AttributeWizardPage.VARIABLE);
+        attributesPage = new AttributesWizardPage();
+        attributesPage.setServer(server);
+        attributesPage.setPartitionName(partitionName);
+        attributesPage.setDefaultType(AttributesWizardPage.VARIABLE);
 
-        addPage(attributePage);
+        addPage(attributesPage);
     }
 
     public boolean canFinish() {
         if (!sourcesPage.isPageComplete()) return false;
-        if (!relationshipPage.isPageComplete()) return false;
-        if (!ocPage.isPageComplete()) return false;
-        if (!attributePage.isPageComplete()) return false;
+        if (!relationsPage.isPageComplete()) return false;
+        if (!objectClassesPage.isPageComplete()) return false;
+        if (!attributesPage.isPageComplete()) return false;
 
         return true;
     }
 
     public IWizardPage getNextPage(IWizardPage page) {
         if (sourcesPage == page) {
-            Collection<EntrySourceConfig> sourceMappings = sourcesPage.getEntrySourceConfigs();
-            relationshipPage.setSourceMappings(sourceMappings);
-            attributePage.setSourceConfigs(sourceMappings);
+            Collection<EntrySourceConfig> sourceConfigs = sourcesPage.getEntrySourceConfigs();
+            relationsPage.setSourceMappings(sourceConfigs);
+            attributesPage.setSourceConfigs(sourceConfigs);
 
-        } else if (ocPage == page) {
-            Collection<String> objectClasses = ocPage.getSelectedObjectClasses();
-            attributePage.setObjectClasses(objectClasses);
+            if (sourceConfigs.size() < 2) return objectClassesPage;
+
+        } else if (objectClassesPage == page) {
+            Collection<String> objectClasses = objectClassesPage.getSelectedObjectClasses();
+            attributesPage.setObjectClasses(objectClasses);
         }
 
         return super.getNextPage(page);
@@ -107,7 +109,7 @@ public class DynamicEntryWizard extends Wizard {
 
             entryConfig.addSourceConfigs(sourcesPage.getEntrySourceConfigs());
 
-            Collection<Relationship> relationships = relationshipPage.getRelationships();
+            Collection<Relationship> relationships = relationsPage.getRelationships();
             for (Relationship relationship : relationships) {
 
                 String lfield = relationship.getLeftField();
@@ -125,10 +127,10 @@ public class DynamicEntryWizard extends Wizard {
                 }
             }
 
-            entryConfig.addObjectClasses(ocPage.getSelectedObjectClasses());
+            entryConfig.addObjectClasses(objectClassesPage.getSelectedObjectClasses());
 
             log.debug("Attribute mappings:");
-            Collection<EntryAttributeConfig> attributeMappings = attributePage.getAttributeConfigs();
+            Collection<EntryAttributeConfig> attributeMappings = attributesPage.getAttributeConfigs();
             entryConfig.addAttributeConfigs(attributeMappings);
 
             RDNBuilder rb = new RDNBuilder();

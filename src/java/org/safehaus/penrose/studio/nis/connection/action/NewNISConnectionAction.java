@@ -26,6 +26,7 @@ import org.safehaus.penrose.studio.nis.connection.wizard.NISConnectionWizard;
 import org.safehaus.penrose.studio.ldap.connection.wizard.LDAPConnectionWizard;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.connection.ConnectionsNode;
+import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 
 public class NewNISConnectionAction extends Action {
@@ -46,9 +47,12 @@ public class NewNISConnectionAction extends Action {
             ServersView serversView = ServersView.getInstance();
             Server server = connectionsNode.getProjectNode().getServer();
 
+            ConnectionConfig connectionConfig = new ConnectionConfig();
+
             NISConnectionWizard wizard = new NISConnectionWizard();
             wizard.setServer(server);
             wizard.setPartitionName(connectionsNode.getPartitionName());
+            wizard.setConnectionConfig(connectionConfig);
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);

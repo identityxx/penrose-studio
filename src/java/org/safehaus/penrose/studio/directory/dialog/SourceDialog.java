@@ -102,12 +102,12 @@ public class SourceDialog extends Dialog {
                 if (sourceTree.getSelectionCount() == 0) return;
 
                 TreeItem item = sourceTree.getSelection()[0];
-                if (item.getData() != null) {
-                    SourceConfig sourceDefinition = (SourceConfig)item.getData();
-                    aliasText.setText(sourceDefinition.getName());
-                }
+                //if (item.getData() != null) {
+                //    SourceConfig sourceConfig = (SourceConfig)item.getData();
+                //    aliasText.setText(sourceConfig.getName());
+                //}
 
-                aliasText.setEnabled(canEnterAlias());
+                //aliasText.setEnabled(canEnterAlias());
                 saveButton.setEnabled(canSave());
             }
         });
@@ -233,7 +233,7 @@ public class SourceDialog extends Dialog {
 
 		saveButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-                if ("".equals(aliasText.getText())) return;
+                //if ("".equals(aliasText.getText())) return;
                 if (sourceTree.getSelectionCount() == 0) return;
 
                 TreeItem item = sourceTree.getSelection()[0];
@@ -241,7 +241,8 @@ public class SourceDialog extends Dialog {
 
                 SourceConfig sourceConfig = (SourceConfig)item.getData();
 
-                entrySourceConfig.setAlias(aliasText.getText());
+                String alias = aliasText.getText();
+                entrySourceConfig.setAlias("".equals(alias) ? sourceConfig.getName() : alias);
                 entrySourceConfig.setSourceName(sourceConfig.getName());
 
                 entrySourceConfig.setSearch("".equals(searchCombo.getText()) ? null : searchCombo.getText());
@@ -283,10 +284,10 @@ public class SourceDialog extends Dialog {
         boolean enabled = false;
 
         if (sourceTree.getSelectionCount() != 0) {
-            TreeItem item = sourceTree.getSelection()[0];
-            if (item.getData() != null && !"".equals(aliasText.getText())) {
+            //TreeItem item = sourceTree.getSelection()[0];
+            //if (item.getData() != null && !"".equals(aliasText.getText())) {
                 enabled = true;
-            }
+            //}
         }
 
         return enabled;
@@ -320,11 +321,14 @@ public class SourceDialog extends Dialog {
     public void setSourceConfig(EntrySourceConfig source) {
         this.entrySourceConfig = source;
 
-        TreeItem item = items.get(source.getSourceName());
+        String sourceName = source.getSourceName();
+        TreeItem item = items.get(sourceName);
         if (item != null) {
             sourceTree.setSelection(new TreeItem[] { item });
         }
-        aliasText.setText(source.getAlias() == null ? "" : source.getAlias());
+
+        String alias = source.getAlias();
+        aliasText.setText(alias == null || alias.equals(sourceName) ? "" : source.getAlias());
 
         searchCombo.setText(source.getSearch() == null ? "" : source.getSearch());
         bindCombo.setText(source.getBind() == null ? "" : source.getBind());
@@ -334,7 +338,7 @@ public class SourceDialog extends Dialog {
         modifyCombo.setText(source.getModify() == null ? "" : source.getModify());
         modrdnCombo.setText(source.getModrdn() == null ? "" : source.getModrdn());
 
-        aliasText.setEnabled(canEnterAlias());
+        //aliasText.setEnabled(canEnterAlias());
         saveButton.setEnabled(canSave());
     }
 }

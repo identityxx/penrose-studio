@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.jdbc.connection.editor;
 
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditor;
 import org.safehaus.penrose.studio.connection.editor.ConnectionPropertiesPage;
+import org.safehaus.penrose.studio.connection.editor.ConnectionParametersPage;
 import org.safehaus.penrose.studio.config.editor.ParametersPage;
 
 /**
@@ -33,7 +34,7 @@ public class JDBCConnectionEditor extends ConnectionEditor {
             addPage(new ConnectionPropertiesPage(this));
             addPage(new JDBCConnectionPropertiesPage(this));
 
-            parametersPage = new ParametersPage(this, "Connection Editor");
+            parametersPage = new ConnectionParametersPage(this);
             parametersPage.setParameters(connectionConfig.getParameters());
             addPage(parametersPage);
 

@@ -20,43 +20,25 @@ package org.safehaus.penrose.studio.directory.editor;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
-import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
-import org.eclipse.ui.forms.events.HyperlinkAdapter;
-import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
-import org.safehaus.penrose.directory.EntryAttributeConfig;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.EntryFieldConfig;
 import org.safehaus.penrose.directory.EntrySourceConfig;
-import org.safehaus.penrose.partition.PartitionClient;
-import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.client.PenroseClient;
-import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.mapping.Expression;
-import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.source.SourceManagerClient;
-import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.directory.dialog.ExpressionDialog;
-import org.safehaus.penrose.studio.directory.dialog.FieldSelectionDialog;
-import org.safehaus.penrose.studio.directory.wizard.AttributeWizard;
+import org.safehaus.penrose.studio.directory.wizard.AttributesWizard;
 import org.safehaus.penrose.studio.directory.wizard.EntrySourceWizard;
+import org.safehaus.penrose.studio.directory.wizard.SourceFieldsWizard;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -107,7 +89,6 @@ public class EntrySourcesPage extends FormPage { //implements ModifyListener {
         fieldsSection.setClient(fieldsComponent);
 
         refresh();
-        //load();
 	}
 
     public Composite createSourcesSection(final Composite parent) {
@@ -144,39 +125,7 @@ public class EntrySourcesPage extends FormPage { //implements ModifyListener {
 
         sourcesTable.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                if (sourcesTable.getSelectionCount() != 1) return;
-
-                fieldsTable.removeAll();
-
-                TableItem item = sourcesTable.getSelection()[0];
-                EntrySourceConfig source = (EntrySourceConfig)item.getData();
-
-                for (EntryFieldConfig field : source.getFieldConfigs()) {
-
-                    String value;
-
-                    Object constant = field.getConstant();
-                    if (constant != null) {
-                        if (constant instanceof byte[]) {
-                            value = "(binary)";
-                        } else {
-                            value = "\"" + constant + "\"";
-                        }
-
-                    } else {
-                        value = field.getVariable();
-                    }
-
-                    if (value == null) {
-                        Expression expression = field.getExpression();
-                        value = expression == null ? null : expression.getScript();
-                    }
-
-                    TableItem ti = new TableItem(fieldsTable, SWT.CHECK);
-                    ti.setText(0, field.getName());
-                    ti.setText(1, value == null ? "" : value);
-                    ti.setData(field);
-                }
+                refreshFields();
             }
         });
 
@@ -274,10 +223,16 @@ public class EntrySourcesPage extends FormPage { //implements ModifyListener {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    AttributeWizard wizard = new AttributeWizard();
+                    if (sourcesTable.getSelectionCount() != 1) return;
+
+                    TableItem item = sourcesTable.getSelection()[0];
+                    EntrySourceConfig sourceConfig = (EntrySourceConfig)item.getData();
+
+                    SourceFieldsWizard wizard = new SourceFieldsWizard();
                     wizard.setServer(editor.getServer());
                     wizard.setPartitionName(editor.getPartitionName());
                     wizard.setEntryConfig(entryConfig);
+                    wizard.setSourceConfig(sourceConfig);
 
                     WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
@@ -716,56 +671,69 @@ public class EntrySourcesPage extends FormPage { //implements ModifyListener {
                     item.setData(fieldMapping);
                 }
             }
-            
+
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-
-    public void modifyText(ModifyEvent event) {
-        checkDirty();
-    }
-
-    public void checkDirty() {
-        editor.checkDirty();
-    }
-
-    public void load() {
-        refresh();
-
-        Collection sources = entryConfig.getSourceConfigs();
-        if (sources.size() > 0) tabFolder.setSelection(0);
-    }
-
-    public void refresh() {
-        CTabItem items[] = tabFolder.getItems();
-        for (CTabItem item : items) {
-            item.dispose();
-        }
-
-        try {
-            Collection<EntrySourceConfig> sources = entryConfig.getSourceConfigs();
-            for (EntrySourceConfig source : sources) {
-                log.debug("Creating source tab for " + source.getAlias());
-                createSourceTab(tabFolder, source);
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-    }
 */
 
     public void refresh() {
+        int[] indices = sourcesTable.getSelectionIndices();
+
         sourcesTable.removeAll();
 
         Collection<EntrySourceConfig> sources = entryConfig.getSourceConfigs();
         for (EntrySourceConfig source : sources) {
 
+            String name = source.getSourceName();
+            String alias = source.getAlias();
             TableItem item = new TableItem(sourcesTable, SWT.CHECK);
-            item.setText(0, source.getSourceName());
-            item.setText(1, source.getAlias());
+            item.setText(0, name);
+            item.setText(1, alias == null || alias.equals(name) ? "" : alias);
             item.setData(source);
+        }
+
+        sourcesTable.setSelection(indices);
+
+        refreshFields();
+    }
+
+    public void refreshFields() {
+
+        fieldsTable.removeAll();
+
+        if (sourcesTable.getSelectionCount() != 1) return;
+
+        TableItem item = sourcesTable.getSelection()[0];
+        EntrySourceConfig source = (EntrySourceConfig)item.getData();
+
+        for (EntryFieldConfig field : source.getFieldConfigs()) {
+
+            String value;
+
+            Object constant = field.getConstant();
+            if (constant != null) {
+                if (constant instanceof byte[]) {
+                    value = "(binary)";
+                } else {
+                    value = "\"" + constant + "\"";
+                }
+
+            } else {
+                value = field.getVariable();
+            }
+
+            if (value == null) {
+                Expression expression = field.getExpression();
+                value = expression == null ? null : expression.getScript();
+            }
+
+            TableItem ti = new TableItem(fieldsTable, SWT.CHECK);
+            ti.setText(0, field.getName());
+            ti.setText(1, value == null ? "" : value);
+            ti.setData(field);
         }
     }
 }

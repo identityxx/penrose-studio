@@ -90,7 +90,8 @@ public class CreateLDAPProxyWizard extends Wizard {
             PenroseClient client = project.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 
-            PartitionConfig partitionConfig = new PartitionConfig(partitionName);
+            PartitionConfig partitionConfig = new PartitionConfig();
+            partitionConfig.setName(partitionName);
             partitionManagerClient.addPartition(partitionConfig);
 
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
@@ -131,7 +132,7 @@ public class CreateLDAPProxyWizard extends Wizard {
 
             EntryConfig rootEntry = new EntryConfig(connectionInfoPage.getSuffix());
 
-            EntrySourceConfig sourceMapping = new EntrySourceConfig("DEFAULT", partitionName);
+            EntrySourceConfig sourceMapping = new EntrySourceConfig(partitionName);
             rootEntry.addSourceConfig(sourceMapping);
 
             rootEntry.setEntryClass(ProxyEntry.class.getName());
@@ -155,7 +156,7 @@ public class CreateLDAPProxyWizard extends Wizard {
                 EntryConfig rootDseEntryConfig = new EntryConfig();
                 rootDseEntryConfig.setDn("");
 
-                EntrySourceConfig rootDseSourceMapping = new EntrySourceConfig("DEFAULT", rootDseSourceConfig.getName());
+                EntrySourceConfig rootDseSourceMapping = new EntrySourceConfig(rootDseSourceConfig.getName());
                 rootDseEntryConfig.addSourceConfig(rootDseSourceMapping);
 
                 rootDseEntryConfig.setEntryClass(ProxyEntry.class.getName());

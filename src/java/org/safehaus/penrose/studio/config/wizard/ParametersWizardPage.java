@@ -174,6 +174,7 @@ public class ParametersWizardPage extends WizardPage implements SelectionListene
     }
 
     public void setParameters(Map<String,String> parameters) {
+        if (this.parameters == parameters) return;
         this.parameters.clear();
         this.parameters.putAll(parameters);
     }

@@ -23,9 +23,9 @@ import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
-import org.safehaus.penrose.studio.ldap.source.wizard.LDAPSourcePrimaryKeysWizardPage;
 import org.safehaus.penrose.studio.ldap.source.wizard.LDAPSourceFieldsWizardPage;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.source.wizard.SourcePrimaryKeysWizardPage;
 import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.ldap.DN;
@@ -59,7 +59,7 @@ public class LDAPSourceWizard extends Wizard {
 
     public LDAPSourceWizardPage propertiesPage;
     public LDAPSourceFieldsWizardPage fieldsPage;
-    public LDAPSourcePrimaryKeysWizardPage primarykeysPage = new LDAPSourcePrimaryKeysWizardPage();
+    public SourcePrimaryKeysWizardPage primarykeysPage = new SourcePrimaryKeysWizardPage();
 
     Map<String,FieldConfig> availableFieldConfigs = new TreeMap<String,FieldConfig>();
     Map<String,FieldConfig> selectedFieldConfigs = new TreeMap<String,FieldConfig>();

@@ -52,7 +52,7 @@ import java.util.LinkedHashMap;
 /**
  * @author Endi S. Dewata
  */
-public class JDBCConnectionSettingsWizardPage extends WizardPage implements ModifyListener {
+public class JDBCConnectionPropertiesWizardPage extends WizardPage implements ModifyListener {
 
     public Logger log = LoggerFactory.getLogger(getClass());
     
@@ -67,7 +67,7 @@ public class JDBCConnectionSettingsWizardPage extends WizardPage implements Modi
     private Map<String,Parameter> parameters = new LinkedHashMap<String,Parameter>();
     private Map<String,String> parameterValues = new LinkedHashMap<String,String>();
 
-    public JDBCConnectionSettingsWizardPage() {
+    public JDBCConnectionPropertiesWizardPage() {
         super(NAME);
         setDescription("Enter database connection settings.");
     }
@@ -214,7 +214,17 @@ public class JDBCConnectionSettingsWizardPage extends WizardPage implements Modi
             testButton.addSelectionListener(new SelectionAdapter() {
                 public void widgetSelected(SelectionEvent event) {
                     try {
+                        Map<String,String> fieldValues = getFieldValues();
+
+                        log.debug("Fields:");
+                        for (String name : fieldValues.keySet()) {
+                            log.debug(" - "+name+": "+fieldValues.get(name));
+                        }
+
                         Map<String,String> parameterValues = getParameterValues();
+                        String url = parameterValues.get(JDBCClient.URL);
+                        url = Helper.replace(url, fieldValues);
+                        parameterValues.put(JDBCClient.URL, url);
 
                         PenroseClient client = server.getClient();
                         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();

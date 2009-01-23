@@ -8,6 +8,8 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.schema.SchemaManagerClient;
 import org.safehaus.penrose.connection.ConnectionClient;
@@ -19,16 +21,19 @@ import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.nis.source.wizard.NISSourceFieldsWizard;
 import org.safehaus.penrose.studio.ldap.source.LDAPFieldDialog;
+import org.safehaus.penrose.studio.ldap.source.wizard.LDAPSourceFieldsWizard;
 import org.safehaus.penrose.studio.source.FieldDialog;
 import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
+import org.safehaus.penrose.studio.source.editor.SourceFieldsPage;
 import org.safehaus.penrose.client.PenroseClient;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class NISSourceFieldsPage extends SourceEditorPage {
-
+public class NISSourceFieldsPage extends SourceFieldsPage {
+/*
 	Table fieldTable;
 
     Button addButton;
@@ -38,9 +43,13 @@ public class NISSourceFieldsPage extends SourceEditorPage {
 	NISClient nisClient;
 
 	String[] scopes = new String[] { "OBJECT", "ONELEVEL", "SUBTREE" };
-
+*/
     public NISSourceFieldsPage(NISSourceEditor editor) throws Exception {
-        super(editor, "FIELDS", "Fields");
+        super(editor);
+    }
+/*
+    public NISSourceFieldsPage(NISSourceEditor editor) throws Exception {
+        super(editor);
 
         PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
@@ -66,6 +75,7 @@ public class NISSourceFieldsPage extends SourceEditorPage {
         }
 
         nisClient.init(connectionConfig.getParameters());
+
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -287,5 +297,21 @@ public class NISSourceFieldsPage extends SourceEditorPage {
             item.setText(2, fieldConfig.getType());
             item.setData(fieldConfig);
         }
+    }
+*/
+    public void edit() throws Exception {
+
+        NISSourceFieldsWizard wizard = new NISSourceFieldsWizard();
+        wizard.setServer(server);
+        wizard.setPartitionName(partitionName);
+        wizard.setSourceConfig(sourceConfig);
+
+        WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
+        dialog.setPageSize(600, 300);
+        int rc = dialog.open();
+
+        if (rc == Window.CANCEL) return;
+
+        refresh();
     }
 }

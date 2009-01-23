@@ -139,43 +139,17 @@ public class EntryNode extends Node {
             }
         });
 
-        manager.add(new Action("Edit LDAP") {
-            public void run() {
-                try {
-                    editLDAP();
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        });
-
-        manager.add(new Action("Edit Sources") {
-            public void run() {
-                try {
-                    editSources();
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        });
-
-        manager.add(new Action("Edit ACL") {
-            public void run() {
-                try {
-                    editACL();
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        });
-
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        manager.add(new NewEntryAction(this));
+        //manager.add(new NewEntryAction(this));
+        manager.add(new NewStaticEntryAction(this));
         manager.add(new NewDynamicEntryAction(this));
         manager.add(new NewProxyEntryAction(this));
 
-        showCommercialMenu(manager);
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        //manager.add(new NewEntryFromSourceAction(this));
+        manager.add(new MapLDAPTreeAction(this));
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
@@ -220,21 +194,6 @@ public class EntryNode extends Node {
                 }
             }
         });
-    }
-
-    public void showCommercialMenu(IMenuManager manager) throws Exception {
-
-        //PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        //PenroseStudioWorkbenchAdvisor workbenchAdvisor = penroseStudio.getWorkbenchAdvisor();
-        //PenroseStudioWorkbenchWindowAdvisor workbenchWindowAdvisor = workbenchAdvisor.getWorkbenchWindowAdvisor();
-        //PenroseStudioActionBarAdvisor actionBarAdvisor = workbenchWindowAdvisor.getActionBarAdvisor();
-
-        //if (actionBarAdvisor.getShowCommercialFeaturesAction().isChecked()) {
-            manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-            manager.add(new NewEntryFromSourceAction(this));
-            manager.add(new MapLDAPTreeAction(this));
-        //}
-
     }
 
     public void open() throws Exception {

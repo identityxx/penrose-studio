@@ -23,6 +23,7 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.service.wizard.ServiceWizard;
+import org.safehaus.penrose.service.ServiceConfig;
 import org.apache.log4j.Logger;
 
 public class NewServiceAction extends Action {
@@ -38,7 +39,11 @@ public class NewServiceAction extends Action {
         try {
             ServersView serversView = ServersView.getInstance();
 
+            ServiceConfig serviceConfig = new ServiceConfig();
+
             ServiceWizard wizard = new ServiceWizard();
+            wizard.setServiceConfig(serviceConfig);
+            
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
             dialog.open();

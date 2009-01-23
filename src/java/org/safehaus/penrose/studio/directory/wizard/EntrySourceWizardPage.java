@@ -62,9 +62,7 @@ public class EntrySourceWizardPage extends WizardPage implements SelectionListen
         Composite composite = new Composite(parent, SWT.NONE);
         setControl(composite);
 
-        GridLayout sectionLayout = new GridLayout();
-        sectionLayout.numColumns = 2;
-        composite.setLayout(sectionLayout);
+        composite.setLayout(new GridLayout(2, false));
 
         sourcesTable = new Table(composite, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
         sourcesTable.setHeaderVisible(true);
@@ -73,11 +71,11 @@ public class EntrySourceWizardPage extends WizardPage implements SelectionListen
 
         TableColumn tc = new TableColumn(sourcesTable, SWT.NONE);
         tc.setText("Source");
-        tc.setWidth(200);
+        tc.setWidth(250);
 
         tc = new TableColumn(sourcesTable, SWT.NONE);
         tc.setText("Alias");
-        tc.setWidth(200);
+        tc.setWidth(150);
 
         Composite buttons = new Composite(composite, SWT.NONE);
         buttons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
@@ -109,6 +107,7 @@ public class EntrySourceWizardPage extends WizardPage implements SelectionListen
                     }
 
                     EntrySourceConfig sourceConfig = new EntrySourceConfig();
+
                     SourceDialog dialog = new SourceDialog(parent.getShell(), SWT.NONE);
                     dialog.setSourceConfigs(sourceConfigs);
                     dialog.setSourceConfig(sourceConfig);
@@ -306,10 +305,12 @@ public class EntrySourceWizardPage extends WizardPage implements SelectionListen
         sourcesTable.removeAll();
 
         for (EntrySourceConfig sourceConfig : entrySourceConfigs) {
+            String name = sourceConfig.getSourceName();
+            String alias = sourceConfig.getAlias();
 
             TableItem item = new TableItem(sourcesTable, SWT.NONE);
-            item.setText(0, sourceConfig.getSourceName());
-            item.setText(1, sourceConfig.getAlias());
+            item.setText(0, name);
+            item.setText(1, alias == null || alias.equals(name) ? "" : alias);
             item.setData(sourceConfig);
         }
     }

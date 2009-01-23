@@ -120,7 +120,7 @@ public class CreateLDAPProxyWizard extends Wizard {
                 entryConfig.setDn(db.toDn());
             }
 
-            EntrySourceConfig sourceMapping = new EntrySourceConfig("DEFAULT", sourceConfig.getName());
+            EntrySourceConfig sourceMapping = new EntrySourceConfig(sourceConfig.getName());
             entryConfig.addSourceConfig(sourceMapping);
 
             entryConfig.setEntryClass(ProxyEntry.class.getName());

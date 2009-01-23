@@ -44,9 +44,9 @@ public class RootEntryWizard extends Wizard {
     private String partitionName;
     private EntryConfig entryConfig;
 
-    public StaticEntryDNWizardPage dnPage;
+    public EntryDNWizardPage dnPage;
     public ObjectClassWizardPage ocPage;
-    public AttributeWizardPage attributePage;
+    public AttributesWizardPage attributePage;
 
     public RootEntryWizard(Server server, String partitionName) {
         this.server = server;
@@ -64,7 +64,7 @@ public class RootEntryWizard extends Wizard {
 
     public void addPages() {
 
-        dnPage = new StaticEntryDNWizardPage();
+        dnPage = new EntryDNWizardPage();
 
         addPage(dnPage);
 
@@ -72,7 +72,7 @@ public class RootEntryWizard extends Wizard {
 
         addPage(ocPage);
 
-        attributePage = new AttributeWizardPage();
+        attributePage = new AttributesWizardPage();
         attributePage.setServer(server);
         attributePage.setPartitionName(partitionName);
 
@@ -104,7 +104,7 @@ public class RootEntryWizard extends Wizard {
         try {
             entryConfig = new EntryConfig();
             entryConfig.setDn(dnPage.getDn());
-            entryConfig.setEntryClass(dnPage.getClassName());
+            //entryConfig.setEntryClass(dnPage.getClassName());
             entryConfig.addObjectClasses(ocPage.getSelectedObjectClasses());
             entryConfig.addAttributeConfigs(attributePage.getAttributeConfigs());
 

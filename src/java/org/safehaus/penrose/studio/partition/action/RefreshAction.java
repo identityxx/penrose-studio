@@ -29,6 +29,8 @@ public class RefreshAction extends Action {
             ServerNode projectNode = serversView.getSelectedProjectNode();
             serversView.open(projectNode.getPartitionsNode());
 
+            partitionsNode.refresh();
+
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 

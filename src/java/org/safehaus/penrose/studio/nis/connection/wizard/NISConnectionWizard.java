@@ -41,7 +41,7 @@ public class NISConnectionWizard extends Wizard {
     private String partitionName;
     private ConnectionConfig connectionConfig;
 
-    public ConnectionPropertiesWizardPage namePage;
+    public ConnectionPropertiesWizardPage propertiesPage;
 
     public NISConnectionSettingsWizardPage settingsPage;
     public ParametersWizardPage parametersPage;
@@ -52,8 +52,14 @@ public class NISConnectionWizard extends Wizard {
 
     public void addPages() {
 
-        namePage = new ConnectionPropertiesWizardPage();
-        addPage(namePage);
+        propertiesPage = new ConnectionPropertiesWizardPage();
+
+        propertiesPage.setConnectionName(connectionConfig.getName());
+        propertiesPage.setClassName(connectionConfig.getConnectionClass());
+        propertiesPage.setEnabled(connectionConfig.isEnabled());
+        propertiesPage.setConnectionDescription(connectionConfig.getDescription());
+
+        addPage(propertiesPage);
 
         settingsPage = new NISConnectionSettingsWizardPage();
         addPage(settingsPage);
@@ -63,7 +69,7 @@ public class NISConnectionWizard extends Wizard {
     }
 
     public boolean canFinish() {
-        if (!namePage.isPageComplete()) return false;
+        if (!propertiesPage.isPageComplete()) return false;
         if (!settingsPage.isPageComplete()) return false;
         if (!parametersPage.isPageComplete()) return false;
 
@@ -72,8 +78,11 @@ public class NISConnectionWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            connectionConfig = new ConnectionConfig();
-            connectionConfig.setName(namePage.getName());
+            connectionConfig.setName(propertiesPage.getConnectionName());
+            connectionConfig.setConnectionClass(propertiesPage.getClassName());
+            connectionConfig.setEnabled(propertiesPage.isEnabled());
+            connectionConfig.setDescription(propertiesPage.getConnectionDescription());
+
             connectionConfig.setAdapterName("NIS");
 
             Map<String,String> parameters = settingsPage.getParameters();

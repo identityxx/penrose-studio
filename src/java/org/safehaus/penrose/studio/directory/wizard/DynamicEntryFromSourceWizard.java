@@ -46,7 +46,7 @@ public class DynamicEntryFromSourceWizard extends Wizard {
 
     public EntrySourceWizardPage sourcesPage;
     public ObjectClassWizardPage ocPage;
-    public AttributeWizardPage attributePage;
+    public AttributesWizardPage attributePage;
 
     public DynamicEntryFromSourceWizard(String partitionName, EntryConfig parentConfig) {
         this.partitionName = partitionName;
@@ -68,10 +68,10 @@ public class DynamicEntryFromSourceWizard extends Wizard {
 
         addPage(ocPage);
 
-        attributePage = new AttributeWizardPage();
+        attributePage = new AttributesWizardPage();
         attributePage.setServer(server);
         attributePage.setPartitionName(partitionName);
-        attributePage.setDefaultType(AttributeWizardPage.VARIABLE);
+        attributePage.setDefaultType(AttributesWizardPage.VARIABLE);
 
         addPage(attributePage);
     }

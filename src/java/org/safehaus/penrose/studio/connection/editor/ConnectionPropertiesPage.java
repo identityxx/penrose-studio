@@ -35,7 +35,6 @@ public class ConnectionPropertiesPage extends ConnectionEditorPage {
 
     Label nameText;
     Label classText;
-    Label adapterText;
     Button enabledCheckbox;
     Text descriptionText;
 
@@ -97,24 +96,23 @@ public class ConnectionPropertiesPage extends ConnectionEditorPage {
         classText = toolkit.createLabel(composite, "", SWT.READ_ONLY);
         classText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        toolkit.createLabel(composite, "Adapter:");
-
-        adapterText = toolkit.createLabel(composite, "", SWT.READ_ONLY);
-        adapterText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
         toolkit.createLabel(composite, "Enabled:");
 
         enabledCheckbox = toolkit.createButton(composite, "", SWT.CHECK);
         enabledCheckbox.setEnabled(false);
 
+        new Label(composite, SWT.NONE);
+        new Label(composite, SWT.NONE);
+
         Label descriptionLabel = toolkit.createLabel(composite, "Description:");
-        gd = new GridData();
-        gd.verticalAlignment = GridData.BEGINNING;
+        gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.horizontalSpan = 2;
         descriptionLabel.setLayoutData(gd);
 
         descriptionText = toolkit.createText(composite, "", SWT.READ_ONLY | SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 100;
+        gd.horizontalSpan = 2;
         descriptionText.setLayoutData(gd);
 
         return composite;
@@ -164,9 +162,6 @@ public class ConnectionPropertiesPage extends ConnectionEditorPage {
 
         String className = connectionConfig.getConnectionClass();
         classText.setText(className == null ? "" : className);
-
-        String adapter = connectionConfig.getAdapterName();
-        adapterText.setText(adapter == null ? "" : adapter);
 
         enabledCheckbox.setSelection(connectionConfig.isEnabled());
 

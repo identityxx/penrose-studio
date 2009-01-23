@@ -137,14 +137,8 @@ public class SourcePrimaryKeysWizardPage extends WizardPage implements Selection
         }
     }
 
-    public Collection<FieldConfig> getFields() {
-        Collection<FieldConfig> fields = new ArrayList<FieldConfig>();
-        TableItem items[] = fieldsTable.getItems();
-        for (TableItem item : items) {
-            FieldConfig field = (FieldConfig) item.getData();
-            fields.add(field);
-        }
-        return fields;
+    public Map<String,FieldConfig> getFieldConfigs() {
+        return fieldConfigs;
     }
 
     public void setFieldConfigs(Map<String,FieldConfig> fieldConfigs) {

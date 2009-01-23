@@ -61,6 +61,11 @@ public class LDAPSourceWizard extends SourceWizard {
 
         propertiesPage = new SourcePropertiesWizardPage();
 
+        propertiesPage.setSourceName(sourceConfig.getName());
+        propertiesPage.setClassName(sourceConfig.getSourceClass());
+        propertiesPage.setEnabled(sourceConfig.isEnabled());
+        propertiesPage.setSourceDescription(sourceConfig.getDescription());
+
         addPage(propertiesPage);
 
         if (connectionConfig == null) {
@@ -78,7 +83,8 @@ public class LDAPSourceWizard extends SourceWizard {
         addPage(treePage);
 
         fieldsPage = new LDAPSourceFieldsWizardPage();
-        //fieldsPage.setConnectionConfig(connectionConfig);
+        fieldsPage.setAvailableFieldConfigs(availableFieldConfigs);
+        fieldsPage.setSelectedFieldConfigs(selectedFieldConfigs);
 
         addPage(fieldsPage);
 

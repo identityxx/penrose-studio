@@ -86,7 +86,7 @@ public class ModuleEditor extends FormEditor {
             addPage(new ModulePropertiesPage(this));
             addPage(new ModuleMappingsPage(this));
 
-            parametersPage = new ParametersPage(this, "Module Editor");
+            parametersPage = new ModuleParametersPage(this);
             parametersPage.setParameters(moduleConfig.getParameters());
             addPage(parametersPage);
 

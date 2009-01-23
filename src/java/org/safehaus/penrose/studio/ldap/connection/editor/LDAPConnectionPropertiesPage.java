@@ -38,6 +38,7 @@ import javax.naming.InitialContext;
  */
 public class LDAPConnectionPropertiesPage extends ConnectionEditorPage {
 
+    Label adapterText;
     Label urlText;
     Label bindDnText;
     Label passwordText;
@@ -91,138 +92,26 @@ public class LDAPConnectionPropertiesPage extends ConnectionEditorPage {
         layout.marginHeight = 0;
         composite.setLayout(layout);
 
+        toolkit.createLabel(composite, "Adapter:");
+
+        adapterText = toolkit.createLabel(composite, "", SWT.READ_ONLY);
+        adapterText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
         toolkit.createLabel(composite, "URL:");
 
         urlText = toolkit.createLabel(composite, "", SWT.NONE);
-        //protocolCombo.add("ldap");
-        //protocolCombo.add("ldaps");
         urlText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-/*
-        protocolCombo.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent event) {
-                String url = getURL();
-                connectionConfig.setParameter(Context.PROVIDER_URL, url);
-                checkDirty();
-            }
-        });
 
-        toolkit.createLabel(composite, "Host:");
-
-        hostText = toolkit.createLabel(composite, "", SWT.NONE);
-        hostText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        hostText.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent event) {
-                String url = getURL();
-                connectionConfig.setParameter(Context.PROVIDER_URL, url);
-                checkDirty();
-            }
-        });
-
-        toolkit.createLabel(composite, "Port:");
-
-        portText = toolkit.createLabel(composite, "", SWT.NONE);
-        portText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        portText.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent event) {
-                String url = getURL();
-                connectionConfig.setParameter(Context.PROVIDER_URL, url);
-                checkDirty();
-            }
-        });
-*/
-/*
-        suffixCombo.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent event) {
-                String url = getURL();
-                connectionConfig.setParameter(Context.PROVIDER_URL, url);
-                checkDirty();
-            }
-        });
-
-        Button fetchButton = new Button(composite, SWT.PUSH);
-		fetchButton.setText("Fetch Base DNs");
-
-        fetchButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        fetchButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                LDAPClient client = null;
-                try {
-                    suffixCombo.removeAll();
-
-                    client = new LDAPClient(connectionConfig.getParameters());
-
-                    SearchResult rootDse = client.getRootDSE();
-
-                    Attribute namingContexts = rootDse.getAttributes().get("namingContexts");
-                    if (namingContexts != null) {
-                        for (Object value : namingContexts.getValues()) {
-                            String namingContext = (String)value;
-                            suffixCombo.add(namingContext);
-                        }
-                    }
-
-                    suffixCombo.select(0);
-
-                } catch (Exception ex) {
-                    log.error(ex.getMessage(), ex);
-                    ErrorDialog.open(ex);
-
-                } finally {
-                    if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
-                }
-            }
-        });
-*/
         toolkit.createLabel(composite, "Principal:");
 
         bindDnText = toolkit.createLabel(composite, "", SWT.NONE);
-
         bindDnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-/*
-        bindDnText.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent event) {
-                connectionConfig.setParameter(Context.SECURITY_PRINCIPAL, bindDnText.getText());
-                checkDirty();
-            }
-        });
-*/
+
         toolkit.createLabel(composite, "Credentials:");
 
         passwordText = toolkit.createLabel(composite, "", SWT.PASSWORD);
-
         passwordText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-/*
-        passwordText.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent event) {
-                connectionConfig.setParameter(Context.SECURITY_CREDENTIALS, passwordText.getText());
-                checkDirty();
-            }
-        });
 
-        toolkit.createLabel(composite, "");
-
-        Button testButton = new Button(composite, SWT.PUSH);
-		testButton.setText("Test Connection");
-
-        gd = new GridData();
-        gd.horizontalSpan = 5;
-        testButton.setLayoutData(gd);
-
-        testButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
-                Helper.testJndiConnection(
-                        editor.getSite().getShell(),
-                        "com.sun.jndi.ldap.LdapCtxFactory",
-                        getURL(),
-                        bindDnText.getText(),
-                        passwordText.getText()
-                );
-            }
-        });
-*/
         return composite;
     }
 
@@ -267,6 +156,10 @@ public class LDAPConnectionPropertiesPage extends ConnectionEditorPage {
     }
 
     public void refresh() {
+
+        String adapter = connectionConfig.getAdapterName();
+        adapterText.setText(adapter == null ? "" : adapter);
+
         String url = connectionConfig.getParameter(InitialContext.PROVIDER_URL);
         //String[] s = LDAPClient.parseURL(url);
 

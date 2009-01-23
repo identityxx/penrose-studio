@@ -272,6 +272,8 @@ public class PartitionNode extends Node {
             partitionManagerClient.removePartition(partitionNode.getPartitionName());
         }
 
+        parent.refresh();
+        
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }

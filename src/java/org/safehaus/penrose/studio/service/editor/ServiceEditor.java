@@ -68,7 +68,7 @@ public class ServiceEditor extends FormEditor {
             propertiesPage = new ServicePropertiesPage(this);
             addPage(propertiesPage);
 
-            parametersPage = new ParametersPage(this, "Service Editor");
+            parametersPage = new ServiceParametersPage(this);
             parametersPage.setParameters(serviceConfig.getParameters());
             addPage(parametersPage);
 

@@ -36,23 +36,23 @@ import org.apache.log4j.Logger;
 /**
  * @author Endi S. Dewata
  */
-public class CreateRootDSEProxyWizard extends Wizard {
+public class RootDSEProxyWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
     public SelectConnectionWizardPage connectionPage;
 
-    private Server project;
+    private Server server;
     private String partitionName;
 
-    public CreateRootDSEProxyWizard() {
+    public RootDSEProxyWizard() {
         setWindowTitle("New Root DSE Proxy");
     }
 
     public void addPages() {
 
         connectionPage = new SelectConnectionWizardPage();
-        connectionPage.setServer(project);
+        connectionPage.setServer(server);
         connectionPage.setPartitionName(partitionName);
         connectionPage.setAdapterType("LDAP");
 
@@ -79,7 +79,7 @@ public class CreateRootDSEProxyWizard extends Wizard {
 
             EntryConfig entryConfig = new EntryConfig();
 
-            EntrySourceConfig sourceMapping = new EntrySourceConfig("DEFAULT", sourceConfig.getName());
+            EntrySourceConfig sourceMapping = new EntrySourceConfig(sourceConfig.getName());
             entryConfig.addSourceConfig(sourceMapping);
 
             entryConfig.setEntryClass(ProxyEntry.class.getName());
@@ -92,7 +92,7 @@ public class CreateRootDSEProxyWizard extends Wizard {
             //project.save(partitionConfig, sourceConfigManager);
             //project.save(partitionConfig, directoryConfig);
 
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
@@ -116,12 +116,12 @@ public class CreateRootDSEProxyWizard extends Wizard {
         return true;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public String getPartitionName() {

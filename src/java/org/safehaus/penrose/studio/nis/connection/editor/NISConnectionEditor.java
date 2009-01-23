@@ -2,6 +2,7 @@ package org.safehaus.penrose.studio.nis.connection.editor;
 
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditor;
 import org.safehaus.penrose.studio.connection.editor.ConnectionPropertiesPage;
+import org.safehaus.penrose.studio.connection.editor.ConnectionParametersPage;
 import org.safehaus.penrose.studio.config.editor.ParametersPage;
 
 /**
@@ -16,7 +17,7 @@ public class NISConnectionEditor extends ConnectionEditor {
             addPage(new ConnectionPropertiesPage(this));
             addPage(new NISConnectionPropertiesPage(this));
 
-            parametersPage = new ParametersPage(this, "Connection Editor");
+            parametersPage = new ConnectionParametersPage(this);
             parametersPage.setParameters(connectionConfig.getParameters());
             addPage(parametersPage);
 

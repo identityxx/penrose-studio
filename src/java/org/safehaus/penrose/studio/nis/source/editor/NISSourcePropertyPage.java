@@ -11,7 +11,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
-import org.safehaus.penrose.studio.nis.source.wizard.NISSourceSettingsWizard;
+import org.safehaus.penrose.studio.nis.source.wizard.NISSourcePropertiesWizard;
 
 public class NISSourcePropertyPage extends SourceEditorPage {
 
@@ -103,7 +103,7 @@ public class NISSourcePropertyPage extends SourceEditorPage {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    NISSourceSettingsWizard wizard = new NISSourceSettingsWizard();
+                    NISSourcePropertiesWizard wizard = new NISSourcePropertiesWizard();
                     wizard.setServer(server);
                     wizard.setPartitionName(partitionName);
                     wizard.setSourceConfig(sourceConfig);

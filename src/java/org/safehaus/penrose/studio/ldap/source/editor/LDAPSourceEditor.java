@@ -17,10 +17,7 @@
  */
 package org.safehaus.penrose.studio.ldap.source.editor;
 
-import org.safehaus.penrose.studio.source.editor.SourceEditor;
-import org.safehaus.penrose.studio.source.editor.SourceBrowsePage;
-import org.safehaus.penrose.studio.source.editor.SourcePropertiesPage;
-import org.safehaus.penrose.studio.source.editor.SourceFieldsPage;
+import org.safehaus.penrose.studio.source.editor.*;
 import org.safehaus.penrose.studio.config.editor.ParametersPage;
 
 public class LDAPSourceEditor extends SourceEditor {
@@ -33,7 +30,7 @@ public class LDAPSourceEditor extends SourceEditor {
             addPage(new LDAPSourcePropertyPage(this));
             addPage(new LDAPSourceFieldsPage(this));
 
-            parametersPage = new ParametersPage(this, "Source Editor");
+            parametersPage = new SourceParametersPage(this);
             parametersPage.setParameters(sourceConfig.getParameters());
             addPage(parametersPage);
 

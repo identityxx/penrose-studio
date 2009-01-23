@@ -38,7 +38,7 @@ public class SchemaUtil {
         EntryConfig entryConfig = new EntryConfig();
         entryConfig.setDn(destSchemaDn);
 
-        EntrySourceConfig sourceMapping = new EntrySourceConfig("DEFAULT", sourceConfig.getName());
+        EntrySourceConfig sourceMapping = new EntrySourceConfig(sourceConfig.getName());
         entryConfig.addSourceConfig(sourceMapping);
 
         entryConfig.setEntryClass(ProxyEntry.class.getName());

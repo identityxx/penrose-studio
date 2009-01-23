@@ -20,29 +20,38 @@ package org.safehaus.penrose.studio.directory.wizard;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.directory.*;
+import org.safehaus.penrose.directory.EntryConfig;
+import org.safehaus.penrose.directory.DirectoryClient;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.DNBuilder;
+import org.safehaus.penrose.ldap.RDN;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.directory.wizard.EntrySourceWizardPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
+
+import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
  */
-public class ProxyEntryWizard extends Wizard {
+public class StaticEntryWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
     private Server server;
     private String partitionName;
     private DN parentDn;
+
     private EntryConfig entryConfig;
 
     public EntryRDNWizardPage rdnPage;
-    public EntrySourceWizardPage sourcesPage;
+    public ObjectClassWizardPage ocPage;
+    public AttributesWizardPage attributePage;
 
-    public ProxyEntryWizard() {
-        setWindowTitle("Adding proxy entry");
+    public StaticEntryWizard() {
+        setWindowTitle("Adding entry");
     }
 
     public void addPages() {
@@ -55,38 +64,36 @@ public class ProxyEntryWizard extends Wizard {
 
         addPage(rdnPage);
 
-        sourcesPage = new EntrySourceWizardPage();
-        sourcesPage.setDescription("Select proxy source.");
-        sourcesPage.setServer(server);
-        sourcesPage.setPartitionName(partitionName);
+        ocPage = new ObjectClassWizardPage(server);
 
-        addPage(sourcesPage);
+        addPage(ocPage);
+
+        attributePage = new AttributesWizardPage();
+        attributePage.setServer(server);
+        attributePage.setPartitionName(partitionName);
+
+        addPage(attributePage);
     }
 
     public boolean canFinish() {
         if (!rdnPage.isPageComplete()) return false;
-        if (!sourcesPage.isPageComplete()) return false;
-
+        if (!ocPage.isPageComplete()) return false;
+        if (!attributePage.isPageComplete()) return false;
         return true;
     }
 
     public IWizardPage getNextPage(IWizardPage page) {
-        return super.getNextPage(page);
-    }
-
-    public boolean performFinish() {
         try {
-            entryConfig.setEntryClass("org.safehaus.penrose.directory.ProxyEntry");
+            if (rdnPage == page) {
+                RDN rdn = rdnPage.getRdn();
+                attributePage.setRdn(rdn);
 
-            DNBuilder db = new DNBuilder();
-            db.append(rdnPage.getRdn());
-            db.append(parentDn);
-            //db.append(rdnPage.getParentDn());
-            entryConfig.setDn(db.toDn());
+            } else if (ocPage == page) {
+                Collection<String> objectClasses = ocPage.getSelectedObjectClasses();
+                attributePage.setObjectClasses(objectClasses);
+            }
 
-            entryConfig.addSourceConfigs(sourcesPage.getEntrySourceConfigs());
-
-            return true;
+            return super.getNextPage(page);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -94,16 +101,39 @@ public class ProxyEntryWizard extends Wizard {
         }
     }
 
+    public boolean performFinish() {
+        try {
+            entryConfig = new EntryConfig();
+
+            DNBuilder db = new DNBuilder();
+            db.append(rdnPage.getRdn());
+            db.append(parentDn);
+            //db.append(rdnPage.getParentDn());
+            entryConfig.setDn(db.toDn());
+
+            entryConfig.addObjectClasses(ocPage.getSelectedObjectClasses());
+            entryConfig.addAttributeConfigs(attributePage.getAttributeConfigs());
+
+            PenroseClient client = server.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+            DirectoryClient directoryClient = partitionClient.getDirectoryClient();
+            directoryClient.createEntry(entryConfig);
+
+            partitionClient.store();
+
+            return true;
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
+            return false;
+        }
+    }
+
     public boolean needsPreviousAndNextButtons() {
         return true;
-    }
-
-    public DN getParentDn() {
-        return parentDn;
-    }
-
-    public void setParentDn(DN parentDn) {
-        this.parentDn = parentDn;
     }
 
     public EntryConfig getEntryConfig() {
@@ -128,5 +158,13 @@ public class ProxyEntryWizard extends Wizard {
 
     public void setServer(Server server) {
         this.server = server;
+    }
+
+    public DN getParentDn() {
+        return parentDn;
+    }
+
+    public void setParentDn(DN parentDn) {
+        this.parentDn = parentDn;
     }
 }

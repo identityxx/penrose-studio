@@ -43,9 +43,11 @@ public class JDBCSourcePropertiesWizard extends SourceWizard {
     public void addPages() {
 
         connectionPage = new SelectConnectionWizardPage();
+        
         connectionPage.setServer(server);
         connectionPage.setPartitionName(partitionName);
         connectionPage.setAdapterType("JDBC");
+        connectionPage.setConnectionName(sourceConfig.getConnectionName());
 
         addPage(connectionPage);
 

@@ -17,53 +17,61 @@
  */
 package org.safehaus.penrose.studio.nis.source.wizard;
 
-import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.source.wizard.SourceWizard;
+import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
-import org.apache.log4j.Logger;
+import org.safehaus.penrose.nis.source.NISSource;
 
 /**
  * @author Endi S. Dewata
  */
-public class NISSourceSettingsWizard extends Wizard {
+public class NISSourcePropertiesWizard extends SourceWizard {
 
-    Logger log = Logger.getLogger(getClass());
+    public SelectConnectionWizardPage connectionPage;
+    public NISSourcePropertiesWizardPage nisPropertiesPage;
 
-    private Server server;
-    private String partitionName;
-    private SourceConfig sourceConfig;
-
-    public NISSourceSettingsWizardPage settingsPage;
-
-    public NISSourceSettingsWizard() throws Exception {
-        setWindowTitle("Edit NIS Source Settings");
+    public NISSourcePropertiesWizard() throws Exception {
+        setWindowTitle("Edit NIS Source Properties");
     }
 
     public void addPages() {
 
-        settingsPage = new NISSourceSettingsWizardPage();
+        connectionPage = new SelectConnectionWizardPage();
 
-        addPage(settingsPage);
+        connectionPage.setServer(server);
+        connectionPage.setPartitionName(partitionName);
+        connectionPage.setAdapterType("NIS");
+        connectionPage.setConnectionName(sourceConfig.getConnectionName());
+
+        addPage(connectionPage);
+
+        nisPropertiesPage = new NISSourcePropertiesWizardPage();
+
+        nisPropertiesPage.setBase(sourceConfig.getParameter(NISSource.BASE));
+        nisPropertiesPage.setObjectClasses(sourceConfig.getParameter(NISSource.OBJECT_CLASSES));
+
+        addPage(nisPropertiesPage);
 
     }
 
     public boolean canFinish() {
-        if (!settingsPage.isPageComplete()) return false;
+        if (!connectionPage.isPageComplete()) return false;
+        if (!nisPropertiesPage.isPageComplete()) return false;
 
         return true;
     }
 
     public boolean performFinish() {
         try {
-            String base = settingsPage.getBase();
-            sourceConfig.setParameter("base", base);
+            sourceConfig.setConnectionName(connectionPage.getConnectionName());
 
-            String objectClasses = settingsPage.getObjectClasses();
-            sourceConfig.setParameter("objectClasses", objectClasses);
+            sourceConfig.setParameter(NISSource.BASE, nisPropertiesPage.getBase());
+            sourceConfig.setParameter(NISSource.OBJECT_CLASSES, nisPropertiesPage.getObjectClasses());
 
             PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();

@@ -24,6 +24,8 @@ import org.safehaus.penrose.studio.partition.PartitionsNode;
 import org.safehaus.penrose.studio.partition.wizard.CreatePartitionWizard;
 import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.partition.PartitionConfig;
 
 public class NewPartitionAction extends Action {
 
@@ -40,16 +42,25 @@ public class NewPartitionAction extends Action {
             ServerNode projectNode = serversView.getSelectedProjectNode();
             PartitionsNode partitionsNode = projectNode.getPartitionsNode();
 
-            CreatePartitionWizard wizard = new CreatePartitionWizard(projectNode.getServer(), partitionsNode);
+            PartitionConfig partitionConfig = new PartitionConfig();
+
+            CreatePartitionWizard wizard = new CreatePartitionWizard();
+            wizard.setServer(projectNode.getServer());
+            wizard.setPartitionConfig(partitionConfig);
+
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
             dialog.open();
 
             serversView.open(projectNode.getPartitionsNode());
 
+            partitionsNode.refresh();
+            
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            penroseStudio.notifyChangeListeners();
+
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
 	}
-	
 }
