@@ -8,10 +8,12 @@ import java.util.HashMap;
  */
 public class PluginManager {
 
+    public final static Plugin DEFAULT_PLUGIN = new Plugin();
+
     public Map<String,Plugin> plugins = new HashMap<String,Plugin>();
 
     public void init(PluginConfig pluginConfig) throws Exception {
-        Plugin plugin = (Plugin)plugins.get(pluginConfig.getName());
+        Plugin plugin = plugins.get(pluginConfig.getName());
         if (plugin != null) return;
 
         String className = pluginConfig.getClassName();
@@ -28,6 +30,8 @@ public class PluginManager {
     }
 
     public Plugin getPlugin(String name) {
-        return (Plugin)plugins.get(name);
+        Plugin plugin = plugins.get(name);
+        if (plugin == null) return DEFAULT_PLUGIN;
+        return plugin;
     }
 }

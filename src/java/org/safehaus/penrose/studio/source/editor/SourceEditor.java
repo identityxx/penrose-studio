@@ -13,12 +13,13 @@ import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.config.editor.ParametersPage;
 import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi Sukma Dewata
  */
-public abstract class SourceEditor extends FormEditor {
+public class SourceEditor extends FormEditor {
 
     public Logger log = Logger.getLogger(getClass());
 
@@ -30,6 +31,8 @@ public abstract class SourceEditor extends FormEditor {
 
     protected SourceConfig origSourceConfig;
     protected SourceConfig sourceConfig;
+
+    ParametersPage parametersPage;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         super.init(site, input);
@@ -56,6 +59,22 @@ public abstract class SourceEditor extends FormEditor {
 
         setPartName(ei.getName());
 
+    }
+
+    public void addPages() {
+        try {
+            addPage(new SourcePropertiesPage(this));
+            addPage(new SourceFieldsPage(this));
+
+            parametersPage = new SourceParametersPage(this);
+            parametersPage.setParameters(sourceConfig.getParameters());
+            addPage(parametersPage);
+
+            addPage(new SourceBrowsePage(this));
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     public void doSave(IProgressMonitor iProgressMonitor) {

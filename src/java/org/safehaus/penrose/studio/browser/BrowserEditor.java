@@ -25,7 +25,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.TreeAdapter;
 import org.eclipse.swt.events.TreeEvent;
-import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.*;
@@ -48,7 +47,8 @@ public class BrowserEditor extends EditorPart {
     Text bindDnText;
 
     Tree tree;
-    Table table;
+    Text dnText;
+    Table attributesTable;
 
     LDAPConnection connection = new LDAPConnection();
 
@@ -75,8 +75,83 @@ public class BrowserEditor extends EditorPart {
 
         parent.setLayout(new GridLayout());
 
+        Composite browserControl = createBrowserControl(parent);
+        browserControl.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        //SashForm sash = new SashForm(parent, SWT.VERTICAL);
+        //sash.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        tree = new Tree(parent, SWT.BORDER);
+        tree.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        tree.addTreeListener(new TreeAdapter() {
+            public void treeExpanded(TreeEvent event) {
+                try {
+                    if (event.item == null) return;
+
+                    TreeItem treeItem = (TreeItem)event.item;
+                    showChildren(treeItem);
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+        });
+
+        tree.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                try {
+                    if (tree.getSelectionCount() == 0) return;
+
+                    TreeItem treeItem = tree.getSelection()[0];
+                    showEntry(treeItem);
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+        });
+
+        Composite bottomPanel = new Composite(parent, SWT.NONE);
+        bottomPanel.setLayout(new GridLayout(2, false));
+        bottomPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        Label dnLabel = new Label(bottomPanel, SWT.NONE);
+        dnLabel.setText("DN:");
+
+        dnText = new Text(bottomPanel, SWT.BORDER | SWT.READ_ONLY);
+        dnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        attributesTable = new Table(bottomPanel, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+        GridData gd = new GridData(GridData.FILL_BOTH);
+        gd.horizontalSpan = 2;
+        attributesTable.setLayoutData(gd);
+
+        attributesTable.setHeaderVisible(true);
+        attributesTable.setLinesVisible(true);
+
+        TableColumn tc = new TableColumn(attributesTable, SWT.NONE, 0);
+        tc.setText("Name");
+        tc.setWidth(200);
+
+        tc = new TableColumn(attributesTable, SWT.NONE, 1);
+        tc.setText("Value");
+        tc.setWidth(400);
+
+        try {
+            open(hostname, port, "");
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
+        }
+	}
+
+    public Composite createBrowserControl(final Composite parent) {
+
         Composite composite = new Composite(parent, SWT.NONE);
-        composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         composite.setLayout(new GridLayout(5, false));
 
         Label urlLabel = new Label(composite, SWT.NONE);
@@ -129,63 +204,10 @@ public class BrowserEditor extends EditorPart {
             }
         });
 
-        SashForm sash = new SashForm(parent, SWT.VERTICAL);
-        sash.setLayoutData(new GridData(GridData.FILL_BOTH));
+        return composite;
+    }
 
-        tree = new Tree(sash, SWT.BORDER);
-
-        tree.addTreeListener(new TreeAdapter() {
-            public void treeExpanded(TreeEvent event) {
-                try {
-                    if (event.item == null) return;
-
-                    TreeItem treeItem = (TreeItem)event.item;
-                    showChildren(treeItem);
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
-                }
-            }
-        });
-
-        tree.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                try {
-                    if (tree.getSelectionCount() == 0) return;
-
-                    TreeItem treeItem = tree.getSelection()[0];
-                    showEntry(treeItem);
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
-                }
-            }
-        });
-
-        table = new Table(sash, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
-        table.setHeaderVisible(true);
-        table.setLinesVisible(true);
-
-        TableColumn tc = new TableColumn(table, SWT.NONE, 0);
-        tc.setText("Name");
-        tc.setWidth(200);
-
-        tc = new TableColumn(table, SWT.NONE, 1);
-        tc.setText("Value");
-        tc.setWidth(400);
-
-        try {
-            open(hostname, port, "");
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
-        }
-	}
-
-	public void setFocus() {
+    public void setFocus() {
 	}
 
     public void open(String hostname, int port, String baseDn) throws Exception {
@@ -265,9 +287,11 @@ public class BrowserEditor extends EditorPart {
 
     public void showEntry(TreeItem treeItem) throws Exception {
 
-        table.removeAll();
-
         DN dn = (DN)treeItem.getData();
+
+        dnText.setText(dn.toString());
+
+        attributesTable.removeAll();
 
         LDAPSearchResults sr = connection.search(
                 dn.toString(),
@@ -290,7 +314,7 @@ public class BrowserEditor extends EditorPart {
             for (Enumeration e = attribute.getStringValues(); e.hasMoreElements();) {
                 String value = (String) e.nextElement();
 
-                TableItem tableItem = new TableItem(table, SWT.NONE);
+                TableItem tableItem = new TableItem(attributesTable, SWT.NONE);
                 tableItem.setText(0, name);
                 tableItem.setText(1, value);
             }

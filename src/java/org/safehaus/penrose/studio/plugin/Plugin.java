@@ -1,7 +1,9 @@
 package org.safehaus.penrose.studio.plugin;
 
 import org.safehaus.penrose.studio.source.editor.SourceEditorInput;
+import org.safehaus.penrose.studio.source.editor.SourceEditor;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorInput;
+import org.safehaus.penrose.studio.connection.editor.ConnectionEditor;
 
 /**
  * @author Endi S. Dewata
@@ -19,7 +21,7 @@ public class Plugin {
     }
 
     public String getConnectionEditorClass() {
-        return null;
+        return ConnectionEditor.class.getName();
     }
 
     public SourceEditorInput createSourceEditorInput() {
@@ -27,7 +29,7 @@ public class Plugin {
     }
 
     public String getSourceEditorClass() {
-        return null;
+        return SourceEditor.class.getName();
     }
 
     public PluginConfig getPluginConfig() {
