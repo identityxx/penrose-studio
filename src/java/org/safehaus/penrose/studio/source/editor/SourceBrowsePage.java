@@ -23,6 +23,8 @@ import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 
+import javax.management.MBeanException;
+
 public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
 
     Button refreshButton;
@@ -63,8 +65,6 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
 
         Control attributesSection = createAttributesSection(section);
         section.setClient(attributesSection);
-
-        refresh();
     }
 
     public Composite createActionsSection(final Composite parent) {
@@ -209,6 +209,11 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
 
             item.setExpanded(true);
 
+        } catch (MBeanException e) {
+            Throwable t = e.getCause();
+            log.error(t.getMessage(), t);
+            ErrorDialog.open(t);
+
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);
@@ -258,6 +263,11 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
 
                 new TreeItem(it, SWT.NONE);
             }
+
+        } catch (MBeanException e) {
+            Throwable t = e.getCause();
+            log.error(t.getMessage(), t);
+            ErrorDialog.open(t);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

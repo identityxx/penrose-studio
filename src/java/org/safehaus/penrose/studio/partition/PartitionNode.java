@@ -155,6 +155,17 @@ public class PartitionNode extends Node {
             }
         });
 
+        manager.add(new Action("Restart") {
+            public void run() {
+                try {
+                    restart();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+        });
+
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 /*
         manager.add(new Action("Save") {
@@ -224,8 +235,8 @@ public class PartitionNode extends Node {
     public void start() throws Exception {
         log.debug("Starting "+name+" partition.");
 
-        Server project = projectNode.getServer();
-        PenroseClient client = project.getClient();
+        Server server = projectNode.getServer();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(name);
         partitionClient.start();
@@ -234,11 +245,22 @@ public class PartitionNode extends Node {
     public void stop() throws Exception {
         log.debug("Stopping "+name+" partition.");
 
-        Server project = projectNode.getServer();
-        PenroseClient client = project.getClient();
+        Server server = projectNode.getServer();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(name);
         partitionClient.stop();
+    }
+
+    public void restart() throws Exception {
+        log.debug("Restarting "+name+" partition.");
+
+        Server server = projectNode.getServer();
+        PenroseClient client = server.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(name);
+        partitionClient.stop();
+        partitionClient.start();
     }
 
     public void upload() throws Exception {
