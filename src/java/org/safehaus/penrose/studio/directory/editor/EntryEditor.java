@@ -50,8 +50,6 @@ public class EntryEditor extends FormEditor implements ModifyListener {
 
     boolean dirty;
 
-    ParametersPage parametersPage;
-
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         super.init(site, input);
 
@@ -92,7 +90,7 @@ public class EntryEditor extends FormEditor implements ModifyListener {
             addPage(new EntrySourcesPage(this));
             addPage(new ACLPage(this, server, partitionName, entryConfig));
 
-            parametersPage = new EntryParametersPage(this);
+            ParametersPage parametersPage = new EntryParametersPage(this);
             parametersPage.setParameters(entryConfig.getParameters());
             addPage(parametersPage);
 

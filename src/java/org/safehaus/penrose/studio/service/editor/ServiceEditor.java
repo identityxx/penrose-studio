@@ -44,7 +44,6 @@ public class ServiceEditor extends FormEditor {
     boolean dirty;
 
     ServicePropertiesPage propertiesPage;
-    ParametersPage parametersPage;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         ServiceEditorInput ei = (ServiceEditorInput)input;
@@ -68,7 +67,7 @@ public class ServiceEditor extends FormEditor {
             propertiesPage = new ServicePropertiesPage(this);
             addPage(propertiesPage);
 
-            parametersPage = new ServiceParametersPage(this);
+            ParametersPage parametersPage = new ServiceParametersPage(this);
             parametersPage.setParameters(serviceConfig.getParameters());
             addPage(parametersPage);
 

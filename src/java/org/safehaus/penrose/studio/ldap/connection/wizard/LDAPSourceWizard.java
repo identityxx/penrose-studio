@@ -93,7 +93,7 @@ public class LDAPSourceWizard extends Wizard {
         propertiesPage = new LDAPSourceWizardPage(name, baseDn, filter, scope);
         
         fieldsPage = new LDAPSourceFieldsWizardPage(attributeNames);
-        //fieldsPage.setConnectionConfig(connectionConfig);
+        //fieldsPage.setMappingConfig(connectionConfig);
 
         setWindowTitle(connectionConfig.getName()+" - New Source");
     }

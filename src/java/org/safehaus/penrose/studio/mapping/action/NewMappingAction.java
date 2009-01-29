@@ -25,7 +25,7 @@ import org.safehaus.penrose.mapping.MappingConfig;
 import org.safehaus.penrose.mapping.MappingManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.mapping.MappingsNode;
-import org.safehaus.penrose.studio.mapping.wizard.AddMappingWizard;
+import org.safehaus.penrose.studio.mapping.wizard.MappingWizard;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.ServersView;
 
@@ -45,9 +45,12 @@ public class NewMappingAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Server project = node.getProjectNode().getServer();
+            Server server = node.getProjectNode().getServer();
 
-            AddMappingWizard wizard = new AddMappingWizard();
+            MappingConfig mappingConfig = new MappingConfig();
+
+            MappingWizard wizard = new MappingWizard();
+            wizard.setMappingConfig(mappingConfig);
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
@@ -55,8 +58,7 @@ public class NewMappingAction extends Action {
 
             if (rc == WizardDialog.CANCEL) return;
 
-            MappingConfig mappingConfig = wizard.getMappingConfig();
-            PartitionClient partitionClient = project.getClient().getPartitionManagerClient().getPartitionClient(node.getPartitionName());
+            PartitionClient partitionClient = server.getClient().getPartitionManagerClient().getPartitionClient(node.getPartitionName());
             MappingManagerClient mappingManagerClient = partitionClient.getMappingManagerClient();
 
             mappingManagerClient.createMapping(mappingConfig);

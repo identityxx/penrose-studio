@@ -49,7 +49,7 @@ public class ImportMappingsAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Server project = node.getProjectNode().getServer();
+            Server server = node.getProjectNode().getServer();
 
             FileDialog dialog = new FileDialog(serversView.getSite().getShell(), SWT.OPEN);
             dialog.setText("Import Mappings");
@@ -65,7 +65,7 @@ public class ImportMappingsAction extends Action {
             MappingReader mappingReader = new MappingReader();
             mappingReader.read(file, mappingConfigManager);
 
-            PartitionClient partitionClient = project.getClient().getPartitionManagerClient().getPartitionClient(node.getPartitionName());
+            PartitionClient partitionClient = server.getClient().getPartitionManagerClient().getPartitionClient(node.getPartitionName());
             MappingManagerClient mappingManagerClient = partitionClient.getMappingManagerClient();
 
             for (MappingConfig mappingConfig : mappingConfigManager.getMappingConfigs()) {

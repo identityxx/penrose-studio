@@ -10,14 +10,12 @@ import org.safehaus.penrose.studio.config.editor.ParametersPage;
  */
 public class NISConnectionEditor extends ConnectionEditor {
 
-    ParametersPage parametersPage;
-
     public void addPages() {
         try {
             addPage(new ConnectionPropertiesPage(this));
             addPage(new NISConnectionPropertiesPage(this));
 
-            parametersPage = new ConnectionParametersPage(this);
+            ParametersPage parametersPage = new ConnectionParametersPage(this);
             parametersPage.setParameters(connectionConfig.getParameters());
             addPage(parametersPage);
 

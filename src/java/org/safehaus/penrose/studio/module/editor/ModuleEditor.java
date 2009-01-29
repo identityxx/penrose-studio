@@ -51,8 +51,6 @@ public class ModuleEditor extends FormEditor {
 
     boolean dirty;
 
-    ParametersPage parametersPage;
-
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         super.init(site, input);
 
@@ -86,7 +84,7 @@ public class ModuleEditor extends FormEditor {
             addPage(new ModulePropertiesPage(this));
             addPage(new ModuleMappingsPage(this));
 
-            parametersPage = new ModuleParametersPage(this);
+            ParametersPage parametersPage = new ModuleParametersPage(this);
             parametersPage.setParameters(moduleConfig.getParameters());
             addPage(parametersPage);
 

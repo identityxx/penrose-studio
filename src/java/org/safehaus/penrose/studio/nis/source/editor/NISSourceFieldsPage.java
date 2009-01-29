@@ -1,36 +1,9 @@
 package org.safehaus.penrose.studio.nis.source.editor;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
-import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.schema.SchemaManagerClient;
-import org.safehaus.penrose.connection.ConnectionClient;
-import org.safehaus.penrose.connection.ConnectionManagerClient;
-import org.safehaus.penrose.partition.PartitionClient;
-import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.nis.*;
-import org.safehaus.penrose.schema.AttributeType;
-import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.nis.source.wizard.NISSourceFieldsWizard;
-import org.safehaus.penrose.studio.ldap.source.LDAPFieldDialog;
-import org.safehaus.penrose.studio.ldap.source.wizard.LDAPSourceFieldsWizard;
-import org.safehaus.penrose.studio.source.FieldDialog;
-import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
 import org.safehaus.penrose.studio.source.editor.SourceFieldsPage;
-import org.safehaus.penrose.client.PenroseClient;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 public class NISSourceFieldsPage extends SourceFieldsPage {
 /*
@@ -58,7 +31,7 @@ public class NISSourceFieldsPage extends SourceFieldsPage {
 
         ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(sourceConfig.getConnectionName());
 
-        ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
+        ConnectionConfig connectionConfig = connectionClient.getMappingConfig();
         if (connectionConfig == null) return;
 
         String method = connectionConfig.getParameter(NIS.METHOD);

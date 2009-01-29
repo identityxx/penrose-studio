@@ -27,14 +27,12 @@ import org.safehaus.penrose.studio.config.editor.ParametersPage;
  */
 public class JDBCConnectionEditor extends ConnectionEditor {
 
-    ParametersPage parametersPage;
-
     public void addPages() {
         try {
             addPage(new ConnectionPropertiesPage(this));
             addPage(new JDBCConnectionPropertiesPage(this));
 
-            parametersPage = new ConnectionParametersPage(this);
+            ParametersPage parametersPage = new ConnectionParametersPage(this);
             parametersPage.setParameters(connectionConfig.getParameters());
             addPage(parametersPage);
 

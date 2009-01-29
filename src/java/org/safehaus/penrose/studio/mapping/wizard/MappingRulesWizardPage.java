@@ -14,109 +14,79 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- */package org.safehaus.penrose.studio.mapping.editor;
+ */
+package org.safehaus.penrose.studio.mapping.wizard;
 
-import org.apache.log4j.Logger;
+import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
-import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.forms.editor.FormPage;
-import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
-import org.eclipse.ui.forms.widgets.Section;
-import org.safehaus.penrose.mapping.Expression;
-import org.safehaus.penrose.mapping.MappingRuleConfig;
-import org.safehaus.penrose.mapping.MappingConfig;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.mapping.wizard.AddFieldMappingWizard;
-import org.safehaus.penrose.studio.mapping.wizard.EditFieldMappingWizard;
+import org.safehaus.penrose.mapping.MappingRuleConfig;
+import org.safehaus.penrose.mapping.Expression;
+import org.apache.log4j.Logger;
+
+import java.util.*;
+import java.util.List;
 
 /**
  * @author Endi S. Dewata
  */
-public class MappingEditorFieldsPage extends FormPage {
+public class MappingRulesWizardPage extends WizardPage {
 
     Logger log = Logger.getLogger(getClass());
 
-    FormToolkit toolkit;
+    public final static String NAME = "Mapping Rules";
 
-    Table fieldMappings;
+    Table rulesTable;
 
-    MappingEditor editor;
-    MappingConfig mappingConfig;
+    List<MappingRuleConfig> ruleConfigs = new LinkedList<MappingRuleConfig>();
 
-    public MappingEditorFieldsPage(MappingEditor editor) {
-        super(editor, "FIELDS", "  Fields  ");
-
-        this.editor = editor;
-        this.mappingConfig = editor.mappingConfig;
+    public MappingRulesWizardPage() {
+        super(NAME);
+        setDescription("Enter mapping rules.");
     }
 
-    public void createFormContent(IManagedForm managedForm) {
-        try {
-            toolkit = managedForm.getToolkit();
+    public void createControl(final Composite parent) {
 
-            ScrolledForm form = managedForm.getForm();
-            form.setText("Mapping Editor");
+        Composite composite = new Composite(parent, SWT.NONE);
+        setControl(composite);
 
-            Composite body = form.getBody();
-            body.setLayout(new GridLayout());
+        composite.setLayout(new GridLayout(2, false));
 
-            Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-            section.setText("Fields");
-            section.setLayoutData(new GridData(GridData.FILL_BOTH));
+        rulesTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
+        rulesTable.setHeaderVisible(true);
+        rulesTable.setLinesVisible(true);
 
-            Control atSection = createFieldSection(section);
-            section.setClient(atSection);
+        rulesTable.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-            refresh();
+        TableColumn tc = new TableColumn(rulesTable, SWT.LEFT);
+        tc.setText("Field");
+        tc.setWidth(100);
 
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    public Composite createFieldSection(final Composite parent) {
-
-        Composite composite = toolkit.createComposite(parent);
-        GridLayout layout = new GridLayout();
-        layout.numColumns = 2;
-        composite.setLayout(layout);
-
-        fieldMappings = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
-        fieldMappings.setHeaderVisible(true);
-        fieldMappings.setLinesVisible(true);
-
-        fieldMappings.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-        TableColumn tc = new TableColumn(this.fieldMappings, SWT.LEFT);
-        tc.setText("Name");
-        tc.setWidth(140);
-
-        tc = new TableColumn(fieldMappings, SWT.LEFT);
+        tc = new TableColumn(rulesTable, SWT.LEFT);
         tc.setText("Value");
-        tc.setWidth(200);
+        tc.setWidth(180);
 
-        tc = new TableColumn(fieldMappings, SWT.LEFT);
+        tc = new TableColumn(rulesTable, SWT.LEFT);
         tc.setText("Required");
-        tc.setWidth(75);
+        tc.setWidth(80);
 
-        tc = new TableColumn(fieldMappings, SWT.LEFT);
+        tc = new TableColumn(rulesTable, SWT.LEFT);
         tc.setText("Condition");
-        tc.setWidth(150);
+        tc.setWidth(100);
 
-        fieldMappings.addMouseListener(new MouseAdapter() {
+        rulesTable.addMouseListener(new MouseAdapter() {
             public void mouseDoubleClick(MouseEvent event) {
                 try {
-                    editField();
+                    editRule();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -125,8 +95,8 @@ public class MappingEditorFieldsPage extends FormPage {
             }
         });
 
-        Menu menu = new Menu(fieldMappings);
-        fieldMappings.setMenu(menu);
+        Menu menu = new Menu(rulesTable);
+        rulesTable.setMenu(menu);
 
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
         mi.setText("Edit");
@@ -134,7 +104,7 @@ public class MappingEditorFieldsPage extends FormPage {
         mi.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    editField();
+                    editRule();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -143,57 +113,51 @@ public class MappingEditorFieldsPage extends FormPage {
             }
         });
 
-        Composite buttons = toolkit.createComposite(composite);
+        Composite buttons = new Composite(composite, SWT.NONE);
         buttons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
         buttons.setLayout(new GridLayout());
 
         Button addButton = new Button(buttons, SWT.PUSH);
-		addButton.setText("Add");
-
         addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        addButton.setText("Add");
 
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    addField();
+                    addRule();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    ErrorDialog.open(e);
                 }
             }
         });
 
         Button editButton = new Button(buttons, SWT.PUSH);
-		editButton.setText("Edit");
-
         editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        editButton.setText("Edit");
 
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    editField();
+                    editRule();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    ErrorDialog.open(e);
                 }
             }
         });
 
         Button removeButton = new Button(buttons, SWT.PUSH);
-		removeButton.setText("Remove");
-
         removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        removeButton.setText("Remove");
 
         removeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    removeField();
+                    removeRule();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    ErrorDialog.open(e);
                 }
             }
         });
@@ -208,7 +172,7 @@ public class MappingEditorFieldsPage extends FormPage {
         moveUpButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    moveUpField();
+                    moveUpRule();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -225,7 +189,7 @@ public class MappingEditorFieldsPage extends FormPage {
         moveDown.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    moveDownField();
+                    moveDownRule();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -234,87 +198,101 @@ public class MappingEditorFieldsPage extends FormPage {
             }
         });
 
-        return composite;
+        setPageComplete(validatePage());
     }
 
-    public void addField() throws Exception {
+    public void addRule() throws Exception {
 
         AddFieldMappingWizard wizard = new AddFieldMappingWizard();
-        WizardDialog dialog = new WizardDialog(getSite().getShell(), wizard);
+        WizardDialog dialog = new WizardDialog(getShell(), wizard);
         dialog.setPageSize(600, 300);
-        dialog.open();
+        int rc = dialog.open();
 
-        MappingRuleConfig fieldMapping = wizard.getFieldConfig();
-        mappingConfig.addRuleConfig(fieldMapping);
-        
+        if (rc == Window.CANCEL) return;
+
+        MappingRuleConfig ruleConfig = wizard.getFieldConfig();
+        ruleConfigs.add(ruleConfig);
+
         refresh();
-        checkDirty();
     }
 
-    public void editField() throws Exception {
-        if (fieldMappings.getSelectionCount() == 0) return;
+    public void editRule() throws Exception {
+        if (rulesTable.getSelectionCount() == 0) return;
 
-        TableItem ti = fieldMappings.getSelection()[0];
-        MappingRuleConfig fieldMapping = (MappingRuleConfig)ti.getData();
+        TableItem ti = rulesTable.getSelection()[0];
+        MappingRuleConfig ruleConfig = (MappingRuleConfig)ti.getData();
 
-        EditFieldMappingWizard wizard = new EditFieldMappingWizard(fieldMapping);
-        WizardDialog dialog = new WizardDialog(getSite().getShell(), wizard);
+        EditFieldMappingWizard wizard = new EditFieldMappingWizard(ruleConfig);
+        WizardDialog dialog = new WizardDialog(getShell(), wizard);
         dialog.setPageSize(600, 300);
-        dialog.open();
+        int rc = dialog.open();
+
+        if (rc == Window.CANCEL) return;
 
         refresh();
-        checkDirty();
     }
 
-    public void removeField() throws Exception {
-        if (fieldMappings.getSelectionCount() == 0) return;
+    public void removeRule() throws Exception {
+        if (rulesTable.getSelectionCount() == 0) return;
 
-        TableItem ti = fieldMappings.getSelection()[0];
-        MappingRuleConfig fieldMapping = (MappingRuleConfig)ti.getData();
+        TableItem ti = rulesTable.getSelection()[0];
+        MappingRuleConfig ruleConfig = (MappingRuleConfig)ti.getData();
 
-        mappingConfig.removeRuleConfig(fieldMapping);
+        ruleConfigs.remove(ruleConfig);
 
         refresh();
-        checkDirty();
     }
 
-    public void moveUpField() throws Exception {
-        if (fieldMappings.getSelectionCount() == 0) return;
+    public void moveUpRule() throws Exception {
+        if (rulesTable.getSelectionCount() == 0) return;
 
-        TableItem ti = fieldMappings.getSelection()[0];
-        MappingRuleConfig fieldMapping = (MappingRuleConfig)ti.getData();
+        TableItem ti = rulesTable.getSelection()[0];
+        MappingRuleConfig ruleConfig = (MappingRuleConfig)ti.getData();
 
-        int i = mappingConfig.getRuleConfigIndex(fieldMapping);
+        int i = ruleConfigs.indexOf(ruleConfig);
         if (i == 0) return;
 
-        mappingConfig.removeRuleConfig(fieldMapping);
-        mappingConfig.addRuleConfig(i-1, fieldMapping);
+        ruleConfigs.remove(ruleConfig);
+
+        i--;
+
+        ruleConfigs.add(i, ruleConfig);
 
         refresh();
-        checkDirty();
+
+        rulesTable.select(i);
     }
 
-    public void moveDownField() throws Exception {
-        if (fieldMappings.getSelectionCount() == 0) return;
+    public void moveDownRule() throws Exception {
+        if (rulesTable.getSelectionCount() == 0) return;
 
-        TableItem ti = fieldMappings.getSelection()[0];
-        MappingRuleConfig fieldMapping = (MappingRuleConfig)ti.getData();
+        TableItem ti = rulesTable.getSelection()[0];
+        MappingRuleConfig ruleConfig = (MappingRuleConfig)ti.getData();
 
-        int i = mappingConfig.getRuleConfigIndex(fieldMapping);
-        if (i == mappingConfig.getRuleConfigs().size()-1) return;
+        int i = ruleConfigs.indexOf(ruleConfig);
+        if (i == ruleConfigs.size()-1) return;
 
-        mappingConfig.removeRuleConfig(fieldMapping);
-        mappingConfig.addRuleConfig(i+1, fieldMapping);
+        ruleConfigs.remove(ruleConfig);
+
+        i++;
+
+        ruleConfigs.add(i, ruleConfig);
 
         refresh();
-        checkDirty();
+
+        rulesTable. select(i);
     }
 
-    public void refresh() throws Exception {
+    public void setVisible(boolean b) {
+        super.setVisible(b);
+        if (b) refresh();
+    }
 
-        fieldMappings.removeAll();
-        
-        for (MappingRuleConfig ruleConfig : mappingConfig.getRuleConfigs()) {
+    public void refresh() {
+
+        rulesTable.removeAll();
+
+        for (MappingRuleConfig ruleConfig : ruleConfigs) {
             String value;
 
             Object constant = ruleConfig.getConstant();
@@ -337,7 +315,7 @@ public class MappingEditorFieldsPage extends FormPage {
             boolean required = ruleConfig.isRequired();
             String condition = ruleConfig.getCondition();
 
-            TableItem item = new TableItem(fieldMappings, SWT.NONE);
+            TableItem item = new TableItem(rulesTable, SWT.NONE);
             item.setText(0, ruleConfig.getName());
             item.setText(1, value == null ? "" : value);
             item.setText(2, required ? "Yes" : "");
@@ -346,7 +324,22 @@ public class MappingEditorFieldsPage extends FormPage {
         }
     }
 
-    public void checkDirty() {
-        editor.checkDirty();
+    public boolean validatePage() {
+        return true;
+    }
+
+    public void setRuleConfigs(Collection<MappingRuleConfig> ruleConfigs) {
+        this.ruleConfigs.clear();
+        for (MappingRuleConfig ruleConfig : ruleConfigs) {
+            try {
+                this.ruleConfigs.add((MappingRuleConfig)ruleConfig.clone());
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+    }
+
+    public Collection<MappingRuleConfig> getRuleConfigs() {
+        return ruleConfigs;
     }
 }

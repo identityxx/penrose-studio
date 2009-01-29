@@ -31,14 +31,14 @@ import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.mapping.MappingConfig;
 import org.safehaus.penrose.mapping.MappingManagerClient;
-import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.config.editor.ParametersPage;
 import org.safehaus.penrose.studio.server.Server;
 
 public class MappingEditor extends FormEditor implements ModifyListener {
 
     Logger log = Logger.getLogger(getClass());
 
-    Server project;
+    Server server;
     String partitionName;
     String mappingName;
 
@@ -52,12 +52,12 @@ public class MappingEditor extends FormEditor implements ModifyListener {
 
         MappingEditorInput ei = (MappingEditorInput)input;
 
-        project = ei.getProject();
+        server = ei.getProject();
         partitionName = ei.getPartitionName();
         mappingName = ei.getMappingName();
 
         try {
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
@@ -75,8 +75,13 @@ public class MappingEditor extends FormEditor implements ModifyListener {
 
     protected void addPages() {
         try {
-            addPage(new MappingEditorFieldsPage(this));
-            addPage(new MappingEditorScriptsPage(this));
+            addPage(new MappingPropertiesPage(this));
+            addPage(new MappingRulesPage(this));
+            addPage(new MappingScriptsPage(this));
+
+            ParametersPage parametersPage = new MappingParametersPage(this);
+            parametersPage.setParameters(mappingConfig.getParameters());
+            addPage(parametersPage);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -98,17 +103,17 @@ public class MappingEditor extends FormEditor implements ModifyListener {
 
 	public void store() throws Exception {
 
-        PenroseClient client = project.getClient();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         MappingManagerClient mappingManagerClient = partitionClient.getMappingManagerClient();
         mappingManagerClient.updateMapping(origMappingConfig.getName(), mappingConfig);
         partitionClient.store();
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        //PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        //penroseStudio.notifyChangeListeners();
 
-        checkDirty();
+        //checkDirty();
 	}
 
     public boolean isDirty() {
@@ -122,12 +127,12 @@ public class MappingEditor extends FormEditor implements ModifyListener {
     public void checkDirty() {
         try {
             dirty = false;
-
+/*
             if (!origMappingConfig.equals(mappingConfig)) {
                 dirty = true;
                 return;
             }
-
+*/
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
@@ -149,12 +154,12 @@ public class MappingEditor extends FormEditor implements ModifyListener {
         this.partitionName = partitionName;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public MappingConfig getMappingConfig() {

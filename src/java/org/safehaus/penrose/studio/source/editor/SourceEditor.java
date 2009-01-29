@@ -32,8 +32,6 @@ public class SourceEditor extends FormEditor {
     protected SourceConfig origSourceConfig;
     protected SourceConfig sourceConfig;
 
-    ParametersPage parametersPage;
-
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         super.init(site, input);
 
@@ -66,7 +64,7 @@ public class SourceEditor extends FormEditor {
             addPage(new SourcePropertiesPage(this));
             addPage(new SourceFieldsPage(this));
 
-            parametersPage = new SourceParametersPage(this);
+            ParametersPage parametersPage = new SourceParametersPage(this);
             parametersPage.setParameters(sourceConfig.getParameters());
             addPage(parametersPage);
 

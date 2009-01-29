@@ -64,11 +64,11 @@ public class FederationDatabasePage extends FormPage {
 
         PartitionClient partitionClient = client.getPartitionClient(Federation.PARTITION);
         ConnectionClient connectionClient = partitionClient.getConnectionClient(Federation.JDBC);
-        ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
+        ConnectionConfig connectionConfig = connectionClient.getMappingConfig();
 
         //Partition partition = federation.getPartition();
         //JDBCConnection connection = (JDBCConnection)partition.getConnection(Federation.JDBC);
-        //ConnectionConfig connectionConfig = connection.getConnectionConfig();
+        //ConnectionConfig connectionConfig = connection.getMappingConfig();
 
         Label driverLabel = toolkit.createLabel(composite, "Driver:");
         GridData gd = new GridData();

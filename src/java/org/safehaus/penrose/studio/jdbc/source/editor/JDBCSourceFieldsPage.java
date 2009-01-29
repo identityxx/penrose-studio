@@ -78,7 +78,7 @@ public class JDBCSourceFieldsPage extends SourceFieldsPage {
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
                     ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
                     ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(sourceConfig.getConnectionName());
-                    ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
+                    ConnectionConfig connectionConfig = connectionClient.getMappingConfig();
 
                     JDBCClient jdbcClient = new JDBCClient(connectionConfig.getParameters());
 
@@ -167,7 +167,7 @@ public class JDBCSourceFieldsPage extends SourceFieldsPage {
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
                     ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
                     ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(sourceConfig.getConnectionName());
-                    ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
+                    ConnectionConfig connectionConfig = connectionClient.getMappingConfig();
 
                     JDBCClient jdbcClient = new JDBCClient(connectionConfig.getParameters());
 
@@ -216,7 +216,7 @@ public class JDBCSourceFieldsPage extends SourceFieldsPage {
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
                     ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
                     ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(sourceConfig.getConnectionName());
-                    ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
+                    ConnectionConfig connectionConfig = connectionClient.getMappingConfig();
 
                     JDBCClient jdbcClient = new JDBCClient(connectionConfig.getParameters());
 

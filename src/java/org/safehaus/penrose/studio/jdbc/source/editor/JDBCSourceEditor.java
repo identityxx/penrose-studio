@@ -22,15 +22,13 @@ import org.safehaus.penrose.studio.config.editor.ParametersPage;
 
 public class JDBCSourceEditor extends SourceEditor {
 
-    ParametersPage parametersPage;
-
     public void addPages() {
         try {
             addPage(new SourcePropertiesPage(this));
             addPage(new JDBCSourcePropertyPage(this));
             addPage(new JDBCSourceFieldsPage(this));
 
-            parametersPage = new SourceParametersPage(this);
+            ParametersPage parametersPage = new SourceParametersPage(this);
             parametersPage.setParameters(sourceConfig.getParameters());
             addPage(parametersPage);
 
