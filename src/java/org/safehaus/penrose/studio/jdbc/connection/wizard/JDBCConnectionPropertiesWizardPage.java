@@ -259,7 +259,7 @@ public class JDBCConnectionPropertiesWizardPage extends WizardPage implements Mo
                     } catch (MBeanException mbe) {
                         Throwable e = mbe.getCause();
                         log.error(e.getMessage(), e);
-                        ErrorDialog.open(e);
+                        ErrorDialog.open(e.getMessage());
 
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);

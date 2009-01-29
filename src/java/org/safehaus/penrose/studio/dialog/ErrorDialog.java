@@ -27,15 +27,15 @@ public class ErrorDialog {
         PrintWriter pw = new PrintWriter(sw);
         t.printStackTrace(pw);
 
-        String message = sw.toString();
+        open(title, sw.toString());
+    }
+
+    public static void open(String title, String message) {
+
         if (message.length() > 500) {
             message = message.substring(0, 500) + "...";
         }
 
-        open(title, message);
-    }
-
-    public static void open(String title, String message) {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         MessageDialog.openError(window.getShell(), title, message);
     }

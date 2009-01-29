@@ -288,7 +288,7 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
 
                 } catch (Exception ex) {
                     log.error(ex.getMessage(), ex);
-                    ErrorDialog.open(ex);
+                    ErrorDialog.open(ex.getMessage());
 
                 } finally {
                     if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
