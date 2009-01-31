@@ -94,20 +94,30 @@ public class NISSynchronizationErrorsPage extends FormPage {
 
         Control errorsControl = createErrorsControl(errorsSection);
         errorsSection.setClient(errorsControl);
-
-        refresh();
     }
 
-    public Composite createErrorsControl(Composite parent) {
+    public Composite createErrorsControl(final Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
         composite.setLayout(new GridLayout(2, false));
 
-        Composite leftPanel = toolkit.createComposite(composite);
-        leftPanel.setLayout(new GridLayout());
-        leftPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Composite leftControl = createErrorsLeftControl(composite);
+        leftControl.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        table = new Table(leftPanel, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+        Composite rightControl = createErrorsRightControl(composite);
+        GridData gd = new GridData(GridData.FILL_VERTICAL);
+        gd.widthHint = 100;
+        rightControl.setLayoutData(gd);
+
+        return composite;
+    }
+
+    public Composite createErrorsLeftControl(Composite parent) {
+
+        Composite composite = toolkit.createComposite(parent);
+        composite.setLayout(new GridLayout());
+
+        table = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
         table.setLayoutData(new GridData(GridData.FILL_BOTH));
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
@@ -130,33 +140,29 @@ public class NISSynchronizationErrorsPage extends FormPage {
             }
         });
 
-        totalLabel = toolkit.createLabel(leftPanel, "Total:");
+        totalLabel = toolkit.createLabel(composite, "Total:");
         totalLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        new Label(leftPanel, SWT.NONE);
+        new Label(composite, SWT.NONE);
 
-        toolkit.createLabel(leftPanel, "Description:");
+        toolkit.createLabel(composite, "Description:");
 
-        descriptionText = toolkit.createText(leftPanel, "", SWT.BORDER | SWT.READ_ONLY  | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.heightHint = 200;
-        descriptionText.setLayoutData(gd);
-/*
-        toolkit.createLabel(leftPanel, "Note:");
+        descriptionText = toolkit.createText(composite, "", SWT.BORDER | SWT.READ_ONLY  | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+        descriptionText.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        noteText = toolkit.createText(leftPanel, "", SWT.BORDER | SWT.READ_ONLY  | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.heightHint = 100;
-        noteText.setLayoutData(gd);
-*/
-        Composite rightPanel = toolkit.createComposite(composite);
-        rightPanel.setLayout(new GridLayout());
-        gd = new GridData(GridData.FILL_VERTICAL);
-        gd.verticalSpan = 2;
-        gd.widthHint = 120;
-        rightPanel.setLayoutData(gd);
+        return composite;
+    }
 
-        Button removeButton = new Button(rightPanel, SWT.PUSH);
+    public Composite createErrorsRightControl(final Composite parent) {
+
+        Composite composite = toolkit.createComposite(parent);
+
+        GridLayout layout = new GridLayout();
+        layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        composite.setLayout(layout);
+
+        Button removeButton = new Button(composite, SWT.PUSH);
         removeButton.setText("Remove");
         removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -221,9 +227,9 @@ public class NISSynchronizationErrorsPage extends FormPage {
             }
         });
 
-        new Label(rightPanel, SWT.NONE);
+        new Label(composite, SWT.NONE);
 
-        Button refreshButton = new Button(rightPanel, SWT.PUSH);
+        Button refreshButton = new Button(composite, SWT.PUSH);
         refreshButton.setText("Refresh");
         refreshButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
