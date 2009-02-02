@@ -161,7 +161,7 @@ public class ServerDialog extends Dialog {
                     
 				} catch (Exception ex) {
                     log.debug(ex.getMessage(), ex);
-					ErrorDialog.open(ex);
+					ErrorDialog.open(ex.getMessage());
 				}
 			}
 		});

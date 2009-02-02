@@ -31,7 +31,7 @@ public class BrowserDialog extends Dialog {
     private PartitionConfig partitionConfig;
     private EntryConfig entryConfig;
 
-	public BrowserDialog(Shell parent, int style) {
+	public BrowserDialog(Shell parent, int style) throws Exception {
 		super(parent, style);
 
         shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
@@ -59,7 +59,7 @@ public class BrowserDialog extends Dialog {
         }
     }
 
-    public void createControl(final Shell parent) {
+    public void createControl(final Shell parent) throws Exception {
         parent.setLayout(new GridLayout());
 
         tree = new Tree(parent, SWT.BORDER);
@@ -73,16 +73,18 @@ public class BrowserDialog extends Dialog {
                 EntryConfig entry = (EntryConfig)item.getData();
 
                 TreeItem items[] = item.getItems();
-                for (int i=0; i<items.length; i++) {
-                    items[i].dispose();
+                for (TreeItem ti : items) {
+                    ti.dispose();
                 }
 
-                Collection children = partitionConfig.getDirectoryConfig().getChildren(entry);
-                for (Iterator i=children.iterator(); i.hasNext(); ) {
-                    EntryConfig child = (EntryConfig)i.next();
-
+                Collection<EntryConfig> children = partitionConfig.getDirectoryConfig().getChildren(entry);
+                for (EntryConfig child : children) {
                     TreeItem it = new TreeItem(item, SWT.NONE);
-                    it.setText(child.getRdn().toString());
+                    try {
+                        it.setText(child.getRdn().toString());
+                    } catch (Exception e) {
+                        it.setText("Error: "+e.getMessage());                        
+                    }
                     it.setData(child);
 
                     new TreeItem(it, SWT.NONE);

@@ -149,13 +149,17 @@ public class LDAPSourceWizard extends Wizard {
 
     public IWizardPage getNextPage(IWizardPage page) {
         if (fieldsPage == page) {
-            RDN rdn = new DN(baseDn).getRdn();
-            Collection<String> names = new ArrayList<String>();
-            for (String name : rdn.getNames()) {
-                names.add(name.toLowerCase());
+            try {
+                RDN rdn = new DN(baseDn).getRdn();
+                Collection<String> names = new ArrayList<String>();
+                for (String name : rdn.getNames()) {
+                    names.add(name.toLowerCase());
+                }
+                //Collection<AttributeType> attributeTypes = fieldsPage.getAttributeTypes();
+                //primarykeysPage.setAttributeTypes(attributeTypes, names);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-            //Collection<AttributeType> attributeTypes = fieldsPage.getAttributeTypes();
-            //primarykeysPage.setAttributeTypes(attributeTypes, names);
         }
 
         return super.getNextPage(page);

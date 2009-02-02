@@ -708,7 +708,7 @@ public class EntryLDAPPage extends FormPage {
         }
     }
 
-    public void updateRdn() {
+    public void updateRdn() throws Exception {
 
         //log.debug("Rdn:");
 
@@ -741,7 +741,7 @@ public class EntryLDAPPage extends FormPage {
         entryConfig.setDn(dn);
     }
 
-    public DN getDn() {
+    public DN getDn() throws Exception {
         DNBuilder db = new DNBuilder();
         db.append(rdnText.getText());
 
