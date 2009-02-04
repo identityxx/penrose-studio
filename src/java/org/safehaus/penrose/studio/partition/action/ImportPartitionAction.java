@@ -36,7 +36,7 @@ public class ImportPartitionAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            ServerNode projectNode = serversView.getSelectedProjectNode();
+            ServerNode projectNode = serversView.getSelectedServerNode();
 
             ImportPartitionWizard wizard = new ImportPartitionWizard();
             wizard.setServer(projectNode.getServer());

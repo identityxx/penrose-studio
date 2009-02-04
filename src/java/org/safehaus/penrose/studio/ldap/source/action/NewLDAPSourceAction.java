@@ -43,7 +43,7 @@ public class NewLDAPSourceAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Server server = sourcesNode.getProjectNode().getServer();
+            Server server = sourcesNode.getServerNode().getServer();
 
             SourceConfig sourceConfig = new SourceConfig();
 

@@ -50,7 +50,7 @@ public class PreviewAction extends Action {
         try {
             IWorkbenchPage page = window.getActivePage();
             ServersView serversView = ServersView.getInstance();
-            ServerNode projectNode = serversView.getSelectedProjectNode();
+            ServerNode projectNode = serversView.getSelectedServerNode();
             Server project = projectNode.getServer();
 
             //page.showView(ConsoleView.class.getName());

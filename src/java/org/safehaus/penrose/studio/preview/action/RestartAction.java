@@ -47,7 +47,7 @@ public class RestartAction extends Action {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         try {
             ServersView serversView = ServersView.getInstance();
-            ServerNode projectNode = serversView.getSelectedProjectNode();
+            ServerNode projectNode = serversView.getSelectedServerNode();
             Server project = projectNode.getServer();
             PenroseClient client = project.getClient();
             client.restart();

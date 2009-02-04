@@ -91,10 +91,10 @@
             icon="${images.logo}"
             class="org.safehaus.penrose.studio.directory.editor.EntryEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.browser.BrowserEditor"
+            id="org.safehaus.penrose.studio.browser.editor.BrowserEditor"
             name="Browser"
             icon="${images.browser}"
-            class="org.safehaus.penrose.studio.browser.BrowserEditor"/>
+            class="org.safehaus.penrose.studio.browser.editor.BrowserEditor"/>
         <editor
             id="org.safehaus.penrose.studio.properties.SystemPropertiesEditor"
             name="System Properties"
@@ -106,20 +106,20 @@
             icon="${images.module}"
             class="org.safehaus.penrose.studio.module.editor.ModuleEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.schema.SchemaEditor"
+            id="org.safehaus.penrose.studio.schema.editor.SchemaEditor"
             name="Schema"
             icon="${images.schema}"
-            class="org.safehaus.penrose.studio.schema.SchemaEditor"/>
+            class="org.safehaus.penrose.studio.schema.editor.SchemaEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.schema.ObjectClassEditor"
+            id="org.safehaus.penrose.studio.schema.editor.ObjectClassEditor"
             name="Object Class"
             icon="${images.object_class}"
-            class="org.safehaus.penrose.studio.schema.ObjectClassEditor"/>
+            class="org.safehaus.penrose.studio.schema.editor.ObjectClassEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.schema.AttributeTypeEditor"
+            id="org.safehaus.penrose.studio.schema.editor.AttributeTypeEditor"
             name="Attribute Type"
             icon="${images.attribute_type}"
-            class="org.safehaus.penrose.studio.schema.AttributeTypeEditor"/>
+            class="org.safehaus.penrose.studio.schema.editor.AttributeTypeEditor"/>
         <editor
             id="org.safehaus.penrose.studio.user.UserEditor"
             name="User"

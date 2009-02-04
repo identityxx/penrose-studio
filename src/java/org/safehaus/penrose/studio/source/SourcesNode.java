@@ -34,16 +34,14 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.nis.source.action.NewNISSourceAction;
 import org.safehaus.penrose.studio.ldap.source.action.NewLDAPSourceAction;
 import org.safehaus.penrose.studio.jdbc.source.action.NewJDBCSourceAction;
-import org.safehaus.penrose.studio.partition.PartitionNode;
-import org.safehaus.penrose.studio.partition.PartitionsNode;
+import org.safehaus.penrose.studio.partition.node.PartitionNode;
+import org.safehaus.penrose.studio.partition.node.PartitionsNode;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * @author Endi S. Dewata
@@ -52,29 +50,56 @@ public class SourcesNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    public final static char SEPARATOR = '_';
-
     protected ServersView view;
-    protected ServerNode projectNode;
+    protected ServerNode serverNode;
     protected PartitionsNode partitionsNode;
     protected PartitionNode partitionNode;
 
     private String partitionName;
-    private String path;
 
     public SourcesNode(String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
-
-        if (parent instanceof PartitionNode) {
-            partitionNode = (PartitionNode)parent;
-
-        } else if (parent instanceof SourcesNode) {
-            partitionNode = ((SourcesNode)parent).getPartitionNode();
-        }
-
+        partitionNode = (PartitionNode)parent;
         partitionsNode = partitionNode.getPartitionsNode();
-        projectNode = partitionsNode.getProjectNode();
-        view = projectNode.getServersView();
+        serverNode = partitionsNode.getProjectNode();
+        view = serverNode.getServersView();
+    }
+
+    public void init() throws Exception {
+        update();
+    }
+
+    public void update() throws Exception {
+
+        Server server = serverNode.getServer();
+        PenroseClient client = server.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+        SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+
+        for (String sourceName : sourceManagerClient.getSourceNames()) {
+
+            SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceName);
+
+            SourceNode sourceNode = new SourceNode(
+                    sourceName,
+                    PenroseStudio.getImage(PenroseImage.SOURCE),
+                    sourceName,
+                    this
+            );
+
+            sourceNode.setPartitionName(partitionName);
+            sourceNode.setAdapterName(sourceClient.getAdapterName());
+            sourceNode.setSourceName(sourceName);
+
+            children.add(sourceNode);
+        }
+    }
+
+    public void refresh() throws Exception {
+        children.clear();
+        update();
     }
 
     public void showMenu(IMenuManager manager) {
@@ -94,6 +119,23 @@ public class SourcesNode extends Node {
                 }
             }
         });
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(new Action("Refresh") {
+            public void run() {
+                try {
+                    refresh();
+
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    penroseStudio.notifyChangeListeners();
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+        });
     }
 
     public void paste() throws Exception {
@@ -102,24 +144,11 @@ public class SourcesNode extends Node {
 
         if (!(newObject instanceof SourceConfig)) return;
 
-        Server project = projectNode.getServer();
+        Server project = serverNode.getServer();
 
         SourceConfig newSourceConfig = (SourceConfig)((SourceConfig)newObject).clone();
         view.setClipboard(null);
-/*
-        SourceConfigManager sourceConfigManager = partitionConfig.getSourceConfigManager();
 
-        int counter = 1;
-        String name = newSourceConfig.getName();
-        while (sourceConfigManager.getSourceConfig(name) != null) {
-            counter++;
-            name = newSourceConfig.getName()+" ("+counter+")";
-        }
-        newSourceConfig.setName(name);
-
-        sourceConfigManager.addSourceConfig(newSourceConfig);
-        project.save(partitionConfig, sourceConfigManager);
-*/
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
@@ -137,75 +166,10 @@ public class SourcesNode extends Node {
         sourceManagerClient.createSource(newSourceConfig);
         partitionClient.store();
 
+        refresh();
+
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
-    }
-
-    public boolean hasChildren() throws Exception {
-        return !getChildren().isEmpty();
-    }
-
-    public Collection<Node> getChildren() throws Exception {
-
-        Map<String,Node> children = new TreeMap<String,Node>();
-
-        Server project = projectNode.getServer();
-        PenroseClient client = project.getClient();
-        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-        SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
-
-        //log.debug("Getting sources:");
-
-        for (String sourceName : sourceManagerClient.getSourceNames()) {
-            //log.debug(" - "+sourceName);
-
-            SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceName);
-            String adapterName = sourceClient.getAdapterName();
-
-            // log.debug("Checking "+ path +" with "+sourceName);
-            if (path != null && !sourceName.startsWith(path + SEPARATOR)) continue;
-
-            int p = sourceName.indexOf(SEPARATOR, path == null ? 0 : path.length() + 1);
-
-            if (p >= 0) { // intermediate node
-                String label = sourceName.substring(path == null ? 0 : path.length() + 1, p);
-
-                if (!children.containsKey(label)) {
-                    // log.debug("Creating sources node "+label);
-                    SourcesNode sourcesNode = new SourcesNode(
-                            label,
-                            PenroseStudio.getImage(PenroseImage.FOLDER),
-                            ServersView.SOURCES,
-                            this
-                    );
-
-                    sourcesNode.setPartitionName(partitionName);
-                    sourcesNode.setPath(sourceName.substring(0, p));
-
-                    children.put(label, sourcesNode);
-                }
-
-            } else { // leaf node
-                String label = sourceName.substring(path == null ? 0 : path.length() + 1);
-
-                // log.debug("Creating source node "+label);
-                SourceNode sourceNode = new SourceNode(
-                        label,
-                        PenroseStudio.getImage(PenroseImage.SOURCE),
-                        sourceName,
-                        this
-                );
-
-                sourceNode.setPartitionName(partitionName);
-                sourceNode.setAdapterName(adapterName);
-                sourceNode.setSourceName(sourceName);
-
-                children.put(label, sourceNode);
-            }
-        }
-
-        return children.values();
     }
 
     public String getPartitionName() {
@@ -216,14 +180,6 @@ public class SourcesNode extends Node {
         this.partitionName = partitionName;
     }
 
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
     public ServersView getView() {
         return view;
     }
@@ -232,12 +188,12 @@ public class SourcesNode extends Node {
         this.view = view;
     }
 
-    public ServerNode getProjectNode() {
-        return projectNode;
+    public ServerNode getServerNode() {
+        return serverNode;
     }
 
-    public void setProjectNode(ServerNode projectNode) {
-        this.projectNode = projectNode;
+    public void setServerNode(ServerNode serverNode) {
+        this.serverNode = serverNode;
     }
 
     public PartitionsNode getPartitionsNode() {

@@ -36,7 +36,7 @@ public class SourceEditor extends FormEditor {
         super.init(site, input);
 
         SourceEditorInput ei = (SourceEditorInput)input;
-        project = ei.getProject();
+        project = ei.getServer();
         partitionName = ei.getPartitionName();
         origSourceName = ei.getSourceName();
 

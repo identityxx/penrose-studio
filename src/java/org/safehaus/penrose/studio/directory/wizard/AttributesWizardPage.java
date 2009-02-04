@@ -44,10 +44,7 @@ import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.directory.dialog.AttributeTypeSelectionDialog;
 import org.safehaus.penrose.studio.directory.dialog.ExpressionDialog;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * @author Endi S. Dewata
@@ -68,9 +65,9 @@ public class AttributesWizardPage extends WizardPage implements SelectionListene
     private String partitionName;
 
     private Collection<EntrySourceConfig> sourceConfigs;
-    private Collection<String> objectClasses;
+    private Collection<String> objectClasses = new ArrayList<String>();
 
-    private Map<String,Collection<EntryAttributeConfig>> attributeConfigs = new TreeMap<String,Collection<EntryAttributeConfig>>();
+    private Map<String,Collection<EntryAttributeConfig>> attributeConfigs = new LinkedHashMap<String,Collection<EntryAttributeConfig>>();
 
     private int defaultType = CONSTANT;
 
@@ -459,7 +456,9 @@ public class AttributesWizardPage extends WizardPage implements SelectionListene
     }
 
     public void setObjectClasses(Collection<String> objectClasses) {
-        this.objectClasses = objectClasses;
+        if (this.objectClasses == objectClasses) return;
+        this.objectClasses.clear();
+        this.objectClasses.addAll(objectClasses);
     }
 
     public boolean isNeedRdn() {

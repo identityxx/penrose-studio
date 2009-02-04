@@ -10,7 +10,7 @@ import org.safehaus.penrose.studio.server.Server;
  */
 public class ConnectionEditorInput implements IEditorInput {
 
-    private Server project;
+    private Server server;
     private String partitionName;
     private String connectionName;
 
@@ -42,7 +42,7 @@ public class ConnectionEditorInput implements IEditorInput {
     }
 
     public int hashCode() {
-        return (project == null ? 0 : project.hashCode()) +
+        return (server == null ? 0 : server.hashCode()) +
                 (partitionName == null ? 0 : partitionName.hashCode()) +
                 (connectionName == null ? 0 : connectionName.hashCode());
     }
@@ -59,7 +59,7 @@ public class ConnectionEditorInput implements IEditorInput {
         if (object.getClass() != this.getClass()) return false;
 
         ConnectionEditorInput ei = (ConnectionEditorInput)object;
-        if (!equals(project, ei.project)) return false;
+        if (!equals(server, ei.server)) return false;
         if (!equals(partitionName, ei.partitionName)) return false;
         if (!equals(connectionName, ei.connectionName)) return false;
 
@@ -74,12 +74,12 @@ public class ConnectionEditorInput implements IEditorInput {
         this.partitionName = partitionName;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public String getConnectionName() {

@@ -4,7 +4,7 @@ import org.eclipse.jface.action.Action;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.server.ServerNode;
-import org.safehaus.penrose.studio.partition.PartitionsNode;
+import org.safehaus.penrose.studio.partition.node.PartitionsNode;
 import org.safehaus.penrose.studio.PenroseStudio;
 
 public class RefreshAction extends Action {
@@ -26,7 +26,7 @@ public class RefreshAction extends Action {
 
             ServersView serversView = ServersView.getInstance();
 
-            ServerNode projectNode = serversView.getSelectedProjectNode();
+            ServerNode projectNode = serversView.getSelectedServerNode();
             serversView.open(projectNode.getPartitionsNode());
 
             partitionsNode.refresh();

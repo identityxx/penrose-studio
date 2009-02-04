@@ -77,7 +77,8 @@ public class EntryWizard extends Wizard {
 
         addPage(propertiesPage);
 
-        ocPage = new ObjectClassWizardPage(server);
+        ocPage = new ObjectClassWizardPage();
+        ocPage.setServer(server);
 
         addPage(ocPage);
 

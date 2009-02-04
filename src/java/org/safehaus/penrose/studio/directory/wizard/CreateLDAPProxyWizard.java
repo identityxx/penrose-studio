@@ -47,7 +47,7 @@ public class CreateLDAPProxyWizard extends Wizard {
 
     public SelectSourceWizardPage sourcePage;
 
-    private Server project;
+    private Server server;
     private String partitionName;
 
     private DN parentDn;
@@ -64,7 +64,9 @@ public class CreateLDAPProxyWizard extends Wizard {
     }
 
     public void addPages() {
-        sourcePage = new SelectSourceWizardPage(partitionName);
+        sourcePage = new SelectSourceWizardPage();
+        sourcePage.setServer(server);
+        sourcePage.setPartitionName(partitionName);
 
         addPage(sourcePage);
     }
@@ -78,7 +80,7 @@ public class CreateLDAPProxyWizard extends Wizard {
         try {
             SourceConfig sourceConfig = sourcePage.getSourceConfig();
 
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
             ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
@@ -144,12 +146,12 @@ public class CreateLDAPProxyWizard extends Wizard {
         return true;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public String getPartitionName() {

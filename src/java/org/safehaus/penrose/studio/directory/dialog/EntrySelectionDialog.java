@@ -69,7 +69,7 @@ public class EntrySelectionDialog extends Dialog {
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         DirectoryClient directoryClient = partitionClient.getDirectoryClient();
 
-        for (String id : directoryClient.getRootEntryIds()) {
+        for (String id : directoryClient.getRootEntryNames()) {
             EntryClient entryClient = directoryClient.getEntryClient(id);
             DN dn = entryClient.getDn();
 

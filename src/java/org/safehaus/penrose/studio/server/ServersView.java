@@ -246,7 +246,7 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
         contentProvider.removeProjectConfig(name);
     }
 
-    public ServerNode getSelectedProjectNode() {
+    public ServerNode getSelectedServerNode() {
         IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
         if (selection == null) return null;
 

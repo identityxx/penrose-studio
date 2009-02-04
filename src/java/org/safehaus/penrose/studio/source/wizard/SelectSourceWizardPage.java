@@ -18,15 +18,12 @@
 package org.safehaus.penrose.studio.source.wizard;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.connection.ConnectionClient;
@@ -36,7 +33,6 @@ import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
-import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.client.PenroseClient;
 
@@ -54,12 +50,11 @@ public class SelectSourceWizardPage extends WizardPage {
     Table sourceTable;
     Table infoTable;
 
-    Server project;
-    String partitionName;
+    private Server server;
+    private String partitionName;
 
-    public SelectSourceWizardPage(String partitionName) {
+    public SelectSourceWizardPage() {
         super(NAME);
-        this.partitionName = partitionName;
         setDescription("Select source.");
     }
 
@@ -81,7 +76,7 @@ public class SelectSourceWizardPage extends WizardPage {
                     TableItem ti = sourceTable.getSelection()[0];
                     SourceConfig sourceConfig = (SourceConfig)ti.getData();
 
-                    PenroseClient client = project.getClient();
+                    PenroseClient client = server.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
                     ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
@@ -211,7 +206,7 @@ public class SelectSourceWizardPage extends WizardPage {
             sourceTable.removeAll();
             infoTable.removeAll();
 
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
             ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
@@ -243,8 +238,31 @@ public class SelectSourceWizardPage extends WizardPage {
         return (SourceConfig)item.getData();
     }
 
+    public String getSourceName() {
+        if (sourceTable.getSelectionCount() == 0) return null;
+
+        TableItem item = sourceTable.getSelection()[0];
+        return item.getText();
+    }
+
     public boolean validatePage() {
         if (getSourceConfig() == null) return false;
         return true;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
+    }
+
+    public String getPartitionName() {
+        return partitionName;
+    }
+
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 }

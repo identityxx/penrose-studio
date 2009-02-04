@@ -58,10 +58,8 @@ public class ObjectClassWizardPage extends WizardPage {
     Collection<String> availableOCs = new TreeSet<String>();
     Collection<String> selectedOCs = new TreeSet<String>();
 
-    public ObjectClassWizardPage(Server server) {
+    public ObjectClassWizardPage() {
         super(NAME);
-
-        this.server = server;
         setDescription("Select object classes.");
     }
 
@@ -243,5 +241,13 @@ public class ObjectClassWizardPage extends WizardPage {
 
     public Collection<String> getSelectedObjectClasses() {
         return selectedOCs;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

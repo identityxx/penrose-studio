@@ -33,7 +33,7 @@ public class ObjectClassWizard extends Wizard {
     private Server server;
     private EntryConfig entryConfig;
 
-    public ObjectClassWizardPage objectClassPage;
+    public ObjectClassWizardPage objectClassesPage;
 
     public ObjectClassWizard() {
         setWindowTitle("Edit Object Classes");
@@ -41,15 +41,15 @@ public class ObjectClassWizard extends Wizard {
 
     public void addPages() {
 
-        objectClassPage = new ObjectClassWizardPage(server);
-        objectClassPage.setDescription("Enter the object classes of the entry.");
-        objectClassPage.setSelecteObjectClasses(entryConfig.getObjectClasses());
+        objectClassesPage = new ObjectClassWizardPage();
+        objectClassesPage.setServer(server);
+        objectClassesPage.setSelecteObjectClasses(entryConfig.getObjectClasses());
 
-        addPage(objectClassPage);
+        addPage(objectClassesPage);
     }
 
     public boolean canFinish() {
-        if (!objectClassPage.isPageComplete()) return false;
+        if (!objectClassesPage.isPageComplete()) return false;
 
         return true;
     }
@@ -60,7 +60,7 @@ public class ObjectClassWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            entryConfig.setObjectClasses(objectClassPage.getSelectedObjectClasses());
+            entryConfig.setObjectClasses(objectClassesPage.getSelectedObjectClasses());
 
             return true;
 

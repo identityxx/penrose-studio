@@ -40,7 +40,7 @@ public class NewSchemaAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            ServerNode projectNode = serversView.getSelectedProjectNode();
+            ServerNode projectNode = serversView.getSelectedServerNode();
 
             NewSchemaWizard wizard = new NewSchemaWizard(projectNode.getServer());
 

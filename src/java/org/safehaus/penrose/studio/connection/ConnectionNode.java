@@ -37,8 +37,8 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.connection.action.NewSourceAction;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorInput;
-import org.safehaus.penrose.studio.partition.PartitionNode;
-import org.safehaus.penrose.studio.partition.PartitionsNode;
+import org.safehaus.penrose.studio.partition.node.PartitionNode;
+import org.safehaus.penrose.studio.partition.node.PartitionsNode;
 import org.safehaus.penrose.studio.plugin.Plugin;
 import org.safehaus.penrose.studio.plugin.PluginManager;
 import org.safehaus.penrose.studio.server.Server;
@@ -134,7 +134,7 @@ public class ConnectionNode extends Node {
         Plugin plugin = pluginManager.getPlugin(adapterName);
 
         ConnectionEditorInput ei = plugin.createConnectionEditorInput();
-        ei.setProject(projectNode.getServer());
+        ei.setServer(projectNode.getServer());
         ei.setPartitionName(partitionName);
         ei.setConnectionName(connectionName);
 
@@ -150,8 +150,7 @@ public class ConnectionNode extends Node {
 
         boolean confirm = MessageDialog.openQuestion(
                 view.getSite().getShell(),
-                "Confirmation",
-                "Remove selected connections?");
+                "Confirmation", "Remove selected connections?");
 
         if (!confirm) return;
 
@@ -169,7 +168,6 @@ public class ConnectionNode extends Node {
         }
 
         partitionClient.store();
-        //project.save(partitionConfig, connectionConfigManager);
 
         parent.refresh();
         
@@ -199,19 +197,7 @@ public class ConnectionNode extends Node {
 
         ConnectionConfig newConnectionConfig = (ConnectionConfig)((ConnectionConfig)newObject).clone();
         view.setClipboard(null);
-/*
-        ConnectionConfigManager connectionConfigManager = partitionConfig.getConnectionConfigManager();
-        int counter = 1;
-        String name = newConnectionConfig.getName();
-        while (connectionConfigManager.getConnectionConfig(name) != null) {
-            counter++;
-            name = newConnectionConfig.getName()+" ("+counter+")";
-        }
-        newConnectionConfig.setName(name);
 
-        connectionConfigManager.addConnectionConfig(newConnectionConfig);
-        project.save(partitionConfig, connectionConfigManager);
-*/
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
@@ -228,6 +214,8 @@ public class ConnectionNode extends Node {
 
         connectionManagerClient.createConnection(newConnectionConfig);
         partitionClient.store();
+
+        parent.refresh();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();

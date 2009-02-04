@@ -40,7 +40,6 @@ public class ACLWizard extends Wizard {
     public void addPages() {
 
         aclPage = new ACLWizardPage();
-        aclPage.setDescription("Enter the ACL of the entry.");
         aclPage.setACL(entryConfig.getACL());
 
         addPage(aclPage);

@@ -10,6 +10,7 @@ import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.acl.ACI;
 
 /**
  * @author Endi S. Dewata
@@ -27,7 +28,7 @@ public class ADUtil {
     ) throws Exception {
         
         SourceConfig sourceConfig = new SourceConfig();
-        sourceConfig.setName(connectionName+" Schema");
+        sourceConfig.setName(connectionName+"_schema");
         sourceConfig.setConnectionName(connectionName);
 
         sourceConfig.addFieldConfig(new FieldConfig("lDAPDisplayName", true));
@@ -44,7 +45,7 @@ public class ADUtil {
 
         sourceConfig.setParameter("baseDn", sourceSchemaDn);
         sourceConfig.setParameter("scope", "ONELEVEL");
-        sourceConfig.setParameter("filter", "(objectClass=*)");
+        //sourceConfig.setParameter("filter", "(objectClass=*)");
 
         SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
         //partitionConfig.getSourceConfigManager().addSourceConfig(sourceConfig);
@@ -131,8 +132,9 @@ public class ADUtil {
         EntrySourceConfig sourceMapping = new EntrySourceConfig("s", sourceConfig.getName());
         entryConfig.addSourceConfig(sourceMapping);
 
+        entryConfig.addACI(new ACI("rs"));
+
         DirectoryClient directoryClient = partitionClient.getDirectoryClient();
-        //partitionConfig.getDirectoryConfig().addEntryConfig(entryConfig);
         directoryClient.createEntry(entryConfig);
 
         return entryConfig;

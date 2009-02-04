@@ -45,8 +45,8 @@ public class RootEntryWizard extends Wizard {
     private EntryConfig entryConfig;
 
     public EntryDNWizardPage dnPage;
-    public ObjectClassWizardPage ocPage;
-    public AttributesWizardPage attributePage;
+    public ObjectClassWizardPage objectClassesPage;
+    public AttributesWizardPage attributesPage;
 
     public RootEntryWizard(Server server, String partitionName) {
         this.server = server;
@@ -55,40 +55,41 @@ public class RootEntryWizard extends Wizard {
         setWindowTitle("Adding root entry");
     }
 
-    public boolean canFinish() {
-        if (!dnPage.isPageComplete()) return false;
-        if (!ocPage.isPageComplete()) return false;
-        if (!attributePage.isPageComplete()) return false;
-        return true;
-    }
-
     public void addPages() {
 
         dnPage = new EntryDNWizardPage();
 
         addPage(dnPage);
 
-        ocPage = new ObjectClassWizardPage(server);
+        objectClassesPage = new ObjectClassWizardPage();
+        objectClassesPage.setServer(server);
 
-        addPage(ocPage);
+        addPage(objectClassesPage);
 
-        attributePage = new AttributesWizardPage();
-        attributePage.setServer(server);
-        attributePage.setPartitionName(partitionName);
+        attributesPage = new AttributesWizardPage();
+        attributesPage.setServer(server);
+        attributesPage.setPartitionName(partitionName);
 
-        addPage(attributePage);
+        addPage(attributesPage);
+    }
+
+    public boolean canFinish() {
+        if (!dnPage.isPageComplete()) return false;
+        if (!objectClassesPage.isPageComplete()) return false;
+        if (!attributesPage.isPageComplete()) return false;
+        return true;
     }
 
     public IWizardPage getNextPage(IWizardPage page) {
         try {
-            if (ocPage == page) {
-                Collection<String> objectClasses = ocPage.getSelectedObjectClasses();
-                attributePage.setObjectClasses(objectClasses);
+            if (objectClassesPage == page) {
+                Collection<String> objectClasses = objectClassesPage.getSelectedObjectClasses();
+                attributesPage.setObjectClasses(objectClasses);
 
                 if (!objectClasses.isEmpty()) {
                     DN dn = new DN(dnPage.getDn());
                     RDN rdn = dn.getRdn();
-                    attributePage.setRdn(rdn);
+                    attributesPage.setRdn(rdn);
                 }
             }
 
@@ -105,8 +106,8 @@ public class RootEntryWizard extends Wizard {
             entryConfig = new EntryConfig();
             entryConfig.setDn(dnPage.getDn());
             //entryConfig.setEntryClass(dnPage.getClassName());
-            entryConfig.addObjectClasses(ocPage.getSelectedObjectClasses());
-            entryConfig.addAttributeConfigs(attributePage.getAttributeConfigs());
+            entryConfig.setObjectClasses(objectClassesPage.getSelectedObjectClasses());
+            entryConfig.setAttributeConfigs(attributesPage.getAttributeConfigs());
 
             entryConfig.addACI(new ACI("rs"));
 /*

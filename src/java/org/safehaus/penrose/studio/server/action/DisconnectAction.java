@@ -24,7 +24,7 @@ public class DisconnectAction extends Action {
     public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            ServerNode projectNode = serversView.getSelectedProjectNode();
+            ServerNode projectNode = serversView.getSelectedServerNode();
             if (projectNode == null) return;
 
             projectNode.disconnect();

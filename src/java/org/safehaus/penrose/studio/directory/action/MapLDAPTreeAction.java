@@ -20,7 +20,7 @@ package org.safehaus.penrose.studio.directory.action;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.directory.EntryNode;
+import org.safehaus.penrose.studio.directory.node.EntryNode;
 import org.safehaus.penrose.studio.directory.wizard.CreateLDAPProxyWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.server.Server;
@@ -51,7 +51,7 @@ public class MapLDAPTreeAction extends Action {
                     node.getPartitionName(), 
                     node.getEntryConfig().getDn()
             );
-            wizard.setProject(project);
+            wizard.setServer(project);
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);

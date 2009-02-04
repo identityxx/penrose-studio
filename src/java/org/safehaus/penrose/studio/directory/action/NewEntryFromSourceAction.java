@@ -35,7 +35,7 @@ import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.directory.EntryNode;
+import org.safehaus.penrose.studio.directory.node.EntryNode;
 import org.safehaus.penrose.studio.directory.dialog.SourceDialog;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.ServerNode;

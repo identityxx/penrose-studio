@@ -66,7 +66,8 @@ public class DynamicEntryWizard extends Wizard {
 
         addPage(relationsPage);
 
-        objectClassesPage = new ObjectClassWizardPage(server);
+        objectClassesPage = new ObjectClassWizardPage();
+        objectClassesPage.setServer(server);
 
         addPage(objectClassesPage);
 

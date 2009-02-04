@@ -35,8 +35,8 @@ import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.partition.PartitionNode;
-import org.safehaus.penrose.studio.partition.PartitionsNode;
+import org.safehaus.penrose.studio.partition.node.PartitionNode;
+import org.safehaus.penrose.studio.partition.node.PartitionsNode;
 import org.safehaus.penrose.studio.plugin.Plugin;
 import org.safehaus.penrose.studio.plugin.PluginManager;
 import org.safehaus.penrose.studio.server.Server;
@@ -125,7 +125,7 @@ public class SourceNode extends Node {
         Plugin plugin = pluginManager.getPlugin(adapterName);
 
         SourceEditorInput ei = plugin.createSourceEditorInput();
-        ei.setProject(projectNode.getServer());
+        ei.setServer(projectNode.getServer());
         ei.setPartitionName(partitionName);
         ei.setSourceName(sourceName);
 
@@ -151,8 +151,6 @@ public class SourceNode extends Node {
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
-        //SourceConfigManager sourceConfigManager = partitionConfig.getSourceConfigManager();
-
         for (Node node : view.getSelectedNodes()) {
             if (!(node instanceof SourceNode)) continue;
 
@@ -161,7 +159,8 @@ public class SourceNode extends Node {
         }
 
         partitionClient.store();
-        //project.save(partitionConfig, sourceConfigManager);
+
+        parent.refresh();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
@@ -189,19 +188,7 @@ public class SourceNode extends Node {
 
         SourceConfig newSourceConfig = (SourceConfig)((SourceConfig)newObject).clone();
         view.setClipboard(null);
-/*
-        SourceConfigManager sourceConfigManager = partitionConfig.getSourceConfigManager();
-        int counter = 1;
-        String name = newSourceConfig.getName();
-        while (sourceConfigManager.getSourceConfig(name) != null) {
-            counter++;
-            name = newSourceConfig.getName()+" ("+counter+")";
-        }
-        newSourceConfig.setName(name);
 
-        sourceConfigManager.addSourceConfig(newSourceConfig);
-        project.save(partitionConfig, sourceConfigManager);
-*/
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
@@ -218,6 +205,8 @@ public class SourceNode extends Node {
 
         sourceManagerClient.createSource(newSourceConfig);
         partitionClient.store();
+
+        parent.refresh();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();

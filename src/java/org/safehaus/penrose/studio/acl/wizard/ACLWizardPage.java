@@ -287,11 +287,16 @@ public class ACLWizardPage extends WizardPage {
     }
 
     public void setACL(Collection<ACI> acl) {
+        this.acl.clear();
+        for (ACI aci : acl) {
+            addACI(aci);
+        }
+    }
+
+    public void addACI(ACI aci) {
         try {
-            this.acl.clear();
-            for (ACI aci : acl) {
-                this.acl.add((ACI)aci.clone());
-            }
+            acl.add((ACI)aci.clone());
+
         } catch (CloneNotSupportedException e) {
             log.error(e.getMessage(), e);
         }

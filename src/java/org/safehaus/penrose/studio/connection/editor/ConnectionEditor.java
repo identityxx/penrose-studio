@@ -34,7 +34,7 @@ public abstract class ConnectionEditor extends FormEditor {
         super.init(site, input);
 
         ConnectionEditorInput ei = (ConnectionEditorInput)input;
-        server = ei.getProject();
+        server = ei.getServer();
         partitionName = ei.getPartitionName();
         origConnectionName = ei.getConnectionName();
 

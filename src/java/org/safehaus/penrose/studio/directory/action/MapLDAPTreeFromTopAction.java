@@ -21,7 +21,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.directory.DirectoryNode;
+import org.safehaus.penrose.studio.directory.node.DirectoryNode;
 import org.safehaus.penrose.studio.directory.wizard.CreateLDAPProxyWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.apache.log4j.Logger;
@@ -42,18 +42,16 @@ public class MapLDAPTreeFromTopAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Server project = node.getProjectNode().getServer();
-
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            //if (!penroseStudio.isCommercial()) return;
+            Server project = node.getServerNode().getServer();
 
             CreateLDAPProxyWizard wizard = new CreateLDAPProxyWizard(node.getPartitionName());
-            wizard.setProject(project);
+            wizard.setServer(project);
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
             dialog.open();
 
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 
             serversView.open(node);

@@ -22,8 +22,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.directory.wizard.RootEntryWizard;
-import org.safehaus.penrose.studio.directory.DirectoryNode;
-import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.directory.node.DirectoryNode;
 import org.apache.log4j.Logger;
 
 public class NewRootEntryAction extends Action {
@@ -42,7 +41,7 @@ public class NewRootEntryAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            ServerNode projectNode = node.getProjectNode();
+            ServerNode projectNode = node.getServerNode();
 
             RootEntryWizard wizard = new RootEntryWizard(projectNode.getServer(), node.getPartitionName());
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);

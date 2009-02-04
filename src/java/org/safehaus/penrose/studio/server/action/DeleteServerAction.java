@@ -31,7 +31,7 @@ public class DeleteServerAction extends Action {
 
         try {
             ServersView serversView = ServersView.getInstance();
-            ServerNode projectNode = serversView.getSelectedProjectNode();
+            ServerNode projectNode = serversView.getSelectedServerNode();
             if (projectNode == null) return;
 
             Server project = projectNode.getServer();

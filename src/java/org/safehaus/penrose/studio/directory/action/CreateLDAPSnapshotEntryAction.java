@@ -20,7 +20,7 @@ package org.safehaus.penrose.studio.directory.action;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.directory.DirectoryNode;
+import org.safehaus.penrose.studio.directory.node.DirectoryNode;
 import org.safehaus.penrose.studio.directory.wizard.CreateLDAPSnapshotWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.server.Server;
@@ -42,7 +42,7 @@ public class CreateLDAPSnapshotEntryAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Server project = node.getProjectNode().getServer();
+            Server project = node.getServerNode().getServer();
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             //if (!penroseStudio.isCommercial()) return;

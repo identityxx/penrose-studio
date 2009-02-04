@@ -34,14 +34,13 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.nis.connection.action.NewNISConnectionAction;
 import org.safehaus.penrose.studio.ldap.connection.action.NewLDAPConnectionAction;
 import org.safehaus.penrose.studio.jdbc.connection.action.NewJDBCConnectionAction;
-import org.safehaus.penrose.studio.partition.PartitionNode;
-import org.safehaus.penrose.studio.partition.PartitionsNode;
+import org.safehaus.penrose.studio.partition.node.PartitionNode;
+import org.safehaus.penrose.studio.partition.node.PartitionsNode;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -52,7 +51,7 @@ public class ConnectionsNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     private ServersView view;
-    private ServerNode projectNode;
+    private ServerNode serverNode;
     private PartitionsNode partitionsNode;
     private PartitionNode partitionNode;
 
@@ -62,8 +61,8 @@ public class ConnectionsNode extends Node {
         super(name, image, object, parent);
         partitionNode = (PartitionNode)parent;
         partitionsNode = partitionNode.getPartitionsNode();
-        projectNode = partitionsNode.getProjectNode();
-        view = projectNode.getServersView();
+        serverNode = partitionsNode.getProjectNode();
+        view = serverNode.getServersView();
     }
 
     public void init() throws Exception {
@@ -72,20 +71,16 @@ public class ConnectionsNode extends Node {
 
     public void update() throws Exception {
 
-        Server project = projectNode.getServer();
-        PenroseClient client = project.getClient();
+        Server server = serverNode.getServer();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
         ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
 
-        //log.debug("Getting connections:");
-
         for (String connectionName : connectionManagerClient.getConnectionNames()) {
-            //log.debug(" - "+connectionName);
 
             ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(connectionName);
-            connectionClient.getAdapterName();
-            ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
 
             ConnectionNode connectionNode = new ConnectionNode(
                     connectionName,
@@ -95,7 +90,7 @@ public class ConnectionsNode extends Node {
             );
 
             connectionNode.setPartitionName(partitionName);
-            connectionNode.setAdapterName(connectionConfig.getAdapterName());
+            connectionNode.setAdapterName(connectionClient.getAdapterName());
             connectionNode.setConnectionName(connectionName);
 
             children.add(connectionNode);
@@ -150,24 +145,11 @@ public class ConnectionsNode extends Node {
 
         if (!(newObject instanceof ConnectionConfig)) return;
 
-        Server server = projectNode.getServer();
+        Server server = serverNode.getServer();
 
         ConnectionConfig newConnectionConfig = (ConnectionConfig)((ConnectionConfig)newObject).clone();
         view.setClipboard(null);
-/*
-        ConnectionConfigManager connectionConfigManager = partitionConfig.getConnectionConfigManager();
 
-        int counter = 1;
-        String name = newConnectionConfig.getName();
-        while (connectionConfigManager.getConnectionConfig(name) != null) {
-            counter++;
-            name = newConnectionConfig.getName()+" ("+counter+")";
-        }
-        newConnectionConfig.setName(name);
-
-        connectionConfigManager.addConnectionConfig(newConnectionConfig);
-        project.save(partitionConfig, connectionConfigManager);
-*/
         PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
@@ -208,12 +190,12 @@ public class ConnectionsNode extends Node {
         this.view = view;
     }
 
-    public ServerNode getProjectNode() {
-        return projectNode;
+    public ServerNode getServerNode() {
+        return serverNode;
     }
 
-    public void setProjectNode(ServerNode projectNode) {
-        this.projectNode = projectNode;
+    public void setServerNode(ServerNode serverNode) {
+        this.serverNode = serverNode;
     }
 
     public PartitionsNode getPartitionsNode() {

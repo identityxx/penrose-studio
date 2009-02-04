@@ -135,7 +135,7 @@ public class EntryEditor extends FormEditor implements ModifyListener {
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
         DirectoryClient directoryClient = partitionClient.getDirectoryClient();
-        directoryClient.updateEntry(entryConfig);
+        directoryClient.updateEntry(origEntryConfig.getName(), entryConfig);
         partitionClient.store();
 
         String dn;

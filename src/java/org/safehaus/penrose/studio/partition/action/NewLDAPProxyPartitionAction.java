@@ -19,10 +19,13 @@ package org.safehaus.penrose.studio.partition.action;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.partition.wizard.CreateLDAPProxyWizard;
+import org.safehaus.penrose.studio.ldap.wizard.LDAPProxyWizard;
+import org.safehaus.penrose.studio.partition.node.PartitionsNode;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.apache.log4j.Logger;
 
 public class NewLDAPProxyPartitionAction extends Action {
@@ -37,17 +40,25 @@ public class NewLDAPProxyPartitionAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Server project = serversView.getSelectedProjectNode().getServer();
+            ServerNode serverNode = serversView.getSelectedServerNode();
+            PartitionsNode partitionsNode = serverNode.getPartitionsNode();
+            Server server = serverNode.getServer();
 
-            CreateLDAPProxyWizard wizard = new CreateLDAPProxyWizard();
-            wizard.setProject(project);
+            LDAPProxyWizard wizard = new LDAPProxyWizard();
+            wizard.setServer(server);
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
-            dialog.open();
+            int rc = dialog.open();
 
-            ServerNode projectNode = serversView.getSelectedProjectNode();
-            serversView.open(projectNode.getPartitionsNode());
+            if (rc == Window.CANCEL) return;
+
+            serversView.open(serverNode.getPartitionsNode());
+
+            partitionsNode.refresh();
+
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            penroseStudio.notifyChangeListeners();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

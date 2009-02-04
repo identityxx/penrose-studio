@@ -23,7 +23,6 @@ import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.nis.connection.wizard.NISConnectionWizard;
-import org.safehaus.penrose.studio.ldap.connection.wizard.LDAPConnectionWizard;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.connection.ConnectionsNode;
 import org.safehaus.penrose.connection.ConnectionConfig;
@@ -45,7 +44,7 @@ public class NewNISConnectionAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Server server = connectionsNode.getProjectNode().getServer();
+            Server server = connectionsNode.getServerNode().getServer();
 
             ConnectionConfig connectionConfig = new ConnectionConfig();
 

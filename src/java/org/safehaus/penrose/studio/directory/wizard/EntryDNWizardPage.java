@@ -36,12 +36,13 @@ public class EntryDNWizardPage extends WizardPage implements ModifyListener {
     public final static String NAME = "Entry DN";
 
     Text dnText;
-    //Combo classNameCombo;
+
+    String dn;
 
     public EntryDNWizardPage() {
         super(NAME);
 
-        setDescription("Enter the DN and optionally the class name of the entry.");
+        setDescription("Enter the DN of the entry.");
     }
 
     public void createControl(final Composite parent) {
@@ -57,6 +58,7 @@ public class EntryDNWizardPage extends WizardPage implements ModifyListener {
         dnLabel.setLayoutData(gd);
 
         dnText = new Text(composite, SWT.BORDER);
+        dnText.setText(dn == null ? "" : dn);
         dnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         dnText.addModifyListener(this);
 
@@ -90,11 +92,11 @@ public class EntryDNWizardPage extends WizardPage implements ModifyListener {
     public String getDn() {
         return dnText.getText();
     }
-/*
-    public String getClassName() {
-        return "".equals(classNameCombo.getText()) ? null : classNameCombo.getText();
+
+    public void setDn(String dn) {
+        this.dn = dn;
     }
-*/
+
     public boolean validatePage() {
         return LDAPDN.isValid(getDn());
     }

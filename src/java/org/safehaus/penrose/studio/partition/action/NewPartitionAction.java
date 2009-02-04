@@ -20,7 +20,8 @@ package org.safehaus.penrose.studio.partition.action;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.safehaus.penrose.studio.partition.PartitionsNode;
+import org.eclipse.jface.window.Window;
+import org.safehaus.penrose.studio.partition.node.PartitionsNode;
 import org.safehaus.penrose.studio.partition.wizard.CreatePartitionWizard;
 import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
@@ -39,20 +40,22 @@ public class NewPartitionAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            ServerNode projectNode = serversView.getSelectedProjectNode();
-            PartitionsNode partitionsNode = projectNode.getPartitionsNode();
+            ServerNode serverNode = serversView.getSelectedServerNode();
+            PartitionsNode partitionsNode = serverNode.getPartitionsNode();
 
             PartitionConfig partitionConfig = new PartitionConfig();
 
             CreatePartitionWizard wizard = new CreatePartitionWizard();
-            wizard.setServer(projectNode.getServer());
+            wizard.setServer(serverNode.getServer());
             wizard.setPartitionConfig(partitionConfig);
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
-            dialog.open();
+            int rc = dialog.open();
 
-            serversView.open(projectNode.getPartitionsNode());
+            if (rc == Window.CANCEL) return;
+            
+            serversView.open(serverNode.getPartitionsNode());
 
             partitionsNode.refresh();
             

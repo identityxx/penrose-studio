@@ -26,8 +26,8 @@ import org.safehaus.penrose.service.ServiceManagerClient;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.browser.BrowserEditor;
-import org.safehaus.penrose.studio.browser.BrowserEditorInput;
+import org.safehaus.penrose.studio.browser.editor.BrowserEditor;
+import org.safehaus.penrose.studio.browser.editor.BrowserEditorInput;
 import org.safehaus.penrose.studio.server.ServerConfig;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.*;
@@ -57,7 +57,7 @@ public class BrowserAction extends Action {
         
         try {
             ServersView serversView = ServersView.getInstance();
-            ServerNode projectNode = serversView.getSelectedProjectNode();
+            ServerNode projectNode = serversView.getSelectedServerNode();
             Server project = projectNode.getServer();
             PenroseClient client = project.getClient();
 

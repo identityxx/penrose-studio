@@ -63,7 +63,8 @@ public class DynamicEntryFromSourceWizard extends Wizard {
 
         addPage(sourcesPage);
 
-        ocPage = new ObjectClassWizardPage(server);
+        ocPage = new ObjectClassWizardPage();
+        ocPage.setServer(server);
         //ocPage.setSelecteObjectClasses(entryConfig.getObjectClasses());
 
         addPage(ocPage);

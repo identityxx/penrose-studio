@@ -222,23 +222,26 @@ public class LDAPSourceTreeWizardPage extends WizardPage implements ModifyListen
     }
 
     public String getBaseDn() {
-        return baseDnText.getText().trim();
+        String s = baseDnText.getText().trim();
+        return "".equals(s) ? null : s;
     }
 
     public String getFilter() {
-        return filterText.getText().trim();
+        String s = filterText.getText().trim();
+        return "".equals(s) ? null : s;
     }
 
     public String getScope() {
-        return scopeCombo.getText().trim();
+        String s = scopeCombo.getText().trim();
+        return "".equals(s) ? null : s;
     }
 
     public String getObjectClasses() {
-        return objectClassesText.getText().trim();
+        String s = objectClassesText.getText().trim();
+        return "".equals(s) ? null : s;
     }
 
     public boolean validatePage() {
-        if (getBaseDn() == null) return false;
         return true;
     }
 

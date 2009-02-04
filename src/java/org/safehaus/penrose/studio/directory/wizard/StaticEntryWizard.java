@@ -64,7 +64,8 @@ public class StaticEntryWizard extends Wizard {
 
         addPage(rdnPage);
 
-        ocPage = new ObjectClassWizardPage(server);
+        ocPage = new ObjectClassWizardPage();
+        ocPage.setServer(server);
 
         addPage(ocPage);
 

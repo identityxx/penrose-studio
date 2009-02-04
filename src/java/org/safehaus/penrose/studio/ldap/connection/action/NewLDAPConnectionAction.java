@@ -44,7 +44,7 @@ public class NewLDAPConnectionAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Server project = connectionsNode.getProjectNode().getServer();
+            Server project = connectionsNode.getServerNode().getServer();
 
             ConnectionConfig connectionConfig = new ConnectionConfig();
             

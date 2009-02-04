@@ -51,7 +51,7 @@ public class NewServiceAction extends Action {
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 
-            ServerNode projectNode = serversView.getSelectedProjectNode();
+            ServerNode projectNode = serversView.getSelectedServerNode();
             serversView.open(projectNode.getServicesNode());
 
         } catch (Exception e) {

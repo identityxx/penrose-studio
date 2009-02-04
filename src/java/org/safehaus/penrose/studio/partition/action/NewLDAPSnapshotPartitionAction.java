@@ -37,7 +37,7 @@ public class NewLDAPSnapshotPartitionAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Server project = serversView.getSelectedProjectNode().getServer();
+            Server project = serversView.getSelectedServerNode().getServer();
 
             CreateLDAPSnapshotWizard wizard = new CreateLDAPSnapshotWizard();
             wizard.setProject(project);
@@ -46,7 +46,7 @@ public class NewLDAPSnapshotPartitionAction extends Action {
             dialog.setPageSize(600, 300);
             dialog.open();
 
-            ServerNode projectNode = serversView.getSelectedProjectNode();
+            ServerNode projectNode = serversView.getSelectedServerNode();
             serversView.open(projectNode.getPartitionsNode());
 
         } catch (Exception e) {
