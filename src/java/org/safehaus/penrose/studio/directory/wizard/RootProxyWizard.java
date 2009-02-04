@@ -19,119 +19,79 @@ package org.safehaus.penrose.studio.directory.wizard;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.ProxyEntry;
 import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.directory.DirectoryClient;
 import org.safehaus.penrose.ldap.DN;
-import org.safehaus.penrose.ldap.DNBuilder;
-import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.client.PenroseClient;
-import org.safehaus.penrose.connection.ConnectionClient;
-import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.source.wizard.SelectSourceWizardPage;
-
-import javax.naming.Context;
+import org.safehaus.penrose.studio.acl.wizard.ACLWizardPage;
+import org.safehaus.penrose.acl.ACI;
 
 /**
  * @author Endi S. Dewata
  */
-public class CreateLDAPProxyWizard extends Wizard {
+public class RootProxyWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
+    public EntryDNWizardPage dnPage;
     public SelectSourceWizardPage sourcePage;
+    public ACLWizardPage aclPage;
 
     private Server server;
     private String partitionName;
-
     private DN parentDn;
 
-    public CreateLDAPProxyWizard(String partitionName) {
-        this(partitionName, null);
-    }
-
-    public CreateLDAPProxyWizard(String partitionName, DN parentDn) {
-        this.partitionName = partitionName;
-        this.parentDn = parentDn;
-
-        setWindowTitle("New LDAP Proxy");
+    public RootProxyWizard() {
+        setWindowTitle("New Root Proxy");
     }
 
     public void addPages() {
+
+        dnPage = new EntryDNWizardPage();
+
+        addPage(dnPage);
+
         sourcePage = new SelectSourceWizardPage();
         sourcePage.setServer(server);
         sourcePage.setPartitionName(partitionName);
 
         addPage(sourcePage);
+
+        aclPage = new ACLWizardPage();
+        aclPage.addACI(new ACI("rs"));
+
+        addPage(aclPage);
     }
 
     public boolean canFinish() {
+        if (!dnPage.isPageComplete()) return false;
         if (!sourcePage.isPageComplete()) return false;
+        if (!aclPage.isPageComplete()) return false;
         return true;
     }
 
     public boolean performFinish() {
         try {
-            SourceConfig sourceConfig = sourcePage.getSourceConfig();
-
             PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-            ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
-            DirectoryClient directoryClient = partitionClient.getDirectoryClient();
 
-            ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(sourceConfig.getConnectionName());
-            ConnectionConfig connectionConfig = connectionClient.getConnectionConfig();
-
-            String url = connectionConfig.getParameter(Context.PROVIDER_URL);
-
-            int index = url.indexOf("://");
-            index = url.indexOf("/", index+3);
-
-            String suffix = "";
-            if (index >= 0) {
-                suffix = url.substring(index+1);
-            }
-
-            DN baseDn = new DN(sourceConfig.getParameter("baseDn"));
-
-            DNBuilder db = new DNBuilder();
-            db.append(baseDn);
-            db.append(suffix);
-            DN dn = db.toDn();
-
-            log.debug("DN: "+dn);
-
-            EntryConfig entryConfig = new EntryConfig();
-            if (parentDn == null) {
-                entryConfig.setDn(dn);
-
-            } else {
-                RDN rdn = dn.getRdn();
-
-                db.clear();
-                db.append(rdn);
-                db.append(parentDn);
-
-                entryConfig.setDn(db.toDn());
-            }
-
-            EntrySourceConfig sourceMapping = new EntrySourceConfig(sourceConfig.getName());
-            entryConfig.addSourceConfig(sourceMapping);
-
+            EntryConfig entryConfig = new EntryConfig(dnPage.getDn());
             entryConfig.setEntryClass(ProxyEntry.class.getName());
-/*
-            DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
-            directoryConfig.addEntryConfig(entryConfig);
-            project.save(partitionConfig, directoryConfig);
-*/
+
+            entryConfig.addSourceConfig(new EntrySourceConfig(sourcePage.getSourceName()));
+
+            entryConfig.setACL(aclPage.getACL());
+
+            DirectoryClient directoryClient = partitionClient.getDirectoryClient();
             directoryClient.createEntry(entryConfig);
+
             partitionClient.store();
             
             return true;

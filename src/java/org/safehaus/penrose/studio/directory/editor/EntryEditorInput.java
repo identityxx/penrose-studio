@@ -29,7 +29,7 @@ public class EntryEditorInput implements IEditorInput {
 
     private Server project;
     private String partitionName;
-    private String entryId;
+    private String entryName;
 
     public EntryEditorInput() {
     }
@@ -43,7 +43,7 @@ public class EntryEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return entryId;
+        return entryName;
     }
 
     public IPersistableElement getPersistable() {
@@ -51,7 +51,7 @@ public class EntryEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return entryId;
+        return entryName;
     }
 
     public Object getAdapter(Class aClass) {
@@ -61,7 +61,7 @@ public class EntryEditorInput implements IEditorInput {
     public int hashCode() {
         return (project == null ? 0 : project.hashCode()) +
                 (partitionName == null ? 0 : partitionName.hashCode()) +
-                (entryId == null ? 0 : entryId.hashCode());
+                (entryName == null ? 0 : entryName.hashCode());
     }
 
     boolean equals(Object o1, Object o2) {
@@ -78,7 +78,7 @@ public class EntryEditorInput implements IEditorInput {
         EntryEditorInput ei = (EntryEditorInput)object;
         if (!equals(project, ei.project)) return false;
         if (!equals(partitionName, ei.partitionName)) return false;
-        if (!equals(entryId, ei.entryId)) return false;
+        if (!equals(entryName, ei.entryName)) return false;
 
         return true;
     }
@@ -99,11 +99,11 @@ public class EntryEditorInput implements IEditorInput {
         this.project = project;
     }
 
-    public String getEntryId() {
-        return entryId;
+    public String getEntryName() {
+        return entryName;
     }
 
-    public void setEntryId(String entryId) {
-        this.entryId = entryId;
+    public void setEntryName(String entryName) {
+        this.entryName = entryName;
     }
 }

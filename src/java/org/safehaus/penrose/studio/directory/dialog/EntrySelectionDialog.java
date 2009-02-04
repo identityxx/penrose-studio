@@ -122,7 +122,7 @@ public class EntrySelectionDialog extends Dialog {
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
                     DirectoryClient directoryClient = partitionClient.getDirectoryClient();
 
-                    for (String id : entryClient.getChildIds()) {
+                    for (String id : entryClient.getChildNames()) {
                         EntryClient childClient = directoryClient.getEntryClient(id);
 
                         TreeItem it = new TreeItem(item, SWT.NONE);

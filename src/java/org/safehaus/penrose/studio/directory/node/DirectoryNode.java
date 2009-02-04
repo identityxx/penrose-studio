@@ -112,6 +112,8 @@ public class DirectoryNode extends Node {
     public void showMenu(IMenuManager manager) throws Exception {
 
         manager.add(new NewRootEntryAction(this));
+        manager.add(new NewRootProxyAction(this));
+        //manager.add(new CreateLDAPSnapshotEntryAction(this));
 
         if ("DEFAULT".equals(partitionName)) {
             manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -126,11 +128,6 @@ public class DirectoryNode extends Node {
             manager.add(new NewDefaultSchemaAction(this));
             manager.add(new NewADSchemaProxyAction(this));
         }
-
-        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-
-        manager.add(new MapLDAPTreeFromTopAction(this));
-        manager.add(new CreateLDAPSnapshotEntryAction(this));
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 

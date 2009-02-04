@@ -67,25 +67,7 @@ public class EntryDNWizardPage extends WizardPage implements ModifyListener {
         Label exampleDnLabel = new Label(composite, SWT.NONE);
         exampleDnLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         exampleDnLabel.setText("Example: dc=Example,dc=com");
-/*
-        new Label(composite, SWT.NONE);
-        new Label(composite, SWT.NONE);
-        new Label(composite, SWT.NONE);
 
-        Label classLabel = new Label(composite, SWT.NONE);
-        classLabel.setText("Class:");
-        gd = new GridData();
-        gd.widthHint = 50;
-        classLabel.setLayoutData(gd);
-
-        classNameCombo = new Combo(composite, SWT.BORDER);
-        classNameCombo.add("");
-        classNameCombo.add("org.safehaus.penrose.directory.DynamicEntry");
-        classNameCombo.add("org.safehaus.penrose.directory.ProxyEntry");
-
-        classNameCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        classNameCombo.addModifyListener(this);
-*/
         setPageComplete(validatePage());
     }
 

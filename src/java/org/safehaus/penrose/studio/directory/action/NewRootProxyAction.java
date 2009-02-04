@@ -19,47 +19,48 @@ package org.safehaus.penrose.studio.directory.action;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.directory.node.EntryNode;
-import org.safehaus.penrose.studio.directory.wizard.CreateLDAPProxyWizard;
-import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.directory.node.DirectoryNode;
+import org.safehaus.penrose.studio.directory.wizard.RootProxyWizard;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.apache.log4j.Logger;
 
-public class MapLDAPTreeAction extends Action {
+public class NewRootProxyAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
-    EntryNode node;
+    DirectoryNode directoryNode;
 
-	public MapLDAPTreeAction(EntryNode node) {
-        this.node = node;
+	public NewRootProxyAction(DirectoryNode directoryNode) {
+        this.directoryNode = directoryNode;
 
-        setText("Map LDAP Tree...");
+        setText("New Root Proxy...");
         setId(getClass().getName());
 	}
 	
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Server project = node.getServerNode().getServer();
+            Server server = directoryNode.getServerNode().getServer();
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            //if (!penroseStudio.isCommercial()) return;
-
-            CreateLDAPProxyWizard wizard = new CreateLDAPProxyWizard(
-                    node.getPartitionName(), 
-                    node.getEntryConfig().getDn()
-            );
-            wizard.setServer(project);
+            RootProxyWizard wizard = new RootProxyWizard();
+            wizard.setServer(server);
+            wizard.setPartitionName(directoryNode.getPartitionName());
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
-            dialog.open();
+            int rc = dialog.open();
 
+            if (rc == Window.CANCEL) return;
+
+            directoryNode.refresh();
+
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 
-            serversView.open(node);
+            serversView.open(directoryNode);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

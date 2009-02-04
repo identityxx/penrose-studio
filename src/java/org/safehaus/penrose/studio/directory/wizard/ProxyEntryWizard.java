@@ -24,7 +24,8 @@ import org.safehaus.penrose.directory.*;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.directory.wizard.EntrySourceWizardPage;
+import org.safehaus.penrose.studio.source.wizard.SelectSourceWizardPage;
+import org.safehaus.penrose.source.SourceConfig;
 
 /**
  * @author Endi S. Dewata
@@ -33,16 +34,16 @@ public class ProxyEntryWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
+    public EntryRDNWizardPage rdnPage;
+    public SelectSourceWizardPage sourcePage;
+
     private Server server;
     private String partitionName;
     private DN parentDn;
     private EntryConfig entryConfig;
 
-    public EntryRDNWizardPage rdnPage;
-    public EntrySourceWizardPage sourcesPage;
-
     public ProxyEntryWizard() {
-        setWindowTitle("Adding proxy entry");
+        setWindowTitle("New Proxy Entry");
     }
 
     public void addPages() {
@@ -55,17 +56,16 @@ public class ProxyEntryWizard extends Wizard {
 
         addPage(rdnPage);
 
-        sourcesPage = new EntrySourceWizardPage();
-        sourcesPage.setDescription("Select proxy source.");
-        sourcesPage.setServer(server);
-        sourcesPage.setPartitionName(partitionName);
+        sourcePage = new SelectSourceWizardPage();
+        sourcePage.setServer(server);
+        sourcePage.setPartitionName(partitionName);
 
-        addPage(sourcesPage);
+        addPage(sourcePage);
     }
 
     public boolean canFinish() {
         if (!rdnPage.isPageComplete()) return false;
-        if (!sourcesPage.isPageComplete()) return false;
+        if (!sourcePage.isPageComplete()) return false;
 
         return true;
     }
@@ -84,7 +84,9 @@ public class ProxyEntryWizard extends Wizard {
             //db.append(rdnPage.getParentDn());
             entryConfig.setDn(db.toDn());
 
-            entryConfig.addSourceConfigs(sourcesPage.getEntrySourceConfigs());
+            SourceConfig sourceConfig = sourcePage.getSourceConfig();
+
+            entryConfig.addSourceConfig(new EntrySourceConfig(sourceConfig.getName()));
 
             return true;
 

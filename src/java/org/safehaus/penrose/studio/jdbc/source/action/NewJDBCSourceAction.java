@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.jdbc.source.action;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -54,7 +55,11 @@ public class NewJDBCSourceAction extends Action {
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
-            dialog.open();
+            int rc = dialog.open();
+
+            if (rc == Window.CANCEL) return;
+
+            sourcesNode.refresh();
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();

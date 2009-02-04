@@ -435,7 +435,7 @@ public class ACLPage extends FormPage implements ModifyListener {
         DirectoryClient directoryClient = partitionClient.getDirectoryClient();
 
         EntryClient entryClient = directoryClient.getEntryClient(entryConfig.getName());
-        String parentId = entryClient.getParentId();
+        String parentId = entryClient.getParentName();
         log.debug("Parent ID: "+parentId);
 
         if (parentId == null) return;
@@ -466,7 +466,7 @@ public class ACLPage extends FormPage implements ModifyListener {
                 item.setData(aci);
             }
 
-            parentId = parentClient.getParentId();
+            parentId = parentClient.getParentName();
             log.debug("Parent ID: "+parentId);
             if (parentId == null) break;
 

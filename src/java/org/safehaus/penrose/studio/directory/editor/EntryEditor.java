@@ -57,7 +57,7 @@ public class EntryEditor extends FormEditor implements ModifyListener {
 
         server = ei.getProject();
         partitionName = ei.getPartitionName();
-        entryId = ei.getEntryId();
+        entryId = ei.getEntryName();
 
         try {
             PenroseClient client = server.getClient();

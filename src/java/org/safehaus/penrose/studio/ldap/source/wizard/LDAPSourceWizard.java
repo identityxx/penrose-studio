@@ -109,9 +109,10 @@ public class LDAPSourceWizard extends SourceWizard {
             connectionConfig = connectionPage.getConnectionConfig();
             if (connectionConfig == null) return null;
             treePage.setConnectionConfig(connectionConfig);
+            fieldsPage.setConnectionConfig(connectionConfig);
 
-            Schema schema = getSchema(connectionConfig);
-            fieldsPage.setSchema(schema);
+            //Schema schema = getSchema(connectionConfig);
+            //fieldsPage.setSchema(schema);
 /*
         } else if (fieldsPage == page) {
             Collection<AttributeType> attributeTypes = fieldsPage.getAttributeTypes();

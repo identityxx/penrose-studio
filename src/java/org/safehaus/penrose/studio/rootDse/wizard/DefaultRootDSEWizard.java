@@ -36,7 +36,7 @@ public class DefaultRootDSEWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    public AttributesWizardPage attributePage;
+    public AttributesWizardPage attributesPage;
     public ACLWizardPage aclPage;
 
     private Server server;
@@ -61,7 +61,7 @@ public class DefaultRootDSEWizard extends Wizard {
             String vendorName = penroseClient.getProductVendor();
             entryConfig.addAttributeConfig("vendorName", vendorName);
 
-            String vendorVersion = penroseClient.getProductName()+" Server "+penroseClient.getProductVersion();
+            String vendorVersion = penroseClient.getProductName()+" "+penroseClient.getProductVersion();
             entryConfig.addAttributeConfig("vendorVersion", vendorVersion);
             
         } catch (Exception e) {
@@ -72,32 +72,32 @@ public class DefaultRootDSEWizard extends Wizard {
         entryConfig.addAttributeConfig("subschemaSubentry", "cn=Subschema");
         entryConfig.addAttributeConfig("changelog", "cn=changelog");
         entryConfig.addAttributeConfig("namingContexts", "dc=Example,dc=com");
-
-        entryConfig.addACI(new ACI("rs"));
     }
 
     public void addPages() {
 
-        attributePage = new AttributesWizardPage();
-        attributePage.setServer(server);
-        attributePage.setPartitionName(partitionName);
-        attributePage.setAttributeConfigs(entryConfig.getAttributeConfigs());
+        attributesPage = new AttributesWizardPage();
+        attributesPage.setServer(server);
+        attributesPage.setPartitionName(partitionName);
+        attributesPage.setAttributeConfigs(entryConfig.getAttributeConfigs());
 
-        addPage(attributePage);
+        addPage(attributesPage);
 
         aclPage = new ACLWizardPage();
-        aclPage.setACL(entryConfig.getACL());
+        aclPage.addACI(new ACI("rs"));
 
         addPage(aclPage);
     }
 
     public boolean canFinish() {
-        return attributePage.isPageComplete();
+        if (!attributesPage.isPageComplete()) return false;
+        if (!aclPage.isPageComplete()) return false;
+        return true;
     }
 
     public boolean performFinish() {
         try {
-            entryConfig.addAttributeConfigs(attributePage.getAttributeConfigs());
+            entryConfig.addAttributeConfigs(attributesPage.getAttributeConfigs());
 
             entryConfig.setACL(aclPage.getACL());
 

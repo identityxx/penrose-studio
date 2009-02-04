@@ -86,7 +86,7 @@ public class EntryNode extends Node {
 
         log.debug("Getting children:");
 
-        for (String id : entryClient.getChildIds()) {
+        for (String id : entryClient.getChildNames()) {
             log.debug(" - "+id);
 
             EntryClient childClient = directoryClient.getEntryClient(id);
@@ -135,15 +135,9 @@ public class EntryNode extends Node {
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        //manager.add(new NewEntryAction(this));
         manager.add(new NewStaticEntryAction(this));
         manager.add(new NewDynamicEntryAction(this));
         manager.add(new NewProxyEntryAction(this));
-
-        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-
-        //manager.add(new NewEntryFromSourceAction(this));
-        manager.add(new MapLDAPTreeAction(this));
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
@@ -194,7 +188,7 @@ public class EntryNode extends Node {
 
         EntryEditorInput ei = new EntryEditorInput();
         ei.setPartitionName(partitionName);
-        ei.setEntryId(entryConfig.getName());
+        ei.setEntryName(entryConfig.getName());
         ei.setProject(serverNode.getServer());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -207,7 +201,7 @@ public class EntryNode extends Node {
 
         EntryEditorInput ei = new EntryEditorInput();
         ei.setPartitionName(partitionName);
-        ei.setEntryId(entryConfig.getName());
+        ei.setEntryName(entryConfig.getName());
         ei.setProject(serverNode.getServer());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -221,7 +215,7 @@ public class EntryNode extends Node {
 
         EntryEditorInput ei = new EntryEditorInput();
         ei.setPartitionName(partitionName);
-        ei.setEntryId(entryConfig.getName());
+        ei.setEntryName(entryConfig.getName());
         ei.setProject(serverNode.getServer());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -235,7 +229,7 @@ public class EntryNode extends Node {
 
         EntryEditorInput ei = new EntryEditorInput();
         ei.setPartitionName(partitionName);
-        ei.setEntryId(entryConfig.getName());
+        ei.setEntryName(entryConfig.getName());
         ei.setProject(serverNode.getServer());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

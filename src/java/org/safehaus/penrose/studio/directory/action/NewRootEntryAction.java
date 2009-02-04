@@ -19,20 +19,22 @@ package org.safehaus.penrose.studio.directory.action;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.server.ServerNode;
 import org.safehaus.penrose.studio.directory.wizard.RootEntryWizard;
 import org.safehaus.penrose.studio.directory.node.DirectoryNode;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.apache.log4j.Logger;
 
 public class NewRootEntryAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
-    DirectoryNode node;
+    DirectoryNode directoryNode;
 
-	public NewRootEntryAction(DirectoryNode node) {
-        this.node = node;
+	public NewRootEntryAction(DirectoryNode directoryNode) {
+        this.directoryNode = directoryNode;
 
         setText("New Root Entry...");
         setId(getClass().getName());
@@ -41,19 +43,24 @@ public class NewRootEntryAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            ServerNode projectNode = node.getServerNode();
+            ServerNode serverNode = directoryNode.getServerNode();
 
-            RootEntryWizard wizard = new RootEntryWizard(projectNode.getServer(), node.getPartitionName());
+            RootEntryWizard wizard = new RootEntryWizard();
+            wizard.setServer(serverNode.getServer());
+            wizard.setPartitionName(directoryNode.getPartitionName());
+
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
-            dialog.open();
+            int rc = dialog.open();
 
-            node.refresh();
+            if (rc == Window.CANCEL) return;
 
-            //PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            //penroseStudio.notifyChangeListeners();
+            directoryNode.refresh();
 
-            serversView.open(node);
+            PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            penroseStudio.notifyChangeListeners();
+
+            serversView.open(directoryNode);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

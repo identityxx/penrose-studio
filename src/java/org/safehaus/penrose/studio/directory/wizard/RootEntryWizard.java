@@ -28,8 +28,8 @@ import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.acl.wizard.ACLWizardPage;
 
 import java.util.Collection;
 
@@ -42,17 +42,14 @@ public class RootEntryWizard extends Wizard {
 
     private Server server;
     private String partitionName;
-    private EntryConfig entryConfig;
 
     public EntryDNWizardPage dnPage;
     public ObjectClassWizardPage objectClassesPage;
     public AttributesWizardPage attributesPage;
+    public ACLWizardPage aclPage;
 
-    public RootEntryWizard(Server server, String partitionName) {
-        this.server = server;
-        this.partitionName = partitionName;
-
-        setWindowTitle("Adding root entry");
+    public RootEntryWizard() {
+        setWindowTitle("New Root Entry");
     }
 
     public void addPages() {
@@ -71,12 +68,18 @@ public class RootEntryWizard extends Wizard {
         attributesPage.setPartitionName(partitionName);
 
         addPage(attributesPage);
+
+        aclPage = new ACLWizardPage();
+        aclPage.addACI(new ACI("rs"));
+
+        addPage(aclPage);
     }
 
     public boolean canFinish() {
         if (!dnPage.isPageComplete()) return false;
         if (!objectClassesPage.isPageComplete()) return false;
         if (!attributesPage.isPageComplete()) return false;
+        if (!aclPage.isPageComplete()) return false;
         return true;
     }
 
@@ -103,18 +106,13 @@ public class RootEntryWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            entryConfig = new EntryConfig();
+            EntryConfig entryConfig = new EntryConfig();
             entryConfig.setDn(dnPage.getDn());
-            //entryConfig.setEntryClass(dnPage.getClassName());
             entryConfig.setObjectClasses(objectClassesPage.getSelectedObjectClasses());
             entryConfig.setAttributeConfigs(attributesPage.getAttributeConfigs());
 
-            entryConfig.addACI(new ACI("rs"));
-/*
-            DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
-            directoryConfig.addEntryConfig(entryConfig);
-            project.save(partitionConfig, directoryConfig);
-*/
+            entryConfig.setACL(aclPage.getACL());
+
             PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
@@ -128,21 +126,12 @@ public class RootEntryWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            ErrorDialog.open(e);
-            return false;
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     public boolean needsPreviousAndNextButtons() {
         return true;
-    }
-
-    public EntryConfig getEntryConfig() {
-        return entryConfig;
-    }
-
-    public void setEntryConfig(EntryConfig entryConfig) {
-        this.entryConfig = entryConfig;
     }
 
     public String getPartitionName() {
