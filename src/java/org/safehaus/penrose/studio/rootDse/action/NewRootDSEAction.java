@@ -15,28 +15,28 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.schema.action;
+package org.safehaus.penrose.studio.rootDse.action;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.directory.node.DirectoryNode;
+import org.safehaus.penrose.studio.rootDse.wizard.DefaultRootDSEWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.schema.wizard.DefaultSchemaWizard;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.apache.log4j.Logger;
 
-public class NewDefaultSchemaAction extends Action {
+public class NewRootDSEAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
     DirectoryNode directoryNode;
 
-	public NewDefaultSchemaAction(DirectoryNode node) {
+	public NewRootDSEAction(DirectoryNode node) {
         this.directoryNode = node;
 
-        setText("Create Default Schema...");
+        setText("New Root DSE...");
         setId(getClass().getName());
 	}
 
@@ -46,9 +46,10 @@ public class NewDefaultSchemaAction extends Action {
             Server server = directoryNode.getServerNode().getServer();
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
 
-            DefaultSchemaWizard wizard = new DefaultSchemaWizard();
+            DefaultRootDSEWizard wizard = new DefaultRootDSEWizard();
             wizard.setServer(server);
             wizard.setPartitionName(directoryNode.getPartitionName());
+            wizard.init();
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);

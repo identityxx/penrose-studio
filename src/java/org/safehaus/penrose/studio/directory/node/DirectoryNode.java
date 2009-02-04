@@ -31,9 +31,9 @@ import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.schema.action.NewDefaultSchemaAction;
+import org.safehaus.penrose.studio.schema.action.NewSchemaEntryAction;
 import org.safehaus.penrose.studio.schema.action.NewADSchemaProxyAction;
-import org.safehaus.penrose.studio.rootDse.action.NewDefaultRootDSEAction;
+import org.safehaus.penrose.studio.rootDse.action.NewRootDSEAction;
 import org.safehaus.penrose.studio.rootDse.action.NewRootDSEProxyAction;
 import org.safehaus.penrose.studio.directory.action.*;
 import org.safehaus.penrose.studio.partition.node.PartitionNode;
@@ -118,14 +118,14 @@ public class DirectoryNode extends Node {
         if ("DEFAULT".equals(partitionName)) {
             manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-            manager.add(new NewDefaultRootDSEAction(this));
+            manager.add(new NewRootDSEAction(this));
             manager.add(new NewRootDSEProxyAction(this));
         }
 
         if ("DEFAULT".equals(partitionName)) {
             manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-            manager.add(new NewDefaultSchemaAction(this));
+            manager.add(new NewSchemaEntryAction(this));
             manager.add(new NewADSchemaProxyAction(this));
         }
 
