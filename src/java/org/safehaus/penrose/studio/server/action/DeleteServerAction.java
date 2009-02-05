@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.ServersView;
 
@@ -31,10 +31,8 @@ public class DeleteServerAction extends Action {
 
         try {
             ServersView serversView = ServersView.getInstance();
-            ServerNode projectNode = serversView.getSelectedServerNode();
-            if (projectNode == null) return;
-
-            Server project = projectNode.getServer();
+            ServerNode serverNode = serversView.getSelectedServerNode();
+            if (serverNode == null) return;
 
             boolean confirm = MessageDialog.openQuestion(
                     window.getShell(),
@@ -43,9 +41,12 @@ public class DeleteServerAction extends Action {
 
             if (!confirm) return;
 
-            serversView.removeProjectConfig(project.getName());
-
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            penroseStudio.getApplicationConfig().removeServerConfig(serverNode.getServerName());
+            penroseStudio.store();
+
+            serversView.removeServerConfig(serverNode.getServerName());
+
             penroseStudio.notifyChangeListeners();
 
         } catch (Exception e) {

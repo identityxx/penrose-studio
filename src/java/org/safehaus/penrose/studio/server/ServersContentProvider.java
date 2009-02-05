@@ -22,6 +22,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -40,10 +41,10 @@ public class ServersContentProvider implements ITreeContentProvider {
         this.view = view;
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.loadApplicationConfig();
+        penroseStudio.load();
 
-        for (ServerConfig projectConfig : penroseStudio.getApplicationConfig().getProjects()) {
-            addProjectConfig(projectConfig);
+        for (ServerConfig projectConfig : penroseStudio.getApplicationConfig().getServerConfigs()) {
+            addServerConfig(projectConfig);
         }
     }
 
@@ -89,16 +90,16 @@ public class ServersContentProvider implements ITreeContentProvider {
         }
     }
 
-    public void addProjectConfig(ServerConfig projectConfig) {
-        ServerNode projectNode = new ServerNode(
+    public void addServerConfig(ServerConfig serverConfig) {
+        ServerNode serverNode = new ServerNode(
                 view,
-                projectConfig.getName(),
+                serverConfig.getName(),
                 PenroseStudio.getImage(PenroseImage.LOGO),
-                projectConfig,
+                serverConfig,
                 null
         );
 
-        servers.put(projectConfig.getName(), projectNode);
+        servers.put(serverConfig.getName(), serverNode);
     }
 
     public void removeProjectConfig(String name) {

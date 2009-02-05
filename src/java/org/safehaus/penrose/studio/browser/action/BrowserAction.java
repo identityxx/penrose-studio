@@ -31,6 +31,7 @@ import org.safehaus.penrose.studio.browser.editor.BrowserEditorInput;
 import org.safehaus.penrose.studio.server.ServerConfig;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.*;
+import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.user.UserConfig;
 import org.safehaus.penrose.client.PenroseClient;
 
@@ -61,7 +62,7 @@ public class BrowserAction extends Action {
             Server project = projectNode.getServer();
             PenroseClient client = project.getClient();
 
-            ServerConfig projectConfig = project.getProjectConfig();
+            ServerConfig projectConfig = project.getServerConfig();
             String hostname = projectConfig.getHost();
 
             ServiceManagerClient serviceManagerClient = client.getServiceManagerClient();

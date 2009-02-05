@@ -36,7 +36,7 @@ import org.safehaus.penrose.studio.module.action.NewModuleAction;
 import org.safehaus.penrose.studio.partition.node.PartitionNode;
 import org.safehaus.penrose.studio.partition.node.PartitionsNode;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 

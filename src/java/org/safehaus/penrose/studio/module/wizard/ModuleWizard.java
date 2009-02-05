@@ -26,7 +26,7 @@ import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Collection;
@@ -36,23 +36,29 @@ import java.util.Collection;
  */
 public class ModuleWizard extends Wizard {
 
-    Logger log = Logger.getLogger(getClass());
+    org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
 
-    Server project;
+    Server server;
     String partitionName;
 
-    public ModulePropertiesWizardPage propertyPage = new ModulePropertiesWizardPage();
-    public ModuleParameterWizardPage parameterPage = new ModuleParameterWizardPage();
-    public ModuleMappingWizardPage mappingPage = new ModuleMappingWizardPage();
+    public ModulePropertiesWizardPage propertiesPage = new ModulePropertiesWizardPage();
+    public ModuleParameterWizardPage parametersPage = new ModuleParameterWizardPage();
+    public ModuleMappingWizardPage mappingsPage = new ModuleMappingWizardPage();
 
     public ModuleWizard() {
         setWindowTitle("New Module");
     }
 
+    public void addPages() {
+        addPage(propertiesPage);
+        addPage(parametersPage);
+        addPage(mappingsPage);
+    }
+
     public boolean canFinish() {
-        if (!propertyPage.isPageComplete()) return false;
-        if (!parameterPage.isPageComplete()) return false;
-        if (!mappingPage.isPageComplete()) return false;
+        if (!propertiesPage.isPageComplete()) return false;
+        if (!parametersPage.isPageComplete()) return false;
+        if (!mappingsPage.isPageComplete()) return false;
 
         return true;
     }
@@ -60,10 +66,10 @@ public class ModuleWizard extends Wizard {
     public boolean performFinish() {
         try {
             ModuleConfig moduleConfig = new ModuleConfig();
-            moduleConfig.setName(propertyPage.getModuleName());
-            moduleConfig.setModuleClass(propertyPage.getModuleClass());
+            moduleConfig.setName(propertiesPage.getModuleName());
+            moduleConfig.setModuleClass(propertiesPage.getModuleClass());
 
-            Map<String,String> parameters = parameterPage.getParameters();
+            Map<String,String> parameters = parametersPage.getParameters();
             for (String name : parameters.keySet()) {
                 moduleConfig.setParameter(name, parameters.get(name));
             }
@@ -79,14 +85,14 @@ public class ModuleWizard extends Wizard {
 
             project.save(partitionConfig, moduleConfigManager);
 */
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
             ModuleManagerClient moduleManagerCient = partitionClient.getModuleManagerClient();
 
-            Collection<ModuleMapping> moduleMappings = mappingPage.getModuleMappings();
+            Collection<ModuleMapping> moduleMappings = mappingsPage.getModuleMappings();
             for (ModuleMapping moduleMapping : moduleMappings) {
-                moduleMapping.setModuleName(propertyPage.getModuleName());
+                moduleMapping.setModuleName(propertiesPage.getModuleName());
             }
 
             moduleManagerCient.createModule(moduleConfig, moduleMappings);
@@ -104,22 +110,16 @@ public class ModuleWizard extends Wizard {
         }
     }
 
-    public void addPages() {
-        addPage(propertyPage);
-        addPage(parameterPage);
-        addPage(mappingPage);
-    }
-
     public boolean needsPreviousAndNextButtons() {
         return true;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public String getPartitionName() {

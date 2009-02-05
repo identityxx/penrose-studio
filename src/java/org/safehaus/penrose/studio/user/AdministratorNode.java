@@ -26,7 +26,7 @@ import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.user.UserConfig;

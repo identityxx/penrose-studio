@@ -29,7 +29,7 @@ import org.eclipse.swt.layout.GridData;
  */
 public class ModulePropertiesWizardPage extends WizardPage implements ModifyListener {
 
-    public final static String NAME = "Module Property";
+    public final static String NAME = "Module Properties";
 
     Text nameText;
     Combo classCombo;

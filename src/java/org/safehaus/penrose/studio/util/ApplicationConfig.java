@@ -32,12 +32,10 @@ import org.safehaus.penrose.util.FileUtil;
 
 public class ApplicationConfig {
 	
-	private Logger log = Logger.getLogger(getClass().getName());
+	Logger log = Logger.getLogger(getClass());
 
-	Map<String, ServerConfig> projects = new TreeMap<String, ServerConfig>();
+	Map<String,ServerConfig> serverConfigs = new TreeMap<String,ServerConfig>();
 	
-    ServerConfig currentProjectConfig;
-
 	public ApplicationConfig() {
 		super();
 	}
@@ -48,7 +46,7 @@ public class ApplicationConfig {
 			Digester digester = new Digester();
 			digester.addObjectCreate("config/project", ServerConfig.class);
 			digester.addSetProperties("config/project");
-			digester.addSetNext("config/project", "addProject");
+			digester.addSetNext("config/project", "addServerConfig");
 			digester.setValidating(false);
 	        digester.setClassLoader(this.getClass().getClassLoader());
 			digester.push(this);
@@ -73,37 +71,49 @@ public class ApplicationConfig {
 		writer.close();
 	}
 	
-	public void addProject(ServerConfig projectConfig) {
-		projects.put(projectConfig.getName(), projectConfig);
+    public ServerConfig getServerConfig(String name) {
+        return serverConfigs.get(name);
+    }
+
+	public void addServerConfig(ServerConfig serverConfig) throws Exception {
+        String name = serverConfig.getName();
+        if (serverConfigs.containsKey(name)) {
+            throw new Exception("Server \""+name+"\" already exists.");
+        }
+
+        serverConfigs.put(name, serverConfig);
 	}
 
-    public ServerConfig getProject(String name) {
-        return projects.get(name);
+    public void updateServerConfig(String name, ServerConfig newServerConfig) throws Exception {
+        String newName = newServerConfig.getName();
+        if (name.equals(newName)) {
+            removeServerConfig(name);
+            addServerConfig(newServerConfig);
+
+        } else {
+            addServerConfig(newServerConfig);
+            removeServerConfig(name);
+        }
     }
-    
-    public void removeProject(String name) {
-        projects.remove(name);
+
+    public void removeServerConfig(String name) throws Exception {
+        ServerConfig serverConfig = serverConfigs.remove(name);
+        if (serverConfig == null) {
+            throw new Exception("Server \""+name+"\" not found.");
+        }
     }
 
 	public Element toElement() {
 		Element element = new DefaultElement("config");
 
-        for (ServerConfig projectConfig : projects.values()) {
-            element.add(projectConfig.toElement());
+        for (ServerConfig serverConfig : serverConfigs.values()) {
+            element.add(serverConfig.toElement());
         }
 
         return element;
 	}
 	
-	public Collection<ServerConfig> getProjects() {
-		return projects.values();
-	}
-	
-    public void setCurrentProject(ServerConfig projectConfig) {
-        this.currentProjectConfig = projectConfig;
-    }
-
-	public ServerConfig getCurrentProject() {
-		return currentProjectConfig;
+	public Collection<ServerConfig> getServerConfigs() {
+		return serverConfigs.values();
 	}
 }

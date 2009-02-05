@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.server;
+package org.safehaus.penrose.studio.server.node;
 
 import org.safehaus.penrose.studio.tree.Node;
 

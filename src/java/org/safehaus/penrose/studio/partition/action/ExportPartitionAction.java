@@ -23,7 +23,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.partition.node.PartitionNode;
 import org.safehaus.penrose.studio.partition.wizard.ExportPartitionWizard;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 
 public class ExportPartitionAction extends Action {

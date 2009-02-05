@@ -21,7 +21,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.schema.wizard.ImportSchemaWizard;
 import org.apache.log4j.Logger;
 

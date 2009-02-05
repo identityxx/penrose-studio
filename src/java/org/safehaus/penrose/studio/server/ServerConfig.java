@@ -21,7 +21,9 @@ import org.dom4j.Element;
 import org.dom4j.tree.DefaultElement;
 import org.safehaus.penrose.client.PenroseClient;
 
-public class ServerConfig {
+import java.io.Serializable;
+
+public class ServerConfig implements Serializable, Cloneable {
 
 	private String name;
     private String type = PenroseClient.PENROSE;
@@ -33,15 +35,6 @@ public class ServerConfig {
     public ServerConfig() {
     }
 
-    public ServerConfig(ServerConfig projectConfig) {
-        name = projectConfig.getName();
-        type = projectConfig.getType();
-        host = projectConfig.getHost();
-        port = projectConfig.getPort();
-        username = projectConfig.getUsername();
-        password = projectConfig.getPassword();
-    }
-    
 	public Element toElement() {
 		Element element = new DefaultElement("project");
 		element.addAttribute("name", name);
@@ -116,15 +109,30 @@ public class ServerConfig {
         if (object == null) return false;
         if (object.getClass() != this.getClass()) return false;
 
-        ServerConfig projectConfig = (ServerConfig)object;
-        if (!equals(name, projectConfig.name)) return false;
-        if (!equals(type, projectConfig.type)) return false;
-        if (!equals(host, projectConfig.host)) return false;
-        if (!equals(port, projectConfig.port)) return false;
-        if (!equals(username, projectConfig.username)) return false;
-        if (!equals(password, projectConfig.password)) return false;
+        ServerConfig serverConfig = (ServerConfig)object;
+        if (!equals(name, serverConfig.name)) return false;
+        if (!equals(type, serverConfig.type)) return false;
+        if (!equals(host, serverConfig.host)) return false;
+        if (!equals(port, serverConfig.port)) return false;
+        if (!equals(username, serverConfig.username)) return false;
+        if (!equals(password, serverConfig.password)) return false;
 
         return true;
+    }
+
+    public void copy(ServerConfig serverConfig) {
+        name = serverConfig.name;
+        type = serverConfig.type;
+        host = serverConfig.host;
+        port = serverConfig.port;
+        username = serverConfig.username;
+        password = serverConfig.password;
+    }
+
+    public Object clone() throws CloneNotSupportedException {
+        ServerConfig serverConfig = (ServerConfig)super.clone();
+        serverConfig.copy(this);
+        return serverConfig;
     }
 }
 

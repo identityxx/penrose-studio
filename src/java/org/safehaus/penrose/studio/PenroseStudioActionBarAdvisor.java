@@ -43,7 +43,7 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
 
     Logger log = Logger.getLogger(getClass());
 
-    CreateServerAction newProjectAction;
+    AddServerAction newProjectAction;
     DeleteServerAction deleteProjectAction;
 
     ConnectAction connectAction;
@@ -87,7 +87,7 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
         super.makeActions(window);
 
         try {
-            newProjectAction = new CreateServerAction();
+            newProjectAction = new AddServerAction();
             register(newProjectAction);
 
             deleteProjectAction = new DeleteServerAction();

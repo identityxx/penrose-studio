@@ -24,7 +24,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.preview.PreviewEditorInput;

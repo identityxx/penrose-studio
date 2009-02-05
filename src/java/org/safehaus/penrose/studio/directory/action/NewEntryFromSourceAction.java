@@ -38,7 +38,7 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.directory.node.EntryNode;
 import org.safehaus.penrose.studio.directory.dialog.SourceDialog;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 
 import java.io.StringReader;

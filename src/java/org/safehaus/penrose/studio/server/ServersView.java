@@ -30,6 +30,7 @@ import org.eclipse.jface.action.*;
 import org.eclipse.swt.SWT;
 import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.tree.Node;
@@ -122,13 +123,10 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
                 public void doubleClick(DoubleClickEvent event) {
                     try {
                         IStructuredSelection selection = (IStructuredSelection)event.getSelection();
-                        //IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
                         Object object = selection.getFirstElement();
 
                         Node node = (Node)object;
                         node.open();
-
-                        //treeViewer.refresh();
 
                         PenroseStudio penroseStudio = PenroseStudio.getInstance();
                         penroseStudio.notifyChangeListeners();
@@ -153,8 +151,6 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
                         PenroseStudio penroseStudio = PenroseStudio.getInstance();
                         penroseStudio.notifyChangeListeners();
 
-                        //treeViewer.refresh();
-
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
                         ErrorDialog.open(e);
@@ -171,8 +167,6 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
 
                         PenroseStudio penroseStudio = PenroseStudio.getInstance();
                         penroseStudio.notifyChangeListeners();
-
-                        //treeViewer.refresh();
 
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
@@ -230,19 +224,11 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
         this.treeViewer = treeViewer;
     }
 
-    public void addProjectConfig(ServerConfig projectConfig) {
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.getApplicationConfig().addProject(projectConfig);
-        penroseStudio.saveApplicationConfig();
-
-        contentProvider.addProjectConfig(projectConfig);
+    public void addServerConfig(ServerConfig serverConfig) throws Exception {
+        contentProvider.addServerConfig(serverConfig);
     }
 
-    public void removeProjectConfig(String name) {
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.getApplicationConfig().removeProject(name);
-        penroseStudio.saveApplicationConfig();
-
+    public void removeServerConfig(String name) {
         contentProvider.removeProjectConfig(name);
     }
 

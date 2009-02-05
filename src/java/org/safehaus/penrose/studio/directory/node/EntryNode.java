@@ -39,7 +39,7 @@ import org.safehaus.penrose.studio.directory.action.*;
 import org.safehaus.penrose.studio.directory.editor.EntryEditorInput;
 import org.safehaus.penrose.studio.directory.editor.EntryEditor;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 

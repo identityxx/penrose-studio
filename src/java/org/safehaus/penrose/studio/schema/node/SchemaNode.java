@@ -32,7 +32,7 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.schema.editor.SchemaEditor;
 import org.safehaus.penrose.studio.schema.editor.SchemaEditorInput;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 

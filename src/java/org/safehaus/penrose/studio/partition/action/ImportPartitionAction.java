@@ -20,7 +20,7 @@ package org.safehaus.penrose.studio.partition.action;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.partition.wizard.ImportPartitionWizard;
 import org.apache.log4j.Logger;
 

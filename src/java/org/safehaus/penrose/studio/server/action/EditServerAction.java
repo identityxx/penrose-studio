@@ -17,59 +17,59 @@
  */
 package org.safehaus.penrose.studio.server.action;
 
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.window.Window;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.server.ServerConfig;
-import org.safehaus.penrose.studio.server.dialog.ServerDialog;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.util.ApplicationConfig;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.server.node.ServerNode;
+import org.safehaus.penrose.studio.server.wizard.AddServerWizard;
+import org.safehaus.penrose.studio.server.wizard.EditServerWizard;
 import org.apache.log4j.Logger;
 
-public class CreateServerAction extends Action {
+public class EditServerAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
-	public CreateServerAction() {
-        setText("&New Server...");
-        setImageDescriptor(PenroseStudio.getImageDescriptor(PenroseImage.NEW));
-        setAccelerator(SWT.CTRL | 'N');
-        setToolTipText("New Server");
+    ServerNode serverNode;
+
+    public EditServerAction(ServerNode serverNode) {
+        this.serverNode = serverNode;
+
+        setText("Properties");
+        setToolTipText("Properties");
         setId(getClass().getName());
 	}
-	
+
 	public void run() {
-
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        Shell shell = window.getShell();
-
         try {
-            ServerConfig projectConfig = new ServerConfig();
-            projectConfig.setName("localhost");
-            projectConfig.setHost("localhost");
-            projectConfig.setPort(1099);
-
-            ServerDialog dialog = new ServerDialog(shell, SWT.NONE);
-            dialog.setText("New Server");
-            dialog.setProjectConfig(projectConfig);
-            dialog.open();
-
-            if (dialog.getAction() == ServerDialog.CANCEL) return;
-
             ServersView serversView = ServersView.getInstance();
-            serversView.addProjectConfig(projectConfig);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
+            ApplicationConfig applicationConfig = penroseStudio.getApplicationConfig();
+
+            ServerConfig serverConfig = applicationConfig.getServerConfig(serverNode.getServerName());
+
+            EditServerWizard wizard = new EditServerWizard();
+            wizard.setServerConfig(serverConfig);
+
+            WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
+            dialog.setPageSize(600, 300);
+            int rc = dialog.open();
+
+            if (rc == Window.CANCEL) return;
+
             penroseStudio.notifyChangeListeners();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            ErrorDialog.open(e);
+            ErrorDialog.open(e.getMessage());
         }
 	}
-	
+
 }

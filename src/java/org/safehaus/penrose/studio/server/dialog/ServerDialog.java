@@ -18,6 +18,7 @@
 package org.safehaus.penrose.studio.server.dialog;
 
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
@@ -37,9 +38,6 @@ public class ServerDialog extends Dialog {
 
     Logger log = Logger.getLogger(getClass());
 
-    public final static int CANCEL = 0;
-    public final static int SAVE   = 1;
-
     Shell shell;
 
 	Text nameText;
@@ -49,7 +47,7 @@ public class ServerDialog extends Dialog {
 	Text bindDnText;
 	Text bindPasswordText;
 
-	private ServerConfig projectConfig;
+	private ServerConfig serverConfig;
 	
     private int action;
 
@@ -61,7 +59,7 @@ public class ServerDialog extends Dialog {
         createControl(shell);
     }
 
-    public void open() {
+    public int open() {
 
         Point size = new Point(400, 300);
         shell.setSize(size);
@@ -80,6 +78,8 @@ public class ServerDialog extends Dialog {
         while (!shell.isDisposed()) {
             if (!display.readAndDispatch()) display.sleep();
         }
+
+        return action;
     }
 
     public void createControl(final Shell parent) {
@@ -179,7 +179,7 @@ public class ServerDialog extends Dialog {
 
         cancelButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                action = CANCEL;
+                action = Window.CANCEL;
                 shell.close();
             }
         });
@@ -190,7 +190,7 @@ public class ServerDialog extends Dialog {
         saveButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 store();
-                action = SAVE;
+                action = Window.OK;
                 shell.close();
             }
         });
@@ -200,37 +200,37 @@ public class ServerDialog extends Dialog {
 
 	public void store() {
         String s = nameText.getText().trim();
-        projectConfig.setName("".equals(s) ? null : s);
+        serverConfig.setName("".equals(s) ? null : s);
 
         s = typeCombo.getText().trim();
-        projectConfig.setType(s);
+        serverConfig.setType(s);
 
         s = hostText.getText().trim();
-        projectConfig.setHost("".equals(s) ? null : s);
+        serverConfig.setHost("".equals(s) ? null : s);
 
         s = portText.getText().trim();
-        projectConfig.setPort("".equals(s) ? 0 : Integer.parseInt(s));
+        serverConfig.setPort("".equals(s) ? 0 : Integer.parseInt(s));
 
         s = bindDnText.getText().trim();
-        projectConfig.setUsername("".equals(s) ? null : s);
+        serverConfig.setUsername("".equals(s) ? null : s);
 
         s = bindPasswordText.getText().trim();
-        projectConfig.setPassword("".equals(s) ? null : s);
+        serverConfig.setPassword("".equals(s) ? null : s);
 	}
 
-    public ServerConfig getProjectConfig() {
-        return projectConfig;
+    public ServerConfig getServerConfig() {
+        return serverConfig;
     }
 
-    public void setProjectConfig(ServerConfig projectConfig) {
-        this.projectConfig = projectConfig;
+    public void setServerConfig(ServerConfig serverConfig) {
+        this.serverConfig = serverConfig;
 
-        nameText.setText(projectConfig.getName() == null ? "" : projectConfig.getName());
-        typeCombo.setText(projectConfig.getType() == null ? PenroseClient.PENROSE : projectConfig.getType());
-        hostText.setText(projectConfig.getHost() == null ? "localhost" : projectConfig.getHost());
-        portText.setText(projectConfig.getPort() == 0 ? "" : ""+ projectConfig.getPort());
-        bindDnText.setText(projectConfig.getUsername() == null ? "" : projectConfig.getUsername());
-        bindPasswordText.setText(projectConfig.getPassword() == null ? "" : projectConfig.getPassword());
+        nameText.setText(serverConfig.getName() == null ? "" : serverConfig.getName());
+        typeCombo.setText(serverConfig.getType() == null ? PenroseClient.PENROSE : serverConfig.getType());
+        hostText.setText(serverConfig.getHost() == null ? "localhost" : serverConfig.getHost());
+        portText.setText(serverConfig.getPort() == 0 ? "" : ""+ serverConfig.getPort());
+        bindDnText.setText(serverConfig.getUsername() == null ? "" : serverConfig.getUsername());
+        bindPasswordText.setText(serverConfig.getPassword() == null ? "" : serverConfig.getPassword());
     }
 
     public int getAction() {

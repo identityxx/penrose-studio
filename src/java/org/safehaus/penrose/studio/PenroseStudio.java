@@ -166,7 +166,7 @@ public class PenroseStudio implements IPlatformRunnable {
         }
     }
 
-	public void saveApplicationConfig() {
+	public void store() {
 		try {
 			File file = new File(homeDir, "config.xml");
 			applicationConfig.save(file);
@@ -175,11 +175,11 @@ public class PenroseStudio implements IPlatformRunnable {
 		}
 	}
 	
-	public void loadApplicationConfig() {
+	public void load() {
 		File file = new File(homeDir, "config.xml");
 
         if (!file.exists()) {
-            saveApplicationConfig();
+            store();
         }
 
 		try {

@@ -23,7 +23,7 @@ import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.directory.wizard.DynamicEntryWizard;
 import org.safehaus.penrose.studio.directory.node.EntryNode;
-import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.apache.log4j.Logger;
 

@@ -50,7 +50,7 @@ public class PreviewEditor extends EditorPart {
 
     private Logger log = Logger.getLogger(getClass());
 
-    Server project;
+    Server server;
     ServerConfig projectConfig;
     PenroseConfig penroseConfig;
     File workDir;
@@ -68,11 +68,11 @@ public class PreviewEditor extends EditorPart {
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         try {
             PreviewEditorInput ei = (PreviewEditorInput)input;
-            project = ei.getProject();
-            projectConfig = project.getProjectConfig();
-            workDir = project.getWorkDir();
+            server = ei.getProject();
+            projectConfig = server.getServerConfig();
+            workDir = server.getWorkDir();
 
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             penroseConfig = client.getPenroseConfig();
 
             setSite(site);

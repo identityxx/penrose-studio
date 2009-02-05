@@ -15,23 +15,29 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.service.action;
+package org.safehaus.penrose.studio.server.action;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.server.ServerConfig;
+import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.server.node.ServerNode;
-import org.safehaus.penrose.studio.service.wizard.ServiceWizard;
-import org.safehaus.penrose.service.ServiceConfig;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
+import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.server.wizard.AddServerWizard;
 import org.apache.log4j.Logger;
 
-public class NewServiceAction extends Action {
+public class AddServerAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
-	public NewServiceAction() {
-        setText("New Service...");
+	public AddServerAction() {
+        setText("&New Server...");
+        setImageDescriptor(PenroseStudio.getImageDescriptor(PenroseImage.NEW));
+        setAccelerator(SWT.CTRL | 'N');
+        setToolTipText("New Server");
         setId(getClass().getName());
 	}
 	
@@ -39,24 +45,30 @@ public class NewServiceAction extends Action {
         try {
             ServersView serversView = ServersView.getInstance();
 
-            ServiceConfig serviceConfig = new ServiceConfig();
+            ServerConfig serverConfig = new ServerConfig();
+            serverConfig.setName("My Server");
+            serverConfig.setHost("localhost");
+            serverConfig.setPort(1099);
+            serverConfig.setUsername("uid=admin,ou=system");
+            serverConfig.setPassword("secret");
 
-            ServiceWizard wizard = new ServiceWizard();
-            wizard.setServiceConfig(serviceConfig);
+            AddServerWizard wizard = new AddServerWizard();
+            wizard.setServerConfig(serverConfig);
             
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
-            dialog.open();
+            int rc = dialog.open();
+
+            if (rc == Window.CANCEL) return;
+
+            serversView.addServerConfig(serverConfig);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 
-            ServerNode projectNode = serversView.getSelectedServerNode();
-            serversView.open(projectNode.getServicesNode());
-
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            ErrorDialog.open(e.getMessage());
         }
 	}
 	

@@ -1,13 +1,14 @@
-package org.safehaus.penrose.studio.server;
+package org.safehaus.penrose.studio.server.node;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.server.dialog.ServerDialog;
 import org.safehaus.penrose.studio.partition.node.PartitionsNode;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.util.ApplicationConfig;
 import org.safehaus.penrose.studio.server.ServerConfig;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.server.action.EditServerAction;
 import org.safehaus.penrose.studio.federation.FederationNode;
 import org.safehaus.penrose.studio.logger.LoggingNode;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
@@ -22,8 +23,6 @@ import org.safehaus.penrose.service.ServiceManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.user.UserConfig;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
@@ -45,7 +44,7 @@ public class ServerNode extends Node {
 
     protected ServersView serversView;
 
-    protected ServerConfig projectConfig;
+    private String serverName;
     protected Server server;
 
     protected PartitionsNode partitionsNode;
@@ -57,10 +56,8 @@ public class ServerNode extends Node {
     public ServerNode(ServersView serversView, String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
 
+        this.serverName = name;
         this.serversView = serversView;
-
-        projectConfig = (ServerConfig) object;
-        server = new Server(projectConfig);
     }
 
     public void showMenu(IMenuManager manager) {
@@ -80,7 +77,7 @@ public class ServerNode extends Node {
             }
 
             public boolean isEnabled() {
-                return !server.isConnected();
+                return server == null;
             }
         });
 
@@ -99,7 +96,7 @@ public class ServerNode extends Node {
             }
 
             public boolean isEnabled() {
-                return server.isConnected();
+                return server != null;
             }
         });
 
@@ -129,7 +126,7 @@ public class ServerNode extends Node {
             }
 
             public boolean isEnabled() {
-                return server.isConnected();
+                return server != null;
             }
         });
 
@@ -175,15 +172,7 @@ public class ServerNode extends Node {
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        manager.add(new Action("Properties") {
-            public void run() {
-                try {
-                    edit();
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        });
+        manager.add(new EditServerAction(this));
     }
 
     public void open() throws Exception {
@@ -217,6 +206,12 @@ public class ServerNode extends Node {
         progressService.busyCursorWhile(new IRunnableWithProgress() {
             public void run(IProgressMonitor monitor) throws InvocationTargetException {
                 try {
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    ApplicationConfig applicationConfig = penroseStudio.getApplicationConfig();
+
+                    ServerConfig serverConfig = applicationConfig.getServerConfig(name);
+                    server = new Server(serverConfig);
+
                     server.connect(monitor);
 
                     partitionsNode = new PartitionsNode(
@@ -292,36 +287,15 @@ public class ServerNode extends Node {
     public void disconnect() throws Exception {
         try {
             children.clear();
-            server.close();
+            if (server != null) {
+                server.close();
+                server = null;
+            }
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             //ErrorDialog.open(e);
         }
-    }
-
-    public void edit() throws Exception {
-
-        String oldProjectName = projectConfig.getName();
-
-        Shell shell = serversView.getSite().getShell();
-
-        ServerDialog dialog = new ServerDialog(shell, SWT.NONE);
-        dialog.setText("Edit Server");
-        dialog.setProjectConfig(projectConfig);
-        dialog.open();
-
-        if (dialog.getAction() == ServerDialog.CANCEL) return;
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-
-        if (!oldProjectName.equals(projectConfig.getName())) {
-            penroseStudio.getApplicationConfig().removeProject(oldProjectName);
-            penroseStudio.getApplicationConfig().addProject(projectConfig);
-        }
-
-        penroseStudio.saveApplicationConfig();
-        penroseStudio.notifyChangeListeners();
     }
 
     public void remove() throws Exception {
@@ -333,9 +307,12 @@ public class ServerNode extends Node {
 
         if (!confirm) return;
 
-        serversView.removeProjectConfig(projectConfig.getName());
-
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.getApplicationConfig().removeServerConfig(serverName);
+        penroseStudio.store();
+
+        serversView.removeServerConfig(serverName);
+
         penroseStudio.notifyChangeListeners();
     }
 /*
@@ -353,7 +330,7 @@ public class ServerNode extends Node {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
 
-        ServerConfig projectConfig = server.getProjectConfig();
+        ServerConfig projectConfig = server.getServerConfig();
         String hostname = projectConfig.getHost();
 
         PenroseClient client = server.getClient();
@@ -413,14 +390,6 @@ public class ServerNode extends Node {
         this.loggingNode = loggingNode;
     }
 
-    public ServerConfig getProjectConfig() {
-        return projectConfig;
-    }
-
-    public void setProjectConfig(ServerConfig projectConfig) {
-        this.projectConfig = projectConfig;
-    }
-
     public ServersView getServersView() {
         return serversView;
     }
@@ -431,5 +400,17 @@ public class ServerNode extends Node {
 
     public void setServer(Server server) {
         this.server = server;
+    }
+
+    public String getServerName() {
+        return serverName;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    public boolean isConnected() {
+        return server != null;
     }
 }

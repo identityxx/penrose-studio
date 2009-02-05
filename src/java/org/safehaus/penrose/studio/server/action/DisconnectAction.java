@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 
 public class DisconnectAction extends Action {
@@ -24,11 +24,11 @@ public class DisconnectAction extends Action {
     public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            ServerNode projectNode = serversView.getSelectedServerNode();
-            if (projectNode == null) return;
+            ServerNode serverNode = serversView.getSelectedServerNode();
+            if (serverNode == null) return;
 
-            projectNode.disconnect();
-            serversView.close(projectNode);
+            serverNode.disconnect();
+            serversView.close(serverNode);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();

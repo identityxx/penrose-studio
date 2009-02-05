@@ -3,7 +3,7 @@ package org.safehaus.penrose.studio.partition.action;
 import org.eclipse.jface.action.Action;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.server.ServerNode;
+import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.partition.node.PartitionsNode;
 import org.safehaus.penrose.studio.PenroseStudio;
 

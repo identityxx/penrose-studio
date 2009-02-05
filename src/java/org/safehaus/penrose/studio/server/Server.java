@@ -15,35 +15,35 @@ public class Server {
     public Logger log = Logger.getLogger(getClass());
     public boolean debug = log.isDebugEnabled();
 
-    protected ServerConfig projectConfig;
+    protected ServerConfig serverConfig;
 
     protected PenroseClient client;
     protected File workDir;
 
     boolean connected;
 
-    public Server(ServerConfig projectConfig) {
-        this.projectConfig = projectConfig;
+    public Server(ServerConfig serverConfig) {
+        this.serverConfig = serverConfig;
     }
 
     public String getName() {
-        return projectConfig.getName();
+        return serverConfig.getName();
     }
 
     public void connect(IProgressMonitor monitor) throws Exception {
         try {
-            monitor.beginTask("Opening " + projectConfig.getName() + "...", IProgressMonitor.UNKNOWN);
+            monitor.beginTask("Opening " + serverConfig.getName() + "...", IProgressMonitor.UNKNOWN);
     
             log.debug("-------------------------------------------------------------------------------------");
 
-            log.debug("Opening "+ projectConfig.getName()+"...");
+            log.debug("Opening "+ serverConfig.getName()+"...");
 
             client = new PenroseClient(
-                    projectConfig.getType(),
-                    projectConfig.getHost(),
-                    projectConfig.getPort(),
-                    projectConfig.getUsername(),
-                    projectConfig.getPassword()
+                    serverConfig.getType(),
+                    serverConfig.getHost(),
+                    serverConfig.getPort(),
+                    serverConfig.getUsername(),
+                    serverConfig.getPassword()
             );
 
             client.connect();
@@ -52,7 +52,7 @@ public class Server {
             File homeDir = new File(userHome, ".penrose");
             homeDir.mkdirs();
 
-            workDir = new File(homeDir, "Servers"+File.separator+projectConfig.getName());
+            workDir = new File(homeDir, "Servers"+File.separator+ serverConfig.getName());
             FileUtil.delete(workDir);
 
             monitor.worked(1);
@@ -67,7 +67,7 @@ public class Server {
     public void close() throws Exception {
 
         log.debug("-------------------------------------------------------------------------------------");
-        log.debug("Closing "+ projectConfig.getName()+".");
+        log.debug("Closing "+ serverConfig.getName()+".");
 
         connected = false;
         client.close();
@@ -77,12 +77,12 @@ public class Server {
         return connected;
     }
     
-    public ServerConfig getProjectConfig() {
-        return projectConfig;
+    public ServerConfig getServerConfig() {
+        return serverConfig;
     }
 
-    public void setProjectConfig(ServerConfig projectConfig) {
-        this.projectConfig = projectConfig;
+    public void setServerConfig(ServerConfig serverConfig) {
+        this.serverConfig = serverConfig;
     }
 
     public PenroseClient getClient() {
@@ -120,7 +120,7 @@ public class Server {
     }
 
     public int hashCode() {
-        return projectConfig == null ? 0 : projectConfig.hashCode();
+        return serverConfig == null ? 0 : serverConfig.hashCode();
     }
 
     boolean equals(Object o1, Object o2) {
@@ -135,7 +135,7 @@ public class Server {
         if (object.getClass() != this.getClass()) return false;
 
         Server ei = (Server)object;
-        if (!equals(projectConfig, ei.projectConfig)) return false;
+        if (!equals(serverConfig, ei.serverConfig)) return false;
 
         return true;
     }

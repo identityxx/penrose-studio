@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.module.action;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -42,15 +43,17 @@ public class NewModuleAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Server project = node.getProjectNode().getServer();
+            Server server = node.getProjectNode().getServer();
 
             ModuleWizard wizard = new ModuleWizard();
-            wizard.setProject(project);
+            wizard.setServer(server);
             wizard.setPartitionName(node.getPartitionName());
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
-            dialog.open();
+            int rc = dialog.open();
+
+            if (rc == Window.CANCEL) return;
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
