@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.user;
+package org.safehaus.penrose.studio.user.node;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
@@ -26,6 +26,8 @@ import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.user.editor.UserEditor;
+import org.safehaus.penrose.studio.user.editor.UserEditorInput;
 import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.tree.Node;
@@ -38,12 +40,12 @@ public class AdministratorNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ServerNode projectNode;
+    ServerNode serverNode;
 
     public AdministratorNode(String name, Object object, Node parent) {
         super(name, PenroseStudio.getImage(PenroseImage.ADMINISTRATOR), object, parent);
         
-        projectNode = (ServerNode)parent;
+        serverNode = (ServerNode)parent;
     }
 
     public void showMenu(IMenuManager manager) {
@@ -61,12 +63,12 @@ public class AdministratorNode extends Node {
     }
 
     public void open() throws Exception {
-        Server project = projectNode.getServer();
-        PenroseClient penroseClient = project.getClient();
+        Server server = serverNode.getServer();
+        PenroseClient penroseClient = server.getClient();
         UserConfig rootUserConfig = penroseClient.getRootUserConfig();
                 
         UserEditorInput ei = new UserEditorInput();
-        ei.setProject(project);
+        ei.setServer(server);
         ei.setUserConfig(rootUserConfig);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.user;
+package org.safehaus.penrose.studio.user.editor;
 
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
@@ -28,7 +28,7 @@ import org.safehaus.penrose.studio.server.Server;
  */
 public class UserEditorInput implements IEditorInput {
 
-    private Server project;
+    private Server server;
     private UserConfig userConfig;
 
     public UserEditorInput() {
@@ -59,7 +59,7 @@ public class UserEditorInput implements IEditorInput {
     }
 
     public int hashCode() {
-        return project == null ? 0 : project.hashCode();
+        return server == null ? 0 : server.hashCode();
     }
 
     boolean equals(Object o1, Object o2) {
@@ -74,18 +74,18 @@ public class UserEditorInput implements IEditorInput {
         if (object.getClass() != this.getClass()) return false;
 
         UserEditorInput ei = (UserEditorInput)object;
-        if (!equals(project, ei.project)) return false;
+        if (!equals(server, ei.server)) return false;
         if (!equals(userConfig, ei.userConfig)) return false;
 
         return true;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public UserConfig getUserConfig() {

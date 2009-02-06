@@ -15,7 +15,7 @@ import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.browser.editor.BrowserEditorInput;
 import org.safehaus.penrose.studio.browser.editor.BrowserEditor;
 import org.safehaus.penrose.studio.properties.SystemPropertiesNode;
-import org.safehaus.penrose.studio.user.AdministratorNode;
+import org.safehaus.penrose.studio.user.node.AdministratorNode;
 import org.safehaus.penrose.studio.service.ServicesNode;
 import org.safehaus.penrose.studio.schema.node.SchemasNode;
 import org.safehaus.penrose.service.ServiceConfig;
@@ -209,7 +209,7 @@ public class ServerNode extends Node {
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     ApplicationConfig applicationConfig = penroseStudio.getApplicationConfig();
 
-                    ServerConfig serverConfig = applicationConfig.getServerConfig(name);
+                    ServerConfig serverConfig = applicationConfig.getServerConfig(serverName);
                     server = new Server(serverConfig);
 
                     server.connect(monitor);

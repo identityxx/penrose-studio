@@ -27,7 +27,7 @@ public class EditServerWizard extends Wizard {
 
         propertiesPage = new ServerWizardPage();
 
-        propertiesPage.setName(serverConfig.getName());
+        propertiesPage.setServerName(serverConfig.getName());
         propertiesPage.setType(serverConfig.getType());
         propertiesPage.setHost(serverConfig.getHost());
         propertiesPage.setPort(""+serverConfig.getPort());
@@ -45,7 +45,7 @@ public class EditServerWizard extends Wizard {
         try {
             ServerConfig newServerConfig = new ServerConfig();
 
-            newServerConfig.setName(propertiesPage.getName());
+            newServerConfig.setName(propertiesPage.getServerName());
             newServerConfig.setType(propertiesPage.getType());
             newServerConfig.setHost(propertiesPage.getHost());
 

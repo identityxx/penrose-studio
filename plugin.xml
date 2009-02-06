@@ -121,10 +121,10 @@
             icon="${images.attribute_type}"
             class="org.safehaus.penrose.studio.schema.editor.AttributeTypeEditor"/>
         <editor
-            id="org.safehaus.penrose.studio.user.UserEditor"
+            id="org.safehaus.penrose.studio.user.editor.UserEditor"
             name="User"
             icon="${images.administrator}"
-            class="org.safehaus.penrose.studio.user.UserEditor"/>
+            class="org.safehaus.penrose.studio.user.editor.UserEditor"/>
         <editor
             id="org.safehaus.penrose.studio.service.editor.ServiceEditor"
             name="Service"

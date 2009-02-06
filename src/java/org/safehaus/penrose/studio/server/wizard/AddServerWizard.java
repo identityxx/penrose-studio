@@ -27,7 +27,7 @@ public class AddServerWizard extends Wizard {
 
         propertiesPage = new ServerWizardPage();
 
-        propertiesPage.setName(serverConfig.getName());
+        propertiesPage.setServerName(serverConfig.getName());
         propertiesPage.setType(serverConfig.getType());
         propertiesPage.setHost(serverConfig.getHost());
         propertiesPage.setPort(""+serverConfig.getPort());
@@ -43,7 +43,7 @@ public class AddServerWizard extends Wizard {
 
     public boolean performFinish() {
         try {
-            serverConfig.setName(propertiesPage.getName());
+            serverConfig.setName(propertiesPage.getServerName());
             serverConfig.setType(propertiesPage.getType());
             serverConfig.setHost(propertiesPage.getHost());
 

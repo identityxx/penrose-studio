@@ -138,7 +138,7 @@ public class ServerWizardPage extends WizardPage {
     }
 
     public boolean validatePage() {
-        if (getName() == null) return false;
+        if (getServerName() == null) return false;
         if (getType() == null) return false;
         if (getHost() == null) return false;
         if (getPort() == null) return false;
@@ -147,16 +147,12 @@ public class ServerWizardPage extends WizardPage {
         return true;
     }
 
-	public void store() {
-
-	}
-
-    public String getName() {
+    public String getServerName() {
         String s = nameText.getText().trim();
         return "".equals(s) ? null : s;
     }
 
-    public void setName(String name) {
+    public void setServerName(String name) {
         this.name = name;
     }
 

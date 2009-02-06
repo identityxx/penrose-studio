@@ -15,39 +15,56 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.mapping.editor;
+package org.safehaus.penrose.studio.user.editor;
 
-import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.*;
+import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
-import org.safehaus.penrose.studio.mapping.wizard.MappingPropertiesWizard;
+import org.safehaus.penrose.user.UserConfig;
+import org.safehaus.penrose.studio.user.wizard.AdministratorWizard;
+import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Endi S. Dewata
  */
-public class MappingPropertiesPage extends MappingEditorPage {
+public class UserPropertyPage extends FormPage {
 
-    Label nameText;
-    Label classText;
-    Button enabledCheckbox;
-    Text descriptionText;
+    public Logger log = LoggerFactory.getLogger(getClass());
 
-    public MappingPropertiesPage(MappingEditor editor) {
-        super(editor, "PROPERTIES", "Properties");
+    FormToolkit toolkit;
+
+    UserEditor editor;
+
+    Label dnText;
+	Label passwordText;
+
+    UserConfig userConfig;
+
+    public UserPropertyPage(UserEditor editor) {
+        super(editor, "PROPERTIES", "  Properties  ");
+
+        this.editor = editor;
+        userConfig = editor.getUserConfig();
     }
 
     public void createFormContent(IManagedForm managedForm) {
-        super.createFormContent(managedForm);
+
+        toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
+        form.setText("User Editor");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
@@ -58,7 +75,7 @@ public class MappingPropertiesPage extends MappingEditorPage {
 
         Control propertiesControl = createPropertiesControl(propertiesSection);
         propertiesSection.setClient(propertiesControl);
-    }
+	}
 
     public Composite createPropertiesControl(final Composite parent) {
 
@@ -76,49 +93,27 @@ public class MappingPropertiesPage extends MappingEditorPage {
         return composite;
     }
 
-    public Composite createPropertiesLeftControl(final Composite parent) {
+	public Composite createPropertiesLeftControl(Composite parent) {
 
-        Composite composite = toolkit.createComposite(parent);
+		Composite composite = toolkit.createComposite(parent);
 
         GridLayout layout = new GridLayout(2, false);
         layout.marginWidth = 0;
         layout.marginHeight = 0;
         composite.setLayout(layout);
 
-        Label nameLabel = toolkit.createLabel(composite, "Name:");
-        GridData gd = new GridData();
-        gd.widthHint = 100;
-        nameLabel.setLayoutData(gd);
+		toolkit.createLabel(composite, "DN:");
 
-        nameText = toolkit.createLabel(composite, "", SWT.READ_ONLY);
-        nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		dnText = toolkit.createLabel(composite, "", SWT.NONE);
+		dnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        toolkit.createLabel(composite, "Class:");
+		toolkit.createLabel(composite, "Password:");
 
-        classText = toolkit.createLabel(composite, "", SWT.READ_ONLY);
-        classText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        passwordText = toolkit.createLabel(composite, "", SWT.PASSWORD);
+        passwordText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        toolkit.createLabel(composite, "Enabled:");
-
-        enabledCheckbox = toolkit.createButton(composite, "", SWT.CHECK);
-        enabledCheckbox.setEnabled(false);
-
-        new Label(composite, SWT.NONE);
-        new Label(composite, SWT.NONE);
-
-        Label descriptionLabel = toolkit.createLabel(composite, "Description:");
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalSpan = 2;
-        descriptionLabel.setLayoutData(gd);
-
-        descriptionText = toolkit.createText(composite, "", SWT.READ_ONLY | SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
-        gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.heightHint = 100;
-        gd.horizontalSpan = 2;
-        descriptionText.setLayoutData(gd);
-
-        return composite;
-    }
+		return composite;
+	}
 
     public Composite createPropertiesRightControl(final Composite parent) {
 
@@ -136,17 +131,21 @@ public class MappingPropertiesPage extends MappingEditorPage {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    MappingPropertiesWizard wizard = new MappingPropertiesWizard();
-                    wizard.setMappingConfig(mappingConfig);
+                    AdministratorWizard wizard = new AdministratorWizard();
+                    wizard.setUserConfig(userConfig);
 
-                    WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
+                    WizardDialog dialog = new WizardDialog(parent.getShell(), wizard);
                     dialog.setPageSize(600, 300);
-
                     int rc = dialog.open();
+
                     if (rc == Window.CANCEL) return;
 
                     editor.store();
+
                     refresh();
+
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    penroseStudio.store();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -158,16 +157,15 @@ public class MappingPropertiesPage extends MappingEditorPage {
         return composite;
     }
 
+    public void setActive(boolean b) {
+        super.setActive(b);
+        if (b) refresh();
+    }
+
     public void refresh() {
-        String name = mappingConfig.getName();
-        nameText.setText(name == null ? "" : name);
+        String dn = userConfig.getDn().toString();
+        dnText.setText(dn == null ? "" : dn);
 
-        String className = mappingConfig.getMappingClass();
-        classText.setText(className == null ? "" : className);
-
-        enabledCheckbox.setSelection(mappingConfig.isEnabled());
-
-        String description = mappingConfig.getDescription();
-        descriptionText.setText(description == null ? "" : description);
+        passwordText.setText("*****");
     }
 }

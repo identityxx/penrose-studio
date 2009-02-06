@@ -109,11 +109,6 @@ public class MappingEditor extends FormEditor implements ModifyListener {
         MappingManagerClient mappingManagerClient = partitionClient.getMappingManagerClient();
         mappingManagerClient.updateMapping(origMappingConfig.getName(), mappingConfig);
         partitionClient.store();
-
-        //PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        //penroseStudio.notifyChangeListeners();
-
-        //checkDirty();
 	}
 
     public boolean isDirty() {

@@ -16,14 +16,14 @@ public class MappingEditorPage extends FormPage {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    protected FormToolkit toolkit;
+    FormToolkit toolkit;
 
-    protected MappingEditor editor;
+    MappingEditor editor;
     String title;
 
-    protected Server server;
-    protected String partitionName;
-    protected MappingConfig mappingConfig;
+    Server server;
+    String partitionName;
+    MappingConfig mappingConfig;
 
     public MappingEditorPage(MappingEditor editor, String name, String title) {
         super(editor, name, "  "+title+"  ");

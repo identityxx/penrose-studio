@@ -60,6 +60,7 @@ public class EntryDNWizardPage extends WizardPage implements ModifyListener {
         dnText = new Text(composite, SWT.BORDER);
         dnText.setText(dn == null ? "" : dn);
         dnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
         dnText.addModifyListener(this);
 
         new Label(composite, SWT.NONE);
