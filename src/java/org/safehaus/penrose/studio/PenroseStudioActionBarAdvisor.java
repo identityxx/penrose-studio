@@ -31,8 +31,6 @@ import org.safehaus.penrose.studio.validation.ValidationAction;
 import org.safehaus.penrose.studio.console.ConsoleAction;
 import org.safehaus.penrose.studio.partition.action.NewPartitionAction;
 import org.safehaus.penrose.studio.partition.action.ImportPartitionAction;
-import org.safehaus.penrose.studio.partition.action.NewLDAPSnapshotPartitionAction;
-import org.safehaus.penrose.studio.partition.action.NewLDAPProxyPartitionAction;
 import org.safehaus.penrose.studio.service.action.NewServiceAction;
 import org.safehaus.penrose.studio.schema.action.ImportSchemaAction;
 import org.safehaus.penrose.studio.schema.action.NewSchemaAction;
@@ -49,13 +47,10 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
     ConnectAction connectAction;
     DisconnectAction disconnectAction;
 
-    //UploadAction uploadAction;
     IAction quitAction;
 
     NewPartitionAction newPartitionAction;
     ImportPartitionAction importPartitionAction;
-    NewLDAPSnapshotPartitionAction newLDAPSnapshotPartitionAction;
-    NewLDAPProxyPartitionAction newLDAPProxyPartitionAction;
 
     NewSchemaAction newSchemaAction;
     ImportSchemaAction importSchemaAction;
@@ -99,17 +94,12 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
             disconnectAction = new DisconnectAction();
             register(disconnectAction);
 
-            //uploadAction = new UploadAction();
-            //register(uploadAction);
-
             quitAction = ActionFactory.QUIT.create(window);
             quitAction.setAccelerator(SWT.ALT | SWT.F4);
             register(quitAction);
 
             newPartitionAction = new NewPartitionAction();
             importPartitionAction = new ImportPartitionAction();
-            newLDAPSnapshotPartitionAction = new NewLDAPSnapshotPartitionAction();
-            newLDAPProxyPartitionAction = new NewLDAPProxyPartitionAction();
 
             newSchemaAction = new NewSchemaAction();
             importSchemaAction = new ImportSchemaAction();
@@ -138,10 +128,6 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
 
         partitionMenu.add(newPartitionAction);
         partitionMenu.add(importPartitionAction);
-
-        partitionMenu.add(new Separator());
-        partitionMenu.add(newLDAPSnapshotPartitionAction);
-        partitionMenu.add(newLDAPProxyPartitionAction);
     }
 
     public void fillHelpMenu() {
@@ -169,11 +155,6 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
 
             fileMenu.add(connectAction);
             fileMenu.add(disconnectAction);
-
-            //fileMenu.add(new Separator());
-
-            //fileMenu.add(uploadAction);
-            //fileMenu.add(restartAction);
 
             fileMenu.add(new Separator());
             fileMenu.add(quitAction);
@@ -231,11 +212,6 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
 
             standardToolBar.add(new ActionContributionItem(connectAction));
             standardToolBar.add(new ActionContributionItem(disconnectAction));
-
-            //standardToolBar.add(new Separator());
-
-            //standardToolBar.add(new ActionContributionItem(uploadAction));
-            //standardToolBar.add(new ActionContributionItem(restartAction));
 
             IToolBarManager previewToolBar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
             coolBar.add(new ToolBarContributionItem(previewToolBar, "preview"));

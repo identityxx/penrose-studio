@@ -26,6 +26,7 @@ import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.AttributeType;
@@ -115,7 +116,10 @@ public class LDAPConnectionSchemaPage extends ConnectionEditorPage {
                     SchemaExportWizard wizard = new SchemaExportWizard(server, newSchema);
                     WizardDialog dialog = new WizardDialog(shell, wizard);
                     dialog.setPageSize(600, 300);
-                    dialog.open();
+                    int rc = dialog.open();
+
+                    if (rc == Window.CANCEL) return;
+
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);

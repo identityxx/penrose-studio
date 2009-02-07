@@ -15,37 +15,60 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.partition.action;
+package org.safehaus.penrose.studio.directory.action;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.server.node.ServerNode;
-import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.ldap.wizard.LDAPProxyWizard;
-import org.safehaus.penrose.studio.partition.node.PartitionsNode;
+import org.safehaus.penrose.studio.directory.node.DirectoryNode;
+import org.safehaus.penrose.studio.directory.node.EntryNode;
+import org.safehaus.penrose.studio.directory.wizard.ImportEntriesWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.tree.Node;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.ldap.DN;
 import org.apache.log4j.Logger;
 
-public class NewLDAPProxyPartitionAction extends Action {
+public class ImportStaticEntriesAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
-	public NewLDAPProxyPartitionAction() {
-        setText("New LDAP Proxy Partition...");
+    Server server;
+    String partitionName;
+    DN targetDn;
+
+    Node node;
+
+	public ImportStaticEntriesAction(DirectoryNode node) {
+        this((Node)node);
+        server = node.getServerNode().getServer();
+        partitionName = node.getPartitionName();
+        targetDn = new DN();
+    }
+
+    public ImportStaticEntriesAction(EntryNode node) {
+        this((Node)node);
+        server = node.getServerNode().getServer();
+        partitionName = node.getPartitionName();
+        targetDn = node.getEntryConfig().getDn();
+    }
+
+    public ImportStaticEntriesAction(Node node) {
+        this.node = node;
+
+        setText("Import Static Entries...");
         setId(getClass().getName());
 	}
 	
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            ServerNode serverNode = serversView.getSelectedServerNode();
-            PartitionsNode partitionsNode = serverNode.getPartitionsNode();
-            Server server = serverNode.getServer();
 
-            LDAPProxyWizard wizard = new LDAPProxyWizard();
+            ImportEntriesWizard wizard = new ImportEntriesWizard();
             wizard.setServer(server);
+            wizard.setPartitionName(partitionName);
+            wizard.setTargetDn(targetDn);
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
@@ -53,15 +76,16 @@ public class NewLDAPProxyPartitionAction extends Action {
 
             if (rc == Window.CANCEL) return;
 
-            serversView.open(serverNode.getPartitionsNode());
-
-            partitionsNode.refresh();
-
+            node.refresh();
+            
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 
+            serversView.open(node);
+
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
 	}
 	

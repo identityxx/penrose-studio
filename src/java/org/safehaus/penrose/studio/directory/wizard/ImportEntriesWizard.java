@@ -18,34 +18,64 @@
 package org.safehaus.penrose.studio.directory.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
 import org.safehaus.penrose.studio.util.SnapshotUtil;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.ldap.source.wizard.LDAPSourceTreeWizardPage;
 import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.safehaus.penrose.filter.FilterTool;
 import org.apache.log4j.Logger;
 
 /**
  * @author Endi S. Dewata
  */
-public class CreateLDAPSnapshotWizard extends Wizard {
+public class ImportEntriesWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Server project;
-    private String partitionName;
+    Server server;
+    String partitionName;
+    DN targetDn;
+    
     SelectConnectionWizardPage connectionPage;
+    ImportTreeWizardPage treePage;
 
-    public CreateLDAPSnapshotWizard() {
-        setWindowTitle("Create LDAP Snapshot");
+    public ImportEntriesWizard() {
+        setWindowTitle("Import Entries");
+    }
+
+    public void addPages() {
 
         connectionPage = new SelectConnectionWizardPage();
+        connectionPage.setServer(server);
         connectionPage.setPartitionName(partitionName);
         connectionPage.setAdapterType("LDAP");
+
+        addPage(connectionPage);
+
+        treePage = new ImportTreeWizardPage();
+        treePage.setServer(server);
+        treePage.setPartitionName(partitionName);
+
+        addPage(treePage);
+    }
+
+    public IWizardPage getNextPage(IWizardPage page) {
+        if (connectionPage == page) {
+            ConnectionConfig connectionConfig = connectionPage.getConnectionConfig();
+            if (connectionConfig == null) return null;
+            treePage.setConnectionConfig(connectionConfig);
+        }
+
+        return super.getNextPage(page);
     }
 
     public boolean canFinish() {
         if (!connectionPage.isPageComplete()) return false;
+        if (!treePage.isPageComplete()) return false;
         return true;
     }
 
@@ -53,14 +83,25 @@ public class CreateLDAPSnapshotWizard extends Wizard {
         LDAPClient client = null;
         try {
             ConnectionConfig connectionConfig = connectionPage.getConnectionConfig();
-
             client = new LDAPClient(connectionConfig.getParameters());
 
-            SnapshotUtil snapshotUtil = new SnapshotUtil(project);
-            snapshotUtil.createSnapshot(partitionName, client);
+            SnapshotUtil util = new SnapshotUtil();
+            util.setServer(server);
+            util.setPartitionName(partitionName);
+            util.setLdapClient(client);
 
-            //project.save(partitionConfig);
-            
+            util.setSourceDn(new DN(treePage.getBaseDn()));
+            util.setTargetDn(targetDn);
+
+            String filter = treePage.getFilter();
+            if (filter != null) {
+                util.setFilter(FilterTool.parseFilter(filter));
+            }
+
+            util.setDepth(treePage.getDepth());
+
+            util.run();
+
             return true;
 
         } catch (Exception e) {
@@ -72,20 +113,16 @@ public class CreateLDAPSnapshotWizard extends Wizard {
         }
     }
 
-    public void addPages() {
-        addPage(connectionPage);
-    }
-
     public boolean needsPreviousAndNextButtons() {
         return true;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public String getPartitionName() {
@@ -94,5 +131,13 @@ public class CreateLDAPSnapshotWizard extends Wizard {
 
     public void setPartitionName(String partitionName) {
         this.partitionName = partitionName;
+    }
+
+    public DN getTargetDn() {
+        return targetDn;
+    }
+
+    public void setTargetDn(DN targetDn) {
+        this.targetDn = targetDn;
     }
 }

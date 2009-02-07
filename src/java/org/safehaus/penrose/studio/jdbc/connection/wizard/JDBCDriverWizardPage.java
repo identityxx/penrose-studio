@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -183,7 +184,9 @@ public class JDBCDriverWizardPage extends WizardPage implements SelectionListene
                 	DriverWizard wizard = new DriverWizard();
                     WizardDialog dialog = new WizardDialog(parent.getShell(), wizard);
                     dialog.setPageSize(600, 300);
-                    dialog.open();
+                    int rc = dialog.open();
+
+                    if (rc == Window.CANCEL) return;
 
                     Driver driver = wizard.getDriver();
                     if (driver == null) return;
@@ -216,7 +219,9 @@ public class JDBCDriverWizardPage extends WizardPage implements SelectionListene
                     DriverWizard wizard = new DriverWizard(driver);
                     WizardDialog dialog = new WizardDialog(parent.getShell(), wizard);
                     dialog.setPageSize(600, 300);
-                    dialog.open();
+                    int rc = dialog.open();
+
+                    if (rc == Window.CANCEL) return;
 
                     saveDrivers();
                     refresh();

@@ -206,7 +206,7 @@ public class PenroseStudio implements IPlatformRunnable {
 /*
     public void initSchemaManager(String dir) throws Exception {
 
-        schemaManager = penroseContext.getSchemaManager();
+        schemaManager = penroseContext.getSchema();
 
         for (Iterator i=penroseConfig.getSchemaConfigs().iterator(); i.hasNext(); ) {
             SchemaConfig schemaConfig = (SchemaConfig)i.next();

@@ -97,10 +97,6 @@ public class PartitionsNode extends Node {
         manager.add(new ImportPartitionAction());
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-        manager.add(new NewLDAPSnapshotPartitionAction());
-        manager.add(new NewLDAPProxyPartitionAction());
-
-        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
         manager.add(new Action("Paste") {
             public void run() {

@@ -130,8 +130,9 @@ public class NISDomainsPage extends FormPage {
                     AddNISDomainWizard wizard = new AddNISDomainWizard();
                     WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
+                    int rc = dialog.open();
 
-                    if (dialog.open() == Window.CANCEL) return;
+                    if (rc == Window.CANCEL) return;
 
                     FederationRepositoryConfig repositoryConfig = wizard.getRepository();
 
@@ -166,16 +167,10 @@ public class NISDomainsPage extends FormPage {
                     EditNISDomainWizard wizard = new EditNISDomainWizard(domain);
                     WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
+                    int rc = dialog.open();
 
-                    if (dialog.open() == Window.CANCEL) return;
-/*
-                    NISDomainDialog dialog = new NISDomainDialog(editor.getSite().getShell(), SWT.NONE);
-                    dialog.setRepositoryConfig(domain);
-                    dialog.open();
+                    if (rc == Window.CANCEL) return;
 
-                    int action = dialog.getAction();
-                    if (action == NISUserDialog.CANCEL) return;
-*/
                     federationClient.updateRepository(domain);
                     federationClient.store();
 

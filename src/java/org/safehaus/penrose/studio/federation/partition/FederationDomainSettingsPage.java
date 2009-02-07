@@ -161,10 +161,9 @@ public class FederationDomainSettingsPage extends FormPage {
                     IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
                     WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
                     dialog.setPageSize(600, 300);
+                    int rc = dialog.open();
 
-                    if (dialog.open() == Window.CANCEL) return;
-
-                    //federationClient.updateGlobalRepository(wizard.getRepository());
+                    if (rc == Window.CANCEL) return;
 
                     refresh();
                     

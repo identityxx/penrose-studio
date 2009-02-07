@@ -20,6 +20,7 @@ package org.safehaus.penrose.studio.partition.action;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.partition.node.PartitionNode;
 import org.safehaus.penrose.studio.partition.wizard.ExportPartitionWizard;
 import org.safehaus.penrose.studio.server.Server;
@@ -48,7 +49,9 @@ public class ExportPartitionAction extends Action {
             ExportPartitionWizard wizard = new ExportPartitionWizard(project, partitionNode.getPartitionName());
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
-            dialog.open();
+            int rc = dialog.open();
+
+            if (rc == Window.CANCEL) return;
 
             serversView.open(projectNode.getPartitionsNode());
 

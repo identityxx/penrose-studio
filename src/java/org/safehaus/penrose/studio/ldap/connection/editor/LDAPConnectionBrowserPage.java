@@ -18,6 +18,7 @@
 package org.safehaus.penrose.studio.ldap.connection.editor;
 
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -172,7 +173,9 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
 
                     WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
-                    dialog.open();
+                    int rc = dialog.open();
+
+                    if (rc == Window.CANCEL) return;
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
@@ -211,7 +214,9 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
 
                     WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
-                    dialog.open();
+                    int rc = dialog.open();
+
+                    if (rc == Window.CANCEL) return;
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();
@@ -277,7 +282,9 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
 
                     WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
-                    dialog.open();
+                    int rc = dialog.open();
+
+                    if (rc == Window.CANCEL) return;
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();

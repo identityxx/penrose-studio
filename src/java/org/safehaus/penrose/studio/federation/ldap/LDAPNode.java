@@ -125,8 +125,9 @@ public class LDAPNode extends Node {
         AddLDAPRepositoryWizard wizard = new AddLDAPRepositoryWizard();
         WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
         dialog.setPageSize(600, 300);
+        int rc = dialog.open();
 
-        if (dialog.open() == Window.CANCEL) return;
+        if (rc == Window.CANCEL) return;
 
         FederationRepositoryConfig repository = wizard.getRepository();
 

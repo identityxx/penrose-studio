@@ -113,7 +113,7 @@ public class DirectoryNode extends Node {
 
         manager.add(new NewRootEntryAction(this));
         manager.add(new NewRootProxyAction(this));
-        //manager.add(new CreateLDAPSnapshotEntryAction(this));
+        manager.add(new ImportStaticEntriesAction(this));
 
         if ("DEFAULT".equals(partitionName)) {
             manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));

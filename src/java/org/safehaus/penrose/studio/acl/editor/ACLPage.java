@@ -174,7 +174,7 @@ public class ACLPage extends FormPage implements ModifyListener {
                     dialog.setDn(aci.getDn());
                     dialog.setTarget(aci.getTarget());
                     dialog.setAttributes(aci.getAttributes());
-                    dialog.setScope(aci.getScope());
+                    dialog.setDepth(aci.getScope());
                     dialog.setAction(aci.getAction());
                     dialog.setPermission(aci.getPermission());
 
@@ -185,7 +185,7 @@ public class ACLPage extends FormPage implements ModifyListener {
                     aci.setDn(dialog.getDn());
                     aci.setTarget(dialog.getTarget());
                     aci.setAttributes(dialog.getAttributes());
-                    aci.setScope(dialog.getScope());
+                    aci.setDepth(dialog.getScope());
                     aci.setAction(dialog.getAction());
                     aci.setPermission(dialog.getPermission());
 
@@ -230,7 +230,7 @@ public class ACLPage extends FormPage implements ModifyListener {
                     aci.setDn(dialog.getDn());
                     aci.setTarget(dialog.getTarget());
                     aci.setAttributes(dialog.getAttributes());
-                    aci.setScope(dialog.getScope());
+                    aci.setDepth(dialog.getScope());
                     aci.setAction(dialog.getAction());
                     aci.setPermission(dialog.getPermission());
 
@@ -279,7 +279,7 @@ public class ACLPage extends FormPage implements ModifyListener {
                     dialog.setDn(aci.getDn().toString());
                     dialog.setTarget(aci.getTarget());
                     dialog.setAttributes(aci.getAttributes());
-                    dialog.setScope(aci.getScope());
+                    dialog.setDepth(aci.getScope());
                     dialog.setAction(aci.getAction());
                     dialog.setPermission(aci.getPermission());
 
@@ -290,7 +290,7 @@ public class ACLPage extends FormPage implements ModifyListener {
                     aci.setDn(dialog.getDn());
                     aci.setTarget(dialog.getTarget());
                     aci.setAttributes(dialog.getAttributes());
-                    aci.setScope(dialog.getScope());
+                    aci.setDepth(dialog.getScope());
                     aci.setAction(dialog.getAction());
                     aci.setPermission(dialog.getPermission());
 

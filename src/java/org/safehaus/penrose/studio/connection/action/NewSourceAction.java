@@ -20,6 +20,7 @@ package org.safehaus.penrose.studio.connection.action;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.connection.ConnectionClient;
 import org.safehaus.penrose.connection.ConnectionManagerClient;
@@ -69,6 +70,8 @@ public class NewSourceAction extends Action {
             SourceConfig sourceConfig = new SourceConfig();
 
             SourceWizard wizard;
+            int rc = Window.CANCEL;
+
             if ("JDBC".equals(adapterName)) {
                 wizard = new JDBCSourceWizard();
                 wizard.setServer(project);
@@ -78,7 +81,7 @@ public class NewSourceAction extends Action {
 
                 WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
                 dialog.setPageSize(600, 300);
-                dialog.open();
+                rc = dialog.open();
 
             } else if ("LDAP".equals(adapterName)) {
                 wizard = new LDAPSourceWizard();
@@ -89,7 +92,7 @@ public class NewSourceAction extends Action {
 
                 WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
                 dialog.setPageSize(600, 300);
-                dialog.open();
+                rc = dialog.open();
 
             } else if ("NIS".equals(adapterName)) {
                 wizard = new NISSourceWizard();
@@ -100,8 +103,10 @@ public class NewSourceAction extends Action {
 
                 WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
                 dialog.setPageSize(600, 300);
-                dialog.open();
+                rc = dialog.open();
             }
+
+            if (rc == Window.CANCEL) return;
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();

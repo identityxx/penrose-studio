@@ -28,6 +28,7 @@ import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.jdbc.*;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -182,7 +183,9 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
 
                     WizardDialog dialog = new WizardDialog(getEditor().getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
-                    dialog.open();
+                    int rc = dialog.open();
+
+                    if (rc == Window.CANCEL) return;
 
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     penroseStudio.notifyChangeListeners();

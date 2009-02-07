@@ -1005,8 +1005,9 @@ public class IdentityLinkingPage extends FormPage {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
             dialog.setPageSize(600, 300);
+            int rc = dialog.open();
 
-            if (dialog.open() != Window.OK) return;
+            if (rc == Window.CANCEL) return;
 
             localBaseText.setText(wizard.getDn());
 
@@ -1027,8 +1028,9 @@ public class IdentityLinkingPage extends FormPage {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
             dialog.setPageSize(600, 300);
+            int rc = dialog.open();
 
-            if (dialog.open() != Window.OK) return;
+            if (rc == Window.CANCEL) return;
 
             globalBaseText.setText(wizard.getDn());
 

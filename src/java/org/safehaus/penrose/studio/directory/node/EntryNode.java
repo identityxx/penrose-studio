@@ -138,6 +138,7 @@ public class EntryNode extends Node {
         manager.add(new NewStaticEntryAction(this));
         manager.add(new NewDynamicEntryAction(this));
         manager.add(new NewProxyEntryAction(this));
+        manager.add(new ImportStaticEntriesAction(this));
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 

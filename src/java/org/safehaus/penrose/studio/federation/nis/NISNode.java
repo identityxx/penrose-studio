@@ -131,8 +131,9 @@ public class NISNode extends Node implements ChangeListener {
         AddNISDomainWizard wizard = new AddNISDomainWizard();
         WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
         dialog.setPageSize(600, 300);
+        int rc = dialog.open();
 
-        if (dialog.open() == Window.CANCEL) return;
+        if (rc == Window.CANCEL) return;
 
         FederationRepositoryConfig domain = wizard.getRepository();
 

@@ -12,6 +12,8 @@ import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.filter.Filter;
+import org.safehaus.penrose.filter.FilterEvaluator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,95 +26,162 @@ public class SnapshotUtil {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    Server project;
+    Server server;
+    String partitionName;
+    LDAPClient ldapClient;
+    DN sourceDn;
+    DN targetDn;
+    Filter filter;
+    Integer depth;
 
-    public SnapshotUtil(Server project) throws Exception {
-        this.project = project;
+    PartitionClient partitionClient;
+    DirectoryClient directoryClient;
+    FilterEvaluator filterEvaluator;
+    Schema schema;
+
+    public SnapshotUtil() throws Exception {
     }
 
-    public void createSnapshot(String partitionName, LDAPClient ldapClient) throws Exception {
-        PenroseClient client = project.getClient();
-        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+    public void run() throws Exception {
 
-        createEntries(partitionClient, ldapClient, "");
+        PenroseClient client = server.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+
+        partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        directoryClient = partitionClient.getDirectoryClient();
+
+        SchemaUtil schemaUtil = new SchemaUtil();
+        schema = schemaUtil.getSchema(ldapClient);
+
+        filterEvaluator = new FilterEvaluator();
+        filterEvaluator.setSchema(schema);
+        
+        SearchResult entry = ldapClient.find(sourceDn);
+        DN dn = entry.getDn().getRdn().append(targetDn);
+        importEntries(entry, dn, 0);
 
         partitionClient.store();
     }
     
-    public void createEntries(PartitionClient partitionClient, LDAPClient ldapClient, String baseDn) throws Exception {
+    public void importEntries(SearchResult entry, DN targetDn, int level) throws Exception {
 
-        DirectoryClient directoryClient = partitionClient.getDirectoryClient();
+        if (!filterEvaluator.eval(entry.getAttributes(), filter)) return;
 
-        if ("".equals(baseDn)) {
-            SearchResult entry = ldapClient.find(baseDn);
-            if (entry == null) return;
-            
-            EntryConfig entryConfig = createMapping(ldapClient, entry);
-            //partitionConfig.getDirectoryConfig().addEntryConfig(entryConfig);
+        EntryConfig entryConfig = createEntry(entry, targetDn);
+        directoryClient.createEntry(entryConfig);
 
-            directoryClient.createEntry(entryConfig);
+        if (depth != null && depth < ++level) return;
+
+        Collection<SearchResult> children = ldapClient.findChildren(entry.getDn());
+        for (SearchResult child : children) {
+            DN childDn = child.getDn().getRdn().append(targetDn);
+            importEntries(child, childDn, level);
         }
-
-        Collection<SearchResult> children = ldapClient.findChildren(baseDn);
-        for (SearchResult entry : children) {
-            EntryConfig entryConfig = createMapping(ldapClient, entry);
-            //partitionConfig.getDirectoryConfig().addEntryConfig(entryConfig);
-            directoryClient.createEntry(entryConfig);
-
-            createEntries(partitionClient, ldapClient, entry.getDn().toString());
-        }
-
     }
 
-    public EntryConfig createMapping(LDAPClient client, SearchResult entry) throws Exception {
+    public EntryConfig createEntry(SearchResult entry, DN targetDn) throws Exception {
 
-        SchemaUtil schemaUtil = new SchemaUtil();
-        Schema schema = schemaUtil.getSchema(client);
+        RDN rdn = targetDn.getRdn();
 
-        DN dn = entry.getDn();
-        RDN rdn = dn.getRdn();
-
-        EntryConfig entryConfig = new EntryConfig(dn);
+        EntryConfig entryConfig = new EntryConfig(targetDn);
 
         log.debug("Attributes:");
         Attributes attributes = entry.getAttributes();
         for (Attribute attribute : attributes.getAll()) {
 
             String name = attribute.getName();
+
             AttributeType attributeType = schema.getAttributeType(name);
-            AttributeSyntax attributeSyntax = AttributeSyntax.getAttributeSyntax(attributeType.getSyntax());
+            String syntax = attributeType == null ? null : attributeType.getSyntax();
+
+            AttributeSyntax attributeSyntax = syntax == null ? null : AttributeSyntax.getAttributeSyntax(syntax);
+
             boolean binary = attributeSyntax != null && attributeSyntax.isHumanReadable();
             log.debug(" - "+name+": binary "+binary);
 
-            boolean oc = "objectClass".equalsIgnoreCase(name);
-
-            for (Object value : attribute.getValues()) {
-
-                if (oc) {
+            if ("objectClass".equalsIgnoreCase(name)) {
+                for (Object value : attribute.getValues()) {
                     entryConfig.addObjectClass(value.toString());
-                    continue;
                 }
 
-                boolean rdnAttr = false;
+            } else {
+                for (Object value : attribute.getValues()) {
 
-                if (!binary) {
-                    String string = value.toString();
-                    for (String n : rdn.getNames()) {
-                        String v = (String) rdn.get(n);
-                        if (name.equalsIgnoreCase(n) && string.equalsIgnoreCase(v)) {
-                            rdnAttr = true;
-                            break;
+                    boolean rdnAttr = false;
+
+                    if (!binary) {
+                        String string = value.toString();
+                        for (String n : rdn.getNames()) {
+                            String v = (String) rdn.get(n);
+                            if (name.equalsIgnoreCase(n) && string.equalsIgnoreCase(v)) {
+                                rdnAttr = true;
+                                break;
+                            }
                         }
                     }
-                }
 
-                log.debug(" - "+name+": "+value);
-                entryConfig.addAttributeConfig(new EntryAttributeConfig(name, value, rdnAttr));
+                    log.debug(" - "+name+": "+value);
+                    entryConfig.addAttributeConfig(new EntryAttributeConfig(name, value, rdnAttr));
+                }
             }
         }
 
         return entryConfig;
     }
 
+    public String getPartitionName() {
+        return partitionName;
+    }
+
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
+    }
+
+    public LDAPClient getLdapClient() {
+        return ldapClient;
+    }
+
+    public void setLdapClient(LDAPClient ldapClient) {
+        this.ldapClient = ldapClient;
+    }
+
+    public DN getSourceDn() {
+        return sourceDn;
+    }
+
+    public void setSourceDn(DN sourceDn) {
+        this.sourceDn = sourceDn;
+    }
+
+    public DN getTargetDn() {
+        return targetDn;
+    }
+
+    public void setTargetDn(DN targetDn) {
+        this.targetDn = targetDn;
+    }
+
+    public Filter getFilter() {
+        return filter;
+    }
+
+    public void setFilter(Filter filter) {
+        this.filter = filter;
+    }
+
+    public int getDepth() {
+        return depth;
+    }
+
+    public void setDepth(Integer depth) {
+        this.depth = depth;
+    }
 }
