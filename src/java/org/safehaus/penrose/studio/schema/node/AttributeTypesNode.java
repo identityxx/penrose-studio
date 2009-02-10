@@ -47,7 +47,7 @@ public class AttributeTypesNode extends Node {
     public AttributeTypesNode(ServersView view, String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
         schemaNode = (SchemaNode)parent;
-        projectNode = schemaNode.getProjectNode();
+        projectNode = schemaNode.getServerNode();
         this.view = projectNode.getServersView();
     }
 

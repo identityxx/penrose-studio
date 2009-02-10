@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Endi S. Dewata
  */
-public class EntrySelectionDialog extends Dialog {
+public class SelectEntryDialog extends Dialog {
 
     public Logger log = LoggerFactory.getLogger(getClass());
     Shell shell;
@@ -54,7 +54,7 @@ public class EntrySelectionDialog extends Dialog {
     String partitionName;
     DN dn;
 
-	public EntrySelectionDialog(Shell parent, int style) {
+	public SelectEntryDialog(Shell parent, int style) {
 		super(parent, style);
 
         shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);

@@ -27,6 +27,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
+import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.schema.SchemaManagerClient;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.studio.PenroseImage;
@@ -38,12 +39,9 @@ import java.util.Collection;
 /**
  * @author Endi S. Dewata
  */
-public class AttributeTypeSelectionDialog extends Dialog implements SelectionListener {
+public class SelectAttributeTypeDialog extends Dialog implements SelectionListener {
 
     Logger log = Logger.getLogger(getClass());
-
-    public final static int CANCEL = 0;
-    public final static int OK     = 1;
 
     Shell shell;
 
@@ -53,9 +51,9 @@ public class AttributeTypeSelectionDialog extends Dialog implements SelectionLis
     private SchemaManagerClient schemaManagerClient;
     private Collection<String> selections = new ArrayList<String>();
 
-    private int action = CANCEL;
+    private int action = Window.CANCEL;
 
-	public AttributeTypeSelectionDialog(Shell parent, int style) {
+	public SelectAttributeTypeDialog(Shell parent, int style) {
 		super(parent, style);
 
         shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
@@ -63,7 +61,7 @@ public class AttributeTypeSelectionDialog extends Dialog implements SelectionLis
         createControl(shell);
     }
 
-    public void open () {
+    public int open () {
 
         Point size = new Point(400, 300);
         shell.setSize(size);
@@ -81,6 +79,8 @@ public class AttributeTypeSelectionDialog extends Dialog implements SelectionLis
         while (!shell.isDisposed()) {
             if (!display.readAndDispatch()) display.sleep();
         }
+
+        return action;
     }
 
     public void createControl(final Shell parent) {
@@ -126,7 +126,7 @@ public class AttributeTypeSelectionDialog extends Dialog implements SelectionLis
                 for (TableItem item : items) {
                     selections.add(item.getText());
                 }
-                action = OK;
+                action = Window.OK;
                 shell.close();
 			}
 		});

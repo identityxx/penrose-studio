@@ -42,8 +42,8 @@ public class AdministratorNode extends Node {
 
     ServerNode serverNode;
 
-    public AdministratorNode(String name, Object object, Node parent) {
-        super(name, PenroseStudio.getImage(PenroseImage.ADMINISTRATOR), object, parent);
+    public AdministratorNode(String name, Node parent) {
+        super(name, PenroseStudio.getImage(PenroseImage.ADMINISTRATOR), null, parent);
         
         serverNode = (ServerNode)parent;
     }

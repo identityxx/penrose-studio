@@ -276,67 +276,7 @@ public class EntryLDAPPage extends FormPage {
                 }
             }
         });
-/*
-        Button addButton = new Button(composite, SWT.PUSH);
-		addButton.setText("Add");
 
-        addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        addButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                try {
-                    ObjectClassSelectionDialog dialog = new ObjectClassSelectionDialog(editor.getParent().getShell(), SWT.NONE);
-                    dialog.setText("Add object classes...");
-
-                    Server project = editor.getServer();
-                    PenroseClient client = project.getClient();
-                    SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
-
-                    Collection<String> ocNames = schemaManagerClient.getObjectClassNames();
-                    dialog.setObjectClasses(ocNames);
-
-                    dialog.open();
-
-                    for (String objectClass : dialog.getSelections()) {
-                        entryConfig.addObjectClass(objectClass);
-                    }
-
-                    refresh();
-                    checkDirty();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
-                }
-            }
-        });
-
-        Button removeButton = new Button(composite, SWT.PUSH);
-		removeButton.setText("Remove");
-
-        removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        removeButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                try {
-                    if (objectClassTable.getSelectionCount() == 0) return;
-
-                    TableItem items[] = objectClassTable.getSelection();
-                    for (TableItem item : items) {
-                        String objectClass = (String) item.getData();
-                        entryConfig.removeObjectClass(objectClass);
-                    }
-
-                    refresh();
-                    checkDirty();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
-                }
-            }
-        });
-*/
         return composite;
     }
 
@@ -361,57 +301,7 @@ public class EntryLDAPPage extends FormPage {
         attributeTable = new Table(parent, SWT.BORDER | SWT.FULL_SELECTION);
         attributeTable.setHeaderVisible(true);
         attributeTable.setLinesVisible(true);
-/*
-        attributeTable.addMouseListener(new MouseAdapter() {
-            public void mouseDoubleClick(MouseEvent event) {
-                try {
-                    editAttribute();
 
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-
-            public void mouseUp(MouseEvent event) {
-                try {
-                    //boolean found = false;
-                    for (int i=0; i<attributeTable.getItemCount(); i++) {
-                        TableItem item = attributeTable.getItem(i);
-                        EntryAttributeConfig ad = (EntryAttributeConfig)item.getData();
-
-                        item.setImage(PenroseStudio.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
-                        ad.setRdn(item.getChecked());
-                    }
-                    updateRdn();
-                    refresh();
-                    checkDirty();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-
-        });
-
-        attributeTable.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                try {
-                    for (int i=0; i<attributeTable.getItemCount(); i++) {
-                        TableItem item = attributeTable.getItem(i);
-                        EntryAttributeConfig ad = (EntryAttributeConfig)item.getData();
-
-                        item.setImage(PenroseStudio.getImage(item.getChecked() ? PenroseImage.KEY : PenroseImage.NOKEY));
-                        ad.setRdn(item.getChecked());
-                    }
-                    updateRdn();
-                    refresh();
-                    checkDirty();
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        });
-*/
         TableColumn tc = new TableColumn(attributeTable, SWT.LEFT);
         tc.setText("Attribute");
         tc.setWidth(150);
@@ -423,24 +313,7 @@ public class EntryLDAPPage extends FormPage {
         tc = new TableColumn(attributeTable, SWT.LEFT);
         tc.setText("RDN");
         tc.setWidth(50);
-/*
-        Menu menu = new Menu(attributeTable);
-        attributeTable.setMenu(menu);
 
-        MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Edit...");
-
-        mi.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                try {
-                    editAttribute();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        });
-*/
         return attributeTable;
     }
 
@@ -480,127 +353,8 @@ public class EntryLDAPPage extends FormPage {
                 }
             }
         });
-/*
-        Button addButton = new Button(composite, SWT.PUSH);
-		addButton.setText("Add");
 
-        addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        addButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                try {
-                    AttributeTypeSelectionDialog dialog = new AttributeTypeSelectionDialog(editor.getParent().getShell(), SWT.NONE);
-                    dialog.setText("Add attributes...");
-
-                    Server project = editor.getServer();
-                    PenroseClient client = project.getClient();
-                    dialog.setSchemaManagerClient(client.getSchemaManagerClient());
-
-                    dialog.open();
-                    if (dialog.getAction() == AttributeTypeSelectionDialog.CANCEL) return;
-
-                    for (String name : dialog.getSelections()) {
-                        EntryAttributeConfig ad = new EntryAttributeConfig();
-                        ad.setName(name);
-                        entryConfig.addAttributeConfig(ad);
-                    }
-
-                    refresh();
-                    checkDirty();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        });
-
-        Button editButton = new Button(composite, SWT.PUSH);
-		editButton.setText("Edit");
-
-        editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        editButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                try {
-                    editAttribute();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        });
-
-        Button removeButton = new Button(composite, SWT.PUSH);
-		removeButton.setText("Remove");
-
-        removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        removeButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                try {
-                    if (attributeTable.getSelectionCount() == 0) return;
-
-                    TableItem items[] = attributeTable.getSelection();
-                    for (TableItem item : items) {
-                        EntryAttributeConfig attributeMapping = (EntryAttributeConfig) item.getData();
-                        entryConfig.removeAttributeConfig(attributeMapping);
-                    }
-
-                    refresh();
-                    checkDirty();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
-                }
-            }
-        });
-*/
         return composite;
-    }
-
-    public void editAttribute() throws Exception {
-        if (attributeTable.getSelectionCount() == 0) return;
-
-        TableItem item = attributeTable.getSelection()[0];
-        EntryAttributeConfig ad = (EntryAttributeConfig)item.getData();
-
-        ExpressionDialog dialog = new ExpressionDialog(editor.getParent().getShell(), SWT.NONE);
-        dialog.setText("Edit attribute value/expression...");
-
-        Server project = editor.getServer();
-        PenroseClient client = project.getClient();
-        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(editor.getPartitionName());
-        SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
-
-        //PartitionConfig partitionConfig = editor.getPartitionConfig();
-        Collection<EntrySourceConfig> sources = entryConfig.getSourceConfigs();
-
-        for (EntrySourceConfig sourceMapping : sources) {
-
-            SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceMapping.getSourceName());
-            SourceConfig sourceConfig = sourceClient.getSourceConfig();
-
-            //SourceConfig sourceConfig = partitionConfig.getSourceConfigManager().getSourceConfig(sourceMapping.getSourceName());
-            dialog.addVariable(sourceMapping.getAlias());
-
-            for (FieldConfig fieldDefinition : sourceConfig.getFieldConfigs()) {
-                dialog.addVariable(sourceMapping.getAlias() + "." + fieldDefinition.getName());
-            }
-        }
-
-        dialog.setAttributeMapping(ad);
-
-        dialog.open();
-
-        if (dialog.getAction() == ExpressionDialog.CANCEL) return;
-
-        //entry.addEntryAttributeConfig(ad);
-
-        updateRdn();
-        refresh();
-        checkDirty();
     }
 
     public void refresh() throws Exception {
@@ -611,16 +365,8 @@ public class EntryLDAPPage extends FormPage {
 
         objectClassTable.removeAll();
         attributeTable.removeAll();
-/*
-        Map attributes = new TreeMap();
 
-        for (Iterator i=entry.getAttributeMappings().iterator(); i.hasNext(); ) {
-            AttributeMapping ad = (AttributeMapping)i.next();
-            attributes.put(ad.getName(), ad);
-        }
-*/
         Map<String,ObjectClass> objectClasses = getObjectClasses(entryConfig.getObjectClasses());
-        //completeAttributeTypes(objectClasses, attributes);
 
         for (ObjectClass objectClass : objectClasses.values()) {
             String ocName = objectClass.getName();

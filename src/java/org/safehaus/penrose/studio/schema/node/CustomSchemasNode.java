@@ -19,19 +19,16 @@ package org.safehaus.penrose.studio.schema.node;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.action.Action;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.schema.SchemaManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.schema.action.ImportSchemaAction;
 import org.safehaus.penrose.studio.schema.action.NewSchemaAction;
-import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.tree.Node;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
@@ -42,58 +39,49 @@ public class CustomSchemasNode extends SchemasNode {
 
     protected SchemasNode schemasNode;
 
-    public CustomSchemasNode(String name, String type, Object object, SchemasNode schemasNode) {
-        super(name, object, schemasNode.getProjectNode());
+    public CustomSchemasNode(String name, SchemasNode schemasNode) {
+        super(name, schemasNode.getServerNode());
 
         this.schemasNode = schemasNode;
     }
 
-    public void showMenu(IMenuManager manager) {
-        manager.add(new NewSchemaAction());
-        manager.add(new ImportSchemaAction());
-    }
+    public void update() throws Exception {
 
-    public boolean hasChildren() throws Exception {
-        return !getChildren().isEmpty();
-    }
-
-    public Collection<Node> getChildren() throws Exception {
-
-        Collection<Node> children = new ArrayList<Node>();
-
-        Server project = projectNode.getServer();
-        PenroseClient client = project.getClient();
+        Server server = serverNode.getServer();
+        PenroseClient client = server.getClient();
         SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
 
         for (String schemaName : schemaManagerClient.getCustomSchemaNames()) {
 
             SchemaNode schemaNode = new SchemaNode(
                     schemaName,
-                    PenroseStudio.getImage(PenroseImage.SCHEMA),
-                    schemaName,
                     this
             );
 
             children.add(schemaNode);
         }
-
-        return children;
     }
 
-    public ServersView getView() {
-        return view;
-    }
+    public void showMenu(IMenuManager manager) {
+        manager.add(new NewSchemaAction());
+        manager.add(new ImportSchemaAction());
 
-    public void setView(ServersView view) {
-        this.view = view;
-    }
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-    public ServerNode getProjectNode() {
-        return projectNode;
-    }
+        manager.add(new Action("Refresh") {
+            public void run() {
+                try {
+                    refresh();
 
-    public void setProjectNode(ServerNode projectNode) {
-        this.projectNode = projectNode;
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    penroseStudio.notifyChangeListeners();
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+        });
     }
 
     public SchemasNode getSchemasNode() {

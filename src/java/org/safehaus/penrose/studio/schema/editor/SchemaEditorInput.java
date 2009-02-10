@@ -27,8 +27,7 @@ import org.safehaus.penrose.studio.server.Server;
  */
 public class SchemaEditorInput implements IEditorInput {
 
-    private Server project;
-
+    private Server server;
     private String schemaName;
 
     public SchemaEditorInput() {
@@ -77,11 +76,11 @@ public class SchemaEditorInput implements IEditorInput {
         return true;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

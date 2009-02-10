@@ -25,12 +25,15 @@ import org.eclipse.swt.events.*;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.jface.window.Window;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.schema.ObjectClass;
-import org.safehaus.penrose.schema.Schema;
-import org.safehaus.penrose.studio.schema.dialog.ObjectClassDialog;
+import org.safehaus.penrose.schema.SchemaManagerClient;
+import org.safehaus.penrose.schema.SchemaClient;
+import org.safehaus.penrose.studio.schema.wizard.ObjectClassWizard;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.client.PenroseClient;
 import org.apache.log4j.Logger;
-
-import java.util.*;
 
 /**
  * @author Endi S. Dewata
@@ -44,13 +47,16 @@ public class ObjectClassesEditorPage extends FormPage {
     Table table;
 
     SchemaEditor editor;
-    Schema schema;
+
+    Server server;
+    String schemaName;
 
     public ObjectClassesEditorPage(SchemaEditor editor) {
         super(editor, "Object Classes", "  Object Classes  ");
 
         this.editor = editor;
-        this.schema = editor.getSchema();
+        this.server = editor.getServer();
+        this.schemaName = editor.getSchema().getName();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -89,12 +95,12 @@ public class ObjectClassesEditorPage extends FormPage {
         tc.setWidth(200);
 
         tc = new TableColumn(table, SWT.LEFT);
-        tc.setText("Name");
-        tc.setWidth(150);
+        tc.setText("Names");
+        tc.setWidth(200);
 
         tc = new TableColumn(table, SWT.LEFT);
         tc.setText("Description");
-        tc.setWidth(250);
+        tc.setWidth(200);
 
         Composite buttons = toolkit.createComposite(composite);
         buttons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
@@ -110,16 +116,26 @@ public class ObjectClassesEditorPage extends FormPage {
                 try {
                     ObjectClass objectClass = new ObjectClass();
 
-                    ObjectClassDialog dialog = new ObjectClassDialog(parent.getShell(), SWT.NONE);
-                    dialog.setObjectClass(objectClass);
-                    dialog.open();
+                    ObjectClassWizard wizard = new ObjectClassWizard();
+                    wizard.setWindowTitle("Add Object Class");
+                    wizard.setServer(server);
+                    wizard.setObjectClass(objectClass);
 
-                    if (dialog.getAction() == ObjectClassDialog.CANCEL) return;
+                    WizardDialog dialog = new WizardDialog(parent.getShell(), wizard);
+                    dialog.setPageSize(600, 300);
+                    int rc = dialog.open();
 
-                    schema.addObjectClass(objectClass);
+                    if (rc == Window.CANCEL) return;
+
+                    PenroseClient client = server.getClient();
+
+                    SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+                    SchemaClient schemaClient = schemaManagerClient.getSchemaClient(schemaName);
+                    schemaClient.addObjectClass(objectClass);
+                    schemaClient.store();
 
                     refresh();
-                    checkDirty();
+
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     throw new RuntimeException(e.getMessage(), e);
@@ -140,10 +156,14 @@ public class ObjectClassesEditorPage extends FormPage {
                     TableItem ti = table.getSelection()[0];
                     ObjectClass objectClass = (ObjectClass)ti.getData();
 
-                    schema.removeObjectClass(objectClass.getOid());
+                    PenroseClient client = server.getClient();
+
+                    SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+                    SchemaClient schemaClient = schemaManagerClient.getSchemaClient(schemaName);
+                    schemaClient.removeObjectClass(objectClass.getName());
+                    schemaClient.store();
 
                     refresh();
-                    checkDirty();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -158,14 +178,25 @@ public class ObjectClassesEditorPage extends FormPage {
                     TableItem ti = table.getSelection()[0];
                     ObjectClass objectClass = (ObjectClass)ti.getData();
 
-                    ObjectClassDialog dialog = new ObjectClassDialog(parent.getShell(), SWT.NONE);
-                    dialog.setObjectClass(objectClass);
-                    dialog.open();
+                    ObjectClassWizard wizard = new ObjectClassWizard();
+                    wizard.setWindowTitle("Edit Object Class");
+                    wizard.setServer(server);
+                    wizard.setObjectClass(objectClass);
 
-                    if (dialog.getAction() == ObjectClassDialog.CANCEL) return;
+                    WizardDialog dialog = new WizardDialog(parent.getShell(), wizard);
+                    dialog.setPageSize(600, 300);
+                    int rc = dialog.open();
+
+                    if (rc == Window.CANCEL) return;
+
+                    PenroseClient client = server.getClient();
+
+                    SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+                    SchemaClient schemaClient = schemaManagerClient.getSchemaClient(schemaName);
+                    schemaClient.updateObjectClass(objectClass.getName(), objectClass);
+                    schemaClient.store();
 
                     refresh();
-                    checkDirty();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -180,20 +211,31 @@ public class ObjectClassesEditorPage extends FormPage {
     public void refresh() {
         table.removeAll();
 
-        Collection list = schema.getObjectClasses();
+        try {
+            PenroseClient client = server.getClient();
 
-        for (Iterator i=list.iterator(); i.hasNext(); ) {
-            ObjectClass objectClass = (ObjectClass)i.next();
+            SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+            SchemaClient schemaClient = schemaManagerClient.getSchemaClient(schemaName);
 
-            TableItem item = new TableItem(table, SWT.NONE);
-            item.setText(0, objectClass.getOid());
-            item.setText(1, objectClass.getName());
-            item.setText(2, objectClass.getDescription() == null ? "" : objectClass.getDescription());
-            item.setData(objectClass);
+            log.debug("Object classes:");
+            for (ObjectClass objectClass : schemaClient.getObjectClasses()) {
+                log.debug(" - "+objectClass.getName());
+
+                StringBuilder sb = new StringBuilder();
+                for (String name : objectClass.getNames()) {
+                    if (sb.length() > 0) sb.append(" ");
+                    sb.append(name);
+                }
+
+                TableItem item = new TableItem(table, SWT.NONE);
+                item.setText(0, objectClass.getOid());
+                item.setText(1, sb.toString());
+                item.setText(2, objectClass.getDescription() == null ? "" : objectClass.getDescription());
+                item.setData(objectClass);
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
-    }
-
-    public void checkDirty() {
-        editor.checkDirty();
     }
 }

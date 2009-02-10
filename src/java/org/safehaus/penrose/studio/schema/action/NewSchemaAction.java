@@ -25,6 +25,8 @@ import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.schema.wizard.NewSchemaWizard;
+import org.safehaus.penrose.studio.schema.node.SchemasNode;
+import org.safehaus.penrose.studio.schema.node.CustomSchemasNode;
 import org.apache.log4j.Logger;
 
 
@@ -41,9 +43,9 @@ public class NewSchemaAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            ServerNode projectNode = serversView.getSelectedServerNode();
+            ServerNode serverNode = serversView.getSelectedServerNode();
 
-            NewSchemaWizard wizard = new NewSchemaWizard(projectNode.getServer());
+            NewSchemaWizard wizard = new NewSchemaWizard(serverNode.getServer());
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
@@ -51,10 +53,14 @@ public class NewSchemaAction extends Action {
 
             if (rc == Window.CANCEL) return;
 
+            SchemasNode schemasNode = serverNode.getSchemasNode();
+            CustomSchemasNode customSchemasNode = schemasNode.getCustomSchemasNode();
+            customSchemasNode.refresh();
+
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 
-            serversView.open(projectNode.getSchemasNode());
+            serversView.open(serverNode.getSchemasNode());
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

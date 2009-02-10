@@ -18,8 +18,8 @@ public class LoggingNode extends Node {
 
     ServersView view;
 
-    public LoggingNode(ServersView view, String name, Object object, Node parent) {
-        super(name, PenroseStudio.getImage(PenroseImage.FOLDER), object, parent);
+    public LoggingNode(ServersView view, String name, Node parent) {
+        super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, parent);
         this.view = view;
     }
 

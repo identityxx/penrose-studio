@@ -49,9 +49,7 @@ public class SchemaFileWizardPage extends WizardPage implements ModifyListener {
         Composite composite = new Composite(parent, SWT.NONE);
         setControl(composite);
 
-        GridLayout sectionLayout = new GridLayout();
-        sectionLayout.numColumns = 3;
-        composite.setLayout(sectionLayout);
+        composite.setLayout(new GridLayout(2, false));
 
         Label locationLabel = new Label(composite, SWT.NONE);
         locationLabel.setText("File:");

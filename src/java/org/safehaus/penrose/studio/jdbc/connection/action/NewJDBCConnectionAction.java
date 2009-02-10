@@ -24,7 +24,7 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.jdbc.connection.wizard.JDBCConnectionWizard;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.connection.ConnectionsNode;
+import org.safehaus.penrose.studio.connection.node.ConnectionsNode;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.apache.log4j.Logger;
 

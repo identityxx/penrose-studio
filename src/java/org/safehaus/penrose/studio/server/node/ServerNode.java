@@ -217,7 +217,6 @@ public class ServerNode extends Node {
                     partitionsNode = new PartitionsNode(
                             serversView,
                             "Partitions",
-                            "Partitions",
                             ServerNode.this);
                     partitionsNode.init();
 
@@ -225,19 +224,18 @@ public class ServerNode extends Node {
 
                     schemasNode = new SchemasNode(
                             "Schemas",
-                            "Schemas",
                             ServerNode.this);
+                    schemasNode.init();
+
                     children.add(schemasNode);
 
                     servicesNode = new ServicesNode(
-                            "Services",
                             "Services",
                             ServerNode.this);
                     children.add(servicesNode);
 
                     loggingNode = new LoggingNode(
                             serversView,
-                            "Logging",
                             "Logging",
                             ServerNode.this);
                     children.add(loggingNode);
@@ -253,12 +251,10 @@ public class ServerNode extends Node {
 
                     children.add(new AdministratorNode(
                             "Administrator",
-                            "Administrator",
                             ServerNode.this
                     ));
 
                     children.add(new SystemPropertiesNode(
-                            "System Properties",
                             "System Properties",
                             ServerNode.this
                     ));

@@ -34,15 +34,15 @@ public class ImportSchemaWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Server project;
+    private Server server;
 
     public SchemaNameWizardPage namePage = new SchemaNameWizardPage();
     public SchemaFileWizardPage filePage = new SchemaFileWizardPage();
 
-    public ImportSchemaWizard(Server project) {
+    public ImportSchemaWizard(Server server) {
         setWindowTitle("Import Schema");
 
-        this.project = project;
+        this.server = server;
     }
 
     public boolean canFinish() {
@@ -60,7 +60,7 @@ public class ImportSchemaWizard extends Wizard {
             SchemaReader reader = new SchemaReader();
             Schema schema = reader.read(file);
 
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
             schemaManagerClient.createSchema(schema);
 
@@ -81,11 +81,11 @@ public class ImportSchemaWizard extends Wizard {
         return true;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

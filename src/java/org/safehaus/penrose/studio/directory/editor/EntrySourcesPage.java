@@ -35,7 +35,6 @@ import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.EntryFieldConfig;
 import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.mapping.Expression;
-import org.safehaus.penrose.studio.directory.wizard.AttributesWizard;
 import org.safehaus.penrose.studio.directory.wizard.EntrySourceWizard;
 import org.safehaus.penrose.studio.directory.wizard.SourceFieldsWizard;
 
@@ -550,7 +549,7 @@ public class EntrySourcesPage extends FormPage { //implements ModifyListener {
         addField.addHyperlinkListener(new HyperlinkAdapter() {
             public void linkActivated(HyperlinkEvent event) {
                 try {
-                    FieldSelectionDialog dialog = new FieldSelectionDialog(editor.getParent().getShell(), SWT.NONE);
+                    FieldSelectionDialog dialog = new SelectFieldDialog(editor.getParent().getShell(), SWT.NONE);
                     dialog.setText("Add field...");
 
                     Server project = editor.getServer();

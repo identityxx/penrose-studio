@@ -21,7 +21,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -44,17 +43,18 @@ public class SchemaNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ServersView view;
-    protected ServerNode projectNode;
-    protected SchemasNode schemasNode;
+    ServerNode serverNode;
+    SchemasNode schemasNode;
 
-    private String schemaName;
+    String schemaName;
 
-    public SchemaNode(String name, Image image, Object object, SchemasNode parent) {
-        super(name, image, object, parent);
-        schemasNode = (SchemasNode)parent;
-        projectNode = schemasNode.getProjectNode();
-        schemaName = (String)object;
-        view = projectNode.getServersView();
+    public SchemaNode(String schemaName, SchemasNode parent) {
+        super(schemaName, PenroseStudio.getImage(PenroseImage.SCHEMA), null, parent);
+        
+        this.schemaName = schemaName;
+        schemasNode = parent;
+        serverNode = schemasNode.getServerNode();
+        view = serverNode.getServersView();
     }
 
     public void showMenu(IMenuManager manager) {
@@ -92,10 +92,10 @@ public class SchemaNode extends Node {
 
     public void open() throws Exception {
 
-        Server project = projectNode.getServer();
+        Server server = serverNode.getServer();
 
         SchemaEditorInput ei = new SchemaEditorInput();
-        ei.setProject(project);
+        ei.setServer(server);
         ei.setSchemaName(schemaName);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -112,52 +112,18 @@ public class SchemaNode extends Node {
 
         if (!confirm) return;
 
-        Server project = projectNode.getServer();
-        PenroseClient client = project.getClient();
+        Server server = serverNode.getServer();
+        PenroseClient client = server.getClient();
+        
         SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
         schemaManagerClient.removeSchema(schemaName);
+
+        parent.refresh();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
 
-    public boolean hasChildren() throws Exception {
-        return false;
-    }
-/*
-    public Collection getChildren() throws Exception {
-
-        Collection children = new ArrayList();
-
-        AttributeTypesNode attributeTypesNode = new AttributeTypesNode(
-                view,
-                ServersView.ATTRIBUTE_TYPES,
-                ServersView.ATTRIBUTE_TYPES,
-                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
-                ServersView.ATTRIBUTE_TYPES,
-                this
-        );
-
-        attributeTypesNode.setSchemaConfig(schemaConfig);
-
-        children.add(attributeTypesNode);
-
-        ObjectClassesNode objectClassesNode = new ObjectClassesNode(
-                view,
-                ServersView.OBJECT_CLASSES,
-                ServersView.OBJECT_CLASSES,
-                PenroseStudioPlugin.getImage(PenroseImage.FOLDER),
-                ServersView.OBJECT_CLASSES,
-                this
-        );
-
-        objectClassesNode.setSchemaConfig(schemaConfig);
-
-        children.add(objectClassesNode);
-
-        return children;
-    }
-*/
     public String getSchemaName() {
         return schemaName;
     }
@@ -166,12 +132,12 @@ public class SchemaNode extends Node {
         this.schemaName = schemaName;
     }
 
-    public ServerNode getProjectNode() {
-        return projectNode;
+    public ServerNode getServerNode() {
+        return serverNode;
     }
 
-    public void setProjectNode(ServerNode projectNode) {
-        this.projectNode = projectNode;
+    public void setServerNode(ServerNode serverNode) {
+        this.serverNode = serverNode;
     }
 
     public SchemasNode getSchemasNode() {

@@ -24,9 +24,6 @@ import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 /**
  * @author Endi S. Dewata
  */
@@ -35,57 +32,70 @@ public class SchemasNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     protected ServersView view;
-    protected ServerNode projectNode;
+    protected ServerNode serverNode;
 
-    public SchemasNode(String name, Object object, ServerNode projectNode) {
-        super(name, PenroseStudio.getImage(PenroseImage.FOLDER), object, projectNode);
+    private BuiltInSchemasNode builtInSchemasNode;
+    private CustomSchemasNode customSchemasNode;
 
-        this.projectNode = projectNode;
-        this.view = this.projectNode.getServersView();
+    public SchemasNode(String name, ServerNode serverNode) {
+        super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, serverNode);
+
+        this.serverNode = serverNode;
+        this.view = serverNode.getServersView();
     }
 
-    public boolean hasChildren() throws Exception {
-        return true;
+    public void init() throws Exception {
+        update();
     }
 
-    public Collection<Node> getChildren() throws Exception {
+    public void update() throws Exception {
 
-        Collection<Node> children = new ArrayList<Node>();
-
-        BuiltinSchemasNode builtinSchemas = new BuiltinSchemasNode(
+        builtInSchemasNode = new BuiltInSchemasNode(
                 "Built-in Schemas",
-                ServersView.BUILTIN_SCHEMA,
-                PenroseStudio.getImage(PenroseImage.SCHEMA),
                 this
         );
 
-        children.add(builtinSchemas);
+        builtInSchemasNode.init();
 
-        CustomSchemasNode customSchemasNode = new CustomSchemasNode(
+        children.add(builtInSchemasNode);
+
+        customSchemasNode = new CustomSchemasNode(
                 "Custom Schemas",
-                ServersView.CUSTOM_SCHEMA,
-                PenroseStudio.getImage(PenroseImage.SCHEMA),
                 this
         );
+
+        customSchemasNode.init();
 
         children.add(customSchemasNode);
-
-        return children;
     }
 
-    public ServersView getView() {
-        return view;
+
+    public void refresh() throws Exception {
+        children.clear();
+        update();
     }
 
-    public void setView(ServersView view) {
-        this.view = view;
+    public ServerNode getServerNode() {
+        return serverNode;
     }
 
-    public ServerNode getProjectNode() {
-        return projectNode;
+    public void setServerNode(ServerNode serverNode) {
+        this.serverNode = serverNode;
     }
 
-    public void setProjectNode(ServerNode projectNode) {
-        this.projectNode = projectNode;
+    public BuiltInSchemasNode getBuiltInSchemasNode() {
+        return builtInSchemasNode;
+    }
+
+    public void setBuiltInSchemasNode(BuiltInSchemasNode builtInSchemasNode) {
+        this.builtInSchemasNode = builtInSchemasNode;
+    }
+
+    public CustomSchemasNode getCustomSchemasNode() {
+        return customSchemasNode;
+    }
+
+    public void setCustomSchemasNode(CustomSchemasNode customSchemasNode) {
+        this.customSchemasNode = customSchemasNode;
     }
 }

@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.directory.wizard;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridData;
@@ -41,7 +42,7 @@ import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.directory.dialog.AttributeTypeSelectionDialog;
+import org.safehaus.penrose.studio.directory.dialog.SelectAttributeTypeDialog;
 import org.safehaus.penrose.studio.directory.dialog.ExpressionDialog;
 
 import java.util.*;
@@ -178,14 +179,14 @@ public class AttributesWizardPage extends WizardPage implements SelectionListene
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    AttributeTypeSelectionDialog dialog = new AttributeTypeSelectionDialog(parent.getShell(), SWT.NONE);
+                    SelectAttributeTypeDialog dialog = new SelectAttributeTypeDialog(parent.getShell(), SWT.NONE);
                     dialog.setText("Add attributes...");
 
                     PenroseClient client = server.getClient();
                     dialog.setSchemaManagerClient(client.getSchemaManagerClient());
 
-                    dialog.open();
-                    if (dialog.getAction() == AttributeTypeSelectionDialog.CANCEL) return;
+                    int rc = dialog.open();
+                    if (rc == Window.CANCEL) return;
 
                     for (String name : dialog.getSelections()) {
                         EntryAttributeConfig ad = new EntryAttributeConfig();

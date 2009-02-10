@@ -19,19 +19,19 @@ public class SchemaEditor extends FormEditor {
 
     Logger log = Logger.getLogger(getClass());
 
-    Server project;
+    Server server;
 
-    public Schema origSchema;
-    public Schema schema;
+    Schema origSchema;
+    Schema schema;
 
     boolean dirty;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         SchemaEditorInput ei = (SchemaEditorInput)input;
-        project = ei.getProject();
+        server = ei.getServer();
 
         try {
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
             origSchema = schemaManagerClient.getSchema(ei.getSchemaName());
             schema = (Schema)origSchema.clone();
@@ -74,7 +74,7 @@ public class SchemaEditor extends FormEditor {
 
     public void store() throws Exception {
 
-        PenroseClient client = project.getClient();
+        PenroseClient client = server.getClient();
         SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
         schemaManagerClient.updateSchema(origSchema.getName(), schema);
 
@@ -84,29 +84,10 @@ public class SchemaEditor extends FormEditor {
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
-
-        checkDirty();
     }
 
     public boolean isDirty() {
         return dirty;
-    }
-
-    public void checkDirty() {
-        try {
-            dirty = false;
-
-            if (!origSchema.equals(schema)) {
-                dirty = true;
-                return;
-            }
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-
-        } finally {
-            firePropertyChange(PROP_DIRTY);
-        }
     }
 
     public Schema getSchema() {
@@ -115,5 +96,13 @@ public class SchemaEditor extends FormEditor {
 
     public void setSchema(Schema schema) {
         this.schema = schema;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

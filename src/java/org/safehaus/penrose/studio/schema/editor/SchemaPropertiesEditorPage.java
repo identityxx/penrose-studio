@@ -43,19 +43,16 @@ public class SchemaPropertiesEditorPage extends FormPage {
     
     FormToolkit toolkit;
 
-    Text nameText;
-    //Text pathText;
+    Label nameText;
 
     SchemaEditor editor;
     Schema schema;
-    //SchemaConfig schemaConfig;
 
     public SchemaPropertiesEditorPage(SchemaEditor editor) {
         super(editor, "PROPERTIES", "  Properties  ");
 
         this.editor = editor;
         this.schema = editor.getSchema();
-        //this.schemaConfig = editor.getSchema().getSchemaConfig();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -87,38 +84,13 @@ public class SchemaPropertiesEditorPage extends FormPage {
         gd.widthHint = 100;
         nameLabel.setLayoutData(gd);
 
-        nameText = toolkit.createText(composite, schema.getName(), SWT.BORDER);
+        nameText = toolkit.createLabel(composite, schema.getName(), SWT.NONE);
         nameText.setEnabled(false);
         nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        nameText.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent event) {
-                schema.setName(nameText.getText());
-                checkDirty();
-            }
-        });
-/*
-        Label pathLabel = toolkit.createLabel(composite, "Path:");
-        pathLabel.setLayoutData(new GridData());
-
-        pathText = toolkit.createText(composite, schemaConfig.getPath(), SWT.BORDER);
-        pathText.setEnabled(false);
-        pathText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        pathText.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent event) {
-                schemaConfig.setPath(pathText.getText());
-                checkDirty();
-            }
-        });
-*/
         return composite;
     }
 
     public void refresh() {
-    }
-
-    public void checkDirty() {
-        editor.checkDirty();
     }
 }

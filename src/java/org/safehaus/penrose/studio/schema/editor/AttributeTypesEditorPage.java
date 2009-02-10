@@ -25,12 +25,15 @@ import org.eclipse.swt.events.*;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
-import org.safehaus.penrose.schema.Schema;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.schema.AttributeType;
-import org.safehaus.penrose.studio.schema.dialog.AttributeTypeDialog;
+import org.safehaus.penrose.schema.SchemaManagerClient;
+import org.safehaus.penrose.schema.SchemaClient;
+import org.safehaus.penrose.studio.schema.wizard.AttributeTypeWizard;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.client.PenroseClient;
 import org.apache.log4j.Logger;
-
-import java.util.*;
 
 /**
  * @author Endi S. Dewata
@@ -44,13 +47,16 @@ public class AttributeTypesEditorPage extends FormPage {
     Table table;
 
     SchemaEditor editor;
-    Schema schema;
+
+    Server server;
+    String schemaName;
 
     public AttributeTypesEditorPage(SchemaEditor editor) {
         super(editor, "Attribute Types", "  Attribute Types  ");
 
         this.editor = editor;
-        this.schema = editor.getSchema();
+        this.server = editor.getServer();
+        this.schemaName = editor.getSchema().getName();
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -89,12 +95,12 @@ public class AttributeTypesEditorPage extends FormPage {
         tc.setWidth(200);
 
         tc = new TableColumn(table, SWT.LEFT);
-        tc.setText("Name");
-        tc.setWidth(150);
+        tc.setText("Names");
+        tc.setWidth(200);
 
         tc = new TableColumn(table, SWT.LEFT);
         tc.setText("Description");
-        tc.setWidth(250);
+        tc.setWidth(200);
 
         Composite buttons = toolkit.createComposite(composite);
         buttons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
@@ -110,16 +116,25 @@ public class AttributeTypesEditorPage extends FormPage {
                 try {
                     AttributeType attributeType = new AttributeType();
 
-                    AttributeTypeDialog dialog = new AttributeTypeDialog(parent.getShell(), SWT.NONE);
-                    dialog.setAttributeType(attributeType);
-                    dialog.open();
+                    AttributeTypeWizard wizard = new AttributeTypeWizard();
+                    wizard.setWindowTitle("Add Attribute Type");
+                    wizard.setAttributeType(attributeType);
 
-                    if (dialog.getAction() == AttributeTypeDialog.CANCEL) return;
+                    WizardDialog dialog = new WizardDialog(parent.getShell(), wizard);
+                    dialog.setPageSize(600, 300);
+                    int rc = dialog.open();
 
-                    schema.addAttributeType(attributeType);
+                    if (rc == Window.CANCEL) return;
+
+                    PenroseClient client = server.getClient();
+
+                    SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+                    SchemaClient schemaClient = schemaManagerClient.getSchemaClient(schemaName);
+                    schemaClient.addAttributeType(attributeType);
+                    schemaClient.store();
 
                     refresh();
-                    checkDirty();
+
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     throw new RuntimeException(e.getMessage(), e);
@@ -140,10 +155,14 @@ public class AttributeTypesEditorPage extends FormPage {
                     TableItem ti = table.getSelection()[0];
                     AttributeType attributeType = (AttributeType)ti.getData();
 
-                    schema.removeAttributeType(attributeType.getOid());
+                    PenroseClient client = server.getClient();
+
+                    SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+                    SchemaClient schemaClient = schemaManagerClient.getSchemaClient(schemaName);
+                    schemaClient.removeAttributeType(attributeType.getName());
+                    schemaClient.store();
 
                     refresh();
-                    checkDirty();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -158,14 +177,24 @@ public class AttributeTypesEditorPage extends FormPage {
                     TableItem ti = table.getSelection()[0];
                     AttributeType attributeType = (AttributeType)ti.getData();
 
-                    AttributeTypeDialog dialog = new AttributeTypeDialog(parent.getShell(), SWT.NONE);
-                    dialog.setAttributeType(attributeType);
-                    dialog.open();
+                    AttributeTypeWizard wizard = new AttributeTypeWizard();
+                    wizard.setWindowTitle("Edit Attribute Type");
+                    wizard.setAttributeType(attributeType);
 
-                    if (dialog.getAction() == AttributeTypeDialog.CANCEL) return;
+                    WizardDialog dialog = new WizardDialog(parent.getShell(), wizard);
+                    dialog.setPageSize(600, 300);
+                    int rc = dialog.open();
+
+                    if (rc == Window.CANCEL) return;
+
+                    PenroseClient client = server.getClient();
+
+                    SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+                    SchemaClient schemaClient = schemaManagerClient.getSchemaClient(schemaName);
+                    schemaClient.updateAttributeType(attributeType.getName(), attributeType);
+                    schemaClient.store();
 
                     refresh();
-                    checkDirty();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -180,22 +209,31 @@ public class AttributeTypesEditorPage extends FormPage {
     public void refresh() {
         table.removeAll();
 
-        Collection list = schema.getAttributeTypes();
+        try {
+            PenroseClient client = server.getClient();
 
-        log.debug("Attribute type:");
-        for (Iterator i=list.iterator(); i.hasNext(); ) {
-            AttributeType attributeType = (AttributeType)i.next();
-            log.debug(" - "+attributeType.getName());
+            SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+            SchemaClient schemaClient = schemaManagerClient.getSchemaClient(schemaName);
 
-            TableItem item = new TableItem(table, SWT.NONE);
-            item.setText(0, attributeType.getOid());
-            item.setText(1, attributeType.getName());
-            item.setText(2, attributeType.getDescription() == null ? "" : attributeType.getDescription());
-            item.setData(attributeType);
+            log.debug("Attribute type:");
+            for (AttributeType attributeType : schemaClient.getAttributeTypes()) {
+                log.debug(" - "+attributeType.getName());
+
+                StringBuilder sb = new StringBuilder();
+                for (String name : attributeType.getNames()) {
+                    if (sb.length() > 0) sb.append(" ");
+                    sb.append(name);
+                }
+
+                TableItem item = new TableItem(table, SWT.NONE);
+                item.setText(0, attributeType.getOid());
+                item.setText(1, sb.toString());
+                item.setText(2, attributeType.getDescription() == null ? "" : attributeType.getDescription());
+                item.setData(attributeType);
+            }
+            
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
-    }
-
-    public void checkDirty() {
-        editor.checkDirty();
     }
 }

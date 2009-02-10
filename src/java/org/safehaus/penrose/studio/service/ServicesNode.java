@@ -42,8 +42,8 @@ public class ServicesNode extends Node {
     private ServersView view;
     private ServerNode projectNode;
 
-    public ServicesNode(String name, Object object, Node parent) {
-        super(name, PenroseStudio.getImage(PenroseImage.FOLDER), object, parent);
+    public ServicesNode(String name, Node parent) {
+        super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, parent);
         
         projectNode = (ServerNode)parent;
         view = projectNode.getServersView();

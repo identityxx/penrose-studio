@@ -43,9 +43,7 @@ public class SchemaNameWizardPage extends WizardPage implements ModifyListener {
         Composite composite = new Composite(parent, SWT.NONE);
         setControl(composite);
 
-        GridLayout sectionLayout = new GridLayout();
-        sectionLayout.numColumns = 2;
-        composite.setLayout(sectionLayout);
+        composite.setLayout(new GridLayout(2, false));
 
         Label nameLabel = new Label(composite, SWT.NONE);
         nameLabel.setText("Name:");

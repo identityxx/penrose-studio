@@ -34,7 +34,7 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.directory.dialog.ExpressionDialog;
-import org.safehaus.penrose.studio.directory.dialog.FieldSelectionDialog;
+import org.safehaus.penrose.studio.directory.dialog.SelectFieldDialog;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.source.SourceManagerClient;
@@ -115,7 +115,7 @@ public class SourceFieldsWizardPage extends WizardPage implements SelectionListe
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    FieldSelectionDialog dialog = new FieldSelectionDialog(parent.getShell(), SWT.NONE);
+                    SelectFieldDialog dialog = new SelectFieldDialog(parent.getShell(), SWT.NONE);
                     dialog.setText("Add field...");
 
                     PenroseClient client = server.getClient();

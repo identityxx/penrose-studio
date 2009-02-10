@@ -33,7 +33,7 @@ import java.util.ArrayList;
 /**
  * @author Endi S. Dewata
  */
-public class ObjectClassSelectionDialog extends Dialog {
+public class SelectObjectClassDialog extends Dialog {
 
     Shell shell;
 
@@ -41,7 +41,7 @@ public class ObjectClassSelectionDialog extends Dialog {
 
     private Collection<String> selections = new ArrayList<String>();
 
-	public ObjectClassSelectionDialog(Shell parent, int style) {
+	public SelectObjectClassDialog(Shell parent, int style) {
 		super(parent, style);
 
         shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);

@@ -34,14 +34,18 @@ public class NewSchemaWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Server project;
+    private Server server;
 
     public SchemaNameWizardPage namePage = new SchemaNameWizardPage();
 
-    public NewSchemaWizard(Server project) {
+    public NewSchemaWizard(Server server) {
         setWindowTitle("New Schema");
 
-        this.project = project;
+        this.server = server;
+    }
+
+    public void addPages() {
+        addPage(namePage);
     }
 
     public boolean canFinish() {
@@ -81,7 +85,7 @@ public class NewSchemaWizard extends Wizard {
 
             Schema schema = new Schema(name);
 
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
             schemaManagerClient.createSchema(schema);
 
@@ -93,19 +97,15 @@ public class NewSchemaWizard extends Wizard {
         }
     }
 
-    public void addPages() {
-        addPage(namePage);
-    }
-
     public boolean needsPreviousAndNextButtons() {
         return true;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

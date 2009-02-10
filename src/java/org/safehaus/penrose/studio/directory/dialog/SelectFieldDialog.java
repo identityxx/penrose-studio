@@ -34,7 +34,7 @@ import java.util.ArrayList;
 /**
  * @author Endi S. Dewata
  */
-public class FieldSelectionDialog extends Dialog {
+public class SelectFieldDialog extends Dialog {
 
     Shell shell;
 
@@ -44,7 +44,7 @@ public class FieldSelectionDialog extends Dialog {
 
     private Collection<String> selections = new ArrayList<String>();
 
-	public FieldSelectionDialog(Shell parent, int style) {
+	public SelectFieldDialog(Shell parent, int style) {
 		super(parent, style);
 
         shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
