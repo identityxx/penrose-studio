@@ -49,6 +49,7 @@ public class AttributeTypeOptionsWizardPage extends WizardPage {
 
     public AttributeTypeOptionsWizardPage() {
         super(NAME);
+        setDescription("Enter the attribute type properties.");
     }
 
     public void createControl(Composite parent) {

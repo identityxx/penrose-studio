@@ -31,7 +31,7 @@ import org.safehaus.penrose.client.PenroseClient;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
-import java.util.ArrayList;
+import java.util.TreeSet;
 
 /**
  * @author Endi S. Dewata
@@ -46,8 +46,8 @@ public class ObjectClassAttributesWizardPage extends WizardPage {
     Table optionalAttributesTable;
 
     Server server;
-    Collection<String> requiredAttributes = new ArrayList<String>();
-    Collection<String> optionalAttributes = new ArrayList<String>();
+    Collection<String> requiredAttributes = new TreeSet<String>();
+    Collection<String> optionalAttributes = new TreeSet<String>();
 
 	public ObjectClassAttributesWizardPage() {
 		super(NAME);

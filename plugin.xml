@@ -41,6 +41,11 @@
             icon="${images.logo}"
             class="org.safehaus.penrose.studio.welcome.WelcomeEditor"/>
         <editor
+            id="org.safehaus.penrose.studio.partition.editor.PartitionEditor"
+            name="Partition"
+            icon="${images.partition}"
+            class="org.safehaus.penrose.studio.partition.editor.PartitionEditor"/>
+        <editor
             id="org.safehaus.penrose.studio.connection.editor.ConnectionEditor"
             name="Connection"
             icon="${images.connection}"

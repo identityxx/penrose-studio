@@ -135,7 +135,7 @@ public class PartitionsNode extends Node {
 
         for (PartitionNode oldPartitionNode : (PartitionNode[])object) {
 
-            Server oldProject = oldPartitionNode.getProjectNode().getServer();
+            Server oldProject = oldPartitionNode.getServerNode().getServer();
             PenroseClient oldClient = oldProject.getClient();
             PartitionManagerClient oldPartitionManagerClient = oldClient.getPartitionManagerClient();
 

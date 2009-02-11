@@ -15,38 +15,42 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.module;
+package org.safehaus.penrose.studio.module.node;
 
-import org.apache.log4j.Logger;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.IWorkbenchActionConstants;
-import org.safehaus.penrose.module.ModuleClient;
-import org.safehaus.penrose.partition.PartitionClient;
-import org.safehaus.penrose.partition.PartitionManagerClient;
-import org.safehaus.penrose.client.PenroseClient;
+import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.server.node.ServerNode;
+import org.safehaus.penrose.studio.tree.Node;
+import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.partition.node.PartitionsNode;
+import org.safehaus.penrose.studio.partition.node.PartitionNode;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.module.editor.ModuleEditorInput;
+import org.safehaus.penrose.studio.module.editor.ModuleEditor;
 import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
+import org.safehaus.penrose.module.ModuleClient;
 import org.safehaus.penrose.module.ModuleManagerClient;
-import org.safehaus.penrose.studio.PenroseImage;
-import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.module.action.NewModuleAction;
-import org.safehaus.penrose.studio.partition.node.PartitionNode;
-import org.safehaus.penrose.studio.partition.node.PartitionsNode;
-import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.server.node.ServerNode;
-import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.tree.Node;
+import org.safehaus.penrose.client.PenroseClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.swt.graphics.Image;
+import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
  */
-public class ModulesNode extends Node {
+public class ModuleNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -54,13 +58,16 @@ public class ModulesNode extends Node {
     private ServerNode projectNode;
     private PartitionsNode partitionsNode;
     private PartitionNode partitionNode;
+    private ModulesNode modulesNode;
 
     private String partitionName;
+    private String moduleName;
 
-    public ModulesNode(String name, Image image, Object object, Node parent) {
+    public ModuleNode(String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
 
-        partitionNode = (PartitionNode)parent;
+        modulesNode = (ModulesNode)parent;
+        partitionNode = modulesNode.getPartitionNode();
         partitionsNode = partitionNode.getPartitionsNode();
         projectNode = partitionsNode.getProjectNode();
         serversView = projectNode.getServersView();
@@ -68,9 +75,27 @@ public class ModulesNode extends Node {
 
     public void showMenu(IMenuManager manager) {
 
-        manager.add(new NewModuleAction(this));
+        manager.add(new Action("Open") {
+            public void run() {
+                try {
+                    open();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(new Action("Copy") {
+            public void run() {
+                try {
+                    copy();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
 
         manager.add(new Action("Paste") {
             public void run() {
@@ -81,6 +106,69 @@ public class ModulesNode extends Node {
                 }
             }
         });
+
+        manager.add(new Action("Delete", PenroseStudio.getImageDescriptor(PenroseImage.DELETE_SMALL)) {
+            public void run() {
+                try {
+                    remove();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+	}
+
+    public void open() throws Exception {
+
+        ModuleEditorInput ei = new ModuleEditorInput();
+        ei.setServer(projectNode.getServer());
+        ei.setPartitionName(partitionName);
+        ei.setModuleName(moduleName);
+
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        IWorkbenchPage page = window.getActivePage();
+        page.openEditor(ei, ModuleEditor.class.getName());
+    }
+
+    public void remove() throws Exception {
+
+        boolean confirm = MessageDialog.openQuestion(
+                serversView.getSite().getShell(),
+                "Confirmation", "Remove Module \""+ moduleName+"\"?"
+        );
+
+        if (!confirm) return;
+
+        Server project = projectNode.getServer();
+/*
+        ModuleConfigManager moduleConfigManager = partitionConfig.getModuleConfigManager();
+        moduleConfigManager.removeModuleMapping(moduleConfig.getName());
+        moduleConfigManager.removeModuleConfig(moduleConfig.getName());
+
+        project.save(partitionConfig, moduleConfigManager);
+*/
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        ModuleManagerClient moduleManagerClient = partitionClient.getModuleManagerClient();
+
+        moduleManagerClient.removeModule(moduleName);
+
+        partitionClient.store();
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
+    }
+
+    public void copy() throws Exception {
+        Server project = projectNode.getServer();
+        PenroseClient client = project.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        ModuleManagerClient moduleManagerClient = partitionClient.getModuleManagerClient();
+
+        ModuleClient moduleClient = moduleManagerClient.getModuleClient(moduleName);
+        serversView.setClipboard(moduleClient.getModuleConfig());
     }
 
     public void paste() throws Exception {
@@ -111,7 +199,6 @@ public class ModulesNode extends Node {
             for (ModuleMapping mapping : mappings) {
                 ModuleMapping newMapping = (ModuleMapping) ((ModuleMapping) mapping).clone();
                 newMapping.setModuleName(name);
-                newMapping.setModuleConfig(newModuleConfig);
                 moduleConfigManager.addModuleMapping(newMapping);
             }
         }
@@ -150,45 +237,20 @@ public class ModulesNode extends Node {
         penroseStudio.notifyChangeListeners();
     }
 
-    public boolean hasChildren() throws Exception {
-        return !getChildren().isEmpty();
-    }
-
-    public Collection<Node> getChildren() throws Exception {
-
-        Collection<Node> children = new ArrayList<Node>();
-
-        Server project = projectNode.getServer();
-        PenroseClient client = project.getClient();
-        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-        ModuleManagerClient moduleManagerClient = partitionClient.getModuleManagerClient();
-
-        Collection<String> moduleNames = moduleManagerClient.getModuleNames();
-        for (String moduleName : moduleNames) {
-
-            ModuleNode moduleNode = new ModuleNode(
-                    moduleName,
-                    PenroseStudio.getImage(PenroseImage.MODULE),
-                    moduleName,
-                    this
-            );
-
-            moduleNode.setPartitionName(partitionName);
-            moduleNode.setModuleName(moduleName);
-
-            children.add(moduleNode);
-        }
-
-        return children;
-    }
-
     public String getPartitionName() {
         return partitionName;
     }
 
     public void setPartitionName(String partitionName) {
         this.partitionName = partitionName;
+    }
+
+    public String getModuleName() {
+        return moduleName;
+    }
+
+    public void setModuleName(String moduleName) {
+        this.moduleName = moduleName;
     }
 
     public ServersView getServersView() {
@@ -221,5 +283,13 @@ public class ModulesNode extends Node {
 
     public void setPartitionNode(PartitionNode partitionNode) {
         this.partitionNode = partitionNode;
+    }
+
+    public ModulesNode getModulesNode() {
+        return modulesNode;
+    }
+
+    public void setModulesNode(ModulesNode modulesNode) {
+        this.modulesNode = modulesNode;
     }
 }

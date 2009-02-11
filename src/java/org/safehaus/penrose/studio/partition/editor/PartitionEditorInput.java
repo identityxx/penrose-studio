@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.module.editor;
+package org.safehaus.penrose.studio.partition.editor;
 
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
@@ -25,13 +25,12 @@ import org.safehaus.penrose.studio.server.Server;
 /**
  * @author Endi S. Dewata
  */
-public class ModuleEditorInput implements IEditorInput {
+public class PartitionEditorInput implements IEditorInput {
 
     private Server server;
     private String partitionName;
-    private String moduleName;
 
-    public ModuleEditorInput() {
+    public PartitionEditorInput() {
     }
 
     public boolean exists() {
@@ -43,7 +42,7 @@ public class ModuleEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return partitionName+"."+moduleName;
+        return partitionName;
     }
 
     public IPersistableElement getPersistable() {
@@ -63,8 +62,8 @@ public class ModuleEditorInput implements IEditorInput {
         if (object == null) return false;
         if (object.getClass() != this.getClass()) return false;
 
-        ModuleEditorInput ei = (ModuleEditorInput)object;
-        return moduleName.equals(ei.moduleName);
+        PartitionEditorInput ei = (PartitionEditorInput)object;
+        return partitionName.equals(ei.partitionName);
     }
 
     public Server getServer() {
@@ -73,14 +72,6 @@ public class ModuleEditorInput implements IEditorInput {
 
     public void setServer(Server server) {
         this.server = server;
-    }
-
-    public String getModuleName() {
-        return moduleName;
-    }
-
-    public void setModuleName(String moduleName) {
-        this.moduleName = moduleName;
     }
 
     public String getPartitionName() {
