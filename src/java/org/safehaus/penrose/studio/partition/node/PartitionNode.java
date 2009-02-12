@@ -43,7 +43,7 @@ import org.safehaus.penrose.studio.partition.editor.PartitionEditor;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.source.SourcesNode;
+import org.safehaus.penrose.studio.source.node.SourcesNode;
 import org.safehaus.penrose.studio.tree.Node;
 
 import java.util.ArrayList;
@@ -72,7 +72,7 @@ public class PartitionNode extends Node {
         this.partitionName = partitionName;
 
         partitionsNode = (PartitionsNode)parent;
-        serverNode = partitionsNode.getProjectNode();
+        serverNode = partitionsNode.getServerNode();
         view = serverNode.getServersView();
     }
 
@@ -295,16 +295,14 @@ public class PartitionNode extends Node {
 
         if (!confirm) return;
 
-        Server project = serverNode.getServer();
-        PenroseClient client = project.getClient();
+        Server server = serverNode.getServer();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 
         for (Node node : view.getSelectedNodes()) {
             if (!(node instanceof PartitionNode)) continue;
 
             PartitionNode partitionNode = (PartitionNode)node;
-            //partitionsNode.removePartitionConfig(partitionNode.getPartitionName());
-            
             partitionManagerClient.removePartition(partitionNode.getPartitionName());
         }
 

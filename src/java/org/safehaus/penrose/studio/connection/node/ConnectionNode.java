@@ -70,7 +70,7 @@ public class ConnectionNode extends Node {
         connectionsNode = (ConnectionsNode)parent;
         partitionNode = connectionsNode.getPartitionNode();
         partitionsNode = partitionNode.getPartitionsNode();
-        projectNode = partitionsNode.getProjectNode();
+        projectNode = partitionsNode.getServerNode();
         this.view = projectNode.getServersView();
     }
 

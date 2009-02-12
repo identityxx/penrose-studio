@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.source;
+package org.safehaus.penrose.studio.source.node;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
@@ -69,7 +69,7 @@ public class SourceNode extends Node {
         sourcesNode = (SourcesNode)parent;
         partitionNode = sourcesNode.getPartitionNode();
         partitionsNode = partitionNode.getPartitionsNode();
-        projectNode = partitionsNode.getProjectNode();
+        projectNode = partitionsNode.getServerNode();
         view = projectNode.getServersView();
     }
 

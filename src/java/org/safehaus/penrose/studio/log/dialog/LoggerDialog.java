@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.logger;
+package org.safehaus.penrose.studio.log.dialog;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -26,9 +26,9 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.logger.log4j.LoggerConfig;
-import org.safehaus.penrose.logger.log4j.RootConfig;
-import org.safehaus.penrose.logger.log4j.Log4jConfig;
+import org.safehaus.penrose.log.log4j.LoggerConfig;
+import org.safehaus.penrose.log.log4j.RootConfig;
+import org.safehaus.penrose.log.log4j.Log4jConfig;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -114,12 +114,12 @@ public class LoggerDialog extends Dialog {
                     loggerConfig.setName(getLoggerName());
                     loggerConfig.setLevel(getLoggerLevel());
                     loggerConfig.setAdditivity(getAdditivity());
-                    loggerConfig.setAppenders(getAppenders());
+                    loggerConfig.setAppenderNames(getAppenders());
                 }
 
                 if (rootConfig != null) {
                     rootConfig.setLevel(getLoggerLevel());
-                    rootConfig.setAppenders(getAppenders());
+                    rootConfig.setAppenderNames(getAppenders());
                 }
 
                 action = OK;
@@ -280,7 +280,7 @@ public class LoggerDialog extends Dialog {
         setLoggerName(loggerConfig.getName());
         setLoggerLevel(loggerConfig.getLevel());
         setAdditivity(loggerConfig.isAdditivity());
-        setAppenders(loggerConfig.getAppenders());
+        setAppenders(loggerConfig.getAppenderNames());
     }
 
     public void setAdditivity(boolean additivity) {
@@ -297,6 +297,6 @@ public class LoggerDialog extends Dialog {
         setLoggerName("Root Logger");
         setLoggerLevel(rootConfig.getLevel());
         additivityCheckbox.setEnabled(false);
-        setAppenders(rootConfig.getAppenders());
+        setAppenders(rootConfig.getAppenderNames());
     }
 }

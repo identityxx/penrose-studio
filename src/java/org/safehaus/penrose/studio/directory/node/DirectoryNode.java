@@ -59,7 +59,7 @@ public class DirectoryNode extends Node {
         super(name, image, object, parent);
         PartitionNode partitionNode = (PartitionNode)parent;
         PartitionsNode partitionsNode = partitionNode.getPartitionsNode();
-        serverNode = partitionsNode.getProjectNode();
+        serverNode = partitionsNode.getServerNode();
         view = serverNode.getServersView();
     }
 

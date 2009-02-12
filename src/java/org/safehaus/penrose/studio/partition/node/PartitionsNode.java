@@ -28,6 +28,7 @@ import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.*;
+import org.safehaus.penrose.studio.action.RefreshAction;
 import org.safehaus.penrose.studio.partition.action.*;
 import org.safehaus.penrose.studio.partition.dialog.PartitionDialog;
 import org.safehaus.penrose.studio.server.Server;
@@ -45,12 +46,12 @@ public class PartitionsNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     protected ServersView view;
-    protected ServerNode projectNode;
+    protected ServerNode serverNode;
 
-    public PartitionsNode(ServersView view, String name, Node parent) {
-        super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, parent);
+    public PartitionsNode(ServersView view, String name, ServerNode serverNode) {
+        super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, serverNode);
         this.view = view;
-        projectNode = (ServerNode)parent;
+        this.serverNode = serverNode;
     }
 
     public void init() throws Exception {
@@ -69,8 +70,8 @@ public class PartitionsNode extends Node {
 
         children.add(defaultPartitionName);
 
-        Server project = projectNode.getServer();
-        PenroseClient client = project.getClient();
+        Server server = serverNode.getServer();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 
         for (String partitionName : partitionManagerClient.getPartitionNames()) {
@@ -126,7 +127,7 @@ public class PartitionsNode extends Node {
 
         view.setClipboard(null);
 
-        Server project = projectNode.getServer();
+        Server project = serverNode.getServer();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 
@@ -180,11 +181,11 @@ public class PartitionsNode extends Node {
         penroseStudio.notifyChangeListeners();
     }
 
-    public ServerNode getProjectNode() {
-        return projectNode;
+    public ServerNode getServerNode() {
+        return serverNode;
     }
 
-    public void setProjectNode(ServerNode projectNode) {
-        this.projectNode = projectNode;
+    public void setServerNode(ServerNode serverNode) {
+        this.serverNode = serverNode;
     }
 }

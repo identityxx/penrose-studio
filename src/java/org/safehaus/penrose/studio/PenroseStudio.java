@@ -30,9 +30,9 @@ import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.plugin.*;
 import org.safehaus.penrose.studio.nis.NISPlugin;
 import org.safehaus.penrose.studio.image.ImageManager;
-import org.safehaus.penrose.logger.log4j.Log4jConfigReader;
-import org.safehaus.penrose.logger.log4j.Log4jConfig;
-import org.safehaus.penrose.logger.log4j.Log4jConfigWriter;
+import org.safehaus.penrose.log.log4j.Log4jConfigWriter;
+import org.safehaus.penrose.log.log4j.Log4jConfig;
+import org.safehaus.penrose.log.log4j.Log4jConfigReader;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
@@ -221,8 +221,8 @@ public class PenroseStudio implements IPlatformRunnable {
 
     public void loadLoggingConfig(File dir) throws Exception {
         try {
-            Log4jConfigReader reader = new Log4jConfigReader(new File(dir, "conf/log4j.xml"));
-            loggingConfig = reader.read();
+            Log4jConfigReader reader = new Log4jConfigReader();
+            loggingConfig = reader.read(new File(dir, "conf/log4j.xml"));
         } catch (Exception e) {
             log.error("ERROR: "+e.getMessage());
             loggingConfig = new Log4jConfig();

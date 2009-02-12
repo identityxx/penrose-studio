@@ -69,7 +69,7 @@ public class ModuleNode extends Node {
         modulesNode = (ModulesNode)parent;
         partitionNode = modulesNode.getPartitionNode();
         partitionsNode = partitionNode.getPartitionsNode();
-        projectNode = partitionsNode.getProjectNode();
+        projectNode = partitionsNode.getServerNode();
         serversView = projectNode.getServersView();
     }
 

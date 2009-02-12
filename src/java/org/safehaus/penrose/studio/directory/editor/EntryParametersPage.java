@@ -8,7 +8,7 @@ import org.safehaus.penrose.studio.config.editor.ParametersPage;
 public class EntryParametersPage extends ParametersPage {
 
     public EntryParametersPage(EntryEditor editor) {
-        super(editor, "Entry Editor");
+         super(editor, "Entry Editor");
     }
 
     public void store() throws Exception {

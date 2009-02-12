@@ -100,16 +100,15 @@
             name="Browser"
             icon="${images.browser}"
             class="org.safehaus.penrose.studio.browser.editor.BrowserEditor"/>
-        <editor
-            id="org.safehaus.penrose.studio.properties.SystemPropertiesEditor"
-            name="System Properties"
-            icon="${images.system_properties}"
-            class="org.safehaus.penrose.studio.properties.SystemPropertiesEditor"/>
+
+        <!-- Modules  -->
         <editor
             id="org.safehaus.penrose.studio.module.editor.ModuleEditor"
             name="Module"
             icon="${images.module}"
             class="org.safehaus.penrose.studio.module.editor.ModuleEditor"/>
+
+        <!-- Schemas -->
         <editor
             id="org.safehaus.penrose.studio.schema.editor.SchemaEditor"
             name="Schema"
@@ -125,17 +124,41 @@
             name="Attribute Type"
             icon="${images.attribute_type}"
             class="org.safehaus.penrose.studio.schema.editor.AttributeTypeEditor"/>
-        <editor
-            id="org.safehaus.penrose.studio.user.editor.UserEditor"
-            name="User"
-            icon="${images.administrator}"
-            class="org.safehaus.penrose.studio.user.editor.UserEditor"/>
+
+        <!-- Services -->
         <editor
             id="org.safehaus.penrose.studio.service.editor.ServiceEditor"
             name="Service"
             icon="${images.service}"
             class="org.safehaus.penrose.studio.service.editor.ServiceEditor"/>
 
+        <!-- Logs -->
+        <editor
+            id="org.safehaus.penrose.studio.log.editor.AppenderEditor"
+            name="Appender"
+            icon="${images.appender}"
+            class="org.safehaus.penrose.studio.log.editor.AppenderEditor"/>
+        <editor
+            id="org.safehaus.penrose.studio.log.editor.LoggerEditor"
+            name="Logger"
+            icon="${images.logger}"
+            class="org.safehaus.penrose.studio.log.editor.LoggerEditor"/>
+
+        <!-- Administrator -->
+        <editor
+            id="org.safehaus.penrose.studio.user.editor.UserEditor"
+            name="User"
+            icon="${images.administrator}"
+            class="org.safehaus.penrose.studio.user.editor.UserEditor"/>
+
+        <!-- System Properties  -->
+        <editor
+            id="org.safehaus.penrose.studio.properties.SystemPropertiesEditor"
+            name="System Properties"
+            icon="${images.system_properties}"
+            class="org.safehaus.penrose.studio.properties.SystemPropertiesEditor"/>
+
+        <!-- Federation -->
         <editor
             id="org.safehaus.penrose.studio.federation.editor.FederationEditor"
             name="Federation"

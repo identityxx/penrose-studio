@@ -61,7 +61,7 @@ public class ConnectionsNode extends Node {
         super(name, image, object, parent);
         partitionNode = (PartitionNode)parent;
         partitionsNode = partitionNode.getPartitionsNode();
-        serverNode = partitionsNode.getProjectNode();
+        serverNode = partitionsNode.getServerNode();
         view = serverNode.getServersView();
     }
 

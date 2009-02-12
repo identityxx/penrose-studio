@@ -5,12 +5,12 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.partition.node.PartitionsNode;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.log.node.LogsNode;
 import org.safehaus.penrose.studio.util.ApplicationConfig;
 import org.safehaus.penrose.studio.server.ServerConfig;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.action.EditServerAction;
 import org.safehaus.penrose.studio.federation.FederationNode;
-import org.safehaus.penrose.studio.logger.LoggingNode;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.browser.editor.BrowserEditorInput;
 import org.safehaus.penrose.studio.browser.editor.BrowserEditor;
@@ -50,7 +50,7 @@ public class ServerNode extends Node {
     protected PartitionsNode partitionsNode;
     protected SchemasNode schemasNode;
     protected ServicesNode servicesNode;
-    protected LoggingNode loggingNode;
+    protected LogsNode logsNode;
     protected FederationNode federationNode;
 
     public ServerNode(ServersView serversView, String name, Image image, Object object, Node parent) {
@@ -234,11 +234,13 @@ public class ServerNode extends Node {
                             ServerNode.this);
                     children.add(servicesNode);
 
-                    loggingNode = new LoggingNode(
+                    logsNode = new LogsNode(
                             serversView,
-                            "Logging",
+                            "Logs",
                             ServerNode.this);
-                    children.add(loggingNode);
+                    logsNode.init();
+                    
+                    children.add(logsNode);
 
                     federationNode = new FederationNode(
                             "Federation",
@@ -378,12 +380,12 @@ public class ServerNode extends Node {
         this.servicesNode = servicesNode;
     }
 
-    public LoggingNode getLoggingNode() {
-        return loggingNode;
+    public LogsNode getLogsNode() {
+        return logsNode;
     }
 
-    public void setLoggingNode(LoggingNode loggingNode) {
-        this.loggingNode = loggingNode;
+    public void setLogsNode(LogsNode logsNode) {
+        this.logsNode = logsNode;
     }
 
     public ServersView getServersView() {

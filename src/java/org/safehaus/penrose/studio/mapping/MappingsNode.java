@@ -63,7 +63,7 @@ public class MappingsNode extends Node {
         super(name, image, object, parent);
         partitionNode = (PartitionNode)parent;
         partitionsNode = partitionNode.getPartitionsNode();
-        projectNode = partitionsNode.getProjectNode();
+        projectNode = partitionsNode.getServerNode();
         view = projectNode.getServersView();
     }
 

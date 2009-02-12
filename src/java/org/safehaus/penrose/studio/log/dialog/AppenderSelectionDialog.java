@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.logger;
+package org.safehaus.penrose.studio.log.dialog;
 
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
@@ -10,7 +10,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.graphics.Point;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.logger.log4j.AppenderConfig;
+import org.safehaus.penrose.log.log4j.AppenderConfig;
 
 import java.util.Collection;
 import java.util.Iterator;

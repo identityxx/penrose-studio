@@ -1,4 +1,4 @@
-package org.safehaus.penrose.studio.logger;
+package org.safehaus.penrose.studio.log.dialog;
 
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
@@ -13,8 +13,8 @@ import org.eclipse.swt.graphics.Point;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
-import org.safehaus.penrose.logger.log4j.AppenderConfig;
-import org.safehaus.penrose.logger.log4j.LayoutConfig;
+import org.safehaus.penrose.log.log4j.AppenderConfig;
+import org.safehaus.penrose.log.log4j.LayoutConfig;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -111,7 +111,7 @@ public class AppenderDialog extends Dialog {
 
                     layoutConfig.setLayoutClass(layoutClass);
 
-                    layoutConfig.clearParameters();
+                    layoutConfig.removeParameters();
 
                     TableItem items[] = parametersTable.getItems();
                     for (int i=0; i<items.length; i++) {

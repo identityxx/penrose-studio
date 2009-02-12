@@ -15,24 +15,27 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.logger;
+package org.safehaus.penrose.studio.log.node;
 
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.action.RefreshAction;
+import org.safehaus.penrose.studio.log.node.LogsNode;
+import org.safehaus.penrose.studio.log.dialog.LoggerDialog;
 import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.logger.log4j.RootConfig;
-import org.safehaus.penrose.logger.log4j.Log4jConfig;
-import org.safehaus.penrose.logger.log4j.LoggerConfig;
-import org.eclipse.swt.graphics.Image;
+import org.safehaus.penrose.log.log4j.RootConfig;
+import org.safehaus.penrose.log.log4j.Log4jConfig;
+import org.safehaus.penrose.log.log4j.LoggerConfig;
+import org.safehaus.penrose.log.LogManagerClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.eclipse.swt.SWT;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.apache.log4j.Logger;
-
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
@@ -42,10 +45,40 @@ public class LoggersNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ServersView view;
+    LogsNode logsNode;
 
-    public LoggersNode(ServersView view, String name, Image image, Object object, Node parent) {
-        super(name, image, object, parent);
+    public LoggersNode(ServersView view, String name, LogsNode logsNode) {
+        super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, logsNode);
+
         this.view = view;
+        this.logsNode = logsNode;
+    }
+
+    public void init() throws Exception {
+        update();
+    }
+
+    public void update() throws Exception {
+
+        Server server = logsNode.getServerNode().getServer();
+        PenroseClient client = server.getClient();
+        LogManagerClient logManagerClient = client.getLogManagerClient();
+
+        for (String loggerName : logManagerClient.getLoggerConfigNames()) {
+
+            LoggerNode loggerNode = new LoggerNode(
+                    view,
+                    loggerName,
+                    this
+            );
+
+            children.add(loggerNode);
+        }
+    }
+
+    public void refresh() throws Exception {
+        children.clear();
+        update();
     }
 
     public void showMenu(IMenuManager manager) {
@@ -69,6 +102,10 @@ public class LoggersNode extends Node {
                 }
             }
         });
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(new RefreshAction(this));
     }
 
     public void open() throws Exception {
@@ -85,7 +122,7 @@ public class LoggersNode extends Node {
 
         if (dialog.getAction() == LoggerDialog.CANCEL) return;
 
-        if (rootConfig.getLevel() == null && rootConfig.getAppenders().isEmpty()) {
+        if (rootConfig.getLevel() == null && rootConfig.getAppenderNames().isEmpty()) {
             loggingConfig.setRootConfig(null);
 
         } else {
@@ -111,35 +148,11 @@ public class LoggersNode extends Node {
         penroseStudio.notifyChangeListeners();
     }
 
-    public boolean hasChildren() throws Exception {
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Log4jConfig loggingConfig = penroseStudio.getLoggingConfig();
-        if (loggingConfig == null) return false;
-        
-        return !loggingConfig.getLoggerConfigs().isEmpty();
+    public LogsNode getLogsNode() {
+        return logsNode;
     }
 
-    public Collection<Node> getChildren() throws Exception {
-
-        Collection<Node> children = new ArrayList<Node>();
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Log4jConfig loggingConfig = penroseStudio.getLoggingConfig();
-
-        for (Iterator i=loggingConfig.getLoggerConfigs().iterator(); i.hasNext(); ) {
-            LoggerConfig loggerConfig = (LoggerConfig)i.next();
-
-            LoggerNode loggerNode = new LoggerNode(
-                    view,
-                    loggerConfig.getName(),
-                    PenroseStudio.getImage(PenroseImage.LOGGER),
-                    loggerConfig,
-                    this
-            );
-
-            children.add(loggerNode);
-        }
-
-        return children;
+    public void setLogsNode(LogsNode logsNode) {
+        this.logsNode = logsNode;
     }
 }
