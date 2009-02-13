@@ -206,6 +206,8 @@ public class ServerNode extends Node {
         progressService.busyCursorWhile(new IRunnableWithProgress() {
             public void run(IProgressMonitor monitor) throws InvocationTargetException {
                 try {
+                    monitor.beginTask("Connecting to "+serverName+"...", IProgressMonitor.UNKNOWN);
+
                     PenroseStudio penroseStudio = PenroseStudio.getInstance();
                     ApplicationConfig applicationConfig = penroseStudio.getApplicationConfig();
 
@@ -277,6 +279,9 @@ public class ServerNode extends Node {
 
                     log.error(e.getMessage(), e);
                     //throw new RuntimeException(e.getMessage(), t);
+
+                } finally {
+                    monitor.done();
                 }
             }
         });
