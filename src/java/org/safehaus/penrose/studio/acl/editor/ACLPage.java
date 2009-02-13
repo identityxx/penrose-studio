@@ -443,7 +443,7 @@ public class ACLPage extends FormPage implements ModifyListener {
         EntryClient parentClient = directoryClient.getEntryClient(parentId);
         EntryConfig parentConfig = parentClient.getEntryConfig();
 
-        //PartitionConfig partitionConfig = editor.getPartitionConfig();
+        //PartitionConfig partitionConfig = editor.getLoggerConfig();
         //EntryConfig parentConfig = partitionConfig.getDirectoryConfig().getParent(entryConfig);
 
         while (parentConfig != null) {

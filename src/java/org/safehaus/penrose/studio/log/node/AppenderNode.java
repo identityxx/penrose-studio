@@ -7,7 +7,6 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.log.editor.AppenderEditorInput;
 import org.safehaus.penrose.studio.log.editor.AppenderEditor;
-import org.safehaus.penrose.log.log4j.AppenderConfig;
 import org.safehaus.penrose.log.LogManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.apache.log4j.Logger;
@@ -72,17 +71,6 @@ public class AppenderNode extends Node {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
         page.openEditor(ei, AppenderEditor.class.getName());
-/*
-        Server server = appendersNode.getLogsNode().getServerNode().getServer();
-        PenroseClient client = server.getClient();
-        LogManagerClient logManagerClient = client.getLogManagerClient();
-        AppenderConfig appenderConfig = logManagerClient.getAppenderConfig(appenderName);
-
-        AppenderDialog dialog = new AppenderDialog(view.getSite().getShell(), SWT.NONE);
-        dialog.setText("Edit Appender");
-        dialog.setAppenderConfig(appenderConfig);
-        dialog.open();
-*/
     }
 
     public void remove() throws Exception {
@@ -106,6 +94,8 @@ public class AppenderNode extends Node {
             AppenderNode appenderNode = (AppenderNode)node;
             logManagerClient.removeAppenderConfig(appenderNode.getAppenderName());
         }
+
+        logManagerClient.store();
 
         parent.refresh();
 

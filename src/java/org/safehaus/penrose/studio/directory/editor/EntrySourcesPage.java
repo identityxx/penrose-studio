@@ -285,7 +285,7 @@ public class EntrySourcesPage extends FormPage { //implements ModifyListener {
 
                     Collection<String> sourceNames = sourceManagerClient.getSourceNames();
 
-                    //PartitionConfig partitionConfig = editor.getPartitionConfig();
+                    //PartitionConfig partitionConfig = editor.getLoggerConfig();
                     //Collection<SourceConfig> sourceConfigManager = partitionConfig.getSourceConfigManager().getSourceConfigManager();
 
                     if (sourceNames.isEmpty()) {
@@ -343,7 +343,7 @@ public class EntrySourcesPage extends FormPage { //implements ModifyListener {
 
                     Collection<String> sourceNames = sourceManagerClient.getSourceNames();
 
-                    //PartitionConfig partitionConfig = editor.getPartitionConfig();
+                    //PartitionConfig partitionConfig = editor.getLoggerConfig();
                     //Collection<SourceConfig> sourceConfigManager = partitionConfig.getSourceConfigManager().getSourceConfigManager();
 
                     if (sourceNames.isEmpty()) {
@@ -561,7 +561,7 @@ public class EntrySourcesPage extends FormPage { //implements ModifyListener {
                     SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceMapping.getSourceName());
                     SourceConfig sourceConfig = sourceClient.getSourceConfig();
 
-                    //PartitionConfig partitionConfig = editor.getPartitionConfig();
+                    //PartitionConfig partitionConfig = editor.getLoggerConfig();
                     //SourceConfig sourceConfig = partitionConfig.getSourceConfigManager().getSourceConfig(sourceMapping.getSourceName());
 
                     Collection<String> fieldNames = new ArrayList<String>();
@@ -626,7 +626,7 @@ public class EntrySourcesPage extends FormPage { //implements ModifyListener {
             SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceMapping.getSourceName());
             SourceConfig sourceConfig = sourceClient.getSourceConfig();
 
-            //PartitionConfig partitionConfig = editor.getPartitionConfig();
+            //PartitionConfig partitionConfig = editor.getLoggerConfig();
             //SourceConfig sourceConfig = partitionConfig.getSourceConfigManager().getSourceConfig(sourceMapping.getSourceName());
 
             log.debug("Source "+sourceMapping.getAlias()+" "+sourceConfig.getName()+":");

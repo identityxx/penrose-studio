@@ -17,25 +17,20 @@
  */
 package org.safehaus.penrose.studio.log.editor;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
-import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.editor.FormPage;
-import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.log.log4j.AppenderConfig;
+import org.safehaus.penrose.studio.editor.EditorPage;
+import org.safehaus.penrose.studio.log.wizard.AppenderPropertiesWizard;
 
-public class AppenderPropertiesEditorPage extends FormPage {
-
-    Logger log = Logger.getLogger(getClass());
-
-    FormToolkit toolkit;
+public class AppenderPropertiesEditorPage extends EditorPage {
 
     Label nameText;
     Label classText;
@@ -44,20 +39,15 @@ public class AppenderPropertiesEditorPage extends FormPage {
     AppenderConfig appenderConfig;
 
     public AppenderPropertiesEditorPage(AppenderEditor editor) {
-        super(editor, "PROPERTIES", "  Properties  ");
+        super(editor, "PROPERTIES", "Appender Editor", "  Properties  ");
 
         this.editor = editor;
         this.appenderConfig = editor.appenderConfig;
     }
 
-    public void createFormContent(IManagedForm managedForm) {
+    public void init() throws Exception {
 
-        toolkit = managedForm.getToolkit();
-
-        ScrolledForm form = managedForm.getForm();
-        form.setText("Appender Editor");
-
-        Composite body = form.getBody();
+        Composite body = getManagedForm().getForm().getBody();
         body.setLayout(new GridLayout());
 
         Section propertiesSection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
@@ -125,6 +115,17 @@ public class AppenderPropertiesEditorPage extends FormPage {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
+                    AppenderPropertiesWizard wizard = new AppenderPropertiesWizard();
+                    wizard.setAppenderConfig(appenderConfig);
+
+                    WizardDialog dialog = new WizardDialog(getSite().getShell(), wizard);
+                    dialog.setPageSize(600, 300);
+                    int rc = dialog.open();
+
+                    if (rc == Window.CANCEL) return;
+
+                    editor.store();
+                    refresh();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -134,11 +135,6 @@ public class AppenderPropertiesEditorPage extends FormPage {
         });
 
         return composite;
-    }
-
-    public void setActive(boolean b) {
-        super.setActive(b);
-        if (b) refresh();
     }
 
     public void refresh() {

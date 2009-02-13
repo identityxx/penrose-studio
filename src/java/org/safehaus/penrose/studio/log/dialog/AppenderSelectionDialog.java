@@ -8,26 +8,22 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.log.log4j.AppenderConfig;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * @author Endi S. Dewata
  */
 public class AppenderSelectionDialog extends Dialog {
 
-    public final static int CANCEL = 0;
-    public final static int OK     = 1;
-
     Shell shell;
 
-    Table appendersTable;
+    Table appenderNamesTable;
 
-    private int action;
+    private int action = Window.CANCEL;
 
     String appenderName;
 
@@ -39,7 +35,7 @@ public class AppenderSelectionDialog extends Dialog {
         createControl(shell);
     }
 
-    public void open () {
+    public int open () {
 
         Point size = new Point(400, 300);
         shell.setSize(size);
@@ -57,13 +53,15 @@ public class AppenderSelectionDialog extends Dialog {
         while (!shell.isDisposed()) {
             if (!display.readAndDispatch()) display.sleep();
         }
+
+        return action;
     }
 
     public void createControl(final Shell parent) {
         parent.setLayout(new GridLayout());
 
-        appendersTable = new Table(parent, SWT.BORDER | SWT.FULL_SELECTION);
-        appendersTable.setLayoutData(new GridData(GridData.FILL_BOTH));
+        appenderNamesTable = new Table(parent, SWT.BORDER | SWT.FULL_SELECTION);
+        appenderNamesTable.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         Composite buttons = new Composite(parent, SWT.NONE);
         buttons.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -74,12 +72,12 @@ public class AppenderSelectionDialog extends Dialog {
 
         okButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                if (appendersTable.getSelectionCount() == 0) return;
+                if (appenderNamesTable.getSelectionCount() == 0) return;
 
-                TableItem item = appendersTable.getSelection()[0];
+                TableItem item = appenderNamesTable.getSelection()[0];
                 appenderName = item.getText();
 
-                action = AppenderSelectionDialog.OK;
+                action = Window.OK;
                 shell.close();
             }
         });
@@ -102,14 +100,12 @@ public class AppenderSelectionDialog extends Dialog {
         this.action = action;
     }
 
-    public void setAppenderConfigs(Collection appenderConfigs) {
-        appendersTable.clearAll();
-        for (Iterator i=appenderConfigs.iterator(); i.hasNext(); ) {
-            AppenderConfig appenderConfig = (AppenderConfig)i.next();
-            String name = appenderConfig.getName();
+    public void setAppenderNames(Collection<String> appenderNames) {
+        appenderNamesTable.clearAll();
+        for (String appenderName : appenderNames) {
 
-            TableItem item = new TableItem(appendersTable, SWT.NONE);
-            item.setText(name);
+            TableItem item = new TableItem(appenderNamesTable, SWT.NONE);
+            item.setText(appenderName);
         }
     }
 

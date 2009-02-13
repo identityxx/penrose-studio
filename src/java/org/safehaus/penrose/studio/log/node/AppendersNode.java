@@ -6,17 +6,17 @@ import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.action.RefreshAction;
-import org.safehaus.penrose.studio.log.node.LogsNode;
-import org.safehaus.penrose.studio.log.dialog.AppenderDialog;
-import org.safehaus.penrose.log.log4j.Log4jConfig;
+import org.safehaus.penrose.studio.log.wizard.AppenderWizard;
 import org.safehaus.penrose.log.log4j.AppenderConfig;
+import org.safehaus.penrose.log.log4j.LayoutConfig;
 import org.safehaus.penrose.log.LogManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.apache.log4j.Logger;
-import org.eclipse.swt.SWT;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.ui.IWorkbenchActionConstants;
 
 /**
@@ -83,20 +83,23 @@ public class AppendersNode extends Node {
 
     public void createAppender() throws Exception {
 
+        PenroseClient client = logsNode.getServerNode().getServer().getClient();
+        LogManagerClient logManagerClient = client.getLogManagerClient();
+
+        AppenderWizard wizard = new AppenderWizard();
+
+        WizardDialog dialog = new WizardDialog(view.getSite().getShell(), wizard);
+        dialog.setPageSize(600, 300);
+        int rc = dialog.open();
+
+        if (rc == Window.CANCEL) return;
+
+        logManagerClient.addAppenderConfig(wizard.getAppenderConfig());
+        logManagerClient.store();
+
+        refresh();
+
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Log4jConfig loggingConfig = penroseStudio.getLoggingConfig();
-
-        AppenderConfig appenderConfig = new AppenderConfig();
-
-        AppenderDialog dialog = new AppenderDialog(view.getSite().getShell(), SWT.NONE);
-        dialog.setText("Add Appender");
-        dialog.setAppenderConfig(appenderConfig);
-        dialog.open();
-
-        if (dialog.getAction() == AppenderDialog.CANCEL) return;
-
-        loggingConfig.addAppenderConfig(appenderConfig);
-
         penroseStudio.notifyChangeListeners();
     }
 

@@ -274,8 +274,8 @@ public class PenroseStudio implements IPlatformRunnable {
     }
 
     public void saveLoggingConfig(File dir) throws Exception {
-        Log4jConfigWriter writer = new Log4jConfigWriter(new File(dir, "/conf/log4j.xml"));
-        writer.write(loggingConfig);
+        Log4jConfigWriter writer = new Log4jConfigWriter();
+        writer.write(new File(dir, "conf/log4j.xml"), loggingConfig);
     }
 
     public Collection<String> listFiles(File directory, String path) throws Exception {

@@ -26,24 +26,23 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
-import org.safehaus.penrose.log.log4j.LoggerConfig;
+import org.safehaus.penrose.log.log4j.RootLoggerConfig;
 import org.safehaus.penrose.studio.editor.EditorPage;
 import org.safehaus.penrose.studio.log.wizard.LoggerPropertiesWizard;
+import org.safehaus.penrose.studio.log.wizard.RootLoggerPropertiesWizard;
 
-public class LoggerPropertiesEditorPage extends EditorPage {
+public class RootLoggerPropertiesEditorPage extends EditorPage {
 
-    Label nameText;
     Label levelText;
-    Button additivityCheckbox;
 
-    LoggerEditor editor;
-    LoggerConfig loggerConfig;
+    RootLoggerEditor editor;
+    RootLoggerConfig rootLoggerConfig;
 
-    public LoggerPropertiesEditorPage(LoggerEditor editor) {
+    public RootLoggerPropertiesEditorPage(RootLoggerEditor editor) {
         super(editor, "PROPERTIES", "Logger Editor", "  Properties  ");
 
         this.editor = editor;
-        this.loggerConfig = editor.getLoggerConfig();
+        this.rootLoggerConfig = editor.rootLoggerConfig;
     }
 
     public void init() throws Exception {
@@ -84,23 +83,13 @@ public class LoggerPropertiesEditorPage extends EditorPage {
         layout.marginHeight = 0;
         composite.setLayout(layout);
 
-		Label nameLabel = toolkit.createLabel(composite, "Name:");
+		Label levelLabel = toolkit.createLabel(composite, "Level:");
         GridData gd = new GridData(GridData.FILL);
         gd.widthHint = 100;
-        nameLabel.setLayoutData(gd);
-
-		nameText = toolkit.createLabel(composite, "", SWT.NONE);
-		nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-		toolkit.createLabel(composite, "Level:");
+        levelLabel.setLayoutData(gd);
 
 		levelText = toolkit.createLabel(composite, "", SWT.NONE);
         levelText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        toolkit.createLabel(composite, "Additivity:");
-
-        additivityCheckbox = toolkit.createButton(composite, "", SWT.CHECK);
-        additivityCheckbox.setEnabled(false);
 
         return composite;
     }
@@ -121,8 +110,8 @@ public class LoggerPropertiesEditorPage extends EditorPage {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    LoggerPropertiesWizard wizard = new LoggerPropertiesWizard();
-                    wizard.setLoggerConfig(loggerConfig);
+                    RootLoggerPropertiesWizard wizard = new RootLoggerPropertiesWizard();
+                    wizard.setRootLoggerConfig(rootLoggerConfig);
 
                     WizardDialog dialog = new WizardDialog(getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
@@ -145,12 +134,7 @@ public class LoggerPropertiesEditorPage extends EditorPage {
 
     public void refresh() {
 
-        String name = loggerConfig.getName();
-        nameText.setText(name == null ? "" : name);
-
-        String level = loggerConfig.getLevel();
+        String level = rootLoggerConfig.getLevel();
         levelText.setText(level == null ? "" : level);
-
-        additivityCheckbox.setSelection(loggerConfig.getAdditivity());
     }
 }

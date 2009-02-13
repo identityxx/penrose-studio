@@ -17,22 +17,17 @@
  */
 package org.safehaus.penrose.studio.log.editor;
 
-import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.forms.editor.FormEditor;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.config.editor.ParametersPage;
+import org.safehaus.penrose.studio.editor.Editor;
 import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.log.node.AppendersNode;
 import org.safehaus.penrose.log.LogManagerClient;
 import org.safehaus.penrose.log.log4j.AppenderConfig;
 
-public class AppenderEditor extends FormEditor {
-
-    Logger log = Logger.getLogger(getClass());
+public class AppenderEditor extends Editor {
 
     ServerNode serverNode;
     AppendersNode appendersNode;
@@ -40,18 +35,13 @@ public class AppenderEditor extends FormEditor {
 
     AppenderConfig appenderConfig;
 
-    boolean dirty;
+    public void init() throws PartInitException {
 
-    public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        super.init(site, input);
-
-        AppenderEditorInput ei = (AppenderEditorInput)input;
-
+        AppenderEditorInput ei = (AppenderEditorInput)getEditorInput();
         appendersNode = ei.getAppendersNode();
         appenderName = ei.getAppenderName();
 
         try {
-
             serverNode = appendersNode.getLogsNode().getServerNode();
             PenroseClient client = serverNode.getServer().getClient();
             LogManagerClient logManagerClient = client.getLogManagerClient();
@@ -60,8 +50,6 @@ public class AppenderEditor extends FormEditor {
         } catch (Exception e) {
             throw new PartInitException(e.getMessage(), e);
         }
-
-        setPartName(appenderName);
     }
 
     protected void addPages() {
@@ -72,7 +60,7 @@ public class AppenderEditor extends FormEditor {
             layoutPage.setLayoutConfig(appenderConfig.getLayoutConfig());
             addPage(layoutPage);
 
-            AppenderParametersEditorPage parametersPage = new AppenderParametersEditorPage(this);
+            ParametersPage parametersPage = new ParametersPage(this, "Appender Editor");
             parametersPage.setParameters(appenderConfig.getParameters());
             addPage(parametersPage);
 
@@ -82,24 +70,12 @@ public class AppenderEditor extends FormEditor {
         }
     }
 
-    public void doSave(IProgressMonitor iProgressMonitor) {
-    }
-
-    public void doSaveAs() {
-    }
-
-    public boolean isSaveAsAllowed() {
-        return false;
-    }
-
     public void store() throws Exception {
 
-        serverNode = appendersNode.getLogsNode().getServerNode();
         PenroseClient client = serverNode.getServer().getClient();
         LogManagerClient logManagerClient = client.getLogManagerClient();
         logManagerClient.updateAppenderConfig(appenderName, appenderConfig);
-
-        setPartName(appenderName);
+        logManagerClient.store();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();

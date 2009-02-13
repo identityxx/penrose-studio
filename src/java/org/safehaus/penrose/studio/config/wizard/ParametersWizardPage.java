@@ -164,8 +164,7 @@ public class ParametersWizardPage extends WizardPage implements SelectionListene
 
     public Map<String,String> getParameters() {
         parameters.clear();
-        TableItem items[] = parametersTable.getItems();
-        for (TableItem item : items) {
+        for (TableItem item : parametersTable.getItems()) {
             String name = item.getText(0);
             String value = item.getText(1);
             parameters.put(name, value);

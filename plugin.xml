@@ -139,6 +139,11 @@
             icon="${images.appender}"
             class="org.safehaus.penrose.studio.log.editor.AppenderEditor"/>
         <editor
+            id="org.safehaus.penrose.studio.log.editor.RootLoggerEditor"
+            name="Root Logger"
+            icon="${images.logger}"
+            class="org.safehaus.penrose.studio.log.editor.RootLoggerEditor"/>
+        <editor
             id="org.safehaus.penrose.studio.log.editor.LoggerEditor"
             name="Logger"
             icon="${images.logger}"

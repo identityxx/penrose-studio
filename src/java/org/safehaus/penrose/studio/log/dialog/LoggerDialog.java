@@ -27,11 +27,10 @@ import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.log.log4j.LoggerConfig;
-import org.safehaus.penrose.log.log4j.RootConfig;
+import org.safehaus.penrose.log.log4j.RootLoggerConfig;
 import org.safehaus.penrose.log.log4j.Log4jConfig;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.ArrayList;
 
 /**
@@ -47,12 +46,12 @@ public class LoggerDialog extends Dialog {
     Text nameText;
     Combo levelCombo;
     Button additivityCheckbox;
-    Table appendersTable;
+    Table appenderNamesTable;
 
     private int action;
 
     LoggerConfig loggerConfig;
-    RootConfig rootConfig;
+    RootLoggerConfig rootConfig;
 
     public LoggerDialog(Shell parent, int style) {
         super(parent, style);
@@ -174,8 +173,8 @@ public class LoggerDialog extends Dialog {
         Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(new GridLayout(2, false));
 
-        appendersTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
-        appendersTable.setLayoutData(new GridData(GridData.FILL_BOTH));
+        appenderNamesTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
+        appenderNamesTable.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         Composite buttons = new Composite(composite, SWT.NONE);
         buttons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
@@ -194,14 +193,14 @@ public class LoggerDialog extends Dialog {
 
                 AppenderSelectionDialog dialog = new AppenderSelectionDialog(shell, SWT.NONE);
                 dialog.setText("Appenders");
-                dialog.setAppenderConfigs(appenderConfigs);
+                dialog.setAppenderNames(appenderConfigs);
                 dialog.open();
 
                 if (dialog.getAction() == LoggerDialog.CANCEL) return;
 
                 String appenderName = dialog.getAppenderName();
 
-                TableItem item = new TableItem(appendersTable, SWT.NONE);
+                TableItem item = new TableItem(appenderNamesTable, SWT.NONE);
                 item.setText(appenderName);
                 item.setData(appenderName);
             }
@@ -213,11 +212,11 @@ public class LoggerDialog extends Dialog {
 
         removeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                if (appendersTable.getSelectionCount() == 0) return;
+                if (appenderNamesTable.getSelectionCount() == 0) return;
 
-                TableItem items[] = appendersTable.getSelection();
-                for (int i=0; i<items.length; i++) {
-                    items[i].dispose();
+                TableItem items[] = appenderNamesTable.getSelection();
+                for (TableItem item : items) {
+                    item.dispose();
                 }
             }
         });
@@ -250,24 +249,23 @@ public class LoggerDialog extends Dialog {
         return "".equals(levelCombo.getText()) ? null : levelCombo.getText();
     }
 
-    public void setAppenders(Collection appenders) {
-        appendersTable.clearAll();
+    public void setAppenders(Collection<String> appenders) {
+        appenderNamesTable.clearAll();
 
-        for (Iterator i=appenders.iterator(); i.hasNext(); ) {
-            String appenderName = (String)i.next();
+        for (String appenderName : appenders) {
 
-            TableItem item = new TableItem(appendersTable, SWT.NONE);
+            TableItem item = new TableItem(appenderNamesTable, SWT.NONE);
             item.setText(appenderName);
             item.setData(appenderName);
         }
     }
 
-    public Collection getAppenders() {
-        Collection appenders = new ArrayList();
+    public Collection<String> getAppenders() {
+        Collection<String> appenders = new ArrayList<String>();
 
-        TableItem items[] = appendersTable.getItems();
-        for (int i=0; i<items.length; i++) {
-            String appenderName = (String)items[i].getData();
+        TableItem items[] = appenderNamesTable.getItems();
+        for (TableItem item : items) {
+            String appenderName = (String) item.getData();
             appenders.add(appenderName);
         }
 
@@ -279,7 +277,7 @@ public class LoggerDialog extends Dialog {
         
         setLoggerName(loggerConfig.getName());
         setLoggerLevel(loggerConfig.getLevel());
-        setAdditivity(loggerConfig.isAdditivity());
+        setAdditivity(loggerConfig.getAdditivity());
         setAppenders(loggerConfig.getAppenderNames());
     }
 
@@ -291,7 +289,7 @@ public class LoggerDialog extends Dialog {
         return additivityCheckbox.getSelection();
     }
 
-    public void setRootConfig(RootConfig rootConfig) {
+    public void setRootConfig(RootLoggerConfig rootConfig) {
         this.rootConfig = rootConfig;
 
         setLoggerName("Root Logger");

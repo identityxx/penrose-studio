@@ -24,27 +24,25 @@ import org.safehaus.penrose.studio.editor.Editor;
 import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.log.node.LoggersNode;
 import org.safehaus.penrose.log.LogManagerClient;
-import org.safehaus.penrose.log.log4j.LoggerConfig;
+import org.safehaus.penrose.log.log4j.RootLoggerConfig;
 
-public class LoggerEditor extends Editor {
-
-    LoggersNode loggersNode;
-    String loggerName;
+public class RootLoggerEditor extends Editor {
 
     ServerNode serverNode;
-    LoggerConfig loggerConfig;
+    LoggersNode loggersNode;
+
+    RootLoggerConfig rootLoggerConfig;
 
     public void init() throws PartInitException {
 
-        LoggerEditorInput ei = (LoggerEditorInput)getEditorInput();
+        RootLoggerEditorInput ei = (RootLoggerEditorInput)getEditorInput();
         loggersNode = ei.getLoggersNode();
-        loggerName = ei.getLoggerName();
 
         try {
             serverNode = loggersNode.getLogsNode().getServerNode();
             PenroseClient client = serverNode.getServer().getClient();
             LogManagerClient logManagerClient = client.getLogManagerClient();
-            loggerConfig = logManagerClient.getLoggerConfig(loggerName);
+            rootLoggerConfig = logManagerClient.getRootLoggerConfig();
 
         } catch (Exception e) {
             throw new PartInitException(e.getMessage(), e);
@@ -53,8 +51,8 @@ public class LoggerEditor extends Editor {
 
     protected void addPages() {
         try {
-            addPage(new LoggerPropertiesEditorPage(this));
-            addPage(new LoggerAppendersEditorPage(this));
+            addPage(new RootLoggerPropertiesEditorPage(this));
+            addPage(new RootLoggerAppendersEditorPage(this));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -66,9 +64,9 @@ public class LoggerEditor extends Editor {
 
         PenroseClient client = serverNode.getServer().getClient();
         LogManagerClient logManagerClient = client.getLogManagerClient();
-        logManagerClient.updateLoggerConfig(loggerName, loggerConfig);
+        logManagerClient.setRootLoggerConfig(rootLoggerConfig);
         logManagerClient.store();
-
+        
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
@@ -79,13 +77,5 @@ public class LoggerEditor extends Editor {
 
     public void setServerNode(ServerNode serverNode) {
         this.serverNode = serverNode;
-    }
-
-    public LoggerConfig getLoggerConfig() {
-        return loggerConfig;
-    }
-
-    public void setLoggerConfig(LoggerConfig loggerConfig) {
-        this.loggerConfig = loggerConfig;
     }
 }

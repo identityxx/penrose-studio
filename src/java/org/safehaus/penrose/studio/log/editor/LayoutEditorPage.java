@@ -13,6 +13,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.config.wizard.ParametersWizard;
+import org.safehaus.penrose.studio.log.wizard.LayoutPropertiesWizard;
 import org.safehaus.penrose.log.log4j.LayoutConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,6 +116,17 @@ public class LayoutEditorPage extends FormPage {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
+                    LayoutPropertiesWizard wizard = new LayoutPropertiesWizard();
+                    wizard.setLayoutConfig(layoutConfig);
+
+                    WizardDialog dialog = new WizardDialog(getSite().getShell(), wizard);
+                    dialog.setPageSize(600, 300);
+                    int rc = dialog.open();
+
+                    if (rc == Window.CANCEL) return;
+
+                    editor.store();
+                    refresh();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -188,7 +200,7 @@ public class LayoutEditorPage extends FormPage {
                     layoutConfig.removeParameters();
                     layoutConfig.setParameters(wizard.getParameters());
 
-                    store();
+                    editor.store();
 
                     refresh();
 
@@ -221,9 +233,6 @@ public class LayoutEditorPage extends FormPage {
             ti.setText(0, name);
             ti.setText(1, value);
         }
-    }
-
-    public void store() throws Exception {
     }
 
     public LayoutConfig getLayoutConfig() {

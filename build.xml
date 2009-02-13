@@ -216,6 +216,9 @@
                 <include name="images/**"/>
                 <include name="splash.bmp"/>
             </fileset>
+        </copy>
+
+        <copy todir="${plugin.path}" overwrite="true">
             <fileset dir="${branding.path}">
                 <include name="images/**"/>
                 <include name="splash.bmp"/>

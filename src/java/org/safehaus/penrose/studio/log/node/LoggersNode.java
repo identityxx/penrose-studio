@@ -20,20 +20,18 @@ package org.safehaus.penrose.studio.log.node;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.action.RefreshAction;
-import org.safehaus.penrose.studio.log.node.LogsNode;
-import org.safehaus.penrose.studio.log.dialog.LoggerDialog;
+import org.safehaus.penrose.studio.log.wizard.LoggerWizard;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.tree.Node;
-import org.safehaus.penrose.log.log4j.RootConfig;
-import org.safehaus.penrose.log.log4j.Log4jConfig;
 import org.safehaus.penrose.log.log4j.LoggerConfig;
 import org.safehaus.penrose.log.LogManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
-import org.eclipse.swt.SWT;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.apache.log4j.Logger;
 
@@ -64,6 +62,9 @@ public class LoggersNode extends Node {
         PenroseClient client = server.getClient();
         LogManagerClient logManagerClient = client.getLogManagerClient();
 
+        RootLoggerNode rootLoggerNode = new RootLoggerNode(view, this);
+        children.add(rootLoggerNode);
+
         for (String loggerName : logManagerClient.getLoggerConfigNames()) {
 
             LoggerNode loggerNode = new LoggerNode(
@@ -83,16 +84,6 @@ public class LoggersNode extends Node {
 
     public void showMenu(IMenuManager manager) {
 
-        manager.add(new Action("Root Logger") {
-            public void run() {
-                try {
-                    open();
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        });
-
         manager.add(new Action("New Logger...") {
             public void run() {
                 try {
@@ -108,43 +99,29 @@ public class LoggersNode extends Node {
         manager.add(new RefreshAction(this));
     }
 
-    public void open() throws Exception {
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Log4jConfig loggingConfig = penroseStudio.getLoggingConfig();
-
-        RootConfig rootConfig = loggingConfig.getRootConfig();
-        if (rootConfig == null) rootConfig = new RootConfig();
-
-        LoggerDialog dialog = new LoggerDialog(view.getSite().getShell(), SWT.NONE);
-        dialog.setText("Edit Logger");
-        dialog.setRootConfig(rootConfig);
-        dialog.open();
-
-        if (dialog.getAction() == LoggerDialog.CANCEL) return;
-
-        if (rootConfig.getLevel() == null && rootConfig.getAppenderNames().isEmpty()) {
-            loggingConfig.setRootConfig(null);
-
-        } else {
-            if (loggingConfig.getRootConfig() == null) loggingConfig.setRootConfig(rootConfig);
-        }
-    }
-
     public void createLogger() throws Exception {
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        Log4jConfig loggingConfig = penroseStudio.getLoggingConfig();
+
+        PenroseClient client = logsNode.getServerNode().getServer().getClient();
+        LogManagerClient logManagerClient = client.getLogManagerClient();
 
         LoggerConfig loggerConfig = new LoggerConfig();
 
-        LoggerDialog dialog = new LoggerDialog(view.getSite().getShell(), SWT.NONE);
-        dialog.setText("Add Logger");
-        dialog.setLoggerConfig(loggerConfig);
-        dialog.open();
+        LoggerWizard wizard = new LoggerWizard();
+        wizard.setLogManagerClient(logManagerClient);
+        wizard.setLoggerConfig(loggerConfig);
 
-        if (dialog.getAction() == LoggerDialog.CANCEL) return;
+        WizardDialog dialog = new WizardDialog(view.getSite().getShell(), wizard);
+        dialog.setPageSize(600, 300);
+        int rc = dialog.open();
 
-        loggingConfig.addLoggerConfig(loggerConfig);
+        if (rc == Window.CANCEL) return;
 
+        logManagerClient.addLoggerConfig(loggerConfig);
+        logManagerClient.store();
+
+        refresh();
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
 

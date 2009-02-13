@@ -19,39 +19,29 @@ package org.safehaus.penrose.studio.log.node;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.log.editor.LoggerEditorInput;
-import org.safehaus.penrose.studio.log.editor.LoggerEditor;
-import org.safehaus.penrose.log.LogManagerClient;
-import org.safehaus.penrose.client.PenroseClient;
-import org.eclipse.swt.widgets.Shell;
+import org.safehaus.penrose.studio.log.editor.RootLoggerEditorInput;
+import org.safehaus.penrose.studio.log.editor.RootLoggerEditor;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.IWorkbenchPage;
-import org.apache.log4j.Logger;
 
 /**
  * @author Endi S. Dewata
  */
-public class LoggerNode extends Node {
-
-    Logger log = Logger.getLogger(getClass());
+public class RootLoggerNode extends Node {
 
     ServersView view;
     LoggersNode loggersNode;
-    String loggerName;
 
-    public LoggerNode(ServersView view, String loggerName, LoggersNode loggersNode) {
-        super(loggerName, PenroseStudio.getImage(PenroseImage.LOGGER), null, loggersNode);
+    public RootLoggerNode(ServersView view, LoggersNode loggersNode) {
+        super("Root Logger", PenroseStudio.getImage(PenroseImage.LOGGER), null, loggersNode);
 
         this.view = view;
         this.loggersNode = loggersNode;
-        this.loggerName = loggerName;
     }
 
     public void showMenu(IMenuManager manager) {
@@ -65,64 +55,26 @@ public class LoggerNode extends Node {
                 }
             }
         });
-
-        manager.add(new Action("Delete", PenroseStudio.getImageDescriptor(PenroseImage.DELETE_SMALL)) {
-            public void run() {
-                try {
-                    remove();
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        });
     }
 
     public void open() throws Exception {
 
-        LoggerEditorInput ei = new LoggerEditorInput();
+        RootLoggerEditorInput ei = new RootLoggerEditorInput();
         ei.setLoggersNode(loggersNode);
-        ei.setLoggerName(loggerName);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
-        page.openEditor(ei, LoggerEditor.class.getName());
-    }
-
-    public void remove() throws Exception {
-
-        Shell shell = view.getSite().getShell();
-
-        boolean confirm = MessageDialog.openQuestion(
-                shell,
-                "Confirmation",
-                "Remove Logger \""+loggerName+"\"?");
-
-        if (!confirm) return;
-
+        page.openEditor(ei, RootLoggerEditor.class.getName());
+/*
         Server server = loggersNode.getLogsNode().getServerNode().getServer();
         PenroseClient client = server.getClient();
         LogManagerClient logManagerClient = client.getLogManagerClient();
+        LoggerConfig loggerConfig = logManagerClient.getRootLoggerConfig(loggerName);
 
-        for (Node node : view.getSelectedNodes()) {
-            if (!(node instanceof LoggerNode)) continue;
-
-            LoggerNode loggerNode = (LoggerNode)node;
-            logManagerClient.removeLoggerConfig(loggerNode.getLoggerName());
-        }
-        
-        logManagerClient.store();
-
-        parent.refresh();
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
-    }
-
-    public String getLoggerName() {
-        return loggerName;
-    }
-
-    public void setLoggerName(String loggerName) {
-        this.loggerName = loggerName;
+        LoggerDialog dialog = new LoggerDialog(view.getSite().getShell(), SWT.NONE);
+        dialog.setText("Edit Logger");
+        dialog.setRootLoggerConfig(loggerConfig);
+        dialog.open();
+*/
     }
 }
