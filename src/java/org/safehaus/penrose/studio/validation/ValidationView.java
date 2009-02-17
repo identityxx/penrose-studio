@@ -143,12 +143,12 @@ public class ValidationView extends ViewPart {
 		Object object = item.getData();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        PartitionConfigManager partitionConfigManager = null; //penroseStudio.getPartitionConfigManager();
+        //PartitionConfigManager partitionConfigManager = penroseStudio.getPartitionConfigManager();
         PluginManager pluginManager = penroseStudio.getPluginManager();
 
         if (object instanceof ConnectionConfig) {
             ConnectionConfig connectionConfig = (ConnectionConfig)object;
-            PartitionConfig partitionConfig = partitionConfigManager.getPartitionConfig(connectionConfig);
+            PartitionConfig partitionConfig = null; // partitionConfigManager.getPartitionConfig(connectionConfig);
 
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
@@ -163,7 +163,7 @@ public class ValidationView extends ViewPart {
 
 		} else if (object instanceof SourceConfig) {
 			SourceConfig sourceConfig = (SourceConfig)object;
-            PartitionConfig partitionConfig = partitionConfigManager.getPartitionConfig(sourceConfig);
+            PartitionConfig partitionConfig = null; // partitionConfigManager.getPartitionConfig(sourceConfig);
             ConnectionConfig connection = partitionConfig.getConnectionConfigManager().getConnectionConfig(sourceConfig.getConnectionName());
 
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -179,7 +179,7 @@ public class ValidationView extends ViewPart {
 
 		} else if (object instanceof EntryConfig) {
             EntryConfig entryConfig = (EntryConfig)object;
-            PartitionConfig partitionConfig = partitionConfigManager.getPartitionConfig(entryConfig);
+            PartitionConfig partitionConfig = null; // partitionConfigManager.getPartitionConfig(entryConfig);
 
             EntryEditorInput ei = new EntryEditorInput();
             ei.setPartitionName(partitionConfig.getName());

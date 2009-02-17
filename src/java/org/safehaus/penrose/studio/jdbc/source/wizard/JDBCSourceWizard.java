@@ -19,12 +19,11 @@ package org.safehaus.penrose.studio.jdbc.source.wizard;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.jdbc.Table;
-import org.safehaus.penrose.jdbc.source.JDBCSource;
+import org.safehaus.penrose.jdbc.JDBC;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.source.FieldConfig;
-import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.source.wizard.SourceWizard;
 import org.safehaus.penrose.studio.source.wizard.SourcePropertiesWizardPage;
@@ -173,11 +172,11 @@ public class JDBCSourceWizard extends SourceWizard {
 
             Table table = tablePage.getTable();
 
-            sourceConfig.setParameter(JDBCSource.CATALOG, table.getCatalog());
-            sourceConfig.setParameter(JDBCSource.SCHEMA, table.getSchema());
-            sourceConfig.setParameter(JDBCSource.TABLE, table.getName());
+            sourceConfig.setParameter(JDBC.CATALOG, table.getCatalog());
+            sourceConfig.setParameter(JDBC.SCHEMA, table.getSchema());
+            sourceConfig.setParameter(JDBC.TABLE, table.getName());
 
-            sourceConfig.setParameter(JDBCSource.FILTER, filterPage.getFilter());
+            sourceConfig.setParameter(JDBC.FILTER, filterPage.getFilter());
 
             sourceConfig.setFieldConfigs(selectedFieldConfigs.values());
 

@@ -29,7 +29,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
 import org.safehaus.penrose.studio.ldap.source.wizard.LDAPSourcePropertiesWizard;
-import org.safehaus.penrose.ldap.source.LDAPSource;
+import org.safehaus.penrose.ldap.LDAP;
 
 public class LDAPSourcePropertyPage extends SourceEditorPage {
 
@@ -164,16 +164,16 @@ public class LDAPSourcePropertyPage extends SourceEditorPage {
         String connection = sourceConfig.getConnectionName();
         connectionText.setText(connection == null ? "" : connection);
 
-        String baseDn = sourceConfig.getParameter(LDAPSource.BASE_DN);
+        String baseDn = sourceConfig.getParameter(LDAP.BASE_DN);
         baseDnText.setText(baseDn == null ? "" : baseDn);
 
-        String filter = sourceConfig.getParameter(LDAPSource.FILTER);
+        String filter = sourceConfig.getParameter(LDAP.FILTER);
         filterText.setText(filter == null ? "" : filter);
 
-        String scope = sourceConfig.getParameter(LDAPSource.SCOPE);
+        String scope = sourceConfig.getParameter(LDAP.SCOPE);
         scopeCombo.setText(scope == null ? "" : scope);
 
-        String objectClasses = sourceConfig.getParameter(LDAPSource.OBJECT_CLASSES);
+        String objectClasses = sourceConfig.getParameter(LDAP.OBJECT_CLASSES);
         objectClassesText.setText(objectClasses == null ? "" : objectClasses);
     }
 }

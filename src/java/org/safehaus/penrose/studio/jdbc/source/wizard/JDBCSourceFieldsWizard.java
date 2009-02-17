@@ -27,7 +27,7 @@ import org.safehaus.penrose.studio.source.wizard.SourcePrimaryKeysWizardPage;
 import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.connection.ConnectionClient;
 import org.safehaus.penrose.jdbc.Table;
-import org.safehaus.penrose.jdbc.source.JDBCSource;
+import org.safehaus.penrose.jdbc.JDBC;
 
 import java.util.*;
 
@@ -48,9 +48,9 @@ public class JDBCSourceFieldsWizard extends SourceWizard {
 
     public void addPages() {
 
-        String catalog = sourceConfig.getParameter(JDBCSource.CATALOG);
-        String schema = sourceConfig.getParameter(JDBCSource.SCHEMA);
-        String tableName = sourceConfig.getParameter(JDBCSource.TABLE);
+        String catalog = sourceConfig.getParameter(JDBC.CATALOG);
+        String schema = sourceConfig.getParameter(JDBC.SCHEMA);
+        String tableName = sourceConfig.getParameter(JDBC.TABLE);
 
         Table table = new Table(tableName, catalog, schema);
 

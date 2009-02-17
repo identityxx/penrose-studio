@@ -25,7 +25,7 @@ import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.connection.wizard.ConnectionPropertiesWizardPage;
 import org.safehaus.penrose.studio.driver.Driver;
-import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.jdbc.JDBC;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
@@ -101,11 +101,11 @@ public class JDBCConnectionWizard extends Wizard {
             connectionConfig.setAdapterName("JDBC");
 
             Map<String,String> fieldFalues = settingsPage.getFieldValues();
-            String url = fieldFalues.get(JDBCClient.URL);
+            String url = fieldFalues.get(JDBC.URL);
             url = Helper.replace(url, fieldFalues);
 
             Map<String,String> parameters = settingsPage.getParameterValues();
-            parameters.put(JDBCClient.URL, url);
+            parameters.put(JDBC.URL, url);
             connectionConfig.setParameters(parameters);
 
             PenroseClient client = server.getClient();

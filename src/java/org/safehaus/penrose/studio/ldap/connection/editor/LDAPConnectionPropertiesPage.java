@@ -174,6 +174,5 @@ public class LDAPConnectionPropertiesPage extends ConnectionEditorPage {
     }
 
     public void checkDirty() {
-        editor.checkDirty();
     }
 }

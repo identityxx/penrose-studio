@@ -28,7 +28,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
 import org.safehaus.penrose.studio.jdbc.connection.wizard.JDBCConnectionPropertiesWizard;
-import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.jdbc.JDBC;
 
 /**
  * @author Endi S. Dewata
@@ -159,13 +159,13 @@ public class JDBCConnectionPropertiesPage extends ConnectionEditorPage {
         String adapter = connectionConfig.getAdapterName();
         adapterText.setText(adapter == null ? "" : adapter);
 
-        String s = connectionConfig.getParameter(JDBCClient.DRIVER);
+        String s = connectionConfig.getParameter(JDBC.DRIVER);
         driverText.setText(s == null ? "" : s);
 
-        s = connectionConfig.getParameter(JDBCClient.URL);
+        s = connectionConfig.getParameter(JDBC.URL);
         urlText.setText(s == null ? "" : s);
 
-        s = connectionConfig.getParameter(JDBCClient.USER);
+        s = connectionConfig.getParameter(JDBC.USER);
         usernameText.setText(s == null ? "" : s);
 
         passwordText.setText("*****");

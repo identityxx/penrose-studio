@@ -55,6 +55,8 @@ public class LDAPSourceFieldsWizard extends SourceWizard {
         }
 
         fieldsPage = new LDAPSourceFieldsWizardPage();
+        fieldsPage.setServer(server);
+        fieldsPage.setPartitionName(partitionName);
         fieldsPage.setSchema(schema);
         fieldsPage.setAvailableFieldConfigs(availableFieldConfigs);
         fieldsPage.setSelectedFieldConfigs(selectedFieldConfigs);

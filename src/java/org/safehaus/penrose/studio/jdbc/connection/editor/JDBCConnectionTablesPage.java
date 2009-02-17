@@ -139,8 +139,8 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
             }
         });
 
-        String driver   = connectionConfig.getParameter(JDBCClient.DRIVER);
-        String username = connectionConfig.getParameter(JDBCClient.USER);
+        String driver   = connectionConfig.getParameter(JDBC.DRIVER);
+        String username = connectionConfig.getParameter(JDBC.USER);
 
         if ("oracle.jdbc.driver.OracleDriver".equals(driver)) {
             log.debug("Setting Oracle's default schema to "+username.toUpperCase());

@@ -37,7 +37,7 @@ public class LDAPConnectionSettingsWizard extends Wizard {
     private String partitionName;
     private ConnectionConfig connectionConfig;
 
-    public LDAPConnectionSettingsWizardPage settingsPage;
+    public LDAPConnectionSettingsWizardPage connectionPage;
 
     public LDAPConnectionSettingsWizard() {
         setWindowTitle("Edit LDAP Connection Settings");
@@ -45,21 +45,22 @@ public class LDAPConnectionSettingsWizard extends Wizard {
 
     public void addPages() {
 
-        settingsPage = new LDAPConnectionSettingsWizardPage();
-        settingsPage.setParameters(connectionConfig.getParameters());
+        connectionPage = new LDAPConnectionSettingsWizardPage();
+        connectionPage.setServer(server);
+        connectionPage.setParameters(connectionConfig.getParameters());
 
-        addPage(settingsPage);
+        addPage(connectionPage);
     }
 
     public boolean canFinish() {
-        if (!settingsPage.isPageComplete()) return false;
+        if (!connectionPage.isPageComplete()) return false;
 
         return true;
     }
 
     public boolean performFinish() {
         try {
-            connectionConfig.setParameters(settingsPage.getParameters());
+            connectionConfig.setParameters(connectionPage.getParameters());
 
             PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();

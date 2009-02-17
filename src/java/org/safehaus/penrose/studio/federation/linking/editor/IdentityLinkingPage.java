@@ -23,7 +23,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.progress.IProgressService;
 import org.ietf.ldap.LDAPException;
 import org.safehaus.penrose.federation.*;
-import org.safehaus.penrose.federation.module.IdentityLinkingException;
+import org.safehaus.penrose.federation.IdentityLinkingException;
 import org.safehaus.penrose.federation.IdentityLinkingClient;
 import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.filter.FilterTool;

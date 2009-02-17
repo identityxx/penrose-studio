@@ -34,7 +34,7 @@ import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.config.Parameter;
-import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.jdbc.JDBC;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
@@ -222,9 +222,9 @@ public class JDBCConnectionPropertiesWizardPage extends WizardPage implements Mo
                         }
 
                         Map<String,String> parameterValues = getParameterValues();
-                        String url = parameterValues.get(JDBCClient.URL);
+                        String url = parameterValues.get(JDBC.URL);
                         url = Helper.replace(url, fieldValues);
-                        parameterValues.put(JDBCClient.URL, url);
+                        parameterValues.put(JDBC.URL, url);
 
                         PenroseClient client = server.getClient();
                         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
@@ -237,23 +237,7 @@ public class JDBCConnectionPropertiesWizardPage extends WizardPage implements Mo
                         connectionConfig.setParameters(parameterValues);
 
                         connectionManagerClient.validateConnection(connectionConfig);
-/*
-                        String driverClass = parameterValues.get(JDBCClient.DRIVER);
-                        String url = parameterValues.get(JDBCClient.URL);
-                        String username = parameterValues.get(JDBCClient.USER);
-                        String password = parameterValues.get(JDBCClient.PASSWORD);
 
-                        url = Helper.replace(url, parameterValues);
-                        log.debug("Connecting to "+url);
-
-                        Helper.testJdbcConnection(
-                                fieldComposite.getShell(),
-                                driverClass,
-                                url,
-                                username,
-                                password
-                        );
-*/
                         MessageDialog.openInformation(getShell(), "Test Connection Result", "Connection successful!");
 
                     } catch (MBeanException mbe) {

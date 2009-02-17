@@ -48,10 +48,8 @@ import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.views.BaseDialog;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.util.Pair;
-import org.safehaus.penrose.partition.Partition;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
@@ -81,7 +79,6 @@ public class ExpressionEditorDialog extends BaseDialog {
 	
 	boolean ctrlPressed;
 
-    private Partition partition;
 	private EntryConfig entry;
 	
 	public ExpressionEditorDialog(Shell parent, Object obj, String shellTitle, String formTitle) {
@@ -295,14 +292,6 @@ public class ExpressionEditorDialog extends BaseDialog {
 		return obj;
 	}
 
-    public Partition getPartition() {
-        return partition;
-    }
-
-    public void setPartition(Partition partition) {
-        this.partition = partition;
-    }
-
     public interface NameChecker {
 		public String checkName(String name);
 	}
@@ -374,7 +363,7 @@ public class ExpressionEditorDialog extends BaseDialog {
 			for (Iterator i=sources.iterator(); i.hasNext(); ) {
 				EntrySourceConfig source = (EntrySourceConfig)i.next();
 
-                PartitionConfig partitionConfig = partition.getPartitionConfig();
+                PartitionConfig partitionConfig = null; //partition.getPartitionConfig();
 				SourceConfig sourceConfig = partitionConfig.getSourceConfigManager().getSourceConfig(source.getSourceName());
 
 				Object[] fields = sourceConfig.getFieldConfigs().toArray();

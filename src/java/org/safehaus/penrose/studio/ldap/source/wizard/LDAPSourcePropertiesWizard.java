@@ -24,7 +24,7 @@ import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
-import org.safehaus.penrose.ldap.source.LDAPSource;
+import org.safehaus.penrose.ldap.LDAP;
 
 /**
  * @author Endi S. Dewata
@@ -39,27 +39,33 @@ public class LDAPSourcePropertiesWizard extends SourceWizard {
     }
 
     public void addPages() {
+        try {
+            connectionPage = new SelectConnectionWizardPage();
 
-        connectionPage = new SelectConnectionWizardPage();
-        
-        connectionPage.setServer(server);
-        connectionPage.setPartitionName(partitionName);
-        connectionPage.setAdapterType("LDAP");
-        connectionPage.setConnectionName(sourceConfig.getConnectionName());
+            connectionPage.setServer(server);
+            connectionPage.setPartitionName(partitionName);
+            connectionPage.setAdapterType("LDAP");
+            connectionPage.setConnectionName(sourceConfig.getConnectionName());
 
-        addPage(connectionPage);
+            addPage(connectionPage);
 
-        treePage = new LDAPSourceTreeWizardPage();
-        treePage.setServer(server);
-        treePage.setPartitionName(partitionName);
-        treePage.setConnectionConfig(connectionConfig);
+            treePage = new LDAPSourceTreeWizardPage();
+            treePage.setServer(server);
+            treePage.setPartitionName(partitionName);
+            treePage.setConnectionName(sourceConfig.getConnectionName());
 
-        treePage.setBaseDn(sourceConfig.getParameter(LDAPSource.BASE_DN));
-        treePage.setFilter(sourceConfig.getParameter(LDAPSource.FILTER));
-        treePage.setScope(sourceConfig.getParameter(LDAPSource.SCOPE));
-        treePage.setObjectClasses(sourceConfig.getParameter(LDAPSource.OBJECT_CLASSES));
+            treePage.setBaseDn(sourceConfig.getParameter(LDAP.BASE_DN));
+            treePage.setFilter(sourceConfig.getParameter(LDAP.FILTER));
+            treePage.setScope(sourceConfig.getParameter(LDAP.SCOPE));
+            treePage.setObjectClasses(sourceConfig.getParameter(LDAP.OBJECT_CLASSES));
 
-        addPage(treePage);
+            treePage.init();
+
+            addPage(treePage);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public boolean canFinish() {
@@ -73,7 +79,7 @@ public class LDAPSourcePropertiesWizard extends SourceWizard {
         if (connectionPage == page) {
             connectionConfig = connectionPage.getConnectionConfig();
             if (connectionConfig == null) return null;
-            treePage.setConnectionConfig(connectionConfig);
+            treePage.setConnectionName(connectionPage.getConnectionName());
         }
 
         return super.getNextPage(page);
@@ -83,10 +89,10 @@ public class LDAPSourcePropertiesWizard extends SourceWizard {
         try {
             sourceConfig.setConnectionName(connectionConfig.getName());
 
-            sourceConfig.setParameter(LDAPSource.BASE_DN, treePage.getBaseDn());
-            sourceConfig.setParameter(LDAPSource.FILTER, treePage.getFilter());
-            sourceConfig.setParameter(LDAPSource.SCOPE, treePage.getScope());
-            sourceConfig.setParameter(LDAPSource.OBJECT_CLASSES, treePage.getObjectClasses());
+            sourceConfig.setParameter(LDAP.BASE_DN, treePage.getBaseDn());
+            sourceConfig.setParameter(LDAP.FILTER, treePage.getFilter());
+            sourceConfig.setParameter(LDAP.SCOPE, treePage.getScope());
+            sourceConfig.setParameter(LDAP.OBJECT_CLASSES, treePage.getObjectClasses());
 
             PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();

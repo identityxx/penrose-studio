@@ -28,11 +28,7 @@ import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
-import org.safehaus.penrose.ldap.source.LDAPSource;
-import org.safehaus.penrose.ldap.LDAPClient;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.schema.SchemaUtil;
-import org.safehaus.penrose.schema.Schema;
+import org.safehaus.penrose.ldap.LDAP;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -58,40 +54,50 @@ public class LDAPSourceWizard extends SourceWizard {
     }
 
     public void addPages() {
+        try {
+            propertiesPage = new SourcePropertiesWizardPage();
 
-        propertiesPage = new SourcePropertiesWizardPage();
+            propertiesPage.setSourceName(sourceConfig.getName());
+            propertiesPage.setClassName(sourceConfig.getSourceClass());
+            propertiesPage.setEnabled(sourceConfig.isEnabled());
+            propertiesPage.setSourceDescription(sourceConfig.getDescription());
 
-        propertiesPage.setSourceName(sourceConfig.getName());
-        propertiesPage.setClassName(sourceConfig.getSourceClass());
-        propertiesPage.setEnabled(sourceConfig.isEnabled());
-        propertiesPage.setSourceDescription(sourceConfig.getDescription());
+            addPage(propertiesPage);
 
-        addPage(propertiesPage);
+            if (connectionConfig == null) {
+                connectionPage = new SelectConnectionWizardPage();
+                connectionPage.setServer(server);
+                connectionPage.setPartitionName(partitionName);
+                connectionPage.setAdapterType("LDAP");
 
-        if (connectionConfig == null) {
-            connectionPage = new SelectConnectionWizardPage();
-            connectionPage.setServer(server);
-            connectionPage.setPartitionName(partitionName);
-            connectionPage.setAdapterType("LDAP");
+                addPage(connectionPage);
+            }
 
-            addPage(connectionPage);
+            treePage = new LDAPSourceTreeWizardPage();
+            treePage.setServer(server);
+            treePage.setPartitionName(partitionName);
+            treePage.setConnectionName(sourceConfig.getConnectionName());
+
+            treePage.init();
+
+            addPage(treePage);
+
+            fieldsPage = new LDAPSourceFieldsWizardPage();
+            fieldsPage.setServer(server);
+            fieldsPage.setPartitionName(partitionName);
+            fieldsPage.setAvailableFieldConfigs(availableFieldConfigs);
+            fieldsPage.setSelectedFieldConfigs(selectedFieldConfigs);
+
+            addPage(fieldsPage);
+
+            primaryKeysPage = new SourcePrimaryKeysWizardPage();
+            primaryKeysPage.setFieldConfigs(selectedFieldConfigs);
+
+            addPage(primaryKeysPage);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-
-        treePage = new LDAPSourceTreeWizardPage();
-        treePage.setConnectionConfig(connectionConfig);
-
-        addPage(treePage);
-
-        fieldsPage = new LDAPSourceFieldsWizardPage();
-        fieldsPage.setAvailableFieldConfigs(availableFieldConfigs);
-        fieldsPage.setSelectedFieldConfigs(selectedFieldConfigs);
-
-        addPage(fieldsPage);
-
-        primaryKeysPage = new SourcePrimaryKeysWizardPage();
-        primaryKeysPage.setFieldConfigs(selectedFieldConfigs);
-
-        addPage(primaryKeysPage);
     }
 
     public boolean canFinish() {
@@ -108,11 +114,8 @@ public class LDAPSourceWizard extends SourceWizard {
         if (connectionPage == page) {
             connectionConfig = connectionPage.getConnectionConfig();
             if (connectionConfig == null) return null;
-            treePage.setConnectionConfig(connectionConfig);
-            fieldsPage.setConnectionConfig(connectionConfig);
-
-            //Schema schema = getSchema(connectionConfig);
-            //fieldsPage.setSchema(schema);
+            treePage.setConnectionName(connectionPage.getConnectionName());
+            fieldsPage.setConnectionName(connectionPage.getConnectionName());
 /*
         } else if (fieldsPage == page) {
             Collection<AttributeType> attributeTypes = fieldsPage.getAttributeTypes();
@@ -121,23 +124,6 @@ public class LDAPSourceWizard extends SourceWizard {
         }
 
         return super.getNextPage(page);
-    }
-
-    public Schema getSchema(ConnectionConfig connectionConfig) {
-        LDAPClient client = null;
-        try {
-            client = new LDAPClient(connectionConfig.getParameters());
-
-            SchemaUtil schemaUtil = new SchemaUtil();
-            return schemaUtil.getSchema(client);
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return null;
-
-        } finally {
-            if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
-        }
     }
 
     public boolean performFinish() {
@@ -150,10 +136,10 @@ public class LDAPSourceWizard extends SourceWizard {
 
             sourceConfig.setConnectionName(connectionConfig.getName());
 
-            sourceConfig.setParameter(LDAPSource.BASE_DN, treePage.getBaseDn());
-            sourceConfig.setParameter(LDAPSource.FILTER, treePage.getFilter());
-            sourceConfig.setParameter(LDAPSource.SCOPE, treePage.getScope());
-            sourceConfig.setParameter(LDAPSource.OBJECT_CLASSES, treePage.getObjectClasses());
+            sourceConfig.setParameter(LDAP.BASE_DN, treePage.getBaseDn());
+            sourceConfig.setParameter(LDAP.FILTER, treePage.getFilter());
+            sourceConfig.setParameter(LDAP.SCOPE, treePage.getScope());
+            sourceConfig.setParameter(LDAP.OBJECT_CLASSES, treePage.getObjectClasses());
 
             sourceConfig.setFieldConfigs(selectedFieldConfigs.values());
 

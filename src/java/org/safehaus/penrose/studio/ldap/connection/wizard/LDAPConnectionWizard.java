@@ -43,7 +43,7 @@ public class LDAPConnectionWizard extends Wizard {
 
     public ConnectionPropertiesWizardPage propertiesPage;
 
-    public LDAPConnectionSettingsWizardPage settingsPage;
+    public LDAPConnectionSettingsWizardPage connectionPage;
     public ParametersWizardPage parametersPage;
 
     public LDAPConnectionWizard() {
@@ -61,8 +61,9 @@ public class LDAPConnectionWizard extends Wizard {
 
         addPage(propertiesPage);
 
-        settingsPage = new LDAPConnectionSettingsWizardPage();
-        addPage(settingsPage);
+        connectionPage = new LDAPConnectionSettingsWizardPage();
+        connectionPage.setServer(server);
+        addPage(connectionPage);
 
         parametersPage = new ParametersWizardPage();
         addPage(parametersPage);
@@ -70,7 +71,7 @@ public class LDAPConnectionWizard extends Wizard {
 
     public boolean canFinish() {
         if (!propertiesPage.isPageComplete()) return false;
-        if (!settingsPage.isPageComplete()) return false;
+        if (!connectionPage.isPageComplete()) return false;
         if (!parametersPage.isPageComplete()) return false;
 
         return true;
@@ -85,7 +86,7 @@ public class LDAPConnectionWizard extends Wizard {
 
             connectionConfig.setAdapterName("LDAP");
 
-            Map<String,String> parameters = settingsPage.getParameters();
+            Map<String,String> parameters = connectionPage.getParameters();
             parameters.putAll(parametersPage.getParameters());
             connectionConfig.setParameters(parameters);
 

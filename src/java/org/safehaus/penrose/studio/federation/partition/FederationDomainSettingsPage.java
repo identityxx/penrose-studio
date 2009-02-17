@@ -50,7 +50,7 @@ public class FederationDomainSettingsPage extends FormPage {
     Label bindPasswordText;
 
     FederationClient federationClient;
-    Server project;
+    Server server;
 
     ConnectionClient connectionClient;
     SourceClient sourceClient;
@@ -60,7 +60,7 @@ public class FederationDomainSettingsPage extends FormPage {
 
         this.editor = editor;
         this.federationClient = editor.federationClient;
-        this.project = editor.project;
+        this.server = editor.project;
 
         PartitionClient partitionClient = federationClient.getPartitionClient();
         ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
@@ -157,6 +157,7 @@ public class FederationDomainSettingsPage extends FormPage {
             public void widgetSelected(SelectionEvent event) {
                 try {
                     FederationDomainEditorWizard wizard = new FederationDomainEditorWizard(federationClient);
+                    wizard.setServer(server);
 
                     IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
                     WizardDialog dialog = new WizardDialog(window.getShell(), wizard);

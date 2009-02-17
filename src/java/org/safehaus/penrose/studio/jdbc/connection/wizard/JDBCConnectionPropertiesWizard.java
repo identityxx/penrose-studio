@@ -22,7 +22,7 @@ import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.jdbc.JDBCClient;
+import org.safehaus.penrose.jdbc.JDBC;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
@@ -66,11 +66,11 @@ public class JDBCConnectionPropertiesWizard extends Wizard {
     public boolean performFinish() {
         try {
             Map<String,String> fieldValues = propertiesPage.getFieldValues();
-            String url = fieldValues.get(JDBCClient.URL);
+            String url = fieldValues.get(JDBC.URL);
             url = Helper.replace(url, fieldValues);
 
             Map<String,String> parameters = propertiesPage.getParameterValues();
-            parameters.put(JDBCClient.URL, url);
+            parameters.put(JDBC.URL, url);
             connectionConfig.setParameters(parameters);
 
             PenroseClient client = server.getClient();

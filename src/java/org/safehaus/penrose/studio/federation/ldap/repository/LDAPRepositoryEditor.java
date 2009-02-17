@@ -36,7 +36,7 @@ public class LDAPRepositoryEditor extends FormEditor {
     public void addPages() {
         try {
             LDAPRepositorySettingsPage page = new LDAPRepositorySettingsPage(this);
-            page.setProject(project);
+            page.setServer(project);
             page.setFederationClient(federationClient);
             page.setLdapFederationClient(ldapFederationClient);
             page.setRepositoryConfig(repositoryConfig);

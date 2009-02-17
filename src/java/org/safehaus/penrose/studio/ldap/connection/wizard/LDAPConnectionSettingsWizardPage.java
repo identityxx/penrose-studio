@@ -33,6 +33,12 @@ import org.eclipse.swt.widgets.List;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.ldap.connection.LDAPConnectionURLDialog;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.client.PenroseClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.connection.ConnectionManagerClient;
+import org.safehaus.penrose.connection.ConnectionConfig;
 
 import javax.naming.Context;
 import java.util.*;
@@ -48,6 +54,7 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
 
     private Collection<String> urls = new ArrayList<String>();
 
+    private Server server;
     private String suffix;
     private String bindDn;
     private String bindPassword;
@@ -202,8 +209,32 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
 
         fetchButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                LDAPClient client = null;
+                //LDAPClient client = null;
                 try {
+                    PenroseClient client = server.getClient();
+                    PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient("DEFAULT");
+                    ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+
+                    ConnectionConfig connectionConfig = new ConnectionConfig();
+                    connectionConfig.setName("Test");
+                    connectionConfig.setAdapterName("LDAP");
+
+                    Map<String,String> parameters = new HashMap<String,String>();
+                    parameters.put(Context.PROVIDER_URL, getProviderUrl());
+                    parameters.put(Context.SECURITY_PRINCIPAL, getBindDn());
+                    parameters.put(Context.SECURITY_CREDENTIALS, getBindPassword());
+
+                    connectionConfig.setParameters(parameters);
+
+                    Collection<DN> list = connectionManagerClient.getNamingContexts(connectionConfig);
+
+                    suffixCombo.removeAll();
+
+                    for (DN dn : list) {
+                        suffixCombo.add(dn.toString());
+                    }
+/*
                     Map<String,String> properties = new HashMap<String,String>();
                     properties.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
                     properties.put(Context.PROVIDER_URL, getProviderUrl());
@@ -211,8 +242,6 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
                     properties.put(Context.SECURITY_CREDENTIALS, getBindPassword());
 
                     client = new LDAPClient(properties);
-
-                    suffixCombo.removeAll();
 
                     SearchResult rootDse = client.getRootDSE();
 
@@ -223,15 +252,15 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
                             suffixCombo.add(namingContext);
                         }
                     }
-
+*/
                     suffixCombo.select(0);
 
                 } catch (Exception ex) {
                     log.debug(ex.getMessage(), ex);
                     ErrorDialog.open(ex);
 
-                } finally {
-                    if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
+                //} finally {
+                    //if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
                 }
             }
         });
@@ -268,9 +297,10 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
         testButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
 
-                LDAPClient client = null;
+                //LDAPClient client = null;
 
                 try {
+/*
                     String providerUrl = getProviderUrl();
                     String bindDn = getBindDn();
                     String bindPassword = getBindPassword();
@@ -283,6 +313,24 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
 
                     client = new LDAPClient(providerUrl);
                     client.bind(request, response);
+*/
+                    PenroseClient client = server.getClient();
+                    PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient("DEFAULT");
+                    ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+
+                    ConnectionConfig connectionConfig = new ConnectionConfig();
+                    connectionConfig.setName("Test");
+                    connectionConfig.setAdapterName("LDAP");
+
+                    Map<String,String> parameters = new HashMap<String,String>();
+                    parameters.put(Context.PROVIDER_URL, getProviderUrl());
+                    parameters.put(Context.SECURITY_PRINCIPAL, getBindDn());
+                    parameters.put(Context.SECURITY_CREDENTIALS, getBindPassword());
+
+                    connectionConfig.setParameters(parameters);
+
+                    connectionManagerClient.validateConnection(connectionConfig);
 
                     MessageDialog.openInformation(parent.getShell(), "Test Connection Result", "Connection successful!");
 
@@ -290,8 +338,8 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
                     log.error(ex.getMessage(), ex);
                     ErrorDialog.open(ex.getMessage());
 
-                } finally {
-                    if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
+                //} finally {
+                    //if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
                 }
             }
         });
@@ -377,5 +425,13 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
 
     public void setSuffix(String suffix) {
         this.suffix = suffix;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

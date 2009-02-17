@@ -15,50 +15,41 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.preview.action;
+package org.safehaus.penrose.studio.server.action;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.preview.PreviewEditorInput;
+import org.safehaus.penrose.client.PenroseClient;
 import org.apache.log4j.Logger;
 
 /**
  * @author Endi S. Dewata
  */
-public class PreviewAction extends Action {
+public class RestartAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
-    public PreviewAction() {
-
-        setText("&Preview");
-        setImageDescriptor(PenroseStudio.getImageDescriptor(PenroseImage.PREVIEW));
-        setToolTipText("Directory Preview");
+    public RestartAction() {
+        setText("&Restart");
+        setImageDescriptor(PenroseStudio.getImageDescriptor(PenroseImage.REFRESH));
+        setToolTipText("Restart Penrose Server");
         setId(getClass().getName());
     }
 
 	public void run() {
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         try {
-            IWorkbenchPage page = window.getActivePage();
             ServersView serversView = ServersView.getInstance();
             ServerNode projectNode = serversView.getSelectedServerNode();
             Server project = projectNode.getServer();
-
-            //page.showView(ConsoleView.class.getName());
-
-            PreviewEditorInput ei = new PreviewEditorInput();
-            ei.setProject(project);
-            
-            //page.openEditor(ei, PreviewEditor.class.getName());
+            PenroseClient client = project.getClient();
+            client.restart();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

@@ -90,7 +90,7 @@ public class SelectConnectionWizardPage extends WizardPage {
         tc = new TableColumn(infoTable, SWT.NONE);
         tc.setWidth(300);
 
-        for (ConnectionConfig connectionConfig : getConnections()) {
+        for (ConnectionConfig connectionConfig : getConnectionConfigs()) {
             TableItem item = new TableItem(connectionTable, SWT.NONE);
             item.setText(connectionConfig.getName());
             item.setData(connectionConfig);
@@ -161,7 +161,7 @@ public class SelectConnectionWizardPage extends WizardPage {
     public void refresh() {
     }
 
-    public Collection<ConnectionConfig> getConnections() {
+    public Collection<ConnectionConfig> getConnectionConfigs() {
 
         Collection<ConnectionConfig> list = new ArrayList<ConnectionConfig>();
 
@@ -203,7 +203,7 @@ public class SelectConnectionWizardPage extends WizardPage {
     }
 
     public boolean validatePage() {
-        return getConnectionConfig() != null;
+        return getConnectionName() != null;
     }
 
     public Server getServer() {

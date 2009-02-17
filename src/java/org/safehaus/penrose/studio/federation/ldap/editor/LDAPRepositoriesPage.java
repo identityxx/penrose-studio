@@ -41,7 +41,7 @@ public class LDAPRepositoriesPage extends FormPage {
 
     LDAPEditor editor;
     FederationClient federationClient;
-    Server project;
+    Server server;
 
     Table table;
 
@@ -49,7 +49,7 @@ public class LDAPRepositoriesPage extends FormPage {
         super(editor, "REPOSITORIES", "  Repositories  ");
 
         this.editor = editor;
-        this.project = editor.getProject();
+        this.server = editor.getProject();
         this.federationClient = federationClient;
     }
 
@@ -133,6 +133,8 @@ public class LDAPRepositoriesPage extends FormPage {
             public void widgetSelected(SelectionEvent selectionEvent) {
                 try {
                     AddLDAPRepositoryWizard wizard = new AddLDAPRepositoryWizard();
+                    wizard.setServer(server);
+
                     WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
                     int rc = dialog.open();
@@ -170,6 +172,7 @@ public class LDAPRepositoriesPage extends FormPage {
                     FederationRepositoryConfig repositoryConfig = (FederationRepositoryConfig)ti.getData();
 
                     EditLDAPRepositoryWizard wizard = new EditLDAPRepositoryWizard(repositoryConfig);
+                    wizard.setServer(server);
 
                     IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
                     WizardDialog dialog = new WizardDialog(window.getShell(), wizard);

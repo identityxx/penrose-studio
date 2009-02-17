@@ -3,6 +3,7 @@ package org.safehaus.penrose.studio.browser.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.ldap.connection.wizard.LDAPConnectionSettingsWizardPage;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
@@ -13,6 +14,7 @@ public class BrowserConnectionWizard extends Wizard {
 
     LDAPConnectionSettingsWizardPage connectionPage;
 
+    Server server;
     String providerUrl;
     String suffix;
     String bindDn;
@@ -25,7 +27,7 @@ public class BrowserConnectionWizard extends Wizard {
     public void addPages() {
 
         connectionPage = new LDAPConnectionSettingsWizardPage();
-
+        connectionPage.setServer(server);
         connectionPage.setProviderUrl(providerUrl);
         connectionPage.setSuffix(suffix);
         connectionPage.setBindDn(bindDn);
@@ -88,5 +90,13 @@ public class BrowserConnectionWizard extends Wizard {
 
     public void setBindPassword(String bindPassword) {
         this.bindPassword = bindPassword;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

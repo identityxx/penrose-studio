@@ -184,12 +184,12 @@ public class SourceNode extends Node {
 
         if (!(newObject instanceof SourceConfig)) return;
 
-        Server project = projectNode.getServer();
+        Server server = projectNode.getServer();
 
         SourceConfig newSourceConfig = (SourceConfig)((SourceConfig)newObject).clone();
         view.setClipboard(null);
 
-        PenroseClient client = project.getClient();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();

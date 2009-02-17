@@ -85,6 +85,5 @@ public class ConnectionEditorPage extends FormPage {
     }
 
     public void checkDirty() {
-        editor.checkDirty();
     }
 }

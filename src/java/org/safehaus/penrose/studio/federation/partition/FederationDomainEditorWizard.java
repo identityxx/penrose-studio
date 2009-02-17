@@ -2,10 +2,10 @@ package org.safehaus.penrose.studio.federation.partition;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.ldap.connection.wizard.LDAPConnectionSettingsWizardPage;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.connection.ConnectionClient;
@@ -26,8 +26,8 @@ public class FederationDomainEditorWizard extends Wizard {
     Logger log = Logger.getLogger(getClass());
 
     LDAPConnectionSettingsWizardPage connectionPage;
-    //LDAPPartitionsWizardPage partitionsPage;
 
+    Server server;
     PenroseClient client;
     PartitionClient partitionClient;
     FederationClient federationClient;
@@ -44,7 +44,7 @@ public class FederationDomainEditorWizard extends Wizard {
     public void addPages() {
 
         connectionPage = new LDAPConnectionSettingsWizardPage();
-        //partitionsPage = new LDAPPartitionsWizardPage();
+        connectionPage.setServer(server);
 
         try {
             ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
@@ -74,42 +74,18 @@ public class FederationDomainEditorWizard extends Wizard {
         }
 
         addPage(connectionPage);
-        //addPage(partitionsPage);
     }
 
     public boolean canFinish() {
         if (!connectionPage.isPageComplete()) return false;
-        //if (!partitionsPage.isPageComplete()) return false;
         return true;
-    }
-
-    public IWizardPage getNextPage(IWizardPage page) {
-        if (connectionPage == page) {
-            if (repository == null) {
-                String suffix = connectionPage.getSuffix();
-                //partitionsPage.setSuffix(suffix);
-            }
-        }
-
-        return super.getNextPage(page);
     }
 
     public boolean performFinish() {
         try {
             String name = federationClient.getFederationDomain();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-/*
-            if (repository == null) {
-                repository = new FederationRepositoryConfig();
-                repository.setName(FederationClient.GLOBAL);
-                repository.setType("GLOBAL");
-            }
 
-            repository.setParameter(GlobalRepository.URL, connectionPage.getProviderUrl());
-            repository.setParameter(GlobalRepository.SUFFIX, connectionPage.getSuffix());
-            repository.setParameter(GlobalRepository.USER, connectionPage.getBindDn());
-            repository.setParameter(GlobalRepository.PASSWORD, connectionPage.getBindPassword());
-*/
             log.debug("Getting existing configuration.");
 
             ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
@@ -150,16 +126,11 @@ public class FederationDomainEditorWizard extends Wizard {
                 connectionConfig.setParameter(Context.SECURITY_CREDENTIALS, bindPassword);
             }
 
-            //repository.setParameter(GlobalRepository.SUFFIX, partitionsPage.getSuffix());
-            //repository.setParameter(GlobalRepository.TEMPLATE, partitionsPage.getTemplate());
-
             connectionClient.setConnectionConfig(connectionConfig);
             sourceClient.setSourceConfig(sourceConfig);
             partitionManagerClient.storePartition(name);
 
             partitionManagerClient.stopPartition(name);
-            //partitionManagerClient.unloadPartition(name);
-            //partitionManagerClient.loadPartition(name);
             partitionManagerClient.startPartition(name);
 
             return true;
@@ -172,5 +143,13 @@ public class FederationDomainEditorWizard extends Wizard {
 
     public boolean needsPreviousAndNextButtons() {
         return true;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

@@ -42,7 +42,7 @@ public class LDAPRepositorySettingsPage extends FormPage {
     Label bindDnText;
     Label bindPasswordText;
 
-    Server project;
+    Server server;
     FederationClient federationClient;
     LDAPRepositoryClient ldapFederationClient;
     FederationRepositoryConfig repositoryConfig;
@@ -139,6 +139,7 @@ public class LDAPRepositorySettingsPage extends FormPage {
             public void widgetSelected(SelectionEvent event) {
                 try {
                     EditLDAPRepositoryWizard wizard = new EditLDAPRepositoryWizard(repositoryConfig);
+                    wizard.setServer(server);
 
                     IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
                     WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
@@ -190,12 +191,12 @@ public class LDAPRepositorySettingsPage extends FormPage {
         this.federationClient = federationClient;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public LDAPRepositoryClient getLdapFederationClient() {

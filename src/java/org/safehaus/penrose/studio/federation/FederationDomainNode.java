@@ -75,7 +75,7 @@ public class FederationDomainNode extends Node {
             } else if ("LDAP".equals(type)) {
 
                 LDAPNode node = new LDAPNode(type, this);
-                node.setProject(server);
+                node.setServer(server);
                 node.setFederationClient(getFederationClient());
                 node.init();
 
@@ -187,6 +187,7 @@ public class FederationDomainNode extends Node {
     public void edit() throws Exception {
 
         FederationDomainEditorWizard wizard = new FederationDomainEditorWizard(getFederationClient());
+        wizard.setServer(server);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         WizardDialog dialog = new WizardDialog(window.getShell(), wizard);

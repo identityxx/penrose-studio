@@ -40,6 +40,7 @@ import org.eclipse.jface.window.Window;
 import org.ietf.ldap.*;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.studio.browser.wizard.BrowserConnectionWizard;
+import org.safehaus.penrose.studio.server.Server;
 
 public class BrowserEditorPage extends FormPage {
 
@@ -58,6 +59,7 @@ public class BrowserEditorPage extends FormPage {
 
     LDAPConnection connection = new LDAPConnection();
 
+    Server server;
     String hostname;
     int port;
     String suffix;
@@ -68,6 +70,7 @@ public class BrowserEditorPage extends FormPage {
         super(editor, "BROWSER", "  Browser  ");
 
         BrowserEditorInput ei = (BrowserEditorInput)editor.getEditorInput();
+        server = ei.getServer();
         hostname = ei.getHostname();
         port = ei.getPort();
         bindDn = ei.getBindDn();
@@ -188,6 +191,7 @@ public class BrowserEditorPage extends FormPage {
                     LDAPUrl url = new LDAPUrl(urlText.getText());
 
                     BrowserConnectionWizard wizard = new BrowserConnectionWizard();
+                    wizard.setServer(server);
                     wizard.setProviderUrl(url.toString());
                     wizard.setSuffix(suffix);
                     wizard.setBindDn(bindDn);

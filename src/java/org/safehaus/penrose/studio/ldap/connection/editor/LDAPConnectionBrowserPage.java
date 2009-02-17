@@ -35,9 +35,9 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.ldap.*;
+import org.safehaus.penrose.ldap.connection.LDAPConnectionClient;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.Schema;
-import org.safehaus.penrose.schema.SchemaUtil;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.ldap.connection.wizard.LDAPSourceWizard;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
@@ -53,10 +53,16 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
     Tree tree;
     Table table;
 
-    Schema schema;
+    LDAPConnectionClient connectionClient;
 
-    public LDAPConnectionBrowserPage(LDAPConnectionEditor editor) {
+    public LDAPConnectionBrowserPage(LDAPConnectionEditor editor) throws Exception {
         super(editor, "BROWSER", "Browser");
+
+        connectionClient = new LDAPConnectionClient(
+                editor.getServer().getClient(),
+                partitionName,
+                editor.getConnectionName()
+        );
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -88,7 +94,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
         Control attributesSection = createAttributesSection(section);
         section.setClient(attributesSection);
 
-        refresh();
+        update();
     }
 
     public Composite createActionsSection(final Composite parent) {
@@ -100,7 +106,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
 
         refreshSchema.addHyperlinkListener(new HyperlinkAdapter() {
             public void linkActivated(HyperlinkEvent event) {
-                refresh();
+                update();
             }
         });
 
@@ -119,20 +125,15 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
 
         tree.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                LDAPClient client = null;
                 try {
                     TreeItem ti = tree.getSelection()[0];
                     DN dn = (DN)ti.getData();
 
-                    client = new LDAPClient(connectionConfig.getParameters());
-                    SearchResult entry = client.find(dn);
+                    SearchResult entry = connectionClient.find(dn);
                     showEntry(entry);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-
-                } finally {
-                    if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
                 }
             }
         });
@@ -147,21 +148,16 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
 
         mi.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                LDAPClient client = null;
                 try {
-                    client = new LDAPClient(connectionConfig.getParameters());
-
-                    SchemaUtil schemaUtil = new SchemaUtil();
-                    Schema schema = schemaUtil.getSchema(client);
+                    Schema schema = connectionClient.getSchema();
 
                     TreeItem treeItem = tree.getSelection()[0];
                     DN dn = (DN)treeItem.getData();
-                    SearchResult entry = client.find(dn);
+                    SearchResult entry = connectionClient.find(dn);
 
                     Collection<String> attributeNames = getAttributeNames(schema, entry);
 
                     LDAPSourceWizard wizard = new LDAPSourceWizard(
-                            client,
                             partitionName,
                             connectionConfig,
                             dn.toString(),
@@ -169,7 +165,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
                             "OBJECT",
                             attributeNames
                     );
-                    wizard.setProject(editor.getServer());
+                    wizard.setServer(editor.getServer());
 
                     WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
@@ -182,9 +178,6 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-
-                } finally {
-                    if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
                 }
             }
         });
@@ -194,15 +187,11 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
 
         mi.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                LDAPClient client = null;
                 try {
-                    client = new LDAPClient(connectionConfig.getParameters());
-
                     TreeItem treeItem = tree.getSelection()[0];
                     DN baseDn = (DN)treeItem.getData();
 
                     LDAPSourceWizard wizard = new LDAPSourceWizard(
-                            client,
                             partitionName,
                             connectionConfig,
                             baseDn.toString(),
@@ -210,7 +199,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
                             "ONELEVEL",
                             new ArrayList<String>()
                     );
-                    wizard.setProject(editor.getServer());
+                    wizard.setServer(editor.getServer());
 
                     WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
@@ -224,9 +213,6 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     ErrorDialog.open(e);
-
-                } finally {
-                    if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
                 }
             }
         });
@@ -236,18 +222,14 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
 
         mi.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                LDAPClient client = null;
                 try {
-                    client = new LDAPClient(connectionConfig.getParameters());
-
-                    SchemaUtil schemaUtil = new SchemaUtil();
-                    Schema schema = schemaUtil.getSchema(client);
+                    Schema schema = connectionClient.getSchema();
                     
                     TreeItem treeItem = tree.getSelection()[0];
                     DN baseDn = (DN)treeItem.getData();
                     DN parentDn = baseDn.getParentDn();
 
-                    SearchResult entry = client.find(baseDn);
+                    SearchResult entry = connectionClient.find(baseDn);
                     Attribute oc = entry.getAttributes().get("objectClass");
                     int counter = 0;
                     StringBuilder sb = new StringBuilder();
@@ -270,7 +252,6 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
                     Collection<String> attributeNames = getAttributeNames(schema, entry);
 
                     LDAPSourceWizard wizard = new LDAPSourceWizard(
-                            client,
                             partitionName,
                             connectionConfig,
                             parentDn.toString(),
@@ -278,7 +259,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
                             "ONELEVEL",
                             attributeNames
                     );
-                    wizard.setProject(editor.getServer());
+                    wizard.setServer(editor.getServer());
 
                     WizardDialog dialog = new WizardDialog(editor.getSite().getShell(), wizard);
                     dialog.setPageSize(600, 300);
@@ -291,9 +272,6 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-
-                } finally {
-                    if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
                 }
             }
         });
@@ -375,34 +353,19 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
         }
     }
 
-    public void refresh() {
-
-        tree.removeAll();
-
-        LDAPClient client = null;
-
+    public void update() {
         try {
-            client = new LDAPClient(connectionConfig.getParameters());
+            tree.removeAll();
 
             DN rootDn = new DN();
-            SearchResult root = client.find(rootDn);
+            SearchResult root = connectionClient.find(rootDn);
             if (root == null) return;
 
             TreeItem item = new TreeItem(tree, SWT.NONE);
             item.setText("Root");
             item.setData(rootDn);
 
-            Collection<SearchResult> results = client.findChildren(rootDn);
-
-            for (SearchResult entry : results) {
-                DN entryDn = entry.getDn();
-
-                TreeItem it = new TreeItem(item, SWT.NONE);
-                it.setText(entryDn.toString());
-                it.setData(entryDn);
-
-                new TreeItem(it, SWT.NONE);
-            }
+            expand(item);
 
             showEntry(root);
 
@@ -411,9 +374,6 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);
-
-        } finally {
-            if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
         }
     }
 
@@ -421,36 +381,74 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
     }
 
     public void treeExpanded(TreeEvent event) {
-        LDAPClient client = null;
         try {
             if (event.item == null) return;
 
             TreeItem item = (TreeItem)event.item;
-            DN baseDn = (DN)item.getData();
-            //log.debug("Expanding "+baseDn);
+            expand(item);
 
-            TreeItem items[] = item.getItems();
-            for (TreeItem item1 : items) {
-                item1.dispose();
-            }
-
-            client = new LDAPClient(connectionConfig.getParameters());
-            Collection<SearchResult> results = client.findChildren(baseDn);
-
-            for (SearchResult en : results) {
-                DN dn = en.getDn();
-
-                TreeItem it = new TreeItem(item, SWT.NONE);
-                it.setText(dn.getRdn().toString());
-                it.setData(dn);
-
-                new TreeItem(it, SWT.NONE);
-            }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);
-        } finally {
-            if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
         }
+    }
+
+    public Collection<SearchResult> expand(TreeItem item) throws Exception {
+
+        for (TreeItem ti : item.getItems()) {
+            ti.dispose();
+        }
+
+        DN baseDn = (DN)item.getData();
+
+        Collection<SearchResult> list = new ArrayList<SearchResult>();
+
+        if (baseDn.isEmpty()) {
+
+            SearchRequest req = new SearchRequest();
+            req.setScope(SearchRequest.SCOPE_BASE);
+            req.setAttributes(new String[] { "*", "+" });
+
+            SearchResponse response = new SearchResponse();
+
+            SearchResponse res = connectionClient.search(req, response);
+            SearchResult rootDse = res.next();
+
+            Attributes attributes = rootDse.getAttributes();
+            Attribute attribute = attributes.get("namingContexts");
+
+            for (Object value : attribute.getValues()) {
+                String dn = (String)value;
+
+                SearchResult entry = connectionClient.find(dn);
+                list.add(entry);
+            }
+
+        } else {
+
+            SearchRequest req = new SearchRequest();
+            req.setDn(baseDn);
+            req.setScope(SearchRequest.SCOPE_ONE);
+
+            SearchResponse response = new SearchResponse();
+            response = connectionClient.search(req, response);
+
+            for (SearchResult result : response.getResults()) {
+                list.add(result);
+            }
+        }
+
+        for (SearchResult result : list) {
+            DN dn = result.getDn();
+            String label = baseDn.isEmpty() ? dn.toString() : dn.getRdn().toString();
+
+            TreeItem ti = new TreeItem(item, SWT.NONE);
+            ti.setText(label);
+            ti.setData(dn);
+
+            new TreeItem(ti, SWT.NONE);
+        }
+
+        return list;
     }
 }

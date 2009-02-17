@@ -53,13 +53,13 @@ public class NewSourceAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Server project = node.getProjectNode().getServer();
+            Server server = node.getProjectNode().getServer();
 
             String partitionName  = node.getPartitionName();
             String adapterName    = node.getAdapterName();
             String connectionName = node.getConnectionName();
 
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
             ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
@@ -74,7 +74,7 @@ public class NewSourceAction extends Action {
 
             if ("JDBC".equals(adapterName)) {
                 wizard = new JDBCSourceWizard();
-                wizard.setServer(project);
+                wizard.setServer(server);
                 wizard.setPartitionName(partitionName);
                 wizard.setConnectionConfig(connectionConfig);
                 wizard.setSourceConfig(sourceConfig);
@@ -85,7 +85,7 @@ public class NewSourceAction extends Action {
 
             } else if ("LDAP".equals(adapterName)) {
                 wizard = new LDAPSourceWizard();
-                wizard.setServer(project);
+                wizard.setServer(server);
                 wizard.setPartitionName(partitionName);
                 wizard.setConnectionConfig(connectionConfig);
                 wizard.setSourceConfig(sourceConfig);
@@ -96,7 +96,7 @@ public class NewSourceAction extends Action {
 
             } else if ("NIS".equals(adapterName)) {
                 wizard = new NISSourceWizard();
-                wizard.setServer(project);
+                wizard.setServer(server);
                 wizard.setPartitionName(partitionName);
                 wizard.setConnectionConfig(connectionConfig);
                 wizard.setSourceConfig(sourceConfig);

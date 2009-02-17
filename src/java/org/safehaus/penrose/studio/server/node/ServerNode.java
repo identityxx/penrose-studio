@@ -318,17 +318,7 @@ public class ServerNode extends Node {
 
         penroseStudio.notifyChangeListeners();
     }
-/*
-    public void preview() throws Exception {
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        IWorkbenchPage page = window.getActivePage();
 
-        PreviewEditorInput ei = new PreviewEditorInput();
-        ei.setServer(project);
-
-        page.openEditor(ei, PreviewEditor.class.getName());
-    }
-*/
     public void browser() throws Exception {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
@@ -349,6 +339,7 @@ public class ServerNode extends Node {
         byte[] password = rootUserConfig.getPassword();
 
         BrowserEditorInput ei = new BrowserEditorInput();
+        ei.setServer(server);
         ei.setHostname(hostname);
         ei.setPort(port);
         ei.setBindDn(bindDn);

@@ -17,15 +17,19 @@
  */
 package org.safehaus.penrose.studio.browser.editor;
 
-import java.util.Enumeration;
-
-import org.apache.log4j.Logger;
-import org.eclipse.ui.forms.editor.FormEditor;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.safehaus.penrose.studio.editor.Editor;
+import org.safehaus.penrose.studio.server.Server;
 
-public class BrowserEditor extends FormEditor {
+public class BrowserEditor extends Editor {
 
-	private Logger log = Logger.getLogger(getClass());
+    Server server;
+
+    public void init() throws PartInitException {
+        BrowserEditorInput ei = (BrowserEditorInput)getEditorInput();
+        server = ei.getServer();
+    }
 
     protected void addPages() {
         try {
@@ -45,6 +49,14 @@ public class BrowserEditor extends FormEditor {
     }
 
     public void doSaveAs() {
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }
 

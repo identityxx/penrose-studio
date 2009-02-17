@@ -58,11 +58,11 @@ public class BrowserAction extends Action {
         
         try {
             ServersView serversView = ServersView.getInstance();
-            ServerNode projectNode = serversView.getSelectedServerNode();
-            Server project = projectNode.getServer();
-            PenroseClient client = project.getClient();
+            ServerNode serverNode = serversView.getSelectedServerNode();
+            Server server = serverNode.getServer();
+            PenroseClient client = server.getClient();
 
-            ServerConfig projectConfig = project.getServerConfig();
+            ServerConfig projectConfig = server.getServerConfig();
             String hostname = projectConfig.getHost();
 
             ServiceManagerClient serviceManagerClient = client.getServiceManagerClient();
@@ -70,13 +70,14 @@ public class BrowserAction extends Action {
             String s = serviceConfig == null ? null : serviceConfig.getParameter(LDAP_PORT);
             int port = s == null ? DEFAULT_LDAP_PORT : Integer.parseInt(s);
 
-            PenroseClient penroseClient = project.getClient();
+            PenroseClient penroseClient = server.getClient();
             UserConfig rootUserConfig = penroseClient.getRootUserConfig();
 
             String bindDn = rootUserConfig.getDn().toString();
             byte[] password = rootUserConfig.getPassword();
 
             BrowserEditorInput ei = new BrowserEditorInput();
+            ei.setServer(server);
             ei.setHostname(hostname);
             ei.setPort(port);
             ei.setBindDn(bindDn);

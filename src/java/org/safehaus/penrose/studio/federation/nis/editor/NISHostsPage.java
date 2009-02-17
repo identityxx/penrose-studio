@@ -386,7 +386,6 @@ public class NISHostsPage extends FormPage {
             ));
 
             sourceClient.modify(result.getDn(), modifications);
-            //nisFederation.getHosts().modify(result.getDn(), modifications);
 
             Attributes attributes = result.getAttributes();
             String hostname = (String)attributes.getValue("name");
@@ -397,14 +396,6 @@ public class NISHostsPage extends FormPage {
                     new Object[] { hostname, paths },
                     new String[] { String.class.getName(), String[].class.getName() }
             );
-
-            //Runnable runnable = new UpdateFilesRunnable(result, nisFederation.getHosts(), nisFederationClient.getFiles());
-            //runnable.run();
-
-            //new Thread(runnable).start();
-            
-            //Display display = getSite().getShell().getDisplay();
-            //display.asyncExec(runnable);
         }
 
         refresh();

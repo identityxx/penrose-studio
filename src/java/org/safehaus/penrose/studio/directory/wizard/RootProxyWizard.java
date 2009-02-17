@@ -20,7 +20,6 @@ package org.safehaus.penrose.studio.directory.wizard;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.directory.EntryConfig;
-import org.safehaus.penrose.directory.ProxyEntry;
 import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.directory.DirectoryClient;
 import org.safehaus.penrose.ldap.DN;
@@ -83,7 +82,7 @@ public class RootProxyWizard extends Wizard {
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
             EntryConfig entryConfig = new EntryConfig(dnPage.getDn());
-            entryConfig.setEntryClass(ProxyEntry.class.getName());
+            entryConfig.setEntryClass("org.safehaus.penrose.directory.ProxyEntry");
 
             entryConfig.addSourceConfig(new EntrySourceConfig(sourcePage.getSourceName()));
 

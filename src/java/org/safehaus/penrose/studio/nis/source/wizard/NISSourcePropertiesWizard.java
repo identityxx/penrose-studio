@@ -25,7 +25,7 @@ import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
-import org.safehaus.penrose.nis.source.NISSource;
+import org.safehaus.penrose.nis.NIS;
 
 /**
  * @author Endi S. Dewata
@@ -52,8 +52,8 @@ public class NISSourcePropertiesWizard extends SourceWizard {
 
         nisPropertiesPage = new NISSourcePropertiesWizardPage();
 
-        nisPropertiesPage.setBase(sourceConfig.getParameter(NISSource.BASE));
-        nisPropertiesPage.setObjectClasses(sourceConfig.getParameter(NISSource.OBJECT_CLASSES));
+        nisPropertiesPage.setBase(sourceConfig.getParameter(NIS.BASE));
+        nisPropertiesPage.setObjectClasses(sourceConfig.getParameter(NIS.OBJECT_CLASSES));
 
         addPage(nisPropertiesPage);
 
@@ -70,8 +70,8 @@ public class NISSourcePropertiesWizard extends SourceWizard {
         try {
             sourceConfig.setConnectionName(connectionPage.getConnectionName());
 
-            sourceConfig.setParameter(NISSource.BASE, nisPropertiesPage.getBase());
-            sourceConfig.setParameter(NISSource.OBJECT_CLASSES, nisPropertiesPage.getObjectClasses());
+            sourceConfig.setParameter(NIS.BASE, nisPropertiesPage.getBase());
+            sourceConfig.setParameter(NIS.OBJECT_CLASSES, nisPropertiesPage.getObjectClasses());
 
             PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();

@@ -25,7 +25,7 @@ public class LDAPRepositoryNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Server project;
+    private Server server;
     private FederationClient federationClient;
     private LDAPRepositoryClient ldapFederationClient;
     private FederationRepositoryConfig repositoryConfig;
@@ -41,7 +41,7 @@ public class LDAPRepositoryNode extends Node {
                 this
         );
 
-        linkingNode.setProject(project);
+        linkingNode.setProject(server);
         linkingNode.setLdapFederationClient(ldapFederationClient);
         linkingNode.setRepositoryConfig(repositoryConfig);
 
@@ -74,7 +74,7 @@ public class LDAPRepositoryNode extends Node {
     public void open() throws Exception {
 
         LDAPRepositoryEditorInput ei = new LDAPRepositoryEditorInput();
-        ei.setProject(project);
+        ei.setProject(server);
         ei.setFederationClient(federationClient);
         ei.setLdapFederationClient(ldapFederationClient);
         ei.setRepositoryConfig(repositoryConfig);
@@ -87,6 +87,7 @@ public class LDAPRepositoryNode extends Node {
     public void edit() throws Exception {
 
         EditLDAPRepositoryWizard wizard = new EditLDAPRepositoryWizard(repositoryConfig);
+        wizard.setServer(server);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
@@ -99,12 +100,12 @@ public class LDAPRepositoryNode extends Node {
         federationClient.store();
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public FederationRepositoryConfig getRepositoryConfig() {

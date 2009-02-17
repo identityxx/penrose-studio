@@ -24,13 +24,12 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.ldap.DN;
-import org.safehaus.penrose.ldap.LDAPClient;
-import org.safehaus.penrose.ldap.SearchResult;
+import org.safehaus.penrose.ldap.*;
+import org.safehaus.penrose.ldap.connection.LDAPConnectionClient;
 import org.safehaus.penrose.studio.server.Server;
 
 import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
@@ -49,8 +48,7 @@ public class LDAPSourceTreeWizardPage extends WizardPage implements ModifyListen
 
     Server server;
     String partitionName;
-
-    ConnectionConfig connectionConfig;
+    String connectionName;
 
     String baseDn;
     String filter;
@@ -62,14 +60,15 @@ public class LDAPSourceTreeWizardPage extends WizardPage implements ModifyListen
         setDescription("Select a subtree.");
     }
 
+    public void init() throws Exception {
+    }
+
     public void createControl(final Composite parent) {
 
         Composite composite = new Composite(parent, SWT.NONE);
         setControl(composite);
 
-        GridLayout sectionLayout = new GridLayout();
-        sectionLayout.numColumns = 2;
-        composite.setLayout(sectionLayout);
+        composite.setLayout(new GridLayout(2, false));
 
         Label baseDnLabel = new Label(composite, SWT.NONE);
         baseDnLabel.setText("Base DN:");
@@ -78,7 +77,12 @@ public class LDAPSourceTreeWizardPage extends WizardPage implements ModifyListen
         baseDnText = new Text(composite, SWT.BORDER);
         baseDnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        baseDnText.addModifyListener(this);
+        baseDnText.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent event) {
+                baseDn = baseDnText.getText().trim();
+                baseDn = "".equals(baseDn) ? null : baseDn;
+            }
+        });
 
         baseDnTree = new Tree(composite, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         GridData gd = new GridData(GridData.FILL_BOTH);
@@ -86,16 +90,15 @@ public class LDAPSourceTreeWizardPage extends WizardPage implements ModifyListen
         gd.horizontalSpan = 2;
         baseDnTree.setLayoutData(gd);
 
-        baseDnTree.addSelectionListener(new SelectionListener() {
+        baseDnTree.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 if (baseDnTree.getSelectionCount() == 0) return;
 
                 TreeItem item = baseDnTree.getSelection()[0];
-                baseDnText.setText((String)item.getData());
+                DN dn = (DN)item.getData();
+                baseDnText.setText(dn.toString());
 
                 setPageComplete(validatePage());
-            }
-            public void widgetDefaultSelected(SelectionEvent event) {
             }
         });
 
@@ -109,7 +112,14 @@ public class LDAPSourceTreeWizardPage extends WizardPage implements ModifyListen
         filterText.setText("(objectClass=*)");
         filterText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        filterText.addModifyListener(this);
+        filterText.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent event) {
+                filter = filterText.getText().trim();
+                filter = "".equals(filter) ? null : filter;
+
+                setPageComplete(validatePage());
+            }
+        });
 
         Label scopeLabel = new Label(composite, SWT.NONE);
         scopeLabel.setText("Scope:");
@@ -122,7 +132,14 @@ public class LDAPSourceTreeWizardPage extends WizardPage implements ModifyListen
         scopeCombo.add("SUBTREE");
         scopeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        scopeCombo.addModifyListener(this);
+        scopeCombo.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent event) {
+                scope = scopeCombo.getText().trim();
+                scope = "".equals(scope) ? null : scope;
+
+                setPageComplete(validatePage());
+            }
+        });
 
         Label objectClassesLabel = new Label(composite, SWT.NONE);
         objectClassesLabel.setText("Object classes:");
@@ -131,7 +148,14 @@ public class LDAPSourceTreeWizardPage extends WizardPage implements ModifyListen
         objectClassesText = new Text(composite, SWT.BORDER);
         objectClassesText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        objectClassesText.addModifyListener(this);
+        objectClassesText.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent event) {
+                objectClasses = objectClassesText.getText().trim();
+                objectClasses = "".equals(objectClasses) ? null : objectClasses;
+
+                setPageComplete(validatePage());
+            }
+        });
 
         baseDnText.setText(baseDn == null ? "" : baseDn);
         filterText.setText(filter == null ? "" : filter);
@@ -141,46 +165,35 @@ public class LDAPSourceTreeWizardPage extends WizardPage implements ModifyListen
         setPageComplete(validatePage());
     }
 
-    public void setConnectionConfig(ConnectionConfig connectionConfig) {
-        this.connectionConfig = connectionConfig;
-    }
-
     public void setVisible(boolean visible) {
         super.setVisible(visible);
-        if (visible) init();
+        if (visible) refresh();
     }
 
-    public void init() {
-        LDAPClient client = null;
+    public void refresh() {
         try {
             baseDnTree.removeAll();
 
-            client = new LDAPClient(connectionConfig.getParameters());
+            LDAPConnectionClient connectionClient = new LDAPConnectionClient(
+                    server.getClient(),
+                    partitionName,
+                    connectionName
+            );
+
+            DN rootDn = new DN();
+            SearchResult root = connectionClient.find(rootDn);
+            if (root == null) return;
 
             TreeItem item = new TreeItem(baseDnTree, SWT.NONE);
-            String suffix = "Root DSE";
-            item.setText(suffix);
-            item.setData("");
+            item.setText("Root");
+            item.setData(rootDn);
 
-            Collection<SearchResult> results = client.findChildren("");
-
-            for (SearchResult entry : results) {
-                String dn = entry.getDn().toString();
-
-                TreeItem it = new TreeItem(item, SWT.NONE);
-                it.setText(dn);
-                it.setData(dn);
-
-                new TreeItem(it, SWT.NONE);
-            }
+            expand(item);
 
             item.setExpanded(true);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-
-        } finally {
-            if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }                                
         }
     }
 
@@ -188,57 +201,31 @@ public class LDAPSourceTreeWizardPage extends WizardPage implements ModifyListen
     }
 
     public void treeExpanded(TreeEvent event) {
-        LDAPClient client = null;
         try {
             if (event.item == null) return;
 
             TreeItem item = (TreeItem)event.item;
-            String baseDn = (String)item.getData();
+            expand(item);
 
-            TreeItem items[] = item.getItems();
-            for (TreeItem child : items) {
-                child.dispose();
-            }
-
-            client = new LDAPClient(connectionConfig.getParameters());
-            Collection<SearchResult> results = client.findChildren(baseDn);
-
-            for (SearchResult entry : results) {
-                String dn = entry.getDn().toString();
-                String rdn = new DN(dn).getRdn().toString();
-
-                TreeItem it = new TreeItem(item, SWT.NONE);
-                it.setText(rdn);
-                it.setData(dn);
-
-                new TreeItem(it, SWT.NONE);
-            }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-
-        } finally {
-            if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
         }
     }
 
     public String getBaseDn() {
-        String s = baseDnText.getText().trim();
-        return "".equals(s) ? null : s;
+        return baseDn;
     }
 
     public String getFilter() {
-        String s = filterText.getText().trim();
-        return "".equals(s) ? null : s;
+        return filter;
     }
 
     public String getScope() {
-        String s = scopeCombo.getText().trim();
-        return "".equals(s) ? null : s;
+        return scope;
     }
 
     public String getObjectClasses() {
-        String s = objectClassesText.getText().trim();
-        return "".equals(s) ? null : s;
+        return objectClasses;
     }
 
     public boolean validatePage() {
@@ -287,5 +274,78 @@ public class LDAPSourceTreeWizardPage extends WizardPage implements ModifyListen
 
     public void modifyText(ModifyEvent event) {
         setPageComplete(validatePage());
+    }
+
+    public String getConnectionName() {
+        return connectionName;
+    }
+
+    public void setConnectionName(String connectionName) {
+        this.connectionName = connectionName;
+    }
+
+    public Collection<SearchResult> expand(TreeItem item) throws Exception {
+
+        for (TreeItem ti : item.getItems()) {
+            ti.dispose();
+        }
+
+        LDAPConnectionClient connectionClient = new LDAPConnectionClient(
+                server.getClient(),
+                partitionName,
+                connectionName
+        );
+
+        DN baseDn = (DN)item.getData();
+
+        Collection<SearchResult> list = new ArrayList<SearchResult>();
+
+        if (baseDn.isEmpty()) {
+
+            SearchRequest req = new SearchRequest();
+            req.setScope(SearchRequest.SCOPE_BASE);
+            req.setAttributes(new String[] { "*", "+" });
+
+            SearchResponse response = new SearchResponse();
+
+            SearchResponse res = connectionClient.search(req, response);
+            SearchResult rootDse = res.next();
+
+            Attributes attributes = rootDse.getAttributes();
+            Attribute attribute = attributes.get("namingContexts");
+
+            for (Object value : attribute.getValues()) {
+                String dn = (String)value;
+
+                SearchResult entry = connectionClient.find(dn);
+                list.add(entry);
+            }
+
+        } else {
+
+            SearchRequest req = new SearchRequest();
+            req.setDn(baseDn);
+            req.setScope(SearchRequest.SCOPE_ONE);
+
+            SearchResponse response = new SearchResponse();
+            response = connectionClient.search(req, response);
+
+            for (SearchResult result : response.getResults()) {
+                list.add(result);
+            }
+        }
+
+        for (SearchResult result : list) {
+            DN dn = result.getDn();
+            String label = baseDn.isEmpty() ? dn.toString() : dn.getRdn().toString();
+
+            TreeItem ti = new TreeItem(item, SWT.NONE);
+            ti.setText(label);
+            ti.setData(dn);
+
+            new TreeItem(ti, SWT.NONE);
+        }
+
+        return list;
     }
 }

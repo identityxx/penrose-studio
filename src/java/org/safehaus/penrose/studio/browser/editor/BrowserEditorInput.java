@@ -20,12 +20,14 @@ package org.safehaus.penrose.studio.browser.editor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
  */
 public class BrowserEditorInput implements IEditorInput {
 
+    private Server server;
     private String hostname;
     private int port;
     private String bindDn;
@@ -88,5 +90,13 @@ public class BrowserEditorInput implements IEditorInput {
 
     public void setPassword(byte[] password) {
         this.password = password;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

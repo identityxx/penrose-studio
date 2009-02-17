@@ -24,7 +24,7 @@ import org.safehaus.penrose.studio.jdbc.source.wizard.JDBCSourceFieldsWizardPage
 import org.safehaus.penrose.studio.jdbc.source.wizard.JDBCSourceFilterWizardPage;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.jdbc.Table;
-import org.safehaus.penrose.jdbc.source.JDBCSource;
+import org.safehaus.penrose.jdbc.JDBC;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
@@ -146,17 +146,13 @@ public class JDBCSourceWizard extends Wizard {
 
             sourceConfig.setConnectionName(connectionConfig.getName());
 
-            sourceConfig.setParameter(JDBCSource.CATALOG, table.getCatalog());
-            sourceConfig.setParameter(JDBCSource.SCHEMA, table.getSchema());
-            sourceConfig.setParameter(JDBCSource.TABLE, table.getName());
+            sourceConfig.setParameter(JDBC.CATALOG, table.getCatalog());
+            sourceConfig.setParameter(JDBC.SCHEMA, table.getSchema());
+            sourceConfig.setParameter(JDBC.TABLE, table.getName());
 
-            sourceConfig.setParameter(JDBCSource.FILTER, filterPage.getFilter());
+            sourceConfig.setParameter(JDBC.FILTER, filterPage.getFilter());
 
             sourceConfig.setFieldConfigs(selectedFieldConfigs.values());
-
-            //SourceConfigManager sourceConfigManager = partitionConfig.getSourceConfigManager();
-            //sourceConfigManager.addSourceConfig(sourceConfig);
-            //project.save(partitionConfig, sourceConfigManager);
 
             PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();

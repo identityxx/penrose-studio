@@ -27,9 +27,8 @@ import org.safehaus.penrose.studio.ldap.source.wizard.LDAPSourceFieldsWizardPage
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.source.wizard.SourcePrimaryKeysWizardPage;
 import org.safehaus.penrose.ldap.RDN;
-import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.ldap.DN;
-import org.safehaus.penrose.ldap.source.LDAPSource;
+import org.safehaus.penrose.ldap.LDAP;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
@@ -47,8 +46,7 @@ public class LDAPSourceWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Server project;
-    private LDAPClient client;
+    private Server server;
     private String partitionName;
     private ConnectionConfig connectionConfig;
     private String baseDn;
@@ -64,12 +62,7 @@ public class LDAPSourceWizard extends Wizard {
     Map<String,FieldConfig> availableFieldConfigs = new TreeMap<String,FieldConfig>();
     Map<String,FieldConfig> selectedFieldConfigs = new TreeMap<String,FieldConfig>();
 
-    public LDAPSourceWizard(LDAPClient client, String partitionName, ConnectionConfig connectionConfig, String baseDn) throws Exception {
-        this(client, partitionName, connectionConfig, baseDn, "(objectClass=*)", "OBJECT", new ArrayList<String>());
-    }
-    
     public LDAPSourceWizard(
-            LDAPClient client,
             String partitionName,
             ConnectionConfig connectionConfig,
             String baseDn,
@@ -77,7 +70,6 @@ public class LDAPSourceWizard extends Wizard {
             String scope,
             Collection<String> attributeNames) throws Exception {
 
-        this.client = client;
         this.partitionName = partitionName;
         this.connectionConfig = connectionConfig;
         this.baseDn = baseDn;
@@ -93,7 +85,8 @@ public class LDAPSourceWizard extends Wizard {
         propertiesPage = new LDAPSourceWizardPage(name, baseDn, filter, scope);
         
         fieldsPage = new LDAPSourceFieldsWizardPage(attributeNames);
-        //fieldsPage.setMappingConfig(connectionConfig);
+        fieldsPage.setServer(server);
+        fieldsPage.setPartitionName(partitionName);
 
         setWindowTitle(connectionConfig.getName()+" - New Source");
     }
@@ -112,13 +105,13 @@ public class LDAPSourceWizard extends Wizard {
             sourceConfig.setName(propertiesPage.getSourceName());
             sourceConfig.setConnectionName(connectionConfig.getName());
 
-            sourceConfig.setParameter(LDAPSource.BASE_DN, baseDn);
-            sourceConfig.setParameter(LDAPSource.FILTER, propertiesPage.getFilter());
-            sourceConfig.setParameter(LDAPSource.SCOPE, propertiesPage.getScope());
+            sourceConfig.setParameter(LDAP.BASE_DN, baseDn);
+            sourceConfig.setParameter(LDAP.FILTER, propertiesPage.getFilter());
+            sourceConfig.setParameter(LDAP.SCOPE, propertiesPage.getScope());
 
             sourceConfig.setFieldConfigs(selectedFieldConfigs.values());
 
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
             SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
@@ -185,11 +178,11 @@ public class LDAPSourceWizard extends Wizard {
         this.partitionName = partitionName;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

@@ -27,7 +27,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
-import org.safehaus.penrose.jdbc.source.JDBCSource;
+import org.safehaus.penrose.jdbc.JDBC;
 import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
 import org.safehaus.penrose.studio.jdbc.source.wizard.JDBCSourcePropertiesWizard;
 
@@ -171,16 +171,16 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
         String connection = sourceConfig.getConnectionName();
         connectionText.setText(connection == null ? "" : connection);
 
-        String catalog = sourceConfig.getParameter(JDBCSource.CATALOG);
+        String catalog = sourceConfig.getParameter(JDBC.CATALOG);
         catalogText.setText(catalog == null ? "" : catalog);
 
-        String schema = sourceConfig.getParameter(JDBCSource.SCHEMA);
+        String schema = sourceConfig.getParameter(JDBC.SCHEMA);
         schemaText.setText(schema == null ? "" : schema);
 
-        String table = sourceConfig.getParameter(JDBCSource.TABLE);
+        String table = sourceConfig.getParameter(JDBC.TABLE);
         tableText.setText(table == null ? "" : table);
 
-        String filter = sourceConfig.getParameter(JDBCSource.FILTER);
+        String filter = sourceConfig.getParameter(JDBC.FILTER);
         filterText.setText(filter == null ? "" : filter);
     }
 

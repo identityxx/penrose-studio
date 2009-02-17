@@ -28,7 +28,7 @@ public class LDAPNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    Server project;
+    Server server;
     FederationClient federationClient;
 
     public LDAPNode(String name, Node parent) throws Exception {
@@ -54,7 +54,7 @@ public class LDAPNode extends Node {
 
             LDAPRepositoryNode node = new LDAPRepositoryNode(repositoryConfig.getName(), this);
 
-            node.setProject(project);
+            node.setServer(server);
             node.setFederationClient(federationClient);
             node.setLdapFederationClient(ldapFederationClient);
             node.setRepositoryConfig(repositoryConfig);
@@ -107,7 +107,7 @@ public class LDAPNode extends Node {
     public void open() throws Exception {
 
         LDAPEditorInput ei = new LDAPEditorInput();
-        ei.setProject(project);
+        ei.setProject(server);
         ei.setFederationClient(federationClient);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -123,6 +123,8 @@ public class LDAPNode extends Node {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
         AddLDAPRepositoryWizard wizard = new AddLDAPRepositoryWizard();
+        wizard.setServer(server);
+
         WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
         dialog.setPageSize(600, 300);
         int rc = dialog.open();
@@ -138,12 +140,12 @@ public class LDAPNode extends Node {
         penroseStudio.notifyChangeListeners();
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public FederationClient getFederationClient() {

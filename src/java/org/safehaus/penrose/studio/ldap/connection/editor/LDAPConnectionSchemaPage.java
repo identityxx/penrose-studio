@@ -30,12 +30,10 @@ import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.AttributeType;
-import org.safehaus.penrose.schema.SchemaUtil;
 import org.safehaus.penrose.studio.connection.SchemaExportWizard;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.ldap.connection.editor.LDAPConnectionEditor;
-import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.ldap.connection.LDAPConnectionClient;
 
 import java.util.Collection;
 
@@ -47,10 +45,17 @@ public class LDAPConnectionSchemaPage extends ConnectionEditorPage {
     Table objectClassesTable;
     Table attributeTypesTable;
 
+    LDAPConnectionClient connectionClient;
     Schema schema;
 
-    public LDAPConnectionSchemaPage(LDAPConnectionEditor editor) {
+    public LDAPConnectionSchemaPage(LDAPConnectionEditor editor) throws Exception {
         super(editor, "SCHEMA", "Schema");
+
+        connectionClient = new LDAPConnectionClient(
+                editor.getServer().getClient(),
+                partitionName,
+                editor.getConnectionName()
+        );
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -61,14 +66,6 @@ public class LDAPConnectionSchemaPage extends ConnectionEditorPage {
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-/*
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        if (penroseStudio.isFreeware()) {
-            Label label = toolkit.createLabel(body, PenroseStudio.FEATURE_NOT_AVAILABLE);
-            label.setLayoutData(new GridData(GridData.FILL_BOTH));
-            return;
-        }
-*/
         Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Actions");
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -89,6 +86,8 @@ public class LDAPConnectionSchemaPage extends ConnectionEditorPage {
 
         Control attributeTypesSection = createAttributeTypesSection(section);
         section.setClient(attributeTypesSection);
+
+        update();
     }
 
     public Composite createActionsSection(final Composite parent) {
@@ -100,7 +99,7 @@ public class LDAPConnectionSchemaPage extends ConnectionEditorPage {
 
         refreshSchema.addHyperlinkListener(new HyperlinkAdapter() {
             public void linkActivated(HyperlinkEvent event) {
-                refresh();
+                update();
             }
         });
 
@@ -177,16 +176,12 @@ public class LDAPConnectionSchemaPage extends ConnectionEditorPage {
         return composite;
     }
 
-    public void refresh() {
-        LDAPClient client = null;
+    public void update() {
         try {
             attributeTypesTable.removeAll();
             objectClassesTable.removeAll();
 
-            client = new LDAPClient(connectionConfig.getParameters());
-
-            SchemaUtil schemaUtil = new SchemaUtil();
-            schema = schemaUtil.getSchema(client);
+            schema = connectionClient.getSchema();
 
             Collection<AttributeType> attributeTypes = schema.getAttributeTypes();
             for (AttributeType at : attributeTypes) {
@@ -207,9 +202,6 @@ public class LDAPConnectionSchemaPage extends ConnectionEditorPage {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);
-
-        } finally {
-            if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
         }
     }
 }

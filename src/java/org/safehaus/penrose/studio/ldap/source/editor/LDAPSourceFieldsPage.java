@@ -94,7 +94,6 @@ public class LDAPSourceFieldsPage extends SourceFieldsPage {
                         attributeTypes = new ArrayList<AttributeType>();
                     } else {
 
-                        SchemaUtil schemaUtil = new SchemaUtil();
                         Schema schema = schemaUtil.getSchema(ldapClient);
                         attributeTypes = schema.getAttributeTypes();
                     }

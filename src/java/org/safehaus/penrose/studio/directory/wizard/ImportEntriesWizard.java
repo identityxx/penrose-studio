@@ -22,11 +22,12 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
 import org.safehaus.penrose.studio.util.SnapshotUtil;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.ldap.source.wizard.LDAPSourceTreeWizardPage;
-import org.safehaus.penrose.ldap.LDAPClient;
 import org.safehaus.penrose.ldap.DN;
+import org.safehaus.penrose.ldap.connection.LDAPConnectionClient;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.filter.FilterTool;
+import org.safehaus.penrose.client.PenroseClient;
+import org.safehaus.penrose.schema.SchemaManagerClient;
 import org.apache.log4j.Logger;
 
 /**
@@ -67,7 +68,7 @@ public class ImportEntriesWizard extends Wizard {
         if (connectionPage == page) {
             ConnectionConfig connectionConfig = connectionPage.getConnectionConfig();
             if (connectionConfig == null) return null;
-            treePage.setConnectionConfig(connectionConfig);
+            treePage.setConnectionName(connectionPage.getConnectionName());
         }
 
         return super.getNextPage(page);
@@ -80,15 +81,11 @@ public class ImportEntriesWizard extends Wizard {
     }
 
     public boolean performFinish() {
-        LDAPClient client = null;
         try {
-            ConnectionConfig connectionConfig = connectionPage.getConnectionConfig();
-            client = new LDAPClient(connectionConfig.getParameters());
-
             SnapshotUtil util = new SnapshotUtil();
             util.setServer(server);
             util.setPartitionName(partitionName);
-            util.setLdapClient(client);
+            util.setConnectionName(connectionPage.getConnectionName());
 
             util.setSourceDn(new DN(treePage.getBaseDn()));
             util.setTargetDn(targetDn);
@@ -107,9 +104,6 @@ public class ImportEntriesWizard extends Wizard {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
-
-        } finally {
-            if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
         }
     }
 

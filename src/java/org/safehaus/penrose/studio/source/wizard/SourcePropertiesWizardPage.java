@@ -61,7 +61,14 @@ public class SourcePropertiesWizardPage extends WizardPage implements ModifyList
 
         nameText = new Text(composite, SWT.BORDER);
         nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        nameText.addModifyListener(this);
+
+        nameText.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent event) {
+                name = nameText.getText().trim();
+                name = "".equals(name) ? null : name;
+                setPageComplete(validatePage());
+            }
+        });
 
         Label classLabel = new Label(composite, SWT.NONE);
         classLabel.setText("Class:");
@@ -69,7 +76,14 @@ public class SourcePropertiesWizardPage extends WizardPage implements ModifyList
 
         classCombo = new Combo(composite, SWT.BORDER);
         classCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        classCombo.addModifyListener(this);
+
+        classCombo.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                className = classCombo.getText().trim();
+                className = "".equals(className) ? null : className;
+                setPageComplete(validatePage());
+            }
+        });
 
         Label enabledLabel = new Label(composite, SWT.NONE);
         enabledLabel.setText("Enabled:");
@@ -78,6 +92,7 @@ public class SourcePropertiesWizardPage extends WizardPage implements ModifyList
         enabledButton = new Button(composite, SWT.CHECK);
         enabledButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
+                enabled = enabledButton.getSelection();
                 setPageComplete(validatePage());
             }
         });
@@ -91,13 +106,20 @@ public class SourcePropertiesWizardPage extends WizardPage implements ModifyList
 
         descriptionText = new Text(composite, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
         descriptionText.setLayoutData(new GridData(GridData.FILL_BOTH));
-        descriptionText.addModifyListener(this);
+
+        descriptionText.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent event) {
+                description = descriptionText.getText().trim();
+                description = "".equals(description) ? null : description;
+                setPageComplete(validatePage());
+            }
+        });
 
         setPageComplete(validatePage());
     }
 
     public boolean validatePage() {
-        if (nameText.getText().equals("")) return false;
+        if (name == null) return false;
         return true;
     }
 
@@ -118,8 +140,7 @@ public class SourcePropertiesWizardPage extends WizardPage implements ModifyList
     }
 
     public String getSourceName() {
-        String name = nameText.getText();
-        return "".equals(name) ? null : name;
+        return name;
     }
 
     public void setSourceName(String name) {
@@ -127,8 +148,7 @@ public class SourcePropertiesWizardPage extends WizardPage implements ModifyList
     }
 
     public String getClassName() {
-        String className = classCombo.getText();
-        return "".equals(className) ? null : className;
+        return className;
     }
 
     public void setClassName(String className) {
@@ -136,7 +156,7 @@ public class SourcePropertiesWizardPage extends WizardPage implements ModifyList
     }
 
     public boolean isEnabled() {
-        return enabledButton.getSelection();
+        return enabled;
     }
 
     public void setEnabled(boolean enabled) {
@@ -144,8 +164,7 @@ public class SourcePropertiesWizardPage extends WizardPage implements ModifyList
     }
 
     public String getSourceDescription() {
-        String description = descriptionText.getText();
-        return "".equals(description) ? null : description;
+        return description;
     }
 
     public void setSourceDescription(String description) {

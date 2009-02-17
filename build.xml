@@ -118,6 +118,7 @@
             dir="lib"
             newDir="lib"
         />
+        <fixcrlf srcdir="META-INF" includes="MANIFEST.MF" eol="unix"/>
     </target>
 
     <target name="compile" depends="manifest">
@@ -248,6 +249,7 @@
         />
 
         <fixcrlf srcdir="target/dist" includes="**/*.txt" eol="unix"/>
+        <fixcrlf srcdir="${plugin.path}/META-INF" includes="MANIFEST.MF" eol="unix"/>
 
         <mkdir dir="dist"/>
         <tar destfile="dist/${product.name}-${product.version}.tar.gz" compression="gzip">

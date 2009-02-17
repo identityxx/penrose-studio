@@ -27,13 +27,12 @@ import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.schema.ObjectClass;
-import org.safehaus.penrose.schema.SchemaUtil;
-import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.ldap.LDAPClient;
+import org.safehaus.penrose.ldap.connection.LDAPConnectionClient;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -52,7 +51,9 @@ public class LDAPSourceFieldsWizardPage extends WizardPage {
     Table availableTable;
     Table selectedTable;
 
-    ConnectionConfig connectionConfig;
+    Server server;
+    String partitionName;
+    String connectionName;
     Collection<String> attributeNames;
     Schema schema;
 
@@ -165,21 +166,14 @@ public class LDAPSourceFieldsWizardPage extends WizardPage {
         setPageComplete(validatePage());
     }
 
-    public Schema getSchema(ConnectionConfig connectionConfig) {
-        LDAPClient client = null;
-        try {
-            client = new LDAPClient(connectionConfig.getParameters());
+    public Schema getSchema() throws Exception {
+        LDAPConnectionClient connectionClient = new LDAPConnectionClient(
+                server.getClient(),
+                partitionName,
+                connectionName
+        );
 
-            SchemaUtil schemaUtil = new SchemaUtil();
-            return schemaUtil.getSchema(client);
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return null;
-
-        } finally {
-            if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
-        }
+        return connectionClient.getSchema();
     }
 
     public void setVisible(boolean b) {
@@ -189,7 +183,7 @@ public class LDAPSourceFieldsWizardPage extends WizardPage {
 
     public void refresh() {
         try {
-            if (schema == null) schema = getSchema(connectionConfig);
+            if (schema == null) schema = getSchema();
 
             objectClassCombo.removeAll();
             objectClassCombo.add("");
@@ -325,11 +319,27 @@ public class LDAPSourceFieldsWizardPage extends WizardPage {
         this.schema = schema;
     }
 
-    public ConnectionConfig getConnectionConfig() {
-        return connectionConfig;
+    public String getConnectionName() {
+        return connectionName;
     }
 
-    public void setConnectionConfig(ConnectionConfig connectionConfig) {
-        this.connectionConfig = connectionConfig;
+    public void setConnectionName(String connectionName) {
+        this.connectionName = connectionName;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
+    }
+
+    public String getPartitionName() {
+        return partitionName;
+    }
+
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
     }
 }
