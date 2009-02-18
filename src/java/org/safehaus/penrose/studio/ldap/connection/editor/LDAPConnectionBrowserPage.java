@@ -133,6 +133,8 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
                     if (dn == null) return;
 
                     SearchResult entry = connectionClient.find(dn);
+                    if (entry == null) return;
+
                     showAttributes(entry);
 
                 } catch (Exception e) {

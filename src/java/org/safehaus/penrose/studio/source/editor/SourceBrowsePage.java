@@ -131,6 +131,8 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
                     if (dn == null) return;
 
                     SearchResult entry = sourceClient.find(dn);
+                    if (entry == null) return;
+                    
                     showAttributes(entry);
 
                 } catch (Exception e) {
