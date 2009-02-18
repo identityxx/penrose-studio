@@ -1,3 +1,20 @@
+/**
+ * Copyright (c) 2000-2006, Identyx Corporation.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 package org.safehaus.penrose.studio.source.editor;
 
 import org.eclipse.ui.forms.widgets.ScrolledForm;
@@ -23,8 +40,9 @@ import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 
-import javax.management.MBeanException;
-
+/**
+ * @author Endi S. Dewata
+ */
 public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
 
     Button refreshButton;
@@ -33,8 +51,16 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
     Tree tree;
     Table table;
 
+    SourceClient sourceClient;
+
     public SourceBrowsePage(SourceEditor editor) throws Exception {
         super(editor, "BROWSE", "Browse");
+
+        PenroseClient client = server.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+        sourceClient = sourceManagerClient.getSourceClient(sourceConfig.getName());
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -65,6 +91,8 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
 
         Control attributesSection = createAttributesSection(section);
         section.setClient(attributesSection);
+
+        update();
     }
 
     public Composite createActionsSection(final Composite parent) {
@@ -76,7 +104,7 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
 
         refreshSchema.addHyperlinkListener(new HyperlinkAdapter() {
             public void linkActivated(HyperlinkEvent event) {
-                refresh();
+                update();
             }
         });
 
@@ -96,18 +124,14 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
         tree.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
+                    table.removeAll();
+
                     TreeItem item = tree.getSelection()[0];
-                    DN entryDn = (DN)item.getData();
+                    DN dn = (DN)item.getData();
+                    if (dn == null) return;
 
-                    PenroseClient client = server.getClient();
-                    PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-                    SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
-
-                    SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceConfig.getName());
-                    SearchResult entry = sourceClient.find(entryDn);
-                    
-                    showEntry(entry);
+                    SearchResult entry = sourceClient.find(dn);
+                    showAttributes(entry);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -144,8 +168,7 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
         return composite;
     }
 
-    public void showEntry(SearchResult entry) throws Exception {
-        table.removeAll();
+    public void showAttributes(SearchResult entry) throws Exception {
 
         Attributes attributes = entry.getAttributes();
         for (Attribute attribute : attributes.getAll()) {
@@ -162,17 +185,10 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
         }
     }
 
-    public void refresh() {
-
-        tree.removeAll();
-
+    public void update() {
         try {
-            PenroseClient client = server.getClient();
-            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-            SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
-
-            SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceConfig.getName());
+            tree.removeAll();
+            table.removeAll();
 
             DN rootDn = new DN();
             SearchResult root = sourceClient.find(rootDn);
@@ -182,37 +198,11 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
             item.setText("Root");
             item.setData(rootDn);
 
-            log.debug("Naming contexts:");
+            expand(item);
 
-            SearchRequest request = new SearchRequest();
-            request.setDn(rootDn);
-            request.setScope(SearchRequest.SCOPE_ONE);
-
-            SearchResponse response = new SearchResponse();
-
-            sourceClient.search(request, response);
-
-            while (response.hasNext()) {
-
-                SearchResult child = response.next();
-                DN childDn = child.getDn();
-                log.debug(" - "+childDn);
-
-                TreeItem it = new TreeItem(item, SWT.NONE);
-                it.setText(childDn.toString());
-                it.setData(childDn);
-
-                new TreeItem(it, SWT.NONE);
-            }
-
-            showEntry(root);
+            showAttributes(root);
 
             item.setExpanded(true);
-
-        } catch (MBeanException e) {
-            Throwable t = e.getCause();
-            log.error(t.getMessage(), t);
-            ErrorDialog.open(t);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -228,50 +218,46 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
             if (event.item == null) return;
 
             TreeItem item = (TreeItem)event.item;
-            DN entryDn = (DN)item.getData();
-            log.debug("Expanding "+entryDn);
-
-            TreeItem items[] = item.getItems();
-            for (TreeItem item1 : items) {
-                item1.dispose();
-            }
-
-            PenroseClient client = server.getClient();
-            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-            SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
-
-            SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceConfig.getName());
-
-            SearchRequest request = new SearchRequest();
-            request.setDn(entryDn);
-            request.setScope(SearchRequest.SCOPE_ONE);
-
-            SearchResponse response = new SearchResponse();
-
-            sourceClient.search(request, response);
-
-            while (response.hasNext()) {
-
-                SearchResult child = response.next();
-                DN childDn = child.getDn();
-                log.debug(" - "+childDn);
-
-                TreeItem it = new TreeItem(item, SWT.NONE);
-                it.setText(entryDn.isEmpty() ? childDn.toString() : childDn.getRdn().toString());
-                it.setData(childDn);
-
-                new TreeItem(it, SWT.NONE);
-            }
-
-        } catch (MBeanException e) {
-            Throwable t = e.getCause();
-            log.error(t.getMessage(), t);
-            ErrorDialog.open(t);
+            expand(item);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);
+        }
+    }
+
+    public void expand(TreeItem item) throws Exception {
+
+        for (TreeItem ti : item.getItems()) {
+            ti.dispose();
+        }
+
+        try {
+            DN baseDn = (DN)item.getData();
+
+            SearchRequest request = new SearchRequest();
+            request.setDn(baseDn);
+            request.setScope(SearchRequest.SCOPE_ONE);
+
+            SearchResponse response = new SearchResponse();
+
+            response = sourceClient.search(request, response);
+
+            while (response.hasNext()) {
+                SearchResult result = response.next();
+                DN dn = result.getDn();
+                String label = baseDn.isEmpty() ? dn.toString() : dn.getRdn().toString();
+
+                TreeItem it = new TreeItem(item, SWT.NONE);
+                it.setText(label);
+                it.setData(dn);
+
+                new TreeItem(it, SWT.NONE);
+            }
+
+        } catch (Exception e) {
+            TreeItem ti = new TreeItem(item, SWT.NONE);
+            ti.setText("Error: "+e.getMessage());
         }
     }
 }

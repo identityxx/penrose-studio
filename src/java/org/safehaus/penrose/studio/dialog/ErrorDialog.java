@@ -3,6 +3,7 @@ package org.safehaus.penrose.studio.dialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.ietf.ldap.LDAPException;
 
 import java.io.StringWriter;
 import java.io.PrintWriter;
@@ -13,9 +14,32 @@ import java.io.PrintWriter;
 public class ErrorDialog {
 
     public static void open(Throwable t) {
-        open("ERROR", t);
+        if (t instanceof LDAPException) {
+            open((LDAPException)t);
+        } else {
+            open("ERROR", t);
+        }
     }
     
+    public static void open(LDAPException e) {
+        StringWriter sw = new StringWriter();
+
+        PrintWriter pw = new PrintWriter(sw);
+        pw.println("LDAP Error ("+e.getResultCode()+"): "+e.getMessage());
+
+        String matchedDn = e.getMatchedDN();
+        if (matchedDn != null && !"".equals(matchedDn)) {
+            pw.println("Matched DN: "+matchedDn);
+        }
+
+        String errorMessage = e.getLDAPErrorMessage();
+        if (errorMessage != null && !"".equals(errorMessage)) {
+            pw.println("Message: "+errorMessage);
+        }
+
+        open("ERROR", sw.toString());
+    }
+
     public static void open(String message) {
         open("ERROR", message);
     }

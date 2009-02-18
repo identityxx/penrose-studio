@@ -126,14 +126,18 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
         tree.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
+                    table.removeAll();
+
                     TreeItem ti = tree.getSelection()[0];
                     DN dn = (DN)ti.getData();
+                    if (dn == null) return;
 
                     SearchResult entry = connectionClient.find(dn);
-                    showEntry(entry);
+                    showAttributes(entry);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -335,8 +339,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
         return composite;
     }
 
-    public void showEntry(SearchResult entry) throws Exception {
-        table.removeAll();
+    public void showAttributes(SearchResult entry) throws Exception {
 
         Attributes attributes = entry.getAttributes();
         for (Attribute attribute : attributes.getAll()) {
@@ -356,6 +359,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
     public void update() {
         try {
             tree.removeAll();
+            table.removeAll();
 
             DN rootDn = new DN();
             SearchResult root = connectionClient.find(rootDn);
@@ -367,7 +371,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
 
             expand(item);
 
-            showEntry(root);
+            showAttributes(root);
 
             item.setExpanded(true);
 
@@ -393,62 +397,65 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
         }
     }
 
-    public Collection<SearchResult> expand(TreeItem item) throws Exception {
+    public void expand(TreeItem item) throws Exception {
 
         for (TreeItem ti : item.getItems()) {
             ti.dispose();
         }
 
-        DN baseDn = (DN)item.getData();
+        try {
+            DN baseDn = (DN)item.getData();
 
-        Collection<SearchResult> list = new ArrayList<SearchResult>();
+            if (baseDn.isEmpty()) {
 
-        if (baseDn.isEmpty()) {
+                SearchRequest req = new SearchRequest();
+                req.setScope(SearchRequest.SCOPE_BASE);
+                req.setAttributes(new String[] { "*", "+" });
 
-            SearchRequest req = new SearchRequest();
-            req.setScope(SearchRequest.SCOPE_BASE);
-            req.setAttributes(new String[] { "*", "+" });
+                SearchResponse response = new SearchResponse();
 
-            SearchResponse response = new SearchResponse();
+                SearchResponse res = connectionClient.search(req, response);
+                SearchResult rootDse = res.next();
 
-            SearchResponse res = connectionClient.search(req, response);
-            SearchResult rootDse = res.next();
+                Attributes attributes = rootDse.getAttributes();
+                Attribute attribute = attributes.get("namingContexts");
 
-            Attributes attributes = rootDse.getAttributes();
-            Attribute attribute = attributes.get("namingContexts");
+                for (Object value : attribute.getValues()) {
+                    String dn = (String)value;
 
-            for (Object value : attribute.getValues()) {
-                String dn = (String)value;
+                    TreeItem ti = new TreeItem(item, SWT.NONE);
+                    ti.setText(dn);
+                    ti.setData(new DN(dn));
 
-                SearchResult entry = connectionClient.find(dn);
-                list.add(entry);
+                    new TreeItem(ti, SWT.NONE);
+                }
+
+            } else {
+
+                SearchRequest req = new SearchRequest();
+                req.setDn(baseDn);
+                req.setScope(SearchRequest.SCOPE_ONE);
+
+                SearchResponse response = new SearchResponse();
+
+                response = connectionClient.search(req, response);
+
+                while (response.hasNext()) {
+                    SearchResult result = response.next();
+                    DN dn = result.getDn();
+                    String label = dn.getRdn().toString();
+
+                    TreeItem ti = new TreeItem(item, SWT.NONE);
+                    ti.setText(label);
+                    ti.setData(dn);
+
+                    new TreeItem(ti, SWT.NONE);
+                }
             }
 
-        } else {
-
-            SearchRequest req = new SearchRequest();
-            req.setDn(baseDn);
-            req.setScope(SearchRequest.SCOPE_ONE);
-
-            SearchResponse response = new SearchResponse();
-            response = connectionClient.search(req, response);
-
-            for (SearchResult result : response.getResults()) {
-                list.add(result);
-            }
-        }
-
-        for (SearchResult result : list) {
-            DN dn = result.getDn();
-            String label = baseDn.isEmpty() ? dn.toString() : dn.getRdn().toString();
-
+        } catch (Exception e) {
             TreeItem ti = new TreeItem(item, SWT.NONE);
-            ti.setText(label);
-            ti.setData(dn);
-
-            new TreeItem(ti, SWT.NONE);
+            ti.setText("Error: "+e.getMessage());
         }
-
-        return list;
     }
 }

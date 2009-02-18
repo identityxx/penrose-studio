@@ -78,16 +78,11 @@
 
     <target name="import" depends="init">
         <antcall target="import-common"/>
-        <antcall target="import-core"/>
         <antcall target="import-client"/>
     </target>
 
     <target name="import-common" depends="init">
         <copy todir="lib" file="../penrose-server/common/target/${project.name}-common-${penrose.version}.jar"/>
-    </target>
-
-    <target name="import-core" depends="init">
-        <copy todir="lib" file="../penrose-server/core/target/${project.name}-${penrose.version}.jar"/>
     </target>
 
     <target name="import-client" depends="init">
