@@ -23,6 +23,8 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
+import org.eclipse.ui.progress.IProgressService;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
@@ -32,6 +34,8 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.TreeEvent;
 import org.eclipse.swt.events.TreeListener;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.source.SourceManagerClient;
@@ -39,6 +43,8 @@ import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Endi S. Dewata
@@ -51,16 +57,16 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
     Tree tree;
     Table table;
 
-    SourceClient sourceClient;
-
     public SourceBrowsePage(SourceEditor editor) throws Exception {
         super(editor, "BROWSE", "Browse");
+    }
 
+    public SourceClient getSourceClient() throws Exception {
         PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
-        sourceClient = sourceManagerClient.getSourceClient(sourceConfig.getName());
+        return sourceManagerClient.getSourceClient(sourceConfig.getName());
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -130,6 +136,7 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
                     DN dn = (DN)item.getData();
                     if (dn == null) return;
 
+                    SourceClient sourceClient = getSourceClient();
                     SearchResult entry = sourceClient.find(dn);
                     if (entry == null) return;
                     
@@ -170,29 +177,13 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
         return composite;
     }
 
-    public void showAttributes(SearchResult entry) throws Exception {
-
-        Attributes attributes = entry.getAttributes();
-        for (Attribute attribute : attributes.getAll()) {
-            String name = attribute.getName();
-
-            for (Object value : attribute.getValues()) {
-                String label = value instanceof byte[] ? "(binary)" : value.toString();
-
-                TableItem ti = new TableItem(table, SWT.NONE);
-                ti.setText(0, name);
-                ti.setText(1, label);
-                ti.setData(value);
-            }
-        }
-    }
-
     public void update() {
         try {
             tree.removeAll();
             table.removeAll();
 
             DN rootDn = new DN();
+            SourceClient sourceClient = getSourceClient();
             SearchResult root = sourceClient.find(rootDn);
             if (root == null) return;
 
@@ -230,36 +221,69 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
 
     public void expand(TreeItem item) throws Exception {
 
-        for (TreeItem ti : item.getItems()) {
-            ti.dispose();
-        }
+        for (TreeItem ti : item.getItems()) ti.dispose();
 
         try {
             DN baseDn = (DN)item.getData();
 
-            SearchRequest request = new SearchRequest();
+            final SearchRequest request = new SearchRequest();
             request.setDn(baseDn);
             request.setScope(SearchRequest.SCOPE_ONE);
 
-            SearchResponse response = new SearchResponse();
+            final SearchResponse response = new SearchResponse();
 
-            response = sourceClient.search(request, response);
+            IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+            progressService.busyCursorWhile(new IRunnableWithProgress() {
+                public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                    try {
+                        monitor.beginTask("Retrieving data...", IProgressMonitor.UNKNOWN);
+
+                        SourceClient sourceClient = getSourceClient();
+                        sourceClient.search(request, response);
+
+                    } catch (Exception e) {
+                        throw new InvocationTargetException(e);
+
+                    } finally {
+                        monitor.done();
+                    }
+                }
+            });
 
             while (response.hasNext()) {
                 SearchResult result = response.next();
+
                 DN dn = result.getDn();
                 String label = baseDn.isEmpty() ? dn.toString() : dn.getRdn().toString();
 
-                TreeItem it = new TreeItem(item, SWT.NONE);
-                it.setText(label);
-                it.setData(dn);
+                TreeItem ti = new TreeItem(item, SWT.NONE);
+                ti.setText(label);
+                ti.setData(dn);
 
-                new TreeItem(it, SWT.NONE);
+                new TreeItem(ti, SWT.NONE);
             }
 
         } catch (Exception e) {
             TreeItem ti = new TreeItem(item, SWT.NONE);
             ti.setText("Error: "+e.getMessage());
+        }
+    }
+
+    public void showAttributes(SearchResult entry) throws Exception {
+
+        Attributes attributes = entry.getAttributes();
+        for (Attribute attribute : attributes.getAll()) {
+            String name = attribute.getName();
+
+            for (Object value : attribute.getValues()) {
+                String label = value instanceof byte[] ? "(binary)" : value.toString();
+
+                TableItem ti = new TableItem(table, SWT.NONE);
+                ti.setText(0, name);
+                ti.setText(1, label);
+                ti.setData(value);
+            }
         }
     }
 }

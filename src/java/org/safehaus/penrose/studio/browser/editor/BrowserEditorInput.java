@@ -20,16 +20,15 @@ package org.safehaus.penrose.studio.browser.editor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.studio.server.Server;
 
 /**
  * @author Endi S. Dewata
  */
 public class BrowserEditorInput implements IEditorInput {
 
-    private Server server;
     private String hostname;
     private int port;
+    private String suffix;
     private String bindDn;
     private byte[] password;
 
@@ -92,11 +91,11 @@ public class BrowserEditorInput implements IEditorInput {
         this.password = password;
     }
 
-    public Server getServer() {
-        return server;
+    public String getSuffix() {
+        return suffix;
     }
 
-    public void setServer(Server server) {
-        this.server = server;
+    public void setSuffix(String suffix) {
+        this.suffix = suffix;
     }
 }

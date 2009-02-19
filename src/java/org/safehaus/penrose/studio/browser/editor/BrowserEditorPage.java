@@ -40,7 +40,6 @@ import org.eclipse.jface.window.Window;
 import org.ietf.ldap.*;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.studio.browser.wizard.BrowserConnectionWizard;
-import org.safehaus.penrose.studio.server.Server;
 
 public class BrowserEditorPage extends FormPage {
 
@@ -59,7 +58,6 @@ public class BrowserEditorPage extends FormPage {
 
     LDAPConnection connection = new LDAPConnection();
 
-    Server server;
     String hostname;
     int port;
     String suffix;
@@ -70,8 +68,8 @@ public class BrowserEditorPage extends FormPage {
         super(editor, "BROWSER", "  Browser  ");
 
         BrowserEditorInput ei = (BrowserEditorInput)editor.getEditorInput();
-        server = ei.getServer();
         hostname = ei.getHostname();
+        suffix = ei.getSuffix();
         port = ei.getPort();
         bindDn = ei.getBindDn();
         password = ei.getPassword();
@@ -143,7 +141,7 @@ public class BrowserEditorPage extends FormPage {
                     if (event.item == null) return;
 
                     TreeItem item = (TreeItem)event.item;
-                    showChildren(item);
+                    expand(item);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -191,7 +189,6 @@ public class BrowserEditorPage extends FormPage {
                     LDAPUrl url = new LDAPUrl(urlText.getText());
 
                     BrowserConnectionWizard wizard = new BrowserConnectionWizard();
-                    wizard.setServer(server);
                     wizard.setProviderUrl(url.toString());
                     wizard.setSuffix(suffix);
                     wizard.setBindDn(bindDn);
@@ -321,53 +318,66 @@ public class BrowserEditorPage extends FormPage {
         return connection.isConnected();
     }
 
-    public void showChildren(TreeItem parentItem) throws Exception {
+    public void expand(TreeItem item) throws Exception {
 
         if (!isConnected()) connect();
 
-        TreeItem items[] = parentItem.getItems();
-        for (TreeItem item : items) item.dispose();
+        for (TreeItem ti : item.getItems()) ti.dispose();
 
-        DN parentDn = (DN)parentItem.getData();
+        try {
+            DN baseDn = (DN)item.getData();
 
-        if (parentDn.isEmpty()) {
-            LDAPSearchResults sr = connection.search("", LDAPConnection.SCOPE_BASE, "(objectClass=*)", new String[] { "*", "+" }, false);
-            LDAPEntry parentEntry = sr.next();
+            if (baseDn.isEmpty()) {
 
-            LDAPAttribute namingContexts = parentEntry.getAttribute("namingContexts");
-            if (namingContexts != null) {
-                for (Enumeration e = namingContexts.getStringValues(); e.hasMoreElements(); ) {
-                    String namingContext = (String)e.nextElement();
+                LDAPSearchResults sr = connection.search(
+                        "",
+                        LDAPConnection.SCOPE_BASE,
+                        "(objectClass=*)",
+                        new String[] { "*", "+" },
+                        false
+                );
 
-                    TreeItem item = new TreeItem(parentItem, SWT.NONE);
-                    item.setText(namingContext);
-                    item.setData(new DN(namingContext));
+                LDAPEntry rootDse = sr.next();
 
-                    new TreeItem(item, SWT.NONE);
+                LDAPAttribute namingContexts = rootDse.getAttribute("namingContexts");
+                if (namingContexts != null) {
+                    for (Enumeration e = namingContexts.getStringValues(); e.hasMoreElements(); ) {
+                        String dn = (String)e.nextElement();
+
+                        TreeItem ti = new TreeItem(item, SWT.NONE);
+                        ti.setText(dn);
+                        ti.setData(new DN(dn));
+
+                        new TreeItem(ti, SWT.NONE);
+                    }
                 }
-            }
 
-        } else {
+            } else {
 
-            LDAPSearchResults sr = connection.search(parentDn.toString(), LDAPConnection.SCOPE_ONE, "(objectClass=*)", new String[] { "*", "+" }, true);
+                LDAPSearchResults sr = connection.search(
+                        baseDn.toString(),
+                        LDAPConnection.SCOPE_ONE,
+                        "(objectClass=*)",
+                        new String[] { "*", "+" },
+                        true
+                );
 
-            while (sr.hasMore()) {
-                try {
+                while (sr.hasMore()) {
                     LDAPEntry entry = sr.next();
                     DN dn = new DN(entry.getDN());
-                    String rdn = dn.getRdn().toString();
+                    String label = dn.getRdn().toString();
 
-                    TreeItem item = new TreeItem(parentItem, SWT.NONE);
-                    item.setText(rdn);
-                    item.setData(dn);
+                    TreeItem ti = new TreeItem(item, SWT.NONE);
+                    ti.setText(label);
+                    ti.setData(dn);
 
-                    new TreeItem(item, SWT.NONE);
-
-                } catch (Exception e) {
-                    TreeItem item = new TreeItem(parentItem, SWT.NONE);
-                    item.setText(e.getMessage());
+                    new TreeItem(ti, SWT.NONE);
                 }
             }
+
+        } catch (Exception e) {
+            TreeItem ti = new TreeItem(item, SWT.NONE);
+            ti.setText("Error: "+e.getMessage());
         }
     }
 

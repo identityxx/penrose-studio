@@ -21,10 +21,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -39,6 +36,7 @@ import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.connection.ConnectionConfig;
+import org.ietf.ldap.*;
 
 import javax.naming.Context;
 import java.util.*;
@@ -52,7 +50,7 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
 
     public final static String NAME = "LDAP Connection Settings";
 
-    private Collection<String> urls = new ArrayList<String>();
+    private ArrayList<String> urls = new ArrayList<String>();
 
     private Server server;
     private String suffix;
@@ -131,7 +129,8 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
                 int action = dialog.getAction();
                 if (action == LDAPConnectionURLDialog.CANCEL) return;
 
-                urlList.add(dialog.getURL());
+                urls.add(dialog.getURL());
+                updateUrl();
 
                 setPageComplete(validatePage());
             }
@@ -149,7 +148,10 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
 
         removeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                urlList.remove(urlList.getSelectionIndices());
+                for (String url : urlList.getSelection()) {
+                    urls.remove(url);
+                }
+                updateUrl();
 
                 setPageComplete(validatePage());
             }
@@ -163,9 +165,12 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
                 int i = urlList.getSelectionIndex();
                 if (i == 0) return;
 
-                String url = urlList.getItem(i);
-                urlList.remove(i);
-                urlList.add(url, i-1);
+                String url = urls.get(i);
+                urls.remove(i);
+                urls.add(i-1, url);
+
+                updateUrl();
+
                 urlList.setSelection(i-1);
             }
         });
@@ -176,11 +181,14 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
         moveDownButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 int i = urlList.getSelectionIndex();
-                if (i == urlList.getItemCount()-1) return;
+                if (i == urls.size()-1) return;
 
-                String url = urlList.getItem(i);
-                urlList.remove(i);
-                urlList.add(url, i+1);
+                String url = urls.get(i);
+                urls.remove(i);
+                urls.add(i+1, url);
+
+                updateUrl();
+
                 urlList.setSelection(i+1);
             }
         });
@@ -200,7 +208,19 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
         suffixCombo.setText(suffix == null ? "" : suffix);
         suffixCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        suffixCombo.addModifyListener(this);
+        suffixCombo.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent event) {
+                suffix = suffixCombo.getText().trim();
+                suffix = "".equals(suffix) ? null : suffix;
+            }
+        });
+
+        suffixCombo.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                suffix = suffixCombo.getText().trim();
+                suffix = "".equals(suffix) ? null : suffix;
+            }
+        });
 
         Button fetchButton = new Button(composite, SWT.PUSH);
         fetchButton.setText("Fetch Base DNs");
@@ -209,58 +229,18 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
 
         fetchButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                //LDAPClient client = null;
                 try {
-                    PenroseClient client = server.getClient();
-                    PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient("DEFAULT");
-                    ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
-
-                    ConnectionConfig connectionConfig = new ConnectionConfig();
-                    connectionConfig.setName("Test");
-                    connectionConfig.setAdapterName("LDAP");
-
-                    Map<String,String> parameters = new HashMap<String,String>();
-                    parameters.put(Context.PROVIDER_URL, getProviderUrl());
-                    parameters.put(Context.SECURITY_PRINCIPAL, getBindDn());
-                    parameters.put(Context.SECURITY_CREDENTIALS, getBindPassword());
-
-                    connectionConfig.setParameters(parameters);
-
-                    Collection<DN> list = connectionManagerClient.getNamingContexts(connectionConfig);
-
                     suffixCombo.removeAll();
 
-                    for (DN dn : list) {
-                        suffixCombo.add(dn.toString());
+                    for (String dn : fetchSuffixes()) {
+                        suffixCombo.add(dn);
                     }
-/*
-                    Map<String,String> properties = new HashMap<String,String>();
-                    properties.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-                    properties.put(Context.PROVIDER_URL, getProviderUrl());
-                    properties.put(Context.SECURITY_PRINCIPAL, getBindDn());
-                    properties.put(Context.SECURITY_CREDENTIALS, getBindPassword());
 
-                    client = new LDAPClient(properties);
-
-                    SearchResult rootDse = client.getRootDSE();
-
-                    Attribute namingContexts = rootDse.getAttributes().get("namingContexts");
-                    if (namingContexts != null) {
-                        for (Object value : namingContexts.getValues()) {
-                            String namingContext = (String)value;
-                            suffixCombo.add(namingContext);
-                        }
-                    }
-*/
                     suffixCombo.select(0);
 
                 } catch (Exception ex) {
                     log.debug(ex.getMessage(), ex);
                     ErrorDialog.open(ex);
-
-                //} finally {
-                    //if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
                 }
             }
         });
@@ -275,7 +255,12 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
         gd.horizontalSpan = 2;
         bindDnText.setLayoutData(gd);
 
-        bindDnText.addModifyListener(this);
+        bindDnText.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent event) {
+                bindDn = bindDnText.getText().trim();
+                bindDn = "".equals(bindDn) ? null : bindDn;
+            }
+        });
 
         Label passwordLabel = new Label(composite, SWT.NONE);
         passwordLabel.setText("Password:");
@@ -287,7 +272,12 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
         gd.horizontalSpan = 2;
         bindPasswordText.setLayoutData(gd);
 
-        bindPasswordText.addModifyListener(this);
+        bindPasswordText.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent event) {
+                bindPassword = bindPasswordText.getText().trim();
+                bindPassword = "".equals(bindPassword) ? null : bindPassword;
+            }
+        });
 
         new Label(composite, SWT.NONE);
 
@@ -296,55 +286,135 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
 
         testButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-
-                //LDAPClient client = null;
-
                 try {
-/*
-                    String providerUrl = getProviderUrl();
-                    String bindDn = getBindDn();
-                    String bindPassword = getBindPassword();
-
-                    BindRequest request = new BindRequest();
-                    request.setDn(bindDn);
-                    request.setPassword(bindPassword == null ? null : bindPassword.getBytes("UTF-8"));
-
-                    BindResponse response = new BindResponse();
-
-                    client = new LDAPClient(providerUrl);
-                    client.bind(request, response);
-*/
-                    PenroseClient client = server.getClient();
-                    PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-                    PartitionClient partitionClient = partitionManagerClient.getPartitionClient("DEFAULT");
-                    ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
-
-                    ConnectionConfig connectionConfig = new ConnectionConfig();
-                    connectionConfig.setName("Test");
-                    connectionConfig.setAdapterName("LDAP");
-
-                    Map<String,String> parameters = new HashMap<String,String>();
-                    parameters.put(Context.PROVIDER_URL, getProviderUrl());
-                    parameters.put(Context.SECURITY_PRINCIPAL, getBindDn());
-                    parameters.put(Context.SECURITY_CREDENTIALS, getBindPassword());
-
-                    connectionConfig.setParameters(parameters);
-
-                    connectionManagerClient.validateConnection(connectionConfig);
+                    testConnection();
 
                     MessageDialog.openInformation(parent.getShell(), "Test Connection Result", "Connection successful!");
 
                 } catch (Exception ex) {
                     log.error(ex.getMessage(), ex);
                     ErrorDialog.open(ex.getMessage());
-
-                //} finally {
-                    //if (client != null) try { client.close(); } catch (Exception e) { log.error(e.getMessage(), e); }
                 }
             }
         });
 
         return composite;
+    }
+
+    public void connect(LDAPConnection connection) throws Exception {
+
+        Exception exception = null;
+
+        for (String url : urls) {
+            log.debug("Connecting to "+url);
+            try {
+                LDAPUrl ldapUrl = new LDAPUrl(url);
+                connection.connect(ldapUrl.getHost(), ldapUrl.getPort());
+                exception = null;
+                break;
+
+            } catch (Exception e) {
+                exception = e;
+            }
+        }
+
+        if (exception != null) throw exception;
+
+        if (bindDn != null && bindPassword != null) {
+            connection.bind(3, bindDn, bindPassword.getBytes());
+        }
+    }
+
+    public Collection<String> fetchSuffixes() throws Exception {
+
+        Collection<String> list = new ArrayList<String>();
+
+        if (server == null) {
+
+            LDAPConnection connection = new LDAPConnection();
+
+            try {
+                connect(connection);
+
+                LDAPSearchResults sr = connection.search(
+                        "",
+                        LDAPConnection.SCOPE_BASE,
+                        "(objectClass=*)",
+                        new String[] { "*", "+" },
+                        false
+                );
+
+                LDAPEntry rootDse = sr.next();
+
+                LDAPAttribute namingContexts = rootDse.getAttribute("namingContexts");
+
+                if (namingContexts != null) {
+                    for (Enumeration e = namingContexts.getStringValues(); e.hasMoreElements(); ) {
+                        String dn = (String)e.nextElement();
+                        list.add(dn);
+                    }
+                }
+
+            } finally {
+                connection.disconnect();
+            }
+
+        } else {
+            PenroseClient client = server.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient("DEFAULT");
+            ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+
+            ConnectionConfig connectionConfig = new ConnectionConfig();
+            connectionConfig.setName("Test");
+            connectionConfig.setAdapterName("LDAP");
+
+            Map<String,String> parameters = new HashMap<String,String>();
+            parameters.put(Context.PROVIDER_URL, getProviderUrl());
+            parameters.put(Context.SECURITY_PRINCIPAL, getBindDn());
+            parameters.put(Context.SECURITY_CREDENTIALS, getBindPassword());
+
+            connectionConfig.setParameters(parameters);
+
+            for (DN dn : connectionManagerClient.getNamingContexts(connectionConfig)) {
+                list.add(dn.toString());
+            }
+        }
+
+        return list;
+    }
+
+    public void testConnection() throws Exception {
+        if (server == null) {
+
+            LDAPConnection connection = new LDAPConnection();
+
+            try {
+                connect(connection);
+
+            } finally {
+                connection.disconnect();
+            }
+
+        } else {
+            PenroseClient client = server.getClient();
+            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient("DEFAULT");
+            ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
+
+            ConnectionConfig connectionConfig = new ConnectionConfig();
+            connectionConfig.setName("Test");
+            connectionConfig.setAdapterName("LDAP");
+
+            Map<String,String> parameters = new HashMap<String,String>();
+            parameters.put(Context.PROVIDER_URL, getProviderUrl());
+            parameters.put(Context.SECURITY_PRINCIPAL, getBindDn());
+            parameters.put(Context.SECURITY_CREDENTIALS, getBindPassword());
+
+            connectionConfig.setParameters(parameters);
+
+            connectionManagerClient.validateConnection(connectionConfig);
+        }
     }
 
     public String getProviderUrl() {
@@ -360,19 +430,21 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
         return sb.toString();
     }
 
+    public void updateUrl() {
+        urlList.removeAll();
+        for (String url : urls) urlList.add(url);
+    }
+
     public String getSuffix() {
-        String s = suffixCombo.getText();
-        return "".equals(s) ? null : s;
+        return suffix;
     }
 
     public String getBindDn() {
-        String s = bindDnText.getText();
-        return "".equals(s) ? null : s;
+        return bindDn;
     }
 
     public String getBindPassword() {
-        String s = bindPasswordText.getText();
-        return "".equals(s) ? null : s;
+        return bindPassword;
     }
 
     public String getURL() {

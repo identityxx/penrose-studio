@@ -339,7 +339,6 @@ public class ServerNode extends Node {
         byte[] password = rootUserConfig.getPassword();
 
         BrowserEditorInput ei = new BrowserEditorInput();
-        ei.setServer(server);
         ei.setHostname(hostname);
         ei.setPort(port);
         ei.setBindDn(bindDn);

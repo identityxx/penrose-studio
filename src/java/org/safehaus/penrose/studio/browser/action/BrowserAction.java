@@ -19,6 +19,8 @@ package org.safehaus.penrose.studio.browser.action;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -28,12 +30,14 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.browser.editor.BrowserEditor;
 import org.safehaus.penrose.studio.browser.editor.BrowserEditorInput;
+import org.safehaus.penrose.studio.browser.wizard.BrowserConnectionWizard;
 import org.safehaus.penrose.studio.server.ServerConfig;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.*;
 import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.user.UserConfig;
 import org.safehaus.penrose.client.PenroseClient;
+import org.ietf.ldap.LDAPUrl;
 
 /**
  * @author Endi S. Dewata
@@ -55,33 +59,53 @@ public class BrowserAction extends Action {
 
 	public void run() {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        
+
         try {
             ServersView serversView = ServersView.getInstance();
             ServerNode serverNode = serversView.getSelectedServerNode();
-            Server server = serverNode.getServer();
-            PenroseClient client = server.getClient();
 
-            ServerConfig projectConfig = server.getServerConfig();
-            String hostname = projectConfig.getHost();
+            BrowserConnectionWizard wizard = new BrowserConnectionWizard();
 
-            ServiceManagerClient serviceManagerClient = client.getServiceManagerClient();
-            ServiceConfig serviceConfig = serviceManagerClient.getServiceConfig("LDAP");
-            String s = serviceConfig == null ? null : serviceConfig.getParameter(LDAP_PORT);
-            int port = s == null ? DEFAULT_LDAP_PORT : Integer.parseInt(s);
+            if (serverNode != null) {
+                Server server = serverNode.getServer();
+                wizard.setServer(server);
 
-            PenroseClient penroseClient = server.getClient();
-            UserConfig rootUserConfig = penroseClient.getRootUserConfig();
+                PenroseClient client = server.getClient();
 
-            String bindDn = rootUserConfig.getDn().toString();
-            byte[] password = rootUserConfig.getPassword();
+                ServerConfig projectConfig = server.getServerConfig();
+                String hostname = projectConfig.getHost();
+
+                ServiceManagerClient serviceManagerClient = client.getServiceManagerClient();
+                ServiceConfig serviceConfig = serviceManagerClient.getServiceConfig("LDAP");
+                String s = serviceConfig == null ? null : serviceConfig.getParameter(LDAP_PORT);
+                int port = s == null ? DEFAULT_LDAP_PORT : Integer.parseInt(s);
+
+                wizard.setProviderUrl("ldap://"+hostname+":"+port+"/");
+
+                PenroseClient penroseClient = server.getClient();
+                UserConfig rootUserConfig = penroseClient.getRootUserConfig();
+
+                String bindDn = rootUserConfig.getDn().toString();
+                wizard.setBindDn(bindDn);
+
+                byte[] password = rootUserConfig.getPassword();
+                wizard.setBindPassword(new String(password));
+            }
+
+            WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
+            dialog.setPageSize(600, 300);
+            int rc = dialog.open();
+
+            if (rc == Window.CANCEL) return;
+
+            LDAPUrl url = new LDAPUrl(wizard.getProviderUrl());
 
             BrowserEditorInput ei = new BrowserEditorInput();
-            ei.setServer(server);
-            ei.setHostname(hostname);
-            ei.setPort(port);
-            ei.setBindDn(bindDn);
-            ei.setPassword(password);
+            ei.setHostname(url.getHost());
+            ei.setPort(url.getPort());
+            ei.setSuffix(wizard.getSuffix());
+            ei.setBindDn(wizard.getBindDn());
+            ei.setPassword(wizard.getBindPassword().getBytes());
 
             IWorkbenchPage page = window.getActivePage();
             page.openEditor(ei, BrowserEditor.class.getName());

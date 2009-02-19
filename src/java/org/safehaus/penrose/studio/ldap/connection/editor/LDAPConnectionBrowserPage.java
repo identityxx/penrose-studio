@@ -341,23 +341,6 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
         return composite;
     }
 
-    public void showAttributes(SearchResult entry) throws Exception {
-
-        Attributes attributes = entry.getAttributes();
-        for (Attribute attribute : attributes.getAll()) {
-            String name = attribute.getName();
-
-            for (Object value : attribute.getValues()) {
-                String label = value instanceof byte[] ? "(binary)" : value.toString();
-
-                TableItem ti = new TableItem(table, SWT.NONE);
-                ti.setText(0, name);
-                ti.setText(1, label);
-                ti.setData(value);
-            }
-        }
-    }
-
     public void update() {
         try {
             tree.removeAll();
@@ -401,9 +384,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
 
     public void expand(TreeItem item) throws Exception {
 
-        for (TreeItem ti : item.getItems()) {
-            ti.dispose();
-        }
+        for (TreeItem ti : item.getItems()) ti.dispose();
 
         try {
             DN baseDn = (DN)item.getData();
@@ -458,6 +439,23 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage implements T
         } catch (Exception e) {
             TreeItem ti = new TreeItem(item, SWT.NONE);
             ti.setText("Error: "+e.getMessage());
+        }
+    }
+
+    public void showAttributes(SearchResult entry) throws Exception {
+
+        Attributes attributes = entry.getAttributes();
+        for (Attribute attribute : attributes.getAll()) {
+            String name = attribute.getName();
+
+            for (Object value : attribute.getValues()) {
+                String label = value instanceof byte[] ? "(binary)" : value.toString();
+
+                TableItem ti = new TableItem(table, SWT.NONE);
+                ti.setText(0, name);
+                ti.setText(1, label);
+                ti.setData(value);
+            }
         }
     }
 }

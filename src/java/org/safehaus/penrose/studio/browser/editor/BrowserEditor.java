@@ -24,11 +24,7 @@ import org.safehaus.penrose.studio.server.Server;
 
 public class BrowserEditor extends Editor {
 
-    Server server;
-
     public void init() throws PartInitException {
-        BrowserEditorInput ei = (BrowserEditorInput)getEditorInput();
-        server = ei.getServer();
     }
 
     protected void addPages() {
@@ -49,14 +45,6 @@ public class BrowserEditor extends Editor {
     }
 
     public void doSaveAs() {
-    }
-
-    public Server getServer() {
-        return server;
-    }
-
-    public void setServer(Server server) {
-        this.server = server;
     }
 }
 

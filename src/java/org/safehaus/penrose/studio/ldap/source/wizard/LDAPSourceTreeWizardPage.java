@@ -281,9 +281,7 @@ public class LDAPSourceTreeWizardPage extends WizardPage implements SelectionLis
 
     public void expand(TreeItem item) throws Exception {
 
-        for (TreeItem ti : item.getItems()) {
-            ti.dispose();
-        }
+        for (TreeItem ti : item.getItems()) ti.dispose();
 
         LDAPConnectionClient connectionClient = new LDAPConnectionClient(
                 server.getClient(),

@@ -249,9 +249,7 @@ public class ImportTreeWizardPage extends WizardPage implements SelectionListene
 
     public void expand(TreeItem item) throws Exception {
 
-        for (TreeItem ti : item.getItems()) {
-            ti.dispose();
-        }
+        for (TreeItem ti : item.getItems()) ti.dispose();
 
         LDAPConnectionClient connectionClient = new LDAPConnectionClient(
                 server.getClient(),

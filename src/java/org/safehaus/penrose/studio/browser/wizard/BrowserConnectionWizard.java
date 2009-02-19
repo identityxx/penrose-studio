@@ -21,7 +21,7 @@ public class BrowserConnectionWizard extends Wizard {
     String bindPassword;
 
     public BrowserConnectionWizard() {
-        setWindowTitle("Edit LDAP Connection");
+        setWindowTitle("LDAP Browser");
     }
 
     public void addPages() {
