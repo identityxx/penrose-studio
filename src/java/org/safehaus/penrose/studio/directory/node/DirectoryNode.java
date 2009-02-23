@@ -28,6 +28,7 @@ import org.safehaus.penrose.directory.EntryClient;
 import org.safehaus.penrose.directory.DirectoryClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -115,14 +116,13 @@ public class DirectoryNode extends Node {
         manager.add(new NewRootProxyAction(this));
         manager.add(new ImportStaticEntriesAction(this));
 
-        if ("DEFAULT".equals(partitionName)) {
+        if (PartitionConfig.ROOT.equals(partitionName)) {
+
             manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
             manager.add(new NewRootDSEAction(this));
             manager.add(new NewRootDSEProxyAction(this));
-        }
 
-        if ("DEFAULT".equals(partitionName)) {
             manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
             manager.add(new NewSchemaEntryAction(this));

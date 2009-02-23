@@ -60,15 +60,14 @@ public class PartitionsNode extends Node {
 
     public void update() throws Exception {
 
-        PartitionNode defaultPartitionName = new PartitionNode(
-                "DEFAULT",
-                PenroseStudio.getImage(PenroseImage.PARTITION),
-                "DEFAULT",
+        PartitionNode rootPartitionName = new PartitionNode(
+                PartitionConfig.ROOT,
+                PartitionConfig.ROOT,
                 this
         );
-        defaultPartitionName.init();
+        rootPartitionName.init();
 
-        children.add(defaultPartitionName);
+        children.add(rootPartitionName);
 
         Server server = serverNode.getServer();
         PenroseClient client = server.getClient();
@@ -78,7 +77,6 @@ public class PartitionsNode extends Node {
 
             PartitionNode partitionNode = new PartitionNode(
                     partitionName,
-                    PenroseStudio.getImage(PenroseImage.PARTITION),
                     partitionName,
                     this
             );

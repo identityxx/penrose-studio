@@ -31,6 +31,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.connection.node.ConnectionsNode;
@@ -66,8 +67,8 @@ public class PartitionNode extends Node {
 
     Collection<Node> children = new ArrayList<Node>();
 
-    public PartitionNode(String name, Image image, String partitionName, Node parent) throws Exception {
-        super(name, image, partitionName, parent);
+    public PartitionNode(String name, String partitionName, Node parent) throws Exception {
+        super(name, PenroseStudio.getImage(PenroseImage.PARTITION), partitionName, parent);
 
         this.partitionName = partitionName;
 
@@ -186,7 +187,7 @@ public class PartitionNode extends Node {
             }
         });
 
-        if (!"DEFAULT".equals(partitionName)) {
+        if (!PartitionConfig.ROOT.equals(partitionName)) {
             
             manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 

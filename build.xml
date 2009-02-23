@@ -352,13 +352,26 @@
     </target>
 
     <target name="dist" depends="init">
+
         <antcall target="dist-linux"/>
         <antcall target="dist-macosx"/>
         <antcall target="dist-win32"/>
+
         <copy
             todir="dist"
             file="target/${product.name}-${product.version}.jar">
         </copy>
+
+        <copy todir="target/dist/bin">
+            <fileset dir="bin"/>
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+
+        <fixcrlf srcdir="target/dist" includes="**/*.sh" eol="unix" />
+        <chmod dir="target/dist" perm="ugo+rx" includes="**/*.sh"/>
+
     </target>
 
     <target name="dist-linux" depends="build-linux" if="linux">
@@ -400,7 +413,7 @@
 
         <echo message="Creating ${product.name}-${product.version}.dmg"/>
         <mkdir dir="dist"/>
-        <exec executable="bin/pkg-dmg">
+        <exec executable="tools/bin/pkg-dmg">
             <arg line="--source target/dist"/>
             <arg line="--target dist/${product.name}-${product.version}.dmg"/>
             <!-- <arg line="- -volname &quot;${product.title} ${product.version}&quot;"/>
@@ -522,7 +535,7 @@
             file="${rpm.home}/RPMS/${rpm.arch}/${rpm.name}">
         </copy>
 <!--
-        <copy file="bin/sfx-header" tofile="dist/${rpm.name}.bin" overwrite="true"/>
+        <copy file="tools/bin/sfx-header" tofile="dist/${rpm.name}.bin" overwrite="true"/>
 
         <echo message="__LICENSE__${line.separator}" file="dist/${rpm.name}.bin" append="true"/>
         <concat destfile="dist/${rpm.name}.bin" append="true">
@@ -543,9 +556,13 @@
     </target>
 
     <target name="install" depends="init">
+      
         <antcall target="install-linux"/>
         <antcall target="install-macosx"/>
         <antcall target="install-win32"/>
+
+        <chmod dir="${studio.home}" perm="ugo+rx" includes="**/*.sh"/>
+
     </target>
 
     <target name="install-linux" if="linux">

@@ -34,6 +34,7 @@ import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
+import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.ietf.ldap.*;
@@ -362,7 +363,7 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
         } else {
             PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-            PartitionClient partitionClient = partitionManagerClient.getPartitionClient("DEFAULT");
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(PartitionConfig.ROOT);
             ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
 
             ConnectionConfig connectionConfig = new ConnectionConfig();
@@ -399,7 +400,7 @@ public class LDAPConnectionSettingsWizardPage extends WizardPage implements Modi
         } else {
             PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-            PartitionClient partitionClient = partitionManagerClient.getPartitionClient("DEFAULT");
+            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(PartitionConfig.ROOT);
             ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
 
             ConnectionConfig connectionConfig = new ConnectionConfig();
