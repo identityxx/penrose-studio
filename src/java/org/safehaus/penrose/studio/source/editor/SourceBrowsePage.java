@@ -19,27 +19,24 @@ package org.safehaus.penrose.studio.source.editor;
 
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.forms.events.HyperlinkAdapter;
-import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.progress.IProgressService;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.TreeEvent;
-import org.eclipse.swt.events.TreeListener;
+import org.eclipse.swt.events.*;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
+import org.safehaus.penrose.studio.source.wizard.SourceBrowserOptionsWizard;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
@@ -49,13 +46,14 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * @author Endi S. Dewata
  */
-public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
+public class SourceBrowsePage extends SourceEditorPage {
 
     Button refreshButton;
-    Text maxSizeText;
 
     Tree tree;
     Table table;
+
+    Long sizeLimit;
 
     public SourceBrowsePage(SourceEditor editor) throws Exception {
         super(editor, "BROWSE", "Browse");
@@ -77,55 +75,67 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
 
-        Section section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Actions");
-        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Section directorySection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        directorySection.setText("Directory");
+        directorySection.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Control actionsSection = createActionsSection(section);
-        section.setClient(actionsSection);
+        Control directoryControl = createDirectoryControl(directorySection);
+        directorySection.setClient(directoryControl);
 
-        section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Entries");
-        section.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Section entrySection = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
+        entrySection.setText("Entry");
+        entrySection.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        Control entriesSection = createEntriesSection(section);
-        section.setClient(entriesSection);
+        Control entryControl = createEntryControl(entrySection);
+        entrySection.setClient(entryControl);
 
-        section = toolkit.createSection(body, Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Attributes");
-        section.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-        Control attributesSection = createAttributesSection(section);
-        section.setClient(attributesSection);
-
-        update();
+        reset();
     }
 
-    public Composite createActionsSection(final Composite parent) {
+    public Composite createDirectoryControl(final Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
-        composite.setLayout(new RowLayout());
+        composite.setLayout(new GridLayout(2, false));
 
-        Hyperlink refreshSchema = toolkit.createHyperlink(composite, "Refresh", SWT.NONE);
+        Composite leftControl = createDirectoryLeftControl(composite);
+        leftControl.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        refreshSchema.addHyperlinkListener(new HyperlinkAdapter() {
-            public void linkActivated(HyperlinkEvent event) {
-                update();
-            }
-        });
+        Composite rightControl = createDirectoryRightControl(composite);
+        GridData gd = new GridData(GridData.FILL_VERTICAL);
+        gd.widthHint = 100;
+        rightControl.setLayoutData(gd);
 
         return composite;
     }
 
-    public Composite createEntriesSection(final Composite parent) {
+    public Composite createDirectoryLeftControl(final Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
-        composite.setLayout(new GridLayout());
+
+        GridLayout layout = new GridLayout();
+        layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        composite.setLayout(layout);
 
         tree = toolkit.createTree(composite, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         GridData gd = new GridData(GridData.FILL_BOTH);
         gd.heightHint = 100;
         tree.setLayoutData(gd);
+
+        tree.addTreeListener(new TreeAdapter() {
+            public void treeExpanded(TreeEvent event) {
+                try {
+                    if (event.item == null) return;
+
+                    TreeItem item = (TreeItem)event.item;
+                    expand(item);
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
+                }
+            }
+        });
 
         tree.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
@@ -149,74 +159,112 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
             }
         });
 
-        tree.addTreeListener(this);
+        return composite;
+    }
+
+    public Composite createDirectoryRightControl(final Composite parent) {
+
+        Composite composite = toolkit.createComposite(parent);
+
+        GridLayout layout = new GridLayout();
+        layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        composite.setLayout(layout);
+
+        Button settingsButton = new Button(composite, SWT.PUSH);
+        settingsButton.setText("Settings...");
+        settingsButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        settingsButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                try {
+                    SourceBrowserOptionsWizard wizard = new SourceBrowserOptionsWizard();
+                    wizard.setSizeLimit(sizeLimit);
+
+                    IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+                    WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
+                    dialog.setPageSize(600, 300);
+                    int rc = dialog.open();
+
+                    if (rc == Window.CANCEL) return;
+
+                    sizeLimit = wizard.getSizeLimit();
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+        });
 
         return composite;
     }
 
-    public Composite createAttributesSection(final Composite parent) {
+    public Composite createEntryControl(final Composite parent) {
 
         Composite composite = toolkit.createComposite(parent);
-        composite.setLayout(new GridLayout());
+        composite.setLayout(new GridLayout(2, false));
+
+        Composite leftControl = createEntryLeftControl(composite);
+        leftControl.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        Composite rightControl = createEntryRightControl(composite);
+        GridData gd = new GridData(GridData.FILL_VERTICAL);
+        gd.widthHint = 100;
+        rightControl.setLayoutData(gd);
+
+        return composite;
+    }
+
+    public Composite createEntryLeftControl(final Composite parent) {
+
+        Composite composite = toolkit.createComposite(parent);
+
+        GridLayout layout = new GridLayout();
+        layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        composite.setLayout(layout);
 
         table = toolkit.createTable(composite, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
+        
         GridData gd = new GridData(GridData.FILL_BOTH);
         gd.heightHint = 100;
         table.setLayoutData(gd);
 
         TableColumn tc = new TableColumn(table, SWT.LEFT);
-        tc.setText("Attribute Name");
+        tc.setText("Name");
         tc.setWidth(200);
 
         tc = new TableColumn(table, SWT.LEFT);
-        tc.setText("Attribute Value");
+        tc.setText("Value");
         tc.setWidth(300);
 
         return composite;
     }
 
-    public void update() {
-        try {
-            tree.removeAll();
-            table.removeAll();
+    public Composite createEntryRightControl(final Composite parent) {
 
-            DN rootDn = new DN();
-            SourceClient sourceClient = getSourceClient();
-            SearchResult root = sourceClient.find(rootDn);
-            if (root == null) return;
+        Composite composite = toolkit.createComposite(parent);
 
-            TreeItem item = new TreeItem(tree, SWT.NONE);
-            item.setText("Root");
-            item.setData(rootDn);
+        GridLayout layout = new GridLayout();
+        layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        composite.setLayout(layout);
 
-            expand(item);
-
-            showAttributes(root);
-
-            item.setExpanded(true);
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            ErrorDialog.open(e);
-        }
+        return composite;
     }
 
-    public void treeCollapsed(TreeEvent event) {
-    }
+    public void reset() {
+        tree.removeAll();
+        table.removeAll();
 
-    public void treeExpanded(TreeEvent event) {
-        try {
-            if (event.item == null) return;
+        TreeItem item = new TreeItem(tree, SWT.NONE);
+        item.setText("Root");
+        item.setData(new DN());
 
-            TreeItem item = (TreeItem)event.item;
-            expand(item);
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            ErrorDialog.open(e);
-        }
+        new TreeItem(item, SWT.NONE);
     }
 
     public void expand(TreeItem item) throws Exception {
@@ -229,6 +277,7 @@ public class SourceBrowsePage extends SourceEditorPage implements TreeListener {
             final SearchRequest request = new SearchRequest();
             request.setDn(baseDn);
             request.setScope(SearchRequest.SCOPE_ONE);
+            if (sizeLimit != null) request.setSizeLimit(sizeLimit);
 
             final SearchResponse response = new SearchResponse();
 

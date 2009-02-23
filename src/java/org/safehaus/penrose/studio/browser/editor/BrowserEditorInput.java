@@ -44,7 +44,7 @@ public class BrowserEditorInput implements IEditorInput {
     }
 
     public String getName() {
-        return "Browser - "+hostname;
+        return "Browser - ldap://"+hostname+":"+port;
     }
 
     public IPersistableElement getPersistable() {
@@ -52,7 +52,7 @@ public class BrowserEditorInput implements IEditorInput {
     }
 
     public String getToolTipText() {
-        return "Browser - "+hostname;
+        return getName();
     }
 
     public Object getAdapter(Class aClass) {

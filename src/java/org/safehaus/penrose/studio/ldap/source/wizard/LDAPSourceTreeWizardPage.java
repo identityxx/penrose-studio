@@ -294,14 +294,14 @@ public class LDAPSourceTreeWizardPage extends WizardPage implements SelectionLis
 
             if (baseDn.isEmpty()) {
 
-                SearchRequest req = new SearchRequest();
-                req.setScope(SearchRequest.SCOPE_BASE);
-                req.setAttributes(new String[] { "*", "+" });
+                SearchRequest request = new SearchRequest();
+                request.setScope(SearchRequest.SCOPE_BASE);
+                request.setAttributes(new String[] { "*", "+" });
 
                 SearchResponse response = new SearchResponse();
 
-                SearchResponse res = connectionClient.search(req, response);
-                SearchResult rootDse = res.next();
+                connectionClient.search(request, response);
+                SearchResult rootDse = response.next();
 
                 Attributes attributes = rootDse.getAttributes();
                 Attribute attribute = attributes.get("namingContexts");
@@ -318,13 +318,13 @@ public class LDAPSourceTreeWizardPage extends WizardPage implements SelectionLis
 
             } else {
 
-                SearchRequest req = new SearchRequest();
-                req.setDn(baseDn);
-                req.setScope(SearchRequest.SCOPE_ONE);
+                SearchRequest request = new SearchRequest();
+                request.setDn(baseDn);
+                request.setScope(SearchRequest.SCOPE_ONE);
 
                 SearchResponse response = new SearchResponse();
 
-                response = connectionClient.search(req, response);
+                connectionClient.search(request, response);
 
                 while (response.hasNext()) {
                     SearchResult result = response.next();

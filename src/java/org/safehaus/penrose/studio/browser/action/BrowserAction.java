@@ -30,7 +30,7 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.browser.editor.BrowserEditor;
 import org.safehaus.penrose.studio.browser.editor.BrowserEditorInput;
-import org.safehaus.penrose.studio.browser.wizard.BrowserConnectionWizard;
+import org.safehaus.penrose.studio.browser.wizard.BrowserWizard;
 import org.safehaus.penrose.studio.server.ServerConfig;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.*;
@@ -64,7 +64,7 @@ public class BrowserAction extends Action {
             ServersView serversView = ServersView.getInstance();
             ServerNode serverNode = serversView.getSelectedServerNode();
 
-            BrowserConnectionWizard wizard = new BrowserConnectionWizard();
+            BrowserWizard wizard = new BrowserWizard();
 
             if (serverNode != null) {
                 Server server = serverNode.getServer();

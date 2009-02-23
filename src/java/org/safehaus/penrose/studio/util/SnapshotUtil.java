@@ -69,7 +69,7 @@ public class SnapshotUtil {
 
         SearchResponse response = new SearchResponse();
 
-        response = connectionClient.search(request, response);
+        connectionClient.search(request, response);
 
         if (response.hasNext()) {
             SearchResult entry = response.next();
@@ -94,7 +94,7 @@ public class SnapshotUtil {
 
         SearchResponse response = new SearchResponse();
 
-        response = connectionClient.search(request, response);
+        connectionClient.search(request, response);
 
         for (SearchResult child : response.getResults()) {
             DN childDn = child.getDn().getRdn().append(targetDn);

@@ -39,7 +39,8 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.ietf.ldap.*;
 import org.safehaus.penrose.ldap.DN;
-import org.safehaus.penrose.studio.browser.wizard.BrowserConnectionWizard;
+import org.safehaus.penrose.studio.browser.wizard.BrowserOptionsWizard;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 public class BrowserEditorPage extends FormPage {
 
@@ -50,10 +51,8 @@ public class BrowserEditorPage extends FormPage {
 
     FormToolkit toolkit;
 
-    Text urlText;
     Tree tree;
 
-    Text dnText;
     Table attributesTable;
 
     LDAPConnection connection = new LDAPConnection();
@@ -63,6 +62,8 @@ public class BrowserEditorPage extends FormPage {
     String suffix;
     String bindDn;
     byte[] password;
+
+    Long sizeLimit;
 
     public BrowserEditorPage(BrowserEditor editor) {
         super(editor, "BROWSER", "  Browser  ");
@@ -79,7 +80,7 @@ public class BrowserEditorPage extends FormPage {
         toolkit = managedForm.getToolkit();
 
         ScrolledForm form = managedForm.getForm();
-        form.setText("LDAP Browser");
+        form.setText("Browser");
 
         Composite body = form.getBody();
         body.setLayout(new GridLayout());
@@ -97,6 +98,8 @@ public class BrowserEditorPage extends FormPage {
 
         Control entryControl = createEntryControl(entrySection);
         entrySection.setClient(entryControl);
+
+        reset();
     }
 
     public Composite createDirectoryControl(final Composite parent) {
@@ -124,12 +127,6 @@ public class BrowserEditorPage extends FormPage {
         layout.marginHeight = 0;
         composite.setLayout(layout);
 
-        toolkit.createLabel(composite, "URL:", SWT.NONE);
-
-        urlText = new Text(composite, SWT.BORDER);
-        urlText.setEnabled(false);
-        urlText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
         tree = new Tree(composite, SWT.BORDER);
         GridData gd = new GridData(GridData.FILL_BOTH);
         gd.horizontalSpan = 2;
@@ -145,7 +142,7 @@ public class BrowserEditorPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -160,12 +157,10 @@ public class BrowserEditorPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
-
-        reset();
 
         return composite;
     }
@@ -179,20 +174,15 @@ public class BrowserEditorPage extends FormPage {
         layout.marginHeight = 0;
         composite.setLayout(layout);
 
-        Button connectButton = new Button(composite, SWT.PUSH);
-        connectButton.setText("Connect...");
-        connectButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Button settingsButton = new Button(composite, SWT.PUSH);
+        settingsButton.setText("Settings...");
+        settingsButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        connectButton.addSelectionListener(new SelectionAdapter() {
+        settingsButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    LDAPUrl url = new LDAPUrl(urlText.getText());
-
-                    BrowserConnectionWizard wizard = new BrowserConnectionWizard();
-                    wizard.setProviderUrl(url.toString());
-                    wizard.setSuffix(suffix);
-                    wizard.setBindDn(bindDn);
-                    wizard.setBindPassword(new String(password));
+                    BrowserOptionsWizard wizard = new BrowserOptionsWizard();
+                    wizard.setSizeLimit(sizeLimit);
 
                     IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
                     WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
@@ -201,17 +191,7 @@ public class BrowserEditorPage extends FormPage {
 
                     if (rc == Window.CANCEL) return;
 
-                    url = new LDAPUrl(wizard.getProviderUrl());
-                    hostname = url.getHost();
-                    port = url.getPort();
-                    suffix = wizard.getSuffix();
-                    bindDn = wizard.getBindDn();
-                    password = wizard.getBindPassword().getBytes();
-
-                    disconnect();
-                    refresh();
-                    connect();
-                    reset();
+                    sizeLimit = wizard.getSizeLimit();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -248,12 +228,6 @@ public class BrowserEditorPage extends FormPage {
         layout.marginHeight = 0;
         composite.setLayout(layout);
 
-        Label dnLabel = new Label(composite, SWT.NONE);
-        dnLabel.setText("DN:");
-
-        dnText = new Text(composite, SWT.BORDER | SWT.READ_ONLY);
-        dnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
         attributesTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
         GridData gd = new GridData(GridData.FILL_BOTH);
         gd.horizontalSpan = 2;
@@ -285,21 +259,12 @@ public class BrowserEditorPage extends FormPage {
         return composite;
     }
 
-    public void setActive(boolean b) {
-        super.setActive(b);
-        if (b) refresh();
-    }
-
-    public void refresh() {
-        LDAPUrl ldapUrl = new LDAPUrl(hostname, port, "");
-        urlText.setText(ldapUrl.toString());
-    }
-
     public void reset() {
         tree.removeAll();
+        attributesTable.removeAll();
 
         TreeItem item = new TreeItem(tree, SWT.NONE);
-        item.setText(suffix == null ? "Root DSE" : suffix);
+        item.setText(suffix == null ? "Root" : suffix);
         item.setData(suffix == null ? new DN() : new DN(suffix));
 
         new TreeItem(item, SWT.NONE);
@@ -354,12 +319,16 @@ public class BrowserEditorPage extends FormPage {
 
             } else {
 
+                LDAPSearchConstraints constraints = new LDAPSearchConstraints();
+                if (sizeLimit != null) constraints.setMaxResults(sizeLimit.intValue());
+
                 LDAPSearchResults sr = connection.search(
                         baseDn.toString(),
                         LDAPConnection.SCOPE_ONE,
                         "(objectClass=*)",
                         new String[] { "*", "+" },
-                        true
+                        true,
+                        constraints
                 );
 
                 while (sr.hasMore()) {
@@ -386,8 +355,6 @@ public class BrowserEditorPage extends FormPage {
         if (!isConnected()) connect();
 
         DN dn = (DN)item.getData();
-
-        dnText.setText(dn.toString());
 
         attributesTable.removeAll();
 

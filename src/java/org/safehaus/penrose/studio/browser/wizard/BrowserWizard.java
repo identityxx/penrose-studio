@@ -8,7 +8,7 @@ import org.safehaus.penrose.studio.server.Server;
 /**
  * @author Endi S. Dewata
  */
-public class BrowserConnectionWizard extends Wizard {
+public class BrowserWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -20,7 +20,7 @@ public class BrowserConnectionWizard extends Wizard {
     String bindDn;
     String bindPassword;
 
-    public BrowserConnectionWizard() {
+    public BrowserWizard() {
         setWindowTitle("LDAP Browser");
     }
 
