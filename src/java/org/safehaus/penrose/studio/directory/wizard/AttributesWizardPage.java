@@ -36,6 +36,7 @@ import org.safehaus.penrose.schema.SchemaManagerClient;
 import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.mapping.Expression;
 import org.safehaus.penrose.schema.ObjectClass;
+import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
@@ -117,15 +118,17 @@ public class AttributesWizardPage extends WizardPage implements SelectionListene
 
                             for (EntrySourceConfig sourceMapping : sourceConfigs) {
 
+                                String alias = sourceMapping.getAlias();
+                                alias = alias == null ? sourceMapping.getSourceName() : alias;
+
                                 SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceMapping.getSourceName());
                                 SourceConfig sourceConfig = sourceClient.getSourceConfig();
 
-                                //SourceConfig sourceConfig = partitionConfig.getSourceConfigManager().getSourceConfig(sourceMapping.getSourceName());
-                                dialog.addVariable(sourceMapping.getAlias());
+                                dialog.addVariable(alias);
 
                                 Collection<FieldConfig> fields = sourceConfig.getFieldConfigs();
                                 for (FieldConfig field : fields) {
-                                    dialog.addVariable(sourceMapping.getAlias() + "." + field.getName());
+                                    dialog.addVariable(alias+ "."+field.getName());
                                 }
                             }
                         }
@@ -183,7 +186,9 @@ public class AttributesWizardPage extends WizardPage implements SelectionListene
                     dialog.setText("Add attributes...");
 
                     PenroseClient client = server.getClient();
-                    dialog.setSchemaManagerClient(client.getSchemaManagerClient());
+                    SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+                    Schema schema = schemaManagerClient.getSchema();
+                    dialog.setSchema(schema);
 
                     int rc = dialog.open();
                     if (rc == Window.CANCEL) return;

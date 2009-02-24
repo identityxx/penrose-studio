@@ -28,8 +28,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.jface.window.Window;
-import org.safehaus.penrose.schema.SchemaManagerClient;
 import org.safehaus.penrose.schema.ObjectClass;
+import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 
@@ -48,7 +48,7 @@ public class SelectAttributeTypeDialog extends Dialog implements SelectionListen
     Combo objectClassCombo;
     Table attributeTable;
 
-    private SchemaManagerClient schemaManagerClient;
+    private Schema schema;
     private Collection<String> selections = new ArrayList<String>();
 
     private int action = Window.CANCEL;
@@ -148,16 +148,16 @@ public class SelectAttributeTypeDialog extends Dialog implements SelectionListen
         this.selections = selections;
     }
 
-    public SchemaManagerClient getSchemaManagerClient() {
-        return schemaManagerClient;
+    public Schema getSchema() {
+        return schema;
     }
 
-    public void setSchemaManagerClient(SchemaManagerClient schemaManagerClient) throws Exception {
-        this.schemaManagerClient = schemaManagerClient;
+    public void setSchema(Schema schema) throws Exception {
+        this.schema = schema;
 
         objectClassCombo.add("");
 
-        for (String ocName : schemaManagerClient.getObjectClassNames()) {
+        for (String ocName : schema.getObjectClassNames()) {
             objectClassCombo.add(ocName);
         }
 
@@ -170,7 +170,7 @@ public class SelectAttributeTypeDialog extends Dialog implements SelectionListen
 
         if ("".equals(ocName)) {
 
-            for (String atName : schemaManagerClient.getAttributeTypeNames()) {
+            for (String atName : schema.getAttributeTypeNames()) {
                 TableItem item = new TableItem(attributeTable, SWT.NONE);
                 item.setText(0, atName);
                 item.setText(1, "");
@@ -179,7 +179,7 @@ public class SelectAttributeTypeDialog extends Dialog implements SelectionListen
             return;
         }
 
-        ObjectClass oc = schemaManagerClient.getObjectClass(ocName);
+        ObjectClass oc = schema.getObjectClass(ocName);
         Collection<String> atNames = oc.getRequiredAttributes();
 
         for (String atName : atNames) {

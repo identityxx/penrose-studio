@@ -83,7 +83,7 @@ public class ExpressionDialog extends Dialog {
     private EntryAttributeConfig attributeMapping;
     private EntryFieldConfig fieldMapping;
 
-    public Collection variables = new ArrayList();
+    public Collection<String> variables = new ArrayList<String>();
 
     private int action = CANCEL;
 
@@ -408,8 +408,7 @@ public class ExpressionDialog extends Dialog {
 
         variableCombo = new Combo(composite, SWT.BORDER);
         variableCombo.add("");
-        for (Iterator i=variables.iterator(); i.hasNext(); ) {
-            String variable = (String)i.next();
+        for (String variable : variables) {
             variableCombo.add(variable);
         }
         variableCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -467,8 +466,7 @@ public class ExpressionDialog extends Dialog {
 
         foreachCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
         foreachCombo.add("");
-        for (Iterator i=variables.iterator(); i.hasNext(); ) {
-            String variable = (String)i.next();
+        for (String variable : variables) {
             foreachCombo.add(variable);
         }
         foreachCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
