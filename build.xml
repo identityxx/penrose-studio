@@ -242,7 +242,7 @@
             newDir="lib"
         />
 
-        <fixcrlf srcdir="target/dist" includes="**/*.txt" eol="unix"/>
+        <fixcrlf srcdir="target/dist" includes="**/*.txt"/>
         <fixcrlf srcdir="${plugin.path}/META-INF" includes="MANIFEST.MF" eol="unix"/>
 
         <mkdir dir="dist"/>
