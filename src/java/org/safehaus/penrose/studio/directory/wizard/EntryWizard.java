@@ -28,7 +28,7 @@ import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
-import org.safehaus.penrose.studio.directory.wizard.AttributesWizardPage;
+import org.safehaus.penrose.studio.attribute.wizard.AttributesWizardPage;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.directory.wizard.EntrySourceWizardPage;

@@ -24,6 +24,7 @@ import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.io.File;
 
@@ -56,20 +57,21 @@ public class ExportPartitionWizard extends Wizard {
 
     public boolean performFinish() {
         try {
+            String location = locationPage.getLocation();
 
-            File directory = new File(locationPage.getLocation());
+            File dir = new File(location);
+            if (!dir.isDirectory()) {
+                throw new Exception(dir+" folder does not exist.");
+            }
 
             PenroseClient client = project.getClient();
-            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-
-            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-            PartitionConfig partitionConfig = partitionClient.getPartitionConfig();
-            partitionConfig.store(directory);
+            client.download(dir, "partitions/"+partitionName);
 
             return true;
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
             return false;
         }
     }

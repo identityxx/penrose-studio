@@ -11,7 +11,6 @@
     <property file="${branding.path}/build.properties"/>
 
     <property name="prefix" value=""/>
-    <property name="iscc.path" value="ISCC.exe"/>
     <property name="cygwin.home" value="c:/cygwin"/>
 
     <property name="studio.home" value="${prefix}/opt/${product.name}-${product.version}"/>

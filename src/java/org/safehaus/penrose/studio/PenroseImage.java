@@ -44,15 +44,12 @@ public class PenroseImage {
     public final static String FOLDER            = "images.folder";
     public final static String HOME_NODE         = "images.home_node";
     public final static String OPEN_FOLDER       = "images.open_folder";
-    public final static String RED_FOLDER        = "images.red_folder";
-    public final static String DYNAMIC_NODE      = "images.dynamic_node";
 
     // data sources
     public final static String CONNECTION        = "images.connection";
     public final static String SOURCE            = "images.source";
 
     public final static String BROWSER           = "images.browser";
-    public final static String PREVIEW           = "images.preview";
     public final static String ROOT_DSE          = "images.root_dse";
     public final static String ADMINISTRATOR     = "images.administrator";
     public final static String PARTITION         = "images.partition";

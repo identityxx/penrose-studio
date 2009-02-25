@@ -20,7 +20,7 @@ package org.safehaus.penrose.studio.rootDse.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.acl.wizard.ACLWizardPage;
-import org.safehaus.penrose.studio.directory.wizard.AttributesWizardPage;
+import org.safehaus.penrose.studio.attribute.wizard.AttributesWizardPage;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.DirectoryClient;
@@ -75,18 +75,23 @@ public class DefaultRootDSEWizard extends Wizard {
     }
 
     public void addPages() {
+        try {
+            attributesPage = new AttributesWizardPage();
+            attributesPage.setServer(server);
+            attributesPage.setPartitionName(partitionName);
+            attributesPage.setAttributeConfigs(entryConfig.getAttributeConfigs());
 
-        attributesPage = new AttributesWizardPage();
-        attributesPage.setServer(server);
-        attributesPage.setPartitionName(partitionName);
-        attributesPage.setAttributeConfigs(entryConfig.getAttributeConfigs());
+            addPage(attributesPage);
 
-        addPage(attributesPage);
+            aclPage = new ACLWizardPage();
+            aclPage.addACI(new ACI("rs"));
 
-        aclPage = new ACLWizardPage();
-        aclPage.addACI(new ACI("rs"));
+            addPage(aclPage);
 
-        addPage(aclPage);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
     }
 
     public boolean canFinish() {

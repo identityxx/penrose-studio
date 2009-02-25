@@ -43,7 +43,7 @@ import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.directory.wizard.EntryRDNWizard;
 import org.safehaus.penrose.studio.directory.wizard.ObjectClassWizard;
-import org.safehaus.penrose.studio.directory.wizard.AttributesWizard;
+import org.safehaus.penrose.studio.attribute.wizard.AttributesWizard;
 
 import java.util.Collection;
 import java.util.Map;

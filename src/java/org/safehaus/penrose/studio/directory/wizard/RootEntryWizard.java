@@ -30,6 +30,7 @@ import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.acl.wizard.ACLWizardPage;
+import org.safehaus.penrose.studio.attribute.wizard.AttributesWizardPage;
 
 import java.util.Collection;
 

@@ -22,6 +22,7 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.directory.*;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.attribute.wizard.AttributesWizardPage;
 
 /**
  * @author Endi S. Dewata

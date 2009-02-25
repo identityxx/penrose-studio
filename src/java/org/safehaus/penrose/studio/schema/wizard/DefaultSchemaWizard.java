@@ -20,7 +20,7 @@ package org.safehaus.penrose.studio.schema.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.acl.wizard.ACLWizardPage;
-import org.safehaus.penrose.studio.directory.wizard.AttributesWizardPage;
+import org.safehaus.penrose.studio.attribute.wizard.AttributesWizardPage;
 import org.safehaus.penrose.studio.directory.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.directory.wizard.EntryDNWizardPage;
 import org.safehaus.penrose.acl.ACI;
@@ -66,29 +66,34 @@ public class DefaultSchemaWizard extends Wizard {
     }
 
     public void addPages() {
+        try {
+            dnPage = new EntryDNWizardPage();
+            dnPage.setDn(entryConfig.getDn().toString());
 
-        dnPage = new EntryDNWizardPage();
-        dnPage.setDn(entryConfig.getDn().toString());
+            addPage(dnPage);
 
-        addPage(dnPage);
+            objectClassesPage = new ObjectClassWizardPage();
+            objectClassesPage.setServer(server);
+            objectClassesPage.setSelecteObjectClasses(entryConfig.getObjectClasses());
 
-        objectClassesPage = new ObjectClassWizardPage();
-        objectClassesPage.setServer(server);
-        objectClassesPage.setSelecteObjectClasses(entryConfig.getObjectClasses());
+            addPage(objectClassesPage);
 
-        addPage(objectClassesPage);
+            attributesPage = new AttributesWizardPage();
+            attributesPage.setServer(server);
+            attributesPage.setPartitionName(partitionName);
+            attributesPage.setAttributeConfigs(entryConfig.getAttributeConfigs());
 
-        attributesPage = new AttributesWizardPage();
-        attributesPage.setServer(server);
-        attributesPage.setPartitionName(partitionName);
-        attributesPage.setAttributeConfigs(entryConfig.getAttributeConfigs());
+            addPage(attributesPage);
 
-        addPage(attributesPage);
+            aclPage = new ACLWizardPage();
+            aclPage.setACL(entryConfig.getACL());
 
-        aclPage = new ACLWizardPage();
-        aclPage.setACL(entryConfig.getACL());
+            addPage(aclPage);
 
-        addPage(aclPage);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
     }
 
     public boolean canFinish() {

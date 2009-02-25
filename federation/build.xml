@@ -13,7 +13,6 @@
     <property name="project.dist" value="dist"/>
 
     <property name="rcp.prefix" value="eclipse-RCP-3.2.2"/>
-    <property name="iscc.path" value="ISCC.exe"/>
     <property name="cygwin.home" value="c:/cygwin"/>
 
     <tstamp>

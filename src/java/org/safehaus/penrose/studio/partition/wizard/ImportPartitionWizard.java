@@ -22,6 +22,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.server.Server;
 
 import java.io.File;
@@ -75,20 +76,20 @@ public class ImportPartitionWizard extends Wizard {
     public boolean performFinish() {
         try {
 
-            String newPartitionName = namePage.getPartitionName();
+            String partitionName = namePage.getPartitionName();
             String location = locationPage.getLocation();
 
-            File source = new File(location);
-            if (!source.isDirectory()) return false;
+            File dir = new File(location);
+            if (!dir.isDirectory()) {
+                throw new Exception(dir+" folder does not exist.");
+            }
 
-            String partitionName = source.getName();
-            
             PenroseClient client = server.getClient();
 
-            client.uploadFolder(source, "partitions/"+newPartitionName);
+            client.uploadFolder(dir, "partitions/"+partitionName);
 
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-            partitionManagerClient.loadPartition(newPartitionName);
+            partitionManagerClient.loadPartition(partitionName);
 
             if (startupPage.isEnabled()) {
                 partitionManagerClient.startPartition(partitionName);
@@ -101,6 +102,7 @@ public class ImportPartitionWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
             return false;
         }
     }

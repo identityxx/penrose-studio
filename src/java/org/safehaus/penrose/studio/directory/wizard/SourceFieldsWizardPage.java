@@ -32,8 +32,8 @@ import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.mapping.Expression;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.expression.dialog.ExpressionDialog;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.directory.dialog.ExpressionDialog;
 import org.safehaus.penrose.studio.directory.dialog.SelectFieldDialog;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
@@ -205,7 +205,7 @@ public class SourceFieldsWizardPage extends WizardPage implements SelectionListe
                 dialog.setType(ExpressionDialog.TEXT);
             }
 
-            dialog.setFieldMapping(fieldConfig);
+            dialog.setFieldConfig(fieldConfig);
 
             dialog.open();
 

@@ -28,6 +28,8 @@ import org.safehaus.penrose.studio.schema.dialog.SelectAttributeTypeDialog;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.client.PenroseClient;
+import org.safehaus.penrose.schema.SchemaManagerClient;
+import org.safehaus.penrose.schema.Schema;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -85,7 +87,9 @@ public class ObjectClassAttributesWizardPage extends WizardPage {
                     dialog.setText("Add attributes...");
 
                     PenroseClient client = server.getClient();
-                    dialog.setSchemaManagerClient(client.getSchemaManagerClient());
+                    SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+                    Schema schema = schemaManagerClient.getSchema();
+                    dialog.setSchema(schema);
 
                     int rc = dialog.open();
                     if (rc == Window.CANCEL) return;
@@ -144,7 +148,9 @@ public class ObjectClassAttributesWizardPage extends WizardPage {
                     dialog.setText("Add attributes...");
 
                     PenroseClient client = server.getClient();
-                    dialog.setSchemaManagerClient(client.getSchemaManagerClient());
+                    SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
+                    Schema schema = schemaManagerClient.getSchema();
+                    dialog.setSchema(schema);
 
                     int rc = dialog.open();
                     if (rc == Window.CANCEL) return;

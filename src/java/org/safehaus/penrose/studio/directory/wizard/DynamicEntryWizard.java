@@ -29,6 +29,7 @@ import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.mapping.Relationship;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.attribute.wizard.AttributesWizardPage;
 
 import java.util.Collection;
 
@@ -92,7 +93,7 @@ public class DynamicEntryWizard extends Wizard {
         if (sourcesPage == page) {
             Collection<EntrySourceConfig> sourceConfigs = sourcesPage.getEntrySourceConfigs();
             relationsPage.setSourceMappings(sourceConfigs);
-            attributesPage.setSourceConfigs(sourceConfigs);
+            attributesPage.setEntrySourceConfigs(sourceConfigs);
 
             if (sourceConfigs.size() < 2) return objectClassesPage;
 

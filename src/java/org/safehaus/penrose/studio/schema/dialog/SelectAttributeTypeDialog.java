@@ -27,8 +27,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.jface.window.Window;
-import org.safehaus.penrose.schema.SchemaManagerClient;
 import org.safehaus.penrose.schema.AttributeType;
+import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 
@@ -46,7 +46,7 @@ public class SelectAttributeTypeDialog extends Dialog {
 
     Table attributeTable;
 
-    private SchemaManagerClient schemaManagerClient;
+    private Schema schema;
     private Collection<String> selections = new ArrayList<String>();
 
     private int action = Window.CANCEL;
@@ -137,12 +137,12 @@ public class SelectAttributeTypeDialog extends Dialog {
         this.selections = selections;
     }
 
-    public SchemaManagerClient getSchemaManagerClient() {
-        return schemaManagerClient;
+    public Schema getSchema() {
+        return schema;
     }
 
-    public void setSchemaManagerClient(SchemaManagerClient schemaManagerClient) {
-        this.schemaManagerClient = schemaManagerClient;
+    public void setSchema(Schema schema) {
+        this.schema = schema;
     }
 
     public void refresh() {
@@ -150,7 +150,7 @@ public class SelectAttributeTypeDialog extends Dialog {
         try {
             attributeTable.removeAll();
 
-            for (AttributeType at : schemaManagerClient.getAttributeTypes()) {
+            for (AttributeType at : schema.getAttributeTypes()) {
                 String name = at.getName();
                 String description = at.getDescription();
                 
