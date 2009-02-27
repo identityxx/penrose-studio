@@ -42,6 +42,8 @@ import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
 /**
  * @author Endi S. Dewata
@@ -140,17 +142,8 @@ public class SourceBrowsePage extends SourceEditorPage {
         tree.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    table.removeAll();
-
                     TreeItem item = tree.getSelection()[0];
-                    DN dn = (DN)item.getData();
-                    if (dn == null) return;
-
-                    SourceClient sourceClient = getSourceClient();
-                    SearchResult entry = sourceClient.find(dn);
-                    if (entry == null) return;
-                    
-                    showAttributes(entry);
+                    showEntry(item);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -268,10 +261,9 @@ public class SourceBrowsePage extends SourceEditorPage {
     }
 
     public void expand(TreeItem item) throws Exception {
-
-        for (TreeItem ti : item.getItems()) ti.dispose();
-
         try {
+            for (TreeItem ti : item.getItems()) ti.dispose();
+
             DN baseDn = (DN)item.getData();
 
             final SearchRequest request = new SearchRequest();
@@ -313,26 +305,70 @@ public class SourceBrowsePage extends SourceEditorPage {
                 new TreeItem(ti, SWT.NONE);
             }
 
+        } catch (InvocationTargetException e) {
+            Throwable t = e.getCause();
+            TreeItem ti = new TreeItem(item, SWT.NONE);
+            ti.setText("Error: "+t.getMessage());
+
         } catch (Exception e) {
             TreeItem ti = new TreeItem(item, SWT.NONE);
             ti.setText("Error: "+e.getMessage());
         }
     }
 
-    public void showAttributes(SearchResult entry) throws Exception {
+    public void showEntry(TreeItem item) throws Exception {
+        try {
+            table.removeAll();
 
-        Attributes attributes = entry.getAttributes();
-        for (Attribute attribute : attributes.getAll()) {
-            String name = attribute.getName();
+            final DN dn = (DN)item.getData();
+            if (dn == null) return;
 
-            for (Object value : attribute.getValues()) {
-                String label = value instanceof byte[] ? "(binary)" : value.toString();
+            final Attributes results = new Attributes();
 
-                TableItem ti = new TableItem(table, SWT.NONE);
-                ti.setText(0, name);
-                ti.setText(1, label);
-                ti.setData(value);
+            IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+            progressService.busyCursorWhile(new IRunnableWithProgress() {
+                public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                    try {
+                        monitor.beginTask("Retrieving data...", IProgressMonitor.UNKNOWN);
+
+                        SourceClient sourceClient = getSourceClient();
+                        SearchResult entry = sourceClient.find(dn);
+                        if (entry == null) return;
+
+                        Attributes attributes = entry.getAttributes();
+                        results.add(attributes);
+    
+                    } catch (Exception e) {
+                        throw new InvocationTargetException(e);
+
+                    } finally {
+                        monitor.done();
+                    }
+                }
+            });
+
+            for (Attribute attribute : results.getAll()) {
+                String name = attribute.getName();
+
+                for (Object value : attribute.getValues()) {
+                    String label = value instanceof byte[] ? "(binary)" : value.toString();
+
+                    TableItem ti = new TableItem(table, SWT.NONE);
+                    ti.setText(0, name);
+                    ti.setText(1, label);
+                    ti.setData(value);
+                }
             }
+
+        } catch (InvocationTargetException e) {
+            Throwable t = e.getCause();
+            log.error(t.getMessage(), t);
+            ErrorDialog.open(t);
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 }

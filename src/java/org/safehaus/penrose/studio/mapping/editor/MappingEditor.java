@@ -61,7 +61,8 @@ public class MappingEditor extends FormEditor implements ModifyListener {
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
-            MappingClient mappingClient = partitionClient.getMappingClient(mappingName);
+            MappingManagerClient mappingManagerClient = partitionClient.getMappingManagerClient();
+            MappingClient mappingClient = mappingManagerClient.getMappingClient(mappingName);
             origMappingConfig = mappingClient.getMappingConfig();
 
             mappingConfig = (MappingConfig) origMappingConfig.clone();

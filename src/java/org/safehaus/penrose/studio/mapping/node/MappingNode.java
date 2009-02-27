@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.mapping;
+package org.safehaus.penrose.studio.mapping.node;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
@@ -23,6 +23,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -37,6 +38,7 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.mapping.editor.MappingEditor;
 import org.safehaus.penrose.studio.mapping.editor.MappingEditorInput;
+import org.safehaus.penrose.studio.mapping.dnd.MappingTransfer;
 import org.safehaus.penrose.studio.partition.node.PartitionNode;
 import org.safehaus.penrose.studio.partition.node.PartitionsNode;
 import org.safehaus.penrose.studio.server.Server;
@@ -45,6 +47,7 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 
 import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
@@ -53,8 +56,8 @@ public class MappingNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    private ServersView view;
-    private ServerNode projectNode;
+    private ServersView serversView;
+    private ServerNode serverNode;
     private PartitionsNode partitionsNode;
     private PartitionNode partitionNode;
     private MappingsNode mappingsNode;
@@ -67,8 +70,8 @@ public class MappingNode extends Node {
         mappingsNode = (MappingsNode)parent;
         partitionNode = mappingsNode.getPartitionNode();
         partitionsNode = partitionNode.getPartitionsNode();
-        projectNode = partitionsNode.getServerNode();
-        this.view = projectNode.getServersView();
+        serverNode = partitionsNode.getServerNode();
+        this.serversView = serverNode.getServersView();
     }
 
     public void showMenu(IMenuManager manager) {
@@ -100,7 +103,7 @@ public class MappingNode extends Node {
         manager.add(new Action("Paste") {
             public void run() {
                 try {
-                    paste();
+                    mappingsNode.paste();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     throw new RuntimeException(e.getMessage(), e);
@@ -123,7 +126,7 @@ public class MappingNode extends Node {
     public void open() throws Exception {
 
         MappingEditorInput ei = new MappingEditorInput();
-        ei.setProject(projectNode.getServer());
+        ei.setProject(serverNode.getServer());
         ei.setPartitionName(partitionName);
         ei.setMappingName(mappingName);
 
@@ -135,19 +138,18 @@ public class MappingNode extends Node {
     public void remove() throws Exception {
 
         boolean confirm = MessageDialog.openQuestion(
-                view.getSite().getShell(),
-                "Confirmation",
-                "Remove selected mappings?");
+                serversView.getSite().getShell(),
+                "Confirmation","Remove selected mappings?");
 
         if (!confirm) return;
 
-        Server project = projectNode.getServer();
-        PenroseClient client = project.getClient();
+        Server server = serverNode.getServer();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         MappingManagerClient mappingManagerClient = partitionClient.getMappingManagerClient();
 
-        for (Node node : view.getSelectedNodes()) {
+        for (Node node : serversView.getSelectedNodes()) {
             if (!(node instanceof MappingNode)) continue;
 
             MappingNode mappingNode = (MappingNode)node;
@@ -156,51 +158,40 @@ public class MappingNode extends Node {
 
         partitionClient.store();
 
+        parent.refresh();
+
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
     }
 
     public void copy() throws Exception {
 
-        Server project = projectNode.getServer();
-        PenroseClient client = project.getClient();
+        log.debug("Copying mappings:");
+
+        Server server = serverNode.getServer();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
-        MappingClient connectionClient = partitionClient.getMappingClient(mappingName);
-        view.setClipboard(connectionClient.getMappingConfig());
-    }
-
-    public void paste() throws Exception {
-
-        Object newObject = view.getClipboard();
-
-        if (!(newObject instanceof MappingConfig)) return;
-
-        Server project = projectNode.getServer();
-
-        MappingConfig newMappingConfig = (MappingConfig)((MappingConfig)newObject).clone();
-        view.setClipboard(null);
-
-        PenroseClient client = project.getClient();
-        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         MappingManagerClient mappingManagerClient = partitionClient.getMappingManagerClient();
 
-        Collection<String> mappingNames = mappingManagerClient.getMappingNames();
-        int counter = 1;
-        String name = newMappingConfig.getName();
-        while (mappingNames.contains(name)) {
-            counter++;
-            name = newMappingConfig.getName()+" ("+counter+")";
+        Collection<MappingConfig> list = new ArrayList<MappingConfig>();
+        for (Node node : serversView.getSelectedNodes()) {
+            if (!(node instanceof MappingNode)) continue;
+
+            MappingNode mappingNode = (MappingNode)node;
+            String mappingName = mappingNode.getMappingName();
+            log.debug(" - "+mappingName);
+
+            MappingClient mappingClient = mappingManagerClient.getMappingClient(mappingName);
+            MappingConfig mappingConfig = mappingClient.getMappingConfig();
+            list.add(mappingConfig);
         }
-        newMappingConfig.setName(name);
 
-        mappingManagerClient.createMapping(newMappingConfig);
-        partitionClient.store();
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        serversView.getSWTClipboard().setContents(
+                new Object[] { list.toArray(new MappingConfig[list.size()]) },
+                new Transfer[] { MappingTransfer.getInstance() }
+        );
     }
 
     public String getPartitionName() {
@@ -219,20 +210,20 @@ public class MappingNode extends Node {
         this.mappingName = mappingName;
     }
 
-    public ServersView getView() {
-        return view;
+    public ServersView getServersView() {
+        return serversView;
     }
 
-    public void setView(ServersView view) {
-        this.view = view;
+    public void setServersView(ServersView serversView) {
+        this.serversView = serversView;
     }
 
-    public ServerNode getProjectNode() {
-        return projectNode;
+    public ServerNode getServerNode() {
+        return serverNode;
     }
 
-    public void setProjectNode(ServerNode projectNode) {
-        this.projectNode = projectNode;
+    public void setServerNode(ServerNode serverNode) {
+        this.serverNode = serverNode;
     }
 
     public PartitionsNode getPartitionsNode() {

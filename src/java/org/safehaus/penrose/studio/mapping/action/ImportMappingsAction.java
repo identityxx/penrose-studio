@@ -27,7 +27,7 @@ import org.safehaus.penrose.mapping.MappingConfigManager;
 import org.safehaus.penrose.mapping.MappingReader;
 import org.safehaus.penrose.mapping.MappingManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.mapping.MappingsNode;
+import org.safehaus.penrose.studio.mapping.node.MappingsNode;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.ServersView;
 
@@ -37,10 +37,10 @@ public class ImportMappingsAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
-    MappingsNode node;
+    MappingsNode mappingsNode;
 
-	public ImportMappingsAction(MappingsNode node) {
-        this.node = node;
+	public ImportMappingsAction(MappingsNode mappingsNode) {
+        this.mappingsNode = mappingsNode;
 
         setText("Import");
         setId(getClass().getName());
@@ -49,7 +49,7 @@ public class ImportMappingsAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Server server = node.getProjectNode().getServer();
+            Server server = mappingsNode.getServerNode().getServer();
 
             FileDialog dialog = new FileDialog(serversView.getSite().getShell(), SWT.OPEN);
             dialog.setText("Import Mappings");
@@ -65,7 +65,7 @@ public class ImportMappingsAction extends Action {
             MappingReader mappingReader = new MappingReader();
             mappingReader.read(file, mappingConfigManager);
 
-            PartitionClient partitionClient = server.getClient().getPartitionManagerClient().getPartitionClient(node.getPartitionName());
+            PartitionClient partitionClient = server.getClient().getPartitionManagerClient().getPartitionClient(mappingsNode.getPartitionName());
             MappingManagerClient mappingManagerClient = partitionClient.getMappingManagerClient();
 
             for (MappingConfig mappingConfig : mappingConfigManager.getMappingConfigs()) {
@@ -74,10 +74,12 @@ public class ImportMappingsAction extends Action {
 
             partitionClient.store();
 
+            mappingsNode.refresh();
+
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 
-            serversView.open(node);
+            serversView.open(mappingsNode);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

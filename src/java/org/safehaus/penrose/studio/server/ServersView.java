@@ -28,8 +28,10 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.jface.viewers.*;
 import org.eclipse.jface.action.*;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.*;
 import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.source.dnd.SourceTransfer;
 import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.util.Helper;
@@ -82,6 +84,7 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
     ServersContentProvider contentProvider;
     TreeViewer treeViewer;
 
+    Clipboard swtClipboard;
     Object clipboard;
 
     public ServersView() {
@@ -93,6 +96,8 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
 	 */
 	public void createPartControl(Composite parent) {
 		try {
+            swtClipboard = new Clipboard(getSite().getShell().getDisplay());
+
             contentProvider = new ServersContentProvider(this);
 
             treeViewer = new TreeViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
@@ -174,7 +179,30 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
                     }
                 }
             });
-
+/*
+            treeViewer.addDragSupport(
+                    DND.DROP_COPY | DND.DROP_MOVE,
+                    new Transfer[] {
+                            SourceTransfer.getInstance()
+                    },
+                    new DragSourceAdapter() {
+                        public void dragStart(DragSourceEvent event) {
+                            log.debug("Drag start.");
+                        }
+                        public void dragFinished(DragSourceEvent event) {
+                            log.debug("Drag finished.");
+                        }
+                        public void dragSetData(DragSourceEvent event) {
+                            log.debug("Drag set data:");
+                            IStructuredSelection selection = (IStructuredSelection)treeViewer.getSelection();
+                            Node[] nodes = (Node[])selection.toList().toArray(new Node[selection.size()]);
+                            for (Node node : nodes) {
+                                log.debug(" - "+node.getName());
+                            }
+                        }
+                    }
+            );
+*/            
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
 			penroseStudio.addChangeListener(this);
 
@@ -183,6 +211,14 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
 		}
 	}
 
+    public void dispose() {
+        swtClipboard.dispose();
+    }
+    
+    public Clipboard getSWTClipboard() {
+        return swtClipboard;
+    }
+    
     public void setClipboard(Object object) throws Exception {
         this.clipboard = object;
     }
@@ -230,6 +266,10 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
 
     public void removeServerConfig(String name) {
         contentProvider.removeProjectConfig(name);
+    }
+
+    public void setSelection(Node node) {
+        treeViewer.setSelection(new StructuredSelection(node), true);
     }
 
     public ServerNode getSelectedServerNode() {

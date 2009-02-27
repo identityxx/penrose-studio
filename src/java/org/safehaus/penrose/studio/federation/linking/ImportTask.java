@@ -7,7 +7,6 @@ import org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingPage
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.IdentityLinkingResult;
 
-import javax.management.MBeanException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
@@ -50,9 +49,6 @@ public class ImportTask implements IRunnableWithProgress {
 
         } catch (InterruptedException e) {
             // ignore
-
-        } catch (MBeanException e) {
-            throw new InvocationTargetException(e.getCause());
 
         } catch (Exception e) {
             throw new InvocationTargetException(e);

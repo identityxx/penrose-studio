@@ -15,17 +15,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.safehaus.penrose.studio.mapping;
+package org.safehaus.penrose.studio.mapping.node;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.safehaus.penrose.client.PenroseClient;
-import org.safehaus.penrose.mapping.MappingClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.mapping.MappingConfig;
@@ -34,7 +32,7 @@ import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.mapping.action.ImportMappingsAction;
 import org.safehaus.penrose.studio.mapping.action.NewMappingAction;
-import org.safehaus.penrose.studio.mapping.wizard.PasteMappingWizard;
+import org.safehaus.penrose.studio.mapping.dnd.MappingTransfer;
 import org.safehaus.penrose.studio.partition.node.PartitionNode;
 import org.safehaus.penrose.studio.partition.node.PartitionsNode;
 import org.safehaus.penrose.studio.server.Server;
@@ -42,7 +40,6 @@ import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -52,8 +49,8 @@ public class MappingsNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    private ServersView view;
-    private ServerNode projectNode;
+    private ServersView serversView;
+    private ServerNode serverNode;
     private PartitionsNode partitionsNode;
     private PartitionNode partitionNode;
 
@@ -63,8 +60,42 @@ public class MappingsNode extends Node {
         super(name, image, object, parent);
         partitionNode = (PartitionNode)parent;
         partitionsNode = partitionNode.getPartitionsNode();
-        projectNode = partitionsNode.getServerNode();
-        view = projectNode.getServersView();
+        serverNode = partitionsNode.getServerNode();
+        serversView = serverNode.getServersView();
+    }
+
+    public void init() throws Exception {
+        update();
+    }
+
+    public void update() throws Exception {
+
+        Server server = serverNode.getServer();
+        PenroseClient client = server.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+
+        MappingManagerClient mappingManagerClient = partitionClient.getMappingManagerClient();
+
+        for (String mappingName : mappingManagerClient.getMappingNames()) {
+
+            MappingNode mappingNode = new MappingNode(
+                    mappingName,
+                    PenroseStudio.getImage(PenroseImage.MAPPING),
+                    mappingName,
+                    this
+            );
+
+            mappingNode.setPartitionName(partitionName);
+            mappingNode.setMappingName(mappingName);
+
+            children.add(mappingNode);
+        }
+    }
+
+    public void refresh() throws Exception {
+        children.clear();
+        update();
     }
 
     public void showMenu(IMenuManager manager) {
@@ -85,78 +116,62 @@ public class MappingsNode extends Node {
             }
         });
 
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(new Action("Refresh") {
+            public void run() {
+                try {
+                    refresh();
+
+                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
+                    penroseStudio.notifyChangeListeners();
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+        });
     }
 
     public void paste() throws Exception {
 
-        Object newObject = view.getClipboard();
+        log.debug("Pasting mappings:");
 
-        if (!(newObject instanceof MappingConfig)) return;
+        MappingConfig[] mappingConfigs = (MappingConfig[]) serversView.getSWTClipboard().getContents(MappingTransfer.getInstance());
+        if (mappingConfigs == null) return;
 
-        Server project = projectNode.getServer();
+        Server server = serverNode.getServer();
 
-        MappingConfig newMappingConfig = (MappingConfig)((MappingConfig)newObject).clone();
-        view.setClipboard(null);
-
-        PasteMappingWizard wizard = new PasteMappingWizard();
-
-        ServersView serversView = ServersView.getInstance();
-        WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
-        dialog.setPageSize(600, 300);
-        int rc = dialog.open();
-
-        if (rc == WizardDialog.CANCEL) return;
-
-        PenroseClient client = project.getClient();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         MappingManagerClient mappingManagerClient = partitionClient.getMappingManagerClient();
 
-        newMappingConfig.setName(wizard.getMappingName());
+        Collection<String> names = mappingManagerClient.getMappingNames();
 
-        mappingManagerClient.createMapping(newMappingConfig);
+        for (MappingConfig mappingConfig : mappingConfigs) {
+            String name = mappingConfig.getName();
+
+            int counter = 1;
+            String newName = name;
+            while (names.contains(newName)) {
+                counter++;
+                newName = name+"_"+counter;
+            }
+
+            log.debug(" - "+name+" -> "+newName);
+            mappingConfig.setName(newName);
+
+            mappingManagerClient.createMapping(mappingConfig);
+        }
+
         partitionClient.store();
+
+        refresh();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
-    }
-
-    public boolean hasChildren() throws Exception {
-        return !getChildren().isEmpty();
-    }
-
-    public Collection<Node> getChildren() throws Exception {
-
-        Collection<Node> children = new ArrayList<Node>();
-
-        Server project = projectNode.getServer();
-        PenroseClient client = project.getClient();
-        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-        MappingManagerClient mappingManagerClient = partitionClient.getMappingManagerClient();
-
-        //log.debug("Getting mappings:");
-
-        for (String mappingName : mappingManagerClient.getMappingNames()) {
-            //log.debug(" - "+mappingName);
-
-            MappingClient mappingClient = partitionClient.getMappingClient(mappingName);
-            MappingConfig mappingConfig = mappingClient.getMappingConfig();
-
-            MappingNode mappingNode = new MappingNode(
-                    mappingName,
-                    PenroseStudio.getImage(PenroseImage.MAPPING),
-                    mappingName,
-                    this
-            );
-
-            mappingNode.setPartitionName(partitionName);
-            mappingNode.setMappingName(mappingName);
-
-            children.add(mappingNode);
-        }
-
-        return children;
     }
 
     public String getPartitionName() {
@@ -167,20 +182,20 @@ public class MappingsNode extends Node {
         this.partitionName = partitionName;
     }
 
-    public ServersView getView() {
-        return view;
+    public ServersView getServersView() {
+        return serversView;
     }
 
-    public void setView(ServersView view) {
-        this.view = view;
+    public void setServersView(ServersView serversView) {
+        this.serversView = serversView;
     }
 
-    public ServerNode getProjectNode() {
-        return projectNode;
+    public ServerNode getServerNode() {
+        return serverNode;
     }
 
-    public void setProjectNode(ServerNode projectNode) {
-        this.projectNode = projectNode;
+    public void setServerNode(ServerNode serverNode) {
+        this.serverNode = serverNode;
     }
 
     public PartitionsNode getPartitionsNode() {

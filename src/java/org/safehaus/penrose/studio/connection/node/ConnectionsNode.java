@@ -31,6 +31,7 @@ import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.connection.dnd.ConnectionTransfer;
 import org.safehaus.penrose.studio.nis.connection.action.NewNISConnectionAction;
 import org.safehaus.penrose.studio.ldap.connection.action.NewLDAPConnectionAction;
 import org.safehaus.penrose.studio.jdbc.connection.action.NewJDBCConnectionAction;
@@ -50,7 +51,7 @@ public class ConnectionsNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    private ServersView view;
+    private ServersView serversView;
     private ServerNode serverNode;
     private PartitionsNode partitionsNode;
     private PartitionNode partitionNode;
@@ -62,7 +63,7 @@ public class ConnectionsNode extends Node {
         partitionNode = (PartitionNode)parent;
         partitionsNode = partitionNode.getPartitionsNode();
         serverNode = partitionsNode.getServerNode();
-        view = serverNode.getServersView();
+        serversView = serverNode.getServersView();
     }
 
     public void init() throws Exception {
@@ -141,31 +142,36 @@ public class ConnectionsNode extends Node {
 
     public void paste() throws Exception {
 
-        Object newObject = view.getClipboard();
+        log.debug("Pasting connections:");
 
-        if (!(newObject instanceof ConnectionConfig)) return;
+        ConnectionConfig[] connectionConfigs = (ConnectionConfig[]) serversView.getSWTClipboard().getContents(ConnectionTransfer.getInstance());
+        if (connectionConfigs == null) return;
 
         Server server = serverNode.getServer();
-
-        ConnectionConfig newConnectionConfig = (ConnectionConfig)((ConnectionConfig)newObject).clone();
-        view.setClipboard(null);
 
         PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
 
-        Collection<String> connectionNames = connectionManagerClient.getConnectionNames();
+        Collection<String> names = connectionManagerClient.getConnectionNames();
 
-        int counter = 1;
-        String name = newConnectionConfig.getName();
-        while (connectionNames.contains(name)) {
-            counter++;
-            name = newConnectionConfig.getName()+" ("+counter+")";
+        for (ConnectionConfig connectionConfig : connectionConfigs) {
+            String name = connectionConfig.getName();
+            
+            int counter = 1;
+            String newName = name;
+            while (names.contains(newName)) {
+                counter++;
+                newName = name+"_"+counter;
+            }
+
+            log.debug(" - "+name+" -> "+newName);
+            connectionConfig.setName(newName);
+
+            connectionManagerClient.createConnection(connectionConfig);
         }
-        newConnectionConfig.setName(name);
 
-        connectionManagerClient.createConnection(newConnectionConfig);
         partitionClient.store();
 
         refresh();
@@ -182,12 +188,12 @@ public class ConnectionsNode extends Node {
         this.partitionName = partitionName;
     }
 
-    public ServersView getView() {
-        return view;
+    public ServersView getServersView() {
+        return serversView;
     }
 
-    public void setView(ServersView view) {
-        this.view = view;
+    public void setServersView(ServersView serversView) {
+        this.serversView = serversView;
     }
 
     public ServerNode getServerNode() {

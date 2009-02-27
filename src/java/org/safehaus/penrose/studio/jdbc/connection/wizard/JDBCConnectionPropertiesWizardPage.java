@@ -43,7 +43,6 @@ import org.safehaus.penrose.connection.ConnectionConfig;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-import javax.management.MBeanException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -239,11 +238,6 @@ public class JDBCConnectionPropertiesWizardPage extends WizardPage implements Mo
                         connectionManagerClient.validateConnection(connectionConfig);
 
                         MessageDialog.openInformation(getShell(), "Test Connection Result", "Connection successful!");
-
-                    } catch (MBeanException mbe) {
-                        Throwable e = mbe.getCause();
-                        log.error(e.getMessage(), e);
-                        ErrorDialog.open(e.getMessage());
 
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);

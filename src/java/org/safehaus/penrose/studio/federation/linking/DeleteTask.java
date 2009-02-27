@@ -8,7 +8,6 @@ import org.safehaus.penrose.ldap.SearchResult;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingPage;
 
-import javax.management.MBeanException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
@@ -62,9 +61,6 @@ public class DeleteTask implements IRunnableWithProgress {
 */
         } catch (InterruptedException e) {
             // ignore
-
-        } catch (MBeanException e) {
-            throw new InvocationTargetException(e.getCause());
 
         } catch (Exception e) {
             throw new InvocationTargetException(e);

@@ -18,6 +18,9 @@
 package org.safehaus.penrose.studio.browser.editor;
 
 import java.util.Enumeration;
+import java.util.Collection;
+import java.util.ArrayList;
+import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
@@ -35,8 +38,11 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.IProgressService;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.ietf.ldap.*;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.studio.browser.wizard.BrowserOptionsWizard;
@@ -284,65 +290,86 @@ public class BrowserEditorPage extends FormPage {
     }
 
     public void expand(TreeItem item) throws Exception {
-
-        if (!isConnected()) connect();
-
-        for (TreeItem ti : item.getItems()) ti.dispose();
-
         try {
-            DN baseDn = (DN)item.getData();
+            for (TreeItem ti : item.getItems()) ti.dispose();
 
-            if (baseDn.isEmpty()) {
+            if (!isConnected()) connect();
 
-                LDAPSearchResults sr = connection.search(
-                        "",
-                        LDAPConnection.SCOPE_BASE,
-                        "(objectClass=*)",
-                        new String[] { "*", "+" },
-                        false
-                );
+            final DN baseDn = (DN)item.getData();
+            final Collection<DN> results = new ArrayList<DN>();
 
-                LDAPEntry rootDse = sr.next();
+            IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
-                LDAPAttribute namingContexts = rootDse.getAttribute("namingContexts");
-                if (namingContexts != null) {
-                    for (Enumeration e = namingContexts.getStringValues(); e.hasMoreElements(); ) {
-                        String dn = (String)e.nextElement();
+            progressService.busyCursorWhile(new IRunnableWithProgress() {
+                public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                    try {
+                        monitor.beginTask("Retrieving data...", IProgressMonitor.UNKNOWN);
 
-                        TreeItem ti = new TreeItem(item, SWT.NONE);
-                        ti.setText(dn);
-                        ti.setData(new DN(dn));
+                        if (baseDn.isEmpty()) {
 
-                        new TreeItem(ti, SWT.NONE);
+                            LDAPSearchResults sr = connection.search(
+                                    "",
+                                    LDAPConnection.SCOPE_BASE,
+                                    "(objectClass=*)",
+                                    new String[] { "*", "+" },
+                                    false
+                            );
+
+                            LDAPEntry rootDse = sr.next();
+
+                            LDAPAttribute namingContexts = rootDse.getAttribute("namingContexts");
+                            if (namingContexts != null) {
+                                for (Enumeration e = namingContexts.getStringValues(); e.hasMoreElements(); ) {
+                                    String dn = (String)e.nextElement();
+                                    results.add(new DN(dn));
+                                }
+                            }
+
+                        } else {
+
+                            LDAPSearchConstraints constraints = new LDAPSearchConstraints();
+                            if (sizeLimit != null) constraints.setMaxResults(sizeLimit.intValue());
+
+                            LDAPSearchResults sr = connection.search(
+                                    baseDn.toString(),
+                                    LDAPConnection.SCOPE_ONE,
+                                    "(objectClass=*)",
+                                    new String[] { "dn" },
+                                    true,
+                                    constraints
+                            );
+
+                            while (sr.hasMore()) {
+                                LDAPEntry entry = sr.next();
+                                DN dn = new DN(entry.getDN());
+                                results.add(dn);
+                            }
+                        }
+
+                    } catch (Exception e) {
+                        throw new InvocationTargetException(e);
+
+                    } finally {
+                        monitor.done();
                     }
                 }
+            });
 
-            } else {
+            for (DN dn : results) {
 
-                LDAPSearchConstraints constraints = new LDAPSearchConstraints();
-                if (sizeLimit != null) constraints.setMaxResults(sizeLimit.intValue());
+                String label = baseDn.isEmpty() ? dn.toString() : dn.getRdn().toString();
 
-                LDAPSearchResults sr = connection.search(
-                        baseDn.toString(),
-                        LDAPConnection.SCOPE_ONE,
-                        "(objectClass=*)",
-                        new String[] { "*", "+" },
-                        true,
-                        constraints
-                );
+                TreeItem ti = new TreeItem(item, SWT.NONE);
+                ti.setText(label);
+                ti.setData(dn);
 
-                while (sr.hasMore()) {
-                    LDAPEntry entry = sr.next();
-                    DN dn = new DN(entry.getDN());
-                    String label = dn.getRdn().toString();
-
-                    TreeItem ti = new TreeItem(item, SWT.NONE);
-                    ti.setText(label);
-                    ti.setData(dn);
-
-                    new TreeItem(ti, SWT.NONE);
-                }
+                new TreeItem(ti, SWT.NONE);
             }
+
+        } catch (InvocationTargetException e) {
+            Throwable t = e.getCause();
+            TreeItem ti = new TreeItem(item, SWT.NONE);
+            ti.setText("Error: "+t.getMessage());
 
         } catch (Exception e) {
             TreeItem ti = new TreeItem(item, SWT.NONE);
@@ -351,38 +378,70 @@ public class BrowserEditorPage extends FormPage {
     }
 
     public void showEntry(TreeItem item) throws Exception {
+        try {
+            attributesTable.removeAll();
 
-        if (!isConnected()) connect();
+            if (!isConnected()) connect();
 
-        DN dn = (DN)item.getData();
+            final DN dn = (DN)item.getData();
+            if (dn == null) return;
 
-        attributesTable.removeAll();
+            final Collection<LDAPAttribute> results = new ArrayList<LDAPAttribute>();
 
-        LDAPSearchResults sr = connection.search(
-                dn.toString(),
-                LDAPConnection.SCOPE_BASE,
-                "(objectClass=*)",
-                new String[] { "*", "+" },
-                false
-        );
+            IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
-        if (!sr.hasMore()) return;
+            progressService.busyCursorWhile(new IRunnableWithProgress() {
+                public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                    try {
+                        monitor.beginTask("Retrieving data...", IProgressMonitor.UNKNOWN);
 
-        LDAPEntry entry = sr.next();
+                        LDAPSearchResults sr = connection.search(
+                                dn.toString(),
+                                LDAPConnection.SCOPE_BASE,
+                                "(objectClass=*)",
+                                new String[] { "*", "+" },
+                                false
+                        );
 
-        LDAPAttributeSet attributes = entry.getAttributeSet();
+                        if (!sr.hasMore()) return;
 
-        for (Object object : attributes) {
-            LDAPAttribute attribute = (LDAPAttribute) object;
-            String name = attribute.getName();
+                        LDAPEntry entry = sr.next();
+                        LDAPAttributeSet attributes = entry.getAttributeSet();
 
-            for (Enumeration e = attribute.getStringValues(); e.hasMoreElements();) {
-                String value = (String) e.nextElement();
+                        for (Object object : attributes) {
+                            LDAPAttribute attribute = (LDAPAttribute) object;
+                            results.add(attribute);
+                        }
 
-                TableItem tableItem = new TableItem(attributesTable, SWT.NONE);
-                tableItem.setText(0, name);
-                tableItem.setText(1, value);
+                    } catch (Exception e) {
+                        throw new InvocationTargetException(e);
+
+                    } finally {
+                        monitor.done();
+                    }
+                }
+            });
+
+            for (LDAPAttribute attribute : results) {
+                String name = attribute.getName();
+
+                for (Enumeration e = attribute.getStringValues(); e.hasMoreElements();) {
+                    String value = (String) e.nextElement();
+
+                    TableItem tableItem = new TableItem(attributesTable, SWT.NONE);
+                    tableItem.setText(0, name);
+                    tableItem.setText(1, value);
+                }
             }
+
+        } catch (InvocationTargetException e) {
+            Throwable t = e.getCause();
+            log.error(t.getMessage(), t);
+            ErrorDialog.open(t);
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 }

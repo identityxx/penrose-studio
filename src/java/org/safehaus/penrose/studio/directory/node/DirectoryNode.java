@@ -37,12 +37,16 @@ import org.safehaus.penrose.studio.schema.action.NewADSchemaProxyAction;
 import org.safehaus.penrose.studio.rootDse.action.NewRootDSEAction;
 import org.safehaus.penrose.studio.rootDse.action.NewRootDSEProxyAction;
 import org.safehaus.penrose.studio.directory.action.*;
+import org.safehaus.penrose.studio.directory.dnd.EntryTransfer;
 import org.safehaus.penrose.studio.partition.node.PartitionNode;
 import org.safehaus.penrose.studio.partition.node.PartitionsNode;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
+import org.safehaus.penrose.ldap.DN;
+
+import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
@@ -51,7 +55,7 @@ public class DirectoryNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    protected ServersView view;
+    protected ServersView serversView;
     protected ServerNode serverNode;
 
     private String partitionName;
@@ -61,7 +65,7 @@ public class DirectoryNode extends Node {
         PartitionNode partitionNode = (PartitionNode)parent;
         PartitionsNode partitionsNode = partitionNode.getPartitionsNode();
         serverNode = partitionsNode.getServerNode();
-        view = serverNode.getServersView();
+        serversView = serverNode.getServersView();
     }
 
     public void init() throws Exception {
@@ -75,8 +79,8 @@ public class DirectoryNode extends Node {
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         DirectoryClient directoryClient = partitionClient.getDirectoryClient();
 
-        for (String id : directoryClient.getRootEntryNames()) {
-            EntryClient entryClient = directoryClient.getEntryClient(id);
+        for (String entryName : directoryClient.getRootEntryNames()) {
+            EntryClient entryClient = directoryClient.getEntryClient(entryName);
             EntryConfig entryConfig = entryClient.getEntryConfig();
 
             String label;
@@ -94,6 +98,7 @@ public class DirectoryNode extends Node {
             );
 
             entryNode.setPartitionName(partitionName);
+            entryNode.setEntryName(entryName);
             entryNode.setEntryConfig(entryConfig);
             entryNode.init();
             
@@ -131,6 +136,18 @@ public class DirectoryNode extends Node {
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
+        manager.add(new Action("Paste") {
+            public void run() {
+                try {
+                    paste();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
         manager.add(new Action("Refresh") {
             public void run() {
                 try {
@@ -142,6 +159,49 @@ public class DirectoryNode extends Node {
         });
     }
 
+    public void paste() throws Exception {
+
+        log.debug("Pasting entries:");
+
+        EntryConfig[] entryConfigs = (EntryConfig[]) serversView.getSWTClipboard().getContents(EntryTransfer.getInstance());
+        if (entryConfigs == null) return;
+
+        Server server = serverNode.getServer();
+
+        PenroseClient client = server.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        DirectoryClient directoryClient = partitionClient.getDirectoryClient();
+
+        Collection<String> names = directoryClient.getEntryNames();
+
+        for (EntryConfig entryConfig : entryConfigs) {
+            String name = entryConfig.getName();
+
+            int counter = 1;
+            String newName = name;
+            while (names.contains(newName)) {
+                counter++;
+                newName = name+"_"+counter;
+            }
+
+            log.debug(" - "+name+" -> "+newName);
+            entryConfig.setName(newName);
+
+            DN dn = new DN(entryConfig.getRdn());
+            entryConfig.setDn(dn);
+
+            directoryClient.createEntry(entryConfig);
+        }
+
+        partitionClient.store();
+
+        refresh();
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
+    }
+
     public String getPartitionName() {
         return partitionName;
     }
@@ -150,12 +210,12 @@ public class DirectoryNode extends Node {
         this.partitionName = partitionName;
     }
 
-    public ServersView getView() {
-        return view;
+    public ServersView getServersView() {
+        return serversView;
     }
 
-    public void setView(ServersView view) {
-        this.view = view;
+    public void setServersView(ServersView serversView) {
+        this.serversView = serversView;
     }
 
     public ServerNode getServerNode() {

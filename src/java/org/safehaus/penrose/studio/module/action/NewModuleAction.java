@@ -43,7 +43,7 @@ public class NewModuleAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Server server = node.getProjectNode().getServer();
+            Server server = node.getServerNode().getServer();
 
             ModuleWizard wizard = new ModuleWizard();
             wizard.setServer(server);

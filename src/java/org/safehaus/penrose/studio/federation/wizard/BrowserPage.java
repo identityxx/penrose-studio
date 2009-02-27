@@ -18,7 +18,6 @@ import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.source.SourceClient;
 
-import javax.management.MBeanException;
 import java.lang.reflect.InvocationTargetException;
 
 /**

@@ -53,7 +53,7 @@ public class NewSourceAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Server server = node.getProjectNode().getServer();
+            Server server = node.getServerNode().getServer();
 
             String partitionName  = node.getPartitionName();
             String adapterName    = node.getAdapterName();

@@ -31,6 +31,7 @@ import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.source.dnd.SourceTransfer;
 import org.safehaus.penrose.studio.nis.source.action.NewNISSourceAction;
 import org.safehaus.penrose.studio.ldap.source.action.NewLDAPSourceAction;
 import org.safehaus.penrose.studio.jdbc.source.action.NewJDBCSourceAction;
@@ -50,7 +51,7 @@ public class SourcesNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    protected ServersView view;
+    protected ServersView serversView;
     protected ServerNode serverNode;
     protected PartitionsNode partitionsNode;
     protected PartitionNode partitionNode;
@@ -62,7 +63,7 @@ public class SourcesNode extends Node {
         partitionNode = (PartitionNode)parent;
         partitionsNode = partitionNode.getPartitionsNode();
         serverNode = partitionsNode.getServerNode();
-        view = serverNode.getServersView();
+        serversView = serverNode.getServersView();
     }
 
     public void init() throws Exception {
@@ -140,30 +141,36 @@ public class SourcesNode extends Node {
 
     public void paste() throws Exception {
 
-        Object newObject = view.getClipboard();
+        log.debug("Pasting sources:");
 
-        if (!(newObject instanceof SourceConfig)) return;
+        SourceConfig[] sourceConfigs = (SourceConfig[]) serversView.getSWTClipboard().getContents(SourceTransfer.getInstance());
+        if (sourceConfigs == null) return;
 
-        Server project = serverNode.getServer();
+        Server server = serverNode.getServer();
 
-        SourceConfig newSourceConfig = (SourceConfig)((SourceConfig)newObject).clone();
-        view.setClipboard(null);
-
-        PenroseClient client = project.getClient();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
-        Collection<String> sourceNames = sourceManagerClient.getSourceNames();
-        int counter = 1;
-        String name = newSourceConfig.getName();
-        while (sourceNames.contains(name)) {
-            counter++;
-            name = newSourceConfig.getName()+" ("+counter+")";
-        }
-        newSourceConfig.setName(name);
+        Collection<String> names = sourceManagerClient.getSourceNames();
 
-        sourceManagerClient.createSource(newSourceConfig);
+        for (SourceConfig sourceConfig : sourceConfigs) {
+            String name = sourceConfig.getName();
+
+            int counter = 1;
+            String newName = name;
+            while (names.contains(newName)) {
+                counter++;
+                newName = name+"_"+counter;
+            }
+            
+            log.debug(" - "+name+" -> "+newName);
+            sourceConfig.setName(newName);
+
+            sourceManagerClient.createSource(sourceConfig);
+        }
+
         partitionClient.store();
 
         refresh();
@@ -180,12 +187,12 @@ public class SourcesNode extends Node {
         this.partitionName = partitionName;
     }
 
-    public ServersView getView() {
-        return view;
+    public ServersView getServersView() {
+        return serversView;
     }
 
-    public void setView(ServersView view) {
-        this.view = view;
+    public void setServersView(ServersView serversView) {
+        this.serversView = serversView;
     }
 
     public ServerNode getServerNode() {

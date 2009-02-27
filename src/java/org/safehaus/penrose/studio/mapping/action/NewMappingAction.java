@@ -24,7 +24,7 @@ import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.mapping.MappingConfig;
 import org.safehaus.penrose.mapping.MappingManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.mapping.MappingsNode;
+import org.safehaus.penrose.studio.mapping.node.MappingsNode;
 import org.safehaus.penrose.studio.mapping.wizard.MappingWizard;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.ServersView;
@@ -33,10 +33,10 @@ public class NewMappingAction extends Action {
 
     Logger log = Logger.getLogger(getClass());
 
-    MappingsNode node;
+    MappingsNode mappingsNode;
 
-	public NewMappingAction(MappingsNode node) {
-        this.node = node;
+	public NewMappingAction(MappingsNode mappingsNode) {
+        this.mappingsNode = mappingsNode;
 
         setText("New Mapping...");
         setId(getClass().getName());
@@ -45,7 +45,7 @@ public class NewMappingAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Server server = node.getProjectNode().getServer();
+            Server server = mappingsNode.getServerNode().getServer();
 
             MappingConfig mappingConfig = new MappingConfig();
 
@@ -58,17 +58,19 @@ public class NewMappingAction extends Action {
 
             if (rc == WizardDialog.CANCEL) return;
 
-            PartitionClient partitionClient = server.getClient().getPartitionManagerClient().getPartitionClient(node.getPartitionName());
+            PartitionClient partitionClient = server.getClient().getPartitionManagerClient().getPartitionClient(mappingsNode.getPartitionName());
             MappingManagerClient mappingManagerClient = partitionClient.getMappingManagerClient();
 
             mappingManagerClient.createMapping(mappingConfig);
 
             partitionClient.store();
 
+            mappingsNode.refresh();
+            
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 
-            serversView.open(node);
+            serversView.open(mappingsNode);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

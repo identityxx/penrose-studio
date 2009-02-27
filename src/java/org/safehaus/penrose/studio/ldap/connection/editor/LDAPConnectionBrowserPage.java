@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.ldap.connection.editor;
 
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridData;
@@ -29,6 +30,8 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.IProgressService;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.ldap.connection.LDAPConnectionClient;
 import org.safehaus.penrose.schema.ObjectClass;
@@ -40,6 +43,7 @@ import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.util.*;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Endi S. Dewata
@@ -136,16 +140,8 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage {
         tree.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    table.removeAll();
-
-                    TreeItem ti = tree.getSelection()[0];
-                    DN dn = (DN)ti.getData();
-                    if (dn == null) return;
-
-                    SearchResult entry = connectionClient.find(dn);
-                    if (entry == null) return;
-
-                    showAttributes(entry);
+                    TreeItem item = tree.getSelection()[0];
+                    showEntry(item);
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -431,59 +427,81 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage {
     }
 
     public void expand(TreeItem item) throws Exception {
-
-        for (TreeItem ti : item.getItems()) ti.dispose();
-
         try {
-            DN baseDn = (DN)item.getData();
+            for (TreeItem ti : item.getItems()) ti.dispose();
 
-            if (baseDn.isEmpty()) {
+            final DN baseDn = (DN)item.getData();
+            final Collection<DN> results = new ArrayList<DN>();
 
-                SearchRequest request = new SearchRequest();
-                request.setScope(SearchRequest.SCOPE_BASE);
-                request.setAttributes(new String[] { "*", "+" });
+            IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
-                SearchResponse response = new SearchResponse();
+            progressService.busyCursorWhile(new IRunnableWithProgress() {
+                public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                    try {
+                        monitor.beginTask("Retrieving data...", IProgressMonitor.UNKNOWN);
 
-                connectionClient.search(request, response);
-                SearchResult rootDse = response.next();
+                        if (baseDn.isEmpty()) {
 
-                Attributes attributes = rootDse.getAttributes();
-                Attribute attribute = attributes.get("namingContexts");
+                            SearchRequest request = new SearchRequest();
+                            request.setScope(SearchRequest.SCOPE_BASE);
+                            request.setAttributes(new String[] { "*", "+" });
 
-                for (Object value : attribute.getValues()) {
-                    String dn = (String)value;
+                            SearchResponse response = new SearchResponse();
 
-                    TreeItem ti = new TreeItem(item, SWT.NONE);
-                    ti.setText(dn);
-                    ti.setData(new DN(dn));
+                            connectionClient.search(request, response);
+                            SearchResult rootDse = response.next();
 
-                    new TreeItem(ti, SWT.NONE);
+                            Attributes attributes = rootDse.getAttributes();
+                            Attribute attribute = attributes.get("namingContexts");
+
+                            for (Object value : attribute.getValues()) {
+                                String dn = (String)value;
+                                results.add(new DN(dn));
+                            }
+
+                        } else {
+
+                            SearchRequest request = new SearchRequest();
+                            request.setDn(baseDn);
+                            request.setScope(SearchRequest.SCOPE_ONE);
+                            request.setAttributes(new String[] { "dn" });
+                            if (sizeLimit != null) request.setSizeLimit(sizeLimit);
+
+                            SearchResponse response = new SearchResponse();
+
+                            connectionClient.search(request, response);
+
+                            while (response.hasNext()) {
+                                SearchResult result = response.next();
+                                DN dn = result.getDn();
+                                results.add(dn);
+                            }
+                        }
+
+                    } catch (Exception e) {
+                        throw new InvocationTargetException(e);
+
+                    } finally {
+                        monitor.done();
+                    }
                 }
+            });
 
-            } else {
+            for (DN dn : results) {
 
-                SearchRequest request = new SearchRequest();
-                request.setDn(baseDn);
-                request.setScope(SearchRequest.SCOPE_ONE);
-                if (sizeLimit != null) request.setSizeLimit(sizeLimit);
+                String label = baseDn.isEmpty() ? dn.toString() : dn.getRdn().toString();
 
-                SearchResponse response = new SearchResponse();
+                TreeItem ti = new TreeItem(item, SWT.NONE);
+                ti.setText(label);
+                ti.setData(dn);
 
-                connectionClient.search(request, response);
-
-                while (response.hasNext()) {
-                    SearchResult result = response.next();
-                    DN dn = result.getDn();
-                    String label = dn.getRdn().toString();
-
-                    TreeItem ti = new TreeItem(item, SWT.NONE);
-                    ti.setText(label);
-                    ti.setData(dn);
-
-                    new TreeItem(ti, SWT.NONE);
-                }
+                new TreeItem(ti, SWT.NONE);
             }
+
+        } catch (InvocationTargetException e) {
+            Throwable t = e.getCause();
+            TreeItem ti = new TreeItem(item, SWT.NONE);
+            ti.setText("Error: "+t.getMessage());
 
         } catch (Exception e) {
             TreeItem ti = new TreeItem(item, SWT.NONE);
@@ -491,20 +509,58 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage {
         }
     }
 
-    public void showAttributes(SearchResult entry) throws Exception {
+    public void showEntry(TreeItem item) throws Exception {
+        try {
+            table.removeAll();
 
-        Attributes attributes = entry.getAttributes();
-        for (Attribute attribute : attributes.getAll()) {
-            String name = attribute.getName();
+            final DN dn = (DN)item.getData();
+            if (dn == null) return;
 
-            for (Object value : attribute.getValues()) {
-                String label = value instanceof byte[] ? "(binary)" : value.toString();
+            final Attributes results = new Attributes();
 
-                TableItem ti = new TableItem(table, SWT.NONE);
-                ti.setText(0, name);
-                ti.setText(1, label);
-                ti.setData(value);
+            IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
+            progressService.busyCursorWhile(new IRunnableWithProgress() {
+                public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                    try {
+                        monitor.beginTask("Retrieving data...", IProgressMonitor.UNKNOWN);
+
+                        SearchResult entry = connectionClient.find(dn);
+                        if (entry == null) return;
+
+                        Attributes attributes = entry.getAttributes();
+                        results.add(attributes);
+
+                    } catch (Exception e) {
+                        throw new InvocationTargetException(e);
+
+                    } finally {
+                        monitor.done();
+                    }
+                }
+            });
+
+            for (Attribute attribute : results.getAll()) {
+                String name = attribute.getName();
+    
+                for (Object value : attribute.getValues()) {
+                    String label = value instanceof byte[] ? "(binary)" : value.toString();
+
+                    TableItem ti = new TableItem(table, SWT.NONE);
+                    ti.setText(0, name);
+                    ti.setText(1, label);
+                    ti.setData(value);
+                }
             }
+
+        } catch (InvocationTargetException e) {
+            Throwable t = e.getCause();
+            log.error(t.getMessage(), t);
+            ErrorDialog.open(t);
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 }

@@ -23,6 +23,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -43,9 +44,11 @@ import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.source.editor.SourceEditorInput;
+import org.safehaus.penrose.studio.source.dnd.SourceTransfer;
 import org.safehaus.penrose.studio.tree.Node;
 
 import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
@@ -54,8 +57,8 @@ public class SourceNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    protected ServersView view;
-    protected ServerNode projectNode;
+    protected ServersView serversView;
+    protected ServerNode serverNode;
     protected PartitionsNode partitionsNode;
     protected PartitionNode partitionNode;
     protected SourcesNode sourcesNode;
@@ -69,8 +72,8 @@ public class SourceNode extends Node {
         sourcesNode = (SourcesNode)parent;
         partitionNode = sourcesNode.getPartitionNode();
         partitionsNode = partitionNode.getPartitionsNode();
-        projectNode = partitionsNode.getServerNode();
-        view = projectNode.getServersView();
+        serverNode = partitionsNode.getServerNode();
+        serversView = serverNode.getServersView();
     }
 
     public void showMenu(IMenuManager manager) {
@@ -81,6 +84,7 @@ public class SourceNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    throw new RuntimeException(e);
                 }
             }
         });
@@ -93,6 +97,7 @@ public class SourceNode extends Node {
                     copy();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    throw new RuntimeException(e);
                 }
             }
         });
@@ -100,9 +105,10 @@ public class SourceNode extends Node {
         manager.add(new Action("Paste") {
             public void run() {
                 try {
-                    paste();
+                    sourcesNode.paste();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    throw new RuntimeException(e);
                 }
             }
         });
@@ -113,6 +119,7 @@ public class SourceNode extends Node {
                     remove();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    throw new RuntimeException(e);
                 }
             }
         });
@@ -125,7 +132,7 @@ public class SourceNode extends Node {
         Plugin plugin = pluginManager.getPlugin(adapterName);
 
         SourceEditorInput ei = plugin.createSourceEditorInput();
-        ei.setServer(projectNode.getServer());
+        ei.setServer(serverNode.getServer());
         ei.setPartitionName(partitionName);
         ei.setSourceName(sourceName);
 
@@ -140,18 +147,18 @@ public class SourceNode extends Node {
     public void remove() throws Exception {
 
         boolean confirm = MessageDialog.openQuestion(
-                view.getSite().getShell(),
+                serversView.getSite().getShell(),
                 "Confirmation", "Remove selected sources?");
 
         if (!confirm) return;
 
-        Server project = projectNode.getServer();
+        Server project = serverNode.getServer();
         PenroseClient client = project.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
-        for (Node node : view.getSelectedNodes()) {
+        for (Node node : serversView.getSelectedNodes()) {
             if (!(node instanceof SourceNode)) continue;
 
             SourceNode sourceNode = (SourceNode)node;
@@ -168,48 +175,31 @@ public class SourceNode extends Node {
 
     public void copy() throws Exception {
 
-        Server project = projectNode.getServer();
-        PenroseClient client = project.getClient();
-        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
-        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
-        SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
+        log.debug("Copying sources:");
 
-        SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceName);
-        view.setClipboard(sourceClient.getSourceConfig());
-    }
-
-    public void paste() throws Exception {
-
-        Object newObject = view.getClipboard();
-
-        if (!(newObject instanceof SourceConfig)) return;
-
-        Server server = projectNode.getServer();
-
-        SourceConfig newSourceConfig = (SourceConfig)((SourceConfig)newObject).clone();
-        view.setClipboard(null);
-
+        Server server = serverNode.getServer();
         PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
-        
-        Collection<String> sourceNames = sourceManagerClient.getSourceNames();
-        int counter = 1;
-        String name = newSourceConfig.getName();
-        while (sourceNames.contains(name)) {
-            counter++;
-            name = newSourceConfig.getName()+" ("+counter+")";
+
+        Collection<SourceConfig> list = new ArrayList<SourceConfig>();
+        for (Node node : serversView.getSelectedNodes()) {
+            if (!(node instanceof SourceNode)) continue;
+
+            SourceNode sourceNode = (SourceNode)node;
+            String sourceName = sourceNode.getSourceName();
+            log.debug(" - "+sourceName);
+
+            SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceName);
+            SourceConfig sourceConfig = sourceClient.getSourceConfig();
+            list.add(sourceConfig);
         }
-        newSourceConfig.setName(name);
 
-        sourceManagerClient.createSource(newSourceConfig);
-        partitionClient.store();
-
-        parent.refresh();
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        serversView.getSWTClipboard().setContents(
+                new Object[] { list.toArray(new SourceConfig[list.size()]) },
+                new Transfer[] { SourceTransfer.getInstance() }
+        );
     }
 
     public String getPartitionName() {

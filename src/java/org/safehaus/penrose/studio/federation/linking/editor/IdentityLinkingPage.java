@@ -43,7 +43,6 @@ import org.safehaus.penrose.util.BinaryUtil;
 import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.source.SourceManagerClient;
 
-import javax.management.MBeanException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -805,9 +804,6 @@ public class IdentityLinkingPage extends FormPage {
                     } catch (InterruptedException e) {
                         // ignore
 
-                    } catch (MBeanException e) {
-                        throw new InvocationTargetException(e.getCause());
-
                     } catch (Exception e) {
                         throw new InvocationTargetException(e);
 
@@ -1224,11 +1220,6 @@ public class IdentityLinkingPage extends FormPage {
 
             localTableViewer.refresh();
 
-        } catch (MBeanException e) {
-            Exception ex = (Exception)e.getCause();
-            log.error(ex.getMessage(), ex);
-            ErrorDialog.open(ex);
-
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);
@@ -1273,11 +1264,6 @@ public class IdentityLinkingPage extends FormPage {
             globalTable.removeAll();
             clearGlobalAttributes();
             showGlobalEntries(data);
-
-        } catch (MBeanException e) {
-            Exception ex = (Exception)e.getCause();
-            log.error(ex.getMessage(), ex);
-            ErrorDialog.open(ex);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -1346,11 +1332,6 @@ public class IdentityLinkingPage extends FormPage {
                 globalTable.removeAll();
                 clearGlobalAttributes();
             }
-
-        } catch (MBeanException e) {
-            Exception ex = (Exception)e.getCause();
-            log.error(ex.getMessage(), ex);
-            ErrorDialog.open(ex);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -1469,11 +1450,6 @@ public class IdentityLinkingPage extends FormPage {
                         "Failed adding "+targetDn,
                         e.getLDAPErrorMessage()
                 );
-
-            } catch (MBeanException e) {
-                Exception ex = (Exception)e.getCause();
-                log.error(ex.getMessage(), ex);
-                ErrorDialog.open(ex);
 
             } catch (Exception e) {
                 log.error(e.getMessage(), e);

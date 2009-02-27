@@ -23,6 +23,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -38,10 +39,15 @@ import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.directory.action.*;
 import org.safehaus.penrose.studio.directory.editor.EntryEditorInput;
 import org.safehaus.penrose.studio.directory.editor.EntryEditor;
+import org.safehaus.penrose.studio.directory.dnd.EntryTransfer;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.node.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
+import org.safehaus.penrose.ldap.DN;
+
+import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * @author Endi S. Dewata
@@ -50,11 +56,12 @@ public class EntryNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    protected ServersView view;
+    protected ServersView serversView;
     protected ServerNode serverNode;
     protected DirectoryNode directoryNode;
 
     private String partitionName;
+    private String entryName;
     private EntryConfig entryConfig;
 
     public EntryNode(String name, Image image, Object object, Node parent) {
@@ -67,14 +74,14 @@ public class EntryNode extends Node {
         }
 
         serverNode = directoryNode.getServerNode();
-        view = serverNode.getServersView();
+        serversView = serverNode.getServersView();
     }
 
     public void init() throws Exception {
-        updateChildren();
+        update();
     }
 
-    public void updateChildren() throws Exception {
+    public void update() throws Exception {
 
         Server project = serverNode.getServer();
         PenroseClient client = project.getClient();
@@ -82,14 +89,14 @@ public class EntryNode extends Node {
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         DirectoryClient directoryClient = partitionClient.getDirectoryClient();
 
-        EntryClient entryClient = directoryClient.getEntryClient(entryConfig.getName());
+        EntryClient entryClient = directoryClient.getEntryClient(entryName);
 
         log.debug("Getting children:");
 
-        for (String id : entryClient.getChildNames()) {
-            log.debug(" - "+id);
+        for (String childName : entryClient.getChildNames()) {
+            log.debug(" - "+childName);
 
-            EntryClient childClient = directoryClient.getEntryClient(id);
+            EntryClient childClient = directoryClient.getEntryClient(childName);
             EntryConfig childConfig = childClient.getEntryConfig();
 
             //log.debug(" - childConfig "+childConfig);
@@ -105,6 +112,7 @@ public class EntryNode extends Node {
             );
 
             entryNode.setPartitionName(partitionName);
+            entryNode.setEntryName(childName);
             entryNode.setEntryConfig(childConfig);
             entryNode.init();
 
@@ -115,7 +123,7 @@ public class EntryNode extends Node {
     public void refresh() throws Exception {
 
         children.clear();
-        updateChildren();
+        update();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
@@ -145,7 +153,7 @@ public class EntryNode extends Node {
         manager.add(new Action("Copy") {
             public void run() {
                 try {
-                    //copy();
+                    copy();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
@@ -155,7 +163,7 @@ public class EntryNode extends Node {
         manager.add(new Action("Paste") {
             public void run() {
                 try {
-                    //paste();
+                    paste();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
@@ -189,7 +197,7 @@ public class EntryNode extends Node {
 
         EntryEditorInput ei = new EntryEditorInput();
         ei.setPartitionName(partitionName);
-        ei.setEntryName(entryConfig.getName());
+        ei.setEntryName(entryName);
         ei.setProject(serverNode.getServer());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -198,52 +206,82 @@ public class EntryNode extends Node {
         page.openEditor(ei, EntryEditor.class.getName());
     }
 
-    public void editLDAP() throws Exception {
+    public void copy() throws Exception {
 
-        EntryEditorInput ei = new EntryEditorInput();
-        ei.setPartitionName(partitionName);
-        ei.setEntryName(entryConfig.getName());
-        ei.setProject(serverNode.getServer());
+        log.debug("Copying entries:");
 
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        IWorkbenchPage page = window.getActivePage();
+        Server server = serverNode.getServer();
+        PenroseClient client = server.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        DirectoryClient directoryClient = partitionClient.getDirectoryClient();
 
-        EntryEditor editor = (EntryEditor)page.openEditor(ei, EntryEditor.class.getName());
-        editor.showLDAPPage();
+        Collection<EntryConfig> list = new ArrayList<EntryConfig>();
+        for (Node node : serversView.getSelectedNodes()) {
+            if (!(node instanceof EntryNode)) continue;
+
+            EntryNode entryNode = (EntryNode)node;
+            String entryName = entryNode.getEntryName();
+            log.debug(" - "+entryName);
+
+            EntryClient entryClient = directoryClient.getEntryClient(entryName);
+            EntryConfig entryConfig = entryClient.getEntryConfig();
+            list.add(entryConfig);
+        }
+
+        serversView.getSWTClipboard().setContents(
+                new Object[] { list.toArray(new EntryConfig[list.size()]) },
+                new Transfer[] { EntryTransfer.getInstance() }
+        );
     }
 
-    public void editSources() throws Exception {
+    public void paste() throws Exception {
+        
+        log.debug("Pasting entries:");
 
-        EntryEditorInput ei = new EntryEditorInput();
-        ei.setPartitionName(partitionName);
-        ei.setEntryName(entryConfig.getName());
-        ei.setProject(serverNode.getServer());
+        EntryConfig[] entryConfigs = (EntryConfig[]) serversView.getSWTClipboard().getContents(EntryTransfer.getInstance());
+        if (entryConfigs == null) return;
 
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        IWorkbenchPage page = window.getActivePage();
+        Server server = serverNode.getServer();
 
-        EntryEditor editor = (EntryEditor)page.openEditor(ei, EntryEditor.class.getName());
-        editor.showSourcesPage();
-    }
+        PenroseClient client = server.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        DirectoryClient directoryClient = partitionClient.getDirectoryClient();
 
-    public void editACL() throws Exception {
+        Collection<String> names = directoryClient.getEntryNames();
 
-        EntryEditorInput ei = new EntryEditorInput();
-        ei.setPartitionName(partitionName);
-        ei.setEntryName(entryConfig.getName());
-        ei.setProject(serverNode.getServer());
+        for (EntryConfig entryConfig : entryConfigs) {
+            String name = entryConfig.getName();
 
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        IWorkbenchPage page = window.getActivePage();
+            int counter = 1;
+            String newName = name;
+            while (names.contains(newName)) {
+                counter++;
+                newName = name+"_"+counter;
+            }
 
-        EntryEditor editor = (EntryEditor)page.openEditor(ei, EntryEditor.class.getName());
-        editor.showACLPage();
+            log.debug(" - "+name+" -> "+newName);
+            entryConfig.setName(newName);
+
+            DN dn = entryConfig.getRdn().append(this.entryConfig.getDn());
+            entryConfig.setDn(dn);
+
+            directoryClient.createEntry(entryConfig);
+        }
+
+        partitionClient.store();
+
+        refresh();
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public void remove() throws Exception {
 
         boolean confirm = MessageDialog.openQuestion(
-                view.getSite().getShell(),
+                serversView.getSite().getShell(),
                 "Confirmation", "Remove selected entries?"
         );
 
@@ -255,23 +293,18 @@ public class EntryNode extends Node {
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         DirectoryClient directoryClient = partitionClient.getDirectoryClient();
 
-        //DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
-
-        for (Node node : view.getSelectedNodes()) {
+        for (Node node : serversView.getSelectedNodes()) {
             if (!(node instanceof EntryNode)) continue;
 
             EntryNode entryNode = (EntryNode) node;
 
-            String id = entryNode.getEntryConfig().getName();
-            directoryClient.removeEntry(id);
+            String entryName = entryNode.getEntryName();
+            directoryClient.removeEntry(entryName);
         }
 
-        //project.save(partitionConfig, directoryConfig);
         partitionClient.store();
 
         parent.refresh();
-        //PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        //penroseStudio.notifyChangeListeners();
     }
 
     public String getPartitionName() {
@@ -290,12 +323,12 @@ public class EntryNode extends Node {
         this.entryConfig = entryConfig;
     }
 
-    public ServersView getView() {
-        return view;
+    public ServersView getServersView() {
+        return serversView;
     }
 
-    public void setView(ServersView view) {
-        this.view = view;
+    public void setServersView(ServersView serversView) {
+        this.serversView = serversView;
     }
 
     public ServerNode getServerNode() {
@@ -312,5 +345,13 @@ public class EntryNode extends Node {
 
     public void setDirectoryNode(DirectoryNode directoryNode) {
         this.directoryNode = directoryNode;
+    }
+
+    public String getEntryName() {
+        return entryName;
+    }
+
+    public void setEntryName(String entryName) {
+        this.entryName = entryName;
     }
 }

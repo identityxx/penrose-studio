@@ -38,7 +38,6 @@ import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
-import javax.management.MBeanException;
 import java.lang.reflect.InvocationTargetException;
 
 public class ModuleMethodsPage extends FormPage {
@@ -183,9 +182,6 @@ public class ModuleMethodsPage extends FormPage {
 
                 } catch (InterruptedException e) {
                     // ignore
-
-                } catch (MBeanException e) {
-                    throw new InvocationTargetException(e.getCause());
 
                 } catch (Exception e) {
                     throw new InvocationTargetException(e);

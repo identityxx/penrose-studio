@@ -188,6 +188,7 @@ public class ServerNode extends Node {
 
     public void expand() throws Exception {
         connect();
+        serversView.setSelection(this);
     }
 
     public void collapse() throws Exception {
