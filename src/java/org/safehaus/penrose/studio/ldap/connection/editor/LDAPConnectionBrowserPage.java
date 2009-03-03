@@ -442,6 +442,8 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage {
 
                         if (baseDn.isEmpty()) {
 
+                            monitor.subTask("Searching Root DSE...");
+
                             SearchRequest request = new SearchRequest();
                             request.setScope(SearchRequest.SCOPE_BASE);
                             request.setAttributes(new String[] { "*", "+" });
@@ -449,6 +451,11 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage {
                             SearchResponse response = new SearchResponse();
 
                             connectionClient.search(request, response);
+
+                            monitor.worked(1);
+
+                            monitor.subTask("Processing results...");
+
                             SearchResult rootDse = response.next();
 
                             Attributes attributes = rootDse.getAttributes();
@@ -459,7 +466,11 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage {
                                 results.add(new DN(dn));
                             }
 
+                            monitor.worked(1);
+
                         } else {
+
+                            monitor.subTask("Searching children of "+baseDn+"...");
 
                             SearchRequest request = new SearchRequest();
                             request.setDn(baseDn);
@@ -471,10 +482,15 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage {
 
                             connectionClient.search(request, response);
 
+                            monitor.worked(1);
+
+                            monitor.subTask("Processing results...");
+
                             while (response.hasNext()) {
                                 SearchResult result = response.next();
                                 DN dn = result.getDn();
                                 results.add(dn);
+                                monitor.worked(1);
                             }
                         }
 
@@ -525,11 +541,15 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage {
                     try {
                         monitor.beginTask("Retrieving data...", IProgressMonitor.UNKNOWN);
 
+                        monitor.subTask("Searching for "+dn+"...");
+
                         SearchResult entry = connectionClient.find(dn);
                         if (entry == null) return;
 
                         Attributes attributes = entry.getAttributes();
                         results.add(attributes);
+
+                        monitor.worked(1);
 
                     } catch (Exception e) {
                         throw new InvocationTargetException(e);

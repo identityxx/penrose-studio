@@ -6,8 +6,7 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.server.node.ServerNode;
-import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 
 public class ConnectAction extends Action {
@@ -29,7 +28,6 @@ public class ConnectAction extends Action {
             if (serverNode == null) return;
             if (serverNode.isConnected()) return;
 
-            serverNode.connect();
             serversView.open(serverNode);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();

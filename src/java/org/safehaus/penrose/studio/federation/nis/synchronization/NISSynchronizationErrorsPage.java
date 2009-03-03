@@ -192,13 +192,15 @@ public class NISSynchronizationErrorsPage extends FormPage {
                     progressService.busyCursorWhile(new IRunnableWithProgress() {
                         public void run(IProgressMonitor monitor) throws InvocationTargetException {
                             try {
-                                monitor.beginTask("Loading...", dns.size());
+                                monitor.beginTask("Deleting...", dns.size());
 
                                 for (DN dn : dns) {
                                     
                                     if (monitor.isCanceled()) throw new InterruptedException();
 
-                                    errors.delete(dn);   
+                                    monitor.subTask("Deleting "+dn+"...");
+
+                                    errors.delete(dn);
 
                                     monitor.worked(1);
                                 }

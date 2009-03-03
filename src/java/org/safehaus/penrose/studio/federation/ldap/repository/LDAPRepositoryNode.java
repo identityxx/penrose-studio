@@ -45,7 +45,7 @@ public class LDAPRepositoryNode extends Node {
         linkingNode.setLdapFederationClient(ldapFederationClient);
         linkingNode.setRepositoryConfig(repositoryConfig);
 
-        children.add(linkingNode);
+        addChild(linkingNode);
     }
 
     public void showMenu(IMenuManager manager) throws Exception {

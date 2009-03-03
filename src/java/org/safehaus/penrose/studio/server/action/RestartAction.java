@@ -18,12 +18,10 @@
 package org.safehaus.penrose.studio.server.action;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
-import org.safehaus.penrose.studio.server.node.ServerNode;
+import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.client.PenroseClient;

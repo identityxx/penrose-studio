@@ -4,6 +4,7 @@ import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.action.RefreshAction;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.module.ModuleManagerClient;
@@ -27,13 +28,7 @@ public class FederationNode extends Node {
         super(name, PenroseStudio.getImage(PenroseImage.FOLDER), null, parent);
     }
 
-    public void init() throws Exception {
-        refresh();
-    }
-
-    public void refresh() throws Exception {
-
-        children.clear();
+    public void update() throws Exception {
 
         PartitionManagerClient partitionManagerClient = server.getClient().getPartitionManagerClient();
 
@@ -57,25 +52,22 @@ public class FederationNode extends Node {
             node.setServer(server);
             node.init();
 
-            children.add(node);
+            addChild(node);
         }
+    }
+
+    public void expand() throws Exception {
+        if (children == null) update();
+    }
+
+    public void refresh() throws Exception {
+        removeChildren();
+        update();
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
 
-        manager.add(new Action("Refresh") {
-            public void run() {
-                try {
-                    refresh();
-
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        });
+        manager.add(new RefreshAction(this));
     }
 
     public Server getServer() {

@@ -24,7 +24,7 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.jdbc.source.wizard.JDBCSourceWizard;
-import org.safehaus.penrose.studio.source.node.SourcesNode;
+import org.safehaus.penrose.studio.source.tree.SourcesNode;
 import org.safehaus.penrose.source.SourceConfig;
 import org.apache.log4j.Logger;
 
@@ -59,7 +59,7 @@ public class NewJDBCSourceAction extends Action {
 
             if (rc == Window.CANCEL) return;
 
-            sourcesNode.refresh();
+            serversView.refresh(sourcesNode);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();

@@ -28,7 +28,7 @@ public class JDBCNode extends Node {
 
         log.debug("JDBC repositories:");
 
-        children.clear();
+        removeChildren();
 
         for (FederationRepositoryConfig repositoryConfig : federationClient.getRepositories("JDBC")) {
 

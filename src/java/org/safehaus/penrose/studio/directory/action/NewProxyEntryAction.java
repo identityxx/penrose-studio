@@ -22,8 +22,8 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.directory.wizard.ProxyEntryWizard;
-import org.safehaus.penrose.studio.directory.node.EntryNode;
-import org.safehaus.penrose.studio.server.node.ServerNode;
+import org.safehaus.penrose.studio.directory.tree.EntryNode;
+import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.DirectoryClient;
 import org.safehaus.penrose.client.PenroseClient;
@@ -72,7 +72,7 @@ public class NewProxyEntryAction extends Action {
 
             partitionClient.store();
 
-            node.refresh();
+            serversView.refresh(node);
 
             //PenroseStudio penroseStudio = PenroseStudio.getInstance();
             //penroseStudio.notifyChangeListeners();

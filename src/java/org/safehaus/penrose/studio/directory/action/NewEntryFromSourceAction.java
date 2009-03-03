@@ -35,10 +35,10 @@ import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.directory.node.EntryNode;
+import org.safehaus.penrose.studio.directory.tree.EntryNode;
 import org.safehaus.penrose.studio.directory.dialog.SourceDialog;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.server.node.ServerNode;
+import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 
 import java.io.StringReader;

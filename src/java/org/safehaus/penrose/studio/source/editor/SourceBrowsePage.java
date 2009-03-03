@@ -42,8 +42,6 @@ import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
-import java.util.LinkedHashMap;
 
 /**
  * @author Endi S. Dewata
@@ -264,7 +262,7 @@ public class SourceBrowsePage extends SourceEditorPage {
         try {
             for (TreeItem ti : item.getItems()) ti.dispose();
 
-            DN baseDn = (DN)item.getData();
+            final DN baseDn = (DN)item.getData();
 
             final SearchRequest request = new SearchRequest();
             request.setDn(baseDn);
@@ -280,8 +278,12 @@ public class SourceBrowsePage extends SourceEditorPage {
                     try {
                         monitor.beginTask("Retrieving data...", IProgressMonitor.UNKNOWN);
 
+                        monitor.subTask("Searching children of "+baseDn+"...");
+
                         SourceClient sourceClient = getSourceClient();
                         sourceClient.search(request, response);
+
+                        monitor.worked(1);
 
                     } catch (Exception e) {
                         throw new InvocationTargetException(e);
@@ -332,6 +334,8 @@ public class SourceBrowsePage extends SourceEditorPage {
                     try {
                         monitor.beginTask("Retrieving data...", IProgressMonitor.UNKNOWN);
 
+                        monitor.subTask("Searching for "+dn+"...");
+
                         SourceClient sourceClient = getSourceClient();
                         SearchResult entry = sourceClient.find(dn);
                         if (entry == null) return;
@@ -339,6 +343,8 @@ public class SourceBrowsePage extends SourceEditorPage {
                         Attributes attributes = entry.getAttributes();
                         results.add(attributes);
     
+                        monitor.worked(1);
+
                     } catch (Exception e) {
                         throw new InvocationTargetException(e);
 

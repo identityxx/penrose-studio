@@ -20,7 +20,7 @@ package org.safehaus.penrose.studio.rootDse.action;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
-import org.safehaus.penrose.studio.directory.node.DirectoryNode;
+import org.safehaus.penrose.studio.directory.tree.DirectoryNode;
 import org.safehaus.penrose.studio.rootDse.wizard.DefaultRootDSEWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.server.Server;
@@ -57,7 +57,7 @@ public class NewRootDSEAction extends Action {
 
             if (rc == Window.CANCEL) return;
 
-            directoryNode.refresh();
+            serversView.refresh(directoryNode);
 
             penroseStudio.notifyChangeListeners();
 

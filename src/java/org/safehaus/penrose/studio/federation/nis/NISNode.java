@@ -3,8 +3,8 @@ package org.safehaus.penrose.studio.federation.nis;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.action.RefreshAction;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.*;
 import org.safehaus.penrose.studio.federation.nis.editor.NISEditorInput;
@@ -25,7 +25,7 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 /**
  * @author Endi S. Dewata
  */
-public class NISNode extends Node implements ChangeListener {
+public class NISNode extends Node {
 
     Server server;
     FederationClient federationClient;
@@ -35,40 +35,34 @@ public class NISNode extends Node implements ChangeListener {
     }
 
     public void init() throws Exception {
-
-        //PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        //penroseStudio.addChangeListener(this);
-
-        refresh();
+        update();
     }
 
-    public void refresh() {
-        try {
-            log.debug("NIS repositories:");
+    public void update() throws Exception {
+        log.debug("NIS repositories:");
 
-            children.clear();
+        for (FederationRepositoryConfig repositoryConfig : getFederationClient().getRepositories("NIS")) {
 
-            for (FederationRepositoryConfig repositoryConfig : getFederationClient().getRepositories("NIS")) {
+            String repositoryName = repositoryConfig.getName();
+            log.debug(" - "+repositoryName);
 
-                String repositoryName = repositoryConfig.getName();
-                log.debug(" - "+repositoryName);
+            NISRepositoryClient nisFederationClient = new NISRepositoryClient(getFederationClient(), repositoryName);
 
-                NISRepositoryClient nisFederationClient = new NISRepositoryClient(getFederationClient(), repositoryName);
+            NISDomainNode domainNode = new NISDomainNode(repositoryConfig.getName(), this);
 
-                NISDomainNode domainNode = new NISDomainNode(repositoryConfig.getName(), this);
+            domainNode.setProject(server);
+            domainNode.setFederationClient(getFederationClient());
+            domainNode.setNisFederationClient(nisFederationClient);
+            domainNode.setRepositoryConfig(repositoryConfig);
+            domainNode.init();
 
-                domainNode.setProject(server);
-                domainNode.setFederationClient(getFederationClient());
-                domainNode.setNisFederationClient(nisFederationClient);
-                domainNode.setRepositoryConfig(repositoryConfig);
-                domainNode.init();
-
-                children.add(domainNode);
-            }
-            
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            addChild(domainNode);
         }
+    }
+
+    public void refresh() throws Exception {
+        removeChildren();
+        update();
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -95,19 +89,7 @@ public class NISNode extends Node implements ChangeListener {
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        manager.add(new Action("Refresh") {
-            public void run() {
-                try {
-                    refresh();
-
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        });
+        manager.add(new RefreshAction(this));
     }
 
     public void open() throws Exception {
@@ -155,9 +137,5 @@ public class NISNode extends Node implements ChangeListener {
 
     public FederationClient getFederationClient() throws Exception {
         return ((FederationDomainNode)parent).getFederationClient();
-    }
-
-    public void handleChange(Object object) {
-        refresh();
     }
 }

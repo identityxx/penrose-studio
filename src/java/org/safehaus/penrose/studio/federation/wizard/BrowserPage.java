@@ -114,7 +114,9 @@ public class BrowserPage extends WizardPage {
         progressService.busyCursorWhile(new IRunnableWithProgress() {
             public void run(final IProgressMonitor monitor) throws InvocationTargetException {
                 try {
-                    monitor.beginTask("Searching "+parentDn, IProgressMonitor.UNKNOWN);
+                    monitor.beginTask("Searching "+parentDn+"...", IProgressMonitor.UNKNOWN);
+
+                    monitor.subTask("Searching "+parentDn+"...");
 
                     sourceClient.search(request, response);
 

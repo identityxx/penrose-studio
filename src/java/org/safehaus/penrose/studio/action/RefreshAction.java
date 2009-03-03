@@ -3,6 +3,7 @@ package org.safehaus.penrose.studio.action;
 import org.eclipse.jface.action.Action;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 
 public class RefreshAction extends Action {
@@ -20,7 +21,8 @@ public class RefreshAction extends Action {
 
 	public void run() {
         try {
-            node.refresh();
+            ServersView serversView = ServersView.getInstance();
+            serversView.refresh(node);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();

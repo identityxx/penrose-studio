@@ -21,12 +21,12 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.server.node.ServerNode;
+import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.schema.wizard.NewSchemaWizard;
-import org.safehaus.penrose.studio.schema.node.SchemasNode;
-import org.safehaus.penrose.studio.schema.node.CustomSchemasNode;
+import org.safehaus.penrose.studio.schema.tree.SchemasNode;
+import org.safehaus.penrose.studio.schema.tree.CustomSchemasNode;
 import org.apache.log4j.Logger;
 
 
@@ -55,7 +55,8 @@ public class NewSchemaAction extends Action {
 
             SchemasNode schemasNode = serverNode.getSchemasNode();
             CustomSchemasNode customSchemasNode = schemasNode.getCustomSchemasNode();
-            customSchemasNode.refresh();
+
+            serversView.refresh(customSchemasNode);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();

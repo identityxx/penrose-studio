@@ -307,6 +307,8 @@ public class BrowserEditorPage extends FormPage {
 
                         if (baseDn.isEmpty()) {
 
+                            monitor.subTask("Searching Root DSE...");
+
                             LDAPSearchResults sr = connection.search(
                                     "",
                                     LDAPConnection.SCOPE_BASE,
@@ -315,6 +317,10 @@ public class BrowserEditorPage extends FormPage {
                                     false
                             );
 
+                            monitor.worked(1);
+
+                            monitor.subTask("Processing results...");
+                            
                             LDAPEntry rootDse = sr.next();
 
                             LDAPAttribute namingContexts = rootDse.getAttribute("namingContexts");
@@ -325,7 +331,11 @@ public class BrowserEditorPage extends FormPage {
                                 }
                             }
 
+                            monitor.worked(1);
+
                         } else {
+
+                            monitor.subTask("Searching children of "+baseDn+"...");
 
                             LDAPSearchConstraints constraints = new LDAPSearchConstraints();
                             if (sizeLimit != null) constraints.setMaxResults(sizeLimit.intValue());
@@ -339,10 +349,15 @@ public class BrowserEditorPage extends FormPage {
                                     constraints
                             );
 
+                            monitor.worked(1);
+
+                            monitor.subTask("Processing results...");
+
                             while (sr.hasMore()) {
                                 LDAPEntry entry = sr.next();
                                 DN dn = new DN(entry.getDN());
                                 results.add(dn);
+                                monitor.worked(1);
                             }
                         }
 
@@ -395,6 +410,8 @@ public class BrowserEditorPage extends FormPage {
                     try {
                         monitor.beginTask("Retrieving data...", IProgressMonitor.UNKNOWN);
 
+                        monitor.subTask("Searching for "+dn+"...");
+
                         LDAPSearchResults sr = connection.search(
                                 dn.toString(),
                                 LDAPConnection.SCOPE_BASE,
@@ -412,6 +429,8 @@ public class BrowserEditorPage extends FormPage {
                             LDAPAttribute attribute = (LDAPAttribute) object;
                             results.add(attribute);
                         }
+
+                        monitor.worked(1);
 
                     } catch (Exception e) {
                         throw new InvocationTargetException(e);

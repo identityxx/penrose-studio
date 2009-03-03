@@ -20,7 +20,7 @@ package org.safehaus.penrose.studio.log.editor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.safehaus.penrose.studio.log.node.AppendersNode;
+import org.safehaus.penrose.studio.log.tree.AppendersNode;
 
 /**
  * @author Endi S. Dewata

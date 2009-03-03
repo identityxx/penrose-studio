@@ -21,9 +21,9 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.server.node.ServerNode;
+import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.safehaus.penrose.studio.directory.wizard.RootEntryWizard;
-import org.safehaus.penrose.studio.directory.node.DirectoryNode;
+import org.safehaus.penrose.studio.directory.tree.DirectoryNode;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.apache.log4j.Logger;
 
@@ -55,7 +55,7 @@ public class NewRootEntryAction extends Action {
 
             if (rc == Window.CANCEL) return;
 
-            directoryNode.refresh();
+            serversView.refresh(directoryNode);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();

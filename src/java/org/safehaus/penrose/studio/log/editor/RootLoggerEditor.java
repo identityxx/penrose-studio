@@ -21,8 +21,8 @@ import org.eclipse.ui.PartInitException;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.editor.Editor;
-import org.safehaus.penrose.studio.server.node.ServerNode;
-import org.safehaus.penrose.studio.log.node.LoggersNode;
+import org.safehaus.penrose.studio.server.tree.ServerNode;
+import org.safehaus.penrose.studio.log.tree.LoggersNode;
 import org.safehaus.penrose.log.LogManagerClient;
 import org.safehaus.penrose.log.log4j.RootLoggerConfig;
 

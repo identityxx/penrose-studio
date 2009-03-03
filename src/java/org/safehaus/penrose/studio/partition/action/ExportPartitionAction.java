@@ -21,10 +21,10 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
-import org.safehaus.penrose.studio.partition.node.PartitionNode;
+import org.safehaus.penrose.studio.partition.tree.PartitionNode;
 import org.safehaus.penrose.studio.partition.wizard.ExportPartitionWizard;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.server.node.ServerNode;
+import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 
 public class ExportPartitionAction extends Action {

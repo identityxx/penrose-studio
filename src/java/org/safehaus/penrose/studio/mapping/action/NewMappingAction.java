@@ -24,7 +24,7 @@ import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.mapping.MappingConfig;
 import org.safehaus.penrose.mapping.MappingManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.mapping.node.MappingsNode;
+import org.safehaus.penrose.studio.mapping.tree.MappingsNode;
 import org.safehaus.penrose.studio.mapping.wizard.MappingWizard;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.ServersView;
@@ -65,7 +65,7 @@ public class NewMappingAction extends Action {
 
             partitionClient.store();
 
-            mappingsNode.refresh();
+            serversView.refresh(mappingsNode);
             
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();

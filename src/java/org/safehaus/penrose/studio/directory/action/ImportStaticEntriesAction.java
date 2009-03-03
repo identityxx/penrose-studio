@@ -21,8 +21,8 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.directory.node.DirectoryNode;
-import org.safehaus.penrose.studio.directory.node.EntryNode;
+import org.safehaus.penrose.studio.directory.tree.DirectoryNode;
+import org.safehaus.penrose.studio.directory.tree.EntryNode;
 import org.safehaus.penrose.studio.directory.wizard.ImportEntriesWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.tree.Node;
@@ -76,8 +76,8 @@ public class ImportStaticEntriesAction extends Action {
 
             if (rc == Window.CANCEL) return;
 
-            node.refresh();
-            
+            serversView.refresh(node);
+
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();
 

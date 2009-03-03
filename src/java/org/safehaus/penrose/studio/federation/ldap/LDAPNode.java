@@ -12,6 +12,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.action.RefreshAction;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.federation.LDAPRepositoryClient;
 import org.safehaus.penrose.federation.*;
@@ -36,14 +37,12 @@ public class LDAPNode extends Node {
     }
 
     public void init() throws Exception {
-        refresh();
+        update();
     }
 
-    public void refresh() throws Exception {
+    public void update() throws Exception {
 
         log.debug("LDAP repositories:");
-
-        children.clear();
 
         for (FederationRepositoryConfig repositoryConfig : federationClient.getRepositories("LDAP")) {
 
@@ -61,8 +60,13 @@ public class LDAPNode extends Node {
 
             node.init();
 
-            children.add(node);
+            addChild(node);
         }
+    }
+
+    public void refresh() throws Exception {
+        removeChildren();
+        update();
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -88,20 +92,8 @@ public class LDAPNode extends Node {
         });
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-
-        manager.add(new Action("Refresh") {
-            public void run() {
-                try {
-                    refresh();
-
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        });
+        
+        manager.add(new RefreshAction(this));
     }
 
     public void open() throws Exception {

@@ -61,7 +61,7 @@ public class AddServerAction extends Action {
 
             if (rc == Window.CANCEL) return;
 
-            serversView.addServerConfig(serverConfig);
+            serversView.refresh();
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();

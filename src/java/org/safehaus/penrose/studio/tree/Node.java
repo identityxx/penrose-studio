@@ -29,6 +29,8 @@ import java.util.ArrayList;
  */
 public class Node {
 
+    public final static Collection<Node> EMPTY_LIST = new ArrayList<Node>();
+
     public Logger log = Logger.getLogger(getClass());
     public boolean debug = log.isDebugEnabled();
 
@@ -37,7 +39,7 @@ public class Node {
     protected Object object;
     protected Node parent;
 
-    protected Collection<Node> children = new ArrayList<Node>();
+    protected Collection<Node> children;
 
     public Node(String name, Image image, Object object, Node parent) {
         this.name = name;
@@ -123,11 +125,27 @@ public class Node {
     public void collapse() throws Exception {
     }
 
+    public void close() throws Exception {
+    }
+
     public boolean hasChildren() throws Exception {
-        return !children.isEmpty();
+        return children == null || !children.isEmpty();
     }
 
     public Collection<Node> getChildren() throws Exception {
-        return children;
+        return children == null ? EMPTY_LIST : children;
+    }
+
+    public void removeChildren() {
+        if (children != null) children.clear();
+    }
+
+    public void addChild(Node node) {
+        if (children == null) children = new ArrayList<Node>();
+        children.add(node);
+    }
+
+    public String toString() {
+        return name;
     }
 }

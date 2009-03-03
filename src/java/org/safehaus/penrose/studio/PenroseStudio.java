@@ -141,6 +141,8 @@ public class PenroseStudio implements IPlatformRunnable {
         imageManager = new ImageManager("org.safehaus.penrose.studio");
         imageManager.setProperties(properties);
         imageManager.init();
+
+        load();
     }
 
     public static PenroseStudio getInstance() {

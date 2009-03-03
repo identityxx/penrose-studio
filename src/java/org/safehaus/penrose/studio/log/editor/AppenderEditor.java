@@ -22,8 +22,8 @@ import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.config.editor.ParametersPage;
 import org.safehaus.penrose.studio.editor.Editor;
-import org.safehaus.penrose.studio.server.node.ServerNode;
-import org.safehaus.penrose.studio.log.node.AppendersNode;
+import org.safehaus.penrose.studio.server.tree.ServerNode;
+import org.safehaus.penrose.studio.log.tree.AppendersNode;
 import org.safehaus.penrose.log.LogManagerClient;
 import org.safehaus.penrose.log.log4j.AppenderConfig;
 

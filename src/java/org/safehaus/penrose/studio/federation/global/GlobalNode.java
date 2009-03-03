@@ -38,7 +38,7 @@ public class GlobalNode extends Node {
         conflictDetectionNode.setProject(project);
         conflictDetectionNode.setFederationClient(federationClient);
 
-        children.add(conflictDetectionNode);
+        addChild(conflictDetectionNode);
     }
 
     public void showMenu(IMenuManager manager) throws Exception {

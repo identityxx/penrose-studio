@@ -22,7 +22,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
-import org.safehaus.penrose.studio.server.node.ServerNode;
+import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -34,12 +34,14 @@ public class ServersContentProvider implements ITreeContentProvider {
 
     protected Logger log = Logger.getLogger(getClass());
 
-    ServersView view;
+    ServersView serversView;
     Map<String,Node> servers = new TreeMap<String,Node>();
 
-    public ServersContentProvider(ServersView view) {
-        this.view = view;
+    public ServersContentProvider(ServersView serversView) {
+        this.serversView = serversView;
+    }
 
+    public void init() throws Exception {
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.load();
 
@@ -92,11 +94,10 @@ public class ServersContentProvider implements ITreeContentProvider {
 
     public void addServerConfig(ServerConfig serverConfig) {
         ServerNode serverNode = new ServerNode(
-                view,
+                serversView,
                 serverConfig.getName(),
                 PenroseStudio.getImage(PenroseImage.LOGO),
-                serverConfig,
-                null
+                serverConfig
         );
 
         servers.put(serverConfig.getName(), serverNode);

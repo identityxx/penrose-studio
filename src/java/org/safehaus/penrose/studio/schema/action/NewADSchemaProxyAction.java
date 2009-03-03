@@ -22,7 +22,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.studio.directory.node.DirectoryNode;
+import org.safehaus.penrose.studio.directory.tree.DirectoryNode;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.schema.wizard.ADSchemaProxyWizard;
 import org.apache.log4j.Logger;
@@ -55,7 +55,7 @@ public class NewADSchemaProxyAction extends Action {
 
             if (rc == Window.CANCEL) return;
             
-            directoryNode.refresh();
+            serversView.refresh(directoryNode);
 
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();

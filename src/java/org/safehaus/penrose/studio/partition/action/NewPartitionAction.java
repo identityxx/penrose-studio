@@ -21,9 +21,9 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
-import org.safehaus.penrose.studio.partition.node.PartitionsNode;
+import org.safehaus.penrose.studio.partition.tree.PartitionsNode;
 import org.safehaus.penrose.studio.partition.wizard.CreatePartitionWizard;
-import org.safehaus.penrose.studio.server.node.ServerNode;
+import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.partition.PartitionConfig;
@@ -57,7 +57,7 @@ public class NewPartitionAction extends Action {
             
             serversView.open(serverNode.getPartitionsNode());
 
-            partitionsNode.refresh();
+            serversView.refresh(partitionsNode);
             
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             penroseStudio.notifyChangeListeners();

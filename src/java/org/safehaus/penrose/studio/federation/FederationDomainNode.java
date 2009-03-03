@@ -19,6 +19,7 @@ import org.safehaus.penrose.federation.*;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.action.RefreshAction;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.federation.partition.FederationDomainEditorWizard;
 import org.safehaus.penrose.studio.federation.partition.FederationDomainEditor;
@@ -47,15 +48,12 @@ public class FederationDomainNode extends Node {
     }
 
     public void init() throws Exception {
-
-        refresh();
+        update();
     }
 
-    public void refresh() throws Exception {
+    public void update() throws Exception {
 
-        children.clear();
-
-        children.add(new GlobalNode(this));
+        addChild(new GlobalNode(this));
 
         log.debug("Refreshing repository types:");
 
@@ -70,7 +68,7 @@ public class FederationDomainNode extends Node {
                 node.setFederationClient(getFederationClient());
                 node.init();
 
-                children.add(node);
+                addChild(node);
 
             } else if ("LDAP".equals(type)) {
 
@@ -79,7 +77,7 @@ public class FederationDomainNode extends Node {
                 node.setFederationClient(getFederationClient());
                 node.init();
 
-                children.add(node);
+                addChild(node);
 
             } else if ("NIS".equals(type)) {
 
@@ -87,9 +85,14 @@ public class FederationDomainNode extends Node {
                 node.setServer(server);
                 node.init();
 
-                children.add(node);
+                addChild(node);
             }
         }
+    }
+
+    public void refresh() throws Exception {
+        removeChildren();
+        update();
     }
 
     public void showMenu(IMenuManager manager) throws Exception {
@@ -155,19 +158,7 @@ public class FederationDomainNode extends Node {
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        manager.add(new Action("Refresh") {
-            public void run() {
-                try {
-                    refresh();
-
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        });
+        manager.add(new RefreshAction(this));
     }
 
     public void open() throws Exception {

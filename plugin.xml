@@ -158,10 +158,10 @@
 
         <!-- System Properties  -->
         <editor
-            id="org.safehaus.penrose.studio.properties.SystemPropertiesEditor"
+            id="org.safehaus.penrose.studio.properties.editor.SystemPropertiesEditor"
             name="System Properties"
             icon="${images.system_properties}"
-            class="org.safehaus.penrose.studio.properties.SystemPropertiesEditor"/>
+            class="org.safehaus.penrose.studio.properties.editor.SystemPropertiesEditor"/>
 
         <!-- Federation -->
         <editor

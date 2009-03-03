@@ -44,7 +44,7 @@ public class NISDomainNode extends Node {
         synchronizationNode.setNisFederationClient(nisFederationClient);
         synchronizationNode.setRepositoryConfig(repositoryConfig);
 
-        children.add(synchronizationNode);
+        addChild(synchronizationNode);
 
         NISLinkingNode linkingNode = new NISLinkingNode(
                 "Identity Linking",
@@ -55,7 +55,7 @@ public class NISDomainNode extends Node {
         linkingNode.setNisFederationClient(nisFederationClient);
         linkingNode.setRepositoryConfig(repositoryConfig);
 
-        children.add(linkingNode);
+        addChild(linkingNode);
 
         NISOwnershipNode ownershipNode = new NISOwnershipNode(
                 "Ownership Alignment",
@@ -67,11 +67,7 @@ public class NISDomainNode extends Node {
         ownershipNode.setRepositoryConfig(repositoryConfig);
         ownershipNode.init();
 
-        children.add(ownershipNode);
-    }
-
-    public Image getImage() {
-        return PenroseStudio.getImage(PenroseImage.FOLDER);
+        addChild(ownershipNode);
     }
 
     public void showMenu(IMenuManager manager) throws Exception {

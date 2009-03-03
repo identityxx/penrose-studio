@@ -17,18 +17,15 @@
  */
 package org.safehaus.penrose.studio.server.action;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.safehaus.penrose.studio.server.ServerConfig;
-import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.util.ApplicationConfig;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.server.node.ServerNode;
-import org.safehaus.penrose.studio.server.wizard.AddServerWizard;
+import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.safehaus.penrose.studio.server.wizard.EditServerWizard;
 import org.apache.log4j.Logger;
 

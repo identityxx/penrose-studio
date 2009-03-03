@@ -34,7 +34,7 @@ import org.safehaus.penrose.studio.browser.wizard.BrowserWizard;
 import org.safehaus.penrose.studio.server.ServerConfig;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.*;
-import org.safehaus.penrose.studio.server.node.ServerNode;
+import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.safehaus.penrose.user.UserConfig;
 import org.safehaus.penrose.client.PenroseClient;
 import org.ietf.ldap.LDAPUrl;
