@@ -94,8 +94,11 @@
         <ant dir="tools" target="clean"/>
     </target>
 
-    <target name="manifest" depends="init">
+    <target name="tools" depends="init">
         <ant dir="tools" target="compile"/>
+    </target>
+
+    <target name="manifest" depends="tools">
         <mkdir dir="META-INF"/>
         <copy todir="META-INF" file="MANIFEST.MF" overwrite="true">
             <filterchain>
@@ -115,7 +118,7 @@
         <fixcrlf srcdir="META-INF" includes="MANIFEST.MF" eol="unix"/>
     </target>
 
-    <target name="compile" depends="manifest">
+    <target name="compile" depends="tools">
         <mkdir dir="target/classes"/>
         <javac
             srcdir="src/java"
@@ -421,7 +424,7 @@
             <arg line="--license target/LICENSE.txt"/>
             <arg line="--icon images/PenroseDMG.icns"/>
             <arg line="--mkdir /.background"/>
-            <arg line="--copy images/penrose.background.png:/.background/background.png"/>
+            <arg line="--copy images/background.png:/.background/background.png"/>
 			<!-- Custom DS_Store contains the positioning of icons as well as window size which needs to match up
 			with your custom background -->
             <arg line="--copy installer/PenroseStudioDS_Store:/.DS_Store"/>
