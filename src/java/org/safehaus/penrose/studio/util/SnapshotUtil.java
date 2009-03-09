@@ -106,7 +106,8 @@ public class SnapshotUtil {
 
         RDN rdn = targetDn.getRdn();
 
-        EntryConfig entryConfig = new EntryConfig(targetDn);
+        EntryConfig entryConfig = new EntryConfig();
+        entryConfig.setDn(targetDn);
 
         log.debug("Attributes:");
         Attributes attributes = entry.getAttributes();

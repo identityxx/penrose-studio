@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.directory.*;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 /**
  * @author Endi S. Dewata
@@ -63,7 +64,8 @@ public class ACLWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            ErrorDialog.open(e);
+            return false;
         }
     }
 

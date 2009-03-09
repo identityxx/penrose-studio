@@ -39,7 +39,7 @@ public class AppendersNode extends Node {
         PenroseClient client = server.getClient();
         LogManagerClient logManagerClient = client.getLogManagerClient();
 
-        for (String appenderName : logManagerClient.getAppenderConfigNames()) {
+        for (String appenderName : logManagerClient.getAppenderNames()) {
 
             AppenderNode appenderNode = new AppenderNode(
                     view,
@@ -91,7 +91,7 @@ public class AppendersNode extends Node {
 
         if (rc == Window.CANCEL) return;
 
-        logManagerClient.addAppenderConfig(wizard.getAppenderConfig());
+        logManagerClient.addAppender(wizard.getAppenderConfig());
         logManagerClient.store();
 
         ServersView serversView = ServersView.getInstance();

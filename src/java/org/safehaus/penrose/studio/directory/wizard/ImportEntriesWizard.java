@@ -22,6 +22,7 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
 import org.safehaus.penrose.studio.util.SnapshotUtil;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.connection.LDAPConnectionClient;
 import org.safehaus.penrose.connection.ConnectionConfig;
@@ -103,7 +104,8 @@ public class ImportEntriesWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            ErrorDialog.open(e);
+            return false;
         }
     }
 

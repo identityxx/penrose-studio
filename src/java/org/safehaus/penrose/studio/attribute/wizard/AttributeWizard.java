@@ -23,6 +23,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.directory.*;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.expression.wizard.ExpressionWizardPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.schema.SchemaManagerClient;
 import org.safehaus.penrose.schema.Schema;
@@ -165,7 +166,8 @@ public class AttributeWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            ErrorDialog.open(e);
+            return false;
         }
     }
 

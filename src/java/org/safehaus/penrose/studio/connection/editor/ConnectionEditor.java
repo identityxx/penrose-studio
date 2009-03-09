@@ -20,7 +20,6 @@ public abstract class ConnectionEditor extends Editor {
     protected String partitionName;
     protected String connectionName;
 
-    protected ConnectionClient connectionClient;
     protected ConnectionConfig connectionConfig;
 
     public void init() throws PartInitException {
@@ -36,7 +35,7 @@ public abstract class ConnectionEditor extends Editor {
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
             ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
 
-            connectionClient = connectionManagerClient.getConnectionClient(connectionName);
+            ConnectionClient connectionClient = connectionManagerClient.getConnectionClient(connectionName);
             connectionConfig = connectionClient.getConnectionConfig();
 
         } catch (Exception e) {
@@ -92,19 +91,11 @@ public abstract class ConnectionEditor extends Editor {
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
 
         ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
-        connectionManagerClient.updateConnection(connectionConfig);
+        connectionManagerClient.updateConnection(connectionName, connectionConfig);
         partitionClient.store();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
-    }
-
-    public ConnectionClient getConnectionClient() {
-        return connectionClient;
-    }
-
-    public void setConnectionClient(ConnectionClient connectionClient) {
-        this.connectionClient = connectionClient;
     }
 
     public String getConnectionName() {

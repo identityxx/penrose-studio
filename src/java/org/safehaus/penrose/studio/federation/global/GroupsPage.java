@@ -447,6 +447,7 @@ public class GroupsPage extends FormPage {
 
     public void showAttributes(Table table, SearchResult entry) throws Exception {
 
+        boolean debug = log.isDebugEnabled();
         table.removeAll();
 
         Attributes attributes = entry.getAttributes();
@@ -456,7 +457,7 @@ public class GroupsPage extends FormPage {
             String attributeName = attribute.getName();
             //String normalizedAttributeName = attributeName.toLowerCase();
 
-            if (log.isDebugEnabled()) attribute.print();
+            if (debug) attribute.print();
 
             for (Object value : attribute.getValues()) {
 

@@ -29,6 +29,7 @@ import org.safehaus.penrose.studio.source.wizard.SourceWizard;
 import org.safehaus.penrose.studio.source.wizard.SourcePropertiesWizardPage;
 import org.safehaus.penrose.studio.source.wizard.SourcePrimaryKeysWizardPage;
 import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.connection.ConnectionClient;
 
@@ -191,6 +192,7 @@ public class JDBCSourceWizard extends SourceWizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
             return false;
         }
     }

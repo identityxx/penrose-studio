@@ -107,7 +107,7 @@ public class LoggerNode extends Node {
             if (!(node instanceof LoggerNode)) continue;
 
             LoggerNode loggerNode = (LoggerNode)node;
-            logManagerClient.removeLoggerConfig(loggerNode.getLoggerName());
+            logManagerClient.removeLogger(loggerNode.getLoggerName());
         }
         
         logManagerClient.store();

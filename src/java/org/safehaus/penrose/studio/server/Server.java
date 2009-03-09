@@ -13,7 +13,6 @@ import java.io.File;
 public class Server {
 
     public Logger log = Logger.getLogger(getClass());
-    public boolean debug = log.isDebugEnabled();
 
     protected ServerConfig serverConfig;
 

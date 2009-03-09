@@ -302,8 +302,7 @@ public class NISSynchronizationPage extends FormPage {
 
             for (String nisMap : nisMapRDNs.keySet()) {
                 RDN rdn = new RDN(nisMapRDNs.get(nisMap));
-                String name = rdn.getNames().iterator().next();
-                String label = (String)rdn.get(name);
+                String label = (String)rdn.getValue();
 
                 TableItem ti = new TableItem(table, SWT.NONE);
                 ti.setText(0, label);

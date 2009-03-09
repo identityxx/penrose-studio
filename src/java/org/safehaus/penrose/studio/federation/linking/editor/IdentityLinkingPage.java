@@ -890,6 +890,7 @@ public class IdentityLinkingPage extends FormPage {
 
     public void showAttributes(Table table, SearchResult entry) throws Exception {
 
+        boolean debug = log.isDebugEnabled();
         Attributes attributes = entry.getAttributes();
         log.debug("Attributes:");
 
@@ -897,7 +898,7 @@ public class IdentityLinkingPage extends FormPage {
             String attributeName = attribute.getName();
             String normalizedAttributeName = attributeName.toLowerCase();
 
-            if (log.isDebugEnabled()) attribute.print();
+            if (debug) attribute.print();
 
             for (Object value : attribute.getValues()) {
 
@@ -931,6 +932,8 @@ public class IdentityLinkingPage extends FormPage {
     }
 
     public Filter createFilter(SearchResult result, String linkFilter) throws Exception {
+
+        boolean debug = log.isDebugEnabled();
         if ("".equals(linkFilter)) return null;
 
         log.debug("Searching links for "+result.getDn());
@@ -949,7 +952,7 @@ public class IdentityLinkingPage extends FormPage {
             String name = sb.substring(i+2, j);
             Object value = attributes.getValue(name);
 
-            if (log.isDebugEnabled()) {
+            if (debug) {
                 if (value instanceof byte[]) {
                     String s = BinaryUtil.encode(BinaryUtil.BIG_INTEGER, (byte[]) value);
                     log.debug(" - " + name + ": " + s);

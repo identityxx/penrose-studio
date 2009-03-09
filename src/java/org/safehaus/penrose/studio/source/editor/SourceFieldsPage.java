@@ -143,6 +143,5 @@ public class SourceFieldsPage extends SourceEditorPage {
     }
 
     public void checkDirty() {
-        editor.checkDirty();
     }
 }

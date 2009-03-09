@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.schema.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.schema.SchemaConfig;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.client.PenroseClient;
@@ -93,7 +94,8 @@ public class NewSchemaWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            ErrorDialog.open(e);
+            return false;
         }
     }
 

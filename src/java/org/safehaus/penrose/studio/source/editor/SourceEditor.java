@@ -25,31 +25,28 @@ public class SourceEditor extends FormEditor {
 
     protected boolean dirty;
 
-    protected Server project;
+    protected Server server;
     protected String partitionName;
-    protected String origSourceName;
+    protected String sourceName;
 
-    protected SourceConfig origSourceConfig;
     protected SourceConfig sourceConfig;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         super.init(site, input);
 
         SourceEditorInput ei = (SourceEditorInput)input;
-        project = ei.getServer();
+        server = ei.getServer();
         partitionName = ei.getPartitionName();
-        origSourceName = ei.getSourceName();
+        sourceName = ei.getSourceName();
 
         try {
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
             SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
-            SourceClient sourceClient = sourceManagerClient.getSourceClient(origSourceName);
-            origSourceConfig = sourceClient.getSourceConfig();
-
-            sourceConfig = (SourceConfig)origSourceConfig.clone();
+            SourceClient sourceClient = sourceManagerClient.getSourceClient(sourceName);
+            sourceConfig = sourceClient.getSourceConfig();
 
         } catch (Exception e) {
             throw new PartInitException(e.getMessage(), e);
@@ -88,7 +85,7 @@ public class SourceEditor extends FormEditor {
 
     public void rename(String name, String newName) throws Exception {
 
-        PenroseClient client = project.getClient();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
@@ -102,26 +99,22 @@ public class SourceEditor extends FormEditor {
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
-
-        checkDirty();
     }
 
     public void store() throws Exception {
 
-        PenroseClient client = project.getClient();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
 
-        sourceManagerClient.updateSource(origSourceName, sourceConfig);
+        sourceManagerClient.updateSource(sourceName, sourceConfig);
         partitionClient.store();
 
         setPartName(partitionName+"."+sourceConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
-
-        checkDirty();
     }
 
     public boolean isDirty() {
@@ -136,29 +129,12 @@ public class SourceEditor extends FormEditor {
         this.dirty = dirty;
     }
 
-    public void checkDirty() {
-        try {
-            dirty = false;
-/*
-            if (!origSourceConfig.equals(sourceConfig)) {
-                dirty = true;
-                return;
-            }
-*/
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-
-        } finally {
-            firePropertyChange(PROP_DIRTY);
-        }
+    public Server getServer() {
+        return server;
     }
 
-    public Server getProject() {
-        return project;
-    }
-
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public String getPartitionName() {

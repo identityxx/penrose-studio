@@ -40,7 +40,6 @@ import org.apache.log4j.xml.DOMConfigurator;
 public class PenroseStudio implements IPlatformRunnable {
 
     public Logger log = LoggerFactory.getLogger(getClass());
-    public boolean debug = log.isDebugEnabled();
 
     public static String PRODUCT_NAME;
     public static String PRODUCT_VERSION;

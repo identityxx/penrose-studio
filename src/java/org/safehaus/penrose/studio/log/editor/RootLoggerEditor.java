@@ -64,7 +64,7 @@ public class RootLoggerEditor extends Editor {
 
         PenroseClient client = serverNode.getServer().getClient();
         LogManagerClient logManagerClient = client.getLogManagerClient();
-        logManagerClient.setRootLoggerConfig(rootLoggerConfig);
+        logManagerClient.updateRootLogger(rootLoggerConfig);
         logManagerClient.store();
         
         PenroseStudio penroseStudio = PenroseStudio.getInstance();

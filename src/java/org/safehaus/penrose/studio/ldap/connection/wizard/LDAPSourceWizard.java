@@ -26,6 +26,7 @@ import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.ldap.source.wizard.LDAPSourceFieldsWizardPage;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.source.wizard.SourcePrimaryKeysWizardPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.LDAP;
@@ -78,8 +79,7 @@ public class LDAPSourceWizard extends Wizard {
         this.attributeNames = attributeNames;
 
         RDN rdn = new DN(baseDn).getRdn();
-        String rdnAttr = rdn.getNames().iterator().next();
-        String rdnValue = (String)rdn.get(rdnAttr);
+        String rdnValue = (String)rdn.getValue();
         String name = rdnValue.replaceAll("\\s", "").toLowerCase();
 
         propertiesPage = new LDAPSourceWizardPage(name, baseDn, filter, scope);
@@ -122,6 +122,7 @@ public class LDAPSourceWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
             return false;
         }
     }

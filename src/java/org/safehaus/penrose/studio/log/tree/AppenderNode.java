@@ -92,7 +92,7 @@ public class AppenderNode extends Node {
             if (!(node instanceof AppenderNode)) continue;
 
             AppenderNode appenderNode = (AppenderNode)node;
-            logManagerClient.removeAppenderConfig(appenderNode.getAppenderName());
+            logManagerClient.removeAppender(appenderNode.getAppenderName());
         }
 
         logManagerClient.store();

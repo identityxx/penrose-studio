@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.source.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.apache.log4j.Logger;
 
 /**
@@ -59,7 +60,8 @@ public class SelectSourceWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            ErrorDialog.open(e);
+            return false;
         }
     }
 

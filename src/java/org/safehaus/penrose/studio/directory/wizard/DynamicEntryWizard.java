@@ -30,6 +30,7 @@ import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.mapping.Relationship;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.attribute.wizard.AttributesWizardPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.util.Collection;
 
@@ -187,7 +188,8 @@ public class DynamicEntryWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            ErrorDialog.open(e);
+            return false;
         }
     }
 

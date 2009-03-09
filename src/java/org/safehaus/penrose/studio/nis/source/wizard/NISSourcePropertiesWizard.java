@@ -22,6 +22,7 @@ import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.source.wizard.SourceWizard;
 import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
@@ -77,13 +78,14 @@ public class NISSourcePropertiesWizard extends SourceWizard {
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
             SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
-            sourceManagerClient.createSource(sourceConfig);
+            sourceManagerClient.updateSource(sourceConfig.getName(), sourceConfig);
             partitionClient.store();
 
             return true;
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
             return false;
         }
     }

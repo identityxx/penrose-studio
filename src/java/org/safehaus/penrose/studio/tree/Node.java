@@ -32,7 +32,6 @@ public class Node {
     public final static Collection<Node> EMPTY_LIST = new ArrayList<Node>();
 
     public Logger log = Logger.getLogger(getClass());
-    public boolean debug = log.isDebugEnabled();
 
     protected String name;
     protected Image image;

@@ -30,7 +30,7 @@ public class SourceEditorPage extends FormPage {
         this.editor = editor;
         this.title = title;
 
-        server = editor.getProject();
+        server = editor.getServer();
         partitionName = editor.getPartitionName();
         sourceConfig = editor.getSourceConfig();
     }
@@ -84,7 +84,6 @@ public class SourceEditorPage extends FormPage {
     }
 
     public void checkDirty() {
-        editor.checkDirty();
     }
 
     public void setDirty(boolean dirty) {

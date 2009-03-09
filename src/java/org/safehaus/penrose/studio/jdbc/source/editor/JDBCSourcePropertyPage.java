@@ -185,6 +185,5 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
     }
 
     public void checkDirty() {
-        editor.checkDirty();
     }
 }

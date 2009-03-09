@@ -23,6 +23,7 @@ import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.studio.directory.wizard.EntrySourceWizardPage;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.attribute.wizard.AttributesWizardPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDNBuilder;
 import org.safehaus.penrose.directory.*;
@@ -157,7 +158,8 @@ public class DynamicEntryFromSourceWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            ErrorDialog.open(e);
+            return false;
         }
     }
 

@@ -25,6 +25,7 @@ import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.ldap.RDN;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 /**
  * @author Endi S. Dewata
@@ -79,7 +80,8 @@ public class EntryRDNWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            ErrorDialog.open(e);
+            return false;
         }
     }
 

@@ -25,6 +25,7 @@ import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.ldap.DNBuilder;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.source.wizard.SelectSourceWizardPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.source.SourceConfig;
 
 /**
@@ -92,7 +93,8 @@ public class ProxyEntryWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            ErrorDialog.open(e);
+            return false;
         }
     }
 

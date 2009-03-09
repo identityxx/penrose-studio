@@ -20,6 +20,7 @@ package org.safehaus.penrose.studio.mapping.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.mapping.MappingConfig;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 /**
  * @author Endi S. Dewata
@@ -64,7 +65,8 @@ public class MappingPropertiesWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            ErrorDialog.open(e);
+            return false;
         }
     }
 

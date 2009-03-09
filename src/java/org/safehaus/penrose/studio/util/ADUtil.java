@@ -53,7 +53,8 @@ public class ADUtil {
 
         DN dn = new DN(destSchemaDn);
 
-        EntryConfig entryConfig = new EntryConfig(dn);
+        EntryConfig entryConfig = new EntryConfig();
+        entryConfig.setDn(dn);
         entryConfig.addObjectClass("top");
         entryConfig.addObjectClass("subschema");
         entryConfig.addAttributesFromRdn();

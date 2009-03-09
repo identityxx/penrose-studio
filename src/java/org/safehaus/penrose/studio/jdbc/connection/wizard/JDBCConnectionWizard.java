@@ -25,6 +25,7 @@ import org.safehaus.penrose.studio.util.Helper;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.connection.wizard.ConnectionPropertiesWizardPage;
 import org.safehaus.penrose.studio.driver.Driver;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.jdbc.JDBC;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
@@ -119,7 +120,8 @@ public class JDBCConnectionWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            ErrorDialog.open(e);
+            return false;
         }
     }
 

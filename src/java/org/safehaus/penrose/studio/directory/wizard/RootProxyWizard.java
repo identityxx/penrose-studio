@@ -29,6 +29,7 @@ import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.source.wizard.SelectSourceWizardPage;
 import org.safehaus.penrose.studio.acl.wizard.ACLWizardPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.acl.ACI;
 
 /**
@@ -97,7 +98,8 @@ public class RootProxyWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            ErrorDialog.open(e);
+            return false;
         }
     }
 

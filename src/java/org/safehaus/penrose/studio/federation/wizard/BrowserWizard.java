@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.ldap.DN;
 import org.safehaus.penrose.source.SourceClient;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 /**
  * @author Endi Sukma Dewata
@@ -41,7 +42,8 @@ public class BrowserWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            ErrorDialog.open(e);
+            return false;
         }
     }
 

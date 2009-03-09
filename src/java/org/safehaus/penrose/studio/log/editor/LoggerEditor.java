@@ -66,7 +66,7 @@ public class LoggerEditor extends Editor {
 
         PenroseClient client = serverNode.getServer().getClient();
         LogManagerClient logManagerClient = client.getLogManagerClient();
-        logManagerClient.updateLoggerConfig(loggerName, loggerConfig);
+        logManagerClient.updateLogger(loggerName, loggerConfig);
         logManagerClient.store();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();

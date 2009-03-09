@@ -60,7 +60,7 @@ public class LoggersNode extends Node {
         RootLoggerNode rootLoggerNode = new RootLoggerNode(view, this);
         addChild(rootLoggerNode);
 
-        for (String loggerName : logManagerClient.getLoggerConfigNames()) {
+        for (String loggerName : logManagerClient.getLoggerNames()) {
 
             LoggerNode loggerNode = new LoggerNode(
                     view,
@@ -115,7 +115,7 @@ public class LoggersNode extends Node {
 
         if (rc == Window.CANCEL) return;
 
-        logManagerClient.addLoggerConfig(loggerConfig);
+        logManagerClient.addLogger(loggerConfig);
         logManagerClient.store();
 
         ServersView serversView = ServersView.getInstance();

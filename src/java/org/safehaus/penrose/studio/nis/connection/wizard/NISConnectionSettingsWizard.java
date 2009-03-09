@@ -21,6 +21,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.connection.ConnectionConfig;
 import org.safehaus.penrose.connection.ConnectionManagerClient;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
@@ -43,7 +44,7 @@ public class NISConnectionSettingsWizard extends Wizard {
     public NISConnectionSettingsWizardPage settingsPage;
 
     public NISConnectionSettingsWizard() {
-        setWindowTitle("New NIS Connection");
+        setWindowTitle("Update NIS Connection Settings");
     }
 
     public void addPages() {
@@ -69,14 +70,15 @@ public class NISConnectionSettingsWizard extends Wizard {
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
             ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
-            connectionManagerClient.createConnection(connectionConfig);
+            connectionManagerClient.updateConnection(connectionConfig.getName(), connectionConfig);
             partitionClient.store();
 
             return true;
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            ErrorDialog.open(e);
+            return false;
         }
     }
 

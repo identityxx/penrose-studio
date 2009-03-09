@@ -73,7 +73,7 @@ public class LoggerAppendersWizardPage extends WizardPage {
                 try {
                     AppenderSelectionDialog dialog = new AppenderSelectionDialog(getShell(), SWT.NONE);
                     dialog.setText("Appenders");
-                    dialog.setAppenderNames(logManagerClient.getAppenderConfigNames());
+                    dialog.setAppenderNames(logManagerClient.getAppenderNames());
                     int rc = dialog.open();
 
                     if (rc == Window.CANCEL) return;

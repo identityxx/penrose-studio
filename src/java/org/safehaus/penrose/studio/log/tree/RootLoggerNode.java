@@ -69,11 +69,11 @@ public class RootLoggerNode extends Node {
         Server server = loggersNode.getLogsNode().getServerNode().getServer();
         PenroseClient client = server.getClient();
         LogManagerClient logManagerClient = client.getLogManagerClient();
-        LoggerConfig loggerConfig = logManagerClient.getRootLoggerConfig(loggerName);
+        LoggerConfig loggerConfig = logManagerClient.getRootLoggerConfig();
 
         LoggerDialog dialog = new LoggerDialog(view.getSite().getShell(), SWT.NONE);
         dialog.setText("Edit Logger");
-        dialog.setRootLoggerConfig(loggerConfig);
+        dialog.updateRootLogger(loggerConfig);
         dialog.open();
 */
     }
