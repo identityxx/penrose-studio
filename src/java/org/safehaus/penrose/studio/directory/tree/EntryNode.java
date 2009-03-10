@@ -50,6 +50,7 @@ import org.safehaus.penrose.ldap.DN;
 
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Endi S. Dewata
@@ -64,10 +65,13 @@ public class EntryNode extends Node {
 
     private String partitionName;
     private String entryName;
-    private EntryConfig entryConfig;
+    private DN dn;
 
-    public EntryNode(String name, Image image, Object object, Node parent) {
-        super(name, image, object, parent);
+    public EntryNode(String name, Image image, DN dn, Node parent) {
+        super(name, image, null, parent);
+
+        this.dn = dn;
+
         if (parent instanceof DirectoryNode) {
             directoryNode = (DirectoryNode)parent;
         } else if (parent instanceof EntryNode) {
@@ -86,31 +90,23 @@ public class EntryNode extends Node {
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         DirectoryClient directoryClient = partitionClient.getDirectoryClient();
 
-        EntryClient entryClient = directoryClient.getEntryClient(entryName);
-
         log.debug("Getting children:");
 
-        for (String childName : entryClient.getChildNames()) {
+        for (String childName : directoryClient.getChildNames(entryName)) {
             log.debug(" - "+childName);
 
-            EntryClient childClient = directoryClient.getEntryClient(childName);
-            EntryConfig childConfig = childClient.getEntryConfig();
-
-            //log.debug(" - childConfig "+childConfig);
-            //log.debug(" - childConfig.rdn "+childConfig.getRdn());
-
-            String rdn = childConfig.getRdn() == null ? "Root DSE" : childConfig.getRdn().toString();
+            DN childDn = directoryClient.getEntryDn(childName);
+            String label = childDn.getRdn().toString();
 
             EntryNode entryNode = new EntryNode(
-                    rdn,
+                    label,
                     PenroseStudio.getImage(PenroseImage.FOLDER),
-                    childConfig,
+                    childDn,
                     this
             );
 
             entryNode.setPartitionName(partitionName);
             entryNode.setEntryName(childName);
-            entryNode.setEntryConfig(childConfig);
             entryNode.init();
 
             addChild(entryNode);
@@ -145,6 +141,30 @@ public class EntryNode extends Node {
         manager.add(new NewDynamicEntryAction(this));
         manager.add(new NewProxyEntryAction(this));
         manager.add(new ImportStaticEntriesAction(this));
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        manager.add(new Action("Move Up") {
+            public void run() {
+                try {
+                    moveUp();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
+                }
+            }
+        });
+
+        manager.add(new Action("Move Down") {
+            public void run() {
+                try {
+                    moveDown();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
+                }
+            }
+        });
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
@@ -197,6 +217,80 @@ public class EntryNode extends Node {
         IWorkbenchPage page = window.getActivePage();
 
         page.openEditor(ei, EntryEditor.class.getName());
+    }
+
+    public void moveUp() throws Exception {
+
+        log.debug("Moving entries up:");
+
+        Server server = serverNode.getServer();
+        PenroseClient client = server.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        DirectoryClient directoryClient = partitionClient.getDirectoryClient();
+
+        for (Node node : serversView.getSelectedNodes()) {
+            if (!(node instanceof EntryNode)) continue;
+
+            EntryNode entryNode = (EntryNode)node;
+            String entryName = entryNode.getEntryName();
+            String parentName = directoryClient.getParentName(entryName);
+
+            List<String> childNames = directoryClient.getChildNames(parentName);
+            int index = childNames.indexOf(entryName);
+            if (index <= 0) continue;
+
+            log.debug(" - "+entryName+": "+index+" -> "+(index-1));
+
+            childNames.remove(index);
+            childNames.add(index-1, entryName);
+            directoryClient.setChildNames(parentName, childNames);
+        }
+
+        partitionClient.store();
+
+        ServersView serversView = ServersView.getInstance();
+        serversView.refresh(parent);
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
+    }
+
+    public void moveDown() throws Exception {
+
+        log.debug("Moving entries down:");
+
+        Server server = serverNode.getServer();
+        PenroseClient client = server.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        DirectoryClient directoryClient = partitionClient.getDirectoryClient();
+
+        for (Node node : serversView.getSelectedNodes()) {
+            if (!(node instanceof EntryNode)) continue;
+
+            EntryNode entryNode = (EntryNode)node;
+            String entryName = entryNode.getEntryName();
+            String parentName = directoryClient.getParentName(entryName);
+
+            List<String> childNames = directoryClient.getChildNames(parentName);
+            int index = childNames.indexOf(entryName);
+            if (index < 0 || index >= childNames.size() - 1) continue;
+
+            log.debug(" - "+entryName+": "+index+" -> "+(index+1));
+
+            childNames.remove(index);
+            childNames.add(index+1, entryName);
+            directoryClient.setChildNames(parentName, childNames);
+        }
+
+        partitionClient.store();
+
+        ServersView serversView = ServersView.getInstance();
+        serversView.refresh(parent);
+
+        PenroseStudio penroseStudio = PenroseStudio.getInstance();
+        penroseStudio.notifyChangeListeners();
     }
 
     public void copy() throws Exception {
@@ -257,7 +351,7 @@ public class EntryNode extends Node {
             log.debug(" - "+name+" -> "+newName);
             entryConfig.setName(newName);
 
-            DN dn = entryConfig.getRdn().append(this.entryConfig.getDn());
+            DN dn = entryConfig.getRdn().append(this.dn);
             entryConfig.setDn(dn);
 
             directoryClient.createEntry(entryConfig);
@@ -310,14 +404,6 @@ public class EntryNode extends Node {
         this.partitionName = partitionName;
     }
 
-    public EntryConfig getEntryConfig() {
-        return entryConfig;
-    }
-
-    public void setEntryConfig(EntryConfig entryConfig) {
-        this.entryConfig = entryConfig;
-    }
-
     public ServersView getServersView() {
         return serversView;
     }
@@ -362,5 +448,13 @@ public class EntryNode extends Node {
         EntryClient entryClient = directoryClient.getEntryClient(entryName);
 
         return !entryClient.getChildNames().isEmpty();
+    }
+
+    public DN getDn() {
+        return dn;
+    }
+
+    public void setDn(DN dn) {
+        this.dn = dn;
     }
 }

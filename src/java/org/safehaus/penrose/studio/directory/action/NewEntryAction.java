@@ -50,7 +50,7 @@ public class NewEntryAction extends Action {
             EntryWizard wizard = new EntryWizard();
             wizard.setServer(serverNode.getServer());
             wizard.setPartitionName(node.getPartitionName());
-            wizard.setParentDn(node.getEntryConfig().getDn());
+            wizard.setParentDn(node.getDn());
             wizard.setEntryConfig(entryConfig);
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);

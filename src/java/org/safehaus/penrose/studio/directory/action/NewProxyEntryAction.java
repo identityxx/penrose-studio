@@ -56,7 +56,7 @@ public class NewProxyEntryAction extends Action {
             wizard.setEntryConfig(entryConfig);
             wizard.setServer(serverNode.getServer());
             wizard.setPartitionName(node.getPartitionName());
-            wizard.setParentDn(node.getEntryConfig().getDn());
+            wizard.setParentDn(node.getDn());
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);

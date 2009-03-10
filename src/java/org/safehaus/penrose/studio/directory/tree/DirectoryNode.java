@@ -24,7 +24,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.safehaus.penrose.directory.EntryConfig;
-import org.safehaus.penrose.directory.EntryClient;
 import org.safehaus.penrose.directory.DirectoryClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
@@ -78,26 +77,19 @@ public class DirectoryNode extends Node {
         DirectoryClient directoryClient = partitionClient.getDirectoryClient();
 
         for (String entryName : directoryClient.getRootEntryNames()) {
-            EntryClient entryClient = directoryClient.getEntryClient(entryName);
-            EntryConfig entryConfig = entryClient.getEntryConfig();
 
-            String label;
-            if (entryConfig.getDn().isEmpty()) {
-                label = "Root DSE";
-            } else {
-                label = entryConfig.getDn().toString();
-            }
+            DN dn = directoryClient.getEntryDn(entryName);
+            String label = dn.isEmpty() ? "Root DSE" : dn.toString();
 
             EntryNode entryNode = new EntryNode(
                     label,
                     PenroseStudio.getImage(PenroseImage.HOME_NODE),
-                    entryConfig,
+                    dn,
                     this
             );
 
             entryNode.setPartitionName(partitionName);
             entryNode.setEntryName(entryName);
-            entryNode.setEntryConfig(entryConfig);
             entryNode.init();
             
             addChild(entryNode);

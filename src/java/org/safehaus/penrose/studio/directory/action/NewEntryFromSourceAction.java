@@ -120,7 +120,7 @@ public class NewEntryFromSourceAction extends Action {
             }
 
             db.append(rb.toRdn());
-            db.append(node.getEntryConfig().getDn());
+            db.append(node.getDn());
 
             newEntryConfig.setDn(db.toDn());
             newEntryConfig.addObjectClass("top");

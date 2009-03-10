@@ -51,7 +51,7 @@ public class ImportStaticEntriesAction extends Action {
         this((Node)node);
         server = node.getServerNode().getServer();
         partitionName = node.getPartitionName();
-        targetDn = node.getEntryConfig().getDn();
+        targetDn = node.getDn();
     }
 
     public ImportStaticEntriesAction(Node node) {
