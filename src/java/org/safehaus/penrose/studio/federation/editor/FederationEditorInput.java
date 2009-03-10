@@ -11,7 +11,7 @@ import org.safehaus.penrose.federation.FederationClient;
  */
 public class FederationEditorInput implements IEditorInput {
 
-    private Server project;
+    private Server server;
     private FederationClient federation;
 
     public FederationEditorInput() {
@@ -42,7 +42,7 @@ public class FederationEditorInput implements IEditorInput {
     }
 
     public int hashCode() {
-        return project == null ? 0 : project.hashCode();
+        return server == null ? 0 : server.hashCode();
     }
 
     boolean equals(Object o1, Object o2) {
@@ -57,7 +57,7 @@ public class FederationEditorInput implements IEditorInput {
         if (object.getClass() != this.getClass()) return false;
 
         FederationEditorInput ei = (FederationEditorInput)object;
-        if (!equals(project, ei.project)) return false;
+        if (!equals(server, ei.server)) return false;
 
         return true;
     }
@@ -70,11 +70,11 @@ public class FederationEditorInput implements IEditorInput {
         this.federation = federation;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

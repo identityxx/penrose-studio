@@ -108,6 +108,7 @@ public class ServerNode extends Node {
                     preview();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
 
@@ -122,6 +123,7 @@ public class ServerNode extends Node {
                     browser();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
 
@@ -138,6 +140,7 @@ public class ServerNode extends Node {
                     //copy();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
 
@@ -152,6 +155,7 @@ public class ServerNode extends Node {
                     //paste();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
 
@@ -166,6 +170,7 @@ public class ServerNode extends Node {
                     remove();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

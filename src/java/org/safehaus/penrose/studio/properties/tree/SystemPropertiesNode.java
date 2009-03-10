@@ -22,6 +22,7 @@ import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.properties.editor.SystemPropertiesEditorInput;
 import org.safehaus.penrose.studio.properties.editor.SystemPropertiesEditor;
 import org.eclipse.jface.action.IMenuManager;
@@ -38,12 +39,12 @@ public class SystemPropertiesNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ServerNode projectNode;
+    ServerNode serverNode;
 
     public SystemPropertiesNode(String name, Node parent) {
         super(name, PenroseStudio.getImage(PenroseImage.SYSTEM_PROPERTIES), null, parent);
 
-        projectNode = (ServerNode)parent;
+        serverNode = (ServerNode)parent;
     }
 
     public void showMenu(IMenuManager manager) {
@@ -54,16 +55,17 @@ public class SystemPropertiesNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
     }
 
     public void open() throws Exception {
-        Server project = projectNode.getServer();
+        Server server = serverNode.getServer();
 
         SystemPropertiesEditorInput ei = new SystemPropertiesEditorInput();
-        ei.setProject(project);
+        ei.setServer(server);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();

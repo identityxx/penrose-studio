@@ -408,8 +408,8 @@ public class EntryLDAPPage extends FormPage {
 
     public Map<String,ObjectClass> getObjectClasses(Collection<String> ocNames) throws Exception {
 
-        Server project = editor.getServer();
-        PenroseClient client = project.getClient();
+        Server server = editor.getServer();
+        PenroseClient client = server.getClient();
         SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
 
         Map<String,ObjectClass> objectClasses = new TreeMap<String,ObjectClass>();

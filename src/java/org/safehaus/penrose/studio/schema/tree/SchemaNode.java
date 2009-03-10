@@ -28,6 +28,7 @@ import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.schema.SchemaManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.schema.editor.SchemaEditor;
 import org.safehaus.penrose.studio.schema.editor.SchemaEditorInput;
 import org.safehaus.penrose.studio.server.Server;
@@ -65,6 +66,7 @@ public class SchemaNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -75,6 +77,7 @@ public class SchemaNode extends Node {
                     paste();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -85,6 +88,7 @@ public class SchemaNode extends Node {
                     remove();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

@@ -45,10 +45,10 @@ public class NewEntryAction extends Action {
             EntryConfig entryConfig = new EntryConfig();
 
             ServersView serversView = ServersView.getInstance();
-            ServerNode projectNode = node.getServerNode();
+            ServerNode serverNode = node.getServerNode();
 
             EntryWizard wizard = new EntryWizard();
-            wizard.setServer(projectNode.getServer());
+            wizard.setServer(serverNode.getServer());
             wizard.setPartitionName(node.getPartitionName());
             wizard.setParentDn(node.getEntryConfig().getDn());
             wizard.setEntryConfig(entryConfig);

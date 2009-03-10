@@ -49,7 +49,7 @@ public class UsersPage extends FormPage {
 
     ConflictDetectionEditor editor;
 
-    Server project;
+    Server server;
     FederationClient federationClient;
 
     SourceClient globalSourceClient;
@@ -61,7 +61,7 @@ public class UsersPage extends FormPage {
         super(editor, "USERS", "  Users  ");
 
         this.editor = editor;
-        this.project = editor.project;
+        this.server = editor.server;
         this.federationClient = editor.getFederationClient();
 
         PartitionClient federationPartitionClient = federationClient.getPartitionClient();

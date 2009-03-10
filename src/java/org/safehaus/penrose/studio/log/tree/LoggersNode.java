@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.log.tree;
 
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.action.RefreshAction;
 import org.safehaus.penrose.studio.log.wizard.LoggerWizard;
 import org.safehaus.penrose.studio.server.ServersView;
@@ -89,6 +90,7 @@ public class LoggersNode extends Node {
                     createLogger();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

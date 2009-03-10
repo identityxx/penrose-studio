@@ -9,17 +9,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 public class NISEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    public Server project;
+    public Server server;
     public FederationClient federationClient;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         NISEditorInput ei = (NISEditorInput)input;
-        project = ei.getProject();
+        server = ei.getServer();
         federationClient = ei.getFederationClient();
 
         setSite(site);
@@ -34,6 +35,7 @@ public class NISEditor extends FormEditor {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 
@@ -51,11 +53,11 @@ public class NISEditor extends FormEditor {
         return false;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

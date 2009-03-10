@@ -32,6 +32,7 @@ import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -283,6 +284,7 @@ public class AttributeDialog extends Dialog {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -306,6 +308,7 @@ public class AttributeDialog extends Dialog {
                     out.close();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -429,6 +432,7 @@ public class AttributeDialog extends Dialog {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 
         //log.debug("Reading "+bytes.length+" bytes.");

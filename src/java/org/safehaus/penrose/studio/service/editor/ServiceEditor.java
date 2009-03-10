@@ -27,6 +27,7 @@ import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.service.ServiceManagerClient;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.config.editor.ParametersPage;
 import org.safehaus.penrose.studio.server.Server;
 
@@ -48,7 +49,7 @@ public class ServiceEditor extends FormEditor {
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         ServiceEditorInput ei = (ServiceEditorInput)input;
 
-        server = ei.getProject();
+        server = ei.getServer();
         origServiceConfig = ei.getServiceConfig();
 
         try {
@@ -73,6 +74,7 @@ public class ServiceEditor extends FormEditor {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 
@@ -82,6 +84,7 @@ public class ServiceEditor extends FormEditor {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 

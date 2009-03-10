@@ -24,6 +24,7 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.directory.tree.DirectoryNode;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.schema.wizard.ADSchemaProxyWizard;
 import org.apache.log4j.Logger;
 
@@ -64,6 +65,7 @@ public class NewADSchemaProxyAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 	}
 	

@@ -55,7 +55,7 @@ public class EntryEditor extends FormEditor implements ModifyListener {
 
         EntryEditorInput ei = (EntryEditorInput)input;
 
-        server = ei.getProject();
+        server = ei.getServer();
         partitionName = ei.getPartitionName();
         entryId = ei.getEntryName();
 

@@ -20,10 +20,9 @@ package org.safehaus.penrose.studio.mapping.action;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.mapping.MappingConfig;
-import org.safehaus.penrose.mapping.MappingManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.mapping.tree.MappingsNode;
 import org.safehaus.penrose.studio.mapping.wizard.MappingWizard;
 import org.safehaus.penrose.studio.server.Server;
@@ -50,6 +49,8 @@ public class NewMappingAction extends Action {
             MappingConfig mappingConfig = new MappingConfig();
 
             MappingWizard wizard = new MappingWizard();
+            wizard.setServer(server);
+            wizard.setPartitionName(mappingsNode.getPartitionName());
             wizard.setMappingConfig(mappingConfig);
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
@@ -57,13 +58,6 @@ public class NewMappingAction extends Action {
             int rc = dialog.open();
 
             if (rc == WizardDialog.CANCEL) return;
-
-            PartitionClient partitionClient = server.getClient().getPartitionManagerClient().getPartitionClient(mappingsNode.getPartitionName());
-            MappingManagerClient mappingManagerClient = partitionClient.getMappingManagerClient();
-
-            mappingManagerClient.createMapping(mappingConfig);
-
-            partitionClient.store();
 
             serversView.refresh(mappingsNode);
             
@@ -74,6 +68,7 @@ public class NewMappingAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 	}
 

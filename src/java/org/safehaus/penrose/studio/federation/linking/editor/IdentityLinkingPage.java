@@ -72,7 +72,7 @@ public class IdentityLinkingPage extends FormPage {
     public Table globalTable;
     public Table globalAttributeTable;
 
-    public Server project;
+    public Server server;
     public FederationRepositoryConfig repository;
     public String localPartition;
     public String globalPartition;
@@ -99,12 +99,12 @@ public class IdentityLinkingPage extends FormPage {
 
         IdentityLinkingEditorInput ei = (IdentityLinkingEditorInput)editor.getEditorInput();
 
-        this.project = ei.getProject();
+        this.server = ei.getServer();
         this.repository = ei.getRepository();
         this.localPartition = ei.getSourcePartition();
         this.globalPartition = ei.getTargetPartition();
 
-        PenroseClient penroseClient = project.getClient();
+        PenroseClient penroseClient = server.getClient();
 
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
         localPartitionClient = partitionManagerClient.getPartitionClient(localPartition);
@@ -869,6 +869,7 @@ public class IdentityLinkingPage extends FormPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 

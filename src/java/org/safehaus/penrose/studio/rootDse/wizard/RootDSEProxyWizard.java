@@ -21,6 +21,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.acl.wizard.ACLWizardPage;
 import org.safehaus.penrose.studio.connection.wizard.SelectConnectionWizardPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.EntrySourceConfig;
@@ -107,6 +108,7 @@ public class RootDSEProxyWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
             return false;
         }
     }

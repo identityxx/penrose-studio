@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.mapping.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.mapping.MappingConfig;
 import org.apache.log4j.Logger;
 
@@ -29,7 +30,7 @@ public class MappingPreScriptWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    Server project;
+    Server server;
     String partitionName;
     MappingConfig mappingConfig;
 
@@ -62,6 +63,7 @@ public class MappingPreScriptWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
             return false;
         }
     }
@@ -70,12 +72,12 @@ public class MappingPreScriptWizard extends Wizard {
         return true;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public String getPartitionName() {

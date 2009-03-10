@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.*;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.apache.log4j.Logger;
 
 import java.util.Iterator;
@@ -118,6 +119,7 @@ public class SystemPropertiesPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -154,6 +156,7 @@ public class SystemPropertiesPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -196,6 +199,7 @@ public class SystemPropertiesPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -220,6 +224,7 @@ public class SystemPropertiesPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

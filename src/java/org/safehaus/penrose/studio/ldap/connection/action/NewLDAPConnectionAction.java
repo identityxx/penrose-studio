@@ -22,6 +22,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.ldap.connection.wizard.LDAPConnectionWizard;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.connection.tree.ConnectionsNode;
@@ -44,12 +45,12 @@ public class NewLDAPConnectionAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            Server project = connectionsNode.getServerNode().getServer();
+            Server server = connectionsNode.getServerNode().getServer();
 
             ConnectionConfig connectionConfig = new ConnectionConfig();
             
             LDAPConnectionWizard wizard = new LDAPConnectionWizard();
-            wizard.setServer(project);
+            wizard.setServer(server);
             wizard.setPartitionName(connectionsNode.getPartitionName());
             wizard.setConnectionConfig(connectionConfig);
 
@@ -68,6 +69,7 @@ public class NewLDAPConnectionAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 	}
 

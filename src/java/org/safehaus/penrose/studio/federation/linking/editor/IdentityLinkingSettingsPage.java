@@ -35,7 +35,7 @@ public class IdentityLinkingSettingsPage extends FormPage {
 
     FederationRepositoryConfig repository;
 
-    Server project;
+    Server server;
 
     public IdentityLinkingSettingsPage(FormEditor editor, FederationRepositoryConfig repository) {
         super(editor, "LINKING", "  Linking  ");

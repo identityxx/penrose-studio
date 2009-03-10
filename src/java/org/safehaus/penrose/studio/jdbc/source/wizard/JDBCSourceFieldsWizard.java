@@ -100,6 +100,7 @@ public class JDBCSourceFieldsWizard extends SourceWizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 
         return results;

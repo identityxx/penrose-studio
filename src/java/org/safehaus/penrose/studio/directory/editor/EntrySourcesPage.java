@@ -277,8 +277,8 @@ public class EntrySourcesPage extends FormPage { //implements ModifyListener {
         addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    Server project = editor.getServer();
-                    PenroseClient client = project.getClient();
+                    Server server = editor.getServer();
+                    PenroseClient client = server.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(editor.getPartitionName());
                     SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
@@ -335,8 +335,8 @@ public class EntrySourcesPage extends FormPage { //implements ModifyListener {
                     CTabItem item = tabFolder.getSelection();
                     if (item == null) return;
 
-                    Server project = editor.getServer();
-                    PenroseClient client = project.getClient();
+                    Server server = editor.getServer();
+                    PenroseClient client = server.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(editor.getPartitionName());
                     SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
@@ -526,6 +526,7 @@ public class EntrySourcesPage extends FormPage { //implements ModifyListener {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -552,8 +553,8 @@ public class EntrySourcesPage extends FormPage { //implements ModifyListener {
                     FieldSelectionDialog dialog = new SelectFieldDialog(editor.getParent().getShell(), SWT.NONE);
                     dialog.setText("Add field...");
 
-                    Server project = editor.getServer();
-                    PenroseClient client = project.getClient();
+                    Server server = editor.getServer();
+                    PenroseClient client = server.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(editor.getPartitionName());
                     SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
@@ -614,8 +615,8 @@ public class EntrySourcesPage extends FormPage { //implements ModifyListener {
         try {
             table.removeAll();
 
-            Server project = editor.getServer();
-            PenroseClient client = project.getClient();
+            Server server = editor.getServer();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 
             String partitionName = sourceMapping.getPartitionName();

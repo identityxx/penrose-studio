@@ -162,6 +162,7 @@ public class SelectSourceWizardPage extends WizardPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

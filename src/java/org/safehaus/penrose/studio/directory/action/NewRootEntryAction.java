@@ -25,6 +25,7 @@ import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.safehaus.penrose.studio.directory.wizard.RootEntryWizard;
 import org.safehaus.penrose.studio.directory.tree.DirectoryNode;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.apache.log4j.Logger;
 
 public class NewRootEntryAction extends Action {
@@ -64,6 +65,7 @@ public class NewRootEntryAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 	}
 	

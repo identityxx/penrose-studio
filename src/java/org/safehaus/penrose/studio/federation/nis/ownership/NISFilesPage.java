@@ -50,7 +50,7 @@ public class NISFilesPage extends FormPage implements Runnable {
 
     NISFilesEditor editor;
 
-    Server project;
+    Server server;
     NISRepositoryClient nisFederation;
     FederationRepositoryConfig domain;
 
@@ -58,7 +58,7 @@ public class NISFilesPage extends FormPage implements Runnable {
         super(editor, "FILES", "  Files  ");
 
         this.editor = editor;
-        this.project = editor.project;
+        this.server = editor.server;
         this.domain = editor.getDomain();
         this.nisFederation = editor.getNisTool();
     }
@@ -106,7 +106,7 @@ public class NISFilesPage extends FormPage implements Runnable {
                }
            };
 
-           PenroseClient client = project.getClient();
+           PenroseClient client = server.getClient();
            PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
 
@@ -297,7 +297,7 @@ public class NISFilesPage extends FormPage implements Runnable {
             }
         };
 
-        PenroseClient client = project.getClient();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
         SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();

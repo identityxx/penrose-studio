@@ -3,6 +3,7 @@ package org.safehaus.penrose.studio.federation.nis;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.action.RefreshAction;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.federation.NISRepositoryClient;
@@ -50,7 +51,7 @@ public class NISNode extends Node {
 
             NISDomainNode domainNode = new NISDomainNode(repositoryConfig.getName(), this);
 
-            domainNode.setProject(server);
+            domainNode.setServer(server);
             domainNode.setFederationClient(getFederationClient());
             domainNode.setNisFederationClient(nisFederationClient);
             domainNode.setRepositoryConfig(repositoryConfig);
@@ -73,6 +74,7 @@ public class NISNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -83,6 +85,7 @@ public class NISNode extends Node {
                     addNisDomain();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -95,7 +98,7 @@ public class NISNode extends Node {
     public void open() throws Exception {
 
         NISEditorInput ei = new NISEditorInput();
-        ei.setProject(server);
+        ei.setServer(server);
         ei.setFederationClient(getFederationClient());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

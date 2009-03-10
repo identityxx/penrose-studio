@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.jdbc.source.editor;
 
 import org.safehaus.penrose.studio.source.editor.*;
 import org.safehaus.penrose.studio.config.editor.ParametersPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 public class JDBCSourceEditor extends SourceEditor {
 
@@ -36,6 +37,7 @@ public class JDBCSourceEditor extends SourceEditor {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 }

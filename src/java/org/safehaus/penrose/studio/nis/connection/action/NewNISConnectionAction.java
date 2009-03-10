@@ -22,6 +22,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.nis.connection.wizard.NISConnectionWizard;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.connection.tree.ConnectionsNode;
@@ -68,6 +69,7 @@ public class NewNISConnectionAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 	}
 

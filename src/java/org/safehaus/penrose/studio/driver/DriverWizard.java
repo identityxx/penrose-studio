@@ -20,6 +20,7 @@ package org.safehaus.penrose.studio.driver;
 import org.eclipse.jface.wizard.Wizard;
 import org.apache.log4j.Logger;
 import org.safehaus.penrose.config.Parameter;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -72,6 +73,7 @@ public class DriverWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
             return false;
         }
     }

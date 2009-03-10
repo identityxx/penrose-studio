@@ -43,7 +43,7 @@ public class NISHostsPage extends FormPage {
 
     NISFilesEditor editor;
 
-    Server project;
+    Server server;
     NISRepositoryClient nisFederation;
     FederationRepositoryConfig domain;
 
@@ -53,7 +53,7 @@ public class NISHostsPage extends FormPage {
         super(editor, "HOSTS", "  Hosts ");
 
         this.editor = editor;
-        this.project = editor.getProject();
+        this.server = editor.getServer();
         this.nisFederation = editor.getNisTool();
         this.domain = editor.getDomain();
     }
@@ -110,7 +110,7 @@ public class NISHostsPage extends FormPage {
                 }
             };
 
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
             SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
@@ -271,7 +271,7 @@ public class NISHostsPage extends FormPage {
         attributes.setValue("port", dialog.getPort());
         attributes.setValue("paths", dialog.getPaths());
 
-        PenroseClient client = project.getClient();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
         SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
@@ -304,7 +304,7 @@ public class NISHostsPage extends FormPage {
         rb.set("name", dialog.getName());
         RDN newRdn = rb.toRdn();
 
-        PenroseClient client = project.getClient();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
         SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
@@ -340,7 +340,7 @@ public class NISHostsPage extends FormPage {
     public void remove() throws Exception {
         if (hostsTable.getSelectionCount() == 0) return;
 
-        PenroseClient client = project.getClient();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
         SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();
@@ -358,7 +358,7 @@ public class NISHostsPage extends FormPage {
     public void updateFiles() throws Exception {
         if (hostsTable.getSelectionCount() == 0) return;
 
-        PenroseClient client = project.getClient();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient domainClient = partitionManagerClient.getPartitionClient(domain.getName()+"_"+ NISDomain.YP);
         ModuleManagerClient moduleManagerClient = domainClient.getModuleManagerClient();

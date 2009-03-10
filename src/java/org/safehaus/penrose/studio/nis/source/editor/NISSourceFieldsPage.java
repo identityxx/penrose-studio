@@ -111,6 +111,7 @@ public class NISSourceFieldsPage extends SourceFieldsPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
 
@@ -182,6 +183,7 @@ public class NISSourceFieldsPage extends SourceFieldsPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -223,6 +225,7 @@ public class NISSourceFieldsPage extends SourceFieldsPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -247,6 +250,7 @@ public class NISSourceFieldsPage extends SourceFieldsPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

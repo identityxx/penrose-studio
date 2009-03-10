@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.rootDse.tree;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
@@ -46,6 +47,7 @@ public class RootDSENode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

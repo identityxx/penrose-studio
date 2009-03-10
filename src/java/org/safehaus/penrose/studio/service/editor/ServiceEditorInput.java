@@ -28,7 +28,7 @@ import org.safehaus.penrose.studio.server.Server;
  */
 public class ServiceEditorInput implements IEditorInput {
 
-    private Server project;
+    private Server server;
     private ServiceConfig serviceConfig;
 
     public ServiceEditorInput() {
@@ -59,7 +59,7 @@ public class ServiceEditorInput implements IEditorInput {
     }
 
     public int hashCode() {
-        return (project == null ? 0 : project.hashCode()) +
+        return (server == null ? 0 : server.hashCode()) +
                 (serviceConfig == null ? 0 : serviceConfig.hashCode());
     }
 
@@ -75,7 +75,7 @@ public class ServiceEditorInput implements IEditorInput {
         if (object.getClass() != this.getClass()) return false;
 
         ServiceEditorInput ei = (ServiceEditorInput)object;
-        if (!equals(project, ei.project)) return false;
+        if (!equals(server, ei.server)) return false;
         if (!equals(serviceConfig, ei.serviceConfig)) return false;
 
         return true;
@@ -89,11 +89,11 @@ public class ServiceEditorInput implements IEditorInput {
         this.serviceConfig = serviceConfig;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

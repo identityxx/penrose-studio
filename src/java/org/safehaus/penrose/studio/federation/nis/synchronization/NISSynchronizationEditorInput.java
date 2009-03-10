@@ -12,7 +12,7 @@ import org.safehaus.penrose.federation.FederationRepositoryConfig;
  */
 public class NISSynchronizationEditorInput implements IEditorInput {
 
-    private Server project;
+    private Server server;
     private NISRepositoryClient nisFederationClient;
     private FederationRepositoryConfig domain;
 
@@ -44,7 +44,7 @@ public class NISSynchronizationEditorInput implements IEditorInput {
     }
 
     public int hashCode() {
-        return (project == null ? 0 : project.hashCode()) +
+        return (server == null ? 0 : server.hashCode()) +
                 (domain == null ? 0 : domain.hashCode());
     }
 
@@ -60,7 +60,7 @@ public class NISSynchronizationEditorInput implements IEditorInput {
         if (object.getClass() != this.getClass()) return false;
 
         NISSynchronizationEditorInput cei = (NISSynchronizationEditorInput)object;
-        if (!equals(project, cei.project)) return false;
+        if (!equals(server, cei.server)) return false;
         if (!equals(domain, cei.domain)) return false;
 
         return true;
@@ -82,11 +82,11 @@ public class NISSynchronizationEditorInput implements IEditorInput {
         this.nisFederationClient = nisFederationClient;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

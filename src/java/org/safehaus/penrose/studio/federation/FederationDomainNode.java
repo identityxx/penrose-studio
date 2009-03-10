@@ -19,6 +19,7 @@ import org.safehaus.penrose.federation.*;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.action.RefreshAction;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.federation.partition.FederationDomainEditorWizard;
@@ -64,7 +65,7 @@ public class FederationDomainNode extends Node {
             if ("JDBC".equals(type)) {
 
                 JDBCNode node = new JDBCNode(type, this);
-                node.setProject(server);
+                node.setServer(server);
                 node.setFederationClient(getFederationClient());
                 node.init();
 
@@ -103,6 +104,7 @@ public class FederationDomainNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -139,6 +141,7 @@ public class FederationDomainNode extends Node {
                     edit();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -151,6 +154,7 @@ public class FederationDomainNode extends Node {
                     test();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -164,7 +168,7 @@ public class FederationDomainNode extends Node {
     public void open() throws Exception {
 
         FederationDomainEditorInput ei = new FederationDomainEditorInput();
-        ei.setProject(server);
+        ei.setServer(server);
         ei.setFederationClient(getFederationClient());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

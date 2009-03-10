@@ -54,7 +54,7 @@ public class NISScriptsPage extends FormPage {
 
     NISFilesEditor editor;
 
-    Server project;
+    Server server;
     NISRepositoryClient nisFederation;
     FederationRepositoryConfig domain;
 
@@ -64,7 +64,7 @@ public class NISScriptsPage extends FormPage {
         super(editor, "SCRIPTS", "  Scripts  ");
 
         this.editor = editor;
-        this.project = editor.project;
+        this.server = editor.server;
         this.domain = editor.getDomain();
         this.nisFederation = editor.getNisTool();
 
@@ -117,7 +117,7 @@ public class NISScriptsPage extends FormPage {
                }
            };
 
-           PenroseClient penroseClient = project.getClient();
+           PenroseClient penroseClient = server.getClient();
            PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
            PartitionClient partitionClient = partitionManagerClient.getPartitionClient(Federation.FEDERATION);
            SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();

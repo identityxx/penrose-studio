@@ -34,6 +34,7 @@ import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.forms.widgets.*;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.module.editor.ModuleMappingDialog;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
 import org.safehaus.penrose.schema.ObjectClass;
@@ -84,6 +85,7 @@ public class ObjectClassEditor extends EditorPart implements ModifyListener, Sel
 
 	    } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 	}
 
@@ -279,6 +281,7 @@ public class ObjectClassEditor extends EditorPart implements ModifyListener, Sel
             store();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 
@@ -330,6 +333,8 @@ public class ObjectClassEditor extends EditorPart implements ModifyListener, Sel
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
+
         } finally {
             firePropertyChange(PROP_DIRTY);
         }

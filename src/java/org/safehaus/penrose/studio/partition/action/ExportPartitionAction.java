@@ -26,6 +26,7 @@ import org.safehaus.penrose.studio.partition.wizard.ExportPartitionWizard;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 public class ExportPartitionAction extends Action {
 
@@ -43,20 +44,21 @@ public class ExportPartitionAction extends Action {
         try {
             ServersView serversView = ServersView.getInstance();
 
-            ServerNode projectNode = serversView.getSelectedServerNode();
-            Server project = projectNode.getServer();
+            ServerNode serverNode = serversView.getSelectedServerNode();
+            Server server = serverNode.getServer();
 
-            ExportPartitionWizard wizard = new ExportPartitionWizard(project, partitionNode.getPartitionName());
+            ExportPartitionWizard wizard = new ExportPartitionWizard(server, partitionNode.getPartitionName());
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
             dialog.setPageSize(600, 300);
             int rc = dialog.open();
 
             if (rc == Window.CANCEL) return;
 
-            serversView.open(projectNode.getPartitionsNode());
+            serversView.open(serverNode.getPartitionsNode());
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 	}
 }

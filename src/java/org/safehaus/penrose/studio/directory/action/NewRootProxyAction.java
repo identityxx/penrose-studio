@@ -25,6 +25,7 @@ import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.directory.tree.DirectoryNode;
 import org.safehaus.penrose.studio.directory.wizard.RootProxyWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.apache.log4j.Logger;
 
 public class NewRootProxyAction extends Action {
@@ -64,6 +65,7 @@ public class NewRootProxyAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 	}
 	

@@ -35,6 +35,7 @@ import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.source.SourceConfig;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.directory.tree.EntryNode;
 import org.safehaus.penrose.studio.directory.dialog.SourceDialog;
 import org.safehaus.penrose.studio.server.Server;
@@ -67,10 +68,10 @@ public class NewEntryFromSourceAction extends Action {
             PenroseStudio penroseStudio = PenroseStudio.getInstance();
             //if (!penroseStudio.isCommercial()) return;
 
-            ServerNode projectNode = node.getServerNode();
-            Server project = projectNode.getServer();
+            ServerNode serverNode = node.getServerNode();
+            Server server = serverNode.getServer();
 
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(node.getPartitionName());
 
@@ -189,6 +190,7 @@ public class NewEntryFromSourceAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 	}
 	

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
@@ -21,13 +22,13 @@ public class NISSynchronizationEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    Server project;
+    Server server;
     NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig domain;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         NISSynchronizationEditorInput ei = (NISSynchronizationEditorInput)input;
-        project = ei.getProject();
+        server = ei.getServer();
         nisFederationClient = ei.getNisFederationClient();
         domain = ei.getDomain();
 
@@ -40,7 +41,7 @@ public class NISSynchronizationEditor extends FormEditor {
         try {
 
             String federationName = nisFederationClient.getFederationClient().getFederationDomain();
-            PenroseClient penroseClient = project.getClient();
+            PenroseClient penroseClient = server.getClient();
 
             PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(federationName+"_"+domain.getName());
@@ -56,6 +57,7 @@ public class NISSynchronizationEditor extends FormEditor {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 
@@ -85,11 +87,11 @@ public class NISSynchronizationEditor extends FormEditor {
         return nisFederationClient;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

@@ -32,6 +32,7 @@ import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import javax.naming.Context;
 import java.util.Collection;
@@ -183,6 +184,7 @@ public class SelectConnectionWizardPage extends WizardPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 
         return list;

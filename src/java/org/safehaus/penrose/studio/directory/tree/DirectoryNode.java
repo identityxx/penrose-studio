@@ -32,6 +32,7 @@ import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.action.RefreshAction;
 import org.safehaus.penrose.studio.schema.action.NewSchemaEntryAction;
 import org.safehaus.penrose.studio.schema.action.NewADSchemaProxyAction;
@@ -139,6 +140,7 @@ public class DirectoryNode extends Node {
                     paste();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

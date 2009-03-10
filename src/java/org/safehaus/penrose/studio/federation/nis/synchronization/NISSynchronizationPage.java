@@ -50,7 +50,7 @@ public class NISSynchronizationPage extends FormPage {
 
     FormToolkit toolkit;
 
-    Server project;
+    Server server;
     NISSynchronizationEditor editor;
     NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig domain;
@@ -74,11 +74,11 @@ public class NISSynchronizationPage extends FormPage {
         super(editor, "Content", "  Content  ");
 
         this.editor = editor;
-        this.project = editor.getProject();
+        this.server = editor.getServer();
         this.nisFederationClient = editor.getNISFederationClient();
         this.domain = editor.getDomain();
 
-        PenroseClient penroseClient = project.getClient();
+        PenroseClient penroseClient = server.getClient();
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
 
         String federationName = nisFederationClient.getFederationClient().getFederationDomain();

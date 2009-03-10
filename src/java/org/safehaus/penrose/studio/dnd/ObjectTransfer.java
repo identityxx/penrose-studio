@@ -5,6 +5,7 @@ import org.eclipse.swt.dnd.ByteArrayTransfer;
 import org.eclipse.swt.dnd.DND;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.io.*;
 
@@ -32,6 +33,7 @@ public abstract class ObjectTransfer extends ByteArrayTransfer {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 
@@ -51,6 +53,7 @@ public abstract class ObjectTransfer extends ByteArrayTransfer {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 
         return null;

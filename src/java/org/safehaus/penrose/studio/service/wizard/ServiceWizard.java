@@ -20,6 +20,7 @@ package org.safehaus.penrose.studio.service.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.safehaus.penrose.studio.config.wizard.ParametersWizardPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.apache.log4j.Logger;
 
 import java.util.Map;
@@ -78,6 +79,7 @@ public class ServiceWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
             return false;
         }
     }

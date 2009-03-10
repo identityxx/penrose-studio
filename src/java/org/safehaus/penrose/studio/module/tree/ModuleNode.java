@@ -22,6 +22,7 @@ import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.partition.tree.PartitionsNode;
 import org.safehaus.penrose.studio.partition.tree.PartitionNode;
 import org.safehaus.penrose.studio.server.Server;
@@ -83,6 +84,7 @@ public class ModuleNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -95,6 +97,7 @@ public class ModuleNode extends Node {
                     copy();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -105,6 +108,7 @@ public class ModuleNode extends Node {
                     modulesNode.paste();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -115,6 +119,7 @@ public class ModuleNode extends Node {
                     remove();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

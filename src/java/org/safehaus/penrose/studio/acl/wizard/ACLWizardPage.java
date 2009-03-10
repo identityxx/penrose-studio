@@ -27,6 +27,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.jface.wizard.WizardPage;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.studio.directory.dialog.ACIDialog;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -299,6 +300,7 @@ public class ACLWizardPage extends WizardPage {
 
         } catch (CloneNotSupportedException e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 

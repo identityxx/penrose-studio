@@ -23,6 +23,7 @@ import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.directory.tree.DirectoryNode;
 import org.safehaus.penrose.studio.rootDse.wizard.DefaultRootDSEWizard;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.apache.log4j.Logger;
@@ -65,6 +66,7 @@ public class NewRootDSEAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 	}
 

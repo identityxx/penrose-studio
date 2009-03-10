@@ -36,7 +36,7 @@ public class FederationDomainPartitionsPage extends FormPage {
     FormToolkit toolkit;
 
     FederationDomainEditor editor;
-    Server project;
+    Server server;
     FederationClient federationClient;
 
     Table table;
@@ -45,7 +45,7 @@ public class FederationDomainPartitionsPage extends FormPage {
         super(editor, "PARTITONS", "  Partitions  ");
 
         this.editor = editor;
-        this.project = editor.project;
+        this.server = editor.server;
         this.federationClient = editor.getFederationClient();
     }
 
@@ -212,7 +212,7 @@ public class FederationDomainPartitionsPage extends FormPage {
 
             table.removeAll();
 
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 
             for (FederationPartitionConfig partitionConfig : federationClient.getPartitions()) {

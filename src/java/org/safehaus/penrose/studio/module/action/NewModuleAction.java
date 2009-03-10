@@ -23,6 +23,7 @@ import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.module.wizard.ModuleWizard;
 import org.safehaus.penrose.studio.module.tree.ModulesNode;
 import org.apache.log4j.Logger;
@@ -62,6 +63,7 @@ public class NewModuleAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 	}
 	

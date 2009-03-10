@@ -14,7 +14,7 @@ import org.safehaus.penrose.studio.tree.Node;
  */
 public class NISFilesNode extends Node {
 
-    private Server project;
+    private Server server;
     private NISRepositoryClient nisFederation;
     private FederationRepositoryConfig domain;
 
@@ -25,7 +25,7 @@ public class NISFilesNode extends Node {
     public void open() throws Exception {
 
         NISFilesEditorInput ei = new NISFilesEditorInput();
-        ei.setProject(project);
+        ei.setServer(server);
         ei.setNisTool(nisFederation);
         ei.setDomain(domain);
 
@@ -50,11 +50,11 @@ public class NISFilesNode extends Node {
         this.domain = domain;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

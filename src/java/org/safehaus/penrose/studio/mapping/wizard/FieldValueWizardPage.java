@@ -504,6 +504,7 @@ public class FieldValueWizardPage extends WizardPage {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 
         //log.debug("Reading "+bytes.length+" bytes.");

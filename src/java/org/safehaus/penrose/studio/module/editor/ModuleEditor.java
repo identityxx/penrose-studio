@@ -28,13 +28,11 @@ import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.module.ModuleConfig;
-import org.safehaus.penrose.module.ModuleMapping;
 import org.safehaus.penrose.module.ModuleManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.config.editor.ParametersPage;
 import org.safehaus.penrose.studio.server.Server;
-
-import java.util.Collection;
 
 public class ModuleEditor extends FormEditor {
 
@@ -45,9 +43,7 @@ public class ModuleEditor extends FormEditor {
     String moduleName;
 
     ModuleClient moduleClient;
-    ModuleConfig origModuleConfig;
     ModuleConfig moduleConfig;
-    Collection<ModuleMapping> moduleMappings;
 
     boolean dirty;
 
@@ -67,10 +63,7 @@ public class ModuleEditor extends FormEditor {
             ModuleManagerClient moduleManagerClient = partitionClient.getModuleManagerClient();
 
             moduleClient = moduleManagerClient.getModuleClient(moduleName);
-            origModuleConfig = moduleClient.getModuleConfig();
-            moduleMappings = moduleClient.getModuleMappings();
-
-            moduleConfig = (ModuleConfig)origModuleConfig.clone();
+            moduleConfig = moduleClient.getModuleConfig();
 
         } catch (Exception e) {
             throw new PartInitException(e.getMessage(), e);
@@ -101,6 +94,7 @@ public class ModuleEditor extends FormEditor {
             store();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 
@@ -119,35 +113,19 @@ public class ModuleEditor extends FormEditor {
         PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        
         ModuleManagerClient moduleManagerClient = partitionClient.getModuleManagerClient();
-        moduleManagerClient.updateModule(origModuleConfig.getName(), moduleConfig);
+        moduleManagerClient.updateModule(moduleConfig.getName(), moduleConfig);
+
+        partitionClient.store();
 
         setPartName(partitionName+"."+moduleConfig.getName());
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
         penroseStudio.notifyChangeListeners();
-
-        checkDirty();
     }
 
     public boolean isDirty() {
         return dirty;
-    }
-
-    public void checkDirty() {
-        try {
-            dirty = false;
-/*
-            if (!origModuleConfig.equals(moduleConfig)) {
-                dirty = true;
-                return;
-            }
-*/
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-
-        } finally {
-            firePropertyChange(PROP_DIRTY);
-        }
     }
 }

@@ -11,7 +11,7 @@ import org.safehaus.penrose.federation.FederationClient;
  */
 public class LDAPEditorInput implements IEditorInput {
 
-    Server project;
+    Server server;
     FederationClient federationClient;
 
     public LDAPEditorInput() {
@@ -42,7 +42,7 @@ public class LDAPEditorInput implements IEditorInput {
     }
 
     public int hashCode() {
-        return project == null ? 0 : project.hashCode();
+        return server == null ? 0 : server.hashCode();
     }
 
     boolean equals(Object o1, Object o2) {
@@ -57,7 +57,7 @@ public class LDAPEditorInput implements IEditorInput {
         if (object.getClass() != this.getClass()) return false;
 
         LDAPEditorInput ei = (LDAPEditorInput)object;
-        if (!equals(project, ei.project)) return false;
+        if (!equals(server, ei.server)) return false;
 
         return true;
     }
@@ -70,11 +70,11 @@ public class LDAPEditorInput implements IEditorInput {
         this.federationClient = federationClient;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

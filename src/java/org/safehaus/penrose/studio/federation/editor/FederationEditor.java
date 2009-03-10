@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.federation.FederationClient;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 public class FederationEditor extends FormEditor {
 
@@ -30,6 +31,7 @@ public class FederationEditor extends FormEditor {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 

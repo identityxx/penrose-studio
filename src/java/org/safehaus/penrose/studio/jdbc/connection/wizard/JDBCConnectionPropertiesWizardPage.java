@@ -115,6 +115,7 @@ public class JDBCConnectionPropertiesWizardPage extends WizardPage implements Mo
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -250,6 +251,7 @@ public class JDBCConnectionPropertiesWizardPage extends WizardPage implements Mo
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 
         setPageComplete(validatePage());

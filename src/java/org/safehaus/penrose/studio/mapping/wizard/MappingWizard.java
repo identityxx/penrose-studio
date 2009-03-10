@@ -20,7 +20,10 @@ package org.safehaus.penrose.studio.mapping.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.studio.config.wizard.ParametersWizardPage;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.mapping.MappingConfig;
+import org.safehaus.penrose.mapping.MappingManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
 import org.apache.log4j.Logger;
 
 import java.util.Map;
@@ -32,7 +35,7 @@ public class MappingWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    Server project;
+    Server server;
     String partitionName;
     MappingConfig mappingConfig;
 
@@ -102,10 +105,18 @@ public class MappingWizard extends Wizard {
             Map<String,String> parameters = parametersPage.getParameters();
             mappingConfig.setParameters(parameters);
 
+            PartitionClient partitionClient = server.getClient().getPartitionManagerClient().getPartitionClient(partitionName);
+            MappingManagerClient mappingManagerClient = partitionClient.getMappingManagerClient();
+
+            mappingManagerClient.createMapping(mappingConfig);
+
+            partitionClient.store();
+
             return true;
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
             return false;
         }
     }
@@ -114,12 +125,12 @@ public class MappingWizard extends Wizard {
         return true;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public String getPartitionName() {

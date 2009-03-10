@@ -26,6 +26,7 @@ import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.SchemaWriter;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.io.File;
 import java.util.Collection;
@@ -38,14 +39,14 @@ public class SchemaExportWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Server project;
+    private Server server;
     private Schema schema;
 
     public SchemaExportPage page = new SchemaExportPage();
     public SchemaSyntaxMappingPage syntaxMappingPage;
 
-    public SchemaExportWizard(Server project, Schema schema) {
-        this.project = project;
+    public SchemaExportWizard(Server server, Schema schema) {
+        this.server = server;
         this.schema = schema;
 
         syntaxMappingPage = new SchemaSyntaxMappingPage();
@@ -77,13 +78,14 @@ public class SchemaExportWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
             return false;
         }
     }
 
     public void removeDuplicates(Schema schema) throws Exception {
 
-        PenroseClient client = project.getClient();
+        PenroseClient client = server.getClient();
         SchemaManagerClient schemaManagerClient = client.getSchemaManagerClient();
 
         Collection<AttributeType> attributeTypes = schemaManagerClient.getAttributeTypes();

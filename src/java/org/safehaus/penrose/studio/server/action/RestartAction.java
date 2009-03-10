@@ -44,9 +44,9 @@ public class RestartAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
-            ServerNode projectNode = serversView.getSelectedServerNode();
-            Server project = projectNode.getServer();
-            PenroseClient client = project.getClient();
+            ServerNode serverNode = serversView.getSelectedServerNode();
+            Server server = serverNode.getServer();
+            PenroseClient client = server.getClient();
             client.restart();
 
         } catch (Exception e) {

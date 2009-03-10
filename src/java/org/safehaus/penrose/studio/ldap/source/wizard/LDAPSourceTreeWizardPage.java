@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.ldap.connection.LDAPConnectionClient;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 /**
  * @author Endi S. Dewata
@@ -193,6 +194,7 @@ public class LDAPSourceTreeWizardPage extends WizardPage implements SelectionLis
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 
@@ -208,6 +210,7 @@ public class LDAPSourceTreeWizardPage extends WizardPage implements SelectionLis
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 

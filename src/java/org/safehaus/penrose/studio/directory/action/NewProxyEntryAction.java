@@ -24,6 +24,7 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.directory.wizard.ProxyEntryWizard;
 import org.safehaus.penrose.studio.directory.tree.EntryNode;
 import org.safehaus.penrose.studio.server.tree.ServerNode;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.DirectoryClient;
 import org.safehaus.penrose.client.PenroseClient;
@@ -49,11 +50,11 @@ public class NewProxyEntryAction extends Action {
             EntryConfig entryConfig = new EntryConfig();
 
             ServersView serversView = ServersView.getInstance();
-            ServerNode projectNode = node.getServerNode();
+            ServerNode serverNode = node.getServerNode();
 
             ProxyEntryWizard wizard = new ProxyEntryWizard();
             wizard.setEntryConfig(entryConfig);
-            wizard.setServer(projectNode.getServer());
+            wizard.setServer(serverNode.getServer());
             wizard.setPartitionName(node.getPartitionName());
             wizard.setParentDn(node.getEntryConfig().getDn());
 
@@ -63,7 +64,7 @@ public class NewProxyEntryAction extends Action {
 
             if (rc == Window.CANCEL) return;
 
-            PenroseClient client = projectNode.getServer().getClient();
+            PenroseClient client = serverNode.getServer().getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(node.getPartitionName());
 
@@ -81,6 +82,7 @@ public class NewProxyEntryAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 	}
 

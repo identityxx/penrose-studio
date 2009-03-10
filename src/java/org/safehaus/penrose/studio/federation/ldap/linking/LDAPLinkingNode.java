@@ -10,6 +10,7 @@ import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingEditor;
 import org.safehaus.penrose.studio.federation.linking.editor.IdentityLinkingEditorInput;
@@ -20,7 +21,7 @@ import org.safehaus.penrose.studio.tree.Node;
  */
 public class LDAPLinkingNode extends Node {
 
-    Server project;
+    Server server;
     LDAPRepositoryClient ldapFederationClient;
     FederationRepositoryConfig repositoryConfig;
 
@@ -36,6 +37,7 @@ public class LDAPLinkingNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -46,7 +48,7 @@ public class LDAPLinkingNode extends Node {
         FederationClient federationClient = ldapFederationClient.getFederationClient();
         
         IdentityLinkingEditorInput ei = new IdentityLinkingEditorInput();
-        ei.setProject(project);
+        ei.setServer(server);
         ei.setRepository(repositoryConfig);
         ei.setSourcePartition(federationClient.getFederationDomain()+"_"+ repositoryConfig.getName());
         ei.setTargetPartition(federationClient.getFederationDomain());
@@ -64,12 +66,12 @@ public class LDAPLinkingNode extends Node {
         this.ldapFederationClient = ldapFederationClient;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public FederationRepositoryConfig getRepositoryConfig() {

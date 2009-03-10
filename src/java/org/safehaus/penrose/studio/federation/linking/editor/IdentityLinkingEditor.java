@@ -9,19 +9,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 public class IdentityLinkingEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    private Server project;
+    private Server server;
     private FederationRepositoryConfig repository;
     private String localPartition;
     private String globalPartition;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         IdentityLinkingEditorInput ei = (IdentityLinkingEditorInput)input;
-        project = ei.getProject();
+        server = ei.getServer();
         repository = ei.getRepository();
         localPartition = ei.getSourcePartition();
         globalPartition = ei.getTargetPartition();
@@ -37,6 +38,7 @@ public class IdentityLinkingEditor extends FormEditor {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 
@@ -62,12 +64,12 @@ public class IdentityLinkingEditor extends FormEditor {
         this.repository = repository;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public String getLocalPartition() {

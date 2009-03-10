@@ -32,6 +32,7 @@ import org.safehaus.penrose.service.ServiceManagerClient;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.service.editor.ServiceEditor;
 import org.safehaus.penrose.studio.service.editor.ServiceEditorInput;
 import org.safehaus.penrose.studio.server.Server;
@@ -47,14 +48,14 @@ public class ServiceNode extends Node {
     Logger log = Logger.getLogger(getClass());
 
     ServersView view;
-    ServerNode projectNode;
+    ServerNode serverNode;
     ServicesNode servicesNode;
 
     public ServiceNode(String name, Image image, Object object, Node parent) {
         super(name, image, object, parent);
         servicesNode = (ServicesNode)parent;
-        projectNode = servicesNode.getServerNode();
-        view = projectNode.getServersView();
+        serverNode = servicesNode.getServerNode();
+        view = serverNode.getServersView();
     }
 
     public void showMenu(IMenuManager manager) {
@@ -65,6 +66,7 @@ public class ServiceNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -77,6 +79,7 @@ public class ServiceNode extends Node {
                     start();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -87,6 +90,7 @@ public class ServiceNode extends Node {
                     stop();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -99,6 +103,7 @@ public class ServiceNode extends Node {
                     remove();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -108,13 +113,13 @@ public class ServiceNode extends Node {
 
         log.debug("Opening "+name+" service.");
 
-        Server project = projectNode.getServer();
-        PenroseClient client = project.getClient();
+        Server server = serverNode.getServer();
+        PenroseClient client = server.getClient();
         ServiceManagerClient serviceManagerClient = client.getServiceManagerClient();
         ServiceConfig serviceConfig = serviceManagerClient.getServiceConfig(name);
 
         ServiceEditorInput ei = new ServiceEditorInput();
-        ei.setProject(projectNode.getServer());
+        ei.setServer(serverNode.getServer());
         ei.setServiceConfig(serviceConfig);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -131,8 +136,8 @@ public class ServiceNode extends Node {
 
         if (!confirm) return;
 
-        Server project = projectNode.getServer();
-        PenroseClient client = project.getClient();
+        Server server = serverNode.getServer();
+        PenroseClient client = server.getClient();
         ServiceManagerClient serviceManagerClient = client.getServiceManagerClient();
         serviceManagerClient.startService(name);
 
@@ -149,8 +154,8 @@ public class ServiceNode extends Node {
 
         if (!confirm) return;
 
-        Server project = projectNode.getServer();
-        PenroseClient client = project.getClient();
+        Server server = serverNode.getServer();
+        PenroseClient client = server.getClient();
         ServiceManagerClient serviceManagerClient = client.getServiceManagerClient();
         serviceManagerClient.stopService(name);
 
@@ -167,8 +172,8 @@ public class ServiceNode extends Node {
 
         if (!confirm) return;
 
-        Server project = projectNode.getServer();
-        PenroseClient client = project.getClient();
+        Server server = serverNode.getServer();
+        PenroseClient client = server.getClient();
         ServiceManagerClient serviceManagerClient = client.getServiceManagerClient();
         serviceManagerClient.removeService(name);
 

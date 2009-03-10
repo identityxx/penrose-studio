@@ -31,6 +31,7 @@ import org.safehaus.penrose.schema.AttributeType;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -161,6 +162,7 @@ public class SelectAttributeTypeDialog extends Dialog {
             
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 

@@ -2,6 +2,7 @@ package org.safehaus.penrose.studio.federation.nis.domain;
 
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.*;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.federation.nis.ownership.NISOwnershipNode;
 import org.safehaus.penrose.studio.federation.nis.linking.NISLinkingNode;
@@ -10,7 +11,6 @@ import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.studio.federation.nis.wizard.EditNISDomainWizard;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.FederationClient;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -24,7 +24,7 @@ import org.eclipse.ui.IWorkbenchPage;
  */
 public class NISDomainNode extends Node {
 
-    Server project;
+    Server server;
     FederationClient federationClient;
     NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig repositoryConfig;
@@ -40,7 +40,7 @@ public class NISDomainNode extends Node {
                 this
         );
 
-        synchronizationNode.setProject(project);
+        synchronizationNode.setServer(server);
         synchronizationNode.setNisFederationClient(nisFederationClient);
         synchronizationNode.setRepositoryConfig(repositoryConfig);
 
@@ -51,7 +51,7 @@ public class NISDomainNode extends Node {
                 this
         );
 
-        linkingNode.setProject(project);
+        linkingNode.setServer(server);
         linkingNode.setNisFederationClient(nisFederationClient);
         linkingNode.setRepositoryConfig(repositoryConfig);
 
@@ -62,7 +62,7 @@ public class NISDomainNode extends Node {
                 this
         );
 
-        ownershipNode.setProject(project);
+        ownershipNode.setServer(server);
         ownershipNode.setNisFederationClient(nisFederationClient);
         ownershipNode.setRepositoryConfig(repositoryConfig);
         ownershipNode.init();
@@ -78,6 +78,7 @@ public class NISDomainNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -88,6 +89,7 @@ public class NISDomainNode extends Node {
                     edit();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -96,7 +98,7 @@ public class NISDomainNode extends Node {
     public void open() throws Exception {
 
         NISDomainEditorInput ei = new NISDomainEditorInput();
-        ei.setProject(project);
+        ei.setServer(server);
         ei.setFederationClient(federationClient);
         ei.setNisFederationClient(nisFederationClient);
         ei.setRepositoryConfig(repositoryConfig);
@@ -129,12 +131,12 @@ public class NISDomainNode extends Node {
         this.repositoryConfig = repositoryConfig;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public NISRepositoryClient getNisFederationClient() {

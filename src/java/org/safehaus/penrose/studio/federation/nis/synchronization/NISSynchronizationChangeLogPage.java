@@ -52,7 +52,7 @@ public class NISSynchronizationChangeLogPage extends FormPage {
     Text descriptionText;
     //Text noteText;
 
-    Server project;
+    Server server;
     PartitionClient partitionClient;
     SourceClient changes;
 
@@ -60,12 +60,12 @@ public class NISSynchronizationChangeLogPage extends FormPage {
         super(editor, "CHANGELOG", "  Change Log  ");
 
         this.editor = editor;
-        this.project = editor.getProject();
+        this.server = editor.getServer();
         this.nisFederationClient = editor.getNISFederationClient();
         this.domain = editor.getDomain();
 
         String federationName = nisFederationClient.getFederationClient().getFederationDomain();
-        PenroseClient penroseClient = project.getClient();
+        PenroseClient penroseClient = server.getClient();
 
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
         partitionClient = partitionManagerClient.getPartitionClient(federationName+"_"+domain.getName());
@@ -176,6 +176,7 @@ public class NISSynchronizationChangeLogPage extends FormPage {
 
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
+                            ErrorDialog.open(e);
                         }
                     }
 

@@ -8,6 +8,7 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.federation.global.UsersPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.module.ModuleManagerClient;
 import org.safehaus.penrose.module.ModuleClient;
@@ -18,14 +19,14 @@ public class ConflictDetectionEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    public Server project;
+    public Server server;
     public FederationClient federationClient;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         super.init(site, input);
 
         ConflictDetectionInput ei = (ConflictDetectionInput)input;
-        project = ei.getProject();
+        server = ei.getServer();
         federationClient = ei.getFederationClient();
 
         setPartName(ei.getName());
@@ -52,6 +53,7 @@ public class ConflictDetectionEditor extends FormEditor {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 

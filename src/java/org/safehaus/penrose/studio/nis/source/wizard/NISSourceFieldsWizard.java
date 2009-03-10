@@ -91,6 +91,7 @@ public class NISSourceFieldsWizard extends SourceWizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 
         return schema;

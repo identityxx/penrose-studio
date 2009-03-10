@@ -26,6 +26,7 @@ import org.safehaus.penrose.studio.partition.wizard.CreatePartitionWizard;
 import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.partition.PartitionConfig;
 
 public class NewPartitionAction extends Action {
@@ -64,6 +65,7 @@ public class NewPartitionAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 	}
 }

@@ -19,10 +19,7 @@ package org.safehaus.penrose.studio.partition.wizard;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.Wizard;
-import org.safehaus.penrose.partition.PartitionClient;
-import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
-import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
@@ -35,13 +32,13 @@ public class ExportPartitionWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
-    private Server project;
+    private Server server;
     private String partitionName;
 
     public PartitionLocationPage locationPage = new PartitionLocationPage();
 
-    public ExportPartitionWizard(Server project, String partitionName) {
-        this.project = project;
+    public ExportPartitionWizard(Server server, String partitionName) {
+        this.server = server;
         this.partitionName = partitionName;
 
         setWindowTitle("Export Partition");
@@ -64,7 +61,7 @@ public class ExportPartitionWizard extends Wizard {
                 throw new Exception(dir+" folder does not exist.");
             }
 
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             client.download(dir, "partitions/"+partitionName);
 
             return true;

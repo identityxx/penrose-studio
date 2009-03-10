@@ -4,6 +4,7 @@ import org.safehaus.penrose.studio.connection.editor.ConnectionEditor;
 import org.safehaus.penrose.studio.connection.editor.ConnectionPropertiesPage;
 import org.safehaus.penrose.studio.connection.editor.ConnectionParametersPage;
 import org.safehaus.penrose.studio.config.editor.ParametersPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 /**
  * @author Endi S. Dewata
@@ -22,6 +23,7 @@ public class NISConnectionEditor extends ConnectionEditor {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 }

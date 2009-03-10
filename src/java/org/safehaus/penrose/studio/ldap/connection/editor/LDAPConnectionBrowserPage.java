@@ -188,6 +188,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -282,6 +283,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

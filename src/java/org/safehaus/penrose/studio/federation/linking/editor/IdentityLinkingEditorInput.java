@@ -11,7 +11,7 @@ import org.safehaus.penrose.federation.FederationRepositoryConfig;
  */
 public class IdentityLinkingEditorInput implements IEditorInput {
 
-    private Server project;
+    private Server server;
     private FederationRepositoryConfig repository;
     private String sourcePartition;
     private String targetPartition;
@@ -44,7 +44,7 @@ public class IdentityLinkingEditorInput implements IEditorInput {
     }
 
     public int hashCode() {
-        return (project == null ? 0 : project.hashCode()) +
+        return (server == null ? 0 : server.hashCode()) +
                 (repository == null ? 0 : repository.hashCode()) +
                 (sourcePartition == null ? 0 : sourcePartition.hashCode()) +
                 (targetPartition == null ? 0 : targetPartition.hashCode());
@@ -62,7 +62,7 @@ public class IdentityLinkingEditorInput implements IEditorInput {
         if (object.getClass() != this.getClass()) return false;
 
         IdentityLinkingEditorInput ei = (IdentityLinkingEditorInput)object;
-        if (!equals(project, ei.project)) return false;
+        if (!equals(server, ei.server)) return false;
         if (!equals(repository, ei.repository)) return false;
         if (!equals(sourcePartition, ei.sourcePartition)) return false;
         if (!equals(targetPartition, ei.targetPartition)) return false;
@@ -70,12 +70,12 @@ public class IdentityLinkingEditorInput implements IEditorInput {
         return true;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public FederationRepositoryConfig getRepository() {

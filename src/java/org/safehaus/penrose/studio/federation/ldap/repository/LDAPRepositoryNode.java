@@ -4,6 +4,7 @@ import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.federation.ldap.linking.LDAPLinkingNode;
 import org.safehaus.penrose.federation.LDAPRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
@@ -41,7 +42,7 @@ public class LDAPRepositoryNode extends Node {
                 this
         );
 
-        linkingNode.setProject(server);
+        linkingNode.setServer(server);
         linkingNode.setLdapFederationClient(ldapFederationClient);
         linkingNode.setRepositoryConfig(repositoryConfig);
 
@@ -56,6 +57,7 @@ public class LDAPRepositoryNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -66,6 +68,7 @@ public class LDAPRepositoryNode extends Node {
                     edit();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -74,7 +77,7 @@ public class LDAPRepositoryNode extends Node {
     public void open() throws Exception {
 
         LDAPRepositoryEditorInput ei = new LDAPRepositoryEditorInput();
-        ei.setProject(server);
+        ei.setServer(server);
         ei.setFederationClient(federationClient);
         ei.setLdapFederationClient(ldapFederationClient);
         ei.setRepositoryConfig(repositoryConfig);

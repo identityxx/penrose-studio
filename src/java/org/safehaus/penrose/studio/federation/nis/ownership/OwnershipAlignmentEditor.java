@@ -8,6 +8,7 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.module.ModuleManagerClient;
 import org.safehaus.penrose.module.ModuleClient;
 import org.safehaus.penrose.partition.PartitionClient;
@@ -20,13 +21,13 @@ public class OwnershipAlignmentEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    public Server project;
+    public Server server;
     public NISRepositoryClient nisFederationClient;
     public FederationRepositoryConfig repositoryConfig;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         OwnershipAlignmentInput ei = (OwnershipAlignmentInput)input;
-        project = ei.getProject();
+        server = ei.getServer();
         nisFederationClient = ei.getNisFederationClient();
         repositoryConfig = ei.getDomain();
 
@@ -40,7 +41,7 @@ public class OwnershipAlignmentEditor extends FormEditor {
             String federationName = nisFederationClient.getFederationClient().getFederationDomain();
             String localPartitionName = repositoryConfig.getName();
 
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
             PartitionClient localPartitionClient = partitionManagerClient.getPartitionClient(federationName+"_"+localPartitionName);
             ModuleManagerClient moduleManagerClient = localPartitionClient.getModuleManagerClient();
@@ -73,6 +74,7 @@ public class OwnershipAlignmentEditor extends FormEditor {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 

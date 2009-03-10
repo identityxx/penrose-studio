@@ -18,58 +18,64 @@
 package org.safehaus.penrose.studio.module.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
+import org.safehaus.penrose.module.ModuleConfig;
+import org.safehaus.penrose.module.ModuleMapping;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.server.Server;
-import org.safehaus.penrose.module.ModuleMapping;
-import org.safehaus.penrose.ldap.DN;
 import org.apache.log4j.Logger;
+
+import java.util.Collection;
 
 /**
  * @author Endi S. Dewata
  */
-public class ModuleMappingWizard extends Wizard {
+public class ModuleMappingsWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
     Server server;
     String partitionName;
-    ModuleMapping moduleMapping;
 
-    ModuleMappingWizardPage mappingPage;
+    public ModuleMappingsWizardPage mappingsPage;
 
-    public ModuleMappingWizard() {
+    ModuleConfig moduleConfig;
+
+    public ModuleMappingsWizard() {
+        setWindowTitle("Edit Module Mappings");
     }
 
     public void addPages() {
         try {
-            mappingPage = new ModuleMappingWizardPage();
+            mappingsPage = new ModuleMappingsWizardPage();
 
-            mappingPage.setServer(server);
-            mappingPage.setPartitionName(partitionName);
+            mappingsPage.setServer(server);
+            mappingsPage.setPartitionName(partitionName);
+            mappingsPage.setModuleName(moduleConfig.getName());
+            mappingsPage.setModuleMappings(moduleConfig.getModuleMappings());
 
-            DN baseDn = moduleMapping.getBaseDn();
-            mappingPage.setBaseDn(baseDn == null ? null : baseDn.toString());
-
-            mappingPage.setFilter(moduleMapping.getFilter());
-            mappingPage.setScope(moduleMapping.getScope());
-
-            addPage(mappingPage);
-
+            addPage(mappingsPage);
+            
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     public boolean canFinish() {
-        if (!mappingPage.isPageComplete()) return false;
+        if (!mappingsPage.isPageComplete()) return false;
+
         return true;
     }
 
     public boolean performFinish() {
         try {
-            moduleMapping.setBaseDn(mappingPage.getBaseDn());
-            moduleMapping.setFilter(mappingPage.getFilter());
-            moduleMapping.setScope(mappingPage.getScope());
+            log.debug("Mappings:");
+            Collection<ModuleMapping> moduleMappings = mappingsPage.getModuleMappings();
+            for (ModuleMapping moduleMapping : moduleMappings) {
+                log.debug(" - "+moduleMapping.getBaseDn()+" "+moduleMapping.getScope()+" "+moduleMapping.getFilter());
+                moduleMapping.setModuleName(moduleConfig.getName());
+            }
+
+            moduleConfig.setModuleMappings(moduleMappings);
 
             return true;
 
@@ -100,11 +106,11 @@ public class ModuleMappingWizard extends Wizard {
         this.partitionName = partitionName;
     }
 
-    public ModuleMapping getModuleMapping() {
-        return moduleMapping;
+    public ModuleConfig getModuleConfig() {
+        return moduleConfig;
     }
 
-    public void setModuleMapping(ModuleMapping moduleMapping) {
-        this.moduleMapping = moduleMapping;
+    public void setModuleConfig(ModuleConfig moduleConfig) {
+        this.moduleConfig = moduleConfig;
     }
 }

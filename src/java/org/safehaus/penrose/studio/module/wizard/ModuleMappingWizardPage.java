@@ -17,33 +17,48 @@
  */
 package org.safehaus.penrose.studio.module.wizard;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.module.ModuleMapping;
-import org.safehaus.penrose.studio.module.editor.ModuleMappingDialog;
-import org.apache.log4j.Logger;
-
-import java.util.Collection;
-import java.util.ArrayList;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.*;
+import org.safehaus.penrose.ldap.*;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
+import org.safehaus.penrose.directory.DirectoryClient;
+import org.safehaus.penrose.client.PenroseClient;
+import org.safehaus.penrose.partition.PartitionManagerClient;
+import org.safehaus.penrose.partition.PartitionClient;
 
 /**
  * @author Endi S. Dewata
  */
-public class ModuleMappingWizardPage extends WizardPage implements SelectionListener, ModifyListener {
+public class ModuleMappingWizardPage extends WizardPage implements SelectionListener, TreeListener {
 
     Logger log = Logger.getLogger(getClass());
 
-    public final static String NAME = "Module Mappings";
+    public final static String NAME = "LDAP Subtree";
 
-    Table mappingsTable;
+    Tree baseDnTree;
+    Text baseDnText;
+    Text filterText;
+    Combo scopeCombo;
+
+    Server server;
+    String partitionName;
+
+    String baseDn;
+    String filter;
+    String scope;
 
     public ModuleMappingWizardPage() {
         super(NAME);
-        setDescription("Enter module mappings.");
+        setDescription("Select a subtree.");
+    }
+
+    public void init() throws Exception {
     }
 
     public void createControl(final Composite parent) {
@@ -51,120 +66,153 @@ public class ModuleMappingWizardPage extends WizardPage implements SelectionList
         Composite composite = new Composite(parent, SWT.NONE);
         setControl(composite);
 
-        GridLayout sectionLayout = new GridLayout();
-        sectionLayout.numColumns = 2;
-        composite.setLayout(sectionLayout);
+        composite.setLayout(new GridLayout(2, false));
 
-        mappingsTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
-        mappingsTable.setLayoutData(new GridData(GridData.FILL_BOTH));
-        mappingsTable.setHeaderVisible(true);
-        mappingsTable.setLinesVisible(true);
+        Label baseDnLabel = new Label(composite, SWT.NONE);
+        baseDnLabel.setText("Base DN:");
+        baseDnLabel.setLayoutData(new GridData(GridData.FILL));
 
-        TableColumn tc = new TableColumn(mappingsTable, SWT.NONE);
-        tc.setText("Base DN");
-        tc.setWidth(200);
+        baseDnText = new Text(composite, SWT.BORDER);
+        baseDnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        tc = new TableColumn(mappingsTable, SWT.NONE);
-        tc.setText("Scope");
-        tc.setWidth(100);
+        baseDnText.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent event) {
+                baseDn = baseDnText.getText().trim();
+                baseDn = "".equals(baseDn) ? null : baseDn;
 
-        tc = new TableColumn(mappingsTable, SWT.NONE);
-        tc.setText("Filter");
-        tc.setWidth(150);
+                setPageComplete(validatePage());
+            }
+        });
 
-        Composite buttons = new Composite(composite, SWT.NONE);
-        buttons.setLayoutData(new GridData(GridData.FILL_VERTICAL));
-        buttons.setLayout(new GridLayout());
+        baseDnTree = new Tree(composite, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+        GridData gd = new GridData(GridData.FILL_BOTH);
+        gd.heightHint = 100;
+        gd.horizontalSpan = 2;
+        baseDnTree.setLayoutData(gd);
 
-        Button addButton = new Button(buttons, SWT.PUSH);
-        addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        addButton.setText("Add");
-
-        addButton.addSelectionListener(new SelectionAdapter() {
+        baseDnTree.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    ModuleMapping mapping = new ModuleMapping();
-                    mapping.setScope("SUBTREE");
-                    mapping.setFilter("(objectClass=*)");
+                    if (baseDnTree.getSelectionCount() == 0) return;
 
-                    ModuleMappingDialog dialog = new ModuleMappingDialog(parent.getShell(), SWT.NONE);
-                    dialog.setMapping(mapping);
-                    dialog.open();
+                    TreeItem item = baseDnTree.getSelection()[0];
+                    String entryName = (String)item.getData();
 
-                    if (dialog.getAction() == ModuleMappingDialog.CANCEL) return;
+                    DirectoryClient directoryClient = getDirectoryClient();
 
-                    TableItem item = new TableItem(mappingsTable, SWT.NONE);
-                    item.setText(0, mapping.getBaseDn().toString());
-                    item.setText(1, mapping.getScope());
-                    item.setText(2, mapping.getFilter());
-                    item.setData(mapping);
+                    DN dn = directoryClient.getEntryDn(entryName);
+                    if (dn == null) return;
+
+                    baseDnText.setText(dn.toString());
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
 
-        Button editButton = new Button(buttons, SWT.PUSH);
-        editButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        editButton.setText("Edit");
+        baseDnTree.addTreeListener(this);
 
-        editButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                try {
-                    if (mappingsTable.getSelectionCount() == 0) return;
+        Label filterLabel = new Label(composite, SWT.NONE);
+        filterLabel.setText("Filter:");
+        filterLabel.setLayoutData(new GridData(GridData.FILL));
 
-                    TableItem item = mappingsTable.getSelection()[0];
-                    ModuleMapping mapping = (ModuleMapping)item.getData();
+        filterText = new Text(composite, SWT.BORDER);
+        filterText.setText("(objectClass=*)");
+        filterText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-                    ModuleMappingDialog dialog = new ModuleMappingDialog(parent.getShell(), SWT.NONE);
-                    dialog.setMapping(mapping);
-                    dialog.open();
+        filterText.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent event) {
+                filter = filterText.getText().trim();
+                filter = "".equals(filter) ? null : filter;
 
-                    if (dialog.getAction() == ModuleMappingDialog.CANCEL) return;
-
-                    item.setText(0, mapping.getBaseDn().toString());
-                    item.setText(1, mapping.getScope());
-                    item.setText(2, mapping.getFilter());
-                    mappingsTable.redraw();
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
+                setPageComplete(validatePage());
             }
         });
 
-        Button removeButton = new Button(buttons, SWT.PUSH);
-        removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        removeButton.setText("Remove");
+        Label scopeLabel = new Label(composite, SWT.NONE);
+        scopeLabel.setText("Scope:");
+        scopeLabel.setLayoutData(new GridData(GridData.FILL));
 
-        removeButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                try {
-                    if (mappingsTable.getSelectionCount() == 0) return;
+        scopeCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
+        scopeCombo.add("");
+        scopeCombo.add("OBJECT");
+        scopeCombo.add("ONELEVEL");
+        scopeCombo.add("SUBTREE");
+        scopeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-                    TableItem item = mappingsTable.getSelection()[0];
-                    item.dispose();
+        scopeCombo.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent event) {
+                scope = scopeCombo.getText().trim();
+                scope = "".equals(scope) ? null : scope;
 
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
+                setPageComplete(validatePage());
             }
         });
+
+        baseDnText.setText(baseDn == null ? "" : baseDn);
+        filterText.setText(filter == null ? "" : filter);
+        scopeCombo.setText(scope == null ? "" : scope);
 
         setPageComplete(validatePage());
     }
 
-    public Collection<ModuleMapping> getModuleMappings() {
-        Collection<ModuleMapping> mappings = new ArrayList<ModuleMapping>();
-        TableItem items[] = mappingsTable.getItems();
-        for (TableItem item : items) {
-            ModuleMapping moduleMapping = (ModuleMapping) item.getData();
-            mappings.add(moduleMapping);
-        }
-        return mappings;
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+        if (visible) refresh();
     }
-    
+
+    public void refresh() {
+        try {
+            baseDnTree.removeAll();
+
+            DirectoryClient directoryClient = getDirectoryClient();
+
+            for (String rootName : directoryClient.getRootEntryNames()) {
+                DN dn = directoryClient.getEntryDn(rootName);
+
+                TreeItem ti = new TreeItem(baseDnTree, SWT.NONE);
+                ti.setText(dn.toString());
+                ti.setData(rootName);
+
+                new TreeItem(ti, SWT.NONE);
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
+        }
+    }
+
+    public void treeCollapsed(TreeEvent event) {
+    }
+
+    public void treeExpanded(TreeEvent event) {
+        try {
+            if (event.item == null) return;
+
+            TreeItem item = (TreeItem)event.item;
+            expand(item);
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
+        }
+    }
+
+    public String getBaseDn() {
+        return baseDn;
+    }
+
+    public String getFilter() {
+        return filter;
+    }
+
+    public String getScope() {
+        return scope;
+    }
+
     public boolean validatePage() {
         return true;
     }
@@ -174,9 +222,65 @@ public class ModuleMappingWizardPage extends WizardPage implements SelectionList
     }
 
     public void widgetDefaultSelected(SelectionEvent event) {
+        setPageComplete(validatePage());
     }
 
-    public void modifyText(ModifyEvent event) {
-        setPageComplete(validatePage());
+    public void setBaseDn(String baseDn) {
+        this.baseDn = baseDn;
+    }
+
+    public void setFilter(String filter) {
+        this.filter = filter;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
+    }
+
+    public String getPartitionName() {
+        return partitionName;
+    }
+
+    public void setPartitionName(String partitionName) {
+        this.partitionName = partitionName;
+    }
+
+    public DirectoryClient getDirectoryClient() throws Exception {
+        PenroseClient client = server.getClient();
+        PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
+        PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
+        return partitionClient.getDirectoryClient();
+    }
+
+    public void expand(TreeItem item) throws Exception {
+
+        for (TreeItem ti : item.getItems()) ti.dispose();
+
+        DirectoryClient directoryClient = getDirectoryClient();
+
+        try {
+            String entryName = (String)item.getData();
+
+            for (String childName : directoryClient.getChildNames(entryName)) {
+                DN dn = directoryClient.getEntryDn(childName);
+                TreeItem ti = new TreeItem(item, SWT.NONE);
+                ti.setText(dn.getRdn().toString());
+                ti.setData(childName);
+
+                new TreeItem(ti, SWT.NONE);
+            }
+
+        } catch (Exception e) {
+            TreeItem ti = new TreeItem(item, SWT.NONE);
+            ti.setText("Error: "+e.getMessage());
+        }
     }
 }

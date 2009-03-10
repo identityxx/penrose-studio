@@ -5,6 +5,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.federation.FederationDomainNode;
 import org.safehaus.penrose.studio.tree.Node;
@@ -19,7 +20,7 @@ public class GlobalNode extends Node {
 
     FederationDomainNode federationDomainNode;
 
-    Server project;
+    Server server;
     FederationClient federationClient;
 
     public GlobalNode(FederationDomainNode federationDomainNode) throws Exception {
@@ -27,7 +28,7 @@ public class GlobalNode extends Node {
 
         this.federationDomainNode = federationDomainNode;
 
-        project = federationDomainNode.getServer();
+        server = federationDomainNode.getServer();
         federationClient = federationDomainNode.getFederationClient();
 
         ConflictDetectionNode conflictDetectionNode = new ConflictDetectionNode(
@@ -35,7 +36,7 @@ public class GlobalNode extends Node {
                 this
         );
 
-        conflictDetectionNode.setProject(project);
+        conflictDetectionNode.setServer(server);
         conflictDetectionNode.setFederationClient(federationClient);
 
         addChild(conflictDetectionNode);
@@ -49,6 +50,7 @@ public class GlobalNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -57,12 +59,12 @@ public class GlobalNode extends Node {
     public void open() throws Exception {
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public FederationDomainNode getFederationNode() {

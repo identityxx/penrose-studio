@@ -12,6 +12,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.action.RefreshAction;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.federation.LDAPRepositoryClient;
@@ -77,6 +78,7 @@ public class LDAPNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -87,6 +89,7 @@ public class LDAPNode extends Node {
                     addLDAPRepository();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -99,7 +102,7 @@ public class LDAPNode extends Node {
     public void open() throws Exception {
 
         LDAPEditorInput ei = new LDAPEditorInput();
-        ei.setProject(server);
+        ei.setServer(server);
         ei.setFederationClient(federationClient);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

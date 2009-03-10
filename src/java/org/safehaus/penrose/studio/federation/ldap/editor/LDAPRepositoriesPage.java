@@ -49,7 +49,7 @@ public class LDAPRepositoriesPage extends FormPage {
         super(editor, "REPOSITORIES", "  Repositories  ");
 
         this.editor = editor;
-        this.server = editor.getProject();
+        this.server = editor.getServer();
         this.federationClient = federationClient;
     }
 
@@ -222,6 +222,7 @@ public class LDAPRepositoriesPage extends FormPage {
 
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
+                            ErrorDialog.open(e);
                         }
                     }
 

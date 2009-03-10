@@ -21,6 +21,7 @@ import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.log.editor.RootLoggerEditorInput;
 import org.safehaus.penrose.studio.log.editor.RootLoggerEditor;
 import org.eclipse.jface.action.IMenuManager;
@@ -52,6 +53,7 @@ public class RootLoggerNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

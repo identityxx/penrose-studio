@@ -128,6 +128,7 @@ public class MappingRulesWizardPage extends WizardPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -143,6 +144,7 @@ public class MappingRulesWizardPage extends WizardPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -158,6 +160,7 @@ public class MappingRulesWizardPage extends WizardPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -335,6 +338,7 @@ public class MappingRulesWizardPage extends WizardPage {
                 this.ruleConfigs.add((MappingRuleConfig)ruleConfig.clone());
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
+                ErrorDialog.open(e);
             }
         }
     }

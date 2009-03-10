@@ -126,7 +126,7 @@ public class MappingNode extends Node {
     public void open() throws Exception {
 
         MappingEditorInput ei = new MappingEditorInput();
-        ei.setProject(serverNode.getServer());
+        ei.setServer(serverNode.getServer());
         ei.setPartitionName(partitionName);
         ei.setMappingName(mappingName);
 

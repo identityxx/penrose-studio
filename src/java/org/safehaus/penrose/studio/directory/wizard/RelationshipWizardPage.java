@@ -52,15 +52,15 @@ public class RelationshipWizardPage extends WizardPage implements SelectionListe
     
     public final static String NAME = "Data source relationships";
 
-    Server project;
+    Server server;
     String partitionName;
     Table relationshipTable;
 
     private Collection<EntrySourceConfig> sourceMappings;
 
-    public RelationshipWizardPage(Server project, String partitionName) {
+    public RelationshipWizardPage(Server server, String partitionName) {
         super(NAME);
-        this.project = project;
+        this.server = server;
         this.partitionName = partitionName;
         setDescription("Add data source relationships. This step is optional.");
     }
@@ -92,7 +92,7 @@ public class RelationshipWizardPage extends WizardPage implements SelectionListe
                     dialog.setRelationship(relationship);
                     dialog.setText("Add new relationship...");
 
-                    PenroseClient client = project.getClient();
+                    PenroseClient client = server.getClient();
                     PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
                     SourceManagerClient sourceManagerClient = partitionClient.getSourceManagerClient();

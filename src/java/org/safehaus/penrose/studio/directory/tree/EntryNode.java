@@ -36,6 +36,7 @@ import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.action.RefreshAction;
 import org.safehaus.penrose.studio.directory.action.*;
 import org.safehaus.penrose.studio.directory.editor.EntryEditorInput;
@@ -133,6 +134,7 @@ public class EntryNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -152,6 +154,7 @@ public class EntryNode extends Node {
                     copy();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -162,6 +165,7 @@ public class EntryNode extends Node {
                     paste();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -172,6 +176,7 @@ public class EntryNode extends Node {
                     remove();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -186,7 +191,7 @@ public class EntryNode extends Node {
         EntryEditorInput ei = new EntryEditorInput();
         ei.setPartitionName(partitionName);
         ei.setEntryName(entryName);
-        ei.setProject(serverNode.getServer());
+        ei.setServer(serverNode.getServer());
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();

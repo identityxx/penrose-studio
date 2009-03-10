@@ -38,7 +38,7 @@ public class NISDomainSettingsPage extends FormPage {
     Label serverText;
     Label domainText;
 
-    Server project;
+    Server server;
     FederationClient federationClient;
     NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig repositoryConfig;
@@ -158,12 +158,12 @@ public class NISDomainSettingsPage extends FormPage {
         }
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public NISRepositoryClient getNisFederationClient() {

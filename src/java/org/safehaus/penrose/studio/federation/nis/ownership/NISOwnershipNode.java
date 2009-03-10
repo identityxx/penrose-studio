@@ -6,6 +6,7 @@ import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -17,7 +18,7 @@ import org.eclipse.ui.IWorkbenchPage;
  */
 public class NISOwnershipNode extends Node {
 
-    Server project;
+    Server server;
     NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig repositoryConfig;
 
@@ -33,6 +34,7 @@ public class NISOwnershipNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -41,7 +43,7 @@ public class NISOwnershipNode extends Node {
     public void open() throws Exception {
 
         OwnershipAlignmentInput ei = new OwnershipAlignmentInput();
-        ei.setProject(project);
+        ei.setServer(server);
         ei.setNisFederationClient(nisFederationClient);
         ei.setDomain(repositoryConfig);
 
@@ -50,12 +52,12 @@ public class NISOwnershipNode extends Node {
         page.openEditor(ei, OwnershipAlignmentEditor.class.getName());
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public NISRepositoryClient getNisFederationClient() {

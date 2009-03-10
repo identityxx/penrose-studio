@@ -35,6 +35,7 @@ import org.safehaus.penrose.mapping.Expression;
 import org.safehaus.penrose.directory.EntryAttributeConfig;
 import org.safehaus.penrose.directory.EntryFieldConfig;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -350,6 +351,7 @@ public class ExpressionDialog extends Dialog {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -373,6 +375,7 @@ public class ExpressionDialog extends Dialog {
                     out.close();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -684,6 +687,7 @@ public class ExpressionDialog extends Dialog {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 
         //log.debug("Reading "+bytes.length+" bytes.");

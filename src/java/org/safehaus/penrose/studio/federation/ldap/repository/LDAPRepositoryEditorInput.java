@@ -13,7 +13,7 @@ import org.safehaus.penrose.federation.FederationClient;
  */
 public class LDAPRepositoryEditorInput implements IEditorInput {
 
-    private Server project;
+    private Server server;
     private FederationClient federationClient;
     private LDAPRepositoryClient ldapFederationClient;
     private FederationRepositoryConfig repositoryConfig;
@@ -46,7 +46,7 @@ public class LDAPRepositoryEditorInput implements IEditorInput {
     }
 
     public int hashCode() {
-        return (project == null ? 0 : project.hashCode()) +
+        return (server == null ? 0 : server.hashCode()) +
                 (repositoryConfig == null ? 0 : repositoryConfig.hashCode());
     }
 
@@ -62,7 +62,7 @@ public class LDAPRepositoryEditorInput implements IEditorInput {
         if (object.getClass() != this.getClass()) return false;
 
         LDAPRepositoryEditorInput cei = (LDAPRepositoryEditorInput)object;
-        if (!equals(project, cei.project)) return false;
+        if (!equals(server, cei.server)) return false;
         if (!equals(repositoryConfig, cei.repositoryConfig)) return false;
 
         return true;
@@ -84,12 +84,12 @@ public class LDAPRepositoryEditorInput implements IEditorInput {
         this.ldapFederationClient = nisFederation;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public FederationClient getFederationClient() {

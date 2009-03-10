@@ -215,6 +215,7 @@ public class NISDomainsPage extends FormPage {
 
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
+                            ErrorDialog.open(e);
                         }
                     }
 

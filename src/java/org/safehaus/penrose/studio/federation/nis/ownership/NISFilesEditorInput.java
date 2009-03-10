@@ -12,7 +12,7 @@ import org.safehaus.penrose.studio.server.Server;
  */
 public class NISFilesEditorInput implements IEditorInput {
 
-    private Server project;
+    private Server server;
     private NISRepositoryClient nisFederation;
     private FederationRepositoryConfig domain;
 
@@ -44,7 +44,7 @@ public class NISFilesEditorInput implements IEditorInput {
     }
 
     public int hashCode() {
-        return (project == null ? 0 : project.hashCode()) +
+        return (server == null ? 0 : server.hashCode()) +
                 (domain == null ? 0 : domain.hashCode());
     }
 
@@ -60,7 +60,7 @@ public class NISFilesEditorInput implements IEditorInput {
         if (object.getClass() != this.getClass()) return false;
 
         NISFilesEditorInput ei = (NISFilesEditorInput)object;
-        if (!equals(project, ei.project)) return false;
+        if (!equals(server, ei.server)) return false;
         if (!equals(domain, ei.domain)) return false;
 
         return true;
@@ -82,11 +82,11 @@ public class NISFilesEditorInput implements IEditorInput {
         this.nisFederation = nisFederation;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

@@ -157,8 +157,8 @@ public class ConnectionNode extends Node {
 
         if (!confirm) return;
 
-        Server project = serverNode.getServer();
-        PenroseClient client = project.getClient();
+        Server server = serverNode.getServer();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
         PartitionClient partitionClient = partitionManagerClient.getPartitionClient(partitionName);
         ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();

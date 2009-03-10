@@ -24,6 +24,7 @@ import org.safehaus.penrose.schema.SchemaManagerClient;
 import org.safehaus.penrose.schema.Schema;
 import org.safehaus.penrose.schema.SchemaReader;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.io.File;
 
@@ -68,6 +69,7 @@ public class ImportSchemaWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
             return false;
         }
     }

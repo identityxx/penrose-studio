@@ -24,6 +24,7 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.directory.wizard.DynamicEntryWizard;
 import org.safehaus.penrose.studio.directory.tree.EntryNode;
 import org.safehaus.penrose.studio.server.tree.ServerNode;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.apache.log4j.Logger;
 
@@ -45,11 +46,11 @@ public class NewDynamicEntryAction extends Action {
             EntryConfig entryConfig = new EntryConfig();
 
             ServersView serversView = ServersView.getInstance();
-            ServerNode projectNode = node.getServerNode();
+            ServerNode serverNode = node.getServerNode();
 
             DynamicEntryWizard wizard = new DynamicEntryWizard();
             wizard.setEntryConfig(entryConfig);
-            wizard.setServer(projectNode.getServer());
+            wizard.setServer(serverNode.getServer());
             wizard.setPartitionName(node.getPartitionName());
             wizard.setParentDn(node.getEntryConfig().getDn());
 
@@ -68,6 +69,7 @@ public class NewDynamicEntryAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 	}
 	

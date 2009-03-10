@@ -192,6 +192,7 @@ public class LDAPSourceFieldsPage extends SourceFieldsPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -233,6 +234,7 @@ public class LDAPSourceFieldsPage extends SourceFieldsPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -257,6 +259,7 @@ public class LDAPSourceFieldsPage extends SourceFieldsPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

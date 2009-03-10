@@ -192,6 +192,7 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -278,6 +279,7 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
 
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
+                ErrorDialog.open(e);
             }
 
             //client.close();
@@ -325,6 +327,7 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
                     
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
+                ErrorDialog.open(e);
             }
 
             //client.close();

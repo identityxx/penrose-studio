@@ -23,6 +23,7 @@ import org.safehaus.penrose.studio.acl.wizard.ACLWizardPage;
 import org.safehaus.penrose.studio.attribute.wizard.AttributesWizardPage;
 import org.safehaus.penrose.studio.directory.wizard.ObjectClassWizardPage;
 import org.safehaus.penrose.studio.directory.wizard.EntryDNWizardPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.acl.ACI;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.safehaus.penrose.directory.DirectoryClient;
@@ -124,6 +125,7 @@ public class DefaultSchemaWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
             return false;
         }
     }

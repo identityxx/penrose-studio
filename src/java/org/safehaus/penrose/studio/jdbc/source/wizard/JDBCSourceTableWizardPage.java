@@ -258,6 +258,7 @@ public class JDBCSourceTableWizardPage extends WizardPage implements SelectionLi
             
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 
         //client.close();

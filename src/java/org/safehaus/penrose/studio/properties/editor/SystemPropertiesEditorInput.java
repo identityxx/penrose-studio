@@ -27,7 +27,7 @@ import org.safehaus.penrose.studio.server.Server;
  */
 public class SystemPropertiesEditorInput implements IEditorInput {
 
-    private Server project;
+    private Server server;
 
     public SystemPropertiesEditorInput() {
     }
@@ -57,7 +57,7 @@ public class SystemPropertiesEditorInput implements IEditorInput {
     }
 
     public int hashCode() {
-        return project == null ? 0 : project.hashCode();
+        return server == null ? 0 : server.hashCode();
     }
 
     boolean equals(Object o1, Object o2) {
@@ -72,16 +72,16 @@ public class SystemPropertiesEditorInput implements IEditorInput {
         if (object.getClass() != this.getClass()) return false;
 
         SystemPropertiesEditorInput ei = (SystemPropertiesEditorInput)object;
-        if (!equals(project, ei.project)) return false;
+        if (!equals(server, ei.server)) return false;
 
         return true;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

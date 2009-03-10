@@ -43,7 +43,7 @@ public class NISSynchronizationTrackerPage extends FormPage {
 
     FormToolkit toolkit;
 
-    Server project;
+    Server server;
     NISSynchronizationEditor editor;
     NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig domain;
@@ -54,7 +54,7 @@ public class NISSynchronizationTrackerPage extends FormPage {
         super(editor, "TRACKER", "  Tracker  ");
 
         this.editor = editor;
-        this.project = editor.getProject();
+        this.server = editor.getServer();
         this.nisFederationClient = editor.getNISFederationClient();
         this.domain = editor.getDomain();
     }
@@ -127,7 +127,7 @@ public class NISSynchronizationTrackerPage extends FormPage {
                     TableItem[] items = trackerTable.getSelection();
 
                     String federationName = nisFederationClient.getFederationClient().getFederationDomain();
-                    PenroseClient penroseClient = project.getClient();
+                    PenroseClient penroseClient = server.getClient();
 
                     PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
                     PartitionClient partitionClient = partitionManagerClient.getPartitionClient(federationName+"_"+domain.getName()+"_"+ NISDomain.YP);
@@ -177,7 +177,7 @@ public class NISSynchronizationTrackerPage extends FormPage {
             trackerTable.removeAll();
 
             String federationName = nisFederationClient.getFederationClient().getFederationDomain();
-            PenroseClient penroseClient = project.getClient();
+            PenroseClient penroseClient = server.getClient();
 
             PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
             PartitionClient partitionClient = partitionManagerClient.getPartitionClient(federationName+"_"+domain.getName()+"_"+ NISDomain.YP);

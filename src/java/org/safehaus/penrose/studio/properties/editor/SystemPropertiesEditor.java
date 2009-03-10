@@ -27,6 +27,7 @@ import org.eclipse.ui.part.MultiPageEditorPart;
 import org.safehaus.penrose.PenroseConfig;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.server.Server;
 
 import java.util.Map;
@@ -41,7 +42,7 @@ public class SystemPropertiesEditor extends MultiPageEditorPart {
 
     boolean dirty;
 
-    Server project;
+    Server server;
 
     Map<String,String> origProperties;
     Map<String,String> properties = new TreeMap<String,String>();
@@ -51,13 +52,13 @@ public class SystemPropertiesEditor extends MultiPageEditorPart {
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         try {
             SystemPropertiesEditorInput ei = (SystemPropertiesEditorInput)input;
-            project = ei.getProject();
+            server = ei.getServer();
 
             setSite(site);
             setInput(input);
             setPartName("System Properties");
 
-            PenroseClient client = project.getClient();
+            PenroseClient client = server.getClient();
             PenroseConfig penroseConfig = client.getPenroseConfig();
             
             origProperties = penroseConfig.getSystemProperties();
@@ -78,6 +79,7 @@ public class SystemPropertiesEditor extends MultiPageEditorPart {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 
@@ -100,6 +102,7 @@ public class SystemPropertiesEditor extends MultiPageEditorPart {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 

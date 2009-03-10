@@ -32,6 +32,7 @@ import org.safehaus.penrose.schema.SchemaManagerClient;
 import org.safehaus.penrose.schema.SchemaClient;
 import org.safehaus.penrose.studio.schema.wizard.AttributeTypeWizard;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.client.PenroseClient;
 import org.apache.log4j.Logger;
 
@@ -234,6 +235,7 @@ public class AttributeTypesEditorPage extends FormPage {
             
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 }

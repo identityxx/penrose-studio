@@ -59,7 +59,6 @@ public class ModulePropertiesPage extends FormPage {
 
         this.editor = editor;
         this.moduleConfig = editor.moduleConfig;
-        this.moduleMappings = editor.moduleMappings;
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -179,7 +178,6 @@ public class ModulePropertiesPage extends FormPage {
     }
 
     public void checkDirty() {
-        editor.checkDirty();
     }
 
     public void setActive(boolean b) {

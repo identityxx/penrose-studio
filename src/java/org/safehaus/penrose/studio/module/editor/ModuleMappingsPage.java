@@ -32,9 +32,8 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
-import org.safehaus.penrose.studio.module.wizard.ModuleMappingWizard;
-
-import java.util.Collection;
+import org.safehaus.penrose.studio.module.wizard.ModuleMappingsWizard;
+import org.safehaus.penrose.ldap.DN;
 
 public class ModuleMappingsPage extends FormPage {
 
@@ -48,14 +47,12 @@ public class ModuleMappingsPage extends FormPage {
 
     ModuleEditor editor;
     ModuleConfig moduleConfig;
-    Collection<ModuleMapping> moduleMappings;
 
     public ModuleMappingsPage(ModuleEditor editor) {
         super(editor, "MAPPINGS", "  Mappings  ");
 
         this.editor = editor;
         this.moduleConfig = editor.moduleConfig;
-        this.moduleMappings = editor.moduleMappings;
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -131,7 +128,9 @@ public class ModuleMappingsPage extends FormPage {
         editButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    ModuleMappingWizard wizard = new ModuleMappingWizard();
+                    ModuleMappingsWizard wizard = new ModuleMappingsWizard();
+                    wizard.setServer(editor.server);
+                    wizard.setPartitionName(editor.partitionName);
                     wizard.setModuleConfig(moduleConfig);
 
                     WizardDialog dialog = new WizardDialog(getSite().getShell(), wizard);
@@ -154,7 +153,6 @@ public class ModuleMappingsPage extends FormPage {
 	}
 
     public void checkDirty() {
-        editor.checkDirty();
     }
 
     public void setActive(boolean b) {
@@ -164,14 +162,21 @@ public class ModuleMappingsPage extends FormPage {
 
     public void refresh() {
 
-        if (moduleMappings != null) {
-            for (ModuleMapping mapping : moduleMappings) {
-                TableItem tableItem = new TableItem(mappingsTable, SWT.NONE);
-                tableItem.setText(0, mapping.getBaseDn().toString());
-                tableItem.setText(1, mapping.getScope() == null ? "" : mapping.getScope());
-                tableItem.setText(2, mapping.getFilter() == null ? "" : mapping.getFilter());
-                tableItem.setData(mapping);
-            }
+        mappingsTable.removeAll();
+
+        for (ModuleMapping moduleMapping : moduleConfig.getModuleMappings()) {
+            TableItem tableItem = new TableItem(mappingsTable, SWT.NONE);
+
+            DN baseDn = moduleMapping.getBaseDn();
+            tableItem.setText(0, baseDn == null ? "" : baseDn.toString());
+
+            String scope = moduleMapping.getScope();
+            tableItem.setText(1, scope == null ? "" : scope);
+
+            String filter = moduleMapping.getFilter();
+            tableItem.setText(2, filter == null ? "" : filter);
+
+            tableItem.setData(moduleMapping);
         }
     }
 }

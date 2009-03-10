@@ -49,7 +49,7 @@ public class GroupsPage extends FormPage {
 
     ConflictDetectionEditor editor;
 
-    Server project;
+    Server server;
     FederationClient federationClient;
 
     SourceClient globalSourceClient;
@@ -61,7 +61,7 @@ public class GroupsPage extends FormPage {
         super(editor, "GROUPS", "  Groups  ");
 
         this.editor = editor;
-        this.project = editor.project;
+        this.server = editor.server;
         this.federationClient = editor.getFederationClient();
 
         PartitionClient federationPartitionClient = federationClient.getPartitionClient();

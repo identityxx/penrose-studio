@@ -22,6 +22,7 @@ import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
 import org.safehaus.penrose.module.ModuleManagerClient;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
@@ -41,17 +42,29 @@ public class ModuleWizard extends Wizard {
     Server server;
     String partitionName;
 
-    public ModulePropertiesWizardPage propertiesPage = new ModulePropertiesWizardPage();
-    public ModuleParameterWizardPage parametersPage = new ModuleParameterWizardPage();
-    public ModuleMappingWizardPage mappingsPage = new ModuleMappingWizardPage();
+    public ModulePropertiesWizardPage propertiesPage;
+    public ModuleParameterWizardPage parametersPage;
+    public ModuleMappingsWizardPage mappingsPage;
 
     public ModuleWizard() {
         setWindowTitle("New Module");
     }
 
     public void addPages() {
+
+        propertiesPage = new ModulePropertiesWizardPage();
+
         addPage(propertiesPage);
+
+        parametersPage = new ModuleParameterWizardPage();
+
         addPage(parametersPage);
+
+        mappingsPage = new ModuleMappingsWizardPage();
+
+        mappingsPage.setServer(server);
+        mappingsPage.setPartitionName(partitionName);
+
         addPage(mappingsPage);
     }
 
@@ -77,13 +90,13 @@ public class ModuleWizard extends Wizard {
             ModuleConfigManager moduleConfigManager = partitionConfig.getModuleConfigManager();
             moduleConfigManager.addModuleConfig(moduleConfig);
 
-            Collection<ModuleMapping> mappings = mappingPage.getModuleMappings();
+            Collection<ModuleMapping> mappings = mappingsPage.getModuleMappings();
             for (ModuleMapping mapping : mappings) {
                 mapping.setModuleName(propertyPage.getModuleName());
                 moduleConfigManager.addModuleMapping(mapping);
             }
 
-            project.save(partitionConfig, moduleConfigManager);
+            server.save(partitionConfig, moduleConfigManager);
 */
             PenroseClient client = server.getClient();
             PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
@@ -95,7 +108,9 @@ public class ModuleWizard extends Wizard {
                 moduleMapping.setModuleName(propertiesPage.getModuleName());
             }
 
-            moduleManagerCient.createModule(moduleConfig, moduleMappings);
+            moduleConfig.setModuleMappings(moduleMappings);
+            moduleManagerCient.createModule(moduleConfig);
+            //moduleManagerCient.createModule(moduleConfig, moduleMappings);
 
             partitionClient.store();
 
@@ -106,6 +121,7 @@ public class ModuleWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
             return false;
         }
     }

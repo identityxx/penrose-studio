@@ -44,7 +44,7 @@ public class UsersPage extends FormPage {
 
     FormEditor editor;
 
-    Server project;
+    Server server;
     NISRepositoryClient nisFederationClient;
     FederationRepositoryConfig repositoryConfig;
 
@@ -65,11 +65,11 @@ public class UsersPage extends FormPage {
         super(editor, "USERS", "  Users  ");
 
         this.editor = editor;
-        this.project = editor.project;
+        this.server = editor.server;
         this.nisFederationClient = editor.nisFederationClient;
         this.repositoryConfig = editor.repositoryConfig;
 
-        PenroseClient client = project.getClient();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 
         String federationName = nisFederationClient.getFederationClient().getFederationDomain();
@@ -151,6 +151,7 @@ public class UsersPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
 
                 if (globalEntry == null) continue;

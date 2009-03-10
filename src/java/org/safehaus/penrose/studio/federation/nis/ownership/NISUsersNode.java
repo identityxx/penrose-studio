@@ -13,13 +13,14 @@ import org.safehaus.penrose.studio.federation.nis.ownership.OwnershipAlignmentEd
 import org.safehaus.penrose.studio.federation.nis.ownership.OwnershipAlignmentInput;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 /**
  * @author Endi S. Dewata
  */
 public class NISUsersNode extends Node {
 
-    private Server project;
+    private Server server;
     private NISRepositoryClient nisFederationClient;
     private FederationRepositoryConfig repositoryConfig;
 
@@ -35,6 +36,7 @@ public class NISUsersNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -43,7 +45,7 @@ public class NISUsersNode extends Node {
     public void open() throws Exception {
 
         OwnershipAlignmentInput ei = new OwnershipAlignmentInput();
-        ei.setProject(project);
+        ei.setServer(server);
         ei.setNisFederationClient(nisFederationClient);
         ei.setDomain(repositoryConfig);
 
@@ -68,11 +70,11 @@ public class NISUsersNode extends Node {
         this.repositoryConfig = repositoryConfig;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

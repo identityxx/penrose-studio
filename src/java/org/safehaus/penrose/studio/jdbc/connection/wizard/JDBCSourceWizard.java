@@ -123,6 +123,7 @@ public class JDBCSourceWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 
         return results;

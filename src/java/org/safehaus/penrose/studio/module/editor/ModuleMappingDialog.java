@@ -25,6 +25,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.module.ModuleMapping;
+import org.safehaus.penrose.ldap.DN;
 import org.apache.log4j.Logger;
 
 public class ModuleMappingDialog extends Dialog {
@@ -42,19 +43,19 @@ public class ModuleMappingDialog extends Dialog {
 
     int action;
 
-	ModuleMapping mapping;
+	ModuleMapping moduleMapping;
 	
 	String[] scopes = new String[] { "OBJECT", "ONELEVEL", "SUBTREE" };
 
 	public ModuleMappingDialog(Shell parent, int style) {
 		super(parent, style);
-
-        shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
-
-        createControl(shell);
     }
 
     public void open () {
+
+        shell = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
+
+        createControl(shell);
 
         Point size = new Point(400, 300);
         shell.setSize(size);
@@ -90,21 +91,36 @@ public class ModuleMappingDialog extends Dialog {
 		baseDnText = new Text(composite, SWT.BORDER);
 		baseDnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+        DN baseDn = moduleMapping.getBaseDn();
+        baseDnText.setText(baseDn == null ? "" : baseDn.toString());
+
 		Label filterLabel = new Label(composite, SWT.NONE);
         filterLabel.setText("Filter:");
 
 		filterText = new Text(composite, SWT.BORDER);
         filterText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+        String filter = moduleMapping.getFilter();
+        filterText.setText(filter == null ? "" : filter);
+
 		Label scopeLabel = new Label(composite, SWT.NONE);
         scopeLabel.setText("Scope:");
 
 		scopeCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
 		scopeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		for (int i=0; i<scopes.length; i++) {
-			scopeCombo.add(scopes[i]);
-		}
+        for (String scope : scopes) {
+            scopeCombo.add(scope);
+        }
 
+        String scope = moduleMapping.getScope();
+        scopeCombo.setText(scope == null ? "" : scope);
+/*
+        for (int i=0; i<scopes.length; i++) {
+            if (scopes[i].equals(scope)) {
+                scopeCombo.select(i);
+            }
+        }
+*/
         Composite buttons = new Composite(parent, SWT.NONE);
         buttons.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         buttons.setLayout(new RowLayout());
@@ -134,24 +150,14 @@ public class ModuleMappingDialog extends Dialog {
 		});
 	}
 
-    public void setMapping(ModuleMapping mapping) {
-        this.mapping = mapping;
-
-        baseDnText.setText(mapping.getBaseDn().toString());
-        filterText.setText(mapping.getFilter() == null ? "" : mapping.getFilter());
-
-        for (int i=0; i<scopes.length; i++) {
-            if (scopes[i].equals(mapping.getScope())) {
-                scopeCombo.select(i);
-            }
-        }
+    public void setModuleMapping(ModuleMapping moduleMapping) {
+        this.moduleMapping = moduleMapping;
     }
 
     public void store() throws Exception {
-
-        mapping.setBaseDn(baseDnText.getText());
-        mapping.setFilter(filterText.getText());
-        mapping.setScope(scopeCombo.getText());
+        moduleMapping.setBaseDn(baseDnText.getText());
+        moduleMapping.setFilter(filterText.getText());
+        moduleMapping.setScope(scopeCombo.getText());
     }
 
     public int getAction() {

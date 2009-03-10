@@ -57,7 +57,7 @@ public class NISSynchronizationErrorsPage extends FormPage {
     Text descriptionText;
     //Text noteText;
 
-    Server project;
+    Server server;
     PartitionClient partitionClient;
     SourceClient errors;
 
@@ -65,12 +65,12 @@ public class NISSynchronizationErrorsPage extends FormPage {
         super(editor, "ERRORS", "  Errors  ");
 
         this.editor = editor;
-        this.project = editor.getProject();
+        this.server = editor.getServer();
         this.nisFederationClient = editor.getNISFederationClient();
         this.domain = editor.getDomain();
 
         String federationName = nisFederationClient.getFederationClient().getFederationDomain();
-        PenroseClient penroseClient = project.getClient();
+        PenroseClient penroseClient = server.getClient();
 
         PartitionManagerClient partitionManagerClient = penroseClient.getPartitionManagerClient();
         partitionClient = partitionManagerClient.getPartitionClient(federationName+"_"+domain.getName());

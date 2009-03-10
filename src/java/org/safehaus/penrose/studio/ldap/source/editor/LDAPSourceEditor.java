@@ -19,6 +19,7 @@ package org.safehaus.penrose.studio.ldap.source.editor;
 
 import org.safehaus.penrose.studio.source.editor.*;
 import org.safehaus.penrose.studio.config.editor.ParametersPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 public class LDAPSourceEditor extends SourceEditor {
 
@@ -36,6 +37,7 @@ public class LDAPSourceEditor extends SourceEditor {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 }

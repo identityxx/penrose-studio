@@ -60,7 +60,7 @@ public class FederationDomainSettingsPage extends FormPage {
 
         this.editor = editor;
         this.federationClient = editor.federationClient;
-        this.server = editor.project;
+        this.server = editor.server;
 
         PartitionClient partitionClient = federationClient.getPartitionClient();
         ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();

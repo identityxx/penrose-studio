@@ -42,6 +42,7 @@ import org.safehaus.penrose.studio.directory.editor.EntryEditor;
 import org.safehaus.penrose.studio.connection.editor.*;
 import org.safehaus.penrose.studio.source.editor.*;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.plugin.PluginManager;
 import org.safehaus.penrose.studio.plugin.Plugin;
 import org.safehaus.penrose.studio.util.Helper;
@@ -75,6 +76,7 @@ public class ValidationView extends ViewPart {
                             //penroseStudio.validatePartitions();
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
+                            ErrorDialog.open(e);
                         }
 					}
 				};

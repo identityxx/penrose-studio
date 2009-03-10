@@ -8,6 +8,7 @@ import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.filter.Filter;
 import org.safehaus.penrose.studio.federation.linking.wizard.LinkingResultsPage;
 import org.safehaus.penrose.studio.federation.linking.wizard.LinkingSearchPage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.util.Collection;
 
@@ -80,6 +81,7 @@ public class LinkingWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 
         return null;
@@ -93,6 +95,7 @@ public class LinkingWizard extends Wizard {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
             return false;
         }
     }

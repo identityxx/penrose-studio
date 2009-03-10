@@ -33,6 +33,7 @@ import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.connection.tree.ConnectionsNode;
 import org.safehaus.penrose.studio.directory.tree.DirectoryNode;
 import org.safehaus.penrose.studio.mapping.tree.MappingsNode;
@@ -145,6 +146,7 @@ public class PartitionNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -278,8 +280,8 @@ public class PartitionNode extends Node {
     public void upload() throws Exception {
         log.debug("Uploading "+name+" partition.");
 
-        Server project = serverNode.getServer();
-        project.upload("partitions/"+name);
+        Server server = serverNode.getServer();
+        server.upload("partitions/"+name);
     }
 
     public void remove() throws Exception {

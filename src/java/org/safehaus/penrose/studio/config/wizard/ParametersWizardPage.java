@@ -24,6 +24,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.studio.parameter.ParameterDialog;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.apache.log4j.Logger;
 
 import java.util.Map;
@@ -90,6 +91,7 @@ public class ParametersWizardPage extends WizardPage implements SelectionListene
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -119,6 +121,7 @@ public class ParametersWizardPage extends WizardPage implements SelectionListene
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -137,6 +140,7 @@ public class ParametersWizardPage extends WizardPage implements SelectionListene
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

@@ -124,8 +124,8 @@ public class PartitionsNode extends Node {
 
         view.setClipboard(null);
 
-        Server project = serverNode.getServer();
-        PenroseClient client = project.getClient();
+        Server server = serverNode.getServer();
+        PenroseClient client = server.getClient();
         PartitionManagerClient partitionManagerClient = client.getPartitionManagerClient();
 
         Collection<String> partitionNames = partitionManagerClient.getPartitionNames();

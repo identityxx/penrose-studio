@@ -14,7 +14,7 @@ import org.safehaus.penrose.studio.PenroseStudio;
  */
 public class ConflictDetectionNode extends Node {
 
-    private Server project;
+    private Server server;
     private FederationClient federationClient;
 
     public ConflictDetectionNode(String name, Node parent) {
@@ -24,7 +24,7 @@ public class ConflictDetectionNode extends Node {
     public void open() throws Exception {
 
         ConflictDetectionInput ei = new ConflictDetectionInput();
-        ei.setProject(project);
+        ei.setServer(server);
         ei.setFederationClient(federationClient);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -40,11 +40,11 @@ public class ConflictDetectionNode extends Node {
         this.federationClient = federationClient;
     }
 
-    public Server getProject() {
-        return project;
+    public Server getServer() {
+        return server;
     }
 
-    public void setProject(Server project) {
-        this.project = project;
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

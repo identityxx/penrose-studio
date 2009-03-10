@@ -52,7 +52,7 @@ public class MappingEditor extends FormEditor implements ModifyListener {
 
         MappingEditorInput ei = (MappingEditorInput)input;
 
-        server = ei.getProject();
+        server = ei.getServer();
         partitionName = ei.getPartitionName();
         mappingName = ei.getMappingName();
 

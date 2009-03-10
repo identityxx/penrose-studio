@@ -9,6 +9,7 @@ import org.safehaus.penrose.federation.NISRepositoryClient;
 import org.safehaus.penrose.federation.FederationRepositoryConfig;
 import org.safehaus.penrose.federation.FederationClient;
 import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,14 +17,14 @@ public class NISDomainEditor extends FormEditor {
 
     public Logger log = LoggerFactory.getLogger(getClass());
 
-    public Server project;
+    public Server server;
     public FederationClient federationClient;
     public NISRepositoryClient nisFederationClient;
     public FederationRepositoryConfig repositoryConfig;
 
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         NISDomainEditorInput ei = (NISDomainEditorInput)input;
-        project = ei.getProject();
+        server = ei.getServer();
         federationClient = ei.getFederationClient();
         nisFederationClient = ei.getNisFederationClient();
         repositoryConfig = ei.getRepositoryConfig();
@@ -36,7 +37,7 @@ public class NISDomainEditor extends FormEditor {
     public void addPages() {
         try {
             NISDomainSettingsPage page = new NISDomainSettingsPage(this);
-            page.setProject(project);
+            page.setServer(server);
             page.setFederationClient(federationClient);
             page.setNisFederationClient(nisFederationClient);
             page.setRepositoryConfig(repositoryConfig);
@@ -45,6 +46,7 @@ public class NISDomainEditor extends FormEditor {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
     }
 

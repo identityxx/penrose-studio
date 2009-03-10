@@ -28,6 +28,7 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.schema.editor.ObjectClassEditor;
 import org.safehaus.penrose.studio.schema.editor.ObjectClassEditorInput;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.apache.log4j.Logger;
 
 /**
@@ -52,6 +53,7 @@ public class ObjectClassNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
