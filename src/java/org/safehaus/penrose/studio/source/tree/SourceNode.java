@@ -169,9 +169,6 @@ public class SourceNode extends Node {
 
         ServersView serversView = ServersView.getInstance();
         serversView.refresh(parent);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public void copy() throws Exception {

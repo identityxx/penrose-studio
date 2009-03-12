@@ -117,7 +117,7 @@ public class FederationDomainNode extends Node {
                     importFederationConfig();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -128,7 +128,7 @@ public class FederationDomainNode extends Node {
                     exportFederationConfig();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -174,9 +174,6 @@ public class FederationDomainNode extends Node {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
         page.openEditor(ei, FederationDomainEditor.class.getName());
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public void edit() throws Exception {
@@ -294,9 +291,6 @@ public class FederationDomainNode extends Node {
                 }
             }
         });
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public void exportFederationConfig() throws Exception {

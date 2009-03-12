@@ -28,6 +28,7 @@ import org.safehaus.penrose.service.ServiceManagerClient;
 import org.safehaus.penrose.service.ServiceConfig;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.browser.editor.BrowserEditor;
 import org.safehaus.penrose.studio.browser.editor.BrowserEditorInput;
 import org.safehaus.penrose.studio.browser.wizard.BrowserWizard;
@@ -112,7 +113,7 @@ public class BrowserAction extends Action {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 	}
 }

@@ -91,8 +91,5 @@ public class PartitionEditor extends FormEditor {
         partitionManagerClient.updatePartition(partitionName, partitionConfig);
 
         setPartName(partitionName);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 }

@@ -27,6 +27,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.source.wizard.SourcePropertiesWizard;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 /**
  * @author Endi S. Dewata
@@ -148,7 +149,7 @@ public class SourcePropertiesPage extends SourceEditorPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

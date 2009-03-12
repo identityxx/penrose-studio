@@ -30,6 +30,7 @@ import org.safehaus.penrose.log.log4j.LoggerConfig;
 import org.safehaus.penrose.studio.editor.EditorPage;
 import org.safehaus.penrose.studio.log.wizard.LoggerPropertiesWizard;
 import org.safehaus.penrose.studio.log.wizard.LoggerAppendersWizard;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.client.PenroseClient;
 
 public class LoggerAppendersEditorPage extends EditorPage {
@@ -118,7 +119,7 @@ public class LoggerAppendersEditorPage extends EditorPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

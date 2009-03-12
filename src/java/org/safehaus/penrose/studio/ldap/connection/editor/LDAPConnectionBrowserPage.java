@@ -183,9 +183,6 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage {
 
                     if (rc == Window.CANCEL) return;
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
-
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     ErrorDialog.open(e);
@@ -217,9 +214,6 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage {
                     int rc = dialog.open();
 
                     if (rc == Window.CANCEL) return;
-
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -277,9 +271,6 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage {
                     int rc = dialog.open();
 
                     if (rc == Window.CANCEL) return;
-
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -354,7 +345,7 @@ public class LDAPConnectionBrowserPage extends ConnectionEditorPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

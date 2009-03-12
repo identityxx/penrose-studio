@@ -29,6 +29,7 @@ import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.log.log4j.RootLoggerConfig;
 import org.safehaus.penrose.studio.editor.EditorPage;
 import org.safehaus.penrose.studio.log.wizard.RootLoggerAppendersWizard;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.client.PenroseClient;
 
 public class RootLoggerAppendersEditorPage extends EditorPage {
@@ -117,7 +118,7 @@ public class RootLoggerAppendersEditorPage extends EditorPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

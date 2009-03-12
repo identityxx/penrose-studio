@@ -37,6 +37,7 @@ import org.safehaus.penrose.directory.EntrySourceConfig;
 import org.safehaus.penrose.mapping.Expression;
 import org.safehaus.penrose.studio.directory.wizard.EntrySourceWizard;
 import org.safehaus.penrose.studio.directory.wizard.SourceFieldsWizard;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.util.Collection;
 
@@ -163,7 +164,7 @@ public class EntrySourcesPage extends FormPage { //implements ModifyListener {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -244,7 +245,7 @@ public class EntrySourcesPage extends FormPage { //implements ModifyListener {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

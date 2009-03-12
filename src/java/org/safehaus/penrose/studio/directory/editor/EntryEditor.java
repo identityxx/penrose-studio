@@ -147,9 +147,6 @@ public class EntryEditor extends FormEditor implements ModifyListener {
 
         setPartName(dn);
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
-
         checkDirty();
 	}
 

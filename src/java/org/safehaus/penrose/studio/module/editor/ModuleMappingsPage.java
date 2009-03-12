@@ -33,6 +33,7 @@ import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.module.ModuleConfig;
 import org.safehaus.penrose.module.ModuleMapping;
 import org.safehaus.penrose.studio.module.wizard.ModuleMappingsWizard;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.ldap.DN;
 
 public class ModuleMappingsPage extends FormPage {
@@ -144,7 +145,7 @@ public class ModuleMappingsPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

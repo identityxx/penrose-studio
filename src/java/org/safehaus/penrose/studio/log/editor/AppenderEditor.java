@@ -76,8 +76,5 @@ public class AppenderEditor extends Editor {
         LogManagerClient logManagerClient = client.getLogManagerClient();
         logManagerClient.updateAppender(appenderName, appenderConfig);
         logManagerClient.store();
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 }

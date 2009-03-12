@@ -30,6 +30,7 @@ import org.safehaus.penrose.log.log4j.RootLoggerConfig;
 import org.safehaus.penrose.studio.editor.EditorPage;
 import org.safehaus.penrose.studio.log.wizard.LoggerPropertiesWizard;
 import org.safehaus.penrose.studio.log.wizard.RootLoggerPropertiesWizard;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 public class RootLoggerPropertiesEditorPage extends EditorPage {
 
@@ -124,7 +125,7 @@ public class RootLoggerPropertiesEditorPage extends EditorPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

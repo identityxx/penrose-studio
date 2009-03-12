@@ -28,6 +28,7 @@ import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.partition.PartitionConfig;
 import org.safehaus.penrose.studio.*;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.action.RefreshAction;
 import org.safehaus.penrose.studio.partition.action.*;
 import org.safehaus.penrose.studio.partition.dialog.PartitionDialog;
@@ -103,7 +104,7 @@ public class PartitionsNode extends Node {
                     paste();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
             public boolean isEnabled() {
@@ -173,9 +174,6 @@ public class PartitionsNode extends Node {
 
             partitionManagerClient.addPartition(newPartitionConfig);
         }
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public ServerNode getServerNode() {

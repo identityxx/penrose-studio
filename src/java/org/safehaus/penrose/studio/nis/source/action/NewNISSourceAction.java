@@ -23,6 +23,7 @@ import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.nis.source.wizard.NISSourceWizard;
 import org.safehaus.penrose.studio.source.tree.SourcesNode;
 import org.safehaus.penrose.source.SourceConfig;
@@ -60,15 +61,11 @@ public class NewNISSourceAction extends Action {
             if (rc == Window.CANCEL) return;
 
             serversView.refresh(sourcesNode);
-
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
-
             serversView.open(sourcesNode);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 	}
 

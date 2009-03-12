@@ -108,9 +108,6 @@ public class LDAPNode extends Node {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
         page.openEditor(ei, LDAPEditor.class.getName());
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public void addLDAPRepository() throws Exception {
@@ -130,9 +127,6 @@ public class LDAPNode extends Node {
 
         federationClient.addRepository(repository);
         federationClient.store();
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public Server getServer() {

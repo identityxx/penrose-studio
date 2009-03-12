@@ -29,7 +29,7 @@ import org.safehaus.penrose.studio.dialog.ErrorDialog;
 /**
  * @author Endi S. Dewata
  */
-public class CreatePartitionWizard extends Wizard {
+public class PartitionWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -40,7 +40,7 @@ public class CreatePartitionWizard extends Wizard {
 
     protected PartitionConfig partitionConfig;
 
-    public CreatePartitionWizard() {
+    public PartitionWizard() {
         setWindowTitle("New Partition");
     }
 
@@ -82,9 +82,6 @@ public class CreatePartitionWizard extends Wizard {
             if (startupPage.isEnabled()) {
                 partitionManagerClient.startPartition(partitionName);
             }
-
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
 
             return true;
 

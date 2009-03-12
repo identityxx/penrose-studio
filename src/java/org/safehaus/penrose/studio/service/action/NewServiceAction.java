@@ -21,10 +21,15 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
+import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.safehaus.penrose.studio.service.wizard.ServiceWizard;
+import org.safehaus.penrose.studio.service.tree.ServicesNode;
 import org.safehaus.penrose.service.ServiceConfig;
+import org.safehaus.penrose.service.ServiceManagerClient;
+import org.safehaus.penrose.client.PenroseClient;
 import org.apache.log4j.Logger;
 
 public class NewServiceAction extends Action {
@@ -39,10 +44,14 @@ public class NewServiceAction extends Action {
 	public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
+            ServerNode serverNode = serversView.getSelectedServerNode();
+            Server server = serverNode.getServer();
+            ServicesNode servicesNode = serverNode.getServicesNode();
 
             ServiceConfig serviceConfig = new ServiceConfig();
 
             ServiceWizard wizard = new ServiceWizard();
+            wizard.setServer(server);
             wizard.setServiceConfig(serviceConfig);
             
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);
@@ -51,15 +60,12 @@ public class NewServiceAction extends Action {
 
             if (rc == Window.CANCEL) return;
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
-
-            ServerNode serverNode = serversView.getSelectedServerNode();
-            serversView.open(serverNode.getServicesNode());
+            serversView.open(servicesNode);
+            serversView.refresh(servicesNode);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 	}
 	

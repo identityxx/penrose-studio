@@ -28,6 +28,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.safehaus.penrose.source.FieldConfig;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.util.Collection;
 
@@ -115,7 +116,7 @@ public class SourceFieldsPage extends SourceEditorPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

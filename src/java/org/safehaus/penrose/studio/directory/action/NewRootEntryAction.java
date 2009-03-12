@@ -57,10 +57,6 @@ public class NewRootEntryAction extends Action {
             if (rc == Window.CANCEL) return;
 
             serversView.refresh(directoryNode);
-
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
-
             serversView.open(directoryNode);
 
         } catch (Exception e) {

@@ -67,9 +67,6 @@ public class ServerNode extends Node {
                 try {
                     serversView.open(ServerNode.this);
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
-
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     ErrorDialog.open(e);
@@ -85,9 +82,6 @@ public class ServerNode extends Node {
             public void run() {
                 try {
                     serversView.close(ServerNode.this);
-
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -346,8 +340,6 @@ public class ServerNode extends Node {
         penroseStudio.store();
 
         serversView.refresh();
-
-        penroseStudio.notifyChangeListeners();
     }
 
     public void browser() throws Exception {

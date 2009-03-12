@@ -146,9 +146,6 @@ public class LDAPRepositoriesPage extends FormPage {
                     federationClient.addRepository(repository);
                     federationClient.store();
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
-
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     ErrorDialog.open(e);
@@ -225,9 +222,6 @@ public class LDAPRepositoriesPage extends FormPage {
                             ErrorDialog.open(e);
                         }
                     }
-
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
 
                     table.select(index);
 

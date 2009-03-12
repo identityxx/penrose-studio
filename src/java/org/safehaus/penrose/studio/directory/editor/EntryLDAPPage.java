@@ -44,6 +44,7 @@ import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.directory.wizard.EntryRDNWizard;
 import org.safehaus.penrose.studio.directory.wizard.ObjectClassWizard;
 import org.safehaus.penrose.studio.attribute.wizard.AttributesWizard;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.util.Collection;
 import java.util.Map;
@@ -198,7 +199,7 @@ public class EntryLDAPPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -264,7 +265,7 @@ public class EntryLDAPPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -341,7 +342,7 @@ public class EntryLDAPPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

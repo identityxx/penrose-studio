@@ -143,9 +143,6 @@ public class NISSynchronizationTrackerPage extends FormPage {
                         jobClient.invoke("removeTracker", new Object[] { changeNumber }, new String[] { Long.class.getName() });
                     }
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
-
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     ErrorDialog.open(e);

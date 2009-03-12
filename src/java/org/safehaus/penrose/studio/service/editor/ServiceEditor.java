@@ -101,9 +101,6 @@ public class ServiceEditor extends FormEditor {
 
         setPartName(serviceConfig.getName());
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
-
         checkDirty();
     }
 

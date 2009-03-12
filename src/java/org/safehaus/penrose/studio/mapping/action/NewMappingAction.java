@@ -60,10 +60,6 @@ public class NewMappingAction extends Action {
             if (rc == WizardDialog.CANCEL) return;
 
             serversView.refresh(mappingsNode);
-            
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
-
             serversView.open(mappingsNode);
 
         } catch (Exception e) {

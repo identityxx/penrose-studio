@@ -159,7 +159,7 @@ public class PartitionNode extends Node {
                     start();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -170,7 +170,7 @@ public class PartitionNode extends Node {
                     stop();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -181,7 +181,7 @@ public class PartitionNode extends Node {
                     restart();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -200,7 +200,7 @@ public class PartitionNode extends Node {
                         copy();
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
-                        throw new RuntimeException(e.getMessage(), e);
+                        ErrorDialog.open(e);
                     }
                 }
             });
@@ -211,7 +211,7 @@ public class PartitionNode extends Node {
                         paste();
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
-                        throw new RuntimeException(e.getMessage(), e);
+                        ErrorDialog.open(e);
                     }
                 }
                 public boolean isEnabled() {
@@ -228,7 +228,7 @@ public class PartitionNode extends Node {
                         remove();
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
-                        throw new RuntimeException(e.getMessage(), e);
+                        ErrorDialog.open(e);
                     }
                 }
             });
@@ -308,9 +308,6 @@ public class PartitionNode extends Node {
 
         ServersView serversView = ServersView.getInstance();
         serversView.refresh(parent);
-        
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public void copy() throws Exception {

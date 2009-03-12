@@ -125,7 +125,7 @@ public class EntrySourceWizardPage extends WizardPage implements SelectionListen
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -175,7 +175,7 @@ public class EntrySourceWizardPage extends WizardPage implements SelectionListen
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

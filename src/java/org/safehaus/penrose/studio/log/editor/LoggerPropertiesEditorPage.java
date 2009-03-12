@@ -29,6 +29,7 @@ import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.log.log4j.LoggerConfig;
 import org.safehaus.penrose.studio.editor.EditorPage;
 import org.safehaus.penrose.studio.log.wizard.LoggerPropertiesWizard;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 public class LoggerPropertiesEditorPage extends EditorPage {
 
@@ -135,7 +136,7 @@ public class LoggerPropertiesEditorPage extends EditorPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

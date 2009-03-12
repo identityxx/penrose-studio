@@ -30,6 +30,7 @@ import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.jdbc.JDBC;
 import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
 import org.safehaus.penrose.studio.jdbc.source.wizard.JDBCSourcePropertiesWizard;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 public class JDBCSourcePropertyPage extends SourceEditorPage {
 
@@ -158,7 +159,7 @@ public class JDBCSourcePropertyPage extends SourceEditorPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

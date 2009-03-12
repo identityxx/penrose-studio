@@ -28,6 +28,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
 import org.safehaus.penrose.studio.jdbc.connection.wizard.JDBCConnectionPropertiesWizard;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.jdbc.JDBC;
 
 /**
@@ -146,7 +147,7 @@ public class JDBCConnectionPropertiesPage extends ConnectionEditorPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

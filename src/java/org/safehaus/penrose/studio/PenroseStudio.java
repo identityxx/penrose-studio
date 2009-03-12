@@ -26,7 +26,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.safehaus.penrose.studio.util.ApplicationConfig;
-import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.plugin.*;
 import org.safehaus.penrose.studio.nis.NISPlugin;
 import org.safehaus.penrose.studio.image.ImageManager;
@@ -56,7 +55,6 @@ public class PenroseStudio implements IPlatformRunnable {
     public ImageManager imageManager;
 
     public PenroseStudioWorkbenchAdvisor workbenchAdvisor;
-    public ArrayList<ChangeListener> changeListeners = new ArrayList<ChangeListener>();
 
     public Log4jConfig loggingConfig;
 
@@ -190,16 +188,6 @@ public class PenroseStudio implements IPlatformRunnable {
 		}
 	}
 	
-	public void addChangeListener(ChangeListener changeListener) {
-		changeListeners.add(changeListener);
-	}
-
-	public void notifyChangeListeners() {
-        for (ChangeListener listener : changeListeners) {
-            listener.handleChange(null);
-        }
-    }
-
 	public ApplicationConfig getApplicationConfig() {
 		return applicationConfig;
 	}

@@ -187,9 +187,6 @@ public class JDBCConnectionTablesPage extends ConnectionEditorPage {
 
                     if (rc == Window.CANCEL) return;
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
-
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     ErrorDialog.open(e);

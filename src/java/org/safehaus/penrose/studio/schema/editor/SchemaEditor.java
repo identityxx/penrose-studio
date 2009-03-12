@@ -84,9 +84,6 @@ public class SchemaEditor extends FormEditor {
         origSchema.copy(schema);
 
         setPartName("Schema - "+origSchema.getName());
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public boolean isDirty() {

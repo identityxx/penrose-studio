@@ -25,8 +25,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
-import org.safehaus.penrose.studio.driver.ParameterDialog;
-import org.safehaus.penrose.studio.driver.DriverWizard;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.config.Parameter;
 import org.apache.log4j.Logger;
 
@@ -42,7 +41,7 @@ public class DriverParameterPage extends WizardPage implements SelectionListener
 
     public final static String NAME = "Driver Parameters";
 
-    List parameters = new ArrayList();
+    List<Parameter> parameters = new ArrayList<Parameter>();
     Table parameterTable;
 
     public DriverParameterPage() {
@@ -107,7 +106,7 @@ public class DriverParameterPage extends WizardPage implements SelectionListener
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -135,7 +134,7 @@ public class DriverParameterPage extends WizardPage implements SelectionListener
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -156,7 +155,7 @@ public class DriverParameterPage extends WizardPage implements SelectionListener
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -179,7 +178,7 @@ public class DriverParameterPage extends WizardPage implements SelectionListener
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -200,7 +199,7 @@ public class DriverParameterPage extends WizardPage implements SelectionListener
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -234,10 +233,10 @@ public class DriverParameterPage extends WizardPage implements SelectionListener
     }
 
     public void refresh() {
-        parameterTable.removeAll();
-        for (Iterator i=parameters.iterator(); i.hasNext(); ) {
-            Parameter parameter = (Parameter)i.next();
 
+        parameterTable.removeAll();
+
+        for (Parameter parameter : parameters) {
             TableItem item = new TableItem(parameterTable, SWT.NONE);
             item.setText(0, parameter.getName());
             item.setText(1, parameter.getDisplayName());

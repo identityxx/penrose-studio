@@ -95,9 +95,6 @@ public class ImportPartitionWizard extends Wizard {
                 partitionManagerClient.startPartition(partitionName);
             }
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
-
             return true;
 
         } catch (Exception e) {

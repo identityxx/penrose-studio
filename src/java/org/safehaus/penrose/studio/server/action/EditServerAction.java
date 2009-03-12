@@ -61,8 +61,6 @@ public class EditServerAction extends Action {
 
             if (rc == Window.CANCEL) return;
 
-            penroseStudio.notifyChangeListeners();
-
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e.getMessage());

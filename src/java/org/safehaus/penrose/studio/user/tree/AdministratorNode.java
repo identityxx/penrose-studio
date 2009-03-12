@@ -26,6 +26,7 @@ import org.eclipse.ui.PlatformUI;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.user.editor.UserEditor;
 import org.safehaus.penrose.studio.user.editor.UserEditorInput;
 import org.safehaus.penrose.studio.server.tree.ServerNode;
@@ -56,7 +57,7 @@ public class AdministratorNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

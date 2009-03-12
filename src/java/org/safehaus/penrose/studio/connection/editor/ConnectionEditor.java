@@ -79,9 +79,6 @@ public abstract class ConnectionEditor extends Editor {
         partitionClient.store();
 
         connectionConfig.setName(newName);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public void store() throws Exception {
@@ -93,9 +90,6 @@ public abstract class ConnectionEditor extends Editor {
         ConnectionManagerClient connectionManagerClient = partitionClient.getConnectionManagerClient();
         connectionManagerClient.updateConnection(connectionName, connectionConfig);
         partitionClient.store();
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public String getConnectionName() {

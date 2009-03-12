@@ -41,6 +41,7 @@ import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.directory.editor.EntryEditor;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.acl.wizard.ACLWizard;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.util.Collection;
 
@@ -299,7 +300,7 @@ public class ACLPage extends FormPage implements ModifyListener {
 */
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

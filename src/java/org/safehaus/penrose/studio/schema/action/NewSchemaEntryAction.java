@@ -45,7 +45,6 @@ public class NewSchemaEntryAction extends Action {
         try {
             ServersView serversView = ServersView.getInstance();
             Server server = directoryNode.getServerNode().getServer();
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
 
             DefaultSchemaWizard wizard = new DefaultSchemaWizard();
             wizard.setServer(server);
@@ -58,9 +57,6 @@ public class NewSchemaEntryAction extends Action {
             if (rc == Window.CANCEL) return;
 
             serversView.refresh(directoryNode);
-
-            penroseStudio.notifyChangeListeners();
-
             serversView.open(directoryNode);
 
         } catch (Exception e) {

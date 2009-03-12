@@ -24,6 +24,7 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.safehaus.penrose.studio.directory.wizard.EntryWizard;
 import org.safehaus.penrose.studio.directory.tree.EntryNode;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.directory.EntryConfig;
 import org.apache.log4j.Logger;
 
@@ -60,15 +61,11 @@ public class NewEntryAction extends Action {
             if (rc == Window.CANCEL) return;
 
             serversView.refresh(node);
-
-            //PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            //penroseStudio.notifyChangeListeners();
-
             serversView.open(node);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 	}
 	

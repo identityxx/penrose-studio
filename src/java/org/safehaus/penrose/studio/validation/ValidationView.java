@@ -18,7 +18,6 @@
 package org.safehaus.penrose.studio.validation;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
@@ -46,10 +45,7 @@ import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.plugin.PluginManager;
 import org.safehaus.penrose.studio.plugin.Plugin;
 import org.safehaus.penrose.studio.util.Helper;
-import org.safehaus.penrose.partition.*;
-import org.safehaus.penrose.source.SourceConfig;
-import org.safehaus.penrose.connection.ConnectionConfig;
-import org.safehaus.penrose.directory.EntryConfig;
+import org.safehaus.penrose.validation.ValidationResult;
 
 public class ValidationView extends ViewPart {
 
@@ -58,7 +54,7 @@ public class ValidationView extends ViewPart {
 	Composite parent;
 
 	Table table;
-    private Collection results = new ArrayList();
+    Collection<ValidationResult> results = new ArrayList<ValidationResult>();
 
 	public void createPartControl(Composite parent) {
 		this.parent = parent;
@@ -72,8 +68,6 @@ public class ValidationView extends ViewPart {
 				Action refreshAction = new Action("Refresh") {
 					public void run() {
                         try {
-                            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                            //penroseStudio.validatePartitions();
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
                             ErrorDialog.open(e);
@@ -119,22 +113,23 @@ public class ValidationView extends ViewPart {
 	}
 	
     public void refresh() {
+
         table.removeAll();
-        for (Iterator i=results.iterator(); i.hasNext(); ) {
-        	PartitionValidationResult result = (PartitionValidationResult)i.next();
+
+        for (ValidationResult result : results) {
 
             TableItem item = new TableItem(table, SWT.NONE);
             item.setText(0, result.getType());
             item.setText(1, result.getMessage());
-            item.setText(2, result.getSource().toString());
+            item.setText(2, result.getPartitionName()+"."+result.getObjectName());
 
-            if (PartitionValidationResult.ERROR.equals(result.getType())) {
+            if (ValidationResult.ERROR.equals(result.getType())) {
                 item.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_RED));
             } else {
                 item.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_BLACK));
             }
 
-            item.setData(result.getObject());
+            item.setData(result);
         }
     }
 
@@ -142,50 +137,51 @@ public class ValidationView extends ViewPart {
         if (table.getSelectionCount() == 0) return;
 
         TableItem item = table.getSelection()[0];
-		Object object = item.getData();
+		ValidationResult result = (ValidationResult)item.getData();
+        String partitionName = result.getPartitionName();
 
         PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        //PartitionConfigManager partitionConfigManager = penroseStudio.getPartitionConfigManager();
         PluginManager pluginManager = penroseStudio.getPluginManager();
 
-        if (object instanceof ConnectionConfig) {
-            ConnectionConfig connectionConfig = (ConnectionConfig)object;
-            PartitionConfig partitionConfig = null; // partitionConfigManager.getPartitionConfig(connectionConfig);
+        if (result.getObjectType() == ValidationResult.CONNECTION) {
+
+            String connectionName = result.getObjectName();
+            String adapterName = null;
 
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
 
-            Plugin plugin = pluginManager.getPlugin(connectionConfig.getAdapterName());
+            Plugin plugin = pluginManager.getPlugin(adapterName);
             ConnectionEditorInput ei = plugin.createConnectionEditorInput();
-            ei.setPartitionName(partitionConfig.getName());
-            ei.setConnectionName(connectionConfig.getName());
+            ei.setPartitionName(partitionName);
+            ei.setConnectionName(connectionName);
 
             String connectionEditorClass = plugin.getConnectionEditorClass();
             page.openEditor(ei, connectionEditorClass);
 
-		} else if (object instanceof SourceConfig) {
-			SourceConfig sourceConfig = (SourceConfig)object;
-            PartitionConfig partitionConfig = null; // partitionConfigManager.getPartitionConfig(sourceConfig);
-            ConnectionConfig connection = partitionConfig.getConnectionConfigManager().getConnectionConfig(sourceConfig.getConnectionName());
+		} else if (result.getObjectType() == ValidationResult.SOURCE) {
+
+            String sourceName = result.getObjectName();
+            String adapterName = null;
 
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
 
-            Plugin plugin = pluginManager.getPlugin(connection.getAdapterName());
+            Plugin plugin = pluginManager.getPlugin(adapterName);
             SourceEditorInput ei = plugin.createSourceEditorInput();
-            ei.setPartitionName(partitionConfig.getName());
-            ei.setSourceName(sourceConfig.getName());
+            ei.setPartitionName(partitionName);
+            ei.setSourceName(sourceName);
 
             String sourceEditorClass = plugin.getSourceEditorClass();
             page.openEditor(ei, sourceEditorClass);
 
-		} else if (object instanceof EntryConfig) {
-            EntryConfig entryConfig = (EntryConfig)object;
-            PartitionConfig partitionConfig = null; // partitionConfigManager.getPartitionConfig(entryConfig);
+		} else if (result.getObjectType() == ValidationResult.ENTRY) {
+
+            String entryName = result.getObjectName();
 
             EntryEditorInput ei = new EntryEditorInput();
-            ei.setPartitionName(partitionConfig.getName());
-            ei.setEntryName(entryConfig.getName());
+            ei.setPartitionName(partitionName);
+            ei.setEntryName(entryName);
 
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             IWorkbenchPage page = window.getActivePage();
@@ -198,7 +194,7 @@ public class ValidationView extends ViewPart {
         return results;
     }
 
-    public void setResults(Collection results) {
+    public void setResults(Collection<ValidationResult> results) {
         this.results.clear();
         this.results.addAll(results);
     }

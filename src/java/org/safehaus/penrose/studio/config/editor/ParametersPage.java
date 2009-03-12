@@ -16,6 +16,7 @@ import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.config.wizard.ParametersWizard;
 import org.safehaus.penrose.studio.log.editor.AppenderEditor;
 import org.safehaus.penrose.studio.editor.Editor;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,7 +126,7 @@ public class ParametersPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

@@ -22,7 +22,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.partition.tree.PartitionsNode;
-import org.safehaus.penrose.studio.partition.wizard.CreatePartitionWizard;
+import org.safehaus.penrose.studio.partition.wizard.PartitionWizard;
 import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.PenroseStudio;
@@ -46,7 +46,7 @@ public class NewPartitionAction extends Action {
 
             PartitionConfig partitionConfig = new PartitionConfig();
 
-            CreatePartitionWizard wizard = new CreatePartitionWizard();
+            PartitionWizard wizard = new PartitionWizard();
             wizard.setServer(serverNode.getServer());
             wizard.setPartitionConfig(partitionConfig);
 
@@ -56,12 +56,8 @@ public class NewPartitionAction extends Action {
 
             if (rc == Window.CANCEL) return;
             
-            serversView.open(serverNode.getPartitionsNode());
-
+            serversView.open(partitionsNode);
             serversView.refresh(partitionsNode);
-            
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

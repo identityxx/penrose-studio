@@ -144,9 +144,6 @@ public class UserPropertyPage extends FormPage {
 
                     refresh();
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.store();
-
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     ErrorDialog.open(e.getMessage());

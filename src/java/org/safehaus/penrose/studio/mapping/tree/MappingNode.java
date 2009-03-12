@@ -36,6 +36,7 @@ import org.safehaus.penrose.mapping.MappingConfig;
 import org.safehaus.penrose.mapping.MappingManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.mapping.editor.MappingEditor;
 import org.safehaus.penrose.studio.mapping.editor.MappingEditorInput;
 import org.safehaus.penrose.studio.mapping.dnd.MappingTransfer;
@@ -82,7 +83,7 @@ public class MappingNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -95,7 +96,7 @@ public class MappingNode extends Node {
                     copy();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -106,7 +107,7 @@ public class MappingNode extends Node {
                     mappingsNode.paste();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -117,7 +118,7 @@ public class MappingNode extends Node {
                     remove();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -160,9 +161,6 @@ public class MappingNode extends Node {
 
         ServersView serversView = ServersView.getInstance();
         serversView.refresh(parent);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public void copy() throws Exception {

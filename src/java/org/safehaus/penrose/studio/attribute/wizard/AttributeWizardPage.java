@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.jface.wizard.WizardPage;
 import org.safehaus.penrose.schema.ObjectClass;
 import org.safehaus.penrose.schema.Schema;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.util.Collection;
 
@@ -73,7 +74,7 @@ public class AttributeWizardPage extends WizardPage {
                     showAttributes(ocName);
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -97,7 +98,7 @@ public class AttributeWizardPage extends WizardPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

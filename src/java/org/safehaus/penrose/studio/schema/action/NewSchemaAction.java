@@ -24,6 +24,7 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.schema.wizard.NewSchemaWizard;
 import org.safehaus.penrose.studio.schema.tree.SchemasNode;
 import org.safehaus.penrose.studio.schema.tree.CustomSchemasNode;
@@ -57,15 +58,11 @@ public class NewSchemaAction extends Action {
             CustomSchemasNode customSchemasNode = schemasNode.getCustomSchemasNode();
 
             serversView.refresh(customSchemasNode);
-
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
-
             serversView.open(serverNode.getSchemasNode());
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            ErrorDialog.open(e);
         }
 	}
 	

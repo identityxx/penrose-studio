@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.safehaus.penrose.ldap.*;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.source.SourceClient;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -61,7 +62,7 @@ public class BrowserPage extends WizardPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

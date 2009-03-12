@@ -5,6 +5,7 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.action.RefreshAction;
 import org.safehaus.penrose.studio.log.wizard.AppenderWizard;
 import org.safehaus.penrose.log.LogManagerClient;
@@ -68,7 +69,7 @@ public class AppendersNode extends Node {
                     createAppender();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -96,9 +97,6 @@ public class AppendersNode extends Node {
 
         ServersView serversView = ServersView.getInstance();
         serversView.refresh(this);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public LogsNode getLogsNode() {

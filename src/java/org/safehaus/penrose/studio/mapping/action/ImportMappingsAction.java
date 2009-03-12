@@ -76,10 +76,6 @@ public class ImportMappingsAction extends Action {
             partitionClient.store();
 
             serversView.refresh(mappingsNode);
-
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
-
             serversView.open(mappingsNode);
 
         } catch (Exception e) {

@@ -45,7 +45,6 @@ public class NewRootDSEProxyAction extends Action {
         try {
             ServersView serversView = ServersView.getInstance();
             Server server = directoryNode.getServerNode().getServer();
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
 
             RootDSEProxyWizard wizard = new RootDSEProxyWizard();
             wizard.setServer(server);
@@ -58,9 +57,6 @@ public class NewRootDSEProxyAction extends Action {
             if (rc == Window.CANCEL) return;
 
             serversView.refresh(directoryNode);
-            
-            penroseStudio.notifyChangeListeners();
-
             serversView.open(directoryNode);
 
         } catch (Exception e) {

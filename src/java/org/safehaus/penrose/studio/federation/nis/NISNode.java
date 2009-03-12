@@ -104,9 +104,6 @@ public class NISNode extends Node {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
         page.openEditor(ei, NISEditor.class.getName());
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public void addNisDomain() throws Exception {
@@ -125,9 +122,6 @@ public class NISNode extends Node {
         FederationClient federationClient = getFederationClient();
         federationClient.addRepository(domain);
         federationClient.store();
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public Server getServer() {

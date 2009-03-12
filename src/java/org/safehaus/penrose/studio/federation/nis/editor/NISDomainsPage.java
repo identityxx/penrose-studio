@@ -139,9 +139,6 @@ public class NISDomainsPage extends FormPage {
                     federationClient.addRepository(repositoryConfig);
                     federationClient.store();
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
-
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     ErrorDialog.open(e);
@@ -173,9 +170,6 @@ public class NISDomainsPage extends FormPage {
 
                     federationClient.updateRepository(domain);
                     federationClient.store();
-
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -218,9 +212,6 @@ public class NISDomainsPage extends FormPage {
                             ErrorDialog.open(e);
                         }
                     }
-
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
 
                     table.select(index);
 

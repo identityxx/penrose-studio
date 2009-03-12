@@ -99,9 +99,6 @@ public class SourceEditor extends FormEditor {
         sourceConfig.setName(newName);
 
         setPartName(partitionName+"."+newName);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public void store() throws Exception {
@@ -115,9 +112,6 @@ public class SourceEditor extends FormEditor {
         partitionClient.store();
 
         setPartName(partitionName+"."+sourceConfig.getName());
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public boolean isDirty() {

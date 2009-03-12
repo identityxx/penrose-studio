@@ -28,6 +28,7 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.tree.Node;
 import org.safehaus.penrose.studio.schema.editor.AttributeTypeEditor;
 import org.safehaus.penrose.studio.schema.editor.AttributeTypeEditorInput;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.apache.log4j.Logger;
 
 /**
@@ -52,7 +53,7 @@ public class AttributeTypeNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

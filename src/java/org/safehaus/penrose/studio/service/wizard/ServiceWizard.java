@@ -19,8 +19,11 @@ package org.safehaus.penrose.studio.service.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.safehaus.penrose.service.ServiceConfig;
+import org.safehaus.penrose.service.ServiceManagerClient;
 import org.safehaus.penrose.studio.config.wizard.ParametersWizardPage;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
+import org.safehaus.penrose.studio.server.Server;
+import org.safehaus.penrose.client.PenroseClient;
 import org.apache.log4j.Logger;
 
 import java.util.Map;
@@ -32,6 +35,7 @@ public class ServiceWizard extends Wizard {
 
     Logger log = Logger.getLogger(getClass());
 
+    private Server server;
     private ServiceConfig serviceConfig;
 
     public ServicePropertiesWizardPage propertiesPage;
@@ -75,6 +79,11 @@ public class ServiceWizard extends Wizard {
 
             serviceConfig.setParameters(parametersPage.getParameters());
 
+            PenroseClient client = server.getClient();
+            ServiceManagerClient serviceManagerClient = client.getServiceManagerClient();
+
+            serviceManagerClient.createService(serviceConfig);
+
             return true;
 
         } catch (Exception e) {
@@ -94,5 +103,13 @@ public class ServiceWizard extends Wizard {
 
     public void setServiceConfig(ServiceConfig serviceConfig) {
         this.serviceConfig = serviceConfig;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

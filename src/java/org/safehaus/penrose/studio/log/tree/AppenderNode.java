@@ -5,6 +5,7 @@ import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.log.editor.AppenderEditorInput;
 import org.safehaus.penrose.studio.log.editor.AppenderEditor;
 import org.safehaus.penrose.log.LogManagerClient;
@@ -25,14 +26,14 @@ public class AppenderNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ServersView view;
+    ServersView serversView;
     AppendersNode appendersNode;
     String appenderName;
 
     public AppenderNode(ServersView view, String appenderName, AppendersNode appendersNode) {
         super(appenderName, PenroseStudio.getImage(PenroseImage.APPENDER), null, appendersNode);
 
-        this.view = view;
+        this.serversView = view;
         this.appendersNode = appendersNode;
         this.appenderName = appenderName;
     }
@@ -45,7 +46,7 @@ public class AppenderNode extends Node {
                     open();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -56,7 +57,7 @@ public class AppenderNode extends Node {
                     remove();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -75,7 +76,7 @@ public class AppenderNode extends Node {
 
     public void remove() throws Exception {
 
-        Shell shell = view.getSite().getShell();
+        Shell shell = serversView.getSite().getShell();
 
         boolean confirm = MessageDialog.openQuestion(
                 shell,
@@ -88,7 +89,7 @@ public class AppenderNode extends Node {
         PenroseClient client = server.getClient();
         LogManagerClient logManagerClient = client.getLogManagerClient();
 
-        for (Node node : view.getSelectedNodes()) {
+        for (Node node : serversView.getSelectedNodes()) {
             if (!(node instanceof AppenderNode)) continue;
 
             AppenderNode appenderNode = (AppenderNode)node;
@@ -97,11 +98,7 @@ public class AppenderNode extends Node {
 
         logManagerClient.store();
 
-        ServersView serversView = ServersView.getInstance();
         serversView.refresh(parent);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public String getAppenderName() {

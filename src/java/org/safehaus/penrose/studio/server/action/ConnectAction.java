@@ -30,9 +30,6 @@ public class ConnectAction extends Action {
 
             serversView.open(serverNode);
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
-
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);

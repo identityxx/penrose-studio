@@ -117,9 +117,6 @@ public class LoggerNode extends Node {
 
         ServersView serversView = ServersView.getInstance();
         serversView.refresh(parent);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public String getLoggerName() {

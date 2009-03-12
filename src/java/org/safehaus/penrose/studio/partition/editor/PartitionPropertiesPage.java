@@ -30,6 +30,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.IManagedForm;
 import org.safehaus.penrose.partition.PartitionConfig;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 public class PartitionPropertiesPage extends FormPage {
 
@@ -149,7 +150,7 @@ public class PartitionPropertiesPage extends FormPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

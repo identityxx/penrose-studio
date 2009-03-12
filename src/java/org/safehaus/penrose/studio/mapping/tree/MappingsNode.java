@@ -30,6 +30,7 @@ import org.safehaus.penrose.mapping.MappingConfig;
 import org.safehaus.penrose.mapping.MappingManagerClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.action.RefreshAction;
 import org.safehaus.penrose.studio.mapping.action.ImportMappingsAction;
 import org.safehaus.penrose.studio.mapping.action.NewMappingAction;
@@ -112,7 +113,7 @@ public class MappingsNode extends Node {
                     paste();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -158,9 +159,6 @@ public class MappingsNode extends Node {
 
         ServersView serversView = ServersView.getInstance();
         serversView.refresh(this);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public String getPartitionName() {

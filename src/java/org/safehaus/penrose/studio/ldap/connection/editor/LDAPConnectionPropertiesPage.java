@@ -29,6 +29,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.connection.editor.ConnectionEditorPage;
 import org.safehaus.penrose.studio.ldap.connection.wizard.LDAPConnectionSettingsWizard;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -147,7 +148,7 @@ public class LDAPConnectionPropertiesPage extends ConnectionEditorPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

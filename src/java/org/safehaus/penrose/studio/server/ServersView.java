@@ -31,7 +31,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.dnd.*;
-import org.safehaus.penrose.studio.util.ChangeListener;
 import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.server.tree.ServerNode;
@@ -41,7 +40,7 @@ import org.safehaus.penrose.studio.tree.Node;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class ServersView extends ViewPart implements ChangeListener, ISelectionChangedListener {
+public class ServersView extends ViewPart implements ISelectionChangedListener {
 
     Logger log = Logger.getLogger(getClass());
 
@@ -415,11 +414,6 @@ public class ServersView extends ViewPart implements ChangeListener, ISelectionC
 	public void selectionChanged(SelectionChangedEvent event) {
 	}
 	
-    public void handleChange(Object o) {
-        tree.redraw();
-        //treeViewer.refresh();
-	}
-
     public boolean isExpanded(Object object) {
         TreeItem item = findTreeItem(tree.getItems(), (Node)object);
         if (item == null) return false;

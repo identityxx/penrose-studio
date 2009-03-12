@@ -46,8 +46,6 @@ public class DeleteServerAction extends Action {
 
             serversView.refresh();
 
-            penroseStudio.notifyChangeListeners();
-
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);

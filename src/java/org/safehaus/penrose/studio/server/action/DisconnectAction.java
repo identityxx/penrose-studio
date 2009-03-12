@@ -29,9 +29,6 @@ public class DisconnectAction extends Action {
 
             serversView.close(serverNode);
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
-
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);

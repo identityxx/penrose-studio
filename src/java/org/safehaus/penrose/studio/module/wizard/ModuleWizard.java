@@ -110,12 +110,8 @@ public class ModuleWizard extends Wizard {
 
             moduleConfig.setModuleMappings(moduleMappings);
             moduleManagerCient.createModule(moduleConfig);
-            //moduleManagerCient.createModule(moduleConfig, moduleMappings);
 
             partitionClient.store();
-
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
 
             return true;
 

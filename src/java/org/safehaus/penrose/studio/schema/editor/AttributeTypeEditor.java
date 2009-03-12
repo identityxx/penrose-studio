@@ -291,9 +291,6 @@ public class AttributeTypeEditor extends EditorPart implements ModifyListener, S
 
         setPartName("Attribute Type - "+attributeType.getName());
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
-
         checkDirty();
     }
 

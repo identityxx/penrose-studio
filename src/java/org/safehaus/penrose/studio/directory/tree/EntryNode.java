@@ -249,11 +249,7 @@ public class EntryNode extends Node {
 
         partitionClient.store();
 
-        ServersView serversView = ServersView.getInstance();
         serversView.refresh(parent);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public void moveDown() throws Exception {
@@ -286,11 +282,7 @@ public class EntryNode extends Node {
 
         partitionClient.store();
 
-        ServersView serversView = ServersView.getInstance();
         serversView.refresh(parent);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public void copy() throws Exception {
@@ -359,11 +351,7 @@ public class EntryNode extends Node {
 
         partitionClient.store();
 
-        ServersView serversView = ServersView.getInstance();
         serversView.refresh(this);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public void remove() throws Exception {
@@ -392,7 +380,6 @@ public class EntryNode extends Node {
 
         partitionClient.store();
 
-        ServersView serversView = ServersView.getInstance();
         serversView.refresh(parent);
     }
 

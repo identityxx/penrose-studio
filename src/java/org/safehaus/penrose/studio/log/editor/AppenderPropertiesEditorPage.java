@@ -29,6 +29,7 @@ import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.log.log4j.AppenderConfig;
 import org.safehaus.penrose.studio.editor.EditorPage;
 import org.safehaus.penrose.studio.log.wizard.AppenderPropertiesWizard;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 public class AppenderPropertiesEditorPage extends EditorPage {
 
@@ -129,7 +130,7 @@ public class AppenderPropertiesEditorPage extends EditorPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

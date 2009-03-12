@@ -142,9 +142,6 @@ public class FederationDomainPartitionsPage extends FormPage {
                         federationClient.createPartition(partitionConfig.getName());
                     }
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
-
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     ErrorDialog.open(e);
@@ -178,9 +175,6 @@ public class FederationDomainPartitionsPage extends FormPage {
 
                         federationClient.removePartition(partitionConfig.getName());
                     }
-
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);

@@ -26,6 +26,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.safehaus.penrose.studio.log.dialog.AppenderSelectionDialog;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.log.LogManagerClient;
 import org.apache.log4j.Logger;
 
@@ -85,7 +86,7 @@ public class LoggerAppendersWizardPage extends WizardPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

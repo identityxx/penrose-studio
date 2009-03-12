@@ -45,7 +45,6 @@ public class NewRootDSEAction extends Action {
         try {
             ServersView serversView = ServersView.getInstance();
             Server server = directoryNode.getServerNode().getServer();
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
 
             DefaultRootDSEWizard wizard = new DefaultRootDSEWizard();
             wizard.setServer(server);
@@ -59,9 +58,6 @@ public class NewRootDSEAction extends Action {
             if (rc == Window.CANCEL) return;
 
             serversView.refresh(directoryNode);
-
-            penroseStudio.notifyChangeListeners();
-
             serversView.open(directoryNode);
 
         } catch (Exception e) {

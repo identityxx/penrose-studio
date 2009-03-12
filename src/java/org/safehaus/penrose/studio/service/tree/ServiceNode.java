@@ -47,7 +47,7 @@ public class ServiceNode extends Node {
 
     Logger log = Logger.getLogger(getClass());
 
-    ServersView view;
+    ServersView serversView;
     ServerNode serverNode;
     ServicesNode servicesNode;
 
@@ -55,7 +55,7 @@ public class ServiceNode extends Node {
         super(name, image, object, parent);
         servicesNode = (ServicesNode)parent;
         serverNode = servicesNode.getServerNode();
-        view = serverNode.getServersView();
+        serversView = serverNode.getServersView();
     }
 
     public void showMenu(IMenuManager manager) {
@@ -130,7 +130,7 @@ public class ServiceNode extends Node {
     public void start() throws Exception {
 
         boolean confirm = MessageDialog.openQuestion(
-                view.getSite().getShell(),
+                serversView.getSite().getShell(),
                 "Confirmation",
                 "Start \""+name+"\"?");
 
@@ -140,15 +140,12 @@ public class ServiceNode extends Node {
         PenroseClient client = server.getClient();
         ServiceManagerClient serviceManagerClient = client.getServiceManagerClient();
         serviceManagerClient.startService(name);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public void stop() throws Exception {
 
         boolean confirm = MessageDialog.openQuestion(
-                view.getSite().getShell(),
+                serversView.getSite().getShell(),
                 "Confirmation",
                 "Stop \""+name+"\"?");
 
@@ -158,15 +155,12 @@ public class ServiceNode extends Node {
         PenroseClient client = server.getClient();
         ServiceManagerClient serviceManagerClient = client.getServiceManagerClient();
         serviceManagerClient.stopService(name);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public void remove() throws Exception {
 
         boolean confirm = MessageDialog.openQuestion(
-                view.getSite().getShell(),
+                serversView.getSite().getShell(),
                 "Confirmation",
                 "Remove \""+name+"\"?");
 
@@ -177,8 +171,7 @@ public class ServiceNode extends Node {
         ServiceManagerClient serviceManagerClient = client.getServiceManagerClient();
         serviceManagerClient.removeService(name);
 
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
+        serversView.refresh(parent);
     }
 
     public boolean hasChildren() {

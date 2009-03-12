@@ -157,9 +157,6 @@ public class ModulesNode extends Node {
 
         ServersView serversView = ServersView.getInstance();
         serversView.refresh(this);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public String getPartitionName() {

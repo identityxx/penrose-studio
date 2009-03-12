@@ -180,9 +180,6 @@ public class NISSynchronizationChangeLogPage extends FormPage {
                         }
                     }
 
-                    PenroseStudio penroseStudio = PenroseStudio.getInstance();
-                    penroseStudio.notifyChangeListeners();
-
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     ErrorDialog.open(e);

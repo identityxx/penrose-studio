@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.*;
 import org.safehaus.penrose.mapping.*;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.apache.log4j.Logger;
 
 public class RelationshipDialog extends Dialog {
@@ -187,7 +188,7 @@ public class RelationshipDialog extends Dialog {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
 			}
 		});

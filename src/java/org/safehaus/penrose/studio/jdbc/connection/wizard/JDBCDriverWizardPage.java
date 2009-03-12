@@ -45,6 +45,7 @@ import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.packageadmin.PackageAdmin;
 import org.safehaus.penrose.studio.PenroseStudioPlugin;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.driver.Driver;
 import org.safehaus.penrose.studio.driver.DriverReader;
 import org.safehaus.penrose.studio.driver.DriverWizard;
@@ -195,11 +196,10 @@ public class JDBCDriverWizardPage extends WizardPage implements SelectionListene
                     saveDrivers();
 
                     refresh();
-                    
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -228,7 +228,7 @@ public class JDBCDriverWizardPage extends WizardPage implements SelectionListene
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -252,7 +252,7 @@ public class JDBCDriverWizardPage extends WizardPage implements SelectionListene
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

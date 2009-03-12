@@ -65,9 +65,6 @@ public class NewEntryFromSourceAction extends Action {
         try {
             ServersView serversView = ServersView.getInstance();
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            //if (!penroseStudio.isCommercial()) return;
-
             ServerNode serverNode = node.getServerNode();
             Server server = serverNode.getServer();
 
@@ -90,13 +87,7 @@ public class NewEntryFromSourceAction extends Action {
                 SourceConfig sourceConfig = sourceClient.getSourceConfig();
                 sourceConfigs.put(sourceConfig.getName(), sourceConfig);
             }
-/*
-            Collection<SourceConfig> sourceConfigManager = partitionConfig.getSourceConfigManager().getSourceConfigManager();
-            if (sourceConfigManager.isEmpty()) {
-                System.out.println("There is no sources defined.");
-                return;
-            }
-*/
+
             EntrySourceConfig sourceMapping = new EntrySourceConfig();
             SourceDialog dialog = new SourceDialog(serversView.getSite().getShell(), SWT.NONE);
             dialog.setSourceConfigs(sourceConfigs.values());
@@ -177,14 +168,9 @@ public class NewEntryFromSourceAction extends Action {
             }
 
             newEntryConfig.addSourceConfig(sourceMapping);
-/*
-            DirectoryConfig directoryConfig = partitionConfig.getDirectoryConfig();
-            directoryConfig.addEntryConfig(newEntryConfig);
-*/
+
             directoryClient.createEntry(newEntryConfig);
             partitionClient.store();
-
-            penroseStudio.notifyChangeListeners();
 
             serversView.open(node);
 

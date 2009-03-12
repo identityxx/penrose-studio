@@ -31,6 +31,7 @@ import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.studio.PenroseImage;
 import org.safehaus.penrose.studio.PenroseStudio;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.studio.action.RefreshAction;
 import org.safehaus.penrose.studio.connection.dnd.ConnectionTransfer;
 import org.safehaus.penrose.studio.nis.connection.action.NewNISConnectionAction;
@@ -118,7 +119,7 @@ public class ConnectionsNode extends Node {
                     paste();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });
@@ -164,9 +165,6 @@ public class ConnectionsNode extends Node {
 
         ServersView serversView = ServersView.getInstance();
         serversView.refresh(this);
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public String getPartitionName() {

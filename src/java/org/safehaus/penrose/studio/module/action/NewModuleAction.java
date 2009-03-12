@@ -56,10 +56,7 @@ public class NewModuleAction extends Action {
 
             if (rc == Window.CANCEL) return;
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
-
-            serversView.open(node);
+            serversView.refresh(node);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

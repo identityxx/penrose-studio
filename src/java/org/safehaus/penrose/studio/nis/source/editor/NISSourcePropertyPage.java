@@ -12,6 +12,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.source.editor.SourceEditorPage;
 import org.safehaus.penrose.studio.nis.source.wizard.NISSourcePropertiesWizard;
+import org.safehaus.penrose.studio.dialog.ErrorDialog;
 
 public class NISSourcePropertyPage extends SourceEditorPage {
 
@@ -119,7 +120,7 @@ public class NISSourcePropertyPage extends SourceEditorPage {
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    throw new RuntimeException(e.getMessage(), e);
+                    ErrorDialog.open(e);
                 }
             }
         });

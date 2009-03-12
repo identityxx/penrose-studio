@@ -120,9 +120,6 @@ public class ModuleEditor extends FormEditor {
         partitionClient.store();
 
         setPartName(partitionName+"."+moduleConfig.getName());
-
-        PenroseStudio penroseStudio = PenroseStudio.getInstance();
-        penroseStudio.notifyChangeListeners();
     }
 
     public boolean isDirty() {

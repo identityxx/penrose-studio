@@ -49,9 +49,6 @@ public class ImportSchemaAction extends Action {
 
             if (rc == Window.CANCEL) return;
 
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
-
             serversView.open(serverNode.getSchemasNode());
 
         } catch (Exception e) {

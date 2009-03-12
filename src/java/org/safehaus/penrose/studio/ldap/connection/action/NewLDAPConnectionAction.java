@@ -61,10 +61,6 @@ public class NewLDAPConnectionAction extends Action {
             if (rc == Window.CANCEL) return;
 
             serversView.refresh(connectionsNode);
-
-            PenroseStudio penroseStudio = PenroseStudio.getInstance();
-            penroseStudio.notifyChangeListeners();
-
             serversView.open(connectionsNode);
 
         } catch (Exception e) {
