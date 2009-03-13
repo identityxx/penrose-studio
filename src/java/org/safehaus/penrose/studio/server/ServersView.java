@@ -156,9 +156,35 @@ public class ServersView extends ViewPart implements ISelectionChangedListener {
                         ErrorDialog.open(e);
                     }
                 }
+                public void mouseDown(MouseEvent event) {
+                    try {
+                        //log.debug("Button #"+event.button+" down at ("+event.x+","+event.y+").");
+                        if (event.button != 3) return;
+
+                        String osName = System.getProperty("os.name");
+                        //log.debug("OS: "+osName);
+
+                        if (!osName.startsWith("Linux")) return;
+
+                        TreeItem item = tree.getItem(new Point(event.x, event.y));
+                        if (item == null) return;
+
+                        rightClick(item);
+
+                    } catch (Exception e) {
+                        log.error(e.getMessage(), e);
+                        ErrorDialog.open(e);
+                    }
+                }
                 public void mouseUp(MouseEvent event) {
                     try {
+                        //log.debug("Button #"+event.button+" up at ("+event.x+","+event.y+").");
                         if (event.button != 3) return;
+
+                        String osName = System.getProperty("os.name");
+                        //log.debug("OS: "+osName);
+
+                        if (!osName.startsWith("Windows")) return;
 
                         TreeItem item = tree.getItem(new Point(event.x, event.y));
                         if (item == null) return;
