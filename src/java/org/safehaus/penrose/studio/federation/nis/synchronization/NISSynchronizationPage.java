@@ -25,14 +25,13 @@ import org.safehaus.penrose.federation.*;
 import org.safehaus.penrose.studio.server.Server;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.ldap.*;
-import org.safehaus.penrose.module.ModuleClient;
-import org.safehaus.penrose.module.ModuleManagerClient;
 import org.safehaus.penrose.partition.PartitionManagerClient;
 import org.safehaus.penrose.partition.PartitionClient;
 import org.safehaus.penrose.source.SourceClient;
 import org.safehaus.penrose.source.SourceManagerClient;
 import org.safehaus.penrose.client.PenroseClient;
 import org.safehaus.penrose.synchronization.SynchronizationResult;
+import org.safehaus.penrose.nis.NISSynchronizationModuleClient;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -68,7 +67,7 @@ public class NISSynchronizationPage extends FormPage {
     DN sourceSuffix;
     DN targetSuffix;
 
-    ModuleClient moduleClient;
+    NISSynchronizationModuleClient moduleClient;
 
     public NISSynchronizationPage(NISSynchronizationEditor editor) throws Exception {
         super(editor, "Content", "  Content  ");
@@ -95,8 +94,7 @@ public class NISSynchronizationPage extends FormPage {
         sourceSuffix = (DN)sourceClient.getAttribute("BaseDn");
         targetSuffix = (DN)targetClient.getAttribute("BaseDn");
 
-        ModuleManagerClient targetModuleManagerClient = targetPartitionClient.getModuleManagerClient();
-        moduleClient = targetModuleManagerClient.getModuleClient(Federation.SYNCHRONIZATION);
+        moduleClient = new NISSynchronizationModuleClient(penroseClient, federationName+"_"+domain.getName(), Federation.SYNCHRONIZATION);
     }
 
     public void createFormContent(IManagedForm managedForm) {
@@ -298,7 +296,7 @@ public class NISSynchronizationPage extends FormPage {
         });
 
         try {
-            Map<String,String> nisMapRDNs = (Map<String,String>)moduleClient.getAttribute("NisMapRDNs");
+            Map<String,String> nisMapRDNs = moduleClient.getNisMapRDNs();
 
             for (String nisMap : nisMapRDNs.keySet()) {
                 RDN rdn = new RDN(nisMapRDNs.get(nisMap));
@@ -418,11 +416,7 @@ public class NISSynchronizationPage extends FormPage {
 
             if (!confirm) return;
 
-            moduleClient.invoke(
-                    "createBase",
-                    new Object[] { },
-                    new String[] { }
-            );
+            moduleClient.createBase();
 
             statusText.setText("Created");
             baseButton.setText("Remove Base");
@@ -443,11 +437,7 @@ public class NISSynchronizationPage extends FormPage {
 
             if (!confirm) return;
 
-            moduleClient.invoke(
-                    "removeBase",
-                    new Object[] { },
-                    new String[] { }
-            );
+            moduleClient.removeBase();
 
             statusText.setText("Missing");
             baseButton.setText("Create Base");
@@ -505,12 +495,7 @@ public class NISSynchronizationPage extends FormPage {
                             monitor.subTask("Creating "+mapName+"...");
 
                             DN dn = getTargetDn(mapName);
-
-                            moduleClient.invoke(
-                                    "create",
-                                    new Object[] { dn },
-                                    new String[] { DN.class.getName() }
-                            );
+                            moduleClient.create(dn);
 
                             monitor.worked(1);
                         }
@@ -573,15 +558,10 @@ public class NISSynchronizationPage extends FormPage {
                         for (String mapName : mapNames) {
                             if (monitor.isCanceled()) throw new InterruptedException();
 
+                            monitor.subTask("Clearing "+mapName+"...");
+
                             DN dn = getTargetDn(mapName);
-
-                            monitor.subTask("Clearing "+dn+"...");
-
-                            moduleClient.invoke(
-                                    "clear",
-                                    new Object[] { dn },
-                                    new String[] { DN.class.getName() }
-                            );
+                            moduleClient.clear(dn);
                         }
 
                     } catch (InterruptedException e) {
@@ -646,12 +626,7 @@ public class NISSynchronizationPage extends FormPage {
                             monitor.subTask("Removing "+mapName+"...");
 
                             DN dn = getTargetDn(mapName);
-
-                            moduleClient.invoke(
-                                    "remove",
-                                    new Object[] { dn },
-                                    new String[] { DN.class.getName() }
-                            );
+                            moduleClient.remove(dn);
 
                             monitor.worked(1);
                         }
@@ -718,12 +693,7 @@ public class NISSynchronizationPage extends FormPage {
                             DN dn = getTargetDn(mapName);
                             monitor.subTask("Synchronizing "+dn+"...");
 
-                            SynchronizationResult result = (SynchronizationResult)moduleClient.invoke(
-                                    "synchronize",
-                                    new Object[] { dn },
-                                    new String[] { DN.class.getName() }
-                            );
-
+                            SynchronizationResult result = moduleClient.synchronize(dn);
                             log.warn(result.toString());
 
                             results.put(mapName, result);
@@ -758,8 +728,11 @@ public class NISSynchronizationPage extends FormPage {
                 long minutes = duration / 60;
                 long seconds = duration % 60;
 
-                ti.setText(1, ""+result.getSourceEntries());
-                ti.setText(2, ""+result.getTargetEntries());
+                Long sourceEntries = result.getSourceEntries();
+                Long targetEntries = result.getTargetEntries();
+
+                ti.setText(1, (sourceEntries == null ? "N/A" : ""+sourceEntries));
+                ti.setText(2, (targetEntries == null ? "N/A" : ""+targetEntries));
                 ti.setText(3, minutes+":"+seconds);
                 ti.setText(4, ""+result.getAddedEntries());
                 ti.setText(5, ""+result.getModifiedEntries());
@@ -932,36 +905,9 @@ public class NISSynchronizationPage extends FormPage {
     public String getSourceStatus(String mapName) {
         try {
             DN dn = getSourceDn(mapName);
-
-            Long result = (Long)moduleClient.invoke(
-                    "getSourceCount",
-                    new Object[] { dn },
-                    new String[] { DN.class.getName() }
-            );
+            Long result = moduleClient.getSourceCount(dn);
 
             String status = result == null ? "N/A" : ""+result;
-/*
-            DN dn = getSourceDn(mapName);
-            log.debug("Searching "+dn+".");
-
-            SearchRequest request = new SearchRequest();
-            request.setDn(dn);
-            request.setAttributes(new String[] { "dn" });
-            request.setTypesOnly(true);
-
-            SearchResponse response = new SearchResponse();
-
-            sourceClient.search(request, response);
-
-            int rc = response.waitFor();
-
-            String status;
-            if (rc == LDAP.SUCCESS) {
-                status = ""+(response.getTotalCount()-1);
-            } else {
-                status = "N/A";
-            }
-*/
             log.debug("Status: "+status);
 
             return status;
@@ -975,36 +921,9 @@ public class NISSynchronizationPage extends FormPage {
     public String getTargetStatus(String mapName) {
         try {
             DN dn = getTargetDn(mapName);
-
-            Long result = (Long)moduleClient.invoke(
-                    "getTargetCount",
-                    new Object[] { dn },
-                    new String[] { DN.class.getName() }
-            );
+            Long result = moduleClient.getTargetCount(dn);
 
             String status = result == null ? "N/A" : ""+result;
-/*
-            DN dn = getTargetDn(mapName);
-            log.debug("Searching "+dn+".");
-
-            SearchRequest request = new SearchRequest();
-            request.setDn(dn);
-            request.setAttributes(new String[] { "dn" });
-            request.setTypesOnly(true);
-
-            SearchResponse response = new SearchResponse();
-
-            targetClient.search(request, response);
-
-            int rc = response.waitFor();
-
-            String status;
-            if (rc == LDAP.SUCCESS) {
-                status = ""+(response.getTotalCount()-1);
-            } else {
-                status = "N/A";
-            }
-*/
             log.debug("Status: "+status);
             
             return status;
