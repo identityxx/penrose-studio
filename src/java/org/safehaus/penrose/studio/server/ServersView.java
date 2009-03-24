@@ -44,6 +44,9 @@ public class ServersView extends ViewPart implements ISelectionChangedListener {
 
     Logger log = Logger.getLogger(getClass());
 
+    public final static int LINUX   = 0;
+    public final static int WINDOWS = 1;
+
     public final static String PARTITION         = "Partition";
     public final static String DIRECTORY         = "Directory";
     public final static String ENTRY             = "Entry";
@@ -91,7 +94,15 @@ public class ServersView extends ViewPart implements ISelectionChangedListener {
     Clipboard swtClipboard;
     Object clipboard;
 
+    int type;
+
     public ServersView() {
+        String osName = System.getProperty("os.name");
+        if (osName.startsWith("Linux")) {
+            type = LINUX;
+        } else if (osName.startsWith("Windows")) {
+            type = WINDOWS;
+        }
     }
 	
 	/**
@@ -105,7 +116,7 @@ public class ServersView extends ViewPart implements ISelectionChangedListener {
             tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
             tree.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-            menuManager = new MenuManager("Servers");
+            menuManager = new MenuManager("#PopupMenu");
 
             Menu menu = menuManager.createContextMenu(tree);
             tree.setMenu(menu);
@@ -161,10 +172,9 @@ public class ServersView extends ViewPart implements ISelectionChangedListener {
                         //log.debug("Button #"+event.button+" down at ("+event.x+","+event.y+").");
                         if (event.button != 3) return;
 
-                        String osName = System.getProperty("os.name");
-                        //log.debug("OS: "+osName);
+                        menuManager.removeAll();
 
-                        if (!osName.startsWith("Linux")) return;
+                        if (type != LINUX) return;
 
                         TreeItem item = tree.getItem(new Point(event.x, event.y));
                         if (item == null) return;
@@ -181,10 +191,9 @@ public class ServersView extends ViewPart implements ISelectionChangedListener {
                         //log.debug("Button #"+event.button+" up at ("+event.x+","+event.y+").");
                         if (event.button != 3) return;
 
-                        String osName = System.getProperty("os.name");
-                        //log.debug("OS: "+osName);
+                        menuManager.removeAll();
 
-                        if (!osName.startsWith("Windows")) return;
+                        if (type != WINDOWS) return;
 
                         TreeItem item = tree.getItem(new Point(event.x, event.y));
                         if (item == null) return;
@@ -348,9 +357,8 @@ public class ServersView extends ViewPart implements ISelectionChangedListener {
         Node node = (Node)item.getData();
         if (node == null) return;
 
-        log.debug("Right-click node "+node.getName()+".");
+        //log.debug("Right-click node "+node.getName()+".");
 
-        menuManager.removeAll();
         node.showMenu(menuManager);
 
         menuManager.setVisible(true);
