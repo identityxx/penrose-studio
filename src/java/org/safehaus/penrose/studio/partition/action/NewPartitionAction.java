@@ -25,7 +25,6 @@ import org.safehaus.penrose.studio.partition.tree.PartitionsNode;
 import org.safehaus.penrose.studio.partition.wizard.PartitionWizard;
 import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.safehaus.penrose.studio.server.ServersView;
-import org.safehaus.penrose.studio.PenroseStudio;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.safehaus.penrose.partition.PartitionConfig;
 
@@ -37,11 +36,17 @@ public class NewPartitionAction extends Action {
         setText("&New Partition...");
         setId(getClass().getName());
     }
-	
-	public void run() {
+
+    public void run() {
         try {
             ServersView serversView = ServersView.getInstance();
             ServerNode serverNode = serversView.getSelectedServerNode();
+
+            if (serverNode == null || !serverNode.isConnected()) {
+                ErrorDialog.open("Not connected to server.");
+                return;
+            }
+
             PartitionsNode partitionsNode = serverNode.getPartitionsNode();
 
             PartitionConfig partitionConfig = new PartitionConfig();

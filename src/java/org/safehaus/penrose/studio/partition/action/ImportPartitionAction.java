@@ -40,6 +40,11 @@ public class ImportPartitionAction extends Action {
             ServersView serversView = ServersView.getInstance();
             ServerNode serverNode = serversView.getSelectedServerNode();
 
+            if (serverNode == null || !serverNode.isConnected()) {
+                ErrorDialog.open("Not connected to server.");
+                return;
+            }
+
             ImportPartitionWizard wizard = new ImportPartitionWizard();
             wizard.setServer(serverNode.getServer());
 

@@ -46,6 +46,11 @@ public class NewSchemaAction extends Action {
             ServersView serversView = ServersView.getInstance();
             ServerNode serverNode = serversView.getSelectedServerNode();
 
+            if (serverNode == null || !serverNode.isConnected()) {
+                ErrorDialog.open("Not connected to server.");
+                return;
+            }
+
             NewSchemaWizard wizard = new NewSchemaWizard(serverNode.getServer());
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);

@@ -41,6 +41,11 @@ public class ImportSchemaAction extends Action {
             ServersView serversView = ServersView.getInstance();
             ServerNode serverNode = serversView.getSelectedServerNode();
 
+            if (serverNode == null || !serverNode.isConnected()) {
+                ErrorDialog.open("Not connected to server.");
+                return;
+            }
+
             ImportSchemaWizard wizard = new ImportSchemaWizard(serverNode.getServer());
 
             WizardDialog dialog = new WizardDialog(serversView.getSite().getShell(), wizard);

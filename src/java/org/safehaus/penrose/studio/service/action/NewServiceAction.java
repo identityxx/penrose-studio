@@ -45,6 +45,12 @@ public class NewServiceAction extends Action {
         try {
             ServersView serversView = ServersView.getInstance();
             ServerNode serverNode = serversView.getSelectedServerNode();
+
+            if (serverNode == null || !serverNode.isConnected()) {
+                ErrorDialog.open("Not connected to server.");
+                return;
+            }
+
             Server server = serverNode.getServer();
             ServicesNode servicesNode = serverNode.getServicesNode();
 

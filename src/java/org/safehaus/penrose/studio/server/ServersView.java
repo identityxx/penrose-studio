@@ -532,7 +532,10 @@ public class ServersView extends ViewPart implements ISelectionChangedListener {
     public static ServersView getInstance() throws Exception {
         IWorkbench workbench = PlatformUI.getWorkbench();
         IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+
         IWorkbenchPage page = window.getActivePage();
+        if (page == null) return null;
+
         return (ServersView)page.showView(ServersView.class.getName());
     }
 
