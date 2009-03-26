@@ -7,6 +7,7 @@ import org.ietf.ldap.LDAPException;
 
 import java.io.StringWriter;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Endi Sukma Dewata
@@ -14,8 +15,14 @@ import java.io.PrintWriter;
 public class ErrorDialog {
 
     public static void open(Throwable t) {
-        if (t instanceof LDAPException) {
-            open((LDAPException)t);
+        if (t instanceof InvocationTargetException) {
+            InvocationTargetException e = (InvocationTargetException)t;
+            open(e.getCause());
+
+        } else if (t instanceof LDAPException) {
+            LDAPException e = (LDAPException)t;
+            open(e);
+
         } else {
             open("ERROR", t);
         }

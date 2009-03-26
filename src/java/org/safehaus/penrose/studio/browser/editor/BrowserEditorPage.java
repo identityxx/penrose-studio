@@ -453,11 +453,6 @@ public class BrowserEditorPage extends FormPage {
                 }
             }
 
-        } catch (InvocationTargetException e) {
-            Throwable t = e.getCause();
-            log.error(t.getMessage(), t);
-            ErrorDialog.open(t);
-
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);
