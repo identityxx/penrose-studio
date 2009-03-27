@@ -23,6 +23,7 @@ import org.eclipse.jface.window.Window;
 import org.safehaus.penrose.studio.server.ServersView;
 import org.safehaus.penrose.studio.server.tree.ServerNode;
 import org.safehaus.penrose.studio.partition.wizard.ImportPartitionWizard;
+import org.safehaus.penrose.studio.partition.tree.PartitionsNode;
 import org.safehaus.penrose.studio.dialog.ErrorDialog;
 import org.apache.log4j.Logger;
 
@@ -45,6 +46,8 @@ public class ImportPartitionAction extends Action {
                 return;
             }
 
+            PartitionsNode partitionsNode = serverNode.getPartitionsNode();
+
             ImportPartitionWizard wizard = new ImportPartitionWizard();
             wizard.setServer(serverNode.getServer());
 
@@ -54,7 +57,8 @@ public class ImportPartitionAction extends Action {
 
             if (rc == Window.CANCEL) return;
 
-            serversView.open(serverNode.getPartitionsNode());
+            serversView.refresh(partitionsNode);
+            serversView.open(partitionsNode);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);

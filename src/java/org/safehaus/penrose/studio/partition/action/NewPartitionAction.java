@@ -60,9 +60,9 @@ public class NewPartitionAction extends Action {
             int rc = dialog.open();
 
             if (rc == Window.CANCEL) return;
-            
-            serversView.open(partitionsNode);
+
             serversView.refresh(partitionsNode);
+            serversView.open(partitionsNode);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
