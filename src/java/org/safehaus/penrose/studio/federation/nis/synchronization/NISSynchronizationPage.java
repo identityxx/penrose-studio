@@ -461,28 +461,28 @@ public class NISSynchronizationPage extends FormPage {
     }
 
     public void create() {
+        if (table.getSelectionCount() == 0) return;
+
+        boolean confirm = MessageDialog.openQuestion(
+                editor.getSite().getShell(),
+                "Creating Target Subtree",
+                "Are you sure?"
+        );
+
+        if (!confirm) return;
+
+        TableItem[] items = table.getSelection();
+
+        final Collection<String> mapNames = new ArrayList<String>();
+
+        for (TableItem item : items) {
+            String mapName = (String)item.getData();
+            mapNames.add(mapName);
+        }
+
+        IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
         try {
-            if (table.getSelectionCount() == 0) return;
-
-            boolean confirm = MessageDialog.openQuestion(
-                    editor.getSite().getShell(),
-                    "Creating Target Subtree",
-                    "Are you sure?"
-            );
-
-            if (!confirm) return;
-
-            TableItem[] items = table.getSelection();
-
-            final Collection<String> mapNames = new ArrayList<String>();
-
-            for (TableItem item : items) {
-                String mapName = (String)item.getData();
-                mapNames.add(mapName);
-            }
-
-            IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
-
             progressService.busyCursorWhile(new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor) throws InvocationTargetException {
                     try {
@@ -512,6 +512,13 @@ public class NISSynchronizationPage extends FormPage {
                 }
             });
 
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
+        }
+
+        try {
+
             Map<String,String> statuses = refreshTarget(mapNames);
 
             for (TableItem ti : items) {
@@ -528,28 +535,28 @@ public class NISSynchronizationPage extends FormPage {
     }
 
     public void clear() {
+        if (table.getSelectionCount() == 0) return;
+
+        boolean confirm = MessageDialog.openQuestion(
+                editor.getSite().getShell(),
+                "Clearing Target Subtree",
+                "Are you sure?"
+        );
+
+        if (!confirm) return;
+
+        TableItem[] items = table.getSelection();
+
+        final Collection<String> mapNames = new ArrayList<String>();
+
+        for (TableItem ti : items) {
+            String mapName = (String)ti.getData();
+            mapNames.add(mapName);
+        }
+
+        IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
         try {
-            if (table.getSelectionCount() == 0) return;
-
-            boolean confirm = MessageDialog.openQuestion(
-                    editor.getSite().getShell(),
-                    "Clearing Target Subtree",
-                    "Are you sure?"
-            );
-
-            if (!confirm) return;
-
-            TableItem[] items = table.getSelection();
-
-            final Collection<String> mapNames = new ArrayList<String>();
-
-            for (TableItem ti : items) {
-                String mapName = (String)ti.getData();
-                mapNames.add(mapName);
-            }
-
-            IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
-
             progressService.busyCursorWhile(new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor) throws InvocationTargetException {
                     try {
@@ -576,6 +583,12 @@ public class NISSynchronizationPage extends FormPage {
                 }
             });
 
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
+        }
+
+        try {
             Map<String,String> statuses = refreshTarget(mapNames);
 
             for (TableItem ti : items) {
@@ -592,28 +605,28 @@ public class NISSynchronizationPage extends FormPage {
     }
 
     public void remove() {
+        if (table.getSelectionCount() == 0) return;
+
+        boolean confirm = MessageDialog.openQuestion(
+                editor.getSite().getShell(),
+                "Removing Target Subtree",
+                "Are you sure?"
+        );
+
+        if (!confirm) return;
+
+        TableItem[] items = table.getSelection();
+
+        final Collection<String> mapNames = new ArrayList<String>();
+
+        for (TableItem item : items) {
+            String mapName = (String)item.getData();
+            mapNames.add(mapName);
+        }
+
+        IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
         try {
-            if (table.getSelectionCount() == 0) return;
-
-            boolean confirm = MessageDialog.openQuestion(
-                    editor.getSite().getShell(),
-                    "Removing Target Subtree",
-                    "Are you sure?"
-            );
-
-            if (!confirm) return;
-
-            TableItem[] items = table.getSelection();
-
-            final Collection<String> mapNames = new ArrayList<String>();
-
-            for (TableItem item : items) {
-                String mapName = (String)item.getData();
-                mapNames.add(mapName);
-            }
-
-            IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
-
             progressService.busyCursorWhile(new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor) throws InvocationTargetException {
                     try {
@@ -643,6 +656,12 @@ public class NISSynchronizationPage extends FormPage {
                 }
             });
 
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ErrorDialog.open(e);
+        }
+
+        try {
             Map<String,String> statuses = refreshTarget(mapNames);
 
             for (TableItem ti : items) {
@@ -659,29 +678,29 @@ public class NISSynchronizationPage extends FormPage {
     }
 
     public void synchronize() {
+        boolean confirm = MessageDialog.openQuestion(
+                editor.getSite().getShell(),
+                "Synchronize",
+                "Are you sure?"
+        );
+
+        if (!confirm) return;
+
+        TableItem[] items = table.getSelection();
+        if (items == null || items.length == 0) items = table.getItems();
+
+        final Collection<String> mapNames = new ArrayList<String>();
+        for (TableItem ti : items) {
+            String mapName = (String)ti.getData();
+            mapNames.add(mapName);
+        }
+
+        final Map<String,SynchronizationResult> results = new HashMap<String,SynchronizationResult>();
+        final SynchronizationResult totalResult = new SynchronizationResult();
+
+        IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+
         try {
-            boolean confirm = MessageDialog.openQuestion(
-                    editor.getSite().getShell(),
-                    "Synchronize",
-                    "Are you sure?"
-            );
-
-            if (!confirm) return;
-
-            TableItem[] items = table.getSelection();
-            if (items == null || items.length == 0) items = table.getItems();
-
-            final Collection<String> mapNames = new ArrayList<String>();
-            for (TableItem ti : items) {
-                String mapName = (String)ti.getData();
-                mapNames.add(mapName);
-            }
-
-            final Map<String,SynchronizationResult> results = new HashMap<String,SynchronizationResult>();
-            final SynchronizationResult totalResult = new SynchronizationResult();
-
-            IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
-
             progressService.busyCursorWhile(new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor) throws InvocationTargetException {
                     try {
@@ -714,39 +733,39 @@ public class NISSynchronizationPage extends FormPage {
                 }
             });
 
-            //Map<String,String> statuses = refreshTarget(mapNames);
-
-            for (TableItem ti : items) {
-                String mapName = (String)ti.getData();
-
-                //String status = statuses.get(mapName);
-                //ti.setText(2, status);
-
-                SynchronizationResult result = results.get(mapName);
-
-                long duration = result.getDuration()/1000;
-                long minutes = duration / 60;
-                long seconds = duration % 60;
-
-                Long sourceEntries = result.getSourceEntries();
-                Long targetEntries = result.getTargetEntries();
-
-                ti.setText(1, (sourceEntries == null ? "N/A" : ""+sourceEntries));
-                ti.setText(2, (targetEntries == null ? "N/A" : ""+targetEntries));
-                ti.setText(3, minutes+":"+seconds);
-                ti.setText(4, ""+result.getAddedEntries());
-                ti.setText(5, ""+result.getModifiedEntries());
-                ti.setText(6, ""+result.getDeletedEntries());
-                ti.setText(7, ""+result.getFailedEntries());
-            }
-
-            if (totalResult.getFailedEntries() > 0) {
-                ErrorDialog.open("ERROR", "Error(s) occured during synchronization. See Errors tab.");
-            }
-
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ErrorDialog.open(e);
+        }
+
+        //Map<String,String> statuses = refreshTarget(mapNames);
+
+        for (TableItem ti : items) {
+            String mapName = (String)ti.getData();
+
+            //String status = statuses.get(mapName);
+            //ti.setText(2, status);
+
+            SynchronizationResult result = results.get(mapName);
+
+            long duration = result.getDuration()/1000;
+            long minutes = duration / 60;
+            long seconds = duration % 60;
+
+            Long sourceEntries = result.getSourceEntries();
+            Long targetEntries = result.getTargetEntries();
+
+            ti.setText(1, (sourceEntries == null ? "N/A" : ""+sourceEntries));
+            ti.setText(2, (targetEntries == null ? "N/A" : ""+targetEntries));
+            ti.setText(3, minutes+":"+seconds);
+            ti.setText(4, ""+result.getAddedEntries());
+            ti.setText(5, ""+result.getModifiedEntries());
+            ti.setText(6, ""+result.getDeletedEntries());
+            ti.setText(7, ""+result.getFailedEntries());
+        }
+
+        if (totalResult.getFailedEntries() > 0) {
+            ErrorDialog.open("ERROR", "Error(s) occured during synchronization. See Errors tab.");
         }
     }
 
