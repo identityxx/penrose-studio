@@ -58,8 +58,8 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
     NewServiceAction newServiceAction;
 
     ServersAction serversAction;
-    ValidationAction validationAction;
-    ConsoleAction consoleAction;
+    //ValidationAction validationAction;
+    //ConsoleAction consoleAction;
 
     BrowserAction browserAction;
     RestartAction restartAction;
@@ -107,8 +107,8 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
             newServiceAction = new NewServiceAction();
 
             serversAction = new ServersAction();
-            validationAction = new ValidationAction();
-            consoleAction = new ConsoleAction();
+            //validationAction = new ValidationAction();
+            //consoleAction = new ConsoleAction();
 
             browserAction = new BrowserAction();
             restartAction = new RestartAction();
@@ -184,8 +184,8 @@ public class PenroseStudioActionBarAdvisor extends ActionBarAdvisor {
             menuBar.add(windowMenu);
 
             windowMenu.add(serversAction);
-            windowMenu.add(validationAction);
-            windowMenu.add(consoleAction);
+            //windowMenu.add(validationAction);
+            //windowMenu.add(consoleAction);
 
             helpMenu = new MenuManager("&Help", "help");
             menuBar.add(helpMenu);
