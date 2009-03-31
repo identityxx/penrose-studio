@@ -82,7 +82,7 @@
     <adapter-name>JDBC</adapter-name>
     <parameter name="driver" type="READ_ONLY">
       <display-name>Driver</display-name>
-      <default-value>com.microsoft.jdbc.sqlserver.SQLServerDriver</default-value>
+      <default-value>com.microsoft.sqlserver.jdbc.SQLServerDriver</default-value>
     </parameter>
     <parameter name="url" type="READ_ONLY">
       <display-name>URL</display-name>
