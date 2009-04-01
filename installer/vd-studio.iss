@@ -1,12 +1,12 @@
-; Copyright (c) 2000-2006, Identyx Corporation.
+; Copyright 2009 Red Hat, Inc.
 ; All rights reserved.
 
 [Setup]
 
 AppName=${product.title}
 AppVerName=${product.title} ${product.version}
-DefaultDirName={pf}\${product.vendor}\${product.title} ${product.version}
-DefaultGroupName=${product.vendor}\${product.title} ${product.version}
+DefaultDirName={pf}\${product.group}\${product.title} ${product.version}
+DefaultGroupName=${product.group}\${product.title} ${product.version}
 UninstallDisplayName=${product.title} ${product.version}
 UninstallDisplayIcon={app}\${images.icon}
 Compression=zip

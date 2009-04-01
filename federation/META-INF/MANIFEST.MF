@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Penrose Studio Federation
 Bundle-SymbolicName: org.safehaus.penrose.studio.federation; singleton:=true
 Bundle-Version: 2.0.0.b3
-Bundle-Vendor: Identyx Corporation
+Bundle-Vendor: Red Hat, Inc.
 Bundle-Activator: org.safehaus.penrose.studio.federation.FederationPlugin
 Bundle-Localization: plugin
 Eclipse-AutoStart: true

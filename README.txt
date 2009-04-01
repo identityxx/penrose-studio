@@ -1,7 +1,7 @@
 ${product.title}
 --------------
 Version ${product.version}
-Copyright (c) 2000-2006, Identyx Corporation.
+Copyright 2009 Red Hat, Inc.
 
 Overview
 --------
